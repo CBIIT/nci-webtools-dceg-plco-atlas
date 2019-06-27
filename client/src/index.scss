@@ -1,7 +1,40 @@
 $enable-shadows: true;
-$headings-font-weight: 700 !default;
-
+// $headings-font-weight: 700 !default;
 
 $blue: #005ea2;
 
-@import "~bootstrap/scss/bootstrap";
+@import '~bootstrap/scss/bootstrap';
+
+.bg-primary-lighter {
+  background-color: #d9e8f6;
+}
+
+.bg-primary-light {
+  background-color: #73b3e7;
+}
+
+.bg-primary {
+  background-color: #005ea2;
+}
+
+.bg-primary-vivid {
+  background-color: #0050d8;
+}
+
+.bg-primary-dark {
+  background-color: #1a4480;
+}
+
+.bg-primary-darker {
+  background-color: #162e51;
+}
+
+.nav-pills.nav-pills-inverse {
+  .nav-link {
+    color: white;
+  }
+
+  .nav-link.active {
+    background-color: #162e51;
+  }
+}
