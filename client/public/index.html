@@ -7,41 +7,37 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="theme-color" content="#000000" />
   <!-- <link rel="manifest" href="%PUBLIC_URL%/manifest.json" /> -->
-  <title>PLCO</title>
+  <title>PLCO Atlas</title>
 </head>
 
-<body>
-  <header>
+<body class="d-flex flex-column" style="min-height: 100vh">
+  <header class="bg-primary-darker">
+    <a href="#root" class="sr-only sr-only-focusable d-block text-white bg-primary-dark text-center">Skip to Main Content</a>
     <div class="container py-3">
-      <img src="assets/images/nci-logo.svg"
-        class="img-fluid"
-        style="max-width: 800px">
-    </div>
-    <div class="bg-primary text-white">
-      <div class="container py-1">
-        <h1 class="h4 m-0">PLCO</h1>
-      </div>
+      <img src="assets/images/nci-logo-inverse.svg" height="50" alt="National Cancer Institute Logo">
     </div>
   </header>
 
-  <main id="root">
+  <main id="root" style="flex: 1 1 auto;">
     <noscript>Please enable javascript to access this website.</noscript>
   </main>
 
-  <footer class="bg-dark text-light text-center">
-    <div>
-      <a href="https://www.cancer.gov/policies/accessibility">Accessibility</a>
-      <a href="mailto:PLCOWebAdmin@nih.gov">Support</a>
-      <a href="https://www.cancer.gov/policies/foia">FOIA</a>
-      <a href="https://www.cancer.gov/policies/comments">Comment Policy</a>
+  <footer class="bg-primary-darker text-light text-center py-3">
+    <div class="my-2">
+      <a class="text-light mx-2" href="https://www.cancer.gov/policies/accessibility">Accessibility</a>
+      <a class="text-light mx-2" href="mailto:PLCOWebAdmin@nih.gov">Support</a>
+      <a class="text-light mx-2" href="https://www.cancer.gov/policies/foia">FOIA</a>
+      <a class="text-light mx-2" href="https://www.cancer.gov/policies/comments">Comment Policy</a>
     </div>
-    <div>
-      <a href="https://www.hhs.gov">U.S. Department of Health and Human Services</a>
-      <a href="https://www.nih.gov">National Institutes of Health</a>
-      <a href="https://www.cancer.gov">National Cancer Institute</a>
-      <a href="https://www.usa.gov">USA.gov</a>
+    <div class="my-2">
+      <a class="text-light mx-2" href="https://www.hhs.gov">U.S. Department of Health and Human Services</a>
+      <a class="text-light mx-2" href="https://www.nih.gov">National Institutes of Health</a>
+      <a class="text-light mx-2" href="https://www.cancer.gov">National Cancer Institute</a>
+      <a class="text-light mx-2" href="https://www.usa.gov">USA.gov</a>
     </div>
-    NIH … Turning Discovery Into Health<sup>®</sup>
+    <div class="my-2">
+      NIH … Turning Discovery Into Health<sup>®</sup>
+    </div>
   </footer>
 
 </body>
