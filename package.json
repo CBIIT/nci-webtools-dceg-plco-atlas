@@ -7,6 +7,7 @@
     "doc": "docs"
   },
   "scripts": {
+    "start": "node server/server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -18,5 +19,9 @@
   "bugs": {
     "url": "https://github.com/CBIIT/nci-webtools-dceg-plco-gwas/issues"
   },
-  "homepage": "https://github.com/CBIIT/nci-webtools-dceg-plco-gwas#readme"
+  "homepage": "https://github.com/CBIIT/nci-webtools-dceg-plco-gwas#readme",
+  "dependencies": {
+    "express": "^4.17.1",
+    "sqlite3": "^4.0.9"
+  }
 }
