@@ -88,10 +88,7 @@ export function Search({ match }) {
 
                 <img
                   class="img-fluid"
-                  src={
-                    process.env.PUBLIC_URL +
-                    '/assets/images/samples/manhattan_plot.png'
-                  }
+                  src={'assets/images/samples/manhattan_plot.png'}
                   alt="Manhattan Plot"
                 />
 
@@ -99,10 +96,7 @@ export function Search({ match }) {
 
                 <img
                   class="img-fluid"
-                  src={
-                    process.env.PUBLIC_URL +
-                    '/assets/images/samples/mirrored_manhattan_plot.png'
-                  }
+                  src={'assets/images/samples/mirrored_manhattan_plot.png'}
                   alt="Mirrored Manhattan Plot"
                 />
 
@@ -112,20 +106,14 @@ export function Search({ match }) {
                   <div class="col-md-6">
                     <img
                       class="img-fluid"
-                      src={
-                        process.env.PUBLIC_URL +
-                        '/assets/images/samples/qq_plot.svg'
-                      }
+                      src={'assets/images/samples/qq_plot.svg'}
                       alt="QQ Plot"
                     />
                   </div>
                   <div class="col-md-6">
                     <img
                       class="img-fluid"
-                      src={
-                        process.env.PUBLIC_URL +
-                        '/assets/images/samples/heatmap.jpg'
-                      }
+                      src={'assets/images/samples/heatmap.jpg'}
                       alt="Heatmap"
                     />
                   </div>
@@ -144,15 +132,10 @@ export function Search({ match }) {
                 <p>Sample Text</p>
 
                 <img
-                      class="img-fluid"
-                      src={
-                        process.env.PUBLIC_URL +
-                        '/assets/images/samples/phenotype_figure.png'
-                      }
-                      alt="Phenotype Figure 1"
-                    />
-
-
+                  class="img-fluid"
+                  src={'assets/images/samples/phenotype_figure.png'}
+                  alt="Phenotype Figure 1"
+                />
               </Tab.Pane>
             </Tab.Content>
           </Card.Body>
