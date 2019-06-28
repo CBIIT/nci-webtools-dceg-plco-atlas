@@ -3,7 +3,7 @@ const query = require('./query');
 const config = require('./config.json');
 const app = express();
 
-app.use(express.static('docs'));
+app.use(express.static('client/build'));
 
 app.get('/query', async (req, res) => {
     const { database, bpMin, bpMax, pMin, pMax } = req.query;
