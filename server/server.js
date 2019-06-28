@@ -1,9 +1,11 @@
 const express = require('express');
+const cors = require('cors');
 const query = require('./query');
 const config = require('./config.json');
 const app = express();
 
 app.use(express.static('client/build'));
+app.use(cors());
 
 app.get('/query', async (req, res) => {
     const { database, bpMin, bpMax, pMin, pMax } = req.query;
