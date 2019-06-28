@@ -1,3 +1,6 @@
 /node_modules/
 *.meta
+*.db
+*.db-journal
 *.vs
+config.json
