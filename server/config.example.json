@@ -1,0 +1,5 @@
+{
+    "databases": [
+        {"name": "example", "path": "data/meta.db"}
+    ]
+}
