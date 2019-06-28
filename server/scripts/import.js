@@ -10,13 +10,12 @@ if (args.length == 0) {
 }
 
 // parse arguments and set defaults
-let [ metaFilePath, databaseFilePath ] = args;
+let [ inputFilePath, databaseFilePath ] = args;
 databaseFilePath = databaseFilePath || 'meta.db';
 
-
-// meta file should exist
-if (!fs.existsSync(metaFilePath)) {
-    console.error(`ERROR: ${metaFilePath} does not exist.`)
+// input file should exist
+if (!fs.existsSync(inputFilePath)) {
+    console.error(`ERROR: ${inputFilePath} does not exist.`)
     process.exit(1);
 }
 
@@ -49,15 +48,20 @@ db.serialize(() => {
         "I" REAL
     )`);
 
+    // set up transaction and prepare insertion statement
     db.exec('begin transaction');
     const placeholders = Array(12).fill('?').join();
     const stmt = db.prepare(`INSERT INTO meta VALUES (${placeholders})`);
+
+    // stream the input file line by line
     const reader = readline.createInterface({
-        input: fs.createReadStream(metaFilePath)
+        input: fs.createReadStream(inputFilePath)
     });
     let count = 0;
 
+    // insert each line into the database
     reader.on('line', line => {
+        // remove any spaces, and ensure 'NA' values are parsed as null
         const values = line.trim().split(/\s+/).map(e => e === 'NA' ? null : e);
         stmt.run(values);
 
@@ -66,6 +70,7 @@ db.serialize(() => {
             console.log(`PROGRESS: Inserted ${count} rows (${(new Date() - startTime) / 1000} s)`);
     });
 
+    // after reading every line in the file, commit the transaction and create indexes
     reader.on('close', () => {
         // stmt.finalize();
         db.exec('commit');
