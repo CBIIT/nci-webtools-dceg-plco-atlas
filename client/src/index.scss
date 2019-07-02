@@ -1,6 +1,6 @@
-$enable-shadows: true;
-// $headings-font-weight: 700 !default;
+/** We must specify variables before importing bootstrap in order to customize the generated css */
 
+$enable-shadows: true;
 $blue: #005ea2;
 
 @import '~bootstrap/scss/bootstrap';
