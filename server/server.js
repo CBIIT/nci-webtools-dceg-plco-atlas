@@ -1,7 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const { databases, port } = require('./config.json');
-const { query, getSummary, getMetadata } = require('./query');
+const { getRanges, getSummary, getVariants } = require('./query');
 const app = express();
 
 // serve static files from the client/build folder
@@ -14,9 +14,9 @@ app.use(cors());
 app.get('/ping', (req, res) => res.json(true));
 
 // retrieves metadata for a particular database (BP/P ranges, # variants, etc)
-app.get('/metadata', async ({query}, res) => {
+app.get('/ranges', async ({query}, res) => {
     const db = databases.find(e => e.name === query.database);
-    res.json(await getMetadata(db.filepath));
+    res.json(await getRanges(db.filepath));
 });
 
 // retrieves all variant groups for all chroms. at the lowest granularity (in MBases)
@@ -26,9 +26,9 @@ app.get('/summary', async ({query}, res) => {
 });
 
 // retrieves all variants at the specified granularity (using 1000 kb, 100 kb, or individual)
-app.get('/query', async ({query}, res) => {
+app.get('/variants', async ({query}, res) => {
     const db = databases.find(e => e.name === query.database);
-    res.json(await query(db.filepath, query));
+    res.json(await getVariants(db.filepath, query));
 });
 
 app.listen(port, _ => console.log(`Application is running on port: ${port}`));
