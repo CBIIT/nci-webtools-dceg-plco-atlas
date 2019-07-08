@@ -1,6 +1,8 @@
+const assert = require('assert');
 const fs = require('fs');
 const readline = require('readline');
 const sqlite = require('sqlite3').verbose();
+const headers = ['CHR','BP','SNP','A1','A2','N','P','P(R)','OR','OR(R)','Q','I'];
 
 // retrieve arguments
 const args = process.argv.slice(2);
@@ -30,6 +32,7 @@ const db = new sqlite.Database(databaseFilePath);
 
 // used to calculate duration
 const startTime = new Date();
+const duration = _ => ((new Date() - startTime) / 1000).toPrecision(4);
 
 // ensure the following db statements are executed in the order they are created
 db.serialize(() => {
@@ -46,7 +49,7 @@ db.serialize(() => {
         "N" INTEGER,
         "P" REAL,
         "NLOG_P" REAL, -- negative log10(P)
-        "NLOG_P2" REAL,  -- negative log10(P) to a precision of 10^-2
+        "NLOG_P2" REAL, -- negative log10(P) to a precision of 10^-2
         "P_R" REAL,
         "OR" REAL,
         "OR_R" REAL,
@@ -88,13 +91,21 @@ db.serialize(() => {
     // insert each line into the database
     let count = 0;
     reader.on('line', line => {
-        // skip first line
-        if (count++ === 0) return;
-
         // trim, split by spaces, and parse 'NA' as null
         const values = line.trim().split(/\s+/).map(e => e === 'NA' ? null : e);
+
+        // validate headers
+        if (count++ === 0) {
+            try {
+                return assert.deepEqual(values, headers);
+            } catch(e) {
+                console.error(`ERROR: Headers do not match expected values:`, headers)
+                process.exit(3);
+            }
+        }
+
         const [$CHR, $BP, $SNP, $A1, $A2, $N, $P, $P_R, $OR, $OR_R, $Q, $I] = values;
-        const params = {$CHR, $BP, $SNP, $A1, $A2, $N, $P, $P_R, $OR, $OR_R, $Q, $I}
+        const params = {$CHR, $BP, $SNP, $A1, $A2, $N, $P, $P_R, $OR, $OR_R, $Q, $I};
 
         // group base pairs
         params.$BP_1000KB = group($BP, 10**6);
@@ -108,14 +119,14 @@ db.serialize(() => {
 
         // show progress message every 10000 rows
         if (count % 10000 === 0)
-            console.log(`PROGRESS: Inserted ${count} rows (${(new Date() - startTime) / 1000} s)`);
+            console.log(`[${duration()} s] Inserted ${count} rows`);
     });
 
     // after reading every line in the file, commit the transaction and create indexes
     reader.on('close', () => {
-        // stmt.finalize();
+        // stmt.finalize(); // no need to finalize statement
         db.exec('commit');
-        console.log(`ALMOST DONE: Inserted ${count} rows in ${(new Date() - startTime) / 1000} s. DB is being indexed...`)
+        console.log(`[${duration()} s] Inserted ${count} rows. DB is being indexed...`)
         db.exec(`
             create index idx_bp on ${tableName}(BP);
             create index idx_bp_1000kb on ${tableName}(BP_1000KB);
@@ -123,6 +134,6 @@ db.serialize(() => {
             create index idx_nlog_p on ${tableName}(NLOG_P);
             create index idx_nlog_p2 on ${tableName}(NLOG_P2);
         `);
-        db.close(_ => console.log(`DONE: Created database in ${(new Date() - startTime) / 1000} s`));
+        db.close(_ => console.log(`[${duration()} s] Created database`));
     });
 });
