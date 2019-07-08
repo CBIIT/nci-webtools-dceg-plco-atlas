@@ -69,7 +69,7 @@ db.serialize(() => {
         (
             "CHR"       INTEGER,
             "BP_1000KB" INTEGER, -- BP floored to the nearest multiple of 10^6 (1000 kilobases)
-            "NLOG_P2"   REAL, -- negative log10(P) floored to the nearest multiple of 10^-2
+            "NLOG_P2"   REAL -- negative log10(P) floored to the nearest multiple of 10^-2
         );
     `);
 
@@ -114,9 +114,10 @@ db.serialize(() => {
     });
 
     // floors a value to the lowest multiple of the size given (usually a power of 10)
-    const group = (value, size) => +(
-        size * Math.floor(value / size)
-    ).toPrecision(16);
+    const group = (value, size) =>
+        value === null ? null : +(
+            size * Math.floor(value / size)
+        ).toPrecision(12);
 
     // insert each line into the database
     let count = 0;
@@ -158,7 +159,7 @@ db.serialize(() => {
         db.exec('commit');
 
         // create indexes for columns we will be querying off
-        console.log(`[${duration()} s] Inserted ${count} rows. DB is being indexed...`);
+        console.log(`[${duration()} s] Inserted ${count} rows. Indexing...`);
         db.exec(`
             CREATE INDEX idx_${variantTable}_chr       ON ${variantTable}(CHR);
             CREATE INDEX idx_${variantTable}_bp        ON ${variantTable}(BP);
@@ -195,6 +196,7 @@ db.serialize(() => {
             ORDER BY CHR, BP;
         `);
 
+        console.log(`[${duration()} s] Finalizing database...`);
         db.close(_ => console.log(`[${duration()} s] Created database`));
     });
 });
