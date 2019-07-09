@@ -1,18 +1,11 @@
-import React, { useState } from 'react';
-import {
-  Form,
-  Card,
-  Nav,
-  Tab,
-  Button,
-  InputGroup,
-  FormControl
-} from 'react-bootstrap';
+import React, { useState, useRef } from 'react';
+import { Button, Card, Nav, Tab } from 'react-bootstrap';
+import { query } from '../../services/query';
 
 export function Search({ match }) {
   const searchType = match.params.searchType;
   const [tab, setTab] = useState(searchType);
-
+  const [loading, setLoading] = useState(false);
   return (
     <div className="container">
       <h1 className="font-weight-light">Search</h1>
@@ -23,47 +16,7 @@ export function Search({ match }) {
           Enter Parameters
         </Card.Header>
         <Card.Body>
-          <Form>
-            <Form.Group controlId="trait-search" className="mb-4">
-              <Form.Label>
-                <b>Trait Search</b>
-              </Form.Label>
-              <InputGroup>
-                <FormControl placeholder="Enter Trait" />
-                <InputGroup.Append>
-                  <Button variant="primary">Search</Button>
-                </InputGroup.Append>
-              </InputGroup>
-            </Form.Group>
-
-            <Form.Group controlId="trait-list">
-              <Form.Label>
-                <b>Trait List</b>
-              </Form.Label>
-              <InputGroup>
-                <InputGroup.Prepend>
-                  <Form.Control as="select">
-                    <option>Categorical</option>
-                    <option>Alphabetic</option>
-                  </Form.Control>
-                </InputGroup.Prepend>
-                <Form.Control as="select">
-                  <option hidden>Select a trait</option>
-                  <optgroup label="Group A">
-                    <option>Sample Trait A1</option>
-                    <option>Sample Trait A2</option>
-                  </optgroup>
-                  <optgroup label="Group B">
-                    <option>Sample Trait B1</option>
-                    <option>Sample Trait B2</option>
-                  </optgroup>
-                </Form.Control>
-                <InputGroup.Append>
-                  <Button variant="primary">Go</Button>
-                </InputGroup.Append>
-              </InputGroup>
-            </Form.Group>
-          </Form>
+          <SearchForm />
         </Card.Body>
       </Card>
 
@@ -85,6 +38,8 @@ export function Search({ match }) {
                 <h2 class="font-weight-light">GWAS Results</h2>
 
                 <hr />
+
+                <ManhattanPlot data={records} />
 
                 <img
                   class="img-fluid"
