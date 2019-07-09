@@ -33,18 +33,15 @@ export function Home() {
           Screening Trial
         </p>
         <div className="text-center">
-          {links.map(({ exact, route, title }, index) =>
-            React.createElement(
-              Link,
-              {
-                className: 'btn btn-primary m-2',
-                exact: exact,
-                key: index,
-                to: route
-              },
-              title
-            )
-          )}
+          {links.map(({ exact, route, title }, index) => (
+            <Link
+              className="btn btn-primary m-2"
+              exact={exact}
+              key={index}
+              to={route}>
+              {title}
+            </Link>
+          ))}
         </div>
       </div>
     </div>

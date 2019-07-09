@@ -1,23 +1,17 @@
-// set api root
-let root = (process.env.NODE_ENV === 'development'
+// set api root, removing trailing slashes
+const root = (process.env.NODE_ENV === 'development'
   ? 'http://localhost:9000'
   : window.location.pathname
-).replace(/\/$/, '');
+).replace(/\/+$/, '');
 
 /**
- * Converts an object with key-value pairs into a query string
- * Any values that are arrays will be converted to strings
+ * Serializes an object as a query string
  * @param {object} obj
  */
-export const asQueryString = obj => {
+function asQueryString(obj) {
   const query = [];
-  for (let key in obj) {
-    let value = obj[key];
-    if (Array.isArray(value))
-      value = value.join();
-    const pair = [key, value].map(encodeURIComponent);
-    query.push(pair.join('='));
-  }
+  for (let key in obj)
+    query.push([key, obj[key]].map(encodeURIComponent).join('='));
   return '?' + query.join('&');
 }
 
