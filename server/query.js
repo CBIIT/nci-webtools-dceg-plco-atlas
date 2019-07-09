@@ -16,7 +16,8 @@ function getRanges(filepath) {
 function getSummary(filepath) {
     return new Promise((resolve, reject) => {
         const db = new sqlite.Database(filepath, sqlite.OPEN_READONLY);
-        let sql = `SELECT * FROM ${summaryTable} WHERE NLOG_P2 >= 3`;
+        let sql = `SELECT * FROM ${summaryTable} WHERE NLOG_P2 >= 3
+            ORDER BY CHR ASC, BP_ABS_1000KB ASC, NLOG_P2 DESC`;
         db.all(sql, [], (err, rows) => err
             ? reject(err)
             : resolve(rows));
