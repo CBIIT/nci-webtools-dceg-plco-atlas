@@ -2,7 +2,6 @@ const assert = require('assert');
 const fs = require('fs');
 const readline = require('readline');
 const sqlite = require('sqlite3').verbose();
-const headers = ['CHR','BP','SNP','A1','A2','N','P','P(R)','OR','OR(R)','Q','I'];
 
 // retrieve arguments
 const argv = process.argv.slice(2);
@@ -29,6 +28,7 @@ if (fs.existsSync(databaseFilePath)) {
 
 // initialize database
 const db = new sqlite.Database(databaseFilePath);
+// db.run(`PRAGMA synchronous = OFF`);
 
 // used to calculate duration
 const startTime = new Date();
@@ -39,27 +39,30 @@ db.serialize(() => {
     const variantTable = 'variant';
     const summaryTable = 'variant_summary';
     const rangeTable = 'variant_range';
+    const headers = ['CHR','BP','SNP','A1','A2','N','P','P(R)','OR','OR(R)','Q','I'];
 
     // variant table stores all variant information
     db.run(`
         CREATE TABLE ${variantTable}
         (
-            "CHR"       INTEGER,
-            "BP"        INTEGER,
-            "BP_1000KB" INTEGER, -- BP floored to the nearest multiple of 10^6 (1000 kilobases)
-            "BP_100KB"  INTEGER, -- BP floored to the nearest multiple of 10^5 (100 kilobases)
-            "SNP"       TEXT,
-            "A1"        TEXT,
-            "A2"        TEXT,
-            "N"         INTEGER,
-            "P"         REAL,
-            "NLOG_P"    REAL, -- negative log10(P)
-            "NLOG_P2"   REAL, -- negative log10(P) floored to the nearest multiple of 10^-2
-            "P_R"       REAL,
-            "OR"        REAL,
-            "OR_R"      REAL,
-            "Q"         REAL,
-            "I"         REAL
+            "CHR"           INTEGER,
+            "BP"            INTEGER,
+            "BP_100KB"      INTEGER, -- BP floored to the nearest multiple of 10^5 (100 kilobases)
+            "BP_1000KB"     INTEGER, -- BP floored to the nearest multiple of 10^6 (1000 kilobases)
+            "BP_ABS"        INTEGER, -- The absolute position from the beginning of the genome (used for plotting)
+            "BP_ABS_1000KB" INTEGER, -- Absolute BP floored to the nearest multiple of 10^6 (1000 kilobases)
+            "SNP"           TEXT,
+            "A1"            TEXT,
+            "A2"            TEXT,
+            "N"             INTEGER,
+            "P"             REAL,
+            "NLOG_P"        REAL, -- negative log10(P)
+            "NLOG_P2"       REAL, -- negative log10(P) floored to the nearest multiple of 10^-2
+            "P_R"           REAL,
+            "OR"            REAL,
+            "OR_R"          REAL,
+            "Q"             REAL,
+            "I"             REAL
         );
     `);
 
@@ -69,6 +72,7 @@ db.serialize(() => {
         (
             "CHR"       INTEGER,
             "BP_1000KB" INTEGER, -- BP floored to the nearest multiple of 10^6 (1000 kilobases)
+            "BP_ABS_1000KB" INTEGER, -- BP floored to the nearest multiple of 10^6 (1000 kilobases)
             "NLOG_P2"   REAL -- negative log10(P) floored to the nearest multiple of 10^-2
         );
     `);
@@ -91,8 +95,10 @@ db.serialize(() => {
         INSERT INTO ${variantTable} VALUES (
             $CHR,
             $BP,
-            $BP_1000KB,
             $BP_100KB,
+            $BP_1000KB,
+            $BP_ABS,
+            $BP_ABS_1000KB,
             $SNP,
             $A1,
             $A2,
@@ -119,11 +125,25 @@ db.serialize(() => {
             size * Math.floor(value / size)
         ).toPrecision(12);
 
-    // insert each line into the database
+    // parses each line in the file
+    const parseLine = line => line.trim().split(/\s+/).map(val => {
+        // nulls are represented as 'NA' values
+        if (val === 'NA') return null;
+
+        // if the value is a number, parse it as a number
+        else if (!isNaN(val)) return parseFloat(val);
+
+        // otherwise, return it as-is
+        else return val;
+    });
+
     let count = 0;
+    let bpOffset = 0;
+    let bpPrev = 0;
+
     reader.on('line', line => {
         // trim, split by spaces, and parse 'NA' as null
-        const values = line.trim().split(/\s+/).map(e => e === 'NA' ? null : e);
+        const values = parseLine(line);
 
         // validate headers
         if (count++ === 0) {
@@ -146,6 +166,16 @@ db.serialize(() => {
         params.$NLOG_P = $P ? -Math.log10($P) : null;
         params.$NLOG_P2 = group(params.$NLOG_P, 10**-2);
 
+        // determine absolute position of variant relative to the start of the genome
+        if (bpPrev > $BP)
+            bpOffset += bpPrev;
+
+        bpPrev = $BP;
+
+        // store the absolute BP and group by megabases
+        params.$BP_ABS = bpOffset + $BP;
+        params.$BP_ABS_1000KB = group(params.$BP_ABS, 10**6);
+
         stmt.run(params);
 
         // show progress message every 10000 rows
@@ -161,25 +191,28 @@ db.serialize(() => {
         // create indexes for columns we will be querying off
         console.log(`[${duration()} s] Inserted ${count} rows. Indexing...`);
         db.exec(`
-            CREATE INDEX idx_${variantTable}_chr       ON ${variantTable}(CHR);
-            CREATE INDEX idx_${variantTable}_bp        ON ${variantTable}(BP);
-            CREATE INDEX idx_${variantTable}_bp_1000kb ON ${variantTable}(BP_1000KB);
-            CREATE INDEX idx_${variantTable}_bp_100kb  ON ${variantTable}(BP_100KB);
-            CREATE INDEX idx_${variantTable}_nlog_p    ON ${variantTable}(NLOG_P);
-            CREATE INDEX idx_${variantTable}_nlog_p2   ON ${variantTable}(NLOG_P2);
+            CREATE INDEX idx_${variantTable}_chr           ON ${variantTable}(CHR);
+            CREATE INDEX idx_${variantTable}_bp            ON ${variantTable}(BP);
+            CREATE INDEX idx_${variantTable}_bp_100kb      ON ${variantTable}(BP_100KB);
+            CREATE INDEX idx_${variantTable}_bp_1000kb     ON ${variantTable}(BP_1000KB);
+            CREATE INDEX idx_${variantTable}_bp_abs        ON ${variantTable}(BP_ABS);
+            CREATE INDEX idx_${variantTable}_bp_abs_1000kb ON ${variantTable}(BP_ABS_1000KB);
+            CREATE INDEX idx_${variantTable}_nlog_p        ON ${variantTable}(NLOG_P);
+            CREATE INDEX idx_${variantTable}_nlog_p2       ON ${variantTable}(NLOG_P2);
         `);
 
         // store summary table for variants
         console.log(`[${duration()} s] Storing summary...`);
         db.exec(`
             INSERT INTO ${summaryTable} SELECT DISTINCT
-                CHR, BP_1000KB, NLOG_P2
+                CHR, BP_1000KB, BP_ABS_1000KB, NLOG_P2
             FROM ${variantTable}
-            ORDER BY CHR, BP_1000KB, NLOG_P2;
+            ORDER BY CHR, BP_ABS_1000KB, NLOG_P2;
 
-            CREATE INDEX idx_${summaryTable}_chr       ON ${summaryTable}(CHR);
-            CREATE INDEX idx_${summaryTable}_bp_1000kb ON ${summaryTable}(BP_1000KB);
-            CREATE INDEX idx_${summaryTable}_nlog_p2   ON ${summaryTable}(NLOG_P2);
+            CREATE INDEX idx_${summaryTable}_chr           ON ${summaryTable}(CHR);
+            CREATE INDEX idx_${summaryTable}_bp_1000kb     ON ${summaryTable}(BP_1000KB);
+            CREATE INDEX idx_${summaryTable}_bp_abs_1000kb ON ${summaryTable}(BP_ABS_1000KB);
+            CREATE INDEX idx_${summaryTable}_nlog_p2       ON ${summaryTable}(NLOG_P2);
         `);
 
         // store min/max position and nlog_p values for each chromosome
