@@ -16,7 +16,7 @@
     "build": "npm run format && react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "format": "prettier --single-quote --write \"src/**/*.{js,jsx,ts,tsx,json,css,scss,md}\""
+    "format": "prettier --single-quote --jsx-bracket-same-line --write \"src/**/*.{js,json,css,scss}\""
   },
   "homepage": ".",
   "eslintConfig": {
