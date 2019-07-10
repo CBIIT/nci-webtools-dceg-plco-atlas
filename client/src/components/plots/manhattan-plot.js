@@ -31,69 +31,40 @@ export function ManhattanPlot(props) {
   );
 
   function scatterPlot(el, data, xAxisConfig, yAxisConfig) {
-    const outerWidth = 960;
-    const outerHeight = 500;
-
-
-  }
-
-  async function loadPlot() {
-    setLoading(true);
-    const el = plotContainer.current;
-    const results = await query('summary', params);
-
-    console.log(results);
-
-
-    // if (!aggregate) results = await query('variants', params);
-    // else {
-    //   results = await query('summary', params);
-    //   results = results.filter(v => v.CHR == params.chr);
-    // }
-
-    /*
-    let data = results;
-    setLoading(false);
-    const el = plotContainer.current;
-
-    var margin = { top: 20, right: 20, bottom: 30, left: 40 },
-      width = 960 - margin.left - margin.right,
-      height = 500 - margin.top - margin.bottom;
-
-    var x = d3.scaleLinear().range([0, width]);
-
-    var y = d3.scaleLinear().range([height, 0]);
-
-    var color = d3.scaleOrdinal(d3.schemeCategory10);
-
-    var xAxis = d3.axisBottom(x);
-
-    var yAxis = d3.axisLeft(y);
     el.innerHTML = '';
 
-    var svg = d3
+    const margin = { top: 20, right: 20, bottom: 30, left: 40 };
+    const outerWidth = 960;
+    const outerHeight = 500;
+    const width = outerWidth - margin.left - margin.right;
+    const height = outerHeight - margin.top - margin.bottom;
+
+    let x = d3.scaleLinear().range([0, width]);
+    let y = d3.scaleLinear().range([height, 0]);
+    x.domain(d3.extent(data, d => d[xAxisConfig.key])).nice();
+    y.domain(d3.extent(data, d => d[yAxisConfig.key])).nice();
+
+    let color = d3.scaleOrdinal(d3.schemeCategory10);
+
+    let xAxis = d3.axisBottom(x);
+//    if (xAxisConfig.configureFn)
+//      xAxis = xAxisConfig.configureFn(xAxis);
+
+    let yAxis = d3.axisLeft(y);
+
+
+    let svg = d3
       .select(el)
       .append('svg')
       .attr('height', '100%')
-      .attr('viewBox', `0 0 960 500`)
+      .attr('viewBox', `0 0 ${outerWidth} ${outerHeight}`)
       .append('g')
-      .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
-
-    x.domain(
-      d3.extent(data, function(d) {
-        return !aggregate ? d.BP : d.BP_GROUP;
-      })
-    ).nice();
-    y.domain(
-      d3.extent(data, function(d) {
-        return !aggregate ? d.NLOG_P : d.NLOG_P_GROUP;
-      })
-    ).nice();
+      .attr('transform', `translate(${margin.left}, ${margin.top})`);
 
     svg
       .append('g')
       .attr('class', 'x axis')
-      .attr('transform', 'translate(0,' + height + ')')
+      .attr('transform', `translate(0, ${height})`)
       .call(xAxis)
       .append('text')
       .attr('class', 'label')
@@ -101,7 +72,8 @@ export function ManhattanPlot(props) {
       .attr('y', -6)
       .style('text-anchor', 'end')
       .style('fill', 'black')
-      .text('BP');
+      .text(xAxisConfig.title);
+
 
     svg
       .append('g')
@@ -114,7 +86,7 @@ export function ManhattanPlot(props) {
       .attr('dy', '.71em')
       .style('text-anchor', 'end')
       .style('fill', 'black')
-      .text('-log10(P)');
+      .text(yAxisConfig.title);
 
     svg
       .selectAll('.dot')
@@ -124,16 +96,36 @@ export function ManhattanPlot(props) {
       .attr('class', 'dot')
       .attr('r', 2)
       .attr('opacity', 0.8)
-      .attr('cx', function(d) {
-        return x(d.BP_GROUP);
-      })
-      .attr('cy', function(d) {
-        return y(d.NLOG_P_GROUP);
-      })
+      .attr('cx', d => x(d[xAxisConfig.key]))
+      .attr('cy', d => y(d[yAxisConfig.key]))
       .style('fill', 'steelblue');
+  }
 
-    console.log(el, d3);
-    */
+  async function loadPlot() {
+    setLoading(true);
+
+    const el = plotContainer.current;
+    el.innerHTML = '';
+    const data = await query('summary', params);
+    const ranges = await query('ranges', params);
+    console.log(data, ranges);
+
+    scatterPlot(
+      el,
+      data,
+      {
+        key: 'BP_ABS_1000KB',
+        title: 'Chr',
+        configureFn: axis => axis
+          .ticks(ranges.length)
+          .tickValues(d3.set(ranges.map(d => d.MAX_BP_ABS)).values())
+          .tickFormat(d => d.CHR)
+    //    .tickSize(-(height), 0, 0);
+      },
+      {key: 'NLOG_P2', title: '-log10(p)'}
+    );
+
+    setLoading(false);
   };
 
 
