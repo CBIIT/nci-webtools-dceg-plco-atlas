@@ -84,6 +84,7 @@ db.serialize(() => {
             "CHR"        INTEGER,
             "MIN_BP"     INTEGER,
             "MAX_BP"     INTEGER,
+            "MAX_BP_ABS" INTEGER,
             "MIN_NLOG_P" REAL,
             "MAX_NLOG_P" REAL
         );
@@ -222,6 +223,7 @@ db.serialize(() => {
                 CHR,
                 MIN(BP) AS MIN_BP,
                 MAX(BP) AS MAX_BP,
+                MAX(MAX_BP_ABS) AS MAX_BP_ABS,
                 MIN(NLOG_P) AS MIN_NLOG_P,
                 MAX(NLOG_P) AS MAX_NLOG_P
             FROM ${variantTable}
