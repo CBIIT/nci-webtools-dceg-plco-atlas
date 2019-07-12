@@ -122,15 +122,14 @@ export function ManhattanPlot(props) {
     let color = d3.scaleOrdinal(d3.schemeCategory10);
 
     let xAxis = d3.axisBottom(x);
-    if (config.xAxis.callback)
-      xAxis = config.xAxis.callback(xAxis);
+    if (config.xAxis.callback) xAxis = config.xAxis.callback(xAxis);
 
     let yAxis = d3.axisLeft(y);
 
     let svg = d3
       .select(el)
       .append('svg')
-      .attr('height', '100%')
+      .attr('width', '100%')
       .attr('viewBox', `0 0 ${outerWidth} ${outerHeight}`)
       .append('g')
       .attr('transform', `translate(${margin.left}, ${margin.top})`);
@@ -171,7 +170,9 @@ export function ManhattanPlot(props) {
       .attr('opacity', 0.8)
       .attr('cx', d => x(d[config.xAxis.key]))
       .attr('cy', d => y(d[config.yAxis.key]))
-      .style('fill', d => color(d[config.colorKey]));
+      .attr('title', d => JSON.stringify(d))
+      .style('opacity', 0.5)
+      .style('fill', (d, i) => d[config.colorKey] % 2 == 0 ? '#005ea2' : '#162e51')// color(d[config.colorKey]));
   }
 
   async function loadRangesPlot() {
@@ -185,18 +186,14 @@ export function ManhattanPlot(props) {
     el.innerHTML = '';
     const data = await query('variants', params);
 
-    scatterPlot(
-      el,
-      data,
-      {
-        xAxis: { key: 'BP', title: 'bp' },
-        yAxis: { key: 'NLOG_P', title: '-log10(p)' },
-        colorKey: 'CHR',
-        onDragSelection: (x, y) => {
-          console.log(x, y);
-        }
+    scatterPlot(el, data, {
+      xAxis: { key: 'BP', title: 'bp' },
+      yAxis: { key: 'NLOG_P', title: '-log10(p)' },
+      colorKey: 'CHR',
+      onDragSelection: (x, y) => {
+        console.log(x, y);
       }
-    );
+    });
 
     setLoading(false);
     setTimestamp(getTimestamp());
@@ -215,23 +212,20 @@ export function ManhattanPlot(props) {
     const ranges = await query('ranges', params);
     console.log(data, ranges);
 
-    scatterPlot(
-      el,
-      data,
-      {
-        xAxis: {
-          key: 'BP_ABS_1000KB',
-          title: 'chr',
-          callback: axis =>
-            axis
-              .ticks(ranges.length)
-              .tickValues(d3.set(ranges.map(e => e.MAX_BP_ABS)).values())
-              .tickFormat((d, i) => ranges[i].CHR + 1)
-        },
-        yAxis: { key: 'NLOG_P2', title: '-log10(p)' },
-        colorKey: 'CHR'
-      }
-    );
+    scatterPlot(el, data, {
+      xAxis: {
+        key: 'BP_ABS_1000KB',
+        title: 'chr',
+        callback: axis =>
+          axis
+            .ticks(ranges.length)
+            .tickValues(d3.set(ranges.map(e => e.MAX_BP_ABS)).values())
+            .tickFormat((d, i) => ranges[i].CHR + 1),
+
+      },
+      yAxis: { key: 'NLOG_P2', title: '-log10(p)' },
+      colorKey: 'CHR'
+    });
 
     setLoading(false);
     setTimestamp(getTimestamp());
