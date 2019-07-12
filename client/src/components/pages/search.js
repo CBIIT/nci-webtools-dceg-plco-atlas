@@ -6,7 +6,7 @@ import { SearchForm } from '../search-form';
 export function Search({ match }) {
   return (
     <div className="container">
-      <h1 className="font-weight-light">Search</h1>
+      {/* <h1 className="font-weight-light">Search</h1>
       <hr />
 
       <Card className="shadow-lg mb-4">
@@ -16,7 +16,7 @@ export function Search({ match }) {
         <Card.Body>
           <SearchForm />
         </Card.Body>
-      </Card>
+      </Card> */}
 
       <Card className="shadow-lg mb-4">
         <Tab.Container defaultActiveKey={match.params.searchType}>
@@ -25,50 +25,21 @@ export function Search({ match }) {
               <Nav.Item>
                 <Nav.Link eventKey="gwas">GWAS</Nav.Link>
               </Nav.Item>
-              <Nav.Item>
-                <Nav.Link eventKey="phenotypes">Phenotypes</Nav.Link>
-              </Nav.Item>
+              {/* <Nav.Item>
+                <Nav.Link eventKey="phenotype">Phenotype</Nav.Link>
+              </Nav.Item> */}
             </Nav>
           </Card.Header>
           <Card.Body>
             <Tab.Content>
               <Tab.Pane eventKey="gwas">
-                <h2 className="font-weight-light">Results</h2>
-
+                <h2 className="font-weight-light">Plots</h2>
                 <hr />
-
                 <ManhattanPlot />
+             </Tab.Pane>
 
-                <hr />
-
-                <img
-                  className="img-fluid"
-                  src={'assets/images/samples/mirrored_manhattan_plot.png'}
-                  alt="Mirrored Manhattan Plot"
-                />
-
-                <hr />
-
-                <div className="row">
-                  <div className="col-md-6">
-                    <img
-                      className="img-fluid"
-                      src={'assets/images/samples/qq_plot.svg'}
-                      alt="QQ Plot"
-                    />
-                  </div>
-                  <div className="col-md-6">
-                    <img
-                      className="img-fluid"
-                      src={'assets/images/samples/heatmap.jpg'}
-                      alt="Heatmap"
-                    />
-                  </div>
-                </div>
-              </Tab.Pane>
-
-              <Tab.Pane eventKey="phenotypes">
-                <h2 className="font-weight-light">Phenotypes</h2>
+              {/* <Tab.Pane eventKey="phenotype">
+                <h2 className="font-weight-light">Phenotype</h2>
 
                 <hr />
 
@@ -78,12 +49,7 @@ export function Search({ match }) {
                 <h3 className="h5">Summary</h3>
                 <p>Sample Text</p>
 
-                <img
-                  className="img-fluid"
-                  src={'assets/images/samples/phenotype_figure.png'}
-                  alt="Phenotype Figure 1"
-                />
-              </Tab.Pane>
+              </Tab.Pane> */}
             </Tab.Content>
           </Card.Body>
         </Tab.Container>
