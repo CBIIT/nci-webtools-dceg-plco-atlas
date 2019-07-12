@@ -4,3 +4,4 @@
 *.db-journal
 *.vs
 config.json
+/server/data/**/*
