@@ -1,0 +1,6 @@
+.git
+.cache
+**/config.json
+**/package-lock.json
+**/node_modules/
+server/data/**/*
