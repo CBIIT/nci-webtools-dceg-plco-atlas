@@ -39,7 +39,25 @@ $blue: #005ea2;
   }
 }
 
-// .video-banner {
-//   width: 100%;
-//   object-fit: fill;
-// }
+/** home.js video banner*/
+
+.video-banner-container {
+  z-index: 0;
+  overflow: hidden;
+  display: block;
+  height: 420px;
+  position: relative;
+}
+
+#video-banner {
+  width: 100%;
+  position: relative;
+  display: block;
+}
+
+.video-banner-overlay-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
