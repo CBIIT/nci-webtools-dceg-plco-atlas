@@ -1,26 +1,9 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import Card from 'react-bootstrap/Card';
+import { CardDeck } from 'react-bootstrap';
 
-export function Home() {
-  const links = [
-    {
-      route: '/about',
-      title: 'About'
-    },
-    {
-      route: '/search/gwas',
-      title: 'GWAS'
-    },
-    {
-      route: '/search/phenotypes',
-      title: 'Phenotypes'
-    },
-    {
-      route: '/downloads',
-      title: 'Downloads'
-    }
-  ];
-
+export function Home({links}) {
   return (
     <div className="container py-4">
       <div className="text-center">
@@ -32,16 +15,35 @@ export function Home() {
           Simplifying GWAS for the Prostate, Lung, Colorectal and Ovarian Cancer
           Screening Trial
         </p>
+
+        <div className="video-banner" style={{width: 100}}>
+          <video muted="" autoplay="autoplay" loop="loop" width="640" height="480">
+            <source src="assets/images/plco-banner.mp4" type="video/mp4" />
+          </video>
+        </div>
+
         <div className="text-center">
-          {links.map(({ exact, route, title }, index) => (
-            <Link
-              className="btn btn-primary m-2"
-              exact={exact}
-              key={index}
-              to={route}>
-              {title}
-            </Link>
-          ))}
+          <CardDeck>
+            {links.map(({ exact, route, title, image }, index) => (
+              <Card style={{ width: '18rem', justifyContent: 'center', alignItems: 'center' }} border="white">
+                <Card.Img variant="top" src={image} style={{width: 160, height: 160}} />
+                <Card.Body>
+                  <Card.Title>
+                    <h3>{title}</h3>
+                  </Card.Title>
+                  <Card.Text>
+                    Summary text here...
+                  </Card.Text>
+                  <Link
+                    className="stretched-link"
+                    exact={exact}
+                    key={index}
+                    to={route}>
+                  </Link>
+                </Card.Body>
+              </Card>
+            ))}
+          </CardDeck>
         </div>
       </div>
     </div>

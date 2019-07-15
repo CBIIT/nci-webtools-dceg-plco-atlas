@@ -7,15 +7,42 @@ import { Search } from './pages/search';
 import { Downloads } from './pages/downloads';
 
 function App() {
+  const links = [
+    {
+      route: '/about',
+      title: 'About',
+      image: 'assets/images/about-icon.svg',
+      navIndex: 3
+    },
+    {
+      route: '/search/gwas',
+      title: 'GWAS',
+      image: 'assets/images/gwas-icon.svg',
+      navIndex: 0
+    },
+    {
+      route: '/search/phenotypes',
+      title: 'Phenotypes',
+      image: 'assets/images/phenotypes-icon.svg',
+      navIndex: 1
+    },
+    {
+      route: '/downloads',
+      title: 'Downloads',
+      image: 'assets/images/downloads-icon.svg',
+      navIndex: 2
+    }
+  ];
+
   return (
     <Router >
-      <Navbar />
+      <Navbar links={links} />
       <div className="my-4">
-        <Route path="/" exact={true} component={Home} />
+        <Route path="/" exact={true} render={_ => <Home links={links} /> } />
         <Route path="/about" component={About} />
         <Route path="/search/:searchType" component={Search} />
         <Route path="/downloads" component={Downloads} />
-        <Redirect to="/search/gwas" />
+        {/* <Redirect to="/search/gwas" /> */}
       </div>
     </Router>
   );
