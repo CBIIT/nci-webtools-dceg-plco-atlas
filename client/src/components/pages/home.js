@@ -7,7 +7,7 @@ export function Home({links}) {
   return (
     <div>
       <div className="video-banner-container text-center">
-        <video id="video-banner" muted="" autoplay="autoplay" loop="loop">
+        <video id="video-banner" autoPlay muted loop>
           <source src="assets/images/plco-banner.mp4" type="video/mp4" />
         </video>
         <div className="video-banner-overlay-text">
