@@ -11,7 +11,7 @@ export function Navbar({links}) {
         <Link className="text-white mr-3" to="/">
           Home
         </Link>
-        {links.map(({route, title}) => <Link className="text-white ml-3 mr-3" to={route}>{title}</Link>)}
+        {[].concat(links).sort((a, b) => a.navIndex - b.navIndex).map(({route, title}) => <Link className="text-white ml-3 mr-3" to={route}>{title}</Link>)}
         {/* <pre>{JSON.stringify(links)}</pre> */}
       </div>
     </div>
