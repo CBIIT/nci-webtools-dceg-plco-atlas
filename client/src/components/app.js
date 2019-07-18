@@ -9,7 +9,7 @@ import { Phenotypes } from './pages/phenotypes';
 import { Downloads } from './pages/downloads';
 
 function App() {
-  const [params, setParams] = useState({trait: 'test'});  
+  const [params, setParams] = useState({ trait: 'test' });
 
   const links = [
     {
@@ -39,14 +39,20 @@ function App() {
   ];
 
   return (
-    <Router >
+    <Router>
       <Navbar links={links} />
       <div className="mb-4">
-        <Route path="/" exact={true} render={_ => <Home links={links} /> } />
+        <Route path="/" exact={true} render={_ => <Home links={links} />} />
         <Route path="/about" component={About} />
         {/* <Route path="/search/:searchType" component={Search} /> */}
-        <Route path="/gwas" render={_ => <Gwas params={params} setParams={setParams} />} />
-        <Route path="/phenotypes" render={_ => <Phenotypes params={params} setParams={setParams} />} /> 
+        <Route
+          path="/gwas"
+          render={_ => <Gwas params={params} setParams={setParams} />}
+        />
+        <Route
+          path="/phenotypes"
+          render={_ => <Phenotypes params={params} setParams={setParams} />}
+        />
         <Route path="/downloads" component={Downloads} />
         {/* <Redirect to="/search/gwas" /> */}
       </div>

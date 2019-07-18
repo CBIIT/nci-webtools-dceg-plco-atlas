@@ -18,7 +18,28 @@ export function ManhattanPlot(props) {
 
   return (
     <div className="row">
-      <div className="col-md-2">
+
+      <div class="col-md-12">
+        <Button
+          variant="primary"
+          className="my-2"
+          onClick={e => loadSummaryPlot()}
+          disabled={loading}>
+          Show Summary
+        </Button>
+        {timestamp
+          ? <strong class="ml-2">{timestamp} s</strong>
+          : null}
+      </div>
+
+
+      <div className="col-md-12">
+        <div ref={plotContainer} />
+        {/* <pre>{ JSON.stringify(params, null, 2) }</pre> */}
+      </div>
+
+
+      {/* <div className="col-md-2">
         <Form.Group controlId="chromosome" className="mb-4">
           <Form.Label>
             <b>Chromosome</b>
@@ -83,32 +104,37 @@ export function ManhattanPlot(props) {
 
         <Button
           variant="primary"
-          className="m-2"
+          className="my-2 w-100"
           onClick={e => loadRangesPlot()}
           disabled={loading}>
           Plot Ranges
         </Button>
-        <Button
-          variant="primary"
-          className="m-2"
-          onClick={e => loadSummaryPlot()}
-          disabled={loading}>
-          Plot Summary
-        </Button>
-      </div>
-
-      <div className="col-md-10">
-        <div ref={plotContainer} />
-        <div>{timestamp} s</div>
-        {/* <pre>{ JSON.stringify(params, null, 2) }</pre> */}
-      </div>
+      </div> */}
     </div>
   );
 
-  function scatterPlot(el, data, config) {
-    el.innerHTML = '';
+  function canvasScatterPlot(data, config) {
+    const canvas = document.createElement('canvas');
+    const context = canvas.getContext('2d');
+    const margin = config.margin || {
+      top: 20,
+      right: 20,
+      bottom: 30,
+      left: 40
+    };
+    const outerWidth = config.width || 960;
+    const outerHeight = config.height || 500;
+    const width = outerWidth - margin.left - margin.right;
+    const height = outerHeight - margin.top - margin.bottom;
+  }
 
-    const margin = { top: 20, right: 20, bottom: 30, left: 40 };
+  function scatterPlot(el, data, config) {
+    const margin = config.margin || {
+      top: 20,
+      right: 20,
+      bottom: 30,
+      left: 40
+    };
     const outerWidth = config.width || 960;
     const outerHeight = config.height || 500;
     const width = outerWidth - margin.left - margin.right;
@@ -119,12 +145,12 @@ export function ManhattanPlot(props) {
     x.domain(d3.extent(data, d => d[config.xAxis.key])).nice();
     y.domain(d3.extent(data, d => d[config.yAxis.key])).nice();
 
-    let color = d3.scaleOrdinal(d3.schemeCategory10);
-
     let xAxis = d3.axisBottom(x);
     if (config.xAxis.callback) xAxis = config.xAxis.callback(xAxis);
 
     let yAxis = d3.axisLeft(y);
+
+    d3.select(el).selectAll('*').remove().empty();
 
     let svg = d3
       .select(el)
@@ -132,11 +158,12 @@ export function ManhattanPlot(props) {
       .attr('width', '100%')
       .attr('viewBox', `0 0 ${outerWidth} ${outerHeight}`)
       .append('g')
+      .attr('class', 'manhattan-plot')
       .attr('transform', `translate(${margin.left}, ${margin.top})`);
 
-    svg
+    let xAxisGroup = svg
       .append('g')
-      .attr('class', 'x axis')
+      .attr('class', 'x-axis')
       .attr('transform', `translate(0, ${height})`)
       .call(xAxis)
       .append('text')
@@ -147,9 +174,9 @@ export function ManhattanPlot(props) {
       .style('fill', 'black')
       .text(config.xAxis.title);
 
-    svg
+    let yAxisGroup = svg
       .append('g')
-      .attr('class', 'y axis')
+      .attr('class', 'y-axis')
       .call(yAxis)
       .append('text')
       .attr('class', 'label')
@@ -160,22 +187,26 @@ export function ManhattanPlot(props) {
       .style('fill', 'black')
       .text(config.yAxis.title);
 
-    svg
+    let pointGroup = svg
       .selectAll('.dot')
       .data(data)
       .enter()
       .append('circle')
       .attr('class', 'dot')
-      .attr('r', 2)
-      .attr('opacity', 0.8)
+      .attr('r', 3)
+
       .attr('cx', d => x(d[config.xAxis.key]))
       .attr('cy', d => y(d[config.yAxis.key]))
-      .attr('title', d => JSON.stringify(d))
-      .style('opacity', 0.5)
-      .style('fill', (d, i) => d[config.colorKey] % 2 == 0 ? '#005ea2' : '#162e51')// color(d[config.colorKey]));
+      // .style('opacity', 0.5)
+      .attr('fill', (d, i) =>
+        d[config.colorKey] % 2 == 0 ? '#005ea2' : '#162e51'
+      ) // color(d[config.colorKey]));
+      .attr('fill-opacity', 0.7);
+
+    return svg;
   }
 
-  async function loadRangesPlot() {
+  async function loadRangesPlot(args) {
     setLoading(true);
     setTimestamp(0);
 
@@ -183,10 +214,14 @@ export function ManhattanPlot(props) {
     let getTimestamp = e => (new Date() - start) / 1000;
 
     const el = plotContainer.current;
-    el.innerHTML = '';
-    const data = await query('variants', params);
+
+
+    const data = await query('variants', args || params);
 
     scatterPlot(el, data, {
+      margin: { top: 20, right: 40, bottom: 30, left: 40 },
+      width: 960,
+      height: 500,
       xAxis: { key: 'BP', title: 'bp' },
       yAxis: { key: 'NLOG_P', title: '-log10(p)' },
       colorKey: 'CHR',
@@ -207,34 +242,89 @@ export function ManhattanPlot(props) {
     let getTimestamp = e => (new Date() - start) / 1000;
 
     const el = plotContainer.current;
-    el.innerHTML = '';
+
     const data = await query('summary', params);
     const ranges = await query('ranges', params);
-    console.log(data, ranges);
-
-    scatterPlot(el, data, {
+    const config = {
+      margin: { top: 20, right: 40, bottom: 30, left: 40 },
+      width: 960,
+      height: 500,
       xAxis: {
         key: 'BP_ABS_1000KB',
         title: 'chr',
         callback: axis =>
           axis
             .ticks(ranges.length)
-            .tickValues(d3.set(ranges.map(e => e.MAX_BP_ABS)).values())
-            .tickFormat((d, i) => ranges[i].CHR + 1),
-
+            .tickValues(ranges.map(d => d.MAX_BP_ABS))
+            .tickFormat('')
       },
       yAxis: { key: 'NLOG_P2', title: '-log10(p)' },
       colorKey: 'CHR'
-    });
+    };
+    const width = config.width - config.margin.left - config.margin.right;
+    const height = config.height - config.margin.top - config.margin.bottom;
+
+    let xOverlayScale = d3
+      .scaleLinear()
+      .domain(d3.extent(ranges.concat({ MAX_BP_ABS: 0 }), d => d.MAX_BP_ABS))
+      .nice()
+      .range([0, width]);
+
+    let xAxis = d3
+      .axisBottom(xOverlayScale)
+      .ticks(ranges.length)
+      .tickValues(
+        ranges.map(
+          (d, idx) =>
+            (d.MAX_BP_ABS + (idx > 0 ? ranges[idx - 1].MAX_BP_ABS : 0)) / 2
+        )
+      )
+      .tickFormat((d, i) => ranges[i].CHR)
+      .tickSize(0);
+
+    const svg = scatterPlot(el, data, config);
+
+    let xAxisEl = svg
+      .append('g')
+      .attr('class', 'hide-paths')
+      .attr('transform', `translate(0, ${height})`)
+      .call(xAxis)
+      .selectAll('text')
+      .attr('transform', `translate(0, 4)`);
+
+    let overlayGroup = svg
+      .selectAll('.manhattan-overlay')
+      .data(ranges)
+      .enter()
+      .append('rect')
+      .attr('class', 'manhattan-overlay')
+      .attr('width', (d, i) =>
+        xOverlayScale(
+          ranges[i].MAX_BP_ABS - (i > 0 ? ranges[i - 1].MAX_BP_ABS : 0)
+        )
+      )
+      .attr('height', height + 2)
+      .attr('x', (d, i) =>
+        i > 0 ? xOverlayScale(ranges[i - 1].MAX_BP_ABS) : 0
+      )
+      .attr('y', 0)
+      .attr('fill', (d, i) => (i % 2 ? '#888' : '#fff'))
+      .on('click', d => {
+        const args = {
+          database: 'example',
+          chr: d.CHR,
+          nlogpMin: Math.max(3, Math.floor(d.MIN_NLOG_P)),
+          nlogpMax: Math.ceil(d.MAX_NLOG_P),
+          bpMin: d.MIN_BP,
+          bpMax: d.MAX_BP
+        };
+
+        loadRangesPlot(args);
+        setParams(args);
+//        console.log('clicked', d)
+      });
 
     setLoading(false);
     setTimestamp(getTimestamp());
   }
-
-  async function loadPlotWindow() {}
-
-  /*
-  return (
-  );
-  */
 }

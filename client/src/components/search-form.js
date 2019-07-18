@@ -4,7 +4,7 @@ import { Button, Form, FormControl, InputGroup } from 'react-bootstrap';
 export function SearchForm(props) {
   return (
     <Form>
-      <Form.Group controlId="trait-search" className="mb-4">
+      {/* <Form.Group controlId="trait-search" className="mb-4">
         <Form.Label>
           <b>Trait Search</b>
         </Form.Label>
@@ -14,7 +14,7 @@ export function SearchForm(props) {
             <Button variant="primary">Search</Button>
           </InputGroup.Append>
         </InputGroup>
-      </Form.Group>
+      </Form.Group> */}
 
       <Form.Group controlId="trait-list">
         <Form.Label>

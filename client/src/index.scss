@@ -61,3 +61,30 @@ $blue: #005ea2;
   left: 50%;
   transform: translate(-50%, -50%);
 }
+
+.manhattan-plot {
+  min-height: 500px;
+
+  text {
+    font-size: 12px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+      'Helvetica Neue', Arial, 'Noto Sans', sans-serif, 'Apple Color Emoji',
+      'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+    font-weight: 600;
+  }
+
+  .hide-paths path {
+    display: none;
+  }
+
+  .manhattan-overlay {
+    cursor: pointer;
+    opacity: 0.1;
+    transition: all 0.1s;
+  }
+
+  .manhattan-overlay:hover {
+    fill: #005ea2;
+    opacity: 0.15;
+  }
+}

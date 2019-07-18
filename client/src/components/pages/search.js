@@ -36,7 +36,7 @@ export function Search({ match }) {
                 <h2 className="font-weight-light">Plots</h2>
                 <hr />
                 <ManhattanPlot />
-             </Tab.Pane>
+              </Tab.Pane>
 
               {/* <Tab.Pane eventKey="phenotype">
                 <h2 className="font-weight-light">Phenotype</h2>
