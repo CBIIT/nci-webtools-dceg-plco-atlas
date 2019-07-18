@@ -4,6 +4,7 @@
 <head>
   <meta charset="utf-8" />
   <link rel="shortcut icon" href="%PUBLIC_URL%/favicon.ico" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="theme-color" content="#000000" />
   <!-- <link rel="manifest" href="%PUBLIC_URL%/manifest.json" /> -->
@@ -40,6 +41,8 @@
     </div>
   </footer>
 
+  <!-- Polyfills for IE11 -->
+  <script nomodule src="https://cdn.jsdelivr.net/combine/npm/babel-polyfill@6.26.0/dist/polyfill.min.js,npm/whatwg-fetch@3.0.0"></script>
 </body>
 
 </html>
