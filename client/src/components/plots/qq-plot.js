@@ -19,25 +19,21 @@ export function QQPlot(props) {
 
   return (
     <div className="row">
-
-        <div className="col-md-12">
-            <Button
-            variant="primary"
-            className="my-2"
-            onClick={e => loadQQData()}
-            disabled={loading}>
-            Show Data
-            </Button>
-            {timestamp
-            ? <strong className="ml-2">{timestamp} s</strong>
-            : null}
-        </div>
-
-        <div className="col-md-12">
-        {/* <div ref={plotContainer} /> */}
-        <pre>{ JSON.stringify(debug, null, 2) }</pre>
+      <div className="col-md-12">
+        <Button
+          variant="primary"
+          className="my-2"
+          onClick={e => loadQQData()}
+          disabled={loading}>
+          Show Data
+        </Button>
+        {timestamp ? <strong className="ml-2">{timestamp} s</strong> : null}
       </div>
 
+      <div className="col-md-12">
+        {/* <div ref={plotContainer} /> */}
+        <pre>{JSON.stringify(debug, null, 2)}</pre>
+      </div>
     </div>
   );
 
@@ -59,7 +55,5 @@ export function QQPlot(props) {
 
     setLoading(false);
     setTimestamp(getTimestamp());
-
   }
-
 }
