@@ -19,7 +19,7 @@ export function ManhattanPlot(props) {
   return (
     <div className="row">
 
-      <div class="col-md-12">
+      <div className="col-md-12">
         <Button
           variant="primary"
           className="my-2"
@@ -28,7 +28,7 @@ export function ManhattanPlot(props) {
           Show Summary
         </Button>
         {timestamp
-          ? <strong class="ml-2">{timestamp} s</strong>
+          ? <strong className="ml-2">{timestamp} s</strong>
           : null}
       </div>
 
