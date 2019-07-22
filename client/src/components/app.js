@@ -41,7 +41,6 @@ function App() {
   return (
     <Router>
       <Navbar links={links} />
-      <div className="mb-4">
         <Route path="/" exact={true} render={_ => <Home links={links} />} />
         <Route path="/about" component={About} />
         {/* <Route path="/search/:searchType" component={Search} /> */}
@@ -55,7 +54,6 @@ function App() {
         />
         <Route path="/downloads" component={Downloads} />
         {/* <Redirect to="/search/gwas" /> */}
-      </div>
     </Router>
   );
 }

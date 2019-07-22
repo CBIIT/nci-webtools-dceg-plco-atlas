@@ -18,8 +18,7 @@ export function ManhattanPlot(props) {
 
   return (
     <div className="row">
-
-      <div class="col-md-12">
+      <div className="col-md-12">
         <Button
           variant="primary"
           className="my-2"
@@ -27,17 +26,13 @@ export function ManhattanPlot(props) {
           disabled={loading}>
           Show Summary
         </Button>
-        {timestamp
-          ? <strong class="ml-2">{timestamp} s</strong>
-          : null}
+        {timestamp ? <strong className="ml-2">{timestamp} s</strong> : null}
       </div>
-
 
       <div className="col-md-12">
         <div ref={plotContainer} />
         {/* <pre>{ JSON.stringify(params, null, 2) }</pre> */}
       </div>
-
 
       {/* <div className="col-md-2">
         <Form.Group controlId="chromosome" className="mb-4">
@@ -150,7 +145,10 @@ export function ManhattanPlot(props) {
 
     let yAxis = d3.axisLeft(y);
 
-    d3.select(el).selectAll('*').remove().empty();
+    d3.select(el)
+      .selectAll('*')
+      .remove()
+      .empty();
 
     let svg = d3
       .select(el)
@@ -214,7 +212,6 @@ export function ManhattanPlot(props) {
     let getTimestamp = e => (new Date() - start) / 1000;
 
     const el = plotContainer.current;
-
 
     const data = await query('variants', args || params);
 
@@ -321,7 +318,7 @@ export function ManhattanPlot(props) {
 
         loadRangesPlot(args);
         setParams(args);
-//        console.log('clicked', d)
+        //        console.log('clicked', d)
       });
 
     setLoading(false);

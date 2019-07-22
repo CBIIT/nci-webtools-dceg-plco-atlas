@@ -5,7 +5,7 @@ import { CardDeck } from 'react-bootstrap';
 
 export function Home({ links }) {
   return (
-    <div>
+    <>
       <div className="video-banner-container text-center">
         <video id="video-banner" autoPlay muted loop>
           <source src="assets/images/plco-banner.mp4" type="video/mp4" />
@@ -17,7 +17,7 @@ export function Home({ links }) {
           </h1>
         </div>
       </div>
-      <div className="container py-4">
+      <div className="container pt-4 align-middle">
         <div className="text-center">
           <h3 className="font-weight-light">OUR FOCUS</h3>
           <h5 className="text-secondary">
@@ -56,6 +56,6 @@ export function Home({ links }) {
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }

@@ -40,26 +40,39 @@ $blue: #005ea2;
 }
 
 /** home.js video banner*/
-
 .video-banner-container {
   z-index: 0;
   overflow: hidden;
   display: block;
-  height: 380px;
+  // height: 38vh;
+  height: 422px;
   position: relative;
+
+  #video-banner {
+    width: 100%;
+    position: relative;
+    display: block;
+  }
+  
+  .video-banner-overlay-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
 }
 
-#video-banner {
-  width: 100%;
-  position: relative;
-  display: block;
+/** navbar.js tab links*/
+.navlinks {
+  text-decoration: none !important;
 }
-
-.video-banner-overlay-text {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+.navlinks:hover {
+  color: #bfbfbf !important;
+}
+.active-navlinks {
+  background-color: #fff68f !important;
+  color: black !important;
+  // font-weight: bold !important;
 }
 
 .manhattan-plot {
