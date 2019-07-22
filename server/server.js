@@ -1,34 +1,32 @@
-const express = require('express');
-const cors = require('cors');
+const path = require('path');
 const { databases, port } = require('./config.json');
 const { getRanges, getSummary, getVariants } = require('./query');
-const app = express();
 
-// serve static files from the client/build folder
-app.use(express.static('client/build'));
-
-// add cors headers to the response (allow cross-origin requests)
-app.use(cors());
+const app = require('fastify')();
+app.register(require('fastify-cors'));
+app.register(require('fastify-static'), {
+    root: path.resolve('client', 'build')
+});
 
 // todo: check connectivity to database
-app.get('/ping', (req, res) => res.json(true));
+app.get('/ping', (req, res) => res.send(true));
 
 // retrieves metadata for a particular database (BP/P ranges, # variants, etc)
-app.get('/ranges', async ({query}, res) => {
+app.get('/ranges', ({query}, res) => {
     const db = databases.find(e => e.name === query.database);
-    res.json(await getRanges(db.filepath));
+    res.send(getRanges(db.filepath));
 });
 
 // retrieves all variant groups for all chroms. at the lowest granularity (in MBases)
-app.get('/summary', async ({query}, res) => {
+app.get('/summary', ({query}, res) => {
     const db = databases.find(e => e.name === query.database);
-    res.json(await getSummary(db.filepath));
+    res.send(getSummary(db.filepath));
 });
 
-// retrieves all variants at the specified granularity (using 1000 kb, 100 kb, or individual)
-app.get('/variants', async ({query}, res) => {
+// retrieves all variants within the specified range
+app.get('/variants', ({query}, res) => {
     const db = databases.find(e => e.name === query.database);
-    res.json(await getVariants(db.filepath, query));
+    res.send(getVariants(db.filepath, query));
 });
 
 app.listen(port, _ => console.log(`Application is running on port: ${port}`));

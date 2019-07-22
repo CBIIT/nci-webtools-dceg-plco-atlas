@@ -200,6 +200,7 @@ db.serialize(() => {
             CREATE INDEX idx_${variantTable}_bp_abs_1000kb ON ${variantTable}(BP_ABS_1000KB);
             CREATE INDEX idx_${variantTable}_nlog_p        ON ${variantTable}(NLOG_P);
             CREATE INDEX idx_${variantTable}_nlog_p2       ON ${variantTable}(NLOG_P2);
+            CREATE INDEX idx_${variantTable}_chr_bp_nlog_p ON ${variantTable}(CHR, BP, NLOG_P);
         `);
 
         // store summary table for variants
@@ -214,6 +215,7 @@ db.serialize(() => {
             CREATE INDEX idx_${summaryTable}_bp_1000kb     ON ${summaryTable}(BP_1000KB);
             CREATE INDEX idx_${summaryTable}_bp_abs_1000kb ON ${summaryTable}(BP_ABS_1000KB);
             CREATE INDEX idx_${summaryTable}_nlog_p2       ON ${summaryTable}(NLOG_P2);
+            CREATE INDEX idx_${summaryTable}_chr_bp_abs_nlog_p2 ON ${summaryTable}(CHR, BP_ABS_1000KB, NLOG_P2);
         `);
 
         // store min/max position and nlog_p values for each chromosome
