@@ -2,20 +2,20 @@ const Database = require('better-sqlite3');
 
 function getRanges(filepath) {
     return new Database(filepath, {readonly: true}).prepare(`
-        SELECT * FROM variant_range
+        SELECT chr, min_bp, max_bp, max_bp_abs, min_nlog_p, max_nlog_p FROM variant_range
     `).all();
 }
 
-function getSummary(filepath) {
+function getSummary(filepath, params) {
     const stmt = new Database(filepath, {readonly: true}).prepare(`
         SELECT chr, bp_abs_1000kb, nlog_p2
             FROM variant_summary
-            WHERE nlog_p2 >= 3;
+            WHERE nlog_p2 >= :nlogpMin;
     `);
 
     return {
         columns: stmt.columns().map(c => c.name),
-        data: stmt.raw().all()
+        data: stmt.raw().all(params)
     };
 }
 
@@ -27,11 +27,11 @@ function getVariants(filepath, params) {
         AND bp <= :bpMax
         AND nlog_p >= :nlogpMin
         AND nlog_p <= :nlogpMax
-    `).all(params);
+    `);
 
     return {
         columns: stmt.columns().map(c => c.name),
-        data: stmt.raw().all()
+        data: stmt.raw().all(params)
     };
 }
 
