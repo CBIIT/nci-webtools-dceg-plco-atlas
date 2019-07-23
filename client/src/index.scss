@@ -44,8 +44,8 @@ $blue: #005ea2;
   z-index: 0;
   overflow: hidden;
   display: block;
-  // height: 38vh;
-  height: 422px;
+  height: 50vh;
+  // height: 422px;
   position: relative;
 
   #video-banner {
@@ -72,7 +72,7 @@ $blue: #005ea2;
 .active-navlinks {
   background-color: #fff68f !important;
   color: black !important;
-  // font-weight: bold !important;
+  font-weight: bold !important;
 }
 
 .manhattan-plot {
