@@ -21,4 +21,4 @@ function asQueryString(obj) {
  * @param {*} params
  */
 export const query = (resource, params) =>
-  fetch(`${root}/${resource}/${asQueryString(params)}`).then(r => r.json());
+  fetch(`${root}/${resource}${asQueryString(params)}`).then(r => r.json());
