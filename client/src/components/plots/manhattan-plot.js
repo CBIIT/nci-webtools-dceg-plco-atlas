@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { query } from '../../services/query';
+import { rawQuery as query } from '../../services/query';
 import * as d3 from 'd3';
 
 export function ManhattanPlot(props) {

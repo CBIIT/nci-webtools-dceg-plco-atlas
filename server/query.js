@@ -13,10 +13,13 @@ function getSummary(filepath, params) {
             WHERE nlog_p2 >= :nlogpMin;
     `);
 
-    return {
-        columns: stmt.columns().map(c => c.name),
-        data: stmt.raw().all(params)
-    };
+    if (params.raw)   
+        return {
+            columns: stmt.columns().map(c => c.name),
+            data: stmt.raw().all(params)
+        };
+    else
+        return stmt.all(params);
 }
 
 function getVariants(filepath, params) {
