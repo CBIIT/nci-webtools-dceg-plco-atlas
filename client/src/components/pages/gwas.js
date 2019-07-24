@@ -2,6 +2,7 @@ import React from 'react';
 import { Nav, Tab } from 'react-bootstrap';
 import { SearchForm } from '../search-form';
 import { ManhattanPlot } from '../plots/manhattan-plot';
+import { QQPlot } from '../plots/qq-plot';
 
 export function Gwas({ params, setParams }) {
   return (
@@ -32,7 +33,7 @@ export function Gwas({ params, setParams }) {
             </Nav>
           </div>
 
-          <div class="card-body">
+          <div className="card-body">
             <Tab.Content>
               <Tab.Pane eventKey="manhattan-plot">
                 <h2 className="font-weight-light">Manhattan Plots</h2>
@@ -43,7 +44,7 @@ export function Gwas({ params, setParams }) {
               <Tab.Pane eventKey="qq-plot">
                 <h2 className="font-weight-light">Quantile-Quantile Plot</h2>
                 <hr />
-                Placeholder
+                <QQPlot />
               </Tab.Pane>
             </Tab.Content>
           </div>

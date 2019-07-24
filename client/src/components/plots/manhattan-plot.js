@@ -131,6 +131,7 @@ export function ManhattanPlot(props) {
       right: 20,
       bottom: 20
     };
+
     const outerWidth = config.outerWidth || 700;
     const outerHeight = config.outerHeight || 600;
     const width = outerWidth - margins.left - margins.right;
@@ -199,7 +200,6 @@ export function ManhattanPlot(props) {
       nlogpMin: 3
     });
     const data = results.data;
-
     const config = {
       title: 'Ewing Sarcoma',
       data: data,
