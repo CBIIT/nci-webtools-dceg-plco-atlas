@@ -22,7 +22,8 @@ export function ManhattanPlot(props) {
 
   return (
     <div className="row">
-      <div class="col-md-12">
+      <div class="col-md-12 text-right">
+      {timestamp ? <strong class="mx-2">{timestamp} s</strong> : null}
         <div class="btn-group" role="group" aria-label="Basic example">
           <button
             className="btn btn-primary btn-sm"
@@ -30,14 +31,7 @@ export function ManhattanPlot(props) {
             disabled={loading}>
             Reset
           </button>
-          <button
-            className="btn btn-primary btn-sm"
-            onClick={e => exportPlot(params)}
-            disabled={loading}>
-            Export
-          </button>
         </div>
-        {timestamp ? <strong class="ml-2">{timestamp} s</strong> : null}
       </div>
 
       <div className="col-md-12">

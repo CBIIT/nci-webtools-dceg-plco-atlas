@@ -7,13 +7,7 @@ import { QQPlot } from '../plots/qq-plot';
 export function Gwas({ params, setParams }) {
   return (
     <div className="container my-4">
-      <h1 className="font-weight-light">GWAS</h1>
-      <hr />
-
-      <div className="card shadow-lg mb-4">
-        <div className="card-header bg-primary text-white font-weight-bolder">
-          Select Trait
-        </div>
+      <div className="card shadow-sm mb-4">
         <div className="card-body">
           <SearchForm params={params} onChange={setParams} />
         </div>
@@ -21,9 +15,9 @@ export function Gwas({ params, setParams }) {
 
       <div className="card shadow-lg mb-4">
         <Tab.Container defaultActiveKey="manhattan-plot">
-          <div className="card-header bg-primary font-weight-bolder">
-            <Nav variant="pills" className="nav-pills-inverse">
-              <Nav.Item>
+          <div className="card-header bg-white font-weight-bolder border-bottom-0">
+            <Nav variant="pills" className="nav-pills-custom">
+              <Nav.Item className="mr-2">
                 <Nav.Link eventKey="manhattan-plot">Manhattan Plots</Nav.Link>
               </Nav.Item>
 
@@ -36,13 +30,13 @@ export function Gwas({ params, setParams }) {
           <div className="card-body">
             <Tab.Content>
               <Tab.Pane eventKey="manhattan-plot">
-                <h2 className="font-weight-light">Manhattan Plots</h2>
+                <h2 className="font-weight-light">Results</h2>
                 <hr />
                 <ManhattanPlot />
               </Tab.Pane>
 
               <Tab.Pane eventKey="qq-plot">
-                <h2 className="font-weight-light">Quantile-Quantile Plot</h2>
+                <h2 className="font-weight-light">Results</h2>
                 <hr />
                 <QQPlot />
               </Tab.Pane>
