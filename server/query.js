@@ -22,6 +22,23 @@ function getSummary(filepath, params) {
         return stmt.all(params);
 }
 
+function getSummaryQQ(filepath, params) {
+    const stmt = new Database(filepath, {readonly: true}).prepare(`
+        SELECT nlog_p2
+            FROM variant_summary
+            WHERE nlog_p2 >= :nlogpMin
+            ORDER BY nlog_p2 ASC;
+    `);
+
+    if (params.raw)   
+        return {
+            columns: stmt.columns().map(c => c.name),
+            data: stmt.raw().all(params)
+        };
+    else
+        return stmt.all(params);
+}
+
 function getVariants(filepath, params) {
     const stmt = new Database(filepath, {readonly: true}).prepare(`
         SELECT chr, bp, nlog_p FROM variant WHERE
@@ -38,4 +55,4 @@ function getVariants(filepath, params) {
     };
 }
 
-module.exports = {getRanges, getSummary, getVariants};
+module.exports = {getRanges, getSummary, getSummaryQQ, getVariants};

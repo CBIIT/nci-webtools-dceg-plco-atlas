@@ -119,9 +119,7 @@ export function ManhattanPlot(props) {
     </div>
   );
 
-  function exportPlot(params) {
-
-  }
+  function exportPlot(params) {}
 
   function scatterPlot(config) {
     const data = config.data;

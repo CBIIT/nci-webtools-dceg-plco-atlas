@@ -15,9 +15,11 @@ export function QQPlot(props) {
     bpMin: 0,
     bpMax: 10e7
   });
+  const [debugQuery, setDebugQuery] = useState({});
   const [debug1, setDebug1] = useState({});
   const [debug2, setDebug2] = useState({});
   const [debug3, setDebug3] = useState({});
+  const [debugQQPoints, setDebugQQPoints] = useState({});
 
   return (
     <div className="row">
@@ -34,9 +36,11 @@ export function QQPlot(props) {
 
       <div className="col-md-12">
         {/* <div ref={plotContainer} /> */}
+        {/* <pre>{JSON.stringify(debugQuery, null, 2)}</pre> */}
         <pre>{JSON.stringify(debug1, null, 2)}</pre>
         <pre>{JSON.stringify(debug2, null, 2)}</pre>
         <pre>{JSON.stringify(debug3, null, 2)}</pre>
+        <pre>{JSON.stringify(debugQQPoints, null, 2)}</pre>
       </div>
     </div>
   );
@@ -49,11 +53,10 @@ export function QQPlot(props) {
     let getTimestamp = e => (new Date() - start) / 1000;
 
     // const el = plotContainer.current;
-    // const variant_range = await query('ranges', params);
-    const variant_summary = await query('summary', params);
 
-    // console.log("data", data);
-    // console.log("ranges", ranges);
+    const variant_summary = await query('summary_qq', params);
+    setDebugQuery(variant_summary);
+    
     var variant_summary_n = variant_summary.length;
     var variant_summary_pvals = [];
     variant_summary.map(( variant ) => {
@@ -65,7 +68,8 @@ export function QQPlot(props) {
     var qq_points = variant_summary_pvals.map((observed_p, idx) => {
       return [observed_p, ppoints_n[idx]];
     });
-    setDebug3(qq_points);
+    setDebug3("# of QQ plot points: " + qq_points.length);
+    setDebugQQPoints(qq_points);
 
     setLoading(false);
     setTimestamp(getTimestamp());
@@ -73,12 +77,12 @@ export function QQPlot(props) {
 
   function ppoints(n, a) {
     if (!a) {
-      a = n <= 10 ? 3/8 : 1/2;
+      a = n <= 10 ? 3 / 8 : 1 / 2;
     }
     var points = new Array(n);
-    for (var i = 1; i <= n; i ++) {
-        var point = (i - a) / (n + (1 - a) - a)
-        points[i - 1] = point;
+    for (var i = 1; i <= n; i++) {
+      var point = (i - a) / (n + (1 - a) - a);
+      points[i - 1] = point;
     }
     return points;
   }

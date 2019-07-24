@@ -1,6 +1,6 @@
 const path = require('path');
 const { databases, port } = require('./config.json');
-const { getRanges, getSummary, getVariants } = require('./query');
+const { getRanges, getSummary, getSummaryQQ, getVariants } = require('./query');
 
 const app = require('fastify')({
     ignoreTrailingSlash: true,
@@ -25,6 +25,13 @@ app.get('/summary', ({query}, res) => {
     const db = databases.find(e => e.name === query.database);
     res.header('Cache-Control', 'max-age=300');
     res.send(getSummary(db.filepath, query));
+});
+
+// retrieves all variant groups for all chroms. at the lowest granularity (in MBases), sorted by nlog_p2 ascending
+app.get('/summary_qq', ({query}, res) => {
+    const db = databases.find(e => e.name === query.database);
+    res.header('Cache-Control', 'max-age=300');
+    res.send(getSummaryQQ(db.filepath, query));
 });
 
 // retrieves all variants within the specified range
