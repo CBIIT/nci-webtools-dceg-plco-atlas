@@ -2,7 +2,9 @@ const path = require('path');
 const { databases, port } = require('./config.json');
 const { getRanges, getSummary, getVariants } = require('./query');
 
-const app = require('fastify')();
+const app = require('fastify')({
+    ignoreTrailingSlash: true,
+});
 app.register(require('fastify-cors'));
 app.register(require('fastify-static'), {
     root: path.resolve('client', 'build')
@@ -32,4 +34,9 @@ app.get('/variants', ({query}, res) => {
     res.send(getVariants(db.filepath, query));
 });
 
-app.listen(port, _ => console.log(`Application is running on port: ${port}`));
+app.listen(port, '0.0.0.0')
+    .then(addr => console.log(`Application is running on: ${addr}`))
+    .catch(error => {
+        console.error(error);
+        process.exit(1);
+    });
