@@ -1,54 +1,38 @@
-const sqlite = require('sqlite3').verbose();
-const variantTable = 'variant';
-const rangeTable = 'variant_range';
-const summaryTable = 'variant_summary';
+const Database = require('better-sqlite3');
 
 function getRanges(filepath) {
-    return new Promise((resolve, reject) => {
-        const db = new sqlite.Database(filepath, sqlite.OPEN_READONLY);
-        const sql = `SELECT * FROM ${rangeTable}`;
-        db.all(sql, [], (err, rows) => err
-            ? reject(err)
-            : resolve(rows));
-    });
+    return new Database(filepath, {readonly: true}).prepare(`
+        SELECT chr, min_bp, max_bp, max_bp_abs, min_nlog_p, max_nlog_p FROM variant_range
+    `).all();
 }
 
-function getSummary(filepath) {
-    return new Promise((resolve, reject) => {
-        const db = new sqlite.Database(filepath, sqlite.OPEN_READONLY);
-        let sql = `SELECT distinct CHR, BP_ABS_1000KB, NLOG_P2
-            FROM ${summaryTable}
-            WHERE NLOG_P2 >= 3
-            ORDER BY CHR ASC, BP_ABS_1000KB ASC, NLOG_P2 DESC`;
-        db.all(sql, [], (err, rows) => err
-            ? reject(err)
-            : resolve(rows));
-    });
+function getSummary(filepath, params) {
+    const stmt = new Database(filepath, {readonly: true}).prepare(`
+        SELECT chr, bp_abs_1000kb, nlog_p2
+            FROM variant_summary
+            WHERE nlog_p2 >= :nlogpMin;
+    `);
+
+    return {
+        columns: stmt.columns().map(c => c.name),
+        data: stmt.raw().all(params)
+    };
 }
 
-function getVariants(filepath, {chr, bpMin, bpMax, nlogpMin, nlogpMax}) {
-    return new Promise((resolve, reject) => {
-        const db = new sqlite.Database(filepath, sqlite.OPEN_READONLY);
-        let stmt = db.prepare(`
-            SELECT * FROM ${variantTable} WHERE
-                CHR = $chr
-                AND BP >= $bpMin
-                AND BP <= $bpMax
-                AND NLOG_P >= $nlogpMin
-                AND NLOG_P <= $nlogpMax`);
+function getVariants(filepath, params) {
+    const stmt = new Database(filepath, {readonly: true}).prepare(`
+        SELECT chr, bp, nlog_p FROM variant WHERE
+        chr = :chr
+        AND bp >= :bpMin
+        AND bp <= :bpMax
+        AND nlog_p >= :nlogpMin
+        AND nlog_p <= :nlogpMax
+    `);
 
-        stmt.run({
-            $chr: chr,
-            $bpMin: bpMin,
-            $bpMax: bpMax,
-            $nlogpMin: nlogpMin,
-            $nlogpMax: nlogpMax,
-        });
-
-        stmt.all((err, rows) => err
-            ? reject(err)
-            : resolve(rows));
-    });
+    return {
+        columns: stmt.columns().map(c => c.name),
+        data: stmt.raw().all(params)
+    };
 }
 
 module.exports = {getRanges, getSummary, getVariants};
