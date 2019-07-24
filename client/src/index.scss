@@ -39,6 +39,22 @@ $blue: #005ea2;
   }
 }
 
+.nav-pills.nav-pills-custom {
+  .nav-link {
+    color: white;
+  }
+
+  .nav-link {
+    background-color: #1a4480;
+    opacity: 0.7;
+  }
+
+  .nav-link.active {
+    // background-color: #e47833;
+    opacity: 1;
+  }
+}
+
 /** home.js video banner*/
 .video-banner-container {
   z-index: 0;
@@ -53,7 +69,7 @@ $blue: #005ea2;
     position: relative;
     display: block;
   }
-  
+
   .video-banner-overlay-text {
     position: absolute;
     top: 50%;

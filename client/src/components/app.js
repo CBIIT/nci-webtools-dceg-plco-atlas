@@ -3,7 +3,6 @@ import { HashRouter as Router, Redirect, Route } from 'react-router-dom';
 import { Navbar } from './navbar';
 import { Home } from './pages/home';
 import { About } from './pages/about';
-import { Search } from './pages/search';
 import { Gwas } from './pages/gwas';
 import { Phenotypes } from './pages/phenotypes';
 import { Downloads } from './pages/downloads';
