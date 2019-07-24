@@ -40,19 +40,19 @@ function App() {
   return (
     <Router>
       <Navbar links={links} />
-        <Route path="/" exact={true} render={_ => <Home links={links} />} />
-        <Route path="/about" component={About} />
-        {/* <Route path="/search/:searchType" component={Search} /> */}
-        <Route
-          path="/gwas"
-          render={_ => <Gwas params={params} setParams={setParams} />}
-        />
-        <Route
-          path="/phenotypes"
-          render={_ => <Phenotypes params={params} setParams={setParams} />}
-        />
-        <Route path="/downloads" component={Downloads} />
-        {/* <Redirect to="/search/gwas" /> */}
+      <Route path="/" exact={true} render={_ => <Home links={links} />} />
+      <Route path="/about" component={About} />
+      {/* <Route path="/search/:searchType" component={Search} /> */}
+      <Route
+        path="/gwas"
+        render={_ => <Gwas params={params} setParams={setParams} />}
+      />
+      <Route
+        path="/phenotypes"
+        render={_ => <Phenotypes params={params} setParams={setParams} />}
+      />
+      <Route path="/downloads" component={Downloads} />
+      {/* <Redirect to="/search/gwas" /> */}
     </Router>
   );
 }

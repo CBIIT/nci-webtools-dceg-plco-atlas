@@ -56,12 +56,17 @@ export function QQPlot(props) {
     // console.log("ranges", ranges);
     var variant_summary_n = variant_summary.length;
     var variant_summary_pvals = [];
-    variant_summary.map(( variant ) => {
+    variant_summary.map(variant => {
       return variant_summary_pvals.push(variant.NLOG_P2);
     });
-    setDebug1("# of variant_summary p-values (-log10 rounded): " + variant_summary_pvals.length);
+    setDebug1(
+      '# of variant_summary p-values (-log10 rounded): ' +
+        variant_summary_pvals.length
+    );
     var ppoints_n = ppoints(variant_summary_n);
-    setDebug2("# of ppoints generated from variant_summary length: " + ppoints_n.length);
+    setDebug2(
+      '# of ppoints generated from variant_summary length: ' + ppoints_n.length
+    );
     var qq_points = variant_summary_pvals.map((observed_p, idx) => {
       return [observed_p, ppoints_n[idx]];
     });
@@ -73,12 +78,12 @@ export function QQPlot(props) {
 
   function ppoints(n, a) {
     if (!a) {
-      a = n <= 10 ? 3/8 : 1/2;
+      a = n <= 10 ? 3 / 8 : 1 / 2;
     }
     var points = new Array(n);
-    for (var i = 1; i <= n; i ++) {
-        var point = (i - a) / (n + (1 - a) - a)
-        points[i - 1] = point;
+    for (var i = 1; i <= n; i++) {
+      var point = (i - a) / (n + (1 - a) - a);
+      points[i - 1] = point;
     }
     return points;
   }
