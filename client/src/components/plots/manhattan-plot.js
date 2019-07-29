@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { rawQuery as query } from '../../services/query';
 import * as d3 from 'd3';
 
-export function ManhattanPlot(props) {
+export function ManhattanPlot({ trait }) {
   const plotContainer = useRef(null);
   const [timestamp, setTimestamp] = useState(0);
   const [loading, setLoading] = useState(false);
@@ -10,7 +10,7 @@ export function ManhattanPlot(props) {
   const [params, setParams] = useState({
     database: 'example',
     chr: 10,
-    nlogpMin: 2,
+    nlogpMin: 3,
     nlogpMax: 20,
     bpMin: 0,
     bpMax: 10e7
@@ -20,10 +20,16 @@ export function ManhattanPlot(props) {
     query('ranges', { database: 'example' }).then(e => setRanges(e));
   }, []);
 
+
+  useEffect(() => {
+    if (ranges.length && trait)
+      drawSummaryPlot({...params, database: trait});
+  }, [trait]);
+
   return (
     <div className="row">
       <div class="col-md-12 text-right">
-      {timestamp ? <strong class="mx-2">{timestamp} s</strong> : null}
+        {timestamp ? <strong class="mx-2">{timestamp} s</strong> : null}
         <div class="btn-group" role="group" aria-label="Basic example">
           <button
             className="btn btn-primary btn-sm"
@@ -191,6 +197,10 @@ export function ManhattanPlot(props) {
       database: params.database,
       nlogpMin: 3
     });
+
+    if (results.error)
+      return;
+
     const data = results.data;
     const config = {
       title: 'Ewing Sarcoma',

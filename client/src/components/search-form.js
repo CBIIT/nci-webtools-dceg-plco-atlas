@@ -1,45 +1,89 @@
-import React from 'react';
-import { Button, Form, FormControl, InputGroup } from 'react-bootstrap';
+import React, { useState } from 'react';
+import { Form, FormControl, InputGroup } from 'react-bootstrap';
 
-export function SearchForm(props) {
+export function SearchForm({ params, onChange, onSubmit }) {
+  const [listType, setListType] = useState('alphabetic');
+
+  const categories = [
+    'Sample Category A',
+    'Sample Category B',
+    'Sample Category C'
+  ];
+
+  const traits = [
+    {
+      value: `example`,
+      label: `Ewing's Sarcoma`,
+      category: 'Sample Category A'
+    },
+    {
+      value: `example_2a`,
+      label: `Sample trait 2A`,
+      category: 'Sample Category A'
+    },
+    {
+      value: `example_1b`,
+      label: `Sample trait 2A`,
+      category: 'Sample Category B'
+    },
+    {
+      value: `example_2b`,
+      label: `Sample trait 2A`,
+      category: 'Sample Category B'
+    },
+    {
+      value: `example_1c`,
+      label: `Sample trait 2A`,
+      category: 'Sample Category C'
+    },
+    {
+      value: `example_2c`,
+      label: `Sample trait 2A`,
+      category: 'Sample Category C'
+    }
+  ];
+
   return (
     <Form>
-      {/* <Form.Group controlId="trait-search" className="mb-4">
-        <Form.Label>
-          <b>Trait Search</b>
-        </Form.Label>
-        <InputGroup>
-          <FormControl placeholder="Enter Trait" />
-          <InputGroup.Append>
-            <Button variant="primary">Search</Button>
-          </InputGroup.Append>
-        </InputGroup>
-      </Form.Group> */}
-
       <Form.Group controlId="trait-list">
         <Form.Label>
           <b>Trait List</b>
         </Form.Label>
         <InputGroup>
           <InputGroup.Prepend>
-            <Form.Control as="select">
-              <option>Categorical</option>
-              <option>Alphabetic</option>
-            </Form.Control>
+            <select
+              class="form-control"
+              value={listType}
+              onChange={e => setListType(e.target.value)}>
+              <option value="alphabetic">Alphabetic</option>
+              <option value="categorical">Categorical</option>
+            </select>
           </InputGroup.Prepend>
-          <Form.Control as="select">
+
+          <select
+            class="form-control"
+            value={params.trait}
+            onChange={e => onChange({ ...params, trait: e.target.value })}>
             <option hidden>Select a trait</option>
-            <optgroup label="Group A">
-              <option>Sample Trait A1</option>
-              <option>Sample Trait A2</option>
-            </optgroup>
-            <optgroup label="Group B">
-              <option>Sample Trait B1</option>
-              <option>Sample Trait B2</option>
-            </optgroup>
-          </Form.Control>
+
+            {listType === 'categorical' &&
+              categories.map(category => (
+                <optgroup label={category}>
+                  {traits
+                    .filter(t => t.category === category)
+                    .map(t => (
+                      <option value={t.value}>{t.label}</option>
+                    ))}
+                </optgroup>
+              ))}
+
+            {listType == 'alphabetic' &&
+              traits.map(t => <option value={t.value}>{t.label}</option>)}
+          </select>
           <InputGroup.Append>
-            <Button variant="primary">Go</Button>
+            <button className="btn btn-primary" onClick={onSubmit}>
+              Submit
+            </button>
           </InputGroup.Append>
         </InputGroup>
       </Form.Group>
