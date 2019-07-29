@@ -1,7 +1,8 @@
 import React, { useState, useRef } from 'react';
-import { query } from '../../services/query';
+import { rawQuery as query } from '../../services/query';
 import { Button, Form, FormControl } from 'react-bootstrap';
 import * as d3 from 'd3';
+import * as math from 'mathjs';
 
 export function QQPlot(props) {
   const plotContainer = useRef(null);
@@ -15,7 +16,7 @@ export function QQPlot(props) {
     bpMin: 0,
     bpMax: 10e7
   });
-  const [debugQuery, setDebugQuery] = useState({});
+  // const [debugQuery, setDebugQuery] = useState({});
   const [debug1, setDebug1] = useState({});
   const [debug2, setDebug2] = useState({});
   const [debug3, setDebug3] = useState({});
@@ -55,19 +56,23 @@ export function QQPlot(props) {
     // const el = plotContainer.current;
 
     const variant_summary = await query('summary_qq', params);
-    setDebugQuery(variant_summary);
+    // setDebugQuery(variant_summary.data.flat());
     
-    var variant_summary_n = variant_summary.length;
-    var variant_summary_pvals = [];
-    variant_summary.map(( variant ) => {
-      return variant_summary_pvals.push(variant.NLOG_P2);
-    });
-    setDebug1("# of variant_summary p-values (-log10 rounded): " + variant_summary_pvals.length);
-    var ppoints_n = ppoints(variant_summary_n);
-    setDebug2("# of ppoints generated from variant_summary length: " + ppoints_n.length);
+    var variant_summary_pvals = variant_summary.data.flat();
+    var variant_summary_pvals_n = variant_summary_pvals.length;
+
+    // variant_summary.data.map(( data ) => {
+    //   return variant_summary_pvals.push(variant.NLOG_P2);
+    // });
+    setDebug1("# of variant_summary p-values (-log10 rounded): N = " + variant_summary_pvals.length);
+    var ppoints_n = ppoints(variant_summary_pvals_n);
     var qq_points = variant_summary_pvals.map((observed_p, idx) => {
       return [observed_p, ppoints_n[idx]];
     });
+    
+    var one_minus_median_p = 1 - math.pow(10, -1.0 * math.median(variant_summary_pvals));
+    setDebug2("lambdaGC = " + qchisq(0.5, 1) + " median = " + one_minus_median_p);
+
     setDebug3("# of QQ plot points: " + qq_points.length);
     setDebugQQPoints(qq_points);
 
@@ -86,4 +91,27 @@ export function QQPlot(props) {
     }
     return points;
   }
+
+  function probabilityDensity(x, v) {
+    // console.log(math.pow(x, (v / 2.0) - 1.0));
+    // console.log(math.pow(math.e, (x / 2.0) * -1.0));
+    var numer = (math.pow(x, (v / 2.0) - 1.0) * (math.pow(math.e, (x / 2.0) * -1.0)))
+    var denom = (math.pow(2.0, (v / 2.0)) * (math.gamma(v / 2.0)));
+    var probabilityDensity = numer / denom;
+    return probabilityDensity;
+  }
+
+  function qchisq(p, df) {
+    return probabilityDensity(p, df);
+  }
+
 }
+
+
+// round(
+  
+//   qchisq(1 - median(pvector), 1) /
+//    qchisq(0.5, 1)
+
+// , 4)
+
