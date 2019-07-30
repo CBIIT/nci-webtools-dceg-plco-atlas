@@ -139,10 +139,6 @@ db.serialize(() => {
         // stmt.finalize(); // no need to finalize statement
         db.exec('commit');
 
-        // create indexes
-        console.log(`[${duration()} s] Inserted ${count} rows. Indexing...`);
-        db.run(readFile('indexes.sql'));
-
         // store summary table for variants
         console.log(`[${duration()} s] Storing summary...`);
         db.exec(`
@@ -166,6 +162,10 @@ db.serialize(() => {
             GROUP BY CHR
             ORDER BY CHR, BP;
         `);
+
+        // create indexes
+        console.log(`[${duration()} s] Indexing...`);
+        db.run(readFile('indexes.sql'));
 
         console.log(`[${duration()} s] Finalizing database...`);
         db.close(_ => console.log(`[${duration()} s] Created database`));
