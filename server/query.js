@@ -38,4 +38,21 @@ function getVariants(filepath, params) {
     };
 }
 
-module.exports = {getRanges, getSummary, getVariants};
+function getVariantsQQ(filepath, params) {
+    const stmt = new Database(filepath, {readonly: true}).prepare(`
+        SELECT snp, p, nlog_p, nlog_p2
+            FROM variant
+            WHERE nlog_p2 >= :nlogpMin
+            ORDER BY p DESC;
+    `);
+
+    if (params.raw)   
+        return {
+            columns: stmt.columns().map(c => c.name),
+            data: stmt.raw().all(params)
+        };
+    else
+        return stmt.all(params);
+}
+
+module.exports = {getRanges, getSummary, getVariants, getVariantsQQ};
