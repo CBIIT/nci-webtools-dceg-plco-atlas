@@ -48,7 +48,6 @@ db.serialize(() => {
         INSERT INTO variant VALUES (
             $CHR,
             $BP,
-            $BP_100KB,
             $BP_1000KB,
             $BP_ABS,
             $BP_ABS_1000KB,
