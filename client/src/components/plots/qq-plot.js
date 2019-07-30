@@ -2,7 +2,6 @@ import React, { useState, useRef } from 'react';
 // import { rawQuery as query } from '../../services/query';
 // import { Button, Form, FormControl } from 'react-bootstrap';
 // import * as d3 from 'd3';
-// import * as math from 'mathjs';
 
 export function QQPlot(props) {
   // const plotContainer = useRef(null);
