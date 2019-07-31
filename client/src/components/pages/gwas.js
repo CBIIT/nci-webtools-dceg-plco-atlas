@@ -11,7 +11,11 @@ export function Gwas({ params, setParams }) {
     <div className="container my-4">
       <div className="card shadow-sm mb-4">
         <div className="card-body">
-          <SearchForm params={params} onChange={setParams} onSubmit={e => setTrait(params.trait)}/>
+          <SearchForm
+            params={params}
+            onChange={setParams}
+            onSubmit={e => setTrait(params.trait)}
+          />
         </div>
       </div>
 

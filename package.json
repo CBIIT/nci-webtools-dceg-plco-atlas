@@ -1,5 +1,5 @@
 {
-  "name": "nci-webtools-dceg-plco-gwas",
+  "name": "nci-webtools-dceg-plco-atlas",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -13,14 +13,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/CBIIT/nci-webtools-dceg-plco-gwas.git"
+    "url": "git+https://github.com/CBIIT/nci-webtools-dceg-plco-atlas.git"
   },
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/CBIIT/nci-webtools-dceg-plco-gwas/issues"
+    "url": "https://github.com/CBIIT/nci-webtools-dceg-plco-atlas/issues"
   },
-  "homepage": "https://github.com/CBIIT/nci-webtools-dceg-plco-gwas#readme",
+  "homepage": "https://github.com/CBIIT/nci-webtools-dceg-plco-atlas#readme",
   "dependencies": {
     "better-sqlite3": "^5.4.1",
     "fastify": "^2.6.0",

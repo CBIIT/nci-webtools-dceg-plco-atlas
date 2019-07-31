@@ -1,1 +1,1 @@
-# nci-webtools-dceg-plco-gwas
+# nci-webtools-dceg-plco-atlas
