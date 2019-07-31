@@ -13,7 +13,7 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "build": "npm run format && react-scripts build",
+    "build": "npm run format && react-scripts build && mv build ../www",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "format": "prettier --single-quote --jsx-bracket-same-line --write \"src/**/*.{js,json,css,scss}\""

@@ -20,10 +20,8 @@ export function ManhattanPlot({ trait }) {
     query('ranges', { database: 'example' }).then(e => setRanges(e));
   }, []);
 
-
   useEffect(() => {
-    if (ranges.length && trait)
-      drawSummaryPlot({...params, database: trait});
+    if (ranges.length && trait) drawSummaryPlot({ ...params, database: trait });
   }, [trait]);
 
   return (
@@ -198,8 +196,7 @@ export function ManhattanPlot({ trait }) {
       nlogpMin: 3
     });
 
-    if (results.error)
-      return;
+    if (results.error) return;
 
     const data = results.data;
     const config = {
