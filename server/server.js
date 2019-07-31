@@ -7,7 +7,8 @@ const app = require('fastify')({
 });
 app.register(require('fastify-cors'));
 app.register(require('fastify-static'), {
-    root: path.resolve('client', 'build')
+    // root: path.resolve('client', 'build')
+    root: path.resolve('www')
 });
 
 // todo: check connectivity to database
