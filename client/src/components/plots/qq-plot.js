@@ -15,1521 +15,289 @@ export function QQPlot(props) {
   //   bpMin: 0,
   //   bpMax: 10e7
   // });
-  // const [debugQuery, setDebugQuery] = useState({});
+  const [debugQuery, setDebugQuery] = useState({});
   // const [debug1, setDebug1] = useState({});
   // const [debug2, setDebug2] = useState({});
   // const [debug3, setDebug3] = useState({});
   // const [debugQQPoints, setDebugQQPoints] = useState({});
 
   return (
-    <div className="text-center">
-      <img
-        src="assets/images/qq-plots/ewings_sarcoma.png"
-        alt="QQ-plot of selected trait"
-        useMap="#image-map"
-      />
-      <map name="image-map">
-        <area
-          shape="rect"
-          coords="739,88,749,80"
-          href="imPoint.html"
-          alt="Point 1"
-        />
-        <area
-          shape="rect"
-          coords="666,141,676,133"
-          href="imPoint.html"
-          alt="Point 2"
-        />
-        <area
-          shape="rect"
-          coords="631,141,641,134"
-          href="imPoint.html"
-          alt="Point 3"
-        />
-        <area
-          shape="rect"
-          coords="609,141,619,134"
-          href="imPoint.html"
-          alt="Point 4"
-        />
-        <area
-          shape="rect"
-          coords="592,143,602,135"
-          href="imPoint.html"
-          alt="Point 5"
-        />
-        <area
-          shape="rect"
-          coords="579,146,589,138"
-          href="imPoint.html"
-          alt="Point 6"
-        />
-        <area
-          shape="rect"
-          coords="568,146,578,138"
-          href="imPoint.html"
-          alt="Point 7"
-        />
-        <area
-          shape="rect"
-          coords="558,146,568,138"
-          href="imPoint.html"
-          alt="Point 8"
-        />
-        <area
-          shape="rect"
-          coords="550,146,560,138"
-          href="imPoint.html"
-          alt="Point 9"
-        />
-        <area
-          shape="rect"
-          coords="542,146,552,139"
-          href="imPoint.html"
-          alt="Point 10"
-        />
-        <area
-          shape="rect"
-          coords="536,147,546,139"
-          href="imPoint.html"
-          alt="Point 11"
-        />
-        <area
-          shape="rect"
-          coords="529,147,539,139"
-          href="imPoint.html"
-          alt="Point 12"
-        />
-        <area
-          shape="rect"
-          coords="524,148,534,140"
-          href="imPoint.html"
-          alt="Point 13"
-        />
-        <area
-          shape="rect"
-          coords="519,148,529,140"
-          href="imPoint.html"
-          alt="Point 14"
-        />
-        <area
-          shape="rect"
-          coords="514,148,524,140"
-          href="imPoint.html"
-          alt="Point 15"
-        />
-        <area
-          shape="rect"
-          coords="510,148,520,140"
-          href="imPoint.html"
-          alt="Point 16"
-        />
-        <area
-          shape="rect"
-          coords="505,148,515,141"
-          href="imPoint.html"
-          alt="Point 17"
-        />
-        <area
-          shape="rect"
-          coords="501,148,511,141"
-          href="imPoint.html"
-          alt="Point 18"
-        />
-        <area
-          shape="rect"
-          coords="498,149,508,141"
-          href="imPoint.html"
-          alt="Point 19"
-        />
-        <area
-          shape="rect"
-          coords="494,149,504,141"
-          href="imPoint.html"
-          alt="Point 20"
-        />
-        <area
-          shape="rect"
-          coords="491,149,501,142"
-          href="imPoint.html"
-          alt="Point 21"
-        />
-        <area
-          shape="rect"
-          coords="488,150,498,142"
-          href="imPoint.html"
-          alt="Point 22"
-        />
-        <area
-          shape="rect"
-          coords="485,150,495,142"
-          href="imPoint.html"
-          alt="Point 23"
-        />
-        <area
-          shape="rect"
-          coords="482,150,492,142"
-          href="imPoint.html"
-          alt="Point 24"
-        />
-        <area
-          shape="rect"
-          coords="479,150,489,142"
-          href="imPoint.html"
-          alt="Point 25"
-        />
-        <area
-          shape="rect"
-          coords="476,150,486,142"
-          href="imPoint.html"
-          alt="Point 26"
-        />
-        <area
-          shape="rect"
-          coords="474,151,484,143"
-          href="imPoint.html"
-          alt="Point 27"
-        />
-        <area
-          shape="rect"
-          coords="471,152,481,144"
-          href="imPoint.html"
-          alt="Point 28"
-        />
-        <area
-          shape="rect"
-          coords="469,152,479,144"
-          href="imPoint.html"
-          alt="Point 29"
-        />
-        <area
-          shape="rect"
-          coords="467,152,477,144"
-          href="imPoint.html"
-          alt="Point 30"
-        />
-        <area
-          shape="rect"
-          coords="464,152,474,145"
-          href="imPoint.html"
-          alt="Point 31"
-        />
-        <area
-          shape="rect"
-          coords="462,152,472,145"
-          href="imPoint.html"
-          alt="Point 32"
-        />
-        <area
-          shape="rect"
-          coords="460,153,470,145"
-          href="imPoint.html"
-          alt="Point 33"
-        />
-        <area
-          shape="rect"
-          coords="458,153,468,145"
-          href="imPoint.html"
-          alt="Point 34"
-        />
-        <area
-          shape="rect"
-          coords="456,153,466,145"
-          href="imPoint.html"
-          alt="Point 35"
-        />
-        <area
-          shape="rect"
-          coords="454,153,464,146"
-          href="imPoint.html"
-          alt="Point 36"
-        />
-        <area
-          shape="rect"
-          coords="452,154,462,146"
-          href="imPoint.html"
-          alt="Point 37"
-        />
-        <area
-          shape="rect"
-          coords="450,154,460,146"
-          href="imPoint.html"
-          alt="Point 38"
-        />
-        <area
-          shape="rect"
-          coords="449,156,459,148"
-          href="imPoint.html"
-          alt="Point 39"
-        />
-        <area
-          shape="rect"
-          coords="447,157,457,149"
-          href="imPoint.html"
-          alt="Point 40"
-        />
-        <area
-          shape="rect"
-          coords="445,160,455,152"
-          href="imPoint.html"
-          alt="Point 41"
-        />
-        <area
-          shape="rect"
-          coords="444,161,454,153"
-          href="imPoint.html"
-          alt="Point 42"
-        />
-        <area
-          shape="rect"
-          coords="442,161,452,153"
-          href="imPoint.html"
-          alt="Point 43"
-        />
-        <area
-          shape="rect"
-          coords="441,163,451,155"
-          href="imPoint.html"
-          alt="Point 44"
-        />
-        <area
-          shape="rect"
-          coords="439,166,449,158"
-          href="imPoint.html"
-          alt="Point 45"
-        />
-        <area
-          shape="rect"
-          coords="438,167,448,159"
-          href="imPoint.html"
-          alt="Point 46"
-        />
-        <area
-          shape="rect"
-          coords="436,168,446,161"
-          href="imPoint.html"
-          alt="Point 47"
-        />
-        <area
-          shape="rect"
-          coords="435,170,445,162"
-          href="imPoint.html"
-          alt="Point 48"
-        />
-        <area
-          shape="rect"
-          coords="433,170,443,162"
-          href="imPoint.html"
-          alt="Point 49"
-        />
-        <area
-          shape="rect"
-          coords="432,171,442,163"
-          href="imPoint.html"
-          alt="Point 50"
-        />
-        <area
-          shape="rect"
-          coords="431,173,441,165"
-          href="imPoint.html"
-          alt="Point 51"
-        />
-        <area
-          shape="rect"
-          coords="429,174,439,166"
-          href="imPoint.html"
-          alt="Point 52"
-        />
-        <area
-          shape="rect"
-          coords="428,174,438,166"
-          href="imPoint.html"
-          alt="Point 53"
-        />
-        <area
-          shape="rect"
-          coords="427,174,437,166"
-          href="imPoint.html"
-          alt="Point 54"
-        />
-        <area
-          shape="rect"
-          coords="425,174,435,166"
-          href="imPoint.html"
-          alt="Point 55"
-        />
-        <area
-          shape="rect"
-          coords="424,174,434,166"
-          href="imPoint.html"
-          alt="Point 56"
-        />
-        <area
-          shape="rect"
-          coords="423,174,433,166"
-          href="imPoint.html"
-          alt="Point 57"
-        />
-        <area
-          shape="rect"
-          coords="422,174,432,166"
-          href="imPoint.html"
-          alt="Point 58"
-        />
-        <area
-          shape="rect"
-          coords="421,175,431,167"
-          href="imPoint.html"
-          alt="Point 59"
-        />
-        <area
-          shape="rect"
-          coords="420,175,430,167"
-          href="imPoint.html"
-          alt="Point 60"
-        />
-        <area
-          shape="rect"
-          coords="419,175,429,167"
-          href="imPoint.html"
-          alt="Point 61"
-        />
-        <area
-          shape="rect"
-          coords="417,175,427,168"
-          href="imPoint.html"
-          alt="Point 62"
-        />
-        <area
-          shape="rect"
-          coords="416,176,426,168"
-          href="imPoint.html"
-          alt="Point 63"
-        />
-        <area
-          shape="rect"
-          coords="415,177,425,169"
-          href="imPoint.html"
-          alt="Point 64"
-        />
-        <area
-          shape="rect"
-          coords="414,178,424,170"
-          href="imPoint.html"
-          alt="Point 65"
-        />
-        <area
-          shape="rect"
-          coords="413,178,423,170"
-          href="imPoint.html"
-          alt="Point 66"
-        />
-        <area
-          shape="rect"
-          coords="412,178,422,170"
-          href="imPoint.html"
-          alt="Point 67"
-        />
-        <area
-          shape="rect"
-          coords="411,178,421,170"
-          href="imPoint.html"
-          alt="Point 68"
-        />
-        <area
-          shape="rect"
-          coords="410,180,420,172"
-          href="imPoint.html"
-          alt="Point 69"
-        />
-        <area
-          shape="rect"
-          coords="409,180,419,172"
-          href="imPoint.html"
-          alt="Point 70"
-        />
-        <area
-          shape="rect"
-          coords="408,181,418,173"
-          href="imPoint.html"
-          alt="Point 71"
-        />
-        <area
-          shape="rect"
-          coords="407,181,417,173"
-          href="imPoint.html"
-          alt="Point 72"
-        />
-        <area
-          shape="rect"
-          coords="406,181,416,173"
-          href="imPoint.html"
-          alt="Point 73"
-        />
-        <area
-          shape="rect"
-          coords="406,181,416,173"
-          href="imPoint.html"
-          alt="Point 74"
-        />
-        <area
-          shape="rect"
-          coords="405,181,415,173"
-          href="imPoint.html"
-          alt="Point 75"
-        />
-        <area
-          shape="rect"
-          coords="404,181,414,173"
-          href="imPoint.html"
-          alt="Point 76"
-        />
-        <area
-          shape="rect"
-          coords="403,181,413,173"
-          href="imPoint.html"
-          alt="Point 77"
-        />
-        <area
-          shape="rect"
-          coords="402,181,412,173"
-          href="imPoint.html"
-          alt="Point 78"
-        />
-        <area
-          shape="rect"
-          coords="401,182,411,174"
-          href="imPoint.html"
-          alt="Point 79"
-        />
-        <area
-          shape="rect"
-          coords="400,182,410,174"
-          href="imPoint.html"
-          alt="Point 80"
-        />
-        <area
-          shape="rect"
-          coords="399,182,409,174"
-          href="imPoint.html"
-          alt="Point 81"
-        />
-        <area
-          shape="rect"
-          coords="399,183,409,175"
-          href="imPoint.html"
-          alt="Point 82"
-        />
-        <area
-          shape="rect"
-          coords="398,184,408,176"
-          href="imPoint.html"
-          alt="Point 83"
-        />
-        <area
-          shape="rect"
-          coords="397,184,407,176"
-          href="imPoint.html"
-          alt="Point 84"
-        />
-        <area
-          shape="rect"
-          coords="396,184,406,176"
-          href="imPoint.html"
-          alt="Point 85"
-        />
-        <area
-          shape="rect"
-          coords="395,184,405,176"
-          href="imPoint.html"
-          alt="Point 86"
-        />
-        <area
-          shape="rect"
-          coords="395,184,405,176"
-          href="imPoint.html"
-          alt="Point 87"
-        />
-        <area
-          shape="rect"
-          coords="394,184,404,176"
-          href="imPoint.html"
-          alt="Point 88"
-        />
-        <area
-          shape="rect"
-          coords="393,184,403,176"
-          href="imPoint.html"
-          alt="Point 89"
-        />
-        <area
-          shape="rect"
-          coords="392,184,402,176"
-          href="imPoint.html"
-          alt="Point 90"
-        />
-        <area
-          shape="rect"
-          coords="392,184,402,177"
-          href="imPoint.html"
-          alt="Point 91"
-        />
-        <area
-          shape="rect"
-          coords="391,184,401,177"
-          href="imPoint.html"
-          alt="Point 92"
-        />
-        <area
-          shape="rect"
-          coords="390,185,400,177"
-          href="imPoint.html"
-          alt="Point 93"
-        />
-        <area
-          shape="rect"
-          coords="389,185,399,177"
-          href="imPoint.html"
-          alt="Point 94"
-        />
-        <area
-          shape="rect"
-          coords="389,185,399,177"
-          href="imPoint.html"
-          alt="Point 95"
-        />
-        <area
-          shape="rect"
-          coords="388,185,398,177"
-          href="imPoint.html"
-          alt="Point 96"
-        />
-        <area
-          shape="rect"
-          coords="387,185,397,177"
-          href="imPoint.html"
-          alt="Point 97"
-        />
-        <area
-          shape="rect"
-          coords="387,185,397,177"
-          href="imPoint.html"
-          alt="Point 98"
-        />
-        <area
-          shape="rect"
-          coords="386,186,396,178"
-          href="imPoint.html"
-          alt="Point 99"
-        />
-        <area
-          shape="rect"
-          coords="385,186,395,178"
-          href="imPoint.html"
-          alt="Point 100"
-        />
-        <area
-          shape="rect"
-          coords="385,187,395,179"
-          href="imPoint.html"
-          alt="Point 101"
-        />
-        <area
-          shape="rect"
-          coords="384,187,394,179"
-          href="imPoint.html"
-          alt="Point 102"
-        />
-        <area
-          shape="rect"
-          coords="383,187,393,179"
-          href="imPoint.html"
-          alt="Point 103"
-        />
-        <area
-          shape="rect"
-          coords="383,187,393,179"
-          href="imPoint.html"
-          alt="Point 104"
-        />
-        <area
-          shape="rect"
-          coords="382,188,392,180"
-          href="imPoint.html"
-          alt="Point 105"
-        />
-        <area
-          shape="rect"
-          coords="381,188,391,180"
-          href="imPoint.html"
-          alt="Point 106"
-        />
-        <area
-          shape="rect"
-          coords="381,188,391,180"
-          href="imPoint.html"
-          alt="Point 107"
-        />
-        <area
-          shape="rect"
-          coords="380,188,390,180"
-          href="imPoint.html"
-          alt="Point 108"
-        />
-        <area
-          shape="rect"
-          coords="379,188,389,180"
-          href="imPoint.html"
-          alt="Point 109"
-        />
-        <area
-          shape="rect"
-          coords="379,189,389,181"
-          href="imPoint.html"
-          alt="Point 110"
-        />
-        <area
-          shape="rect"
-          coords="378,190,388,182"
-          href="imPoint.html"
-          alt="Point 111"
-        />
-        <area
-          shape="rect"
-          coords="378,191,388,183"
-          href="imPoint.html"
-          alt="Point 112"
-        />
-        <area
-          shape="rect"
-          coords="377,192,387,184"
-          href="imPoint.html"
-          alt="Point 113"
-        />
-        <area
-          shape="rect"
-          coords="376,193,386,185"
-          href="imPoint.html"
-          alt="Point 114"
-        />
-        <area
-          shape="rect"
-          coords="376,194,386,186"
-          href="imPoint.html"
-          alt="Point 115"
-        />
-        <area
-          shape="rect"
-          coords="375,194,385,186"
-          href="imPoint.html"
-          alt="Point 116"
-        />
-        <area
-          shape="rect"
-          coords="375,194,385,186"
-          href="imPoint.html"
-          alt="Point 117"
-        />
-        <area
-          shape="rect"
-          coords="374,197,384,190"
-          href="imPoint.html"
-          alt="Point 118"
-        />
-        <area
-          shape="rect"
-          coords="374,199,384,192"
-          href="imPoint.html"
-          alt="Point 119"
-        />
-        <area
-          shape="rect"
-          coords="373,208,383,200"
-          href="imPoint.html"
-          alt="Point 120"
-        />
-        <area
-          shape="rect"
-          coords="372,209,382,201"
-          href="imPoint.html"
-          alt="Point 121"
-        />
-        <area
-          shape="rect"
-          coords="372,210,382,202"
-          href="imPoint.html"
-          alt="Point 122"
-        />
-        <area
-          shape="rect"
-          coords="371,212,381,204"
-          href="imPoint.html"
-          alt="Point 123"
-        />
-        <area
-          shape="rect"
-          coords="371,220,381,212"
-          href="imPoint.html"
-          alt="Point 124"
-        />
-        <area
-          shape="rect"
-          coords="370,222,380,214"
-          href="imPoint.html"
-          alt="Point 125"
-        />
-        <area
-          shape="rect"
-          coords="370,222,380,214"
-          href="imPoint.html"
-          alt="Point 126"
-        />
-        <area
-          shape="rect"
-          coords="369,226,379,218"
-          href="imPoint.html"
-          alt="Point 127"
-        />
-        <area
-          shape="rect"
-          coords="369,227,379,219"
-          href="imPoint.html"
-          alt="Point 128"
-        />
-        <area
-          shape="rect"
-          coords="368,228,378,221"
-          href="imPoint.html"
-          alt="Point 129"
-        />
-        <area
-          shape="rect"
-          coords="368,231,378,223"
-          href="imPoint.html"
-          alt="Point 130"
-        />
-        <area
-          shape="rect"
-          coords="367,234,377,226"
-          href="imPoint.html"
-          alt="Point 131"
-        />
-        <area
-          shape="rect"
-          coords="367,239,377,231"
-          href="imPoint.html"
-          alt="Point 132"
-        />
-        <area
-          shape="rect"
-          coords="366,239,376,232"
-          href="imPoint.html"
-          alt="Point 133"
-        />
-        <area
-          shape="rect"
-          coords="366,241,376,233"
-          href="imPoint.html"
-          alt="Point 134"
-        />
-        <area
-          shape="rect"
-          coords="365,241,375,233"
-          href="imPoint.html"
-          alt="Point 135"
-        />
-        <area
-          shape="rect"
-          coords="365,242,375,234"
-          href="imPoint.html"
-          alt="Point 136"
-        />
-        <area
-          shape="rect"
-          coords="364,244,374,236"
-          href="imPoint.html"
-          alt="Point 137"
-        />
-        <area
-          shape="rect"
-          coords="364,246,374,239"
-          href="imPoint.html"
-          alt="Point 138"
-        />
-        <area
-          shape="rect"
-          coords="363,247,373,239"
-          href="imPoint.html"
-          alt="Point 139"
-        />
-        <area
-          shape="rect"
-          coords="363,247,373,239"
-          href="imPoint.html"
-          alt="Point 140"
-        />
-        <area
-          shape="rect"
-          coords="362,248,372,240"
-          href="imPoint.html"
-          alt="Point 141"
-        />
-        <area
-          shape="rect"
-          coords="362,249,372,241"
-          href="imPoint.html"
-          alt="Point 142"
-        />
-        <area
-          shape="rect"
-          coords="361,250,371,242"
-          href="imPoint.html"
-          alt="Point 143"
-        />
-        <area
-          shape="rect"
-          coords="361,253,371,245"
-          href="imPoint.html"
-          alt="Point 144"
-        />
-        <area
-          shape="rect"
-          coords="360,255,370,247"
-          href="imPoint.html"
-          alt="Point 145"
-        />
-        <area
-          shape="rect"
-          coords="360,255,370,247"
-          href="imPoint.html"
-          alt="Point 146"
-        />
-        <area
-          shape="rect"
-          coords="359,255,369,247"
-          href="imPoint.html"
-          alt="Point 147"
-        />
-        <area
-          shape="rect"
-          coords="359,255,369,248"
-          href="imPoint.html"
-          alt="Point 148"
-        />
-        <area
-          shape="rect"
-          coords="359,256,369,248"
-          href="imPoint.html"
-          alt="Point 149"
-        />
-        <area
-          shape="rect"
-          coords="358,257,368,249"
-          href="imPoint.html"
-          alt="Point 150"
-        />
-        <area
-          shape="rect"
-          coords="358,257,368,249"
-          href="imPoint.html"
-          alt="Point 151"
-        />
-        <area
-          shape="rect"
-          coords="357,257,367,249"
-          href="imPoint.html"
-          alt="Point 152"
-        />
-        <area
-          shape="rect"
-          coords="357,257,367,250"
-          href="imPoint.html"
-          alt="Point 153"
-        />
-        <area
-          shape="rect"
-          coords="356,258,366,250"
-          href="imPoint.html"
-          alt="Point 154"
-        />
-        <area
-          shape="rect"
-          coords="356,258,366,250"
-          href="imPoint.html"
-          alt="Point 155"
-        />
-        <area
-          shape="rect"
-          coords="355,259,365,251"
-          href="imPoint.html"
-          alt="Point 156"
-        />
-        <area
-          shape="rect"
-          coords="355,259,365,251"
-          href="imPoint.html"
-          alt="Point 157"
-        />
-        <area
-          shape="rect"
-          coords="355,259,365,251"
-          href="imPoint.html"
-          alt="Point 158"
-        />
-        <area
-          shape="rect"
-          coords="354,259,364,251"
-          href="imPoint.html"
-          alt="Point 159"
-        />
-        <area
-          shape="rect"
-          coords="354,259,364,251"
-          href="imPoint.html"
-          alt="Point 160"
-        />
-        <area
-          shape="rect"
-          coords="353,259,363,252"
-          href="imPoint.html"
-          alt="Point 161"
-        />
-        <area
-          shape="rect"
-          coords="353,259,363,252"
-          href="imPoint.html"
-          alt="Point 162"
-        />
-        <area
-          shape="rect"
-          coords="353,260,363,253"
-          href="imPoint.html"
-          alt="Point 163"
-        />
-        <area
-          shape="rect"
-          coords="352,261,362,253"
-          href="imPoint.html"
-          alt="Point 164"
-        />
-        <area
-          shape="rect"
-          coords="352,261,362,253"
-          href="imPoint.html"
-          alt="Point 165"
-        />
-        <area
-          shape="rect"
-          coords="351,261,361,253"
-          href="imPoint.html"
-          alt="Point 166"
-        />
-        <area
-          shape="rect"
-          coords="351,261,361,254"
-          href="imPoint.html"
-          alt="Point 167"
-        />
-        <area
-          shape="rect"
-          coords="350,262,360,254"
-          href="imPoint.html"
-          alt="Point 168"
-        />
-        <area
-          shape="rect"
-          coords="350,262,360,254"
-          href="imPoint.html"
-          alt="Point 169"
-        />
-        <area
-          shape="rect"
-          coords="350,263,360,255"
-          href="imPoint.html"
-          alt="Point 170"
-        />
-        <area
-          shape="rect"
-          coords="349,263,359,255"
-          href="imPoint.html"
-          alt="Point 171"
-        />
-        <area
-          shape="rect"
-          coords="349,264,359,256"
-          href="imPoint.html"
-          alt="Point 172"
-        />
-        <area
-          shape="rect"
-          coords="349,264,359,256"
-          href="imPoint.html"
-          alt="Point 173"
-        />
-        <area
-          shape="rect"
-          coords="348,264,358,256"
-          href="imPoint.html"
-          alt="Point 174"
-        />
-        <area
-          shape="rect"
-          coords="348,264,358,257"
-          href="imPoint.html"
-          alt="Point 175"
-        />
-        <area
-          shape="rect"
-          coords="347,265,357,258"
-          href="imPoint.html"
-          alt="Point 176"
-        />
-        <area
-          shape="rect"
-          coords="347,267,357,259"
-          href="imPoint.html"
-          alt="Point 177"
-        />
-        <area
-          shape="rect"
-          coords="347,268,357,260"
-          href="imPoint.html"
-          alt="Point 178"
-        />
-        <area
-          shape="rect"
-          coords="346,270,356,262"
-          href="imPoint.html"
-          alt="Point 179"
-        />
-        <area
-          shape="rect"
-          coords="346,271,356,263"
-          href="imPoint.html"
-          alt="Point 180"
-        />
-        <area
-          shape="rect"
-          coords="345,272,355,264"
-          href="imPoint.html"
-          alt="Point 181"
-        />
-        <area
-          shape="rect"
-          coords="345,272,355,265"
-          href="imPoint.html"
-          alt="Point 182"
-        />
-        <area
-          shape="rect"
-          coords="345,273,355,265"
-          href="imPoint.html"
-          alt="Point 183"
-        />
-        <area
-          shape="rect"
-          coords="344,273,354,265"
-          href="imPoint.html"
-          alt="Point 184"
-        />
-        <area
-          shape="rect"
-          coords="344,274,354,266"
-          href="imPoint.html"
-          alt="Point 185"
-        />
-        <area
-          shape="rect"
-          coords="344,274,354,266"
-          href="imPoint.html"
-          alt="Point 186"
-        />
-        <area
-          shape="rect"
-          coords="343,274,353,266"
-          href="imPoint.html"
-          alt="Point 187"
-        />
-        <area
-          shape="rect"
-          coords="343,277,353,269"
-          href="imPoint.html"
-          alt="Point 188"
-        />
-        <area
-          shape="rect"
-          coords="343,277,353,270"
-          href="imPoint.html"
-          alt="Point 189"
-        />
-        <area
-          shape="rect"
-          coords="342,280,352,272"
-          href="imPoint.html"
-          alt="Point 190"
-        />
-        <area
-          shape="rect"
-          coords="342,280,352,272"
-          href="imPoint.html"
-          alt="Point 191"
-        />
-        <area
-          shape="rect"
-          coords="342,281,352,273"
-          href="imPoint.html"
-          alt="Point 192"
-        />
-        <area
-          shape="rect"
-          coords="341,281,351,273"
-          href="imPoint.html"
-          alt="Point 193"
-        />
-        <area
-          shape="rect"
-          coords="341,282,351,274"
-          href="imPoint.html"
-          alt="Point 194"
-        />
-        <area
-          shape="rect"
-          coords="340,282,350,274"
-          href="imPoint.html"
-          alt="Point 195"
-        />
-        <area
-          shape="rect"
-          coords="340,283,350,275"
-          href="imPoint.html"
-          alt="Point 196"
-        />
-        <area
-          shape="rect"
-          coords="340,284,350,276"
-          href="imPoint.html"
-          alt="Point 197"
-        />
-        <area
-          shape="rect"
-          coords="339,286,349,278"
-          href="imPoint.html"
-          alt="Point 198"
-        />
-        <area
-          shape="rect"
-          coords="339,286,349,278"
-          href="imPoint.html"
-          alt="Point 199"
-        />
-        <area
-          shape="rect"
-          coords="339,287,349,279"
-          href="imPoint.html"
-          alt="Point 200"
-        />
-        <area
-          shape="rect"
-          coords="338,287,348,279"
-          href="imPoint.html"
-          alt="Point 201"
-        />
-        <area
-          shape="rect"
-          coords="338,287,348,279"
-          href="imPoint.html"
-          alt="Point 202"
-        />
-        <area
-          shape="rect"
-          coords="338,287,348,280"
-          href="imPoint.html"
-          alt="Point 203"
-        />
-        <area
-          shape="rect"
-          coords="337,288,347,280"
-          href="imPoint.html"
-          alt="Point 204"
-        />
-        <area
-          shape="rect"
-          coords="337,291,347,283"
-          href="imPoint.html"
-          alt="Point 205"
-        />
-        <area
-          shape="rect"
-          coords="337,291,347,284"
-          href="imPoint.html"
-          alt="Point 206"
-        />
-        <area
-          shape="rect"
-          coords="336,292,346,284"
-          href="imPoint.html"
-          alt="Point 207"
-        />
-        <area
-          shape="rect"
-          coords="336,293,346,285"
-          href="imPoint.html"
-          alt="Point 208"
-        />
-        <area
-          shape="rect"
-          coords="336,294,346,286"
-          href="imPoint.html"
-          alt="Point 209"
-        />
-        <area
-          shape="rect"
-          coords="336,296,346,288"
-          href="imPoint.html"
-          alt="Point 210"
-        />
-        <area
-          shape="rect"
-          coords="335,296,345,288"
-          href="imPoint.html"
-          alt="Point 211"
-        />
-        <area
-          shape="rect"
-          coords="335,296,345,288"
-          href="imPoint.html"
-          alt="Point 212"
-        />
-        <area
-          shape="rect"
-          coords="335,296,345,288"
-          href="imPoint.html"
-          alt="Point 213"
-        />
-        <area
-          shape="rect"
-          coords="334,296,344,288"
-          href="imPoint.html"
-          alt="Point 214"
-        />
-        <area
-          shape="rect"
-          coords="334,296,344,288"
-          href="imPoint.html"
-          alt="Point 215"
-        />
-        <area
-          shape="rect"
-          coords="334,296,344,288"
-          href="imPoint.html"
-          alt="Point 216"
-        />
-        <area
-          shape="rect"
-          coords="333,296,343,288"
-          href="imPoint.html"
-          alt="Point 217"
-        />
-        <area
-          shape="rect"
-          coords="333,296,343,288"
-          href="imPoint.html"
-          alt="Point 218"
-        />
-        <area
-          shape="rect"
-          coords="333,296,343,288"
-          href="imPoint.html"
-          alt="Point 219"
-        />
-        <area
-          shape="rect"
-          coords="332,296,342,289"
-          href="imPoint.html"
-          alt="Point 220"
-        />
-        <area
-          shape="rect"
-          coords="332,296,342,289"
-          href="imPoint.html"
-          alt="Point 221"
-        />
-        <area
-          shape="rect"
-          coords="332,297,342,289"
-          href="imPoint.html"
-          alt="Point 222"
-        />
-        <area
-          shape="rect"
-          coords="332,297,342,289"
-          href="imPoint.html"
-          alt="Point 223"
-        />
-        <area
-          shape="rect"
-          coords="331,297,341,289"
-          href="imPoint.html"
-          alt="Point 224"
-        />
-        <area
-          shape="rect"
-          coords="331,297,341,289"
-          href="imPoint.html"
-          alt="Point 225"
-        />
-        <area
-          shape="rect"
-          coords="331,297,341,290"
-          href="imPoint.html"
-          alt="Point 226"
-        />
-        <area
-          shape="rect"
-          coords="330,297,340,290"
-          href="imPoint.html"
-          alt="Point 227"
-        />
-        <area
-          shape="rect"
-          coords="330,298,340,290"
-          href="imPoint.html"
-          alt="Point 228"
-        />
-        <area
-          shape="rect"
-          coords="330,298,340,290"
-          href="imPoint.html"
-          alt="Point 229"
-        />
-        <area
-          shape="rect"
-          coords="329,298,339,290"
-          href="imPoint.html"
-          alt="Point 230"
-        />
-        <area
-          shape="rect"
-          coords="329,298,339,290"
-          href="imPoint.html"
-          alt="Point 231"
-        />
-        <area
-          shape="rect"
-          coords="329,298,339,290"
-          href="imPoint.html"
-          alt="Point 232"
-        />
-        <area
-          shape="rect"
-          coords="329,298,339,291"
-          href="imPoint.html"
-          alt="Point 233"
-        />
-        <area
-          shape="rect"
-          coords="328,299,338,291"
-          href="imPoint.html"
-          alt="Point 234"
-        />
-        <area
-          shape="rect"
-          coords="328,299,338,292"
-          href="imPoint.html"
-          alt="Point 235"
-        />
-        <area
-          shape="rect"
-          coords="328,300,338,292"
-          href="imPoint.html"
-          alt="Point 236"
-        />
-        <area
-          shape="rect"
-          coords="327,300,337,292"
-          href="imPoint.html"
-          alt="Point 237"
-        />
-        <area
-          shape="rect"
-          coords="327,300,337,292"
-          href="imPoint.html"
-          alt="Point 238"
-        />
-        <area
-          shape="rect"
-          coords="327,300,337,292"
-          href="imPoint.html"
-          alt="Point 239"
-        />
-        <area
-          shape="rect"
-          coords="327,300,337,292"
-          href="imPoint.html"
-          alt="Point 240"
-        />
-        <area
-          shape="rect"
-          coords="326,300,336,292"
-          href="imPoint.html"
-          alt="Point 241"
-        />
-        <area
-          shape="rect"
-          coords="326,300,336,292"
-          href="imPoint.html"
-          alt="Point 242"
-        />
-        <area
-          shape="rect"
-          coords="326,300,336,292"
-          href="imPoint.html"
-          alt="Point 243"
-        />
-        <area
-          shape="rect"
-          coords="325,300,335,292"
-          href="imPoint.html"
-          alt="Point 244"
-        />
-        <area
-          shape="rect"
-          coords="325,300,335,292"
-          href="imPoint.html"
-          alt="Point 245"
-        />
-        <area
-          shape="rect"
-          coords="325,300,335,292"
-          href="imPoint.html"
-          alt="Point 246"
-        />
-        <area
-          shape="rect"
-          coords="325,300,335,292"
-          href="imPoint.html"
-          alt="Point 247"
-        />
-        <area
-          shape="rect"
-          coords="324,300,334,292"
-          href="imPoint.html"
-          alt="Point 248"
-        />
-        <area
-          shape="rect"
-          coords="324,300,334,292"
-          href="imPoint.html"
-          alt="Point 249"
-        />
-        <area
-          shape="rect"
-          coords="324,300,334,292"
-          href="imPoint.html"
-          alt="Point 250"
-        />
-      </map>
-    </div>
+    <>
+      <div>
+        <pre>{ JSON.stringify(debugQuery, null, 2) }</pre>
+      </div>
+      <div className="text-center">
+        <img
+          src="assets/images/qq-plots/ewings_sarcoma.png"
+          alt="QQ-plot of selected trait"
+          useMap="#image-map"
+        />
+        <map name="image-map">
+          <area shape="rect" coords="741,88,747,80" alt="point_1	1:869121	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="697,141,703,133" alt="point_2	1:5665513	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="677,141,683,134" alt="point_3	1:34044616	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="663,141,669,134" alt="point_4	1:65187438	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="653,143,659,135" alt="point_5	1:69771179	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="645,146,651,138" alt="point_6	1:78317564	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="638,146,644,138" alt="point_7	1:84203044	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="633,146,639,138" alt="point_8	1:110408241	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="628,146,634,138" alt="point_9	1:112788376	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="623,146,629,139" alt="point_10	1:115906457	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="619,147,625,139" alt="point_11	1:116117652	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="615,147,621,139" alt="point_12	1:152229333	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="612,148,618,140" alt="point_13	1:152238264	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="609,148,615,140" alt="point_14	1:153834298	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="606,148,612,140" alt="point_15	1:158265687	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="604,148,610,140" alt="point_16	1:161251769	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="601,148,607,141" alt="point_17	1:164512877	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="599,148,605,141" alt="point_18	1:177472877	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="596,149,602,141" alt="point_19	1:202095531	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="594,149,600,141" alt="point_20	1:211079618	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="592,149,598,142" alt="point_21	1:216745245	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="590,150,596,142" alt="point_22	1:222129049	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="589,150,595,142" alt="point_23	1:242360934	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="587,150,593,142" alt="point_24	1:247226344	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="585,150,591,142" alt="point_25	2:651382	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="584,150,590,142" alt="point_26	2:8703350	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="582,151,588,143" alt="point_27	2:13137599	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="581,152,587,144" alt="point_28	2:15372731	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="579,152,585,144" alt="point_29	2:16937318	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="578,152,584,144" alt="point_30	2:21475944	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="576,152,582,145" alt="point_31	2:27065449	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="575,152,581,145" alt="point_32	2:33621348	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="574,153,580,145" alt="point_33	2:34557763	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="573,153,579,145" alt="point_34	2:41714662	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="572,153,578,145" alt="point_35	2:42711419	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="570,153,576,146" alt="point_36	2:50126245	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="569,154,575,146" alt="point_37	2:73848933	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="568,154,574,146" alt="point_38	2:102613299	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="567,156,573,148" alt="point_39	2:109810800	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="566,157,572,149" alt="point_40	2:115450301	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="565,160,571,152" alt="point_41	2:124090496	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="564,161,570,153" alt="point_42	2:124090531	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="563,161,569,153" alt="point_43	2:128392468	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="562,163,568,155" alt="point_44	2:137435956	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="561,166,567,158" alt="point_45	2:143803847	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="560,167,566,159" alt="point_46	2:160311382	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="560,168,566,161" alt="point_47	2:172415450	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="559,170,565,162" alt="point_48	2:193326547	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="558,170,564,162" alt="point_49	2:201576053	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="557,171,563,163" alt="point_50	2:202419367	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="556,173,562,165" alt="point_51	2:202419507	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="555,174,561,166" alt="point_52	2:202419622	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="555,174,561,166" alt="point_53	2:202420067	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="554,174,560,166" alt="point_54	2:202420552	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="553,174,559,166" alt="point_55	2:202420764	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="553,174,558,166" alt="point_56	2:202421282	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="552,174,558,166" alt="point_57	2:202421559	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="551,174,557,166" alt="point_58	2:202421914	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="550,175,556,167" alt="point_59	2:202422216	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="550,175,556,167" alt="point_60	2:202422268	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="549,175,555,167" alt="point_61	2:202422496	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="548,175,554,168" alt="point_62	2:202422709	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="548,176,554,168" alt="point_63	2:202422795	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="547,177,553,169" alt="point_64	2:202423172	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="546,178,552,170" alt="point_65	2:202423507	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="546,178,552,170" alt="point_66	2:202423761	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="545,178,551,170" alt="point_67	2:202425545	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="545,178,551,170" alt="point_68	2:202425664	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="544,180,550,172" alt="point_69	2:202425695	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="544,180,549,172" alt="point_70	2:202425702	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="543,181,549,173" alt="point_71	2:202425913	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="542,181,548,173" alt="point_72	2:202426017	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="542,181,548,173" alt="point_73	2:202426355	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="541,181,547,173" alt="point_74	2:202426467	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="541,181,547,173" alt="point_75	2:202426567	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="540,181,546,173" alt="point_76	2:202426653	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="540,181,546,173" alt="point_77	2:202429193	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="539,181,545,173" alt="point_78	2:202430584	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="539,182,545,174" alt="point_79	2:202430679	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="538,182,544,174" alt="point_80	2:217270394	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="538,182,544,174" alt="point_81	2:217270450	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="537,183,543,175" alt="point_82	2:217270918	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="537,184,543,176" alt="point_83	3:12735637	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="536,184,542,176" alt="point_84	3:20508526	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="536,184,542,176" alt="point_85	3:22165478	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="535,184,541,176" alt="point_86	3:35170994	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="535,184,541,176" alt="point_87	3:36817328	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="534,184,540,176" alt="point_88	3:46137970	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="534,184,540,176" alt="point_89	3:57055343	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="533,184,539,176" alt="point_90	3:58273743	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="533,184,539,177" alt="point_91	3:69869617	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="533,184,538,177" alt="point_92	3:110224103	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="532,185,538,177" alt="point_93	3:122234615	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="532,185,538,177" alt="point_94	3:125680151	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="531,185,537,177" alt="point_95	3:126606492	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="531,185,537,177" alt="point_96	3:137580228	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="530,185,536,177" alt="point_97	3:142846370	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="530,185,536,177" alt="point_98	3:145529925	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="530,186,536,178" alt="point_99	3:152806318	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="529,186,535,178" alt="point_100	3:171608370	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="529,187,535,179" alt="point_101	3:185524081	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="528,187,534,179" alt="point_102	3:191172985	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="528,187,534,179" alt="point_103	3:194078002	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="528,187,534,179" alt="point_104	3:195473391	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="527,188,533,180" alt="point_105	3:195746908	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="527,188,533,180" alt="point_106	3:195838911	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="526,188,532,180" alt="point_107	4:3874052	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="526,188,532,180" alt="point_108	4:4077395	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="526,188,532,180" alt="point_109	4:4856579	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="525,189,531,181" alt="point_110	4:6325544	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="525,190,531,182" alt="point_111	4:15081864	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="525,191,531,183" alt="point_112	4:17699039	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="524,192,530,184" alt="point_113	4:21017775	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="524,193,530,185" alt="point_114	4:26147138	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="524,194,530,186" alt="point_115	4:32367310	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="523,194,529,186" alt="point_116	4:34355318	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="523,194,529,186" alt="point_117	4:64290189	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="522,197,528,190" alt="point_118	4:64290196	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="522,199,528,192" alt="point_119	4:64488898	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="522,208,528,200" alt="point_120	4:83325914	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="521,209,527,201" alt="point_121	4:83590099	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="521,210,527,202" alt="point_122	4:88922734	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="521,212,527,204" alt="point_123	4:116986018	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="521,220,526,212" alt="point_124	4:125437889	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="520,222,526,214" alt="point_125	4:157366246	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="520,222,526,214" alt="point_126	4:173667417	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="520,226,526,218" alt="point_127	4:173669613	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="519,227,525,219" alt="point_128	4:183896181	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="519,228,525,221" alt="point_129	4:188051175	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="519,231,525,223" alt="point_130	5:4799060	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="518,234,524,226" alt="point_131	5:7578674	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="518,239,524,231" alt="point_132	5:15823365	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="518,239,524,232" alt="point_133	5:17255364	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="517,241,523,233" alt="point_134	5:25578655	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="517,241,523,233" alt="point_135	5:73212507	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="517,242,523,234" alt="point_136	5:78444148	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="516,244,522,236" alt="point_137	5:101169258	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="516,246,522,239" alt="point_138	5:111582288	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="516,247,522,239" alt="point_139	5:114175565	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="516,247,522,239" alt="point_140	5:117457353	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="515,248,521,240" alt="point_141	5:134846562	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="515,249,521,241" alt="point_142	5:148924068	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="515,250,521,242" alt="point_143	5:158886939	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="514,253,520,245" alt="point_144	5:159815377	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="514,255,520,247" alt="point_145	5:179722699	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="514,255,520,247" alt="point_146	5:179723445	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="514,255,520,247" alt="point_147	6:3852233	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="513,255,519,248" alt="point_148	6:26426301	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="513,256,519,248" alt="point_149	6:32608589	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="513,257,519,249" alt="point_150	6:33051845	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="513,257,519,249" alt="point_151	6:36967614	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="512,257,518,249" alt="point_152	6:37648778	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="512,257,518,250" alt="point_153	6:38761296	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="512,258,518,250" alt="point_154	6:39301627	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="512,258,518,250" alt="point_155	6:47149297	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="511,259,517,251" alt="point_156	6:48414688	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="511,259,517,251" alt="point_157	6:54823431	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="511,259,517,251" alt="point_158	6:54879099	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="511,259,517,251" alt="point_159	6:66153462	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="510,259,516,251" alt="point_160	6:66452510	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="510,259,516,252" alt="point_161	6:78675271	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="510,259,516,252" alt="point_162	6:112336716	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="510,260,516,253" alt="point_163	6:115853024	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="509,261,515,253" alt="point_164	6:118443045	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="509,261,515,253" alt="point_165	6:121843294	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="509,261,515,253" alt="point_166	6:133633350	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="509,261,515,254" alt="point_167	6:140136531	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="508,262,514,254" alt="point_168	6:141807873	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="508,262,514,254" alt="point_169	6:143116005	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="508,263,514,255" alt="point_170	6:146739230	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="508,263,514,255" alt="point_171	6:151778934	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="507,264,513,256" alt="point_172	7:1095471	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="507,264,513,256" alt="point_173	7:5873080	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="507,264,513,256" alt="point_174	7:8610841	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="507,264,513,257" alt="point_175	7:8851998	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="506,265,512,258" alt="point_176	7:16445066	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="506,267,512,259" alt="point_177	7:29954693	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="506,268,512,260" alt="point_178	7:31911298	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="506,270,512,262" alt="point_179	7:47029506	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="506,271,512,263" alt="point_180	7:47554347	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="505,272,511,264" alt="point_181	7:55030269	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="505,272,511,265" alt="point_182	7:57208666	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="505,273,511,265" alt="point_183	7:82428904	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="505,273,511,265" alt="point_184	7:82998022	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="504,274,510,266" alt="point_185	7:86456833	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="504,274,510,266" alt="point_186	7:89685507	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="504,274,510,266" alt="point_187	7:107442370	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="504,277,510,269" alt="point_188	7:108493447	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="504,277,510,270" alt="point_189	7:109359714	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="503,280,509,272" alt="point_190	7:112980477	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="503,280,509,272" alt="point_191	7:118518479	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="503,281,509,273" alt="point_192	7:124015030	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="503,281,509,273" alt="point_193	7:144708411	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="503,282,509,274" alt="point_194	7:146848333	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="502,282,508,274" alt="point_195	7:149707006	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="502,283,508,275" alt="point_196	7:158466432	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="502,284,508,276" alt="point_197	8:10935898	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="502,286,508,278" alt="point_198	8:24807520	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="502,286,508,278" alt="point_199	8:24809636	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="501,287,507,279" alt="point_200	8:37147349	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="501,287,507,279" alt="point_201	8:40360196	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="501,287,507,279" alt="point_202	8:49941703	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="501,287,507,280" alt="point_203	8:71658951	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="501,288,507,280" alt="point_204	8:77510348	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="500,291,506,283" alt="point_205	8:78817219	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="500,291,506,284" alt="point_206	8:80277213	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="500,292,506,284" alt="point_207	8:84781808	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="500,293,506,285" alt="point_208	8:96234759	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="500,294,506,286" alt="point_209	8:104138970	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="499,296,505,288" alt="point_210	8:117634425	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="499,296,505,288" alt="point_211	8:122032732	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="499,296,505,288" alt="point_212	8:122468073	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="499,296,505,288" alt="point_213	8:131640155	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="499,296,505,288" alt="point_214	8:139926589	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="498,296,504,288" alt="point_215	9:16787786	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="498,296,504,288" alt="point_216	9:19161456	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="498,296,504,288" alt="point_217	9:19330561	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="498,296,504,288" alt="point_218	9:71759542	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="498,296,504,288" alt="point_219	9:78518999	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="497,296,503,289" alt="point_220	9:97162778	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="497,296,503,289" alt="point_221	9:98449514	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="497,297,503,289" alt="point_222	9:101204352	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="497,297,503,289" alt="point_223	9:101971621	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="497,297,503,289" alt="point_224	9:111807273	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="497,297,503,289" alt="point_225	9:130586095	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="496,297,502,290" alt="point_226	9:132900076	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="496,297,502,290" alt="point_227	9:136454105	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="496,298,502,290" alt="point_228	10:3925728	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="496,298,502,290" alt="point_229	10:8454687	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="496,298,502,290" alt="point_230	10:15596732	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="496,298,502,290" alt="point_231	10:55847908	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="495,298,501,290" alt="point_232	10:57538419	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="495,298,501,291" alt="point_233	10:82434987	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="495,299,501,291" alt="point_234	10:87598700	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="495,299,501,292" alt="point_235	10:122717301	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="495,300,501,292" alt="point_236	10:134615093	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="495,300,500,292" alt="point_237	11:2776410	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="494,300,500,292" alt="point_238	11:3882730	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="494,300,500,292" alt="point_239	11:8183707	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="494,300,500,292" alt="point_240	11:10383322	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="494,300,500,292" alt="point_241	11:15605255	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="494,300,500,292" alt="point_242	11:24941083	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="494,300,499,292" alt="point_243	11:45108536	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="493,300,499,292" alt="point_244	11:47103486	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="493,300,499,292" alt="point_245	11:47171714	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="493,300,499,292" alt="point_246	11:55531292	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="493,300,499,292" alt="point_247	11:55531298	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="493,300,499,292" alt="point_248	11:65590043	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="493,300,499,292" alt="point_249	11:80769390	0.9999	0"  onClick={e => clickPoint(e)} />
+          <area shape="rect" coords="492,300,498,292" alt="point_250	11:83457724	0.9999	0"  onClick={e => clickPoint(e)} />
+        </map>
+      </div>
+    </>
   );
+
+  function clickPoint(e) {
+    console.log(e.target.alt);
+    var variant = e.target.alt.split("\t");
+    setDebugQuery(
+      {
+        "point_#": variant[0],
+        "snp": variant[1],
+        "p-value": variant[2],
+        "nlog_p": variant[3] 
+      }
+    );
+  }
 }
