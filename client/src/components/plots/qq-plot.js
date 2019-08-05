@@ -33,13 +33,8 @@ export function QQPlot({ trait }) {
       </div>
 
       <div className="row mt-3">
-<<<<<<< HEAD
-        <div class="col-md-12 text-center">
-          <pre>{ JSON.stringify(debugQuery, null, 2) }</pre>
-=======
         <div class="col-md-12 text-left">
           <pre>{JSON.stringify(debugQuery, null, 2)}</pre>
->>>>>>> master
         </div>
       </div>
 
