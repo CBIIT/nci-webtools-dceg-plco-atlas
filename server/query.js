@@ -1,4 +1,5 @@
 const Database = require('better-sqlite3');
+const fs = require('fs');
 
 function getRanges(filepath) {
     return new Database(filepath, {readonly: true}).prepare(`
@@ -38,21 +39,12 @@ function getVariants(filepath, params) {
     };
 }
 
-function getVariantsQQ(filepath, params) {
-    const stmt = new Database(filepath, {readonly: true}).prepare(`
-        SELECT snp, p, nlog_p, nlog_p2
-            FROM variant
-            WHERE nlog_p2 >= :nlogpMin
-            ORDER BY p DESC;
-    `);
-
-    if (params.raw)   
-        return {
-            columns: stmt.columns().map(c => c.name),
-            data: stmt.raw().all(params)
-        };
-    else
-        return stmt.all(params);
+function getQQImageMapJSON(name) {
+    let raw = fs.readFileSync('server/data/' + name + '.json');
+    let obj = JSON.parse(raw);
+    return {
+        data: obj
+    };
 }
 
-module.exports = {getRanges, getSummary, getVariants, getVariantsQQ};
+module.exports = {getRanges, getSummary, getVariants, getQQImageMapJSON};
