@@ -1,7 +1,7 @@
-import React, { useState, useRef } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { query } from '../../services/query';
 
-export function QQPlot(props) {
+export function QQPlot({ trait }) {
   const plotContainer = useRef(null);
   const [timestamp, setTimestamp] = useState(0);
   const [loading, setLoading] = useState(false);
@@ -12,19 +12,23 @@ export function QQPlot(props) {
 
   const [areaItems, setAreaItems] = useState([{}]);
 
+  useEffect(() => {
+    if (trait) loadQQPlot();
+  }, [trait]);
+
   return (
     <>
       <div className="row">
-        <div class="col-md-12 text-left">
+        <div class="col-md-12 text-right">
+          {timestamp ? <strong class="mx-2">{timestamp} s</strong> : null}
           <div class="btn-group" role="group" aria-label="Basic example">
             <button
               className="btn btn-primary btn-sm"
               onClick={e => loadQQPlot()}
               disabled={loading}>
-              Load
+              Reset
             </button>
           </div>
-          {timestamp ? <strong class="mx-2">{timestamp} s</strong> : null}
         </div>
       </div>
 

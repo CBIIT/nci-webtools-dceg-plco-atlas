@@ -40,7 +40,7 @@ export function Gwas({ params, setParams }) {
               </Tab.Pane>
 
               <Tab.Pane eventKey="qq-plot">
-                <QQPlot />
+                <QQPlot trait={trait}/>
               </Tab.Pane>
             </Tab.Content>
           </div>
