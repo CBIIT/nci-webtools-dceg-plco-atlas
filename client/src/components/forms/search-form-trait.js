@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Form, FormControl, InputGroup } from 'react-bootstrap';
 
-export function SearchForm({ params, onChange, onSubmit }) {
+export function SearchFormTrait({ params, onChange, onSubmit }) {
   const [listType, setListType] = useState('alphabetic');
 
   const categories = [

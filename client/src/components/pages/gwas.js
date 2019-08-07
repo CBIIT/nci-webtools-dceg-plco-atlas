@@ -1,51 +1,47 @@
 import React, { useState } from 'react';
 import { Nav, Tab } from 'react-bootstrap';
-import { SearchForm } from '../search-form';
-import { ManhattanPlot } from '../plots/manhattan-plot';
-import { QQPlot } from '../plots/qq-plot';
+// import { SearchFormTrait } from '../search-form-trait';
+import { SummaryResults } from '../gwas/summary-results';
+import { VariantLookup } from '../gwas/variant-lookup'
+// import { ManhattanPlot } from '../plots/manhattan-plot';
+// import { QQPlot } from '../plots/qq-plot';
 
 export function Gwas({ params, setParams }) {
   const [trait, setTrait] = useState(null);
 
   return (
     <div className="container my-4">
-      <div className="card shadow-sm mb-4">
-        <div className="card-body">
-          <SearchForm
-            params={params}
-            onChange={setParams}
-            onSubmit={e => setTrait(params.trait)}
-          />
-        </div>
-      </div>
+      <Tab.Container defaultActiveKey="summary-results">
 
-      <div className="card shadow-sm mb-4">
-        <Tab.Container defaultActiveKey="manhattan-plot">
-          <div className="card-header bg-white font-weight-bolder border-bottom-0">
-            <Nav variant="pills" className="nav-pills-custom">
-              <Nav.Item className="mr-2">
-                <Nav.Link eventKey="manhattan-plot">Manhattan Plots</Nav.Link>
-              </Nav.Item>
+       <Nav variant="pills" className="nav-pills-custom mb-4">
+          <Nav.Item className="mr-2">
+            <Nav.Link eventKey="summary-results">Summary Results</Nav.Link>
+          </Nav.Item>
 
-              <Nav.Item>
-                <Nav.Link eventKey="qq-plot">Q-Q Plot</Nav.Link>
-              </Nav.Item>
-            </Nav>
-          </div>
+          <Nav.Item className="mr-2">
+            <Nav.Link eventKey="variant-lookup">Variant Lookup</Nav.Link>
+          </Nav.Item>
 
-          <div className="card-body">
-            <Tab.Content>
-              <Tab.Pane eventKey="manhattan-plot">
-                <ManhattanPlot trait={trait} />
-              </Tab.Pane>
+          <Nav.Item>
+            <Nav.Link eventKey="phenotype-correlations">Phenotype Correlations</Nav.Link>
+          </Nav.Item>
+        </Nav>
 
-              <Tab.Pane eventKey="qq-plot">
-                <QQPlot trait={trait} />
-              </Tab.Pane>
-            </Tab.Content>
-          </div>
-        </Tab.Container>
-      </div>
+        <Tab.Content>
+          <Tab.Pane eventKey="summary-results">
+            <SummaryResults params={params} setParams={setParams} />
+          </Tab.Pane>
+
+          <Tab.Pane eventKey="variant-lookup">
+            <VariantLookup params={params} setParams={setParams} />
+          </Tab.Pane>
+
+          <Tab.Pane eventKey="phenotype-correlations">
+            phenotype-correlations
+          </Tab.Pane>
+        </Tab.Content>
+
+      </Tab.Container>
     </div>
   );
 }
