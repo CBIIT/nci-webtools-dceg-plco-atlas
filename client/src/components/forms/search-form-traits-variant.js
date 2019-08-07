@@ -46,6 +46,7 @@ export function SearchFormTraitsVariant({ params, onChange, onSubmit }) {
   ];
   
   const [selectedOption, setSelectedOption] = useState(null);
+  const [selectedVariant, setSelectedVariant] = useState(null);
 
   return (
     <Form>
@@ -80,10 +81,11 @@ export function SearchFormTraitsVariant({ params, onChange, onSubmit }) {
             class="form-control"
             placeholder="Variant"
             aria-label="Variant"
+            onChange={e => setSelectedVariant(e.target.value)}
           />
           {/* submit button */}
           <InputGroup.Append>
-            <button className="btn btn-primary" onClick={onSubmit}>
+            <button className="btn btn-primary" onClick={e => onSubmit({selectedOption, selectedVariant})}>
               Submit
             </button>
           </InputGroup.Append>
@@ -96,9 +98,7 @@ export function SearchFormTraitsVariant({ params, onChange, onSubmit }) {
     var categorized = categories.map(function(category) {
         return {
           label: category,
-          options: traits
-            .filter(t => t.category === category)
-            .map(t => (
+          options: traits.filter(t => t.category === category).map(t => (
               {
                 label: t.label,
                 value: t.value

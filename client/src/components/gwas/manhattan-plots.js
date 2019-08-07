@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Nav, Tab } from 'react-bootstrap';
-import { SearchFormTrait } from '../search-form-trait';
+import { SearchFormTrait } from '../forms/search-form-trait';
 import { ManhattanPlot } from '../plots/manhattan-plot';
 import { QQPlot } from '../plots/qq-plot';
 

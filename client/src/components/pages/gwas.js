@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { Nav, Tab } from 'react-bootstrap';
 // import { SearchFormTrait } from '../search-form-trait';
-import { ManhattanPlots } from './manhattan-plots';
-import { SingleVariants } from './single-variants'
+import { ManhattanPlots } from '../gwas/manhattan-plots';
+import { SingleVariants } from '../gwas/single-variants'
 // import { ManhattanPlot } from '../plots/manhattan-plot';
 // import { QQPlot } from '../plots/qq-plot';
 

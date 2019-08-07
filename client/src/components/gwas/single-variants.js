@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 // import { Nav, Tab } from 'react-bootstrap';
-import { SearchFormTraitsVariant } from '../search-form-traits-variant';
+import { SearchFormTraitsVariant } from '../forms/search-form-traits-variant';
 
 export function SingleVariants({ params, setParams }) {
   const [trait, setTrait] = useState(null);
@@ -12,7 +12,7 @@ export function SingleVariants({ params, setParams }) {
                 <SearchFormTraitsVariant
                     params={params}
                     onChange={setParams}
-                    onSubmit={e => setTrait(params.trait)}
+                    onSubmit={setTrait}
                 />
             </div>
         </div>
