@@ -29,8 +29,11 @@ export function ManhattanPlot({ trait }) {
 
   return (
     <div className="row">
-      <div class="col-md-12 text-right">
-        {timestamp ? <strong class="mx-2">{timestamp} s</strong> : null}
+      <div className="col-md-12">
+        <div ref={plotContainer} className="manhattan-plot" />
+        {/* <pre>{ JSON.stringify(params, null, 2) }</pre> */}
+      </div>
+      <div class="col-md-12" style={{opacity: 0.5}}>
         <div class="btn-group" role="group" aria-label="Basic example">
           <button
             className="btn btn-primary btn-sm"
@@ -39,12 +42,9 @@ export function ManhattanPlot({ trait }) {
             Reset
           </button>
         </div>
+        {timestamp ? <span class="mx-2">{timestamp} s</span> : null}
       </div>
 
-      <div className="col-md-12">
-        <div ref={plotContainer} className="manhattan-plot" />
-        {/* <pre>{ JSON.stringify(params, null, 2) }</pre> */}
-      </div>
     </div>
   );
 
@@ -120,10 +120,10 @@ export function ManhattanPlot({ trait }) {
 
     let context = canvas.getContext('2d');
     context.beginPath();
-    context.globalAlpha = 0.4;
+    context.globalAlpha = 0.6;
     context.strokeStyle = '#888';
-    context.lineWidth = 2;
-    context.setLineDash([2, 4]);
+    context.lineWidth = 1;
+    context.setLineDash([6, 4]);
     context.moveTo(margins.left, thresholdScale(threshold));
     context.lineTo(width, thresholdScale(threshold));
     context.stroke();
@@ -270,12 +270,12 @@ export function ManhattanPlot({ trait }) {
 
     let context = canvas.getContext('2d');
     context.beginPath();
-    context.globalAlpha = 0.4;
+    context.globalAlpha = 0.6;
     context.strokeStyle = '#888';
-    context.lineWidth = 2;
-    context.setLineDash([2, 4]);
-    context.moveTo(margins.left, margins.top + thresholdScale(threshold));
-    context.lineTo(width, margins.top + thresholdScale(threshold));
+    context.lineWidth = 1;
+    context.setLineDash([6, 4]);
+    context.moveTo(margins.left, thresholdScale(threshold));
+    context.lineTo(width, thresholdScale(threshold));
     context.stroke();
 
     let defaultDef = {
