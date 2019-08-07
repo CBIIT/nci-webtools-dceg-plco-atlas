@@ -238,7 +238,7 @@ export function SearchForm({ params, onChange, onSubmit }) {
             class="form-control"
             value={params.phenotype}
             onChange={e => onChange({ ...params, phenotype: e.target.value })}>
-            <option hidden>Select a phenotype</option>
+            <option hidden>(Select a phenotype)</option>
 
             {listType == 'categorical' &&
               listItems.map(t => {
