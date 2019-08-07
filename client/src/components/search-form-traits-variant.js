@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { Form, FormControl, InputGroup } from 'react-bootstrap';
+import Select from 'react-select';
 
-export function SearchForm({ params, onChange, onSubmit }) {
+
+export function SearchFormTraitsVariant({ params, onChange, onSubmit }) {
   const [listType, setListType] = useState('alphabetic');
 
   const categories = [
@@ -42,14 +44,17 @@ export function SearchForm({ params, onChange, onSubmit }) {
       category: 'Sample Category C'
     }
   ];
+  
+  const [selectedOption, setSelectedOption] = useState(null);
 
   return (
     <Form>
       <Form.Group controlId="trait-list">
         <Form.Label>
-          <b>Trait List</b>
+          <b>Select Trait(s) and Input Variant</b>
         </Form.Label>
         <InputGroup>
+          {/* alpha/categorical select */}
           <InputGroup.Prepend>
             <select
               class="form-control"
@@ -60,26 +65,23 @@ export function SearchForm({ params, onChange, onSubmit }) {
             </select>
           </InputGroup.Prepend>
 
-          <select
+          {/* trait multi-select */}
+          <div style={{width: '60%'}}>
+            <Select
+              placeholder="Select trait(s)"
+              value={selectedOption}
+              onChange={(value) => handleChange(value)}
+              options={listType === 'categorical' ? categorizeTraits(traits) : traits}
+              isMulti
+            />
+          </div>
+          {/* variant input */}
+          <FormControl
             class="form-control"
-            value={params.trait}
-            onChange={e => onChange({ ...params, trait: e.target.value })}>
-            <option hidden>Select a trait</option>
-
-            {listType === 'categorical' &&
-              categories.map(category => (
-                <optgroup label={category}>
-                  {traits
-                    .filter(t => t.category === category)
-                    .map(t => (
-                      <option value={t.value}>{t.label}</option>
-                    ))}
-                </optgroup>
-              ))}
-
-            {listType == 'alphabetic' &&
-              traits.map(t => <option value={t.value}>{t.label}</option>)}
-          </select>
+            placeholder="Variant"
+            aria-label="Variant"
+          />
+          {/* submit button */}
           <InputGroup.Append>
             <button className="btn btn-primary" onClick={onSubmit}>
               Submit
@@ -89,4 +91,28 @@ export function SearchForm({ params, onChange, onSubmit }) {
       </Form.Group>
     </Form>
   );
+
+  function categorizeTraits(traits) {
+    var categorized = categories.map(function(category) {
+        return {
+          label: category,
+          options: traits
+            .filter(t => t.category === category)
+            .map(t => (
+              {
+                label: t.label,
+                value: t.value
+              }
+            )
+          )
+        }
+      }
+    );
+    return categorized;
+  }
+
+  function handleChange(selectedOption) {
+    setSelectedOption(selectedOption);
+    console.log(`Option selected:`, selectedOption);
+  };
 }
