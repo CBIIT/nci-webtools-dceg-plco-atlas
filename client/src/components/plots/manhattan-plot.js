@@ -109,6 +109,25 @@ export function ManhattanPlot({ trait }) {
       .range([height, 0])
       .nice();
 
+    const thresholdScale = d3
+      .scaleLinear()
+      .domain([config.y.min, config.y.max])
+      .range([height, 0]);
+
+    // add a dotted line at -log10(p) = 5*10^-8
+    const threshold = -Math.log10(5 * 10 ** -8);
+    console.log(threshold, scaleY(threshold))
+
+    let context = canvas.getContext('2d');
+    context.beginPath();
+    context.globalAlpha = 0.4;
+    context.strokeStyle = '#888';
+    context.lineWidth = 2;
+    context.setLineDash([2, 4]);
+    context.moveTo(margins.left, thresholdScale(threshold));
+    context.lineTo(width, thresholdScale(threshold));
+    context.stroke();
+
     let defaultDef = {
       textBaseline: 'middle',
       font: `600 14px ${systemFont}`
@@ -172,8 +191,8 @@ export function ManhattanPlot({ trait }) {
           const args = {
             database: 'example',
             chr: ranges[idx].CHR,
-            nlogpMin: Math.max(2, Math.floor(ranges[idx].MIN_NLOG_P)),
-            nlogpMax: Math.ceil(ranges[idx].MAX_NLOG_P),
+            nlogpMin: 2,//Math.max(2, Math.floor(ranges[idx].MIN_NLOG_P)),
+            nlogpMax: 20,//Math.ceil(ranges[idx].MAX_NLOG_P),
             bpMin: ranges[idx].MIN_BP,
             bpMax: ranges[idx].MAX_BP
           };
@@ -240,6 +259,24 @@ export function ManhattanPlot({ trait }) {
       .domain([config.y.min, config.y.max])
       .range([height, 0])
       .nice();
+
+    const thresholdScale = d3
+      .scaleLinear()
+      .domain([config.y.min, config.y.max])
+      .range([height, 0]);
+
+    // add a dotted line at -log10(p) = 5*10^-8
+    const threshold = -Math.log10(5 * 10 ** -8);
+
+    let context = canvas.getContext('2d');
+    context.beginPath();
+    context.globalAlpha = 0.4;
+    context.strokeStyle = '#888';
+    context.lineWidth = 2;
+    context.setLineDash([2, 4]);
+    context.moveTo(margins.left, margins.top + thresholdScale(threshold));
+    context.lineTo(width, margins.top + thresholdScale(threshold));
+    context.stroke();
 
     let defaultDef = {
       textBaseline: 'middle',
