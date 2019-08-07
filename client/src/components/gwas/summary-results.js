@@ -4,7 +4,7 @@ import { SearchFormTrait } from '../forms/search-form-trait';
 import { ManhattanPlot } from '../plots/manhattan-plot';
 import { QQPlot } from '../plots/qq-plot';
 
-export function ManhattanPlots({ params, setParams }) {
+export function SummaryResults({ params, setParams }) {
   const [trait, setTrait] = useState(null);
 
   return (

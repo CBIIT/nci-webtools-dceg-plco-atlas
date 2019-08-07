@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 // import { Nav, Tab } from 'react-bootstrap';
 import { SearchFormTraitsVariant } from '../forms/search-form-traits-variant';
 
-export function SingleVariants({ params, setParams }) {
+export function VariantLookup({ params, setParams }) {
   const [trait, setTrait] = useState(null);
 
   return (
