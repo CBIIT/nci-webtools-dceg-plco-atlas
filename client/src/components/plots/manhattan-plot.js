@@ -251,6 +251,7 @@ export function ManhattanPlot({ trait }) {
       font: `600 10px ${systemFont}`
     };
 
+
     axisLeft(canvas, {
       title: [
         { ...defaultDef, text: '-log' },
