@@ -1,5 +1,8 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { rawQuery as query } from '../../services/query';
+import { scatterPlot } from '../../services/plots/scatter-plot';
+import { axisBottom, axisLeft } from '../../services/plots/axis';
+import { systemFont } from '../../services/plots/text';
 import * as d3 from 'd3';
 
 export function ManhattanPlot({ trait }) {
@@ -42,148 +45,8 @@ export function ManhattanPlot({ trait }) {
         <div ref={plotContainer} className="manhattan-plot" />
         {/* <pre>{ JSON.stringify(params, null, 2) }</pre> */}
       </div>
-
-      {/* <div className="col-md-2">
-        <Form.Group controlId="chromosome" className="mb-4">
-          <Form.Label>
-            <b>Chromosome</b>
-          </Form.Label>
-          <select
-            className="form-control"
-            onChange={e => setParams({ ...params, chr: e.target.value })}
-            value={params.chr}>
-            {(() => {
-              const options = [];
-              for (let i = 1; i <= 22; i++)
-                options.push(<option value={i}>{i}</option>);
-              return options;
-            })()}
-          </select>
-        </Form.Group>
-
-        <Form.Group className="mb-4">
-          <Form.Label>
-            <b>Min BP</b>
-          </Form.Label>
-          <FormControl
-            type="number"
-            value={params.bpMin}
-            onChange={e => setParams({ ...params, bpMin: e.target.value })}
-          />
-        </Form.Group>
-
-        <Form.Group className="mb-4">
-          <Form.Label>
-            <b>Max BP</b>
-          </Form.Label>
-          <FormControl
-            type="number"
-            value={params.bpMax}
-            onChange={e => setParams({ ...params, bpMax: e.target.value })}
-          />
-        </Form.Group>
-
-        <Form.Group className="mb-4">
-          <Form.Label>
-            <b>Min -log10(P)</b>
-          </Form.Label>
-          <FormControl
-            type="number"
-            min="2"
-            value={params.nlogpMin}
-            onChange={e => setParams({ ...params, nlogpMin: e.target.value })}
-          />
-        </Form.Group>
-
-        <Form.Group className="mb-4">
-          <Form.Label>
-            <b>Max -log10(P)</b>
-          </Form.Label>
-          <FormControl
-            type="number"
-            value={params.nlogpMax}
-            onChange={e => setParams({ ...params, nlogpMax: e.target.value })}
-          />
-        </Form.Group>
-
-        <Button
-          variant="primary"
-          className="my-2 w-100"
-          onClick={e => loadRangesPlot()}
-          disabled={loading}>
-          Plot Ranges
-        </Button>
-      </div> */}
     </div>
   );
-
-  function exportPlot(params) {}
-
-  function scatterPlot(config) {
-    const data = config.data;
-    const margins = config.margins || {
-      top: 20,
-      left: 20,
-      right: 20,
-      bottom: 20
-    };
-
-    const outerWidth = config.outerWidth || 700;
-    const outerHeight = config.outerHeight || 600;
-    const width = outerWidth - margins.left - margins.right;
-    const height = outerHeight - margins.top - margins.bottom;
-
-    const canvas = document.createElement('canvas');
-    canvas.width = outerWidth;
-    canvas.height = outerHeight;
-
-    const context = canvas.getContext('2d');
-    context.translate(margins.left, margins.top);
-
-    const scaleX = d3
-      .scaleLinear()
-      .domain([config.x.min, config.x.max])
-      .range([0, width])
-      .nice();
-
-    const scaleY = d3
-      .scaleLinear()
-      .domain([config.y.min, config.y.max])
-      .range([height, 0])
-      .nice();
-
-    // initialize styles
-    let pointSize = config.pointSize || 4;
-    context.fillStyle = config.pointColor || 'black';
-    context.globalAlpha = 0.5;
-
-    // do not check config.fast inside loop
-    if (config.fast) {
-      for (let i = 0; i < data.length; i++) {
-        let cx = scaleX(data[i][config.x.key]);
-        let cy = scaleY(data[i][config.y.key]);
-        context.fillRect(cx, cy, pointSize, pointSize);
-      }
-    } else {
-      for (let i = 0; i < data.length; i++) {
-        context.fillStyle =
-          config.pointColorKey !== undefined && config.pointColorAlt
-            ? data[i][config.pointColorKey] % 2
-              ? config.pointColorAlt
-              : config.pointColor
-            : config.pointColor;
-
-        let cx = scaleX(data[i][config.x.key]);
-        let cy = scaleY(data[i][config.y.key]);
-        context.beginPath();
-        context.arc(cx, cy, pointSize, 0, 2 * Math.PI, true);
-        context.fill();
-      }
-    }
-
-    context.setTransform(1, 0, 0, 1, 0, 0);
-    return canvas;
-  }
 
   async function drawSummaryPlot(params) {
     let start = new Date();
@@ -198,34 +61,47 @@ export function ManhattanPlot({ trait }) {
 
     if (results.error) return;
 
+    // initialize configuration for plot
     const data = results.data;
+    const columnKeys = {
+      chr: results.columns.indexOf('CHR'),
+      x: results.columns.indexOf('BP_ABS_1000KB'),
+      y: results.columns.indexOf('NLOG_P2')
+    };
     const config = {
-      title: 'Ewing Sarcoma',
       data: data,
-      outerWidth: 1000,
-      outerHeight: 600,
-      margins: { top: 20, left: 40, right: 20, bottom: 40 },
-      pointSize: 3,
-      pointColor: '#005ea2',
-      pointColorAlt: '#e47833',
-      pointColorKey: results.columns.indexOf('CHR'),
+      canvas: {
+        width: 1000,
+        height: 600
+      },
+      margins: {
+        top: 20,
+        left: 40,
+        right: 20,
+        bottom: 40
+      },
+      point: {
+        // fast: true,
+        opacity: 0.8,
+        size: 2,
+        color: d => (d[columnKeys.chr] % 2 == 0 ? '#005ea2' : '#e47833')
+      },
       x: {
-        key: results.columns.indexOf('BP_ABS_1000KB'),
+        key: columnKeys.x,
         min: 0,
         max: ranges[ranges.length - 1].MAX_BP_ABS
       },
       y: {
-        key: results.columns.indexOf('NLOG_P2'),
+        key: columnKeys.y,
         min: 3,
-        max: 20,
-        title: '-LOG10(P)'
+        max: 20
       }
     };
     const canvas = scatterPlot(config);
-    const width =
-      config.outerWidth - config.margins.left - config.margins.right;
-    const height =
-      config.outerHeight - config.margins.top - config.margins.bottom;
+    const { margins, canvas: canvasSize } = config;
+
+    const width = canvasSize.width - margins.left - margins.right;
+    const height = canvasSize.height - margins.top - margins.bottom;
 
     const scaleY = d3
       .scaleLinear()
@@ -233,10 +109,24 @@ export function ManhattanPlot({ trait }) {
       .range([height, 0])
       .nice();
 
+    let defaultDef = {
+      textBaseline: 'middle',
+      font: `600 14px ${systemFont}`
+    };
+
+    let subscriptDef = {
+      textBaseline: 'top',
+      font: `600 10px ${systemFont}`
+    };
+
     axisLeft(canvas, {
-      title: '-Log10(P)',
-      xOffset: config.margins.left,
-      yOffset: config.margins.top,
+      title: [
+        { ...defaultDef, text: '-log' },
+        { ...subscriptDef, text: '10' },
+        { ...defaultDef, text: '(p)' }
+      ],
+      xOffset: margins.left,
+      yOffset: margins.top,
       scale: scaleY,
       tickValues: range(config.y.min, config.y.max)
     });
@@ -249,8 +139,8 @@ export function ManhattanPlot({ trait }) {
     axisBottom(canvas, {
       scale: scaleX,
       title: 'Chromosome',
-      xOffset: config.margins.left,
-      yOffset: config.margins.top + scaleY(config.y.min),
+      xOffset: margins.left,
+      yOffset: margins.top + scaleY(config.y.min),
       ticks: ranges.length,
       tickSize: 8,
       tickValues: ranges.map(d => d.MAX_BP_ABS),
@@ -258,9 +148,11 @@ export function ManhattanPlot({ trait }) {
       labelsBetweenTicks: true
     });
 
+    // todo: instead of replacing the canvas, reuse the context
     plotContainer.current.innerHTML = '';
     plotContainer.current.appendChild(canvas);
 
+    // create overlay to select variants for individual chromosomes
     ranges
       .map(d => d.MAX_BP_ABS)
       .forEach((bp, idx, arr) => {
@@ -307,13 +199,23 @@ export function ManhattanPlot({ trait }) {
     const data = results.data;
 
     const config = {
-      title: 'Ewing Sarcoma',
       data: data,
-      outerWidth: 1000,
-      outerHeight: 600,
-      margins: { top: 20, left: 40, right: 20, bottom: 40 },
-      pointSize: 3,
-      pointColor: '#005ea2',
+      canvas: {
+        width: 1000,
+        height: 600
+      },
+      margins: {
+        top: 20,
+        left: 40,
+        right: 20,
+        bottom: 40
+      },
+      point: {
+        // fast: true,
+        opacity: 0.8,
+        size: 2,
+        color: '#005ea2'
+      },
       x: {
         key: results.columns.indexOf('BP'),
         min: 0,
@@ -328,10 +230,10 @@ export function ManhattanPlot({ trait }) {
     };
 
     const canvas = scatterPlot(config);
-    const width =
-      config.outerWidth - config.margins.left - config.margins.right;
-    const height =
-      config.outerHeight - config.margins.top - config.margins.bottom;
+    const { margins, canvas: canvasSize } = config;
+
+    const width = canvasSize.width - margins.left - margins.right;
+    const height = canvasSize.height - margins.top - margins.bottom;
 
     const scaleY = d3
       .scaleLinear()
@@ -339,10 +241,24 @@ export function ManhattanPlot({ trait }) {
       .range([height, 0])
       .nice();
 
+    let defaultDef = {
+      textBaseline: 'middle',
+      font: `600 14px ${systemFont}`
+    };
+
+    let subscriptDef = {
+      textBaseline: 'top',
+      font: `600 10px ${systemFont}`
+    };
+
     axisLeft(canvas, {
-      title: '-Log10(P)',
-      xOffset: config.margins.left,
-      yOffset: config.margins.top,
+      title: [
+        { ...defaultDef, text: '-log' },
+        { ...subscriptDef, text: '10' },
+        { ...defaultDef, text: '(p)' }
+      ],
+      xOffset: margins.left,
+      yOffset: margins.top,
       scale: scaleY,
       tickValues: range(config.y.min, config.y.max)
     });
@@ -354,9 +270,9 @@ export function ManhattanPlot({ trait }) {
       .nice();
     axisBottom(canvas, {
       scale: scaleX,
-      title: 'BP',
-      xOffset: config.margins.left,
-      yOffset: config.margins.top + scaleY(config.y.min),
+      title: `Chromosome ${params.chr} Position (MB)`,
+      xOffset: margins.left,
+      yOffset: margins.top + scaleY(config.y.min),
       tickSize: 8,
       tickFormat: (d, i) => d / 10 ** 6 + ' MB'
     });
@@ -372,93 +288,5 @@ export function ManhattanPlot({ trait }) {
     var nums = [];
     for (let i = min; i <= max; i++) nums.push(i);
     return nums;
-  }
-
-  /**
-   *
-   * @param {HTMLCanvasElement} canvas
-   * @param {*} config
-   */
-  function axisLeft(canvas, config) {
-    const font = `-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
-    'Helvetica Neue', Arial, 'Noto Sans', sans-serif, 'Apple Color Emoji',
-    'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'`;
-
-    let { xOffset, yOffset, scale, tickValues, tickSize } = config;
-    tickSize = tickSize || 6;
-    tickValues = tickValues || scale.ticks();
-    let interpolatedTickValues = tickValues.map(
-      (val, idx, arr) => (val + (idx > 0 ? arr[idx - 1] : 0)) / 2
-    );
-
-    let yCoords = tickValues.map(scale);
-    let padding = 2;
-
-    const context = canvas.getContext('2d');
-    context.translate((xOffset || 0) - tickSize - padding, yOffset || 0);
-    context.fillStyle = 'black';
-    context.font = '600 12px ' + font;
-    context.textAlign = 'right';
-    context.textBaseline = 'middle';
-    context.globalAlpha = 1;
-
-    context.fillRect(tickSize, 0, 2, scale(tickValues[0]));
-    yCoords.forEach((yCoord, i) => {
-      context.fillRect(0, yCoord, tickSize, 2);
-      context.fillText(tickValues[i], -padding, yCoord + 2);
-    });
-
-    context.save();
-
-    const midpoint = scale((d3.min(tickValues) + d3.max(tickValues)) / 2);
-    context.rotate((90 * Math.PI) / 180);
-    context.font = '600 14px ' + font;
-    context.translate(midpoint, 25);
-    context.textAlign = 'center';
-    context.fillText(config.title || 'Y Axis', 0, 0);
-
-    context.restore();
-    context.setTransform(1, 0, 0, 1, 0, 0);
-  }
-
-  function axisBottom(canvas, config) {
-    const font = `-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
-    'Helvetica Neue', Arial, 'Noto Sans', sans-serif, 'Apple Color Emoji',
-    'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'`;
-
-    let { xOffset, yOffset, scale, tickValues, tickSize, tickFormat } = config;
-    tickSize = tickSize || 6;
-    tickValues = tickValues || scale.ticks();
-    let interpolatedTickValues = tickValues.map(
-      (val, idx, arr) => (val + (idx > 0 ? arr[idx - 1] : 0)) / 2
-    );
-
-    let coords = tickValues.map(scale);
-    let padding = 2;
-
-    const context = canvas.getContext('2d');
-    context.translate(xOffset || 0, yOffset || 0);
-    context.fillStyle = 'black';
-    context.font = '600 12px ' + font;
-    context.textAlign = 'center';
-    context.textBaseline = 'top';
-    context.globalAlpha = 1;
-
-    context.fillRect(0, 0, scale(d3.max(tickValues)), 2);
-    coords.forEach((coord, i) => {
-      context.fillRect(coord, 0, 2, tickSize);
-      const label = tickFormat ? tickFormat(tickValues[i], i) : tickValues[i];
-      const labelOffset = config.labelsBetweenTicks
-        ? scale(interpolatedTickValues[i])
-        : coord;
-      context.fillText(label, labelOffset + 1, padding + tickSize);
-    });
-
-    const midpoint = scale(d3.max(tickValues) / 2);
-
-    context.font = '600 14px ' + font;
-    context.fillText(config.title || 'X Axis', midpoint, padding + 25);
-
-    context.setTransform(1, 0, 0, 1, 0, 0);
   }
 }

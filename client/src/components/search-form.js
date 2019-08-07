@@ -10,7 +10,7 @@ export function SearchForm({ params, onChange, onSubmit }) {
     'Sample Category C'
   ];
 
-  const traits = [
+  const phenotypes = [
     {
       value: `example`,
       label: `Ewing's Sarcoma`,
@@ -18,36 +18,36 @@ export function SearchForm({ params, onChange, onSubmit }) {
     },
     {
       value: `example_2a`,
-      label: `Sample trait 2A`,
+      label: `Sample phenotype 2A`,
       category: 'Sample Category A'
     },
     {
       value: `example_1b`,
-      label: `Sample trait 2A`,
+      label: `Sample phenotype 2A`,
       category: 'Sample Category B'
     },
     {
       value: `example_2b`,
-      label: `Sample trait 2A`,
+      label: `Sample phenotype 2A`,
       category: 'Sample Category B'
     },
     {
       value: `example_1c`,
-      label: `Sample trait 2A`,
+      label: `Sample phenotype 2A`,
       category: 'Sample Category C'
     },
     {
       value: `example_2c`,
-      label: `Sample trait 2A`,
+      label: `Sample phenotype 2A`,
       category: 'Sample Category C'
     }
   ];
 
   return (
     <Form>
-      <Form.Group controlId="trait-list">
+      <Form.Group controlId="phenotype-list">
         <Form.Label>
-          <b>Trait List</b>
+          <b>Phenotype List</b>
         </Form.Label>
         <InputGroup>
           <InputGroup.Prepend>
@@ -62,14 +62,14 @@ export function SearchForm({ params, onChange, onSubmit }) {
 
           <select
             class="form-control"
-            value={params.trait}
-            onChange={e => onChange({ ...params, trait: e.target.value })}>
-            <option hidden>Select a trait</option>
+            value={params.phenotype}
+            onChange={e => onChange({ ...params, phenotype: e.target.value })}>
+            <option hidden>Select a phenotype</option>
 
             {listType === 'categorical' &&
               categories.map(category => (
                 <optgroup label={category}>
-                  {traits
+                  {phenotypes
                     .filter(t => t.category === category)
                     .map(t => (
                       <option value={t.value}>{t.label}</option>
@@ -78,7 +78,7 @@ export function SearchForm({ params, onChange, onSubmit }) {
               ))}
 
             {listType == 'alphabetic' &&
-              traits.map(t => <option value={t.value}>{t.label}</option>)}
+              phenotypes.map(t => <option value={t.value}>{t.label}</option>)}
           </select>
           <InputGroup.Append>
             <button className="btn btn-primary" onClick={onSubmit}>
