@@ -45,7 +45,7 @@ export function QQPlot({ trait }) {
 
     return (
       <>
-        <div style={styles} className="p-3 text-left">
+        <div style={styles} className="p-3 text-left bg-white">
           {`x: ${x}`}<br />
           {`y: ${y}`}<br />
           <pre>{JSON.stringify(debugQuery, null, 2)}</pre>
@@ -136,6 +136,7 @@ export function QQPlot({ trait }) {
     // add QQ plot image
     const qqImg = document.createElement('img');
     qqImg.src = 'assets/images/qq-plots/example.png';
+    qqImg.draggable = false;
     qqImg.alt = 'QQ-plot of selected trait';
     qqImg.useMap = '#image-map';
     plotContainer.current.appendChild(qqImg);
