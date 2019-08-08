@@ -19,7 +19,7 @@ export function VariantLookup({ params, setParams }) {
 
         <div className="card shadow-sm mb-4">
             <div className="card-header bg-white font-weight-bolder border-bottom-0">
-                display selected trait(s) and single variant
+                display selected phenotype(s) and variant details in each phenotype
             </div>
 
             <div className="card-body">
