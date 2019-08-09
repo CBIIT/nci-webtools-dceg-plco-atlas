@@ -15,42 +15,30 @@ app.register(require('fastify-static'), {
 app.get('/ping', (req, res) => res.send(true));
 
 // retrieves metadata for a particular database (BP/P ranges, # variants, etc)
-app.get('/ranges', ({query}, res) => {
-    try {
-        const db = databases.find(e => e.name === query.database);
-        res.header('Cache-Control', 'max-age=300');
-        res.send(getRanges(db.filepath));
-    } catch (e) {
-        res.send(e);
-    }
+app.get('/ranges', async ({query}, res) => {
+    const db = databases.find(e => e.name === query.database);
+    res.header('Cache-Control', 'max-age=300');
+    return getRanges(db.filepath);
 });
 
 // retrieves all variant groups for all chroms. at the lowest granularity (in MBases)
-app.get('/summary', ({query}, res) => {
-    try {
-        const db = databases.find(e => e.name === query.database);
-        res.header('Cache-Control', 'max-age=300');
-        res.send(getSummary(db.filepath, query));
-    } catch (e) {
-        res.send(e);
-    }
+app.get('/summary', async ({query}, res) => {
+    const db = databases.find(e => e.name === query.database);
+    res.header('Cache-Control', 'max-age=300');
+    return getSummary(db.filepath, query);
 });
 
 // retrieves all variants within the specified range
-app.get('/variants', ({query}, res) => {
-    try {
-        const db = databases.find(e => e.name === query.database);
-        res.header('Cache-Control', 'max-age=300');
-        res.send(getVariants(db.filepath, query));
-    } catch (e) {
-        res.send(e);
-    }
+app.get('/variants', async ({query}, res) => {
+    const db = databases.find(e => e.name === query.database);
+    res.header('Cache-Control', 'max-age=300');
+    return getVariants(db.filepath, query);
 });
 
 // retrieves all variants within the specified range for QQ plot, sorted by p-values descending
-app.get('/imagemapqq', ({query}, res) => {
+app.get('/imagemapqq', async ({query}, res) => {
     res.header('Cache-Control', 'max-age=300');
-    res.send(getQQImageMapJSON(query.database));
+    return getQQImageMapJSON(query.database);
 });
 
 app.listen(port, '0.0.0.0')
