@@ -4,6 +4,7 @@ import Card from 'react-bootstrap/Card';
 import { CardDeck } from 'react-bootstrap';
 
 export function Home({ links }) {
+
   return (
     <>
       <div className="video-banner-container text-center">
@@ -17,44 +18,45 @@ export function Home({ links }) {
           </h1>
         </div>
       </div>
-      <div className="container pt-4 align-middle">
-        <div className="text-center">
-          <h3 className="font-weight-light">OUR FOCUS</h3>
-          <h5 className="text-secondary">
-            Simplifying GWAS for the Prostate, Lung, Colorectal and Ovarian
-            Cancer Screening Trial
-          </h5>
-          <div className="text-center">
-            <CardDeck>
-              {links.map(({ exact, route, title, image }, index) => (
-                <Card
-                  style={{
-                    width: '18rem',
-                    justifyContent: 'center',
-                    alignItems: 'center'
-                  }}
-                  border="white">
-                  <Card.Img
-                    variant="top"
-                    src={image}
-                    style={{ width: 160, height: 160 }}
-                  />
-                  <Card.Body>
-                    <Card.Title>
-                      <h3>{title}</h3>
-                    </Card.Title>
-                    <Card.Text>Summary text here...</Card.Text>
-                    <Link
-                      className="stretched-link"
-                      exact={exact}
-                      key={index}
-                      to={route}></Link>
-                  </Card.Body>
-                </Card>
-              ))}
-            </CardDeck>
-          </div>
-        </div>
+
+      <div className="container pt-4 align-middle text-center" style={{"margin-top": "-10vh"}}>
+        
+        <CardDeck>
+          {links.map(({ exact, route, title, image }, index) => (
+            <Card
+              className="shadow"
+              style={{
+                width: '18rem',
+                justifyContent: 'center',
+                alignItems: 'center'
+              }}
+              border="white">
+              <Card.Img
+                variant="top"
+                src={image}
+                style={{ width: 160, height: 160 }}
+              />
+              <Card.Body>
+                <Card.Title>
+                  <h3>{title}</h3>
+                </Card.Title>
+                <Card.Text>Summary text here...</Card.Text>
+                <Link
+                  className="stretched-link"
+                  exact={exact}
+                  key={index}
+                  to={route}></Link>
+              </Card.Body>
+            </Card>
+          ))}
+        </CardDeck>
+
+        <h3 className="font-weight-light mt-5">OUR FOCUS</h3>
+        <h5 className="text-secondary mb-5">
+          Simplifying GWAS for the Prostate, Lung, Colorectal and Ovarian
+          Cancer Screening Trial
+        </h5>
+
       </div>
     </>
   );

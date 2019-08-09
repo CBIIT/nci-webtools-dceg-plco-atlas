@@ -106,3 +106,13 @@ $blue: #005ea2;
     background-color: #005ea2;
   }
 }
+
+.qq-plot-mouse-window {
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  transition: border .2s ease-in-out;
+}
+
+.qq-plot-mouse-window:hover {
+  border-color: #337ab7;
+}
