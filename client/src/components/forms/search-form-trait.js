@@ -3,15 +3,10 @@ import { Form, FormControl, InputGroup } from 'react-bootstrap';
 
 export function SearchFormTrait({ params, onChange, onSubmit }) {
   const [listType, setListType] = useState('alphabetic');
-
-  const categories = [
-    'Sample Category A',
-    'Sample Category B',
-    'Sample Category C'
-  ];
+  const [phenotype, setPhenotype] = useState(null);
 
   const listItems = [
-    {label:`(test) Ewing's sarcoma`, value: 'example'},,
+    {label:`(test) Ewing's sarcoma`, value: 'example', children: null},
     {label:'Anthropometric measures',},
     {label:'    Height',},
     {label:'        Height when standing', children: null},
@@ -237,8 +232,12 @@ export function SearchFormTrait({ params, onChange, onSubmit }) {
           <select
             class="form-control"
             value={params.phenotype}
-            onChange={e => onChange({ ...params, phenotype: e.target.value })}>
-            <option hidden>(Select a phenotype)</option>
+            onChange={e => {
+              const value = e.target.value;
+              onChange({ ...params, phenotype: value });
+              setPhenotype(value);
+            }}>
+            <option hidden value="">(Select a phenotype)</option>
 
             {listType == 'categorical' &&
               listItems.map(t => {
@@ -254,11 +253,11 @@ export function SearchFormTrait({ params, onChange, onSubmit }) {
             {listType == 'alphabetic' &&
               listItems
                 .filter(t => t.children === null)
-                .sort((a, b) => a.label.localeCompare(b.label))
+                .sort((a, b) => a.label.trim().localeCompare(b.label.trim()))
                 .map(t => <option value={t.value}>{t.label}</option>)}
           </select>
           <InputGroup.Append>
-            <button className="btn btn-primary" onClick={onSubmit}>
+            <button className="btn btn-primary" onClick={e => { e.preventDefault(); onSubmit(phenotype); }}>
               Submit
             </button>
           </InputGroup.Append>

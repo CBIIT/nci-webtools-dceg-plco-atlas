@@ -5,17 +5,51 @@ import { ManhattanPlot } from '../plots/manhattan-plot';
 import { QQPlot } from '../plots/qq-plot';
 
 export function SummaryResults({ params, setParams }) {
+  const [submitted, setSubmitted] = useState(false);
   const [trait, setTrait] = useState(null);
+  const [messages, setMessages] = useState([]);
 
   return (
     <>
-        <div className="card shadow-sm mb-4"> 
+        <div className="card shadow-sm mb-4">
             <div className="card-body">
                 <SearchFormTrait
                     params={params}
-                    onChange={setParams}
-                    onSubmit={e => setTrait(params.trait)}
+                    onChange={e => {
+                      setSubmitted(false);
+                      setParams(e);
+                    }}
+                    onSubmit={phenotype => {
+                      setSubmitted(true);
+                      setTrait(phenotype);
+
+                      setMessages([]);
+                      // currently, only the example phenotype is supported
+                      if (!phenotype) {
+                        setMessages([{
+                          type: 'alert-danger',
+                          content: 'Please select a phenotype.'
+                        }])
+                      } else if (phenotype != 'example') {
+                        setMessages([{
+                          type: 'alert-danger',
+                          content: 'No data are available for the selected phenotype.'
+                        }])
+                      }
+                    }}
                 />
+
+                {
+                  submitted && messages.map(({type, content}, index) => (
+                    <div className={`alert ${type}`}>
+                      { content }
+
+                      <button type="button" class="close" onClick={e => setMessages([])} aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                      </button>
+                    </div>
+                  ))
+                }
             </div>
         </div>
 
