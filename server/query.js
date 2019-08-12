@@ -1,6 +1,13 @@
 const Database = require('better-sqlite3');
 const fs = require('fs');
 
+function getRawResults(stmt, params) {
+    return {
+        columns: stmt.columns().map(c => c.name),
+        data: stmt.raw().all(params)
+    };
+}
+
 function getRanges(filepath) {
     return new Database(filepath, {readonly: true}).prepare(`
         SELECT chr, min_bp, max_bp, max_bp_abs, min_nlog_p, max_nlog_p FROM variant_range
@@ -14,13 +21,9 @@ function getSummary(filepath, params) {
             WHERE nlog_p2 >= :nlogpMin;
     `);
 
-    if (params.raw)   
-        return {
-            columns: stmt.columns().map(c => c.name),
-            data: stmt.raw().all(params)
-        };
-    else
-        return stmt.all(params);
+    return params.raw
+        ? getRawResults(stmt, params)
+        : stmt.all(params);
 }
 
 function getVariants(filepath, params) {
@@ -33,10 +36,24 @@ function getVariants(filepath, params) {
         AND nlog_p <= :nlogpMax
     `);
 
-    return {
-        columns: stmt.columns().map(c => c.name),
-        data: stmt.raw().all(params)
-    };
+    return params.raw
+        ? getRawResults(stmt, params)
+        : stmt.all(params);
+}
+
+function getTopVariants(filepath, params) {
+    const stmt = new Database(filepath, {readonly: true}).prepare(`
+        SELECT * FROM variant WHERE
+        ${params.chr ? 'chr = :chr' : ''}
+        AND nlog_p > 0
+        ORDER BY nlog_p ASC
+        LIMIT :limit
+        OFFSET :offset
+    `);
+
+    return params.raw
+        ? getRawResults(stmt, params)
+        : stmt.all(params);
 }
 
 function getQQImageMapJSON(name) {
