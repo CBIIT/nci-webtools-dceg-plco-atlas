@@ -70,7 +70,7 @@ export function QQPlot({ trait }) {
 
   return (
     <>
-      <div className="row">
+      {/* <div className="row">
         <div className="col-md-12 text-right">
           {timestamp ? <strong className="mx-2">{timestamp} s</strong> : null}
           <div className="btn-group" role="group" aria-label="Basic example">
@@ -82,7 +82,7 @@ export function QQPlot({ trait }) {
             </button>
           </div>
         </div>
-      </div>
+      </div> */}
 
       <div className="row">
         <div className="col-md-12 text-left">
