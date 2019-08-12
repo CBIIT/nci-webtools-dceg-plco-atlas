@@ -42,7 +42,7 @@ export function ManhattanPlot({ trait }) {
             Reset
           </button>
         </div>
-        {timestamp ? <span class="mx-2">{timestamp} s</span> : null}
+        {/* {timestamp ? <span class="mx-2">{timestamp} s</span> : null} */}
       </div>
 
     </div>

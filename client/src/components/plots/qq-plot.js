@@ -72,7 +72,7 @@ export function QQPlot({ trait }) {
     <>
       <div className="row">
         <div className="col-md-12 text-right">
-          {timestamp ? <strong className="mx-2">{timestamp} s</strong> : null}
+          {/* {timestamp ? <strong className="mx-2">{timestamp} s</strong> : null} */}
           <div className="btn-group" role="group" aria-label="Basic example">
             <button
               className="btn btn-primary btn-sm"
@@ -96,12 +96,12 @@ export function QQPlot({ trait }) {
       <div className="row mt-3">
         <div className="col-md-12 text-center">
 
-          <ReactCursorPosition 
-            className="qq-plot-mouse-window" 
+          <ReactCursorPosition
+            className="qq-plot-mouse-window"
             activationInteractionMouse={INTERACTIONS.CLICK}>
 
             <PositionLabel />
-            
+
             <div ref={plotContainer} className="qq-plot" />
             <map name="image-map">
               {areaItems.map(function(area) {
