@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { Route } from 'react-router-dom';
+
 import { Nav, Tab } from 'react-bootstrap';
 // import { SearchFormTrait } from '../search-form-trait';
 import { SummaryResults } from '../gwas/summary-results';
@@ -9,8 +11,36 @@ import { VariantLookup } from '../gwas/variant-lookup'
 export function Gwas({ params, setParams }) {
   const [trait, setTrait] = useState(null);
 
+  // const gwasLinks = [
+  //   {
+  //     id: 'summary',
+  //     name: 'Summary Results'
+  //   },
+  //   {
+  //     id: 'lookup',
+  //     name: 'Variant Lookup'
+  //   },
+  //   {
+  //     id: 'correlations',
+  //     name: 'Phenotype Correlations'
+  //   },
+  // ];
+
   return (
     <div className="container my-4">
+
+      {/* <Nav variant="pills" className="nav-pills-custom mb-4">
+        {gwasLinks.map(({ name, id }) => (
+          <Nav.Item className="mr-2">
+            <Nav.Link to={`/gwas/${id}`}>{name}</Nav.Link>
+          </Nav.Item>
+        ))}
+      </Nav> */}
+
+
+      {/* <Route path={`/gwas/:gwasId`} component={path}/> */}
+
+
       <Tab.Container defaultActiveKey="summary-results">
 
        <Nav variant="pills" className="nav-pills-custom mb-4">
