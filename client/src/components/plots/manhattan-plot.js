@@ -33,7 +33,7 @@ export function ManhattanPlot({ trait }) {
         <div ref={plotContainer} className="manhattan-plot" />
         {/* <pre>{ JSON.stringify(params, null, 2) }</pre> */}
       </div>
-      {/* <div class="col-md-12" style={{opacity: 0.5}}>
+      {/* <div class="col-md-12" style={{opacity: 0.5}}> */}
         <div class="btn-group" role="group" aria-label="Basic example">
           <button
             className="btn btn-primary btn-sm"
@@ -42,10 +42,10 @@ export function ManhattanPlot({ trait }) {
             Reset
           </button>
         </div>
-        {timestamp ? <span class="mx-2">{timestamp} s</span> : null}
-      </div> */}
+        {/* {timestamp ? <span class="mx-2">{timestamp} s</span> : null} */}
+      </div>
 
-    </div>
+    // </div>
   );
 
   async function drawSummaryPlot(params) {
