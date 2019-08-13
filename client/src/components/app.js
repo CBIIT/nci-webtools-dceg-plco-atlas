@@ -8,7 +8,7 @@ import { Phenotypes } from './pages/phenotypes';
 import { Downloads } from './pages/downloads';
 
 function App() {
-  const [params, setParams] = useState({ trait: 'test' });
+  const [params, setParams] = useState({ trait: 'example' });
 
   const links = [
     {

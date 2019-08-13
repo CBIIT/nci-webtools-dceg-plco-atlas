@@ -216,7 +216,7 @@ export function SearchFormTrait({ params, onChange, onSubmit }) {
     <Form>
       <Form.Group controlId="phenotype-list">
         <Form.Label>
-          <b>Phenotype List</b>
+          <b>Select Phenotype</b>
         </Form.Label>
         <InputGroup>
           <InputGroup.Prepend>
@@ -245,7 +245,7 @@ export function SearchFormTrait({ params, onChange, onSubmit }) {
                 let spaces = '';
                 while (--numSpaces > 0)
                   spaces += '\u00a0'
-                return <option value={t.value}>
+                return <option value={t.value} disabled={t.disabled}>
                   {spaces + t.label}
                   </option>
               })}

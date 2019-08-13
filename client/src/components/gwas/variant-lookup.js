@@ -12,7 +12,7 @@ import filterFactory, { textFilter } from 'react-bootstrap-table2-filter';
 export function VariantLookup({ params, setParams }) {
     const [trait, setTrait] = useState(null);
 
-    const products = [
+    const phenotypes = [
         {
             trait: "Ewing's Sarcoma",
             snp: "rs12345",
@@ -114,7 +114,7 @@ export function VariantLookup({ params, setParams }) {
                     <BootstrapTable 
                         bootstrap4={ true } 
                         keyField='id' 
-                        data={ products } 
+                        data={ phenotypes } 
                         columns={ columns } 
                         pagination={ paginationFactory() }
                         filter={ filterFactory() }
