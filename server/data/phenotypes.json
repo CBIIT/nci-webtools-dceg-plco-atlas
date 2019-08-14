@@ -1,0 +1,764 @@
+[
+    {
+        "label": "(test) Ewing's sarcoma",
+        "value": "meta_fixed_assoc.db"
+    },
+    {
+        "label": "Anthropometric measures",
+        "children": [
+            {
+                "label": "Height",
+                "children": [
+                    {
+                        "label": "Height when standing",
+                        "value": null
+                    },
+                    {
+                        "label": "Height when sitting",
+                        "value": null
+                    }
+                ],
+                "value": null
+            },
+            {
+                "label": "Weight",
+                "children": [
+                    {
+                        "label": "BMI",
+                        "value": null
+                    },
+                    {
+                        "label": "Weight Gain Area",
+                        "value": null
+                    },
+                    {
+                        "label": "Weight Loss Area",
+                        "value": null
+                    },
+                    {
+                        "label": "Waist-Hip Comparison",
+                        "value": null
+                    }
+                ],
+                "value": null
+            },
+            {
+                "label": "Hair pattern at 45",
+                "value": null
+            }
+        ],
+        "value": null
+    },
+    {
+        "label": "Cancer",
+        "children": [
+            {
+                "label": "All cancers",
+                "children": [
+                    {
+                        "label": "By location",
+                        "children": [
+                            {
+                                "label": "Biliary cancer",
+                                "value": null
+                            },
+                            {
+                                "label": "Bladder cancer",
+                                "value": null
+                            },
+                            {
+                                "label": "Breast cancer",
+                                "children": [
+                                    {
+                                        "label": "Breast cancer (lobular)",
+                                        "value": null
+                                    },
+                                    {
+                                        "label": "Breast cancer (ER positive)",
+                                        "value": null
+                                    },
+                                    {
+                                        "label": "Breast cancer (PR positive)",
+                                        "value": null
+                                    },
+                                    {
+                                        "label": "Breast cancer (ER/PR negative)",
+                                        "value": null
+                                    },
+                                    {
+                                        "label": "Breast cancer (tubular)",
+                                        "value": null
+                                    }
+                                ],
+                                "value": null
+                            },
+                            {
+                                "label": "Colorectal cancer",
+                                "children": [
+                                    {
+                                        "label": "Colon cancer (distal)",
+                                        "value": null
+                                    },
+                                    {
+                                        "label": "Colon cancer (proximal)",
+                                        "value": null
+                                    },
+                                    {
+                                        "label": "Colorectal cancer (adenocarcinoma)",
+                                        "value": null
+                                    },
+                                    {
+                                        "label": "Colorectal cancer (advanced)",
+                                        "value": null
+                                    },
+                                    {
+                                        "label": "Rectal cancer",
+                                        "value": null
+                                    }
+                                ],
+                                "value": null
+                            },
+                            {
+                                "label": "Endometrial cancer",
+                                "value": null
+                            },
+                            {
+                                "label": "Glioma cancer",
+                                "value": null
+                            },
+                            {
+                                "label": "Head and neck cancer",
+                                "value": null
+                            },
+                            {
+                                "label": "Hematologic malignancies",
+                                "children": [
+                                    {
+                                        "label": "Hodgkin lymphoma",
+                                        "value": null
+                                    },
+                                    {
+                                        "label": "Lymphocytic leukemia",
+                                        "value": null
+                                    },
+                                    {
+                                        "label": "Myeloid/Monocytic leukemia",
+                                        "value": null
+                                    },
+                                    {
+                                        "label": "Myeloma",
+                                        "value": null
+                                    },
+                                    {
+                                        "label": "Non-Hodgkin lymphoma",
+                                        "value": null
+                                    }
+                                ],
+                                "value": null
+                            },
+                            {
+                                "label": "Liver cancer",
+                                "value": null
+                            },
+                            {
+                                "label": "Lung cancer",
+                                "children": [
+                                    {
+                                        "label": "Lung cancer (small cell)",
+                                        "value": null
+                                    },
+                                    {
+                                        "label": "Lung cancer (adenocarcinoma)",
+                                        "value": null
+                                    },
+                                    {
+                                        "label": "Lung cancer (squamous cell)",
+                                        "value": null
+                                    }
+                                ],
+                                "value": null
+                            },
+                            {
+                                "label": "Melanoma",
+                                "value": null
+                            },
+                            {
+                                "label": "Non-melanoma skin cancer",
+                                "children": [
+                                    {
+                                        "label": "Basal cell only",
+                                        "value": null
+                                    },
+                                    {
+                                        "label": "Basal and squamous cell",
+                                        "value": null
+                                    },
+                                    {
+                                        "label": "Squamous cell only",
+                                        "value": null
+                                    }
+                                ],
+                                "value": null
+                            },
+                            {
+                                "label": "Ovarian cancer",
+                                "value": null
+                            },
+                            {
+                                "label": "Pancreatic cancer",
+                                "value": null
+                            },
+                            {
+                                "label": "Prostate cancer",
+                                "children": [
+                                    {
+                                        "label": "Prostate cancer (advanced)",
+                                        "value": null
+                                    },
+                                    {
+                                        "label": "Prostate cancer (not advanced)",
+                                        "value": null
+                                    }
+                                ],
+                                "value": null
+                            },
+                            {
+                                "label": "Renal cancer",
+                                "value": null
+                            },
+                            {
+                                "label": "Thyroid cancer",
+                                "value": null
+                            },
+                            {
+                                "label": "Upper GI cancer",
+                                "children": [
+                                    {
+                                        "label": "Esophageal cancer",
+                                        "value": null
+                                    },
+                                    {
+                                        "label": "Gastric cancer",
+                                        "value": null
+                                    }
+                                ],
+                                "value": null
+                            },
+                            {
+                                "label": "By pathology",
+                                "children": [
+                                    {
+                                        "label": "Solid tumors",
+                                        "children": [
+                                            {
+                                                "label": "Carcinomas",
+                                                "children": [
+                                                    {
+                                                        "label": "Adenocarcinomas",
+                                                        "children": [
+                                                            {
+                                                                "label": "Breast (adenocarcinoma)",
+                                                                "value": null
+                                                            },
+                                                            {
+                                                                "label": "Colorectal cancer (adenocarcinoma)",
+                                                                "value": null
+                                                            },
+                                                            {
+                                                                "label": "Endometrial cancer (adenocarcinoma)",
+                                                                "value": null
+                                                            },
+                                                            {
+                                                                "label": "Lung cancer (adenocarcinoma)",
+                                                                "value": null
+                                                            },
+                                                            {
+                                                                "label": "Pancreatic cancer (adenocarcinoma)",
+                                                                "value": null
+                                                            },
+                                                            {
+                                                                "label": "Prostate cancer (adenocarcinoma)",
+                                                                "value": null
+                                                            },
+                                                            {
+                                                                "label": "Thyroid cancer (adenocarcinoma)",
+                                                                "value": null
+                                                            }
+                                                        ],
+                                                        "value": null
+                                                    },
+                                                    {
+                                                        "label": "Squamous cell cancers",
+                                                        "children": [
+                                                            {
+                                                                "label": "Esophageal cancer (squamous cell)",
+                                                                "value": null
+                                                            },
+                                                            {
+                                                                "label": "Lung cancer (squamous cell)",
+                                                                "value": null
+                                                            }
+                                                        ],
+                                                        "value": null
+                                                    },
+                                                    {
+                                                        "label": "Urothelial cancers",
+                                                        "children": [
+                                                            {
+                                                                "label": "Bladder cancer (urothelial)",
+                                                                "value": null
+                                                            },
+                                                            {
+                                                                "label": "Renal cancer (urothelial)",
+                                                                "value": null
+                                                            }
+                                                        ],
+                                                        "value": null
+                                                    },
+                                                    {
+                                                        "label": "Sarcomas",
+                                                        "children": [
+                                                            {
+                                                                "label": "Need to look into",
+                                                                "value": null
+                                                            }
+                                                        ],
+                                                        "value": null
+                                                    },
+                                                    {
+                                                        "label": "Neuroendocrine related cancers",
+                                                        "children": [
+                                                            {
+                                                                "label": "Lung cancer (neuroendocrine)",
+                                                                "value": null
+                                                            },
+                                                            {
+                                                                "label": "Pancreatic cancer (neuroendocrine)",
+                                                                "value": null
+                                                            },
+                                                            {
+                                                                "label": "Thyroid cancer (neuroendocrine)",
+                                                                "value": null
+                                                            }
+                                                        ],
+                                                        "value": null
+                                                    },
+                                                    {
+                                                        "label": "Hematologic malignancies",
+                                                        "children": [
+                                                            {
+                                                                "label": "Hodgkin’s lymphoma",
+                                                                "value": null
+                                                            },
+                                                            {
+                                                                "label": "Non-Hodgkin’s lymphoma",
+                                                                "value": null
+                                                            },
+                                                            {
+                                                                "label": "Multiple myeloma",
+                                                                "value": null
+                                                            }
+                                                        ],
+                                                        "value": null
+                                                    },
+                                                    {
+                                                        "label": "By risk factor",
+                                                        "children": [
+                                                            {
+                                                                "label": "Smoking related cancers",
+                                                                "children": [
+                                                                    {
+                                                                        "label": "Lung cancer",
+                                                                        "value": null
+                                                                    },
+                                                                    {
+                                                                        "label": "Bladder cancer",
+                                                                        "value": null
+                                                                    }
+                                                                ],
+                                                                "value": null
+                                                            },
+                                                            {
+                                                                "label": "Obesity related cancers",
+                                                                "children": [
+                                                                    {
+                                                                        "label": "Breast cancer",
+                                                                        "value": null
+                                                                    },
+                                                                    {
+                                                                        "label": "Colorectal cancer",
+                                                                        "value": null
+                                                                    },
+                                                                    {
+                                                                        "label": "Esophageal cancer",
+                                                                        "value": null
+                                                                    },
+                                                                    {
+                                                                        "label": "Kidney cancer",
+                                                                        "value": null
+                                                                    }
+                                                                ],
+                                                                "value": null
+                                                            },
+                                                            {
+                                                                "label": "Hormone-related cancers",
+                                                                "children": [
+                                                                    {
+                                                                        "label": "Breast cancer",
+                                                                        "value": null
+                                                                    },
+                                                                    {
+                                                                        "label": "Endometrial cancer",
+                                                                        "value": null
+                                                                    },
+                                                                    {
+                                                                        "label": "Ovarian cancer",
+                                                                        "value": null
+                                                                    },
+                                                                    {
+                                                                        "label": "Prostate cancer",
+                                                                        "value": null
+                                                                    }
+                                                                ],
+                                                                "value": null
+                                                            },
+                                                            {
+                                                                "label": "Physical activity related cancers",
+                                                                "children": [
+                                                                    {
+                                                                        "label": "Need to look into",
+                                                                        "value": null
+                                                                    }
+                                                                ],
+                                                                "value": null
+                                                            },
+                                                            {
+                                                                "label": "Alcohol-related cancers",
+                                                                "children": [
+                                                                    {
+                                                                        "label": "Breast cancer",
+                                                                        "value": null
+                                                                    },
+                                                                    {
+                                                                        "label": "Liver cancer",
+                                                                        "value": null
+                                                                    }
+                                                                ],
+                                                                "value": null
+                                                            },
+                                                            {
+                                                                "label": "Infection-related cancers",
+                                                                "children": [
+                                                                    {
+                                                                        "label": "H. pylori cancers",
+                                                                        "children": [
+                                                                            {
+                                                                                "label": "Gastric cancer",
+                                                                                "value": null
+                                                                            }
+                                                                        ],
+                                                                        "value": null
+                                                                    },
+                                                                    {
+                                                                        "label": "HPV-related cancers",
+                                                                        "children": [
+                                                                            {
+                                                                                "label": "Cervical cancer",
+                                                                                "value": null
+                                                                            },
+                                                                            {
+                                                                                "label": "Head and neck cancer",
+                                                                                "value": null
+                                                                            }
+                                                                        ],
+                                                                        "value": null
+                                                                    },
+                                                                    {
+                                                                        "label": "Family history of cancer",
+                                                                        "value": null
+                                                                    }
+                                                                ],
+                                                                "value": null
+                                                            }
+                                                        ],
+                                                        "value": null
+                                                    }
+                                                ],
+                                                "value": null
+                                            }
+                                        ],
+                                        "value": null
+                                    }
+                                ],
+                                "value": null
+                            }
+                        ],
+                        "value": null
+                    }
+                ],
+                "value": null
+            }
+        ],
+        "value": null
+    },
+    {
+        "label": "Lifestyle factors",
+        "children": [
+            {
+                "label": "Alcohol consumption",
+                "value": null
+            },
+            {
+                "label": "Diet",
+                "children": [
+                    {
+                        "label": "Caffeine intake",
+                        "value": null
+                    },
+                    {
+                        "label": "Fat intake",
+                        "value": null
+                    },
+                    {
+                        "label": "Protein intake",
+                        "value": null
+                    }
+                ],
+                "value": null
+            },
+            {
+                "label": "Exercise",
+                "children": [
+                    {
+                        "label": "Flights of stairs",
+                        "value": null
+                    },
+                    {
+                        "label": "Light activity duration",
+                        "value": null
+                    },
+                    {
+                        "label": "Mile walk frequency",
+                        "value": null
+                    },
+                    {
+                        "label": "Moderate activity duration",
+                        "value": null
+                    },
+                    {
+                        "label": "Strenuous activity frequency",
+                        "value": null
+                    },
+                    {
+                        "label": "Strenuous activity duration",
+                        "value": null
+                    },
+                    {
+                        "label": "Vigorous activity at 40",
+                        "value": null
+                    },
+                    {
+                        "label": "Vigorous activity current",
+                        "value": null
+                    },
+                    {
+                        "label": "Walking pace",
+                        "value": null
+                    }
+                ],
+                "value": null
+            },
+            {
+                "label": "Smoking",
+                "children": [
+                    {
+                        "label": "Cigarette smoking status",
+                        "value": null
+                    },
+                    {
+                        "label": "Cigarette type",
+                        "value": null
+                    },
+                    {
+                        "label": "Cigarettes per day",
+                        "value": null
+                    },
+                    {
+                        "label": "Experience cigarette cravings",
+                        "value": null
+                    },
+                    {
+                        "label": "Filtered or Non-filtered",
+                        "value": null
+                    },
+                    {
+                        "label": "Menthol or non-menthol",
+                        "value": null
+                    },
+                    {
+                        "label": "Number of cigarettes smoked per day",
+                        "value": null
+                    },
+                    {
+                        "label": "Wake up smoke",
+                        "value": null
+                    }
+                ],
+                "value": null
+            }
+        ],
+        "value": null
+    },
+    {
+        "label": "Medical conditions",
+        "children": [
+            {
+                "label": "Arthritis",
+                "value": null
+            },
+            {
+                "label": "Asthma",
+                "value": null
+            },
+            {
+                "label": "Benign ovarian cyst/tumor",
+                "value": null
+            },
+            {
+                "label": "Broken bone",
+                "children": [
+                    {
+                        "label": "Broken arm",
+                        "value": null
+                    },
+                    {
+                        "label": "Broken hip",
+                        "value": null
+                    },
+                    {
+                        "label": "Broken vertebra",
+                        "value": null
+                    },
+                    {
+                        "label": "Broken other",
+                        "value": null
+                    }
+                ],
+                "value": null
+            },
+            {
+                "label": "Bronchitis",
+                "value": null
+            },
+            {
+                "label": "Cirrhosis",
+                "value": null
+            },
+            {
+                "label": "Colorectal polyps",
+                "value": null
+            },
+            {
+                "label": "Crohn’s disease",
+                "value": null
+            },
+            {
+                "label": "Diabetes",
+                "value": null
+            },
+            {
+                "label": "Diverticulitis/Diverticulosis",
+                "value": null
+            },
+            {
+                "label": "Emphysema",
+                "value": null
+            },
+            {
+                "label": "Endometriosis",
+                "value": null
+            },
+            {
+                "label": "Enlarged prostate of BPH",
+                "value": null
+            },
+            {
+                "label": "Fibrotic breast disease",
+                "value": null
+            },
+            {
+                "label": "Gallbladder stones or inflammation",
+                "value": null
+            },
+            {
+                "label": "Heart attack",
+                "value": null
+            },
+            {
+                "label": "Hepatitis",
+                "value": null
+            },
+            {
+                "label": "High cholesterol",
+                "value": null
+            },
+            {
+                "label": "Hypertension",
+                "value": null
+            },
+            {
+                "label": "Inflamed prostate",
+                "value": null
+            },
+            {
+                "label": "Osteoporosis",
+                "value": null
+            },
+            {
+                "label": "Stroke",
+                "value": null
+            },
+            {
+                "label": "Ulcerative colitis",
+                "value": null
+            },
+            {
+                "label": "Uterine fibroid tumors",
+                "value": null
+            }
+        ],
+        "value": null
+    },
+    {
+        "label": "Reproductive factors",
+        "children": [
+            {
+                "label": "Age of menarche",
+                "value": null
+            },
+            {
+                "label": "Age of menopause",
+                "value": null
+            },
+            {
+                "label": "Ever try to become pregnant without success",
+                "value": null
+            }
+        ],
+        "value": null
+    },
+    {
+        "label": "Mortality",
+        "children": [
+            {
+                "label": "All-cause mortality",
+                "value": null
+            },
+            {
+                "label": "Cancer-specific mortality",
+                "value": null
+            }
+        ],
+        "value": null
+    }
+]
