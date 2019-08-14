@@ -1,9 +1,9 @@
 const path = require('path');
-const { databases, port } = require('./config.json');
-const { getRanges, getSummary, getVariants, getQQImageMapJSON } = require('./query');
 const server = require('fastify');
 const cors = require('fastify-cors');
 const static = require('fastify-static');
+const { databases, port } = require('./config.json');
+const { getRanges, getSummary, getVariants, getQQImageMapJSON } = require('./query');
 
 const app = server({ignoreTrailingSlash: true});
 app.register(static, {root: path.resolve('www')});
