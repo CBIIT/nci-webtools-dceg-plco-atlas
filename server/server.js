@@ -3,7 +3,7 @@ const server = require('fastify');
 const cors = require('fastify-cors');
 const static = require('fastify-static');
 const { databases, port } = require('./config.json');
-const { getRanges, getSummary, getVariants, getQQImageMapJSON } = require('./query');
+const { getRanges, getSummary, getVariants, getVariant, getQQImageMapJSON } = require('./query');
 
 const app = server({ignoreTrailingSlash: true});
 app.register(static, {root: path.resolve('www')});
@@ -32,6 +32,14 @@ app.get('/variants', async ({query}, res) => {
     const db = databases.find(e => e.name === query.database);
     res.header('Cache-Control', 'max-age=300');
     return getVariants(db.filepath, query);
+});
+
+// retrieves single variant details given the snp or chr:pos
+app.get('/variant', async ({query}, res) => {
+    // console.log("query", query);
+    const db = databases.find(e => e.name === query.database);
+    res.header('Cache-Control', 'max-age=300');
+    return getVariant(db.filepath, query);
 });
 
 // retrieves all variants within the specified range for QQ plot, sorted by p-values descending

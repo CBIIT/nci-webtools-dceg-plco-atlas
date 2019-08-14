@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-// import { Nav, Tab } from 'react-bootstrap';
 import { SearchFormTraitsVariant } from '../forms/search-form-traits-variant';
+import { query } from '../../services/query';
 
 import 'react-bootstrap-table-next/dist/react-bootstrap-table2.min.css';
 import BootstrapTable from 'react-bootstrap-table-next';
@@ -10,79 +10,48 @@ import 'react-bootstrap-table2-filter/dist/react-bootstrap-table2-filter.min.css
 import filterFactory, { textFilter } from 'react-bootstrap-table2-filter';
 
 export function VariantLookup({ params, setParams }) {
-    const [trait, setTrait] = useState(null);
-
-    const phenotypes = [
-        {
-            trait: "Ewing's Sarcoma",
-            snp: "rs12345",
-            chr: 1,
-            pos: 246810,
-            ref: 'A',
-            alt: 'T'
-        },
-        {
-            trait: "Lung Cancer",
-            snp: "rs12345",
-            chr: 1,
-            pos: 246810,
-            ref: 'C',
-            alt: 'G'
-        },
-        {
-            trait: "Hair Loss",
-            snp: "rs12345",
-            chr: 1,
-            pos: 246810,
-            ref: 'ATT',
-            alt: 'A'
-        },
-        {
-            trait: "Freckles",
-            snp: "rs12345",
-            chr: 1,
-            pos: 246810,
-            ref: 'C',
-            alt: 'G'
-        },
-        {
-            trait: "Arthritis",
-            snp: "rs12345",
-            chr: 1,
-            pos: 246810,
-            ref: 'ATTATTA',
-            alt: 'TTA'
-        }
-    ];
+    const [debugSearchInput, setDebugSearchInput] = useState(null);
+    const [phenotypes, setPhenotypes] = useState([{}]);
+    const [message, setMessage] = useState("");
+    const [timestamp, setTimestamp] = useState(0);
 
     const columns = [
         {
-            dataField: 'trait',
+            dataField: 'TRAIT',
             text: 'Trait',
+            filter: textFilter(),
             sort: true,
+        }, 
+        {
+            dataField: 'SNP',
+            text: 'SNP',
             filter: textFilter()
         }, 
         {
-            dataField: 'snp',
-            text: 'Product SNP',
-        }, 
-        {
-            dataField: 'chr',
-            text: 'Product Chromosome',
-        },
-        {
-            dataField: 'pos',
-            text: 'Product Position',
-        },
-        {
-            dataField: 'ref',
-            text: 'Product Ref. Allele',
+            dataField: 'CHR',
+            text: 'Chromosome',
             filter: textFilter()
         },
         {
-            dataField: 'alt',
-            text: 'Product Alt. Allele',
+            dataField: 'BP',
+            text: 'Position',
             filter: textFilter()
+        },
+        {
+            dataField: 'A1',
+            text: 'Ref. Allele',
+            filter: textFilter()
+        },
+        {
+            dataField: 'A2',
+            text: 'Alt. Allele',
+            filter: textFilter()
+        },
+        {
+            dataField: 'P',
+            text: 'P-value',
+            filter: textFilter(),
+            sort: true,
         },
     ];
 
@@ -92,8 +61,10 @@ export function VariantLookup({ params, setParams }) {
                 <div className="card-body">
                     <SearchFormTraitsVariant
                         params={params}
-                        onChange={setParams}
-                        onSubmit={setTrait}
+                        onChange={e => {
+                            setParams(e);
+                        }}
+                        onSubmit={lookup}
                     />
                 </div>
             </div>
@@ -104,10 +75,15 @@ export function VariantLookup({ params, setParams }) {
                 </div>
 
                 <div className="card-body">
-                    show variant details and info in each found trait
-                    <div className="row mt-3">
+                    <div className="row">
                         <div class="col-md-12 text-left">
-                            <pre>{JSON.stringify(trait, null, 2)}</pre>
+                            {timestamp ? <strong className="mx-2">{timestamp} s</strong> : null}
+                        </div>
+                        <div class="col-md-12 text-left">
+                            <pre>{JSON.stringify(debugSearchInput, null, 2)}</pre>
+                        </div>
+                        <div class="col-md-12 text-left">
+                            <h4>{message}</h4>
                         </div>
                     </div>
 
@@ -120,8 +96,45 @@ export function VariantLookup({ params, setParams }) {
                         filter={ filterFactory() }
                     />
 
+                    {/* <div className="row mt-3">
+                        <div className="col-md-12 text-left mt-3">
+                            <pre>{JSON.stringify(phenotypes, null, 2)}</pre>
+                        </div>
+                    </div> */}
                 </div>
             </div>
         </>
     );
+
+    async function lookup(searchInput) {
+        let start = new Date();
+        let getTimestamp = e => (new Date() - start) / 1000;
+        setTimestamp(0);
+        
+        var tableList = [];
+        setDebugSearchInput(searchInput);
+        // console.log("Sample query!", searchInput);
+        for (var i = 0; i < searchInput.selectedPhenotypes.length; i++) {
+            const newParams = {
+                database: searchInput.selectedPhenotypes[i].value,
+                snp: searchInput.selectedVariant,
+                chr: '',
+                bp: ''
+            }
+            setParams(newParams);
+            const variantData = await query('variant', newParams);
+            for (var j = 0; j < variantData.length; j++) {
+                variantData[i]['TRAIT'] = searchInput.selectedPhenotypes[i].label;
+                tableList.push(variantData[i]);
+            }
+        }
+        setPhenotypes(tableList);
+        if (tableList.length === 0) {
+            setMessage("Variant not found in any selected trait(s).");
+        } else {
+            setMessage("");
+        }
+
+        setTimestamp(getTimestamp());
+    }
 }
