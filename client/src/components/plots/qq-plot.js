@@ -10,7 +10,6 @@ export function QQPlot({ trait }) {
     database: 'example'
   });
   const [debugQuery, setDebugQuery] = useState({});
-
   const [areaItems, setAreaItems] = useState([{}]);
 
   useEffect(() => {

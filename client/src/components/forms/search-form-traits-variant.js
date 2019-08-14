@@ -45,7 +45,7 @@ export function SearchFormTraitsVariant({ params, onChange, onSubmit }) {
     }
   ];
   
-  const [selectedOption, setSelectedOption] = useState(null);
+  const [selectedPhenotypes, setSelectedPhenotypes] = useState(null);
   const [selectedVariant, setSelectedVariant] = useState(null);
 
   return (
@@ -70,7 +70,7 @@ export function SearchFormTraitsVariant({ params, onChange, onSubmit }) {
           <div style={{width: '60%'}}>
             <Select
               placeholder="(Select one or more traits) *"
-              value={selectedOption}
+              value={selectedPhenotypes}
               onChange={(value) => handleChange(value)}
               options={listType === 'categorical' ? categorizeTraits(traits) : traits}
               isMulti
@@ -91,9 +91,9 @@ export function SearchFormTraitsVariant({ params, onChange, onSubmit }) {
           <InputGroup.Append>
             <button 
               className="btn btn-primary" 
-              // onClick={e => onSubmit({selectedOption, selectedVariant})} 
-              onClick={e => validateVariantInput(selectedOption, selectedVariant)}
-              disabled={!((selectedOption && selectedOption.length > 0) && (selectedVariant && selectedVariant.length > 0))}>
+              // onClick={e => onSubmit({selectedPhenotypes, selectedVariant})} 
+              onClick={e => validateVariantInput(selectedPhenotypes, selectedVariant)}
+              disabled={!((selectedPhenotypes && selectedPhenotypes.length > 0) && (selectedVariant && selectedVariant.length > 0))}>
               Submit
             </button>
           </InputGroup.Append>
@@ -119,18 +119,18 @@ export function SearchFormTraitsVariant({ params, onChange, onSubmit }) {
     return categorized;
   }
 
-  function validateVariantInput(selectedOption, selectedVariant) {
-    console.log(selectedVariant);
-    if (selectedVariant.match(/^[r|R][s|S][0-9]+$/) != null || selectedVariant.match(/^[c|C][h|H][r|R](([1-9]|[1][0-9]|[2][0-2])|[x|X|y|Y]):[0-9]+$/) != null) {
+  function validateVariantInput(selectedPhenotypes, selectedVariant) {
+    // console.log(selectedVariant);
+    if (selectedVariant.match(/^[r|R][s|S][0-9]+$/) != null || selectedVariant.match(/^([c|C][h|H][r|R])?(([1-9]|[1][0-9]|[2][0-2])|[x|X|y|Y]):[0-9]+$/) != null) {
       // console.log("valid");
       onSubmit({
-        selectedOption, 
+        selectedPhenotypes, 
         selectedVariant
       })
     } else {
       // console.log("invalid");
       onSubmit({
-        selectedOption, 
+        selectedPhenotypes, 
         selectedVariant,
         error: "Invalid variant input."
       })
@@ -148,8 +148,8 @@ export function SearchFormTraitsVariant({ params, onChange, onSubmit }) {
   //   }
   // }
 
-  function handleChange(selectedOption) {
-    setSelectedOption(selectedOption);
-    console.log(`Option selected:`, selectedOption);
+  function handleChange(selectedPhenotypes) {
+    setSelectedPhenotypes(selectedPhenotypes);
+    // console.log(`Option selected:`, selectedPhenotypes);
   };
 }
