@@ -1,15 +1,14 @@
 const path = require('path');
+const server = require('fastify');
+const cors = require('fastify-cors');
+const static = require('fastify-static');
 const { databases, port } = require('./config.json');
 const { getRanges, getSummary, getVariants, getVariant, getQQImageMapJSON } = require('./query');
 
-const app = require('fastify')({
-    ignoreTrailingSlash: true,
-});
-app.register(require('fastify-cors'));
-app.register(require('fastify-static'), {
-    // root: path.resolve('client', 'build')
-    root: path.resolve('www')
-});
+const app = server({ignoreTrailingSlash: true});
+app.register(static, {root: path.resolve('www')});
+app.register(static, {root: path.resolve('server/data'), prefix: '/data/', decorateReply: false});
+app.register(cors);
 
 // todo: check connectivity to database
 app.get('/ping', (req, res) => res.send(true));
