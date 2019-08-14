@@ -12,6 +12,8 @@ import filterFactory, { textFilter } from 'react-bootstrap-table2-filter';
 export function VariantLookup({ params, setParams }) {
     const [debugSearchInput, setDebugSearchInput] = useState(null);
     const [phenotypes, setPhenotypes] = useState([{}]);
+    const [message, setMessage] = useState("");
+    const [timestamp, setTimestamp] = useState(0);
 
     const columns = [
         {
@@ -69,12 +71,17 @@ export function VariantLookup({ params, setParams }) {
                 </div>
 
                 <div className="card-body">
-                    show variant details and info in each found trait
-                    {/* <div className="row mt-3">
+                    <div className="row">
+                        <div class="col-md-12 text-left">
+                            {timestamp ? <strong className="mx-2">{timestamp} s</strong> : null}
+                        </div>
                         <div class="col-md-12 text-left">
                             <pre>{JSON.stringify(debugSearchInput, null, 2)}</pre>
                         </div>
-                    </div> */}
+                        <div class="col-md-12 text-left">
+                            <h4>{message}</h4>
+                        </div>
+                    </div>
 
                     <BootstrapTable 
                         bootstrap4={ true } 
@@ -96,12 +103,16 @@ export function VariantLookup({ params, setParams }) {
     );
 
     async function lookup(searchInput) {
+        let start = new Date();
+        let getTimestamp = e => (new Date() - start) / 1000;
+        setTimestamp(0);
+        
         var tableList = [];
         setDebugSearchInput(searchInput);
         // console.log("Sample query!", searchInput);
-        for (var i = 0; i < searchInput.selectedOption.length; i++) {
+        for (var i = 0; i < searchInput.selectedPhenotypes.length; i++) {
             const newParams = {
-                database: searchInput.selectedOption[i].value,
+                database: searchInput.selectedPhenotypes[i].value,
                 snp: searchInput.selectedVariant,
                 chr: '',
                 bp: ''
@@ -109,10 +120,17 @@ export function VariantLookup({ params, setParams }) {
             setParams(newParams);
             const variantData = await query('variant', newParams);
             for (var j = 0; j < variantData.length; j++) {
-                variantData[i]['TRAIT'] = searchInput.selectedOption[i].label;
+                variantData[i]['TRAIT'] = searchInput.selectedPhenotypes[i].label;
                 tableList.push(variantData[i]);
             }
         }
         setPhenotypes(tableList);
+        if (tableList.length === 0) {
+            setMessage("Variant not found in any selected trait(s).");
+        } else {
+            setMessage("");
+        }
+        
+        setTimestamp(getTimestamp());
     }
 }
