@@ -19,20 +19,23 @@ export function VariantLookup({ params, setParams }) {
         {
             dataField: 'TRAIT',
             text: 'Trait',
+            filter: textFilter(),
             sort: true,
-            filter: textFilter()
         }, 
         {
             dataField: 'SNP',
             text: 'SNP',
+            filter: textFilter()
         }, 
         {
             dataField: 'CHR',
             text: 'Chromosome',
+            filter: textFilter()
         },
         {
             dataField: 'BP',
             text: 'Position',
+            filter: textFilter()
         },
         {
             dataField: 'A1',
@@ -47,6 +50,7 @@ export function VariantLookup({ params, setParams }) {
         {
             dataField: 'P',
             text: 'P-value',
+            filter: textFilter(),
             sort: true,
         },
     ];
@@ -130,7 +134,7 @@ export function VariantLookup({ params, setParams }) {
         } else {
             setMessage("");
         }
-        
+
         setTimestamp(getTimestamp());
     }
 }
