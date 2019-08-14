@@ -120,8 +120,8 @@ export function SearchFormTraitsVariant({ params, onChange, onSubmit }) {
   }
 
   function validateVariantInput(selectedOption, selectedVariant) {
-    console.log(selectedVariant);
-    if (selectedVariant.match(/^[r|R][s|S][0-9]+$/) != null || selectedVariant.match(/^[c|C][h|H][r|R](([1-9]|[1][0-9]|[2][0-2])|[x|X|y|Y]):[0-9]+$/) != null) {
+    // console.log(selectedVariant);
+    if (selectedVariant.match(/^[r|R][s|S][0-9]+$/) != null || selectedVariant.match(/^([c|C][h|H][r|R])?(([1-9]|[1][0-9]|[2][0-2])|[x|X|y|Y]):[0-9]+$/) != null) {
       // console.log("valid");
       onSubmit({
         selectedOption, 
@@ -150,6 +150,6 @@ export function SearchFormTraitsVariant({ params, onChange, onSubmit }) {
 
   function handleChange(selectedOption) {
     setSelectedOption(selectedOption);
-    console.log(`Option selected:`, selectedOption);
+    // console.log(`Option selected:`, selectedOption);
   };
 }

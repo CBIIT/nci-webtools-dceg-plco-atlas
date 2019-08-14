@@ -41,6 +41,20 @@ function getVariants(filepath, params) {
         : stmt.all(params);
 }
 
+function getVariant(filepath, params) {
+    // console.log("filepath", filepath);
+    // console.log("params", params);
+    const stmt = new Database(filepath, {readonly: true}).prepare(`
+        SELECT * FROM variant WHERE
+        snp = :snp
+        OR (chr = :chr AND bp = :bp)
+    `);
+
+    return params.raw
+        ? getRawResults(stmt, params)
+        : stmt.all(params);
+}
+
 function getTopVariants(filepath, params) {
     const stmt = new Database(filepath, {readonly: true}).prepare(`
         SELECT * FROM variant WHERE
@@ -64,4 +78,4 @@ function getQQImageMapJSON(name) {
     };
 }
 
-module.exports = {getRanges, getSummary, getVariants, getQQImageMapJSON};
+module.exports = {getRanges, getSummary, getVariants, getVariant, getQQImageMapJSON};

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Route, Link, Redirect } from 'react-router-dom';
+import { Route, NavLink, Redirect } from 'react-router-dom';
 import { ButtonGroup, Button } from 'react-bootstrap';
 import { SummaryResults } from '../gwas/summary-results';
 import { VariantLookup } from '../gwas/variant-lookup';
@@ -25,12 +25,15 @@ export function Gwas({ params, setParams }) {
 
   return (
     <div className="container my-4">
-
       <ButtonGroup className="mb-4">
         {gwasLinks.map(({ name, pathId }) => (
-          <Link className="mr-2" to={`/gwas/${pathId}`}>
+          <NavLink 
+            className="mr-2" 
+            activeClassName="active-navlinks"
+            exact={true}
+            to={`/gwas/${pathId}`}>
             <Button>{name}</Button>
-          </Link>
+          </NavLink>
         ))}
       </ButtonGroup>
 
