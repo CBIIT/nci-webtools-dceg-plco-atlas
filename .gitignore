@@ -6,4 +6,6 @@
 config.json
 /server/data/**/*.db
 /server/data/**/*.meta
+/server/data/**/*.txt
+/server/data/**/*.txt.gz
 /www/
