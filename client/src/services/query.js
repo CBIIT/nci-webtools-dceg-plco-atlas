@@ -1,5 +1,5 @@
 // set api root, removing trailing slashes
-const root = (process.env.NODE_ENV === 'development'
+export const root = (process.env.NODE_ENV === 'development'
   ? 'http://localhost:9000'
   : window.location.pathname
 ).replace(/\/+$/, '');

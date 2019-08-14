@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { query } from '../../services/query';
+import { root, query } from '../../services/query';
 import ReactCursorPosition, { INTERACTIONS } from 'react-cursor-position';
 
 export function QQPlot({ trait }) {
@@ -134,14 +134,14 @@ export function QQPlot({ trait }) {
     plotContainer.current.innerHTML = '';
     // add QQ plot image
     const qqImg = document.createElement('img');
-    qqImg.src = 'assets/images/qq-plots/example.png';
+    qqImg.src = root + '/data/qq-plots/example.png';
     qqImg.draggable = false;
     qqImg.alt = 'QQ-plot of selected trait';
     qqImg.useMap = '#image-map';
     plotContainer.current.appendChild(qqImg);
     // load & add QQ plot image map
-    const imageMapData = await query('imagemapqq', params);
-    setAreaItems(imageMapData.data);
+    const imageMapData = await query('data/qq-plots/example.imagemap.json');
+    setAreaItems(imageMapData);
 
     setLoading(false);
     setTimestamp(getTimestamp());

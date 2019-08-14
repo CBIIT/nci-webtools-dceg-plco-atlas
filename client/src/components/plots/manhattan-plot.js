@@ -11,7 +11,7 @@ export function ManhattanPlot({ trait }) {
   const [loading, setLoading] = useState(false);
   const [ranges, setRanges] = useState([]);
   const [params, setParams] = useState({
-    database: 'example',
+    database: trait,
     chr: 10,
     nlogpMin: 3,
     nlogpMax: 20,
@@ -20,7 +20,7 @@ export function ManhattanPlot({ trait }) {
   });
 
   useEffect(() => {
-    query('ranges', { database: 'example' }).then(e => setRanges(e));
+    query('data/chromosome_ranges.json').then(e => setRanges(e));
   }, []);
 
   useEffect(() => {
