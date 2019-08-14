@@ -3,7 +3,7 @@ const fs = require('fs');
 const path = require('path');
 const readline = require('readline');
 const sqlite = require('better-sqlite3');
-const ranges = require('../data/variant_ranges.json');
+const ranges = require('../data/chromosome_ranges.json');
 
 // retrieve arguments
 const argv = process.argv.slice(2);
