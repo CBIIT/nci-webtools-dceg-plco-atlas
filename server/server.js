@@ -7,7 +7,7 @@ const { getRanges, getSummary, getVariants, getVariant, getQQImageMapJSON } = re
 
 const app = server({ignoreTrailingSlash: true});
 app.register(static, {root: path.resolve('www')});
-app.register(static, {root: path.resolve('server/data'), prefix: '/data/', decorateReply: false});
+app.register(static, {root: path.resolve(dbpath), prefix: '/data/', decorateReply: false});
 app.register(cors);
 
 // todo: check connectivity to database
