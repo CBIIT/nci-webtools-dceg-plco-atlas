@@ -8,4 +8,5 @@ config.json
 /server/data/**/*.meta
 /server/data/**/*.txt
 /server/data/**/*.txt.gz
+/server/data/qq-plots/
 /www/

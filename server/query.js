@@ -71,7 +71,7 @@ function getTopVariants(filepath, params) {
 }
 
 function getQQImageMapJSON(name) {
-    let raw = fs.readFileSync('server/data/' + name + '.imagemap.json');
+    let raw = fs.readFileSync('server/data/qq-plots/' + name + '.imagemap.json');
     let obj = JSON.parse(raw);
     return {
         data: obj
