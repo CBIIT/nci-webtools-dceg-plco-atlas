@@ -4,5 +4,6 @@
 *.db-journal
 *.vs
 config.json
-/server/data
+/server/data/**/*.db
+/server/data/**/*.meta
 /www/

@@ -3,7 +3,7 @@ const fs = require('fs');
 const path = require('path');
 const readline = require('readline');
 const sqlite = require('better-sqlite3');
-const ranges = require('./variant_ranges.json');
+const ranges = require('../data/variant_ranges.json');
 
 // retrieve arguments
 const argv = process.argv.slice(2);
@@ -50,7 +50,7 @@ const parseLine = line => line.trim().split(/\s+/).map(value => {
 const getFirstLine = filepath => {
     const size = 2048;
     const buffer = Buffer.alloc(size);
-    fs.readSync(fs.openSync(filepath), buffer, 0, size);
+    fs.readSync(fs.openSync(filepath, 'r'), buffer, 0, size);
     const contents = buffer.toString();
     return contents.substring(0, contents.indexOf('\n')).trim();
 }
@@ -66,23 +66,23 @@ db.exec(readFile('schema.sql'));
 
 const insert = db.prepare(`
     INSERT INTO variant_stage VALUES (
-        :CHR,
-        :BP,
-        :BP_1000KB,
-        :BP_ABS,
-        :BP_ABS_1000KB,
-        :SNP,
-        :A1,
-        :A2,
-        :N,
-        :P,
-        :NLOG_P,
-        :NLOG_P2,
-        :P_R,
-        :OR,
-        :OR_R,
-        :Q,
-        :I
+        :chr,
+        :bp,
+        :bp_1000kb,
+        :bp_abs,
+        :bp_abs_1000kb,
+        :snp,
+        :a1,
+        :a2,
+        :n,
+        :p,
+        :nlog_p,
+        :nlog_p2,
+        :p_r,
+        :or,
+        :or_r,
+        :q,
+        :i
     )
 `);
 
@@ -92,7 +92,7 @@ const reader = readline.createInterface({
 });
 
 let count = 0;
-let bpPrev = 0;
+let previousChr = 1;
 let bpOffset = 0;
 
 db.exec('BEGIN TRANSACTION');
@@ -104,25 +104,25 @@ reader.on('line', line => {
     // trim, split by spaces, and parse 'NA' as null
     const values = parseLine(line);
 
-    const [CHR, BP, SNP, A1, A2, N, P, P_R, OR, OR_R, Q, I] = values;
-    const params = {CHR, BP, SNP, A1, A2, N, P, P_R, OR, OR_R, Q, I};
+    const [chr, bp, snp, a1, a2, n, p, p_r, or, or_r, q, i] = values;
+    const params = {chr, bp, snp, a1, a2, n, p, p_r, or, or_r, q, i};
 
     // group base pairs
-    params.BP_1000KB = group(BP, 10**6);
+    params.bp_1000kb = group(params.bp, 10**6);
 
     // calculate -log10(p) and group its values
-    params.NLOG_P = P ? -Math.log10(P) : null;
-    params.NLOG_P2 = group(params.NLOG_P, 10**-2);
+    params.nlog_p = params.p ? -Math.log10(params.p) : null;
+    params.nlog_p2 = group(params.nlog_p, 10**-2);
 
     // determine absolute position of variant relative to the start of the genome
-    if (bpPrev > BP)
-        bpOffset += bpPrev;
-
-    bpPrev = BP;
+    if (chr > previousChr) {
+        bpOffset = ranges[previousChr].max_bp_abs;
+        previousChr = chr;
+    }
 
     // store the absolute BP and group by megabases
-    params.BP_ABS = bpOffset + BP;
-    params.BP_ABS_1000KB = group(params.BP_ABS, 10**6);
+    params.bp_abs = bpOffset + bp;
+    params.bp_abs_1000kb = group(params.bp_abs, 10**6);
 
     insert.run(params);
 
@@ -138,7 +138,7 @@ reader.on('close', () => {
     console.log(`[${duration()} s] Storing variants...`);
     db.exec(`
         INSERT INTO variant SELECT
-            NULL, "CHR", "BP", "SNP", "A1", "A2", "N", "P", "NLOG_P", "P_R", "OR", "OR_R", "Q", "I"
+            null, "chr", "bp", "snp", "a1", "a2", "n", "p", "nlog_p", "p_r", "or", "or_r", "q", "i"
         FROM variant_stage;
     `);
 
@@ -146,19 +146,19 @@ reader.on('close', () => {
     console.log(`[${duration()} s] Storing summary...`);
     db.exec(`
         INSERT INTO variant_summary SELECT DISTINCT
-            CHR, BP_ABS_1000KB, NLOG_P2
+            chr, bp_abs_1000kb, nlog_p2
         FROM variant_stage;
     `);
 
     // drop staging table
-    db.exec(`DROP variant_stage`);
+    db.exec(`DROP TABLE variant_stage`);
 
     // create indexes
     console.log(`[${duration()} s] Indexing...`);
-    db.exec(readFile(path.resolve(__dirname, 'indexes.sql')));
+    db.exec(readFile('indexes.sql'));
 
     // close database
     console.log(`[${duration()} s] Finalizing database...`);
     db.close();
-    console.log(`[${duration()} s] Created database...`);
+    console.log(`[${duration()} s] Created database`);
 });
