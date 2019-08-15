@@ -39,7 +39,7 @@ CREATE TABLE variant
 
 CREATE TABLE variant_summary
 (
-    "CHR"       INTEGER,
+    "CHR"           INTEGER,
     "BP_ABS_1000KB" INTEGER, -- Absolute BP floored to the nearest multiple of 10^6 (1000 kilobases)
-    "NLOG_P2"   REAL -- negative log10(P) floored to the nearest multiple of 10^-2
+    "NLOG_P2"       REAL -- negative log10(P) floored to the nearest multiple of 10^-2
 );
