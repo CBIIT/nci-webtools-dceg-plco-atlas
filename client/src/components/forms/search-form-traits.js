@@ -1,51 +1,35 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Form, InputGroup } from 'react-bootstrap';
+import { query } from '../../services/query';
 import Select from 'react-select';
 
 
 export function SearchFormTraits({ params, onChange, onSubmit }) {
   const [listType, setListType] = useState('alphabetic');
+  const [phenotypes, setPhenotypes] = useState([]);
+  const [phenotypesCat, setPhenotypesCat] = useState([]);
+  const [selectedPhenotypes, setSelectedPhenotypes] = useState(null);
 
-  const categories = [
-    'Sample Category A',
-    'Sample Category B',
-    'Sample Category C'
-  ];
-
-  const traits = [
-    {
-      value: `example`,
-      label: `Ewing's Sarcoma`,
-      category: 'Sample Category A'
-    },
-    {
-      value: `example_2a`,
-      label: `Sample trait 2A`,
-      category: 'Sample Category A'
-    },
-    {
-      value: `example_1b`,
-      label: `Sample trait 2A`,
-      category: 'Sample Category B'
-    },
-    {
-      value: `example_2b`,
-      label: `Sample trait 2A`,
-      category: 'Sample Category B'
-    },
-    {
-      value: `example_1c`,
-      label: `Sample trait 2A`,
-      category: 'Sample Category C'
-    },
-    {
-      value: `example_2c`,
-      label: `Sample trait 2A`,
-      category: 'Sample Category C'
+  useEffect(() => {
+    let records = [];
+    function populateRecords(node) {
+      records.push(node);
+      if (node.children)
+        node.children.forEach(populateRecords);
     }
-  ];
-  
-  const [selectedOption, setSelectedOption] = useState(null);
+
+    query('data/phenotypes.json').then(data => {
+      data.forEach(populateRecords, 0);
+      setPhenotypes(records);
+      // clone array for categorical display
+      let recordsCat = JSON.parse(JSON.stringify(records));
+      recordsCat.map(e => (
+        e.label = String.fromCharCode(160).repeat(e.level * 8) + e.label
+      ))
+      setPhenotypesCat(recordsCat);
+    })
+
+  }, [])
 
   return (
     <Form>
@@ -69,9 +53,10 @@ export function SearchFormTraits({ params, onChange, onSubmit }) {
           <div style={{width: '60%'}}>
             <Select
               placeholder="(Select two or more traits) *"
-              value={selectedOption}
+              value={selectedPhenotypes}
               onChange={(value) => handleChange(value)}
-              options={listType === 'categorical' ? categorizeTraits(traits) : traits}
+              options={listType === 'categorical' ? phenotypesCat : phenotypes}
+              isOptionDisabled={(option) => option.value === null}
               isMulti
             />            
           </div>
@@ -81,8 +66,8 @@ export function SearchFormTraits({ params, onChange, onSubmit }) {
             <button 
               className="btn btn-primary" 
               // onClick={e => onSubmit({selectedOption, selectedVariant})} 
-              onClick={e => onSubmit({selectedOption})}
-              disabled={!((selectedOption && selectedOption.length >= 2))}>
+              onClick={e => onSubmit({selectedPhenotypes})}
+              disabled={!((selectedPhenotypes && selectedPhenotypes.length >= 2))}>
               Submit
             </button>
           </InputGroup.Append>
@@ -91,25 +76,7 @@ export function SearchFormTraits({ params, onChange, onSubmit }) {
     </Form>
   );
 
-  function categorizeTraits(traits) {
-    var categorized = categories.map(function(category) {
-        return {
-          label: category,
-          options: traits.filter(t => t.category === category).map(t => (
-              {
-                label: t.label,
-                value: t.value
-              }
-            )
-          )
-        }
-      }
-    );
-    return categorized;
-  }
-
-  function handleChange(selectedOption) {
-    setSelectedOption(selectedOption);
-    console.log(`Option selected:`, selectedOption);
+  function handleChange(value) {
+    setSelectedPhenotypes(value);
   };
 }

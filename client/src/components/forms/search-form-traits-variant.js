@@ -1,52 +1,36 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Form, FormControl, InputGroup } from 'react-bootstrap';
+import { query } from '../../services/query';
 import Select from 'react-select';
 
 
 export function SearchFormTraitsVariant({ params, onChange, onSubmit }) {
   const [listType, setListType] = useState('alphabetic');
-
-  const categories = [
-    'Sample Category A',
-    'Sample Category B',
-    'Sample Category C'
-  ];
-
-  const traits = [
-    {
-      value: `example`,
-      label: `Ewing's Sarcoma`,
-      category: 'Sample Category A'
-    },
-    {
-      value: `example_2a`,
-      label: `Sample trait 2A`,
-      category: 'Sample Category A'
-    },
-    {
-      value: `example_1b`,
-      label: `Sample trait 2A`,
-      category: 'Sample Category B'
-    },
-    {
-      value: `example_2b`,
-      label: `Sample trait 2A`,
-      category: 'Sample Category B'
-    },
-    {
-      value: `example_1c`,
-      label: `Sample trait 2A`,
-      category: 'Sample Category C'
-    },
-    {
-      value: `example_2c`,
-      label: `Sample trait 2A`,
-      category: 'Sample Category C'
-    }
-  ];
-  
+  const [phenotypes, setPhenotypes] = useState([]);
+  const [phenotypesCat, setPhenotypesCat] = useState([]);
   const [selectedPhenotypes, setSelectedPhenotypes] = useState(null);
   const [selectedVariant, setSelectedVariant] = useState(null);
+
+  useEffect(() => {
+    let records = [];
+    function populateRecords(node) {
+      records.push(node);
+      if (node.children)
+        node.children.forEach(populateRecords);
+    }
+
+    query('data/phenotypes.json').then(data => {
+      data.forEach(populateRecords, 0);
+      setPhenotypes(records);
+      // clone array for categorical display
+      let recordsCat = JSON.parse(JSON.stringify(records));
+      recordsCat.map(e => (
+        e.label = String.fromCharCode(160).repeat(e.level * 8) + e.label
+      ))
+      setPhenotypesCat(recordsCat);
+    })
+
+  }, [])
 
   return (
     <Form>
@@ -72,7 +56,8 @@ export function SearchFormTraitsVariant({ params, onChange, onSubmit }) {
               placeholder="(Select one or more traits) *"
               value={selectedPhenotypes}
               onChange={(value) => handleChange(value)}
-              options={listType === 'categorical' ? categorizeTraits(traits) : traits}
+              options={listType === 'categorical' ? phenotypesCat : phenotypes}
+              isOptionDisabled={(option) => option.value === null}
               isMulti
             />            
           </div>
@@ -102,23 +87,6 @@ export function SearchFormTraitsVariant({ params, onChange, onSubmit }) {
     </Form>
   );
 
-  function categorizeTraits(traits) {
-    var categorized = categories.map(function(category) {
-        return {
-          label: category,
-          options: traits.filter(t => t.category === category).map(t => (
-              {
-                label: t.label,
-                value: t.value
-              }
-            )
-          )
-        }
-      }
-    );
-    return categorized;
-  }
-
   function validateVariantInput(selectedPhenotypes, selectedVariant) {
     // console.log(selectedVariant);
     if (selectedVariant.match(/^[r|R][s|S][0-9]+$/) != null || selectedVariant.match(/^([c|C][h|H][r|R])?(([1-9]|[1][0-9]|[2][0-2])|[x|X|y|Y]):[0-9]+$/) != null) {
@@ -137,19 +105,8 @@ export function SearchFormTraitsVariant({ params, onChange, onSubmit }) {
     }
   }
 
-  // function validateVariantInput(selectedVariant) {
-  //   console.log(selectedVariant);
-  //   if (selectedVariant.match(/^[r|R][s|S][0-9]+$/) != null || selectedVariant.match(/^[c|C][h|H][r|R](([1-9]|[1][0-9]|[2][0-2])|[x|X|y|Y]):[0-9]+$/) != null) {
-  //     console.log("valid");
-  //     setSelectedVariant(selectedVariant);
-  //   } else {
-  //     console.log("invalid");
-  //     setSelectedVariant(selectedVariant);
-  //   }
-  // }
-
-  function handleChange(selectedPhenotypes) {
-    setSelectedPhenotypes(selectedPhenotypes);
+  function handleChange(value) {
+    setSelectedPhenotypes(value);
     // console.log(`Option selected:`, selectedPhenotypes);
   };
 }

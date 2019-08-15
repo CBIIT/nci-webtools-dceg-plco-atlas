@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Form, FormControl, InputGroup } from 'react-bootstrap';
+import { Form, InputGroup } from 'react-bootstrap';
 import { query } from '../../services/query';
 
 export function SearchFormTrait({ params, onChange, onSubmit }) {
@@ -17,6 +17,7 @@ export function SearchFormTrait({ params, onChange, onSubmit }) {
 
     query('data/phenotypes.json').then(data => {
       data.forEach(populateRecords, 0);
+      console.log(records);
       setPhenotypes(records);
     })
 
@@ -56,7 +57,7 @@ export function SearchFormTrait({ params, onChange, onSubmit }) {
 
             {listType === 'categorical' && phenotypes.map(e => (
               <option value={e.value} disabled={e.value === null}>
-                {e.label}
+                {String.fromCharCode(160).repeat(e.level * 8)}{e.label}
               </option>
             ))}
 
