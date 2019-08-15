@@ -1,12 +1,29 @@
-import React, { useState } from 'react';
+import React, { useEffect } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
 import { Route, NavLink, Redirect } from 'react-router-dom';
 import { ButtonGroup, Button } from 'react-bootstrap';
 import { SummaryResults } from '../gwas/summary-results';
 import { VariantLookup } from '../gwas/variant-lookup';
 import { PhenotypeCorrelations } from '../gwas/phenotype-correlations';
+import { updatePhenotypes } from '../../services/actions';
+import { query } from '../../services/query';
 
 export function Gwas({ params, setParams }) {
-  const [trait, setTrait] = useState(null);
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    let records = [];
+    function populateRecords(node) {
+      records.push(node);
+      if (node.children)
+        node.children.forEach(populateRecords);
+    }
+
+    query('data/phenotypes.json').then(data => {
+      data.forEach(populateRecords, 0);
+      dispatch(updatePhenotypes(records));
+    });
+  }, []);
 
   const gwasLinks = [
     {
@@ -27,8 +44,8 @@ export function Gwas({ params, setParams }) {
     <div className="container my-4">
       <ButtonGroup className="mb-4">
         {gwasLinks.map(({ name, pathId }) => (
-          <NavLink 
-            className="mr-2" 
+          <NavLink
+            className="mr-2"
             activeClassName="active-navlinks"
             exact={true}
             to={`/gwas/${pathId}`}>
@@ -45,19 +62,19 @@ export function Gwas({ params, setParams }) {
 
       <Route
         path="/gwas/summary"
-        render={_ => <SummaryResults params={params} setParams={setParams} />}
+        component={SummaryResults}
       />
 
       <Route
         path="/gwas/lookup"
-        render={_ => <VariantLookup params={params} setParams={setParams} />}
+        component={VariantLookup}
       />
 
       <Route
         path="/gwas/correlations"
-        render={_ => <PhenotypeCorrelations params={params} setParams={setParams} />}
+        component={PhenotypeCorrelations}
       />
-      
+
     </div>
   );
 }

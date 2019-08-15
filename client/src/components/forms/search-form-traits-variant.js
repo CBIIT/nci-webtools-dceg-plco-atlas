@@ -1,52 +1,65 @@
 import React, { useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { Form, FormControl, InputGroup } from 'react-bootstrap';
+import { updateVariantLookup } from '../../services/actions';
 import Select from 'react-select';
 
+export function SearchFormTraitsVariant({ onSubmit }) {
+  const dispatch = useDispatch();
+  const phenotypes = useSelector(state => state.phenotypes);
+  const variantLookup = useSelector(state => state.variantLookup);
+  const { selectedListType, selectedPhenotypes, selectedVariant } = variantLookup;
 
-export function SearchFormTraitsVariant({ params, onChange, onSubmit }) {
-  const [listType, setListType] = useState('alphabetic');
+  const setSelectedListType = selectedListType => {
+    dispatch(updateVariantLookup({ selectedListType }));
+  }
 
-  const categories = [
-    'Sample Category A',
-    'Sample Category B',
-    'Sample Category C'
-  ];
+  const setSelectedPhenotypes = selectedPhenotypes => {
+    dispatch(updateVariantLookup({selectedPhenotypes}));
+  }
 
-  const traits = [
-    {
-      value: `example`,
-      label: `Ewing's Sarcoma`,
-      category: 'Sample Category A'
-    },
-    {
-      value: `example_2a`,
-      label: `Sample trait 2A`,
-      category: 'Sample Category A'
-    },
-    {
-      value: `example_1b`,
-      label: `Sample trait 2A`,
-      category: 'Sample Category B'
-    },
-    {
-      value: `example_2b`,
-      label: `Sample trait 2A`,
-      category: 'Sample Category B'
-    },
-    {
-      value: `example_1c`,
-      label: `Sample trait 2A`,
-      category: 'Sample Category C'
-    },
-    {
-      value: `example_2c`,
-      label: `Sample trait 2A`,
-      category: 'Sample Category C'
+  const setSelectedVariant = selectedVariant => {
+    dispatch(updateVariantLookup({selectedVariant}));
+  }
+
+  const handleChange = params => {
+    setSelectedPhenotypes(params);
+  }
+
+  const validateVariantInput = (selectedPhenotypes, selectedVariant) => {
+    // console.log(selectedVariant);
+    // (/(^rs\d+)|(chr)?/i).test(selectedVariant)
+
+    if (selectedVariant.match(/^[r|R][s|S][0-9]+$/) != null || selectedVariant.match(/^([c|C][h|H][r|R])?(([1-9]|[1][0-9]|[2][0-2])|[x|X|y|Y]):[0-9]+$/) != null) {
+      // console.log("valid");
+      onSubmit({
+        selectedPhenotypes,
+        selectedVariant
+      })
+    } else {
+      // console.log("invalid");
+      onSubmit({
+        selectedPhenotypes,
+        selectedVariant,
+        error: "Invalid variant input."
+      })
     }
-  ];
-  
-  const [selectedPhenotypes, setSelectedPhenotypes] = useState(null);
-  const [selectedVariant, setSelectedVariant] = useState(null);
+  }
+
+  const alphabetizePhenotypes = phenotypes => {
+    return [...phenotypes].sort((a, b) => a.label.localeCompare(b.label));
+  }
+
+  const categorizePhenotypes = phenotypes => {
+    return phenotypes.map(e => {
+      const spaces = String.fromCharCode(160).repeat(e.level * 2);
+      let label = spaces + e.label;
+      return {...e, label};
+    });
+  }
+
+  const canSubmit = (selectedPhenotypes && selectedPhenotypes.length > 0) &&
+    (selectedVariant && selectedVariant.length > 0)
 
   return (
     <Form>
@@ -59,8 +72,8 @@ export function SearchFormTraitsVariant({ params, onChange, onSubmit }) {
           <InputGroup.Prepend>
             <select
               class="form-control"
-              value={listType}
-              onChange={e => setListType(e.target.value)}>
+              value={selectedListType}
+              onChange={e => setSelectedListType(e.target.value)}>
               <option value="alphabetic">Alphabetic</option>
               <option value="categorical">Categorical</option>
             </select>
@@ -71,10 +84,12 @@ export function SearchFormTraitsVariant({ params, onChange, onSubmit }) {
             <Select
               placeholder="(Select one or more traits) *"
               value={selectedPhenotypes}
-              onChange={(value) => handleChange(value)}
-              options={listType === 'categorical' ? categorizeTraits(traits) : traits}
+              onChange={setSelectedPhenotypes}
+              options={selectedListType === 'categorical' ?
+                categorizePhenotypes(phenotypes) :
+                alphabetizePhenotypes(phenotypes)}
               isMulti
-            />            
+            />
           </div>
           {/* variant input */}
           <FormControl
@@ -89,11 +104,11 @@ export function SearchFormTraitsVariant({ params, onChange, onSubmit }) {
           {/* submit button */}
           {/* disable submit button if required fields are empty */}
           <InputGroup.Append>
-            <button 
-              className="btn btn-primary" 
-              // onClick={e => onSubmit({selectedPhenotypes, selectedVariant})} 
+            <button
+              className="btn btn-primary"
+              // onClick={e => onSubmit({selectedPhenotypes, selectedVariant})}
               onClick={e => validateVariantInput(selectedPhenotypes, selectedVariant)}
-              disabled={!((selectedPhenotypes && selectedPhenotypes.length > 0) && (selectedVariant && selectedVariant.length > 0))}>
+              disabled={!canSubmit}>
               Submit
             </button>
           </InputGroup.Append>
@@ -101,55 +116,4 @@ export function SearchFormTraitsVariant({ params, onChange, onSubmit }) {
       </Form.Group>
     </Form>
   );
-
-  function categorizeTraits(traits) {
-    var categorized = categories.map(function(category) {
-        return {
-          label: category,
-          options: traits.filter(t => t.category === category).map(t => (
-              {
-                label: t.label,
-                value: t.value
-              }
-            )
-          )
-        }
-      }
-    );
-    return categorized;
-  }
-
-  function validateVariantInput(selectedPhenotypes, selectedVariant) {
-    // console.log(selectedVariant);
-    if (selectedVariant.match(/^[r|R][s|S][0-9]+$/) != null || selectedVariant.match(/^([c|C][h|H][r|R])?(([1-9]|[1][0-9]|[2][0-2])|[x|X|y|Y]):[0-9]+$/) != null) {
-      // console.log("valid");
-      onSubmit({
-        selectedPhenotypes, 
-        selectedVariant
-      })
-    } else {
-      // console.log("invalid");
-      onSubmit({
-        selectedPhenotypes, 
-        selectedVariant,
-        error: "Invalid variant input."
-      })
-    }
-  }
-
-  // function validateVariantInput(selectedVariant) {
-  //   console.log(selectedVariant);
-  //   if (selectedVariant.match(/^[r|R][s|S][0-9]+$/) != null || selectedVariant.match(/^[c|C][h|H][r|R](([1-9]|[1][0-9]|[2][0-2])|[x|X|y|Y]):[0-9]+$/) != null) {
-  //     console.log("valid");
-  //     setSelectedVariant(selectedVariant);
-  //   } else {
-  //     console.log("invalid");
-  //     setSelectedVariant(selectedVariant);
-  //   }
-  // }
-
-  function handleChange(selectedPhenotypes) {
-    setSelectedPhenotypes(selectedPhenotypes);
-    // console.log(`Option selected:`, selectedPhenotypes);
-  };
 }

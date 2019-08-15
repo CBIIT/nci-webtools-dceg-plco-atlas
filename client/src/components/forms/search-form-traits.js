@@ -1,88 +1,76 @@
 import React, { useState } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
 import { Form, InputGroup } from 'react-bootstrap';
 import Select from 'react-select';
+import { updatePhenotypeCorrelations } from '../../services/actions';
 
+export function SearchFormTraits({ onSubmit }) {
+  const dispatch = useDispatch();
+  const phenotypes = useSelector(state => state.phenotypes);
+  const phenotypeCorrelations = useSelector(state => state.phenotypeCorrelations);
+  const { selectedListType, selectedPhenotypes } = phenotypeCorrelations;
 
-export function SearchFormTraits({ params, onChange, onSubmit }) {
-  const [listType, setListType] = useState('alphabetic');
+  const setSelectedPhenotypes = selectedPhenotypes => {
+    dispatch(updatePhenotypeCorrelations({selectedPhenotypes}));
+  }
 
-  const categories = [
-    'Sample Category A',
-    'Sample Category B',
-    'Sample Category C'
-  ];
+  const setSelectedListType = selectedListType => {
+    dispatch(updatePhenotypeCorrelations({selectedListType}));
+  }
 
-  const traits = [
-    {
-      value: `example`,
-      label: `Ewing's Sarcoma`,
-      category: 'Sample Category A'
-    },
-    {
-      value: `example_2a`,
-      label: `Sample trait 2A`,
-      category: 'Sample Category A'
-    },
-    {
-      value: `example_1b`,
-      label: `Sample trait 2A`,
-      category: 'Sample Category B'
-    },
-    {
-      value: `example_2b`,
-      label: `Sample trait 2A`,
-      category: 'Sample Category B'
-    },
-    {
-      value: `example_1c`,
-      label: `Sample trait 2A`,
-      category: 'Sample Category C'
-    },
-    {
-      value: `example_2c`,
-      label: `Sample trait 2A`,
-      category: 'Sample Category C'
-    }
-  ];
-  
-  const [selectedOption, setSelectedOption] = useState(null);
+  const handleChange = params => {
+    console.log('changed', params);
+    setSelectedPhenotypes(params);
+  }
+
+  const alphabetizePhenotypes = phenotypes => {
+    return [...phenotypes].sort((a, b) => a.label.localeCompare(b.label));
+  }
+
+  const categorizePhenotypes = phenotypes => {
+    return phenotypes.map(e => {
+      const spaces = String.fromCharCode(160).repeat(e.level * 2);
+      let label = spaces + e.label;
+      return {...e, label};
+    });
+  }
 
   return (
     <Form>
-      <Form.Group controlId="trait-list">
+      <Form.Group controlId="phenotype-list">
         <Form.Label>
-          <b>Select Phenotypes</b>
+          <b>Select Phenotype</b>
         </Form.Label>
         <InputGroup>
-          {/* alpha/categorical select */}
           <InputGroup.Prepend>
             <select
               class="form-control"
-              value={listType}
-              onChange={e => setListType(e.target.value)}>
+              value={selectedListType}
+              onChange={e => setSelectedListType(e.target.value)}>
               <option value="alphabetic">Alphabetic</option>
               <option value="categorical">Categorical</option>
             </select>
           </InputGroup.Prepend>
 
-          {/* trait multi-select */}
           <div style={{width: '60%'}}>
             <Select
-              placeholder="(Select two or more traits) *"
-              value={selectedOption}
-              onChange={(value) => handleChange(value)}
-              options={listType === 'categorical' ? categorizeTraits(traits) : traits}
-              isMulti
-            />            
+                placeholder="(Select two or more traits) *"
+                value={selectedPhenotypes}
+                onChange={handleChange}
+                options={selectedListType === 'categorical' ?
+                  categorizePhenotypes(phenotypes) :
+                  alphabetizePhenotypes(phenotypes)}
+                isMulti
+            />
           </div>
-          {/* submit button */}
-          {/* disable submit button if required fields are empty */}
+
           <InputGroup.Append>
-            <button 
-              className="btn btn-primary" 
-              // onClick={e => onSubmit({selectedOption, selectedVariant})} 
-              onClick={e => onSubmit({selectedOption})}
-              disabled={!((selectedOption && selectedOption.length >= 2))}>
+            <button
+              className="btn btn-primary"
+              onClick={e => {
+                e.preventDefault();
+                onSubmit(selectedPhenotypes);
+              }}>
               Submit
             </button>
           </InputGroup.Append>
@@ -90,26 +78,4 @@ export function SearchFormTraits({ params, onChange, onSubmit }) {
       </Form.Group>
     </Form>
   );
-
-  function categorizeTraits(traits) {
-    var categorized = categories.map(function(category) {
-        return {
-          label: category,
-          options: traits.filter(t => t.category === category).map(t => (
-              {
-                label: t.label,
-                value: t.value
-              }
-            )
-          )
-        }
-      }
-    );
-    return categorized;
-  }
-
-  function handleChange(selectedOption) {
-    setSelectedOption(selectedOption);
-    console.log(`Option selected:`, selectedOption);
-  };
 }

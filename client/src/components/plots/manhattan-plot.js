@@ -1,73 +1,59 @@
 import React, { useEffect, useState, useRef } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+
 import { rawQuery as query } from '../../services/query';
 import { scatterPlot } from '../../services/plots/scatter-plot';
 import { axisBottom, axisLeft } from '../../services/plots/axis';
+import { range } from '../../services/plots/utils';
 import { systemFont } from '../../services/plots/text';
+import { updateSummaryResults } from '../../services/actions';
 import * as d3 from 'd3';
 
-export function ManhattanPlot({ trait }) {
+export function ManhattanPlot({ drawFunctionRef }) {
+  const dispatch = useDispatch();
   const plotContainer = useRef(null);
-  const [timestamp, setTimestamp] = useState(0);
-  const [loading, setLoading] = useState(false);
-  const [ranges, setRanges] = useState([]);
-  const [params, setParams] = useState({
-    database: trait,
-    chr: 10,
-    nlogpMin: 3,
-    nlogpMax: 20,
-    bpMin: 0,
-    bpMax: 10e7
-  });
+  const summaryResults = useSelector(state => state.summaryResults);
+  const { selectedChromosome, phenotype, ranges, loading } = summaryResults;
+
+  const setRanges = ranges => {
+    dispatch(updateSummaryResults({ranges}));
+  }
+
+  const setSelectedChromosome = selectedChromosome => {
+    dispatch(updateSummaryResults({selectedChromosome}));
+  }
+
+  const setLoading = loading => {
+    dispatch(updateSummaryResults({loading}));
+  }
 
   useEffect(() => {
     query('data/chromosome_ranges.json').then(e => setRanges(e));
-  }, []);
+  }, [])
 
   useEffect(() => {
-    if (ranges.length && trait) drawSummaryPlot({ ...params, database: trait });
-  }, [trait]);
+    if (drawFunctionRef)
+      drawFunctionRef(drawSummaryPlot);
+  }, [drawFunctionRef]);
 
-  return (
-    <div className="row">
-      <div className="col-md-12">
-        <div ref={plotContainer} className="manhattan-plot" />
-        {/* <pre>{ JSON.stringify(params, null, 2) }</pre> */}
-      </div>
-      {/* <div class="col-md-12" style={{opacity: 0.5}}> */}
-        <div class="btn-group" role="group" aria-label="Basic example">
-          <button
-            className="btn btn-primary btn-sm"
-            onClick={e => drawSummaryPlot(params)}
-            disabled={loading}>
-            Reset
-          </button>
-        </div>
-        {/* {timestamp ? <span class="mx-2">{timestamp} s</span> : null} */}
-      </div>
-
-    // </div>
-  );
-
-  async function drawSummaryPlot(params) {
-    let start = new Date();
-    let getTimestamp = e => (new Date() - start) / 1000;
+  const drawSummaryPlot = async database => {
+    let rangeSubset = ranges.slice(0, 22);
+    console.log(rangeSubset);
     setLoading(true);
-    setTimestamp(0);
-
     const results = await query('summary', {
-      database: params.database,
+      database: database,
       nlogpMin: 3
     });
 
     if (results.error) return;
 
-    // initialize configuration for plot
     const data = results.data;
     const columnKeys = {
-      chr: results.columns.indexOf('CHR'),
-      x: results.columns.indexOf('BP_ABS_1000KB'),
-      y: results.columns.indexOf('NLOG_P2')
+      chr: results.columns.indexOf('chr'),
+      x: results.columns.indexOf('bp_abs_1000kb'),
+      y: results.columns.indexOf('nlog_p2')
     };
+
     const config = {
       data: data,
       canvas: {
@@ -89,7 +75,7 @@ export function ManhattanPlot({ trait }) {
       x: {
         key: columnKeys.x,
         min: 0,
-        max: ranges[ranges.length - 1].MAX_BP_ABS
+        max: rangeSubset[rangeSubset.length - 1].max_bp_abs
       },
       y: {
         key: columnKeys.y,
@@ -160,10 +146,10 @@ export function ManhattanPlot({ trait }) {
       title: 'Chromosome',
       xOffset: margins.left,
       yOffset: margins.top + scaleY(config.y.min),
-      ticks: ranges.length,
+      ticks: rangeSubset.length,
       tickSize: 8,
-      tickValues: ranges.map(d => d.MAX_BP_ABS),
-      tickFormat: (d, i) => ranges[i].CHR,
+      tickValues: rangeSubset.map(d => d.max_bp_abs),
+      tickFormat: (d, i) => rangeSubset[i].chr,
       labelsBetweenTicks: true
     });
 
@@ -172,8 +158,8 @@ export function ManhattanPlot({ trait }) {
     plotContainer.current.appendChild(canvas);
 
     // create overlay to select variants for individual chromosomes
-    ranges
-      .map(d => d.MAX_BP_ABS)
+    rangeSubset
+      .map(d => d.max_bp_abs)
       .forEach((bp, idx, arr) => {
         const overlay = document.createElement('div');
         overlay.className = 'overlay';
@@ -186,33 +172,29 @@ export function ManhattanPlot({ trait }) {
           scaleX(arr[idx] - (idx > 0 ? arr[idx - 1] : 0)) + 'px';
 
         overlay.onclick = () => {
-          console.log(ranges[idx]);
-
+          console.log(rangeSubset[idx]);
+          const chromosome = rangeSubset[idx].chr;
           const args = {
-            database: 'example',
-            chr: ranges[idx].CHR,
-            nlogpMin: 2,//Math.max(2, Math.floor(ranges[idx].MIN_NLOG_P)),
-            nlogpMax: 20,//Math.ceil(ranges[idx].MAX_NLOG_P),
-            bpMin: ranges[idx].MIN_BP,
-            bpMax: ranges[idx].MAX_BP
+            database: database,
+            chr: chromosome,
+            nlogpMin: 2,//Math.max(2, Math.floor(rangeSubset[idx].MIN_NLOG_P)),
+            nlogpMax: 20,//Math.ceil(rangeSubset[idx].MAX_NLOG_P),
+            bpMin: rangeSubset[idx].bp_min,
+            bpMax: rangeSubset[idx].bp_max
           };
 
-          drawVariantsPlot(args);
-          setParams(args);
+         drawVariantsPlot(args);
+         setSelectedChromosome(chromosome);
         };
 
         plotContainer.current.appendChild(overlay);
       });
 
     setLoading(false);
-    setTimestamp(getTimestamp());
   }
 
-  async function drawVariantsPlot(params) {
-    let start = new Date();
-    let getTimestamp = e => (new Date() - start) / 1000;
+  const drawVariantsPlot = async(params) => {
     setLoading(true);
-    setTimestamp(0);
 
     const results = await query('variants', params);
     const data = results.data;
@@ -236,13 +218,13 @@ export function ManhattanPlot({ trait }) {
         color: '#005ea2'
       },
       x: {
-        key: results.columns.indexOf('BP'),
+        key: results.columns.indexOf('bp'),
         min: 0,
-        max: ranges[params.chr - 1].MAX_BP
+        max: ranges[params.chr - 1].bp_max
       },
 
       y: {
-        key: results.columns.indexOf('NLOG_P'),
+        key: results.columns.indexOf('nlog_p'),
         min: params.nlogpMin,
         max: params.nlogpMax
       }
@@ -288,7 +270,6 @@ export function ManhattanPlot({ trait }) {
       font: `600 10px ${systemFont}`
     };
 
-
     axisLeft(canvas, {
       title: [
         { ...defaultDef, text: '-log' },
@@ -306,6 +287,7 @@ export function ManhattanPlot({ trait }) {
       .domain([config.x.min, config.x.max])
       .range([0, width])
       .nice();
+
     axisBottom(canvas, {
       scale: scaleX,
       title: `Chromosome ${params.chr} Position (MB)`,
@@ -319,12 +301,27 @@ export function ManhattanPlot({ trait }) {
     plotContainer.current.appendChild(canvas);
 
     setLoading(false);
-    setTimestamp(getTimestamp());
   }
 
-  function range(min, max) {
-    var nums = [];
-    for (let i = min; i <= max; i++) nums.push(i);
-    return nums;
-  }
+  return (
+    <div className="row">
+      <div className="col-md-12">
+        <div ref={plotContainer} className="manhattan-plot" />
+        {/* <pre>{ JSON.stringify(params, null, 2) }</pre> */}
+      </div>
+      {/* <div class="col-md-12" style={{opacity: 0.5}}> */}
+        <div class="btn-group" role="group" aria-label="Basic example">
+          <button
+            className="btn btn-primary btn-sm"
+            onClick={e => drawSummaryPlot(phenotype.value)}
+            disabled={loading}>
+            Reset
+          </button>
+        </div>
+        {/* {timestamp ? <span class="mx-2">{timestamp} s</span> : null} */}
+      </div>
+
+    // </div>
+  );
+
 }
