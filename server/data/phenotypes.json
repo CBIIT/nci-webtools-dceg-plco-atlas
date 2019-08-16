@@ -5,6 +5,11 @@
         "level": 0
     },
     {
+        "label": "(test) Renal cell carcinoma",
+        "value": "rcc.db",
+        "level": 0
+    },
+    {
         "label": "Anthropometric measures",
         "value": null,
         "level": 0,
