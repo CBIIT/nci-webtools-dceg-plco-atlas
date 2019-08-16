@@ -54,40 +54,40 @@ const getFirstLine = filepath => {
     const contents = buffer.toString();
     return contents.substring(0, contents.indexOf('\n')).trim();
 }
-// SNP	CHR	LOC	GROUP	CATEGORY	INFO	NUM_CONTROL	NUM_CASE	REFERENCE_ALLELE	EFFECT_ALLELE	EFFECT_ALLELE_FREQ_CONTROL	EFFECT_ALLELE_FREQ_CASE	OR	CI	P	Phet	I2
 // validate headers
-const headers = ['SNP','CHR','LOC','GROUP','CATEGORY','INFO','NUM_CONTROL','NUM_CASE','REFERENCE_ALLELE','EFFECT_ALLELE','EFFECT_ALLELE_FREQ_CONTROL', "EFFECT_ALLELE_FREQ_CASE",'OR','CI','P','Phet','I2'];
+const headers = ["CHR","BP","SNP","A1","A2","N","P","P.R.","OR","OR.R.","Q","I","Case_N","Control_N","Sample_N","SE_fixed","Z_fixed","RSID"];
 const firstLine = parseLine(getFirstLine(inputFilePath));
 assert.deepStrictEqual(firstLine, headers, `Headers do not match expected values: ${headers}`);
 
 // create variant_stage (temp), variant, variant_summary, and variant_lookup
 const db = new sqlite(databaseFilePath);
-db.exec(readFile('schema-rcc.sql'));
+db.exec(readFile('schema-mel.sql'));
 
 const insert = db.prepare(`
     INSERT INTO variant_stage VALUES (
-        :snp,
         :chr,
-        :loc,
+        :bp,
         :bp_1000kb,
         :bp_abs,
         :bp_abs_1000kb,
-        :reference_allele,
-        :effect_allele,
+        :snp,
+        :a1,
+        :a2,
+        :n,
         :p,
         :nlog_p,
         :nlog_p2,
+        :pr,
         :or,
-        :i2,
-        :group,
-        :category,
-        :info,
-        :num_control,
-        :num_case,
-        :effect_allele_freq_control,
-        :effect_allele_freq_case,
-        :ci,
-        :phet
+        :orr,
+        :q,
+        :i,
+        :case_n,
+        :control_n,
+        :sample_n,
+        :se_fixed,
+        :z_fixed,
+        :rsid
     )
 `);
 
@@ -109,32 +109,27 @@ reader.on('line', line => {
     // trim, split by spaces, and parse 'NA' as null
     const values = parseLine(line);
     // const [chr, bp, snp, a1, a2, n, p, p_r, or, or_r, q, i] = values;
-    const [snp, chr, loc, group, category, info, num_control, num_case, reference_allele, effect_allele, effect_allele_freq_control, effect_allele_freq_case, or, ci, p, phet, i2] = values;
-    const params = {snp, chr, loc, group, category, info, num_control, num_case, reference_allele, effect_allele, effect_allele_freq_control, effect_allele_freq_case, or, ci, p, phet, i2};
-
-    // remove 'chr' prefix from some chromosomes
-    let chr_strip = params.chr.toString();
-    params.chr = +chr_strip.replace(/chr/i, "");
+    const [chr, bp, snp, a1, a2, n, p, pr, or, orr, q, i, case_n, control_n, sample_n, se_fixed, z_fixed, rsid] = values;
+    const params = {chr, bp, snp, a1, a2, n, p, pr, or, orr, q, i, case_n, control_n, sample_n, se_fixed, z_fixed, rsid};
 
     // group base pairs
-    params.bp_1000kb = groupFunc(params.loc, 10**6);
+    params.bp_1000kb = groupFunc(params.bp, 10**6);
 
     // calculate -log10(p) and group its values
     params.nlog_p = params.p ? -Math.log10(params.p) : null;
     params.nlog_p2 = groupFunc(params.nlog_p, 10**-2);
 
     // determine absolute position of variant relative to the start of the genome
-    // if (+params.chr > +previousChr) {
-
-        // bpOffset = ranges[params.chr - 1].max_bp_abs;
-        // previousChr = +params.chr;
+    // if (params.chr > previousChr) {
+    //     bpOffset = ranges[previousChr - 1].max_bp_abs;
+    //     previousChr = +params.chr;
     // }
     bpOffset = params.chr > 1
         ? ranges[params.chr - 2].max_bp_abs
         : 0;
 
     // store the absolute BP and group by megabases
-    params.bp_abs = bpOffset + loc;
+    params.bp_abs = bpOffset + bp;
     params.bp_abs_1000kb = groupFunc(params.bp_abs, 10**6);
 
     insert.run(params);
@@ -151,7 +146,7 @@ reader.on('close', () => {
     console.log(`[${duration()} s] Storing variants...`);
     db.exec(`
         INSERT INTO variant SELECT
-            null, "chr", "bp", "snp", "a1", "a2", "p", "nlog_p", "or", "i2"
+            null, "chr", "bp", "rsid", "a1", "a2", "n", "p", "nlog_p", "pr", "or", "orr", "q", "i"
         FROM variant_stage;
     `);
 

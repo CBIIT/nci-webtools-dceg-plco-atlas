@@ -10,6 +10,11 @@
         "level": 0
     },
     {
+        "label": "(test) Melanoma",
+        "value": "mel.db",
+        "level": 0
+    },
+    {
         "label": "Anthropometric measures",
         "value": null,
         "level": 0,
