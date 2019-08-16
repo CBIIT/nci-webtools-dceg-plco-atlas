@@ -85,10 +85,17 @@ $blue: #005ea2;
 .navlinks:hover {
   color: #bfbfbf !important;
 }
+
 .active-navlinks {
   background-color: white !important;
   color: black !important;
   font-weight: bold !important;
+  
+  button {
+    background-color: white !important;
+    color: black !important;
+    font-weight: bold !important;
+  }
 }
 
 .manhattan-plot {

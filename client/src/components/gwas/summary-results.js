@@ -30,11 +30,6 @@ export function SummaryResults({ params, setParams }) {
                           type: 'alert-danger',
                           content: 'Please select a phenotype.'
                         }])
-                      } else if (phenotype != 'example') {
-                        setMessages([{
-                          type: 'alert-danger',
-                          content: 'No data are available for the selected phenotype.'
-                        }])
                       }
                     }}
                 />

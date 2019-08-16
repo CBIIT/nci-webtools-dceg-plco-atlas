@@ -1,6 +1,4 @@
 {
     "port": 9000,
-    "databases": [
-        {"name": "example", "filepath": "server/data/example.db"}
-    ]
+    "dbpath": "server/data/"
 }
