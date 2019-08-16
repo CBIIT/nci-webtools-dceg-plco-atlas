@@ -19,22 +19,14 @@ export function SearchFormTraits({ onSubmit }) {
     dispatch(updatePhenotypeCorrelations({selectedListType}));
   }
 
-  const handleChange = params => {
-    console.log('changed', params);
-    setSelectedPhenotypes(params);
-  }
+  const alphabetizedPhenotypes = [...phenotypes]
+    .sort((a, b) => a.label.localeCompare(b.label))
 
-  const alphabetizePhenotypes = phenotypes => {
-    return [...phenotypes].sort((a, b) => a.label.localeCompare(b.label));
-  }
-
-  const categorizePhenotypes = phenotypes => {
-    return phenotypes.map(e => {
-      const spaces = String.fromCharCode(160).repeat(e.level * 2);
-      let label = spaces + e.label;
-      return {...e, label};
-    });
-  }
+  const categorizedPhenotypes = phenotypes.map(e => {
+    const spaces = String.fromCharCode(160).repeat(e.level * 2);
+    let label = spaces + e.label;
+    return {...e, label};
+  });
 
   return (
     <Form>
@@ -57,11 +49,11 @@ export function SearchFormTraits({ onSubmit }) {
             <Select
                 placeholder="(Select two or more traits) *"
                 value={selectedPhenotypes}
-                onChange={handleChange}
+                onChange={setSelectedPhenotypes}
                 isOptionDisabled={option => option.value === null}
                 options={selectedListType === 'categorical' ?
-                  categorizePhenotypes(phenotypes) :
-                  alphabetizePhenotypes(phenotypes)}
+                  categorizedPhenotypes :
+                  alphabetizedPhenotypes}
                 isMulti
             />
           </div>

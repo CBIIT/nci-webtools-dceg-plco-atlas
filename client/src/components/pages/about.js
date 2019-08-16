@@ -2,7 +2,7 @@ import React from 'react';
 
 export function About() {
   return (
-    <div className="container">
+    <div className="container my-4">
       <h1 className="font-weight-light">About PLCO Atlas</h1>
       <hr />
       <p>
@@ -19,9 +19,11 @@ export function About() {
 
       <hr />
 
-      <h2 className="font-weight-light">General Stats Placeholder</h2>
+      <h2 className="font-weight-light">General Statistics</h2>
+      <p>Placeholder Text</p>
       <hr />
-      <h2 className="font-weight-light">Summary Placeholder</h2>
+      <h2 className="font-weight-light">Summary</h2>
+      <p>Placeholder Text</p>
     </div>
   );
 }

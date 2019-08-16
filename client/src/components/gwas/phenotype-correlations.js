@@ -21,11 +21,13 @@ export function PhenotypeCorrelations() {
 
             <div className="card shadow-sm mb-4">
                 <div className="card-header bg-white font-weight-bolder border-bottom-0">
-                    display selected phenotypes
+                    selected phenotypes
                 </div>
 
                 <div className="card-body">
-                    show heatmap with traits selected
+                    <p>
+                        Placeholder for heatmap of specified phenotypes
+                    </p>
                     <div className="row mt-3">
                         <div class="col-md-12 text-left">
                             <pre>{JSON.stringify(phenotypeCorrelations, null, 2)}</pre>

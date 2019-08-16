@@ -311,12 +311,12 @@ export function ManhattanPlot({ drawFunctionRef }) {
       </div>
       {/* <div class="col-md-12" style={{opacity: 0.5}}> */}
         <div class="btn-group" role="group" aria-label="Basic example">
-          <button
+          {/* <button
             className="btn btn-primary btn-sm"
             onClick={e => drawSummaryPlot(phenotype.value)}
             disabled={loading}>
             Reset
-          </button>
+          </button> */}
         </div>
         {/* {timestamp ? <span class="mx-2">{timestamp} s</span> : null} */}
       </div>

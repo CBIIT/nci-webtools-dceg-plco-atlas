@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Form, FormControl, InputGroup } from 'react-bootstrap';
 import { updateVariantLookup } from '../../services/actions';
@@ -22,15 +22,26 @@ export function SearchFormTraitsVariant({ onSubmit }) {
     dispatch(updateVariantLookup({selectedVariant}));
   }
 
-  const handleChange = params => {
-    setSelectedPhenotypes(params);
-  }
+  const alphabetizedPhenotypes = [...phenotypes]
+    .sort((a, b) => a.label.localeCompare(b.label))
 
-  const validateVariantInput = (selectedPhenotypes, selectedVariant) => {
+  const categorizedPhenotypes = phenotypes.map(e => {
+    const spaces = String.fromCharCode(160).repeat(e.level * 2);
+    let label = spaces + e.label;
+    return {...e, label};
+  });
+
+  const canSubmit = (selectedPhenotypes && selectedPhenotypes.length > 0) &&
+    (selectedVariant && selectedVariant.length > 0)
+
+  const validateVariantInput = e => {
     // console.log(selectedVariant);
-    // (/(^rs\d+)|(chr)?/i).test(selectedVariant)
+    // (/^rs\d+/i).test(selectedVariant)
 
-    if (selectedVariant.match(/^[r|R][s|S][0-9]+$/) != null || selectedVariant.match(/^([c|C][h|H][r|R])?(([1-9]|[1][0-9]|[2][0-2])|[x|X|y|Y]):[0-9]+$/) != null) {
+    if (
+      selectedVariant.match(/^[r|R][s|S][0-9]+$/) != null ||
+      selectedVariant.match(/^([c|C][h|H][r|R])?(([1-9]|[1][0-9]|[2][0-2])|[x|X|y|Y]):[0-9]+$/) != null
+    ) {
       // console.log("valid");
       onSubmit({
         selectedPhenotypes,
@@ -45,42 +56,6 @@ export function SearchFormTraitsVariant({ onSubmit }) {
       })
     }
   }
-
-  const alphabetizePhenotypes = phenotypes => {
-    return [...phenotypes].sort((a, b) => a.label.localeCompare(b.label));
-  }
-
-  const categorizePhenotypes = phenotypes => {
-    return phenotypes.map(e => {
-      const spaces = String.fromCharCode(160).repeat(e.level * 2);
-      let label = spaces + e.label;
-      return {...e, label};
-    });
-  }
-
-  const canSubmit = (selectedPhenotypes && selectedPhenotypes.length > 0) &&
-    (selectedVariant && selectedVariant.length > 0)
-
-  useEffect(() => {
-    let records = [];
-    function populateRecords(node) {
-      records.push(node);
-      if (node.children)
-        node.children.forEach(populateRecords);
-    }
-
-    query('data/phenotypes.json').then(data => {
-      data.forEach(populateRecords, 0);
-      setPhenotypes(records);
-      // clone array for categorical display
-      let recordsCat = JSON.parse(JSON.stringify(records));
-      recordsCat.map(e => (
-        e.label = String.fromCharCode(160).repeat(e.level * 8) + e.label
-      ))
-      setPhenotypesCat(recordsCat);
-    })
-
-  }, [])
 
   return (
     <Form>
@@ -103,13 +78,13 @@ export function SearchFormTraitsVariant({ onSubmit }) {
           {/* trait multi-select */}
           <div style={{width: '60%'}}>
             <Select
-              placeholder="(Select one or more traits) *"
+              placeholder="(Select one or more phenotypes) *"
               value={selectedPhenotypes}
               onChange={setSelectedPhenotypes}
               isOptionDisabled={(option) => option.value === null}
-              options={selectedListType === 'categorical' ?
-                categorizePhenotypes(phenotypes) :
-                alphabetizePhenotypes(phenotypes)}
+              options={selectedListType === 'categorical'
+                ? categorizedPhenotypes
+                : alphabetizedPhenotypes}
               isMulti
             />
           </div>
@@ -129,7 +104,7 @@ export function SearchFormTraitsVariant({ onSubmit }) {
             <button
               className="btn btn-primary"
               // onClick={e => onSubmit({selectedPhenotypes, selectedVariant})}
-              onClick={e => validateVariantInput(selectedPhenotypes, selectedVariant)}
+              onClick={validateVariantInput}
               disabled={!canSubmit}>
               Submit
             </button>

@@ -11,6 +11,7 @@ const initialState = {
         ranges: [],
         results: [],
         messages: [],
+        areaItems: [],
         submitted: null,
         loading: false,
         drawManhattanPlot: null,
@@ -21,6 +22,7 @@ const initialState = {
         selectedPhenotype: null,
         selectedVariant: null,
         results: [],
+        message: '',
         loading: false,
     },
     phenotypeCorrelations: {

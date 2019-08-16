@@ -8,12 +8,12 @@ import { PhenotypeCorrelations } from '../gwas/phenotype-correlations';
 import { updatePhenotypes } from '../../services/actions';
 import { query } from '../../services/query';
 
-export function Gwas({ params, setParams }) {
+export function Gwas() {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    let records = [];
-    function populateRecords(node) {
+    const records = [];
+    const populateRecords = node => {
       records.push(node);
       if (node.children)
         node.children.forEach(populateRecords);

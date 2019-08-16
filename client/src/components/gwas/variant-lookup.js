@@ -1,71 +1,91 @@
 import React, { useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { SearchFormTraitsVariant } from '../forms/search-form-traits-variant';
 import { query } from '../../services/query';
-
-import 'react-bootstrap-table-next/dist/react-bootstrap-table2.min.css';
+import { updateVariantLookup } from '../../services/actions';
 import BootstrapTable from 'react-bootstrap-table-next';
-import 'react-bootstrap-table2-paginator/dist/react-bootstrap-table2-paginator.min.css';
 import paginationFactory from 'react-bootstrap-table2-paginator';
-import 'react-bootstrap-table2-filter/dist/react-bootstrap-table2-filter.min.css';
 import filterFactory, { textFilter } from 'react-bootstrap-table2-filter';
 
-export function VariantLookup({ params, setParams }) {
-    const [debugSearchInput, setDebugSearchInput] = useState(null);
-    const [phenotypes, setPhenotypes] = useState([{}]);
-    const [message, setMessage] = useState("");
-    const [timestamp, setTimestamp] = useState(0);
+export function VariantLookup() {
+    const dispatch = useDispatch();
+    const variantLookup = useSelector(state => state.variantLookup);
+    const { selectedPhenotypes, selectedVariant, results, message } = variantLookup;
+
+    const setResults = results => {
+        dispatch(updateVariantLookup({results}));
+    }
+
+    const setMessage = message => {
+        dispatch(updateVariantLookup({message}));
+    }
 
     const columns = [
         {
-            dataField: 'TRAIT',
+            dataField: 'trait',
             text: 'Trait',
             filter: textFilter(),
             sort: true,
-        }, 
+        },
         {
-            dataField: 'SNP',
+            dataField: 'snp',
             text: 'SNP',
             filter: textFilter()
-        }, 
+        },
         {
-            dataField: 'CHR',
+            dataField: 'chr',
             text: 'Chromosome',
             filter: textFilter()
         },
         {
-            dataField: 'BP',
+            dataField: 'bp',
             text: 'Position',
             filter: textFilter()
         },
         {
-            dataField: 'A1',
+            dataField: 'a1',
             text: 'Ref. Allele',
             filter: textFilter()
         },
         {
-            dataField: 'A2',
+            dataField: 'a2',
             text: 'Alt. Allele',
             filter: textFilter()
         },
         {
-            dataField: 'P',
+            dataField: 'p',
             text: 'P-value',
             filter: textFilter(),
             sort: true,
         },
     ];
 
+    const lookup = async () => {
+        var tableList = [];
+        // console.log("Sample query!", selectedPhenotyes);
+        for (var i = 0; i < selectedPhenotypes.length; i++) {
+            const variantData = await query('variant', {
+                database: selectedPhenotypes[i].value,
+                snp: selectedVariant,
+                chr: '',
+                bp: ''
+            });
+            for (var j = 0; j < variantData.length; j++) {
+                variantData[i]['trait'] = selectedPhenotypes[i].label;
+                tableList.push(variantData[i]);
+            }
+        }
+        setResults(tableList);
+        setMessage('');
+        if (tableList.length === 0)
+            setMessage("Variant not found in any selected trait(s).");
+    }
+
     return (
         <>
-            <div className="card shadow-sm mb-4"> 
+            <div className="card shadow-sm mb-4">
                 <div className="card-body">
-                    <SearchFormTraitsVariant
-                        params={params}
-                        onChange={e => {
-                            setParams(e);
-                        }}
-                        onSubmit={lookup}
-                    />
+                    <SearchFormTraitsVariant onSubmit={lookup} />
                 </div>
             </div>
 
@@ -77,21 +97,18 @@ export function VariantLookup({ params, setParams }) {
                 <div className="card-body">
                     <div className="row">
                         <div class="col-md-12 text-left">
-                            {timestamp ? <strong className="mx-2">{timestamp} s</strong> : null}
-                        </div>
-                        <div class="col-md-12 text-left">
-                            <pre>{JSON.stringify(debugSearchInput, null, 2)}</pre>
+                            <pre>{JSON.stringify(variantLookup, null, 2)}</pre>
                         </div>
                         <div class="col-md-12 text-left">
                             <h4>{message}</h4>
                         </div>
                     </div>
 
-                    <BootstrapTable 
-                        bootstrap4={ true } 
-                        keyField='id' 
-                        data={ phenotypes } 
-                        columns={ columns } 
+                    <BootstrapTable
+                        bootstrap4
+                        keyField='id'
+                        data={ results }
+                        columns={ columns }
                         pagination={ paginationFactory() }
                         filter={ filterFactory() }
                     />
@@ -105,36 +122,4 @@ export function VariantLookup({ params, setParams }) {
             </div>
         </>
     );
-
-    async function lookup(searchInput) {
-        let start = new Date();
-        let getTimestamp = e => (new Date() - start) / 1000;
-        setTimestamp(0);
-        
-        var tableList = [];
-        setDebugSearchInput(searchInput);
-        // console.log("Sample query!", searchInput);
-        for (var i = 0; i < searchInput.selectedPhenotypes.length; i++) {
-            const newParams = {
-                database: searchInput.selectedPhenotypes[i].value,
-                snp: searchInput.selectedVariant,
-                chr: '',
-                bp: ''
-            }
-            setParams(newParams);
-            const variantData = await query('variant', newParams);
-            for (var j = 0; j < variantData.length; j++) {
-                variantData[i]['TRAIT'] = searchInput.selectedPhenotypes[i].label;
-                tableList.push(variantData[i]);
-            }
-        }
-        setPhenotypes(tableList);
-        if (tableList.length === 0) {
-            setMessage("Variant not found in any selected trait(s).");
-        } else {
-            setMessage("");
-        }
-
-        setTimestamp(getTimestamp());
-    }
 }

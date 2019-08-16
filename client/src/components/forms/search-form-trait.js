@@ -18,22 +18,19 @@ export function SearchFormTrait({ onChange, onSubmit }) {
     dispatch(updateSummaryResults({selectedListType}));
   }
 
-  const alphabetizePhenotypes = phenotypes => {
-    return [...phenotypes].sort((a, b) => a.label.localeCompare(b.label));
-  }
-
   const handleChange = params => {
     setSelectedPhenotype(params);
     onChange(params);
   }
 
-  const categorizePhenotypes = phenotypes => {
-    return phenotypes.map(e => {
-      const spaces = String.fromCharCode(160).repeat(e.level * 2);
-      let label = spaces + e.label;
-      return {...e, label};
-    });
-  }
+  const alphabetizedPhenotypes = [...phenotypes]
+    .sort((a, b) => a.label.localeCompare(b.label))
+
+  const categorizedPhenotypes = phenotypes.map(e => {
+    const spaces = String.fromCharCode(160).repeat(e.level * 2);
+    let label = spaces + e.label;
+    return {...e, label};
+  });
 
   return (
     <Form>
@@ -58,8 +55,8 @@ export function SearchFormTrait({ onChange, onSubmit }) {
                 value={selectedPhenotype}
                 onChange={handleChange}
                 options={selectedListType === 'categorical' ?
-                  categorizePhenotypes(phenotypes) :
-                  alphabetizePhenotypes(phenotypes)}
+                  categorizedPhenotypes :
+                  alphabetizedPhenotypes}
             />
           </div>
 
