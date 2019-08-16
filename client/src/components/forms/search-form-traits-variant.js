@@ -61,6 +61,27 @@ export function SearchFormTraitsVariant({ onSubmit }) {
   const canSubmit = (selectedPhenotypes && selectedPhenotypes.length > 0) &&
     (selectedVariant && selectedVariant.length > 0)
 
+  useEffect(() => {
+    let records = [];
+    function populateRecords(node) {
+      records.push(node);
+      if (node.children)
+        node.children.forEach(populateRecords);
+    }
+
+    query('data/phenotypes.json').then(data => {
+      data.forEach(populateRecords, 0);
+      setPhenotypes(records);
+      // clone array for categorical display
+      let recordsCat = JSON.parse(JSON.stringify(records));
+      recordsCat.map(e => (
+        e.label = String.fromCharCode(160).repeat(e.level * 8) + e.label
+      ))
+      setPhenotypesCat(recordsCat);
+    })
+
+  }, [])
+
   return (
     <Form>
       <Form.Group controlId="trait-list">
@@ -85,6 +106,7 @@ export function SearchFormTraitsVariant({ onSubmit }) {
               placeholder="(Select one or more traits) *"
               value={selectedPhenotypes}
               onChange={setSelectedPhenotypes}
+              isOptionDisabled={(option) => option.value === null}
               options={selectedListType === 'categorical' ?
                 categorizePhenotypes(phenotypes) :
                 alphabetizePhenotypes(phenotypes)}

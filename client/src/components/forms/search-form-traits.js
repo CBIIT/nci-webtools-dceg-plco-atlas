@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { Form, InputGroup } from 'react-bootstrap';
+import { query } from '../../services/query';
 import Select from 'react-select';
 import { updatePhenotypeCorrelations } from '../../services/actions';
 
@@ -57,6 +58,7 @@ export function SearchFormTraits({ onSubmit }) {
                 placeholder="(Select two or more traits) *"
                 value={selectedPhenotypes}
                 onChange={handleChange}
+                isOptionDisabled={option => option.value === null}
                 options={selectedListType === 'categorical' ?
                   categorizePhenotypes(phenotypes) :
                   alphabetizePhenotypes(phenotypes)}
@@ -67,6 +69,7 @@ export function SearchFormTraits({ onSubmit }) {
           <InputGroup.Append>
             <button
               className="btn btn-primary"
+              disabled={!((selectedPhenotypes && selectedPhenotypes.length >= 2))}
               onClick={e => {
                 e.preventDefault();
                 onSubmit(selectedPhenotypes);
