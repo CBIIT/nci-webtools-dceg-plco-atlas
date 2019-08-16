@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { Form, InputGroup } from 'react-bootstrap';
 import { query } from '../../services/query';
-import Select from 'react-select';
+import Select, { components } from 'react-select';
 import { updatePhenotypeCorrelations } from '../../services/actions';
 
 export function SearchFormTraits({ onSubmit }) {
@@ -28,6 +28,12 @@ export function SearchFormTraits({ onSubmit }) {
     return {...e, label};
   });
 
+  const MultiValue = props => (
+    <components.MultiValue {...props}>
+      {props.data.label.trim()}
+    </components.MultiValue>
+  );
+
   return (
     <Form>
       <Form.Group controlId="phenotype-list">
@@ -50,11 +56,12 @@ export function SearchFormTraits({ onSubmit }) {
                 placeholder="(Select two or more traits) *"
                 value={selectedPhenotypes}
                 onChange={setSelectedPhenotypes}
-                isOptionDisabled={option => option.value === null}
+                // isOptionDisabled={option => option.value === null}
                 options={selectedListType === 'categorical' ?
                   categorizedPhenotypes :
                   alphabetizedPhenotypes}
                 isMulti
+                components={{ MultiValue }}
             />
           </div>
 

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { Form, FormControl, InputGroup } from 'react-bootstrap';
 import { updateSummaryResults } from '../../services/actions';
-import Select from 'react-select';
+import Select, { components } from 'react-select';
 
 export function SearchFormTrait({ onChange, onSubmit }) {
   const dispatch = useDispatch()
@@ -32,6 +32,12 @@ export function SearchFormTrait({ onChange, onSubmit }) {
     return {...e, label};
   });
 
+  const SingleValue = props => (
+    <components.SingleValue {...props}>
+      {props.data.label.trim()}
+    </components.SingleValue>
+  );
+
   return (
     <Form>
       <Form.Group controlId="phenotype-list">
@@ -57,6 +63,7 @@ export function SearchFormTrait({ onChange, onSubmit }) {
                 options={selectedListType === 'categorical' ?
                   categorizedPhenotypes :
                   alphabetizedPhenotypes}
+                components={{ SingleValue }}
             />
           </div>
 

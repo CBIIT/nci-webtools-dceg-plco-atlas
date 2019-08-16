@@ -2,7 +2,7 @@ import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Form, FormControl, InputGroup } from 'react-bootstrap';
 import { updateVariantLookup } from '../../services/actions';
-import Select from 'react-select';
+import Select, { components } from 'react-select';
 
 export function SearchFormTraitsVariant({ onSubmit }) {
   const dispatch = useDispatch();
@@ -57,6 +57,12 @@ export function SearchFormTraitsVariant({ onSubmit }) {
     }
   }
 
+  const MultiValue = props => (
+    <components.MultiValue {...props}>
+      {props.data.label.trim()}
+    </components.MultiValue>
+  );
+
   return (
     <Form>
       <Form.Group controlId="trait-list">
@@ -86,6 +92,7 @@ export function SearchFormTraitsVariant({ onSubmit }) {
                 ? categorizedPhenotypes
                 : alphabetizedPhenotypes}
               isMulti
+              components={{ MultiValue }}
             />
           </div>
           {/* variant input */}
