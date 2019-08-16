@@ -29,3 +29,11 @@ export function extent(values) {
 
     return [min, max];
 }
+
+export function range(min, max) {
+    var size = Math.abs(max - min);
+    var nums = new Array(size);
+    for (let i = 0; i < size; i++)
+        nums[i] = min + i;
+    return nums;
+}

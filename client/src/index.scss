@@ -4,6 +4,9 @@ $enable-shadows: true;
 $blue: #005ea2;
 
 @import '~bootstrap/scss/bootstrap';
+@import '~react-bootstrap-table-next/dist/react-bootstrap-table2.min.css';
+@import '~react-bootstrap-table2-paginator/dist/react-bootstrap-table2-paginator.min.css';
+@import '~react-bootstrap-table2-filter/dist/react-bootstrap-table2-filter.min.css';
 
 .bg-primary-lighter {
   background-color: #d9e8f6;
@@ -82,19 +85,24 @@ $blue: #005ea2;
 .navlinks {
   text-decoration: none !important;
 }
+
 .navlinks:hover {
-  color: #bfbfbf !important;
+  color: #ddd !important;
 }
 
 .active-navlinks {
   background-color: white !important;
   color: black !important;
   font-weight: bold !important;
-  
+
   button {
     background-color: white !important;
     color: black !important;
     font-weight: bold !important;
+  }
+
+  &:hover {
+    color: black !important;
   }
 }
 

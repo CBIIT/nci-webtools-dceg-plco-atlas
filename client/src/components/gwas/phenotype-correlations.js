@@ -1,31 +1,36 @@
 import React, { useState } from 'react';
+import { useSelector, useDispatch} from 'react-redux';
+import { updatePhenotypeCorrelations } from '../../services/actions';
 import { SearchFormTraits } from '../forms/search-form-traits';
 
-export function PhenotypeCorrelations({ params, setParams }) {
-    const [traits, setTraits] = useState(null);
+export function PhenotypeCorrelations() {
+    const phenotypeCorrelations = useSelector(state => state.phenotypeCorrelations);
+
+    async function handleSubmit(params) {
+        console.log('submitted', params);
+        // let results = await query(...)
+    }
 
     return (
         <>
-            <div className="card shadow-sm mb-4"> 
+            <div className="card shadow-sm mb-4">
                 <div className="card-body">
-                    <SearchFormTraits
-                        params={params}
-                        onChange={setParams}
-                        onSubmit={setTraits}
-                    />
+                    <SearchFormTraits onSubmit={handleSubmit} />
                 </div>
             </div>
 
             <div className="card shadow-sm mb-4">
                 <div className="card-header bg-white font-weight-bolder border-bottom-0">
-                    display selected phenotypes
+                    selected phenotypes
                 </div>
 
                 <div className="card-body">
-                    show heatmap with traits selected
+                    <p>
+                        Placeholder for heatmap of specified phenotypes
+                    </p>
                     <div className="row mt-3">
                         <div class="col-md-12 text-left">
-                            <pre>{JSON.stringify(traits, null, 2)}</pre>
+                            <pre>{JSON.stringify(phenotypeCorrelations, null, 2)}</pre>
                         </div>
                     </div>
 

@@ -20,18 +20,32 @@ function getSummary(filepath, params) {
 }
 
 function getVariants(filepath, params) {
-    const stmt = new Database(filepath, {readonly: true}).prepare(`
-        SELECT chr, bp, nlog_p FROM variant WHERE
-        chr = :chr
-        AND bp >= :bpMin
-        AND bp <= :bpMax
-        AND nlog_p >= :nlogpMin
-        AND nlog_p <= :nlogpMax
-    `);
+    const stmt = new Database(filepath, {readonly: true}).prepare(
+        `SELECT variant_id, chr, bp, nlog_p FROM variant WHERE
+            chr = :chr AND
+            bp >= :bpMin AND
+            bp <= :bpMax AND
+            nlog_p >= :nlogpMin AND
+            nlog_p <= :nlogpMax`);
 
     return params.raw
         ? getRawResults(stmt, params)
         : stmt.all(params);
+}
+
+function getVariantsByPage(filepath, params) {
+    const stmt = new Database(filepath, {readonly: true}).prepare(
+        `SELECT * FROM variant
+        ${params.chr ? 'WHERE chr = :chr' : ''}
+        ORDER BY nlog_p DESC
+        LIMIT :limit
+        OFFSET :offset`);
+
+    const records = params.raw
+        ? getRawResults(stmt, params)
+        : stmt.all(params);
+
+    return records;
 }
 
 function getVariant(filepath, params) {
@@ -48,19 +62,12 @@ function getVariant(filepath, params) {
         : stmt.all(params);
 }
 
-function getTopVariants(filepath, params) {
-    const stmt = new Database(filepath, {readonly: true}).prepare(`
-        SELECT * FROM variant WHERE
-        ${params.chr ? 'chr = :chr' : ''}
-        AND nlog_p > 0
-        ORDER BY nlog_p ASC
-        LIMIT :limit
-        OFFSET :offset
-    `);
+// function getQQImageMapJSON(name) {
+//     let raw = fs.readFileSync('server/data/qq-plots/' + name + '.imagemap.json');
+//     let obj = JSON.parse(raw);
+//     return {
+//         data: obj
+//     };
+// }
 
-    return params.raw
-        ? getRawResults(stmt, params)
-        : stmt.all(params);
-}
-
-module.exports = {getSummary, getVariants, getVariant};
+module.exports = {getSummary, getVariants, getVariantsByPage, getVariant};

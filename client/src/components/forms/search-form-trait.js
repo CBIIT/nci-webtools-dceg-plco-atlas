@@ -1,27 +1,36 @@
 import React, { useState, useEffect } from 'react';
-import { Form, InputGroup } from 'react-bootstrap';
-import { query } from '../../services/query';
+import { useSelector, useDispatch } from 'react-redux';
+import { Form, FormControl, InputGroup } from 'react-bootstrap';
+import { updateSummaryResults } from '../../services/actions';
+import Select from 'react-select';
 
-export function SearchFormTrait({ params, onChange, onSubmit }) {
-  const [listType, setListType] = useState('alphabetic');
-  const [phenotype, setPhenotype] = useState(null);
-  const [phenotypes, setPhenotypes] = useState([]);
+export function SearchFormTrait({ onChange, onSubmit }) {
+  const dispatch = useDispatch()
+  const summaryResults = useSelector(state => state.summaryResults);
+  const phenotypes = useSelector(state => state.phenotypes);
+  const { selectedListType, selectedPhenotype } = summaryResults;
 
-  useEffect(() => {
-    let records = [];
-    function populateRecords(node) {
-      records.push(node);
-      if (node.children)
-        node.children.forEach(populateRecords);
-    }
+  const setSelectedPhenotype = selectedPhenotype => {
+    dispatch(updateSummaryResults({selectedPhenotype}));
+  }
 
-    query('data/phenotypes.json').then(data => {
-      data.forEach(populateRecords, 0);
-      console.log(records);
-      setPhenotypes(records);
-    })
+  const setSelectedListType = selectedListType => {
+    dispatch(updateSummaryResults({selectedListType}));
+  }
 
-  }, [])
+  const handleChange = params => {
+    setSelectedPhenotype(params);
+    onChange(params);
+  }
+
+  const alphabetizedPhenotypes = [...phenotypes]
+    .sort((a, b) => a.label.localeCompare(b.label))
+
+  const categorizedPhenotypes = phenotypes.map(e => {
+    const spaces = String.fromCharCode(160).repeat(e.level * 2);
+    let label = spaces + e.label;
+    return {...e, label};
+  });
 
   return (
     <Form>
@@ -33,39 +42,31 @@ export function SearchFormTrait({ params, onChange, onSubmit }) {
           <InputGroup.Prepend>
             <select
               class="form-control"
-              value={listType}
-              onChange={e => setListType(e.target.value)}>
+              value={selectedListType}
+              onChange={e => setSelectedListType(e.target.value)}>
               <option value="alphabetic">Alphabetic</option>
               <option value="categorical">Categorical</option>
             </select>
           </InputGroup.Prepend>
 
-          <select
-            class="form-control"
-            value={params.phenotype}
-            onChange={e => {
-              const value = e.target.value;
-              onChange({ ...params, phenotype: value });
-              setPhenotype(value);
-            }}>
-            <option hidden value="">(Select a phenotype)</option>
-            {listType === 'alphabetic' && phenotypes.map(e => (
-              <option value={e.value} disabled={e.value === null}>
-                {e.label}
-              </option>
-            ))}
+          <div style={{width: '60%'}}>
+            <Select
+                placeholder="(Select a phenotype)"
+                value={selectedPhenotype}
+                onChange={handleChange}
+                options={selectedListType === 'categorical' ?
+                  categorizedPhenotypes :
+                  alphabetizedPhenotypes}
+            />
+          </div>
 
-            {listType === 'categorical' && phenotypes.map(e => (
-              <option value={e.value} disabled={e.value === null}>
-                {String.fromCharCode(160).repeat(e.level * 8)}{e.label}
-              </option>
-            ))}
-
-
-
-          </select>
           <InputGroup.Append>
-            <button className="btn btn-primary" onClick={e => { e.preventDefault(); onSubmit(phenotype); }}>
+            <button
+              className="btn btn-primary"
+              onClick={e => {
+                e.preventDefault();
+                onSubmit(selectedPhenotype);
+              }}>
               Submit
             </button>
           </InputGroup.Append>

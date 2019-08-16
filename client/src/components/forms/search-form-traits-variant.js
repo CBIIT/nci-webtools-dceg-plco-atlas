@@ -1,36 +1,61 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { Form, FormControl, InputGroup } from 'react-bootstrap';
-import { query } from '../../services/query';
+import { updateVariantLookup } from '../../services/actions';
 import Select from 'react-select';
 
+export function SearchFormTraitsVariant({ onSubmit }) {
+  const dispatch = useDispatch();
+  const phenotypes = useSelector(state => state.phenotypes);
+  const variantLookup = useSelector(state => state.variantLookup);
+  const { selectedListType, selectedPhenotypes, selectedVariant } = variantLookup;
 
-export function SearchFormTraitsVariant({ params, onChange, onSubmit }) {
-  const [listType, setListType] = useState('alphabetic');
-  const [phenotypes, setPhenotypes] = useState([]);
-  const [phenotypesCat, setPhenotypesCat] = useState([]);
-  const [selectedPhenotypes, setSelectedPhenotypes] = useState(null);
-  const [selectedVariant, setSelectedVariant] = useState(null);
+  const setSelectedListType = selectedListType => {
+    dispatch(updateVariantLookup({ selectedListType }));
+  }
 
-  useEffect(() => {
-    let records = [];
-    function populateRecords(node) {
-      records.push(node);
-      if (node.children)
-        node.children.forEach(populateRecords);
+  const setSelectedPhenotypes = selectedPhenotypes => {
+    dispatch(updateVariantLookup({selectedPhenotypes}));
+  }
+
+  const setSelectedVariant = selectedVariant => {
+    dispatch(updateVariantLookup({selectedVariant}));
+  }
+
+  const alphabetizedPhenotypes = [...phenotypes]
+    .sort((a, b) => a.label.localeCompare(b.label))
+
+  const categorizedPhenotypes = phenotypes.map(e => {
+    const spaces = String.fromCharCode(160).repeat(e.level * 2);
+    let label = spaces + e.label;
+    return {...e, label};
+  });
+
+  const canSubmit = (selectedPhenotypes && selectedPhenotypes.length > 0) &&
+    (selectedVariant && selectedVariant.length > 0)
+
+  const validateVariantInput = e => {
+    // console.log(selectedVariant);
+    // (/^rs\d+/i).test(selectedVariant)
+
+    if (
+      selectedVariant.match(/^[r|R][s|S][0-9]+$/) != null ||
+      selectedVariant.match(/^([c|C][h|H][r|R])?(([1-9]|[1][0-9]|[2][0-2])|[x|X|y|Y]):[0-9]+$/) != null
+    ) {
+      // console.log("valid");
+      onSubmit({
+        selectedPhenotypes,
+        selectedVariant
+      })
+    } else {
+      // console.log("invalid");
+      onSubmit({
+        selectedPhenotypes,
+        selectedVariant,
+        error: "Invalid variant input."
+      })
     }
-
-    query('data/phenotypes.json').then(data => {
-      data.forEach(populateRecords, 0);
-      setPhenotypes(records);
-      // clone array for categorical display
-      let recordsCat = JSON.parse(JSON.stringify(records));
-      recordsCat.map(e => (
-        e.label = String.fromCharCode(160).repeat(e.level * 8) + e.label
-      ))
-      setPhenotypesCat(recordsCat);
-    })
-
-  }, [])
+  }
 
   return (
     <Form>
@@ -43,8 +68,8 @@ export function SearchFormTraitsVariant({ params, onChange, onSubmit }) {
           <InputGroup.Prepend>
             <select
               class="form-control"
-              value={listType}
-              onChange={e => setListType(e.target.value)}>
+              value={selectedListType}
+              onChange={e => setSelectedListType(e.target.value)}>
               <option value="alphabetic">Alphabetic</option>
               <option value="categorical">Categorical</option>
             </select>
@@ -53,13 +78,15 @@ export function SearchFormTraitsVariant({ params, onChange, onSubmit }) {
           {/* trait multi-select */}
           <div style={{width: '60%'}}>
             <Select
-              placeholder="(Select one or more traits) *"
+              placeholder="(Select one or more phenotypes) *"
               value={selectedPhenotypes}
-              onChange={(value) => handleChange(value)}
-              options={listType === 'categorical' ? phenotypesCat : phenotypes}
+              onChange={setSelectedPhenotypes}
               isOptionDisabled={(option) => option.value === null}
+              options={selectedListType === 'categorical'
+                ? categorizedPhenotypes
+                : alphabetizedPhenotypes}
               isMulti
-            />            
+            />
           </div>
           {/* variant input */}
           <FormControl
@@ -74,11 +101,11 @@ export function SearchFormTraitsVariant({ params, onChange, onSubmit }) {
           {/* submit button */}
           {/* disable submit button if required fields are empty */}
           <InputGroup.Append>
-            <button 
-              className="btn btn-primary" 
-              // onClick={e => onSubmit({selectedPhenotypes, selectedVariant})} 
-              onClick={e => validateVariantInput(selectedPhenotypes, selectedVariant)}
-              disabled={!((selectedPhenotypes && selectedPhenotypes.length > 0) && (selectedVariant && selectedVariant.length > 0))}>
+            <button
+              className="btn btn-primary"
+              // onClick={e => onSubmit({selectedPhenotypes, selectedVariant})}
+              onClick={validateVariantInput}
+              disabled={!canSubmit}>
               Submit
             </button>
           </InputGroup.Append>
@@ -86,27 +113,4 @@ export function SearchFormTraitsVariant({ params, onChange, onSubmit }) {
       </Form.Group>
     </Form>
   );
-
-  function validateVariantInput(selectedPhenotypes, selectedVariant) {
-    // console.log(selectedVariant);
-    if (selectedVariant.match(/^[r|R][s|S][0-9]+$/) != null || selectedVariant.match(/^([c|C][h|H][r|R])?(([1-9]|[1][0-9]|[2][0-2])|[x|X|y|Y]):[0-9]+$/) != null) {
-      // console.log("valid");
-      onSubmit({
-        selectedPhenotypes, 
-        selectedVariant
-      })
-    } else {
-      // console.log("invalid");
-      onSubmit({
-        selectedPhenotypes, 
-        selectedVariant,
-        error: "Invalid variant input."
-      })
-    }
-  }
-
-  function handleChange(value) {
-    setSelectedPhenotypes(value);
-    // console.log(`Option selected:`, selectedPhenotypes);
-  };
 }

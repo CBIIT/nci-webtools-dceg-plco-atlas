@@ -1,50 +1,67 @@
 import React, { useState } from 'react';
-import { Nav, Tab } from 'react-bootstrap';
+import { useDispatch, useSelector } from 'react-redux';
+import { Alert, Nav, Tab } from 'react-bootstrap';
 import { SearchFormTrait } from '../forms/search-form-trait';
 import { ManhattanPlot } from '../plots/manhattan-plot';
 import { QQPlot } from '../plots/qq-plot';
+import { updateSummaryResults } from '../../services/actions';
 
-export function SummaryResults({ params, setParams }) {
-  const [submitted, setSubmitted] = useState(false);
-  const [trait, setTrait] = useState(null);
-  const [messages, setMessages] = useState([]);
+export function SummaryResults() {
+  const dispatch = useDispatch();
+  const summaryResults = useSelector(state => state.summaryResults);
+  const { submitted, messages, drawManhattanPlot, drawQQPlot } = summaryResults;
+
+  const setSubmitted = submitted => {
+    dispatch(updateSummaryResults({submitted}));
+  }
+
+  // registers a function we can use to draw the manhattan plot
+  const setDrawManhattanPlot = drawManhattanPlot => {
+    dispatch(updateSummaryResults({drawManhattanPlot}));
+  }
+
+  // registers a function we can use to draw the qq plot
+  const setDrawQQPlot = drawQQPlot => {
+    dispatch(updateSummaryResults({drawQQPlot}));
+  }
+
+  const setMessages = messages => {
+    dispatch(updateSummaryResults({messages}));
+  }
+
+  const clearMessages = e => {
+    setMessages([]);
+  }
+
+  const handleSubmit = params => {
+    setSubmitted(new Date());
+    console.log(params);
+
+    if (!params || !params.value) {
+      setMessages([{
+        type: 'danger',
+        content: 'The selected phenotype has no data.'
+      }]);
+      return;
+    }
+
+    if (drawManhattanPlot)
+      drawManhattanPlot(params.value);
+
+    if (drawQQPlot)
+      drawQQPlot(params.value);
+  }
 
   return (
     <>
         <div className="card shadow-sm mb-4">
             <div className="card-body">
-                <SearchFormTrait
-                    params={params}
-                    onChange={e => {
-                      setSubmitted(false);
-                      setParams(e);
-                    }}
-                    onSubmit={phenotype => {
-                      setSubmitted(true);
-                      setTrait(phenotype);
-
-                      setMessages([]);
-                      // currently, only the example phenotype is supported
-                      if (!phenotype) {
-                        setMessages([{
-                          type: 'alert-danger',
-                          content: 'Please select a phenotype.'
-                        }])
-                      }
-                    }}
-                />
-
-                {
-                  submitted && messages.map(({type, content}, index) => (
-                    <div className={`alert ${type}`}>
+                <SearchFormTrait onSubmit={handleSubmit} onChange={clearMessages} />
+                {submitted && messages.map(({type, content}, index) => (
+                    <Alert variant={type} onClose={clearMessages} dismissible>
                       { content }
-
-                      <button type="button" class="close" onClick={e => setMessages([])} aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                      </button>
-                    </div>
-                  ))
-                }
+                    </Alert>
+                  ))}
             </div>
         </div>
 
@@ -65,11 +82,11 @@ export function SummaryResults({ params, setParams }) {
                 <div className="card-body">
                     <Tab.Content>
                         <Tab.Pane eventKey="manhattan-plot">
-                            <ManhattanPlot trait={trait} />
+                            <ManhattanPlot drawFunctionRef={setDrawManhattanPlot} />
                         </Tab.Pane>
 
                         <Tab.Pane eventKey="qq-plot">
-                            <QQPlot trait={trait} />
+                            <QQPlot drawFunctionRef={setDrawQQPlot} />
                         </Tab.Pane>
                     </Tab.Content>
                 </div>

@@ -3,14 +3,15 @@ import { NavLink } from 'react-router-dom';
 
 export function Navbar({ links }) {
   return (
-    <div className="bg-primary text-white">
+    <div className="bg-primary text-white shadow-sm">
       <div className="container">
         {[{ route: '/', title: 'Home', exact: true }]
           .concat(links)
           .sort((a, b) => a.navIndex - b.navIndex)
           .map(({ route, title, exact }) => (
             <NavLink
-              className="navlinks text-white mr-3 py-1 px-3 d-inline-block"
+              className="navlinks text-white py-2 px-4 d-inline-block "
+              style={{fontWeight: 600}}
               activeClassName="active-navlinks"
               exact={exact}
               to={route}>
