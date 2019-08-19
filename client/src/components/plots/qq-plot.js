@@ -142,11 +142,11 @@ export function QQPlot({ drawFunctionRef }) {
             <button type="button" className="close popup-tooltip-close" aria-label="Close" onClick={popupMarkerClose}>
               <span aria-hidden="true">&times;</span>
             </button>
-              id: {hoverTooltipData["point_#"]}
+              id: {popupTooltipData["point_#"]}
               <br/>
-              SNP: <a href="/">{hoverTooltipData.snp}</a>
+              SNP: <a href="/">{popupTooltipData.snp}</a>
               <br/>
-              P-Value: {hoverTooltipData["p-value"]}
+              P-Value: {popupTooltipData["p-value"]}
             </div>
 
             <div ref={plotContainer} className="qq-plot" onClick={e => popupMarkerClick(e)} />
