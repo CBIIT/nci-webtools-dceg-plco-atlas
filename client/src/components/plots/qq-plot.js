@@ -50,7 +50,7 @@ export function QQPlot({ drawFunctionRef }) {
       'point_#': variant[0],
       "snp": variant[1],
       'p-value': variant[2]
-    });
+    }); 
   }
 
   const PositionLabel = (props) => {
@@ -75,8 +75,7 @@ export function QQPlot({ drawFunctionRef }) {
       position: 'absolute',
       top: y + 5,    // computed based on child and parent's height
       left: x,  // computed based on child and parent's width
-      border: '1px solid #ccc',
-      // background: 'white'
+      border: '1px solid #ccc'
     };
 
     return (
@@ -106,29 +105,6 @@ export function QQPlot({ drawFunctionRef }) {
 
   return (
     <>
-      {/* <div className="row">
-        <div className="col-md-12 text-right">
-          {/* {timestamp ? <strong className="mx-2">{timestamp} s</strong> : null} */}
-          {/* <div className="btn-group" role="group" aria-label="Basic example">
-            <button
-              className="btn btn-primary btn-sm"
-              onClick={e => loadQQPlot()}
-              disabled={loading}>
-              Reset
-            </button>
-          </div> */}
-        {/* </div>
-      </div> */}
-
-      <div className="row">
-        <div className="col-md-12 text-left">
-          {/* <pre>{JSON.stringify(debugQuery, null, 2)}</pre> */}
-        </div>
-        <div className="col-md-12 text-left">
-          {/* <PositionLabel /> */}
-        </div>
-      </div>
-
       <div className="row mt-3">
         <div className="col-md-12 text-center">
 

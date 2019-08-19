@@ -29,10 +29,13 @@ qq <- function(o, e, pvector, ...) {
 }
 
 query <- function(phenotype) {
-  # setwd("~/Desktop")
   library("RSQLite")
+  source("qqplot-imagemap-builder.R")
+  # init imagemap
+  im <- imagemap(phenotype,height=800,width=800)  
+  # init phenotype db filename
   filename <- paste0("../data/",phenotype,".db")
-  
+  # query db
   sqlite.driver <- dbDriver("SQLite")
   conn <- dbConnect(sqlite.driver, dbname = filename)
   dbListTables(conn)
@@ -42,11 +45,18 @@ query <- function(phenotype) {
   snpvector <- query[['snp']]
   pvector <- pvector[!is.na(pvector) & pvector<1 & pvector>0]
   dbDisconnect(conn)
-  
+  # store pvector lists and first 250 observable markers in lists
   o <- -log10(sort(pvector,decreasing=F))
   e <- -log10(ppoints(length(pvector)))
   o_head250 <- o[1:250]
   e_head250 <- e[1:250]
-  
+  snpvector_head250 <- snpvector[1:250]
+  # generate image
   qq(o, e, pvector)
+  # generate imagemap
+  for (i in 1:250) {
+    addRegion(im) <- imPoint(e_head250[i], o_head250[i], .065, .2, alt=paste0("point_", i, ",", snpvector[i], ",", pvector[i]))
+  }
+  createPage(im, paste0(phenotype,".imagemap.json"))
+  imClose(im)
 }
