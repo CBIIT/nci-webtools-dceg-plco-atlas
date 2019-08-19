@@ -3,6 +3,7 @@
 *.db
 *.db-journal
 *.vs
+*.Rhistory
 config.json
 /server/data/**/*.db
 /server/data/**/*.meta
