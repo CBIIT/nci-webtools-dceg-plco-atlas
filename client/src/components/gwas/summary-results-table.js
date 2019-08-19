@@ -68,7 +68,7 @@ export function SummaryResultsTable({updateFunctionRef}) {
         const params = {
             offset: (page - 1) * pageSize,
             limit: pageSize,
-            database
+            database: database + '.db'
         };
         if (chromosome)
             params.chr = chromosome;
