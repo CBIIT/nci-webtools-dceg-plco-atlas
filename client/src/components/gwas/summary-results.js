@@ -4,12 +4,22 @@ import { Alert, Nav, Tab } from 'react-bootstrap';
 import { SearchFormTrait } from '../forms/search-form-trait';
 import { ManhattanPlot } from '../plots/manhattan-plot';
 import { QQPlot } from '../plots/qq-plot';
+import { SummaryResultsTable } from './summary-results-table';
 import { updateSummaryResults } from '../../services/actions';
 
 export function SummaryResults() {
   const dispatch = useDispatch();
   const summaryResults = useSelector(state => state.summaryResults);
-  const { submitted, messages, drawManhattanPlot, drawQQPlot } = summaryResults;
+  const {
+    selectedPhenotype,
+    submitted,
+    messages,
+    drawManhattanPlot,
+    drawQQPlot,
+    updateResultsTable,
+    page,
+    pageSize,
+  } = summaryResults;
 
   const setSubmitted = submitted => {
     dispatch(updateSummaryResults({submitted}));
@@ -25,6 +35,14 @@ export function SummaryResults() {
     dispatch(updateSummaryResults({drawQQPlot}));
   }
 
+  const setUpdateResultsTable = updateResultsTable => {
+    dispatch(updateSummaryResults({updateResultsTable}));
+  }
+
+  const setSelectedChromosome = selectedChromosome => {
+    dispatch(updateSummaryResults({selectedChromosome}));
+  }
+
   const setMessages = messages => {
     dispatch(updateSummaryResults({messages}));
   }
@@ -33,8 +51,14 @@ export function SummaryResults() {
     setMessages([]);
   }
 
+  const handleChange = () => {
+    clearMessages();
+    setSubmitted(null);
+  }
+
   const handleSubmit = params => {
     setSubmitted(new Date());
+    setSelectedChromosome(null);
     console.log(params);
 
     if (!params || !params.value) {
@@ -50,13 +74,22 @@ export function SummaryResults() {
 
     if (drawQQPlot)
       drawQQPlot(params.value);
+
+    if (updateResultsTable)
+      updateResultsTable(page, pageSize, params.value);
+  }
+
+  const handleChromosomeChanged = chromosome => {
+    if (updateResultsTable) {
+      updateResultsTable(1, 10, selectedPhenotype.value, chromosome);
+    }
   }
 
   return (
     <>
         <div className="card shadow-sm mb-4">
             <div className="card-body">
-                <SearchFormTrait onSubmit={handleSubmit} onChange={clearMessages} />
+                <SearchFormTrait onSubmit={handleSubmit} onChange={handleChange} />
                 {submitted && messages.map(({type, content}, index) => (
                     <Alert variant={type} onClose={clearMessages} dismissible>
                       { content }
@@ -82,7 +115,14 @@ export function SummaryResults() {
                 <div className="card-body">
                     <Tab.Content>
                         <Tab.Pane eventKey="manhattan-plot">
-                            <ManhattanPlot drawFunctionRef={setDrawManhattanPlot} />
+                            <ManhattanPlot
+                              drawFunctionRef={setDrawManhattanPlot}
+                              onChromosomeChanged={handleChromosomeChanged} />
+                              <div className="my-4" style={{display: submitted ? 'block' : 'none'}}>
+                                <SummaryResultsTable
+                                  className="mw-100"
+                                  updateFunctionRef={setUpdateResultsTable} />
+                              </div>
                         </Tab.Pane>
 
                         <Tab.Pane eventKey="qq-plot">

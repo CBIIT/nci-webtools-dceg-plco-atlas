@@ -9,7 +9,7 @@ import { systemFont } from '../../services/plots/text';
 import { updateSummaryResults } from '../../services/actions';
 import * as d3 from 'd3';
 
-export function ManhattanPlot({ drawFunctionRef }) {
+export function ManhattanPlot({ drawFunctionRef, onChromosomeChanged }) {
   const dispatch = useDispatch();
   const plotContainer = useRef(null);
   const summaryResults = useSelector(state => state.summaryResults);
@@ -185,6 +185,8 @@ export function ManhattanPlot({ drawFunctionRef }) {
 
          drawVariantsPlot(args);
          setSelectedChromosome(chromosome);
+         if (onChromosomeChanged)
+           onChromosomeChanged(chromosome)
         };
 
         plotContainer.current.appendChild(overlay);
