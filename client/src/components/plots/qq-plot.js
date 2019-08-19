@@ -22,7 +22,6 @@ export function QQPlot({ drawFunctionRef }) {
     position: 'absolute',
     top: 0,    // computed based on child and parent's height
     left: 0,  // computed based on child and parent's width
-    border: '1px solid #ccc',
     display: "none"
   });
   const [popupTooltipStyle, setPopupTooltipStyle] = useState({
@@ -104,8 +103,8 @@ export function QQPlot({ drawFunctionRef }) {
       }); 
       setHoverTooltipStyle({
         ...hoverTooltipStyle,
-        top: pos.position.y + 5,    // computed based on child and parent's height
-        left: pos.position.x,  // computed based on child and parent's width
+        top: pos.position.y - 55,    // computed based on child and parent's height
+        left: pos.position.x - 45,  // computed based on child and parent's width
         display: "block"
       });
     } else {
@@ -134,10 +133,10 @@ export function QQPlot({ drawFunctionRef }) {
               onPositionChanged: newPos => setPos(newPos)
             }}>
 
-            <div style={hoverTooltipStyle} className="hover-tooltip p-3 text-left bg-danger">
-              {/* {`x: ${pos.position.x}`}<br />
-              {`y: ${pos.position.y}`}<br /> */}
-              <pre>{JSON.stringify(hoverTooltipData, null, 2)}</pre>
+            <div style={hoverTooltipStyle} className="hover-tooltip">
+              SNP: {hoverTooltipData.snp}
+              <br/>
+              P-Value: {hoverTooltipData["p-value"]}
             </div>
 
             <div style={popupTooltipStyle} className="popup-tooltip p-3 text-left bg-success">
