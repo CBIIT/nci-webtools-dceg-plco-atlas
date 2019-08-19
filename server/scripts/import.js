@@ -115,9 +115,9 @@ reader.on('line', line => {
     params.nlog_p2 = group(params.nlog_p, 10**-2);
 
     // determine absolute position of variant relative to the start of the genome
-    if (chr > previousChr) {
-        bpOffset = ranges[previousChr - 1].max_bp_abs;
-        previousChr = +chr;
+    if (chr != previousChr) {
+        bpOffset = chr > 1 ? ranges[chr - 2].max_bp_abs : 0;
+        previousChr = chr;
     }
 
     // store the absolute BP and group by megabases
