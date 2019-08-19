@@ -144,7 +144,7 @@ export function QQPlot({ drawFunctionRef }) {
             </button>
               id: {hoverTooltipData["point_#"]}
               <br/>
-              SNP: {hoverTooltipData.snp}
+              SNP: <a href="/">{hoverTooltipData.snp}</a>
               <br/>
               P-Value: {hoverTooltipData["p-value"]}
             </div>
