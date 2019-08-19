@@ -28,7 +28,6 @@ export function QQPlot({ drawFunctionRef }) {
     position: 'absolute',
     top: 0,    // computed based on child and parent's height
     left: 0,  // computed based on child and parent's width
-    border: '1px solid #ccc',
     display: "none"
   });
 
@@ -74,8 +73,8 @@ export function QQPlot({ drawFunctionRef }) {
       }); 
       setPopupTooltipStyle({
         ...popupTooltipStyle,
-        top: pos.position.y + 5,    // computed based on child and parent's height
-        left: pos.position.x,  // computed based on child and parent's width
+        top: pos.position.y - 75,    // computed based on child and parent's height
+        left: pos.position.x - 50,  // computed based on child and parent's width
         display: "block"
       });
     } else {
@@ -103,7 +102,7 @@ export function QQPlot({ drawFunctionRef }) {
       }); 
       setHoverTooltipStyle({
         ...hoverTooltipStyle,
-        top: pos.position.y - 55,    // computed based on child and parent's height
+        top: pos.position.y - 60,    // computed based on child and parent's height
         left: pos.position.x - 45,  // computed based on child and parent's width
         display: "block"
       });
@@ -133,19 +132,21 @@ export function QQPlot({ drawFunctionRef }) {
               onPositionChanged: newPos => setPos(newPos)
             }}>
 
-            <div style={hoverTooltipStyle} className="hover-tooltip">
+            <div style={hoverTooltipStyle} className="hover-tooltip shadow">
               SNP: {hoverTooltipData.snp}
               <br/>
               P-Value: {hoverTooltipData["p-value"]}
             </div>
 
-            <div style={popupTooltipStyle} className="popup-tooltip p-3 text-left bg-success">
-            <button type="button" class="close" aria-label="Close" onClick={popupMarkerClose}>
+            <div style={popupTooltipStyle} className="popup-tooltip shadow">
+            <button type="button" className="close popup-tooltip-close" aria-label="Close" onClick={popupMarkerClose}>
               <span aria-hidden="true">&times;</span>
             </button>
-              {/* {`x: ${pos.position.x}`}<br />
-              {`y: ${pos.position.y}`}<br /> */}
-              <pre>{JSON.stringify(popupTooltipData, null, 2)}</pre>
+              id: {hoverTooltipData["point_#"]}
+              <br/>
+              SNP: {hoverTooltipData.snp}
+              <br/>
+              P-Value: {hoverTooltipData["p-value"]}
             </div>
 
             <div ref={plotContainer} className="qq-plot" onClick={e => popupMarkerClick(e)} />
