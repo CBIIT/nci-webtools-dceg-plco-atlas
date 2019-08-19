@@ -37,3 +37,19 @@ export function range(min, max) {
         nums[i] = min + i;
     return nums;
 }
+
+// generates a color based on an index
+export function indexToColor(index, valuesOnly) {
+    const r = index >> 16;
+    index -= r * 65536;
+
+    const g = index >> 8;
+    index -= g * 256;
+
+    const b = index;
+    return `rgb(${r}, ${g}, ${b})`;
+}
+
+export function colorToIndex(r, g, b) {
+    return r * 65536 + g * 256 + b;
+}
