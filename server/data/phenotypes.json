@@ -1,17 +1,17 @@
 [
     {
         "label": "(test) Ewing's sarcoma",
-        "value": "meta_fixed_assoc.db",
+        "value": "meta_fixed_assoc",
         "level": 0
     },
     {
         "label": "(test) Renal cell carcinoma",
-        "value": "rcc.db",
+        "value": "rcc",
         "level": 0
     },
     {
         "label": "(test) Melanoma",
-        "value": "mel.db",
+        "value": "mel",
         "level": 0
     },
     {
