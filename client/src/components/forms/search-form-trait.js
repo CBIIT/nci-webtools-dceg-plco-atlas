@@ -60,6 +60,7 @@ export function SearchFormTrait({ onChange, onSubmit }) {
                 placeholder="(Select a phenotype)"
                 value={selectedPhenotype}
                 onChange={handleChange}
+                isOptionDisabled={(option) => option.value === null}
                 options={selectedListType === 'categorical' ?
                   categorizedPhenotypes :
                   alphabetizedPhenotypes}
