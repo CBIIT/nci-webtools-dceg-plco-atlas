@@ -10,7 +10,26 @@ export function QQPlot({ drawFunctionRef }) {
   const plotContainer = useRef(null);
   const summaryResults = useSelector(state => state.summaryResults);
   const { phenotype, loading, areaItems } = summaryResults;
-  const [debugQuery, setDebugQuery] = useState({});
+  const [hoverTooltipData, setHoverTooltipData] = useState({});
+  const [popupTooltipData, setPopupTooltipData] = useState({});
+  const [pos, setPos] = useState({
+    position: {
+        x: 0,
+        y: 0
+    }
+  });
+  const [hoverTooltipStyle, setHoverTooltipStyle] = useState({
+    position: 'absolute',
+    top: 0,    // computed based on child and parent's height
+    left: 0,  // computed based on child and parent's width
+    display: "none"
+  });
+  const [popupTooltipStyle, setPopupTooltipStyle] = useState({
+    position: 'absolute',
+    top: 0,    // computed based on child and parent's height
+    left: 0,  // computed based on child and parent's width
+    display: "none"
+  });
 
   const setLoading = loading => {
     dispatch(updateSummaryResults({loading}));
@@ -34,7 +53,7 @@ export function QQPlot({ drawFunctionRef }) {
     const qqImg = document.createElement('img');
     qqImg.src = root + '/data/qq-plots/' + phenotype + '.png';
     qqImg.draggable = false;
-    qqImg.alt = 'QQ-plot of selected trait';
+    qqImg.alt = 'QQ-plot of selected phenotype';
     qqImg.useMap = '#image-map';
     plotContainer.current.appendChild(qqImg);
     // load & add QQ plot image map
@@ -44,77 +63,93 @@ export function QQPlot({ drawFunctionRef }) {
     setLoading(false);
   }
 
-  const clickPoint = (e) => {
-    var variant = e.target.alt.split(',');
-    setDebugQuery({
-      'point_#': variant[0],
-      "snp": variant[1],
-      'p-value': variant[2]
-    }); 
+  const popupMarkerClick = (e) => {
+    if (e.target && e.target.coords) {
+      var variant = e.target.alt.split(',');
+      setPopupTooltipData({
+        'point_#': variant[0],
+        "snp": variant[1],
+        'p-value': variant[2]
+      }); 
+      setPopupTooltipStyle({
+        ...popupTooltipStyle,
+        top: pos.position.y - 75,    // computed based on child and parent's height
+        left: pos.position.x - 50,  // computed based on child and parent's width
+        display: "block"
+      });
+    } else {
+      setPopupTooltipStyle({
+        ...popupTooltipStyle,
+        display: "none"
+      });
+    }
   }
 
-  const PositionLabel = (props) => {
-    const {
-      detectedEnvironment: {
-        isMouseDetected = false,
-        isTouchDetected = false
-      } = {},
-      elementDimensions: {
-        width = 0,
-        height = 0
-      } = {},
-      isActive = false,
-      isPositionOutside = false,
-      position: {
-        x = 0,
-        y = 0
-      } = {}
-    } = props;
+  const popupMarkerClose = (e) => {
+    setPopupTooltipStyle({
+      ...popupTooltipStyle,
+      display: "none"
+    });
+  }
 
-    const styles = {
-      position: 'absolute',
-      top: y + 5,    // computed based on child and parent's height
-      left: x,  // computed based on child and parent's width
-      border: '1px solid #ccc'
-    };
+  const hoverMarkerEnter = (e) => {
+    if (e.target && e.target.coords) {
+      var variant = e.target.alt.split(',');
+      setHoverTooltipData({
+        'point_#': variant[0],
+        "snp": variant[1],
+        'p-value': variant[2]
+      }); 
+      setHoverTooltipStyle({
+        ...hoverTooltipStyle,
+        top: pos.position.y - 60,    // computed based on child and parent's height
+        left: pos.position.x - 45,  // computed based on child and parent's width
+        display: "block"
+      });
+    } else {
+      setHoverTooltipStyle({
+        ...hoverTooltipStyle,
+        display: "none"
+      });
+    }
+  }
 
-    return (
-      <>
-        <div style={styles} className="p-3 text-left bg-white">
-          {`x: ${x}`}<br />
-          {`y: ${y}`}<br />
-          <pre>{JSON.stringify(debugQuery, null, 2)}</pre>
-        </div>
-        {/* <div className="example__label">
-          {`x: ${x}`}<br />
-          {`y: ${y}`}<br />
-          {`width:: ${width}`}<br />
-          {`height: ${height}`}<br />
-          {`isActive: ${isActive}`}<br />
-          {`isPositionOutside: ${isPositionOutside ? 'true' : 'false'}`}<br />
-          {`isMouseDetected: ${isMouseDetected ? 'true' : 'false'}`}<br />
-          {`isTouchDetected: ${isTouchDetected ? 'true' : 'false'}`}
-        </div> */}
-      </>
-    );
-  };
-
-  PositionLabel.defaultProps = {
-      shouldShowIsActive: true
-  };
+  const hoverMarkerLeave = (e) => {
+    setHoverTooltipStyle({
+      ...hoverTooltipStyle,
+      display: "none"
+    });
+  }
 
   return (
     <>
       <div className="row mt-3">
         <div className="col-md-12 text-center">
 
-          <ReactCursorPosition
-            className="qq-plot-mouse-window"
-            activationInteractionMouse={INTERACTIONS.CLICK}>
+          <ReactCursorPosition {...{
+              className: "qq-plot-mouse-window",
+              // activationInteractionMouse: INTERACTIONS.CLICK,
+              onPositionChanged: newPos => setPos(newPos)
+            }}>
 
-            <PositionLabel />
+            <div style={hoverTooltipStyle} className="hover-tooltip shadow">
+              SNP: {hoverTooltipData.snp}
+              <br/>
+              P-Value: {hoverTooltipData["p-value"]}
+            </div>
 
-            <div ref={plotContainer} className="qq-plot" />
+            <div style={popupTooltipStyle} className="popup-tooltip shadow">
+            <button type="button" className="close popup-tooltip-close" aria-label="Close" onClick={popupMarkerClose}>
+              <span aria-hidden="true">&times;</span>
+            </button>
+              id: {popupTooltipData["point_#"]}
+              <br/>
+              SNP: <a href="/">{popupTooltipData.snp}</a>
+              <br/>
+              P-Value: {popupTooltipData["p-value"]}
+            </div>
+
+            <div ref={plotContainer} className="qq-plot" onClick={e => popupMarkerClick(e)} />
             <map name="image-map">
               {areaItems.map(function(area) {
                 return (
@@ -122,7 +157,9 @@ export function QQPlot({ drawFunctionRef }) {
                     shape={area.shape}
                     coords={area.coords}
                     alt={area.alt}
-                    onClick={e => clickPoint(e)}
+                    onClick={e => popupMarkerClick(e)}
+                    onMouseEnter={e => hoverMarkerEnter(e)}
+                    onMouseLeave={e => hoverMarkerLeave(e)}
                   />
                 );
               })}

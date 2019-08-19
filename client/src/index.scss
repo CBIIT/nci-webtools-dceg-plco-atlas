@@ -122,12 +122,28 @@ $blue: #005ea2;
   }
 }
 
-// .qq-plot-mouse-window {
-//   border: 1px solid #ccc;
-//   border-radius: 4px;
-//   transition: border .2s ease-in-out;
-// }
+.hover-tooltip {
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  text-align: left;
+  font-weight: bold;
+  padding: 5px;
+  background-color: #ffa503;
+  font-size: 10pt;
+}
 
-// .qq-plot-mouse-window:hover {
-//   border-color: #337ab7;
-// }
+.popup-tooltip {
+  border: 1px solid black;
+  border-radius: 5px;
+  text-align: left;
+  font-weight: bold;
+  padding: 5px;
+  background-color: #ccc;
+  font-size: 10pt;
+  width: 150px;
+}
+
+.popup-tooltip-close {
+  margin-top: -10px;
+  margin-right: -5px;
+}
