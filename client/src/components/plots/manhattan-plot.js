@@ -36,12 +36,12 @@ export function ManhattanPlot({ drawFunctionRef, onChromosomeChanged }) {
       drawFunctionRef(drawSummaryPlot);
   }, [drawFunctionRef]);
 
-  const drawSummaryPlot = async database => {
+  const drawSummaryPlot = async phenotype => {
     let rangeSubset = ranges.slice(0, 22);
     console.log(rangeSubset);
     setLoading(true);
     const results = await query('summary', {
-      database: database,
+      database: phenotype + '.db',
       nlogpMin: 3
     });
 
@@ -175,7 +175,7 @@ export function ManhattanPlot({ drawFunctionRef, onChromosomeChanged }) {
           console.log(rangeSubset[idx]);
           const chromosome = rangeSubset[idx].chr;
           const args = {
-            database: database,
+            database: phenotype + '.db',
             chr: chromosome,
             nlogpMin: 2,//Math.max(2, Math.floor(rangeSubset[idx].MIN_NLOG_P)),
             nlogpMax: 20,//Math.ceil(rangeSubset[idx].MAX_NLOG_P),

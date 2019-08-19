@@ -26,18 +26,19 @@ export function QQPlot({ drawFunctionRef }) {
   }, [drawFunctionRef]);
 
   const drawQQPlot = async phenotype => {
+    console.log(phenotype);
     setLoading(true);
 
     plotContainer.current.innerHTML = '';
     // add QQ plot image
     const qqImg = document.createElement('img');
-    qqImg.src = root + '/data/qq-plots/example.png';
+    qqImg.src = root + '/data/qq-plots/' + phenotype + '.png';
     qqImg.draggable = false;
     qqImg.alt = 'QQ-plot of selected trait';
     qqImg.useMap = '#image-map';
     plotContainer.current.appendChild(qqImg);
     // load & add QQ plot image map
-    const imageMapData = await query('data/qq-plots/example.imagemap.json');
+    const imageMapData = await query('data/qq-plots/' + phenotype + '.imagemap.json');
     if (!imageMapData.error)
       setAreaItems(imageMapData);
     setLoading(false);
@@ -47,9 +48,8 @@ export function QQPlot({ drawFunctionRef }) {
     var variant = e.target.alt.split(',');
     setDebugQuery({
       'point_#': variant[0],
-      snp: variant[1],
-      'p-value': variant[2],
-      nlog_p: variant[3]
+      "snp": variant[1],
+      'p-value': variant[2]
     });
   }
 
