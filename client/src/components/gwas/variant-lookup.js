@@ -22,8 +22,8 @@ export function VariantLookup() {
 
     const columns = [
         {
-            dataField: 'trait',
-            text: 'Trait',
+            dataField: 'phenotype',
+            text: 'Phenotype',
             filter: textFilter(),
             sort: true,
         },
@@ -65,14 +65,18 @@ export function VariantLookup() {
         // console.log("Sample query!", selectedPhenotyes);
         for (var i = 0; i < selectedPhenotypes.length; i++) {
             const variantData = await query('variant', {
-                database: selectedPhenotypes[i].value,
+                database: selectedPhenotypes[i].value + '.db',
                 snp: selectedVariant,
                 chr: '',
                 bp: ''
             });
+            console.log(variantData);
             for (var j = 0; j < variantData.length; j++) {
-                variantData[i]['trait'] = selectedPhenotypes[i].label;
-                tableList.push(variantData[i]);
+                if (variantData[j]) {
+                    console.log(variantData[j]);
+                    variantData[j]['phenotype'] = selectedPhenotypes[i].label;
+                    tableList.push(variantData[j]);
+                }
             }
         }
         setResults(tableList);
