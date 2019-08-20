@@ -48,6 +48,19 @@ function getVariantsByPage(filepath, params) {
     return records;
 }
 
+function getVariantById(filepath, params) {
+    const stmt = new Database(filepath, {readonly: true}).prepare(
+        `SELECT * FROM variant WHERE variant_id = :id`
+    );
+
+    const records = params.raw
+        ? getRawResults(stmt, params)
+        : stmt.all(params);
+
+    return records;
+}
+
+
 function getVariant(filepath, params) {
     // console.log("filepath", filepath);
     // console.log("params", params);
@@ -70,4 +83,4 @@ function getVariant(filepath, params) {
 //     };
 // }
 
-module.exports = {getSummary, getVariants, getVariantsByPage, getVariant};
+module.exports = {getSummary, getVariants, getVariantsByPage, getVariant, getVariantById};
