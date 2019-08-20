@@ -2,8 +2,10 @@ import React, { useEffect, useState, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { root, query } from '../../services/query';
 import { updateSummaryResults } from '../../services/actions';
+import { Link } from 'react-router-dom';
 
-import ReactCursorPosition, { INTERACTIONS } from 'react-cursor-position';
+
+import ReactCursorPosition from 'react-cursor-position';
 
 export function QQPlot({ drawFunctionRef }) {
   const dispatch = useDispatch();
@@ -45,7 +47,6 @@ export function QQPlot({ drawFunctionRef }) {
   }, [drawFunctionRef]);
 
   const drawQQPlot = async phenotype => {
-    console.log(phenotype);
     setLoading(true);
 
     plotContainer.current.innerHTML = '';
@@ -144,7 +145,7 @@ export function QQPlot({ drawFunctionRef }) {
             </button>
               id: {popupTooltipData["point_#"]}
               <br/>
-              SNP: <a href="/">{popupTooltipData.snp}</a>
+              SNP: <Link to='/gwas/lookup'>{popupTooltipData.snp}</Link>
               <br/>
               P-Value: {popupTooltipData["p-value"]}
             </div>
