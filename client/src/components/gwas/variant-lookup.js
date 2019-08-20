@@ -7,7 +7,7 @@ import BootstrapTable from 'react-bootstrap-table-next';
 import paginationFactory from 'react-bootstrap-table2-paginator';
 import filterFactory, { textFilter } from 'react-bootstrap-table2-filter';
 
-export function VariantLookup() {
+export function VariantLookup({ lookupFunctionRef }) {
     const dispatch = useDispatch();
     const variantLookup = useSelector(state => state.variantLookup);
     const { selectedPhenotypes, selectedVariant, results, message } = variantLookup;
@@ -19,6 +19,11 @@ export function VariantLookup() {
     const setMessage = message => {
         dispatch(updateVariantLookup({message}));
     }
+
+    useEffect(() => {
+        if (lookupFunctionRef)
+            lookupFunctionRef(lookup);
+    }, [lookupFunctionRef]);
 
     const columns = [
         {
@@ -60,18 +65,18 @@ export function VariantLookup() {
         },
     ];
 
-    const lookup = async () => {
+    const lookup = async (phenotypes, variant) => {
         var tableList = [];
         // console.log("Sample query!", selectedPhenotyes);
-        for (var i = 0; i < selectedPhenotypes.length; i++) {
+        for (var i = 0; i < phenotypes.length; i++) {
             const variantData = await query('variant', {
-                database: selectedPhenotypes[i].value,
-                snp: selectedVariant,
+                database: phenotypes[i].value,
+                snp: variant,
                 chr: '',
                 bp: ''
             });
             for (var j = 0; j < variantData.length; j++) {
-                variantData[i]['trait'] = selectedPhenotypes[i].label;
+                variantData[i]['trait'] = phenotypes[i].label;
                 tableList.push(variantData[i]);
             }
         }
@@ -85,7 +90,7 @@ export function VariantLookup() {
         <>
             <div className="card shadow-sm mb-4">
                 <div className="card-body">
-                    <SearchFormTraitsVariant onSubmit={lookup} />
+                    <SearchFormTraitsVariant onSubmit={e => lookup(selectedPhenotypes, selectedVariant)} />
                 </div>
             </div>
 

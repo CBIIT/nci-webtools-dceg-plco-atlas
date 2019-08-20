@@ -72,7 +72,8 @@ export function scatterPlot(config) {
   context.globalAlpha = opacity;
   for (let i = 0; i < data.length; i++) {
     // color is a string or a function which returns a string
-    context.fillStyle = color instanceof Function ? color(data[i]) : color;
+    context.fillStyle = color instanceof Function ? color(data[i], i) : color;
+    context.strokeStyle = context.fillStyle;
     let cx = scaleX(data[i][config.x.key]);
     let cy = scaleY(data[i][config.y.key]);
     drawPoint(context, cx, cy, size);

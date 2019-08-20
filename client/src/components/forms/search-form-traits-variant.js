@@ -34,7 +34,8 @@ export function SearchFormTraitsVariant({ onSubmit }) {
   const canSubmit = (selectedPhenotypes && selectedPhenotypes.length > 0) &&
     (selectedVariant && selectedVariant.length > 0)
 
-  const validateVariantInput = e => {
+  const validateVariantInput = e=> {
+    e.preventDefault();
     // console.log(selectedVariant);
     // (/^rs\d+/i).test(selectedVariant)
 
@@ -100,6 +101,7 @@ export function SearchFormTraitsVariant({ onSubmit }) {
             class="form-control"
             placeholder="(Variant) *"
             aria-label="Variant (required)"
+            value={selectedVariant}
             onChange={e => setSelectedVariant(e.target.value)}
             // onChange={e => validateVariantInput(e.target.value)}
             type="text"

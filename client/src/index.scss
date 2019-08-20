@@ -120,6 +120,21 @@ $blue: #005ea2;
   .overlay:hover {
     background-color: #005ea2;
   }
+
+  .interactive-overlay {
+    pointer-events: none;
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+
+  .custom-tooltip {
+    position: absolute;
+    background-color: white;
+    border: 1px solid #bbb;
+    border-radius: 4px;
+    padding: 10px;
+  }
 }
 
 .hover-tooltip {

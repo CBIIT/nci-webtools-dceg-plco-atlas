@@ -5,11 +5,12 @@ import { SearchFormTrait } from '../forms/search-form-trait';
 import { ManhattanPlot } from '../plots/manhattan-plot';
 import { QQPlot } from '../plots/qq-plot';
 import { SummaryResultsTable } from './summary-results-table';
-import { updateSummaryResults } from '../../services/actions';
+import { updateSummaryResults, updateVariantLookup } from '../../services/actions';
 
 export function SummaryResults() {
   const dispatch = useDispatch();
   const summaryResults = useSelector(state => state.summaryResults);
+  const variantLookup = useSelector(state => state.variantLookup);
   const {
     selectedPhenotype,
     submitted,
@@ -85,6 +86,15 @@ export function SummaryResults() {
     }
   }
 
+  const handleVariantLookup = args => {
+    dispatch(updateVariantLookup({
+      selectedPhenotypes: [selectedPhenotype],
+      selectedVariant: args.snp,
+    }));
+
+    console.log(args);
+  }
+
   return (
     <>
         <div className="card shadow-sm mb-4">
@@ -117,7 +127,8 @@ export function SummaryResults() {
                         <Tab.Pane eventKey="manhattan-plot">
                             <ManhattanPlot
                               drawFunctionRef={setDrawManhattanPlot}
-                              onChromosomeChanged={handleChromosomeChanged} />
+                              onChromosomeChanged={handleChromosomeChanged}
+                              onVariantLookup={handleVariantLookup} />
                               <div className="my-4" style={{display: submitted ? 'block' : 'none'}}>
                                 <SummaryResultsTable
                                   className="mw-100"

@@ -1,15 +1,16 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
-import { rawQuery as query } from '../../services/query';
+import { rawQuery, query } from '../../services/query';
 import { scatterPlot } from '../../services/plots/scatter-plot';
 import { axisBottom, axisLeft } from '../../services/plots/axis';
-import { range } from '../../services/plots/utils';
+import { getScale } from '../../services/plots/scale';
+import { range, indexToColor, viewportToLocalCoordinates, colorToIndex, createElement as h } from '../../services/plots/utils';
 import { systemFont } from '../../services/plots/text';
 import { updateSummaryResults } from '../../services/actions';
 import * as d3 from 'd3';
 
-export function ManhattanPlot({ drawFunctionRef, onChromosomeChanged }) {
+export function ManhattanPlot({ drawFunctionRef, onChromosomeChanged, onVariantLookup }) {
   const dispatch = useDispatch();
   const plotContainer = useRef(null);
   const summaryResults = useSelector(state => state.summaryResults);
@@ -28,7 +29,7 @@ export function ManhattanPlot({ drawFunctionRef, onChromosomeChanged }) {
   }
 
   useEffect(() => {
-    query('data/chromosome_ranges.json').then(e => setRanges(e));
+    rawQuery('data/chromosome_ranges.json').then(e => setRanges(e));
   }, [])
 
   useEffect(() => {
@@ -40,7 +41,7 @@ export function ManhattanPlot({ drawFunctionRef, onChromosomeChanged }) {
     let rangeSubset = ranges.slice(0, 22);
     console.log(rangeSubset);
     setLoading(true);
-    const results = await query('summary', {
+    const results = await rawQuery('summary', {
       database: phenotype + '.db',
       nlogpMin: 3
     });
@@ -198,9 +199,14 @@ export function ManhattanPlot({ drawFunctionRef, onChromosomeChanged }) {
   const drawVariantsPlot = async(params) => {
     setLoading(true);
 
-    const results = await query('variants', params);
+    const results = await rawQuery('variants', params);
     const data = results.data;
-
+    const columnIndexes = {
+      variant_id: results.columns.indexOf('variant_id'),
+      chr: results.columns.indexOf('chr'),
+      bp: results.columns.indexOf('bp'),
+      nlog_p: results.columns.indexOf('nlog_p'),
+    }
     const config = {
       data: data,
       canvas: {
@@ -216,23 +222,105 @@ export function ManhattanPlot({ drawFunctionRef, onChromosomeChanged }) {
       point: {
         // fast: true,
         opacity: 0.8,
-        size: 2,
+        size: 3,
         color: '#005ea2'
       },
       x: {
-        key: results.columns.indexOf('bp'),
+        key: columnIndexes.bp,
         min: 0,
         max: ranges[params.chr - 1].bp_max
       },
 
       y: {
-        key: results.columns.indexOf('nlog_p'),
+        key: columnIndexes.nlog_p,
         min: params.nlogpMin,
         max: params.nlogpMax
       }
     };
 
     const canvas = scatterPlot(config);
+    const backingCanvas = scatterPlot({
+      ...config,
+      point: {
+        opacity: 1,
+        size: 3,
+        color: (d, i) => indexToColor(i)
+      }
+    });
+    const interactiveCanvas = document.createElement('canvas');
+    interactiveCanvas.width = canvas.width;
+    interactiveCanvas.height = canvas.height;
+    interactiveCanvas.className = 'interactive-overlay';
+    const interactiveCtx = interactiveCanvas.getContext('2d');
+    interactiveCtx.globalAlpha = 0.5;
+    interactiveCtx.globalCompositeOperation = 'copy';
+
+    canvas.addEventListener('mousemove', e => {
+
+      const ctx = backingCanvas.getContext('2d');
+      const {x, y} = viewportToLocalCoordinates(e.clientX, e.clientY, canvas);
+      const [r, g, b, a] = ctx.getImageData(x, y, 1, 1).data;
+      if (!a) {
+        canvas.style.cursor = 'default';
+        return;
+      }
+      const index = colorToIndex(r, g, b);
+      const pointData = data[index];
+      if (pointData) {
+        canvas.style.cursor = 'pointer';
+      }
+    });
+
+    canvas.addEventListener('click', async e => {
+      const ctx = backingCanvas.getContext('2d');
+      const {x, y} = viewportToLocalCoordinates(e.clientX, e.clientY, canvas);
+      const [r, g, b, a] = ctx.getImageData(x, y, 1, 1).data;
+      if (!a) {
+        clearTooltip();
+        return;
+      }
+
+      const index = colorToIndex(r, g, b);
+      console.log(index);
+      const pointData = data[index];
+      const point = {
+        variant_id: pointData[columnIndexes.variant_id],
+        chr: pointData[columnIndexes.chr],
+        bp: pointData[columnIndexes.bp],
+        nlog_p: pointData[columnIndexes.nlog_p],
+      }
+
+      const response = await query('variant-by-id', {
+        database: params.database,
+        id: point.variant_id,
+      });
+
+      const record = response[0];
+
+      setTooltip(x, y, h('div', {className: ''}, [
+        h('div', null, [
+          h('b', null, 'position: '),
+          `${(record.bp / 1e6).toFixed(4)} MB`
+        ]),
+        h('div', null, [
+          h('b', null, 'p-value: '),
+          `${record.p}`
+        ]),
+        h('div', null, [
+          h('b', null, 'snp: '),
+          `${record.snp}`
+        ]),
+        h('div', null, [
+          h('a', {
+            className: 'font-weight-bold',
+            href: '#/gwas/lookup',
+            onclick: () => onVariantLookup && onVariantLookup(record)
+          }, 'Go to Variant Lookup'),
+        ]),
+      ]));
+      console.log(point);
+    });
+
     const { margins, canvas: canvasSize } = config;
 
     const width = canvasSize.width - margins.left - margins.right;
@@ -300,7 +388,26 @@ export function ManhattanPlot({ drawFunctionRef, onChromosomeChanged }) {
     });
 
     plotContainer.current.innerHTML = '';
+//    plotContainer.current.appendChild(backingCanvas);
     plotContainer.current.appendChild(canvas);
+    plotContainer.current.appendChild(interactiveCanvas);
+
+    const tooltip = document.createElement('div');
+    tooltip.className = 'custom-tooltip';
+    plotContainer.current.appendChild(tooltip);
+
+    function clearTooltip() {
+      tooltip.style.display = 'none';
+      tooltip.innerHTML = '';
+    }
+
+    function setTooltip(x, y, node) {
+      tooltip.style.display = 'inline-block';
+      tooltip.style.left = x + 'px';
+      tooltip.style.top = y + 'px';
+      tooltip.innerHTML = '';
+      tooltip.appendChild(node);
+    }
 
     setLoading(false);
   }

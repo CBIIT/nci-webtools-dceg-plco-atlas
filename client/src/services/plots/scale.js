@@ -1,11 +1,11 @@
-function getScale(inputRange, outputRange) {
+export function getScale(inputRange, outputRange) {
     const [inputMin, inputMax] = inputRange;
     const [outputMin, outputMax] = outputRange;
     const ratio = (outputMax - outputMin) / (inputMax - inputMin);
     return value => outputMin + ratio * (value - inputMin) ;
 }
 
-function getTicks(min, max, numTicks) {
+export function getTicks(min, max, numTicks) {
     numTicks = numTicks || 10;
 
     let ticks = new Array(numTicks)

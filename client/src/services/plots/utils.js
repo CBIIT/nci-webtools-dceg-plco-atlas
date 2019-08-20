@@ -50,6 +50,51 @@ export function indexToColor(index, valuesOnly) {
     return `rgb(${r}, ${g}, ${b})`;
 }
 
+// converts a color (given r, g, b) to an index
 export function colorToIndex(r, g, b) {
     return r * 65536 + g * 256 + b;
+}
+
+/**
+ * Translates coordinates from the current viewport (eg: MouseEvent's clientX/Y)
+ * to local coordinates within an element
+ * @param {*} x
+ * @param {*} y
+ * @param {*} element
+ */
+export function viewportToLocalCoordinates(x, y, element) {
+    const boundingRect = element.getBoundingClientRect(element);
+    const style = getComputedStyle(element);
+
+    const xOffset = Math.floor(
+        boundingRect.left +
+        parseInt(style.borderLeftWidth, 10)
+    );
+
+    const yOffset = Math.floor(
+        boundingRect.top +
+        parseInt(style.borderTopWidth, 10)
+    );
+
+    return {
+        x: x - xOffset,
+        y: y - yOffset
+    };
+}
+
+export function createElement(tagName, props, children) {
+    let el = document.createElement(tagName);
+    for (let key in props || {})
+        el[key] = props[key];
+
+    if (!Array.isArray(children))
+        children = [children];
+
+    for (let child of children || []) {
+        if (child.constructor === String)
+            child = document.createTextNode(child);
+        el.appendChild(child)
+    }
+
+    return el;
 }
