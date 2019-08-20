@@ -123,6 +123,7 @@ $blue: #005ea2;
 }
 
 .hover-tooltip {
+  position: absolute;
   border: 1px solid #ccc;
   border-radius: 5px;
   text-align: left;
@@ -133,6 +134,7 @@ $blue: #005ea2;
 }
 
 .popup-tooltip {
+  position: absolute;
   border: 1px solid black;
   border-radius: 5px;
   text-align: left;

@@ -2,14 +2,32 @@ import React, { useEffect, useState, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { root, query } from '../../services/query';
 import { updateSummaryResults } from '../../services/actions';
+import { Link } from 'react-router-dom';
 
-import ReactCursorPosition, { INTERACTIONS } from 'react-cursor-position';
+
+import ReactCursorPosition from 'react-cursor-position';
 
 export function QQPlot({ drawFunctionRef }) {
   const dispatch = useDispatch();
   const plotContainer = useRef(null);
   const summaryResults = useSelector(state => state.summaryResults);
-  const { phenotype, loading, areaItems } = summaryResults;
+  // const { phenotype, loading, areaItems } = summaryResults;
+  const {
+    phenotype,
+    selectedPhenotype,
+    selectedChromosome,
+    loading,
+    areaItems
+  } = useSelector(state => state.summaryResults);
+  const setLoading = loading => {
+    dispatch(updateSummaryResults({loading}));
+  }
+
+  const setAreaItems = areaItems => {
+    dispatch(updateSummaryResults({areaItems}));
+  }
+
+  // temporary set states
   const [hoverTooltipData, setHoverTooltipData] = useState({});
   const [popupTooltipData, setPopupTooltipData] = useState({});
   const [pos, setPos] = useState({
@@ -19,33 +37,22 @@ export function QQPlot({ drawFunctionRef }) {
     }
   });
   const [hoverTooltipStyle, setHoverTooltipStyle] = useState({
-    position: 'absolute',
     top: 0,    // computed based on child and parent's height
     left: 0,  // computed based on child and parent's width
     display: "none"
   });
   const [popupTooltipStyle, setPopupTooltipStyle] = useState({
-    position: 'absolute',
     top: 0,    // computed based on child and parent's height
     left: 0,  // computed based on child and parent's width
     display: "none"
   });
-
-  const setLoading = loading => {
-    dispatch(updateSummaryResults({loading}));
-  }
-
-  const setAreaItems = areaItems => {
-    dispatch(updateSummaryResults({areaItems}));
-  }
 
   useEffect(() => {
     if (drawFunctionRef)
       drawFunctionRef(drawQQPlot);
   }, [drawFunctionRef]);
 
-  const drawQQPlot = async phenotype => {
-    console.log(phenotype);
+  const drawQQPlot = async (phenotype) => {
     setLoading(true);
 
     plotContainer.current.innerHTML = '';
@@ -64,6 +71,7 @@ export function QQPlot({ drawFunctionRef }) {
   }
 
   const popupMarkerClick = (e) => {
+    // make sure action occurs on imagemap coord only
     if (e.target && e.target.coords) {
       var variant = e.target.alt.split(',');
       setPopupTooltipData({
@@ -77,11 +85,9 @@ export function QQPlot({ drawFunctionRef }) {
         left: pos.position.x - 50,  // computed based on child and parent's width
         display: "block"
       });
+      hoverMarkerLeave();
     } else {
-      setPopupTooltipStyle({
-        ...popupTooltipStyle,
-        display: "none"
-      });
+      popupMarkerClose();
     }
   }
 
@@ -90,27 +96,28 @@ export function QQPlot({ drawFunctionRef }) {
       ...popupTooltipStyle,
       display: "none"
     });
+    setPopupTooltipData({});
   }
 
   const hoverMarkerEnter = (e) => {
+    // make sure action occurs on imagemap coord only
     if (e.target && e.target.coords) {
       var variant = e.target.alt.split(',');
-      setHoverTooltipData({
-        'point_#': variant[0],
-        "snp": variant[1],
-        'p-value': variant[2]
-      }); 
-      setHoverTooltipStyle({
-        ...hoverTooltipStyle,
-        top: pos.position.y - 60,    // computed based on child and parent's height
-        left: pos.position.x - 45,  // computed based on child and parent's width
-        display: "block"
-      });
+      if (popupTooltipData && variant[0] !== popupTooltipData['point_#']) {
+        setHoverTooltipData({
+          'point_#': variant[0],
+          "snp": variant[1],
+          'p-value': variant[2]
+        }); 
+        setHoverTooltipStyle({
+          ...hoverTooltipStyle,
+          top: pos.position.y - 60,    // computed based on child and parent's height
+          left: pos.position.x - 45,  // computed based on child and parent's width
+          display: "block"
+        });
+      }
     } else {
-      setHoverTooltipStyle({
-        ...hoverTooltipStyle,
-        display: "none"
-      });
+      hoverMarkerLeave();
     }
   }
 
@@ -119,6 +126,7 @@ export function QQPlot({ drawFunctionRef }) {
       ...hoverTooltipStyle,
       display: "none"
     });
+    setHoverTooltipData({});
   }
 
   return (
@@ -132,21 +140,21 @@ export function QQPlot({ drawFunctionRef }) {
               onPositionChanged: newPos => setPos(newPos)
             }}>
 
+            <div style={popupTooltipStyle} className="popup-tooltip shadow">
+              <button type="button" className="close popup-tooltip-close" aria-label="Close" onClick={popupMarkerClose}>
+                <span aria-hidden="true">&times;</span>
+              </button>
+              id: {popupTooltipData["point_#"]}
+              <br/>
+              SNP: <Link to='/gwas/lookup'>{popupTooltipData.snp}</Link>
+              <br/>
+              P-Value: {popupTooltipData["p-value"]}
+            </div>
+
             <div style={hoverTooltipStyle} className="hover-tooltip shadow">
               SNP: {hoverTooltipData.snp}
               <br/>
               P-Value: {hoverTooltipData["p-value"]}
-            </div>
-
-            <div style={popupTooltipStyle} className="popup-tooltip shadow">
-            <button type="button" className="close popup-tooltip-close" aria-label="Close" onClick={popupMarkerClose}>
-              <span aria-hidden="true">&times;</span>
-            </button>
-              id: {popupTooltipData["point_#"]}
-              <br/>
-              SNP: <a href="/">{popupTooltipData.snp}</a>
-              <br/>
-              P-Value: {popupTooltipData["p-value"]}
             </div>
 
             <div ref={plotContainer} className="qq-plot" onClick={e => popupMarkerClick(e)} />

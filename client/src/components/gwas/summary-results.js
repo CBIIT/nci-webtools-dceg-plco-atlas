@@ -118,11 +118,11 @@ export function SummaryResults() {
                             <ManhattanPlot
                               drawFunctionRef={setDrawManhattanPlot}
                               onChromosomeChanged={handleChromosomeChanged} />
-                              <div className="my-4" style={{display: submitted ? 'block' : 'none'}}>
-                                <SummaryResultsTable
-                                  className="mw-100"
-                                  updateFunctionRef={setUpdateResultsTable} />
-                              </div>
+                            <div className="my-4" style={{display: submitted ? 'block' : 'none'}}>
+                              <SummaryResultsTable
+                                className="mw-100"
+                                updateFunctionRef={setUpdateResultsTable} />
+                            </div>
                         </Tab.Pane>
 
                         <Tab.Pane eventKey="qq-plot">
