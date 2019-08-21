@@ -1,15 +1,14 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { root, query } from '../../services/query';
 import { updateSummaryResults } from '../../services/actions';
 import { Link } from 'react-router-dom';
+import { Spinner } from 'react-bootstrap';
 
 
 import ReactCursorPosition from 'react-cursor-position';
-
-export function QQPlot({ drawFunctionRef }) {
+export function QQPlot({ drawFunctionRef, onVariantLookup }) {
   const dispatch = useDispatch();
-  const plotContainer = useRef(null);
   const summaryResults = useSelector(state => state.summaryResults);
   // const { phenotype, loading, areaItems } = summaryResults;
   const {
@@ -17,10 +16,15 @@ export function QQPlot({ drawFunctionRef }) {
     selectedPhenotype,
     selectedChromosome,
     loading,
+    qqplotSrc,
     areaItems
   } = useSelector(state => state.summaryResults);
   const setLoading = loading => {
     dispatch(updateSummaryResults({loading}));
+  }
+
+  const setQQplotSrc = qqplotSrc => {
+    dispatch(updateSummaryResults({qqplotSrc}));
   }
 
   const setAreaItems = areaItems => {
@@ -54,16 +58,7 @@ export function QQPlot({ drawFunctionRef }) {
 
   const drawQQPlot = async (phenotype) => {
     setLoading(true);
-
-    plotContainer.current.innerHTML = '';
-    // add QQ plot image
-    const qqImg = document.createElement('img');
-    qqImg.src = root + '/data/qq-plots/' + phenotype + '.png';
-    qqImg.draggable = false;
-    qqImg.alt = 'QQ-plot of selected phenotype';
-    qqImg.useMap = '#image-map';
-    plotContainer.current.appendChild(qqImg);
-    // load & add QQ plot image map
+    setQQplotSrc(root + '/data/qq-plots/' + phenotype + '.png');
     const imageMapData = await query('data/qq-plots/' + phenotype + '.imagemap.json');
     if (!imageMapData.error)
       setAreaItems(imageMapData);
@@ -81,8 +76,8 @@ export function QQPlot({ drawFunctionRef }) {
       }); 
       setPopupTooltipStyle({
         ...popupTooltipStyle,
-        top: pos.position.y - 75,    // computed based on child and parent's height
-        left: pos.position.x - 50,  // computed based on child and parent's width
+        top: pos.position.y,    // computed based on child and parent's height
+        left: pos.position.x + 15,  // computed based on child and parent's width
         display: "block"
       });
       hoverMarkerLeave();
@@ -111,7 +106,7 @@ export function QQPlot({ drawFunctionRef }) {
         }); 
         setHoverTooltipStyle({
           ...hoverTooltipStyle,
-          top: pos.position.y - 60,    // computed based on child and parent's height
+          top: pos.position.y - 70,    // computed based on child and parent's height
           left: pos.position.x - 45,  // computed based on child and parent's width
           display: "block"
         });
@@ -133,46 +128,53 @@ export function QQPlot({ drawFunctionRef }) {
     <>
       <div className="row mt-3">
         <div className="col-md-12 text-center">
+          <div className="qq-plot" style={{display: loading ? 'none' : 'block'}}>
+            <ReactCursorPosition {...{
+                className: "qq-plot-mouse-window",
+                onPositionChanged: newPos => setPos(newPos)
+              }}>
 
-          <ReactCursorPosition {...{
-              className: "qq-plot-mouse-window",
-              // activationInteractionMouse: INTERACTIONS.CLICK,
-              onPositionChanged: newPos => setPos(newPos)
-            }}>
+              <div style={popupTooltipStyle} className="popup-tooltip shadow">
+                <button type="button" className="close popup-tooltip-close" aria-label="Close" onClick={popupMarkerClose}>
+                  <span aria-hidden="true">&times;</span>
+                </button>
+                <b>id:</b> {popupTooltipData["point_#"]}
+                <br/>
+                <b>snp:</b> {popupTooltipData.snp}
+                <br/>
+                <b>p-value:</b> {popupTooltipData["p-value"]}
+                <br/>
+                <Link to='/gwas/lookup' onClick={_ => onVariantLookup(popupTooltipData)}><b>Go to Variant Lookup</b></Link>
+              </div>
 
-            <div style={popupTooltipStyle} className="popup-tooltip shadow">
-              <button type="button" className="close popup-tooltip-close" aria-label="Close" onClick={popupMarkerClose}>
-                <span aria-hidden="true">&times;</span>
-              </button>
-              id: {popupTooltipData["point_#"]}
-              <br/>
-              SNP: <Link to='/gwas/lookup'>{popupTooltipData.snp}</Link>
-              <br/>
-              P-Value: {popupTooltipData["p-value"]}
-            </div>
+              <div style={hoverTooltipStyle} className="hover-tooltip shadow">
+                <b>snp:</b> {hoverTooltipData.snp}
+                <br/>
+                <b>p-value:</b> {hoverTooltipData["p-value"]}
+              </div>
 
-            <div style={hoverTooltipStyle} className="hover-tooltip shadow">
-              SNP: {hoverTooltipData.snp}
-              <br/>
-              P-Value: {hoverTooltipData["p-value"]}
-            </div>
-
-            <div ref={plotContainer} className="qq-plot" onClick={e => popupMarkerClick(e)} />
-            <map name="image-map">
-              {areaItems.map(function(area) {
-                return (
-                  <area
-                    shape={area.shape}
-                    coords={area.coords}
-                    alt={area.alt}
-                    onClick={e => popupMarkerClick(e)}
-                    onMouseEnter={e => hoverMarkerEnter(e)}
-                    onMouseLeave={e => hoverMarkerLeave(e)}
-                  />
-                );
-              })}
-            </map>
-          </ReactCursorPosition>
+              {qqplotSrc && <img src={qqplotSrc} draggable={false} alt="QQ Plot" useMap="#image-map" onClick={e => popupMarkerClick(e)}/>}
+              <map name="image-map">
+                {areaItems.map(function(area) {
+                  return (
+                    <area
+                      shape={area.shape}
+                      coords={area.coords}
+                      alt={area.alt}
+                      onClick={e => popupMarkerClick(e)}
+                      onMouseEnter={e => hoverMarkerEnter(e)}
+                      onMouseLeave={e => hoverMarkerLeave(e)}
+                    />
+                  );
+                })}
+              </map>
+            </ReactCursorPosition>
+          </div>
+          <div className="text-center" style={{display: loading ? 'block' : 'none'}}>
+            <Spinner animation="border" variant="primary"  role="status">
+              <span className="sr-only">Loading...</span>
+            </Spinner>
+          </div>
         </div>
       </div>
 

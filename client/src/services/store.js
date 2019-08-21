@@ -15,6 +15,7 @@ const initialState = {
         page: 1,
         pageSize: 10,
         messages: [],
+        qqplotSrc: '',
         areaItems: [],
         submitted: null,
         loading: false,
@@ -25,6 +26,7 @@ const initialState = {
     variantLookup: {
         selectedListType: 'alphabetic',
         selectedPhenotype: null,
+        selectedPhenotypes: [],
         selectedVariant: null,
         results: [],
         message: '',

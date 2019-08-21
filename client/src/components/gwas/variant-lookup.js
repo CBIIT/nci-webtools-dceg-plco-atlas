@@ -1,24 +1,17 @@
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { SearchFormTraitsVariant } from '../forms/search-form-traits-variant';
-import { query } from '../../services/query';
 import { updateVariantLookup, lookupVariants } from '../../services/actions';
 import BootstrapTable from 'react-bootstrap-table-next';
 import paginationFactory from 'react-bootstrap-table2-paginator';
 import filterFactory, { textFilter } from 'react-bootstrap-table2-filter';
+import { Spinner } from 'react-bootstrap';
+
 
 export function VariantLookup() {
     const dispatch = useDispatch();
     const variantLookup = useSelector(state => state.variantLookup);
-    const { selectedPhenotypes, selectedVariant, results, message } = variantLookup;
-
-    const setResults = results => {
-        dispatch(updateVariantLookup({results}));
-    }
-
-    const setMessage = message => {
-        dispatch(updateVariantLookup({message}));
-    }
+    const { selectedPhenotypes, selectedVariant, results, message, loading } = variantLookup;
 
     const columns = [
         {
@@ -60,33 +53,6 @@ export function VariantLookup() {
         },
     ];
 
-    // the function below needed to be moved to actions.js
-    // because it needs to be called from multiple places,
-    // possibly before this component can be mounted, which
-    // is the only time this function can be registered in the store
-    const lookup = async (phenotypes, variant) => {
-        var tableList = [];
-        // console.log("Sample query!", selectedPhenotyes);
-        for (var i = 0; i < phenotypes.length; i++) {
-            const variantData = await query('variant', {
-                database: phenotypes[i].value + '.db',
-                snp: variant,
-                chr: '',
-                bp: ''
-            });
-            console.log(variantData);
-            for (var j = 0; j < variantData.length; j++) {
-                console.log(variantData[j]);
-                variantData[i]['trait'] = phenotypes[i].label;
-                tableList.push(variantData[i]);
-            }
-        }
-        setResults(tableList);
-        setMessage('');
-        if (tableList.length === 0)
-            setMessage("Variant not found in any selected trait(s).");
-    }
-
     return (
         <>
             <div className="card shadow-sm mb-4">
@@ -96,28 +62,39 @@ export function VariantLookup() {
             </div>
 
             <div className="card shadow-sm mb-4">
-                <div className="card-header bg-white font-weight-bolder border-bottom-0">
+                {/* <div className="card-header bg-white font-weight-bolder border-bottom-0">
                     display selected phenotype(s) and variant details in each phenotype
-                </div>
+                </div> */}
 
                 <div className="card-body">
-                    <div className="row">
-                        <div class="col-md-12 text-left">
+                    <div className="row text-center">
+                        {/* <div class="col-md-12 text-left">
                             <pre>{JSON.stringify(variantLookup, null, 2)}</pre>
-                        </div>
-                        <div class="col-md-12 text-left">
+                        </div> */}
+                        <div className="col-md-12">
                             <h4>{message}</h4>
+                        </div>
+                        <div className="col-md-12" style={{display: results.length === 0 && message.length === 0 && !loading ? 'block' : 'none'}}>
+                            <h4>No Results</h4>
                         </div>
                     </div>
 
-                    <BootstrapTable
-                        bootstrap4
-                        keyField='id'
-                        data={ results }
-                        columns={ columns }
-                        pagination={ paginationFactory() }
-                        filter={ filterFactory() }
-                    />
+                    <div style={{display: results.length > 0 ? 'block' : 'none'}}>
+                        <BootstrapTable
+                            bootstrap4
+                            keyField='id'
+                            data={ results }
+                            columns={ columns }
+                            pagination={ paginationFactory() }
+                            filter={ filterFactory() }
+                        />
+                    </div>
+                    
+                    <div className="text-center" style={{display: loading ? 'block' : 'none'}}>
+                        <Spinner animation="border" variant="primary"  role="status">
+                            <span className="sr-only">Loading...</span>
+                        </Spinner>
+                    </div>
 
                     {/* <div className="row mt-3">
                         <div className="col-md-12 text-left mt-3">
