@@ -42,9 +42,10 @@ export function axisLeft(canvas, config) {
   let titleWidth = measureWidth(context, title);
 
   const midpoint = scale((min(tickValues) + max(tickValues)) / 2);
-  context.rotate((90 * Math.PI) / 180);
+  context.rotate((90 * Math.PI) / -180)
+  //context.rotate((90 * Math.PI) / 180);
   context.font = '600 14px ' + font;
-  context.translate(midpoint - titleWidth / 2, tickSize * 2 + padding * 5);
+  context.translate(-midpoint - titleWidth / 2, - (tickSize * 2 + padding * 6));
   context.textAlign = 'center';
 
   renderText(context, title);
