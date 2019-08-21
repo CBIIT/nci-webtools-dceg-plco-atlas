@@ -6,8 +6,7 @@ import { Link } from 'react-router-dom';
 
 
 import ReactCursorPosition from 'react-cursor-position';
-
-export function QQPlot({ drawFunctionRef }) {
+export function QQPlot({ drawFunctionRef, onVariantLookup }) {
   const dispatch = useDispatch();
   const plotContainer = useRef(null);
   const summaryResults = useSelector(state => state.summaryResults);
@@ -17,10 +16,15 @@ export function QQPlot({ drawFunctionRef }) {
     selectedPhenotype,
     selectedChromosome,
     loading,
+    qqplotSrc,
     areaItems
   } = useSelector(state => state.summaryResults);
   const setLoading = loading => {
     dispatch(updateSummaryResults({loading}));
+  }
+
+  const setQQplotSrc = qqplotSrc => {
+    dispatch(updateSummaryResults({qqplotSrc}));
   }
 
   const setAreaItems = areaItems => {
@@ -55,14 +59,15 @@ export function QQPlot({ drawFunctionRef }) {
   const drawQQPlot = async (phenotype) => {
     setLoading(true);
 
-    plotContainer.current.innerHTML = '';
-    // add QQ plot image
-    const qqImg = document.createElement('img');
-    qqImg.src = root + '/data/qq-plots/' + phenotype + '.png';
-    qqImg.draggable = false;
-    qqImg.alt = 'QQ-plot of selected phenotype';
-    qqImg.useMap = '#image-map';
-    plotContainer.current.appendChild(qqImg);
+    setQQplotSrc(root + '/data/qq-plots/' + phenotype + '.png');
+    // plotContainer.current.innerHTML = '';
+    // // add QQ plot image
+    // const qqImg = document.createElement('img');
+    // qqImg.src = root + '/data/qq-plots/' + phenotype + '.png';
+    // qqImg.draggable = false;
+    // qqImg.alt = 'QQ-plot of selected phenotype';
+    // qqImg.useMap = '#image-map';
+    // plotContainer.current.appendChild(qqImg);
     // load & add QQ plot image map
     const imageMapData = await query('data/qq-plots/' + phenotype + '.imagemap.json');
     if (!imageMapData.error)
@@ -146,7 +151,7 @@ export function QQPlot({ drawFunctionRef }) {
               </button>
               id: {popupTooltipData["point_#"]}
               <br/>
-              SNP: <Link to='/gwas/lookup'>{popupTooltipData.snp}</Link>
+              SNP: <Link to='/gwas/lookup' onClick={_ => onVariantLookup(popupTooltipData)}>{popupTooltipData.snp}</Link>
               <br/>
               P-Value: {popupTooltipData["p-value"]}
             </div>
@@ -157,7 +162,8 @@ export function QQPlot({ drawFunctionRef }) {
               P-Value: {hoverTooltipData["p-value"]}
             </div>
 
-            <div ref={plotContainer} className="qq-plot" onClick={e => popupMarkerClick(e)} />
+            {/* <div ref={plotContainer} className="qq-plot" onClick={e => popupMarkerClick(e)} /> */}
+            {qqplotSrc && <img src={qqplotSrc} alt="QQ Plot" useMap="#image-map" onClick={e => popupMarkerClick(e)}/>}
             <map name="image-map">
               {areaItems.map(function(area) {
                 return (

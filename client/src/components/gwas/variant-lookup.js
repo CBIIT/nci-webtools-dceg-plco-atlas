@@ -12,14 +12,6 @@ export function VariantLookup() {
     const variantLookup = useSelector(state => state.variantLookup);
     const { selectedPhenotypes, selectedVariant, results, message } = variantLookup;
 
-    const setResults = results => {
-        dispatch(updateVariantLookup({results}));
-    }
-
-    const setMessage = message => {
-        dispatch(updateVariantLookup({message}));
-    }
-
     const columns = [
         {
             dataField: 'phenotype',
@@ -59,33 +51,6 @@ export function VariantLookup() {
             sort: true,
         },
     ];
-
-    // the function below needed to be moved to actions.js
-    // because it needs to be called from multiple places,
-    // possibly before this component can be mounted, which
-    // is the only time this function can be registered in the store
-    const lookup = async (phenotypes, variant) => {
-        var tableList = [];
-        // console.log("Sample query!", selectedPhenotyes);
-        for (var i = 0; i < phenotypes.length; i++) {
-            const variantData = await query('variant', {
-                database: phenotypes[i].value + '.db',
-                snp: variant,
-                chr: '',
-                bp: ''
-            });
-            console.log(variantData);
-            for (var j = 0; j < variantData.length; j++) {
-                console.log(variantData[j]);
-                variantData[i]['trait'] = phenotypes[i].label;
-                tableList.push(variantData[i]);
-            }
-        }
-        setResults(tableList);
-        setMessage('');
-        if (tableList.length === 0)
-            setMessage("Variant not found in any selected trait(s).");
-    }
 
     return (
         <>
