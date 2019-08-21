@@ -86,8 +86,8 @@ export function QQPlot({ drawFunctionRef, onVariantLookup }) {
       }); 
       setPopupTooltipStyle({
         ...popupTooltipStyle,
-        top: pos.position.y - 75,    // computed based on child and parent's height
-        left: pos.position.x - 50,  // computed based on child and parent's width
+        top: pos.position.y,    // computed based on child and parent's height
+        left: pos.position.x + 15,  // computed based on child and parent's width
         display: "block"
       });
       hoverMarkerLeave();
@@ -116,7 +116,7 @@ export function QQPlot({ drawFunctionRef, onVariantLookup }) {
         }); 
         setHoverTooltipStyle({
           ...hoverTooltipStyle,
-          top: pos.position.y - 60,    // computed based on child and parent's height
+          top: pos.position.y - 70,    // computed based on child and parent's height
           left: pos.position.x - 45,  // computed based on child and parent's width
           display: "block"
         });
@@ -149,17 +149,19 @@ export function QQPlot({ drawFunctionRef, onVariantLookup }) {
               <button type="button" className="close popup-tooltip-close" aria-label="Close" onClick={popupMarkerClose}>
                 <span aria-hidden="true">&times;</span>
               </button>
-              id: {popupTooltipData["point_#"]}
+              <b>id:</b> {popupTooltipData["point_#"]}
               <br/>
-              SNP: <Link to='/gwas/lookup' onClick={_ => onVariantLookup(popupTooltipData)}>{popupTooltipData.snp}</Link>
+              <b>snp:</b> {popupTooltipData.snp}
               <br/>
-              P-Value: {popupTooltipData["p-value"]}
+              <b>p-value:</b> {popupTooltipData["p-value"]}
+              <br/>
+              <Link to='/gwas/lookup' onClick={_ => onVariantLookup(popupTooltipData)}><b>Go to Variant Lookup</b></Link>
             </div>
 
             <div style={hoverTooltipStyle} className="hover-tooltip shadow">
-              SNP: {hoverTooltipData.snp}
+              <b>snp:</b> {hoverTooltipData.snp}
               <br/>
-              P-Value: {hoverTooltipData["p-value"]}
+              <b>p-value:</b> {hoverTooltipData["p-value"]}
             </div>
 
             {/* <div ref={plotContainer} className="qq-plot" onClick={e => popupMarkerClick(e)} /> */}
