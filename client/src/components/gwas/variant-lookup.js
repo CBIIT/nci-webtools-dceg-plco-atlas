@@ -61,28 +61,33 @@ export function VariantLookup() {
             </div>
 
             <div className="card shadow-sm mb-4">
-                <div className="card-header bg-white font-weight-bolder border-bottom-0">
+                {/* <div className="card-header bg-white font-weight-bolder border-bottom-0">
                     display selected phenotype(s) and variant details in each phenotype
-                </div>
+                </div> */}
 
                 <div className="card-body">
-                    <div className="row">
-                        <div class="col-md-12 text-left">
+                    <div className="row text-center">
+                        {/* <div class="col-md-12 text-left">
                             <pre>{JSON.stringify(variantLookup, null, 2)}</pre>
-                        </div>
-                        <div class="col-md-12 text-left">
+                        </div> */}
+                        <div className="col-md-12">
                             <h4>{message}</h4>
+                        </div>
+                        <div className="col-md-12" style={{display: results.length === 0 && message.length === 0 ? 'block' : 'none'}}>
+                            <h4>No Results</h4>
                         </div>
                     </div>
 
-                    <BootstrapTable
-                        bootstrap4
-                        keyField='id'
-                        data={ results }
-                        columns={ columns }
-                        pagination={ paginationFactory() }
-                        filter={ filterFactory() }
-                    />
+                    <div style={{display: results.length > 0 ? 'block' : 'none'}}>
+                        <BootstrapTable
+                            bootstrap4
+                            keyField='id'
+                            data={ results }
+                            columns={ columns }
+                            pagination={ paginationFactory() }
+                            filter={ filterFactory() }
+                        />
+                    </div>
 
                     {/* <div className="row mt-3">
                         <div className="col-md-12 text-left mt-3">
