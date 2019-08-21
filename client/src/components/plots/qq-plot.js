@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { root, query } from '../../services/query';
 import { updateSummaryResults } from '../../services/actions';
@@ -8,7 +8,6 @@ import { Link } from 'react-router-dom';
 import ReactCursorPosition from 'react-cursor-position';
 export function QQPlot({ drawFunctionRef, onVariantLookup }) {
   const dispatch = useDispatch();
-  const plotContainer = useRef(null);
   const summaryResults = useSelector(state => state.summaryResults);
   // const { phenotype, loading, areaItems } = summaryResults;
   const {
@@ -58,17 +57,7 @@ export function QQPlot({ drawFunctionRef, onVariantLookup }) {
 
   const drawQQPlot = async (phenotype) => {
     setLoading(true);
-
     setQQplotSrc(root + '/data/qq-plots/' + phenotype + '.png');
-    // plotContainer.current.innerHTML = '';
-    // // add QQ plot image
-    // const qqImg = document.createElement('img');
-    // qqImg.src = root + '/data/qq-plots/' + phenotype + '.png';
-    // qqImg.draggable = false;
-    // qqImg.alt = 'QQ-plot of selected phenotype';
-    // qqImg.useMap = '#image-map';
-    // plotContainer.current.appendChild(qqImg);
-    // load & add QQ plot image map
     const imageMapData = await query('data/qq-plots/' + phenotype + '.imagemap.json');
     if (!imageMapData.error)
       setAreaItems(imageMapData);
@@ -141,7 +130,6 @@ export function QQPlot({ drawFunctionRef, onVariantLookup }) {
 
           <ReactCursorPosition {...{
               className: "qq-plot-mouse-window",
-              // activationInteractionMouse: INTERACTIONS.CLICK,
               onPositionChanged: newPos => setPos(newPos)
             }}>
 
@@ -164,8 +152,7 @@ export function QQPlot({ drawFunctionRef, onVariantLookup }) {
               <b>p-value:</b> {hoverTooltipData["p-value"]}
             </div>
 
-            {/* <div ref={plotContainer} className="qq-plot" onClick={e => popupMarkerClick(e)} /> */}
-            {qqplotSrc && <img src={qqplotSrc} alt="QQ Plot" useMap="#image-map" onClick={e => popupMarkerClick(e)}/>}
+            {qqplotSrc && <img src={qqplotSrc} draggable={false} alt="QQ Plot" useMap="#image-map" onClick={e => popupMarkerClick(e)}/>}
             <map name="image-map">
               {areaItems.map(function(area) {
                 return (
