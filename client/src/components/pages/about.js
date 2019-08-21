@@ -12,13 +12,13 @@ export function About() {
 
       <p>We have created this website to maximize use of this resource, promote public access to this federally-funded research, and facilitate meta-analyses with other sample sets. It serves as an interactive resource for genetics researchers as well as other interested individuals to search for, visualize, and download aggregated association results from PLCO genome-wide association analyses (GWAS). The resource includes a comprehensive list of over 200 phenotypes collected from questionnaire data, linkage to medical records, cancer registries, and the National Death Index. Tools are available to visualize association results by interactive Manhattan plots that allow for stratification by gender as well as other diagnostic plots (e.g., Q-q plots) and resources to compare genetic correlations across phenotypes. Furthermore, descriptive characteristics of PLCO, annotation of phenotypes, and links to other pertinent genomic resources are available.</p>
 
-      <hr />
+      {/* <hr /> */}
 
-      <h2 className="font-weight-light">General Statistics</h2>
+      {/* <h2 className="font-weight-light">General Statistics</h2>
       <p>Placeholder Text</p>
       <hr />
       <h2 className="font-weight-light">Summary</h2>
-      <p>Placeholder Text</p>
+      <p>Placeholder Text</p> */}
     </div>
   );
 }

@@ -48,7 +48,7 @@ export function lookupVariants(phenotypes, variant) {
             loading: false,
             results: tableList,
             message: tableList.length === 0
-                ? "Variant not found in any selected trait(s)."
+                ? "Variant not found in selected phenotype(s)."
                 : ''
         }));
     }

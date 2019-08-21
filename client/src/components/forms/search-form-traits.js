@@ -53,7 +53,7 @@ export function SearchFormTraits({ onSubmit }) {
 
           <div style={{width: '60%'}}>
             <Select
-                placeholder="(Select two or more traits) *"
+                placeholder="(Select two or more phenotypes) *"
                 value={selectedPhenotypes}
                 onChange={setSelectedPhenotypes}
                 // isOptionDisabled={option => option.value === null}

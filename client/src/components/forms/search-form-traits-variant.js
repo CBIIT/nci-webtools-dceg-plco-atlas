@@ -99,7 +99,7 @@ export function SearchFormTraitsVariant({ onSubmit }) {
           {/* variant input */}
           <FormControl
             class="form-control"
-            placeholder="(Variant) *"
+            placeholder="(Variant rsid or coordinate) *"
             aria-label="Variant (required)"
             value={selectedVariant}
             onChange={e => setSelectedVariant(e.target.value)}
