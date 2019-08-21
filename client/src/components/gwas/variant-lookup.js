@@ -2,12 +2,12 @@ import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { SearchFormTraitsVariant } from '../forms/search-form-traits-variant';
 import { query } from '../../services/query';
-import { updateVariantLookup } from '../../services/actions';
+import { updateVariantLookup, lookupVariants } from '../../services/actions';
 import BootstrapTable from 'react-bootstrap-table-next';
 import paginationFactory from 'react-bootstrap-table2-paginator';
 import filterFactory, { textFilter } from 'react-bootstrap-table2-filter';
 
-export function VariantLookup({ lookupFunctionRef }) {
+export function VariantLookup() {
     const dispatch = useDispatch();
     const variantLookup = useSelector(state => state.variantLookup);
     const { selectedPhenotypes, selectedVariant, results, message } = variantLookup;
@@ -19,11 +19,6 @@ export function VariantLookup({ lookupFunctionRef }) {
     const setMessage = message => {
         dispatch(updateVariantLookup({message}));
     }
-
-    useEffect(() => {
-        if (lookupFunctionRef)
-            lookupFunctionRef(lookup);
-    }, [lookupFunctionRef]);
 
     const columns = [
         {
@@ -65,6 +60,10 @@ export function VariantLookup({ lookupFunctionRef }) {
         },
     ];
 
+    // the function below needed to be moved to actions.js
+    // because it needs to be called from multiple places,
+    // possibly before this component can be mounted, which
+    // is the only time this function can be registered in the store
     const lookup = async (phenotypes, variant) => {
         var tableList = [];
         // console.log("Sample query!", selectedPhenotyes);
@@ -92,7 +91,7 @@ export function VariantLookup({ lookupFunctionRef }) {
         <>
             <div className="card shadow-sm mb-4">
                 <div className="card-body">
-                    <SearchFormTraitsVariant onSubmit={e => lookup(selectedPhenotypes, selectedVariant)} />
+                    <SearchFormTraitsVariant onSubmit={e => dispatch(lookupVariants(selectedPhenotypes, selectedVariant))} />
                 </div>
             </div>
 

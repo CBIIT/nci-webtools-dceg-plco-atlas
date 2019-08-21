@@ -5,7 +5,7 @@ import { SearchFormTrait } from '../forms/search-form-trait';
 import { ManhattanPlot } from '../plots/manhattan-plot';
 import { QQPlot } from '../plots/qq-plot';
 import { SummaryResultsTable } from './summary-results-table';
-import { updateSummaryResults, updateVariantLookup } from '../../services/actions';
+import { updateSummaryResults, updateVariantLookup, lookupVariants } from '../../services/actions';
 
 export function SummaryResults() {
   const dispatch = useDispatch();
@@ -86,13 +86,12 @@ export function SummaryResults() {
     }
   }
 
-  const handleVariantLookup = args => {
+  const handleVariantLookup = ({snp}) => {
     dispatch(updateVariantLookup({
       selectedPhenotypes: [selectedPhenotype],
-      selectedVariant: args.snp,
+      selectedVariant: snp,
     }));
-
-    console.log(args);
+    dispatch(lookupVariants([selectedPhenotype], snp));
   }
 
   return (
@@ -100,7 +99,7 @@ export function SummaryResults() {
         <div className="card shadow-sm mb-4">
             <div className="card-body">
                 <SearchFormTrait onSubmit={handleSubmit} onChange={handleChange} />
-                {submitted && messages.map(({type, content}, index) => (
+                {submitted && messages.map(({type, content}) => (
                     <Alert variant={type} onClose={clearMessages} dismissible>
                       { content }
                     </Alert>

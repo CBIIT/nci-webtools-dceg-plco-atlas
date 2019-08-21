@@ -28,7 +28,6 @@ const initialState = {
         results: [],
         message: '',
         loading: false,
-        lookupFunction: null,
     },
     phenotypeCorrelations: {
         selectedListType: 'alphabetic',
