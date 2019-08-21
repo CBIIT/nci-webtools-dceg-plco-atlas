@@ -40,8 +40,8 @@ export function lookupVariants(phenotypes, variant) {
             console.log(variantData);
             for (let j = 0; j < variantData.length; j++) {
                 console.log(variantData[j]);
-                variantData[i]['trait'] = phenotypes[i].label;
-                tableList.push(variantData[i]);
+                variantData[j]['phenotype'] = phenotypes[i].label;
+                tableList.push(variantData[j]);
             }
         }
         dispatch(updateVariantLookup({

@@ -136,7 +136,10 @@ export function SummaryResults() {
                         </Tab.Pane>
 
                         <Tab.Pane eventKey="qq-plot">
-                            <QQPlot drawFunctionRef={setDrawQQPlot} />
+                            <QQPlot 
+                              drawFunctionRef={setDrawQQPlot} 
+                              onVariantLookup={handleVariantLookup} 
+                              />
                         </Tab.Pane>
                     </Tab.Content>
                 </div>

@@ -6,8 +6,7 @@ import { Link } from 'react-router-dom';
 
 
 import ReactCursorPosition from 'react-cursor-position';
-
-export function QQPlot({ drawFunctionRef }) {
+export function QQPlot({ drawFunctionRef, onVariantLookup }) {
   const dispatch = useDispatch();
   const plotContainer = useRef(null);
   const summaryResults = useSelector(state => state.summaryResults);
@@ -17,10 +16,15 @@ export function QQPlot({ drawFunctionRef }) {
     selectedPhenotype,
     selectedChromosome,
     loading,
+    qqplotSrc,
     areaItems
   } = useSelector(state => state.summaryResults);
   const setLoading = loading => {
     dispatch(updateSummaryResults({loading}));
+  }
+
+  const setQQplotSrc = qqplotSrc => {
+    dispatch(updateSummaryResults({qqplotSrc}));
   }
 
   const setAreaItems = areaItems => {
@@ -55,14 +59,15 @@ export function QQPlot({ drawFunctionRef }) {
   const drawQQPlot = async (phenotype) => {
     setLoading(true);
 
-    plotContainer.current.innerHTML = '';
-    // add QQ plot image
-    const qqImg = document.createElement('img');
-    qqImg.src = root + '/data/qq-plots/' + phenotype + '.png';
-    qqImg.draggable = false;
-    qqImg.alt = 'QQ-plot of selected phenotype';
-    qqImg.useMap = '#image-map';
-    plotContainer.current.appendChild(qqImg);
+    setQQplotSrc(root + '/data/qq-plots/' + phenotype + '.png');
+    // plotContainer.current.innerHTML = '';
+    // // add QQ plot image
+    // const qqImg = document.createElement('img');
+    // qqImg.src = root + '/data/qq-plots/' + phenotype + '.png';
+    // qqImg.draggable = false;
+    // qqImg.alt = 'QQ-plot of selected phenotype';
+    // qqImg.useMap = '#image-map';
+    // plotContainer.current.appendChild(qqImg);
     // load & add QQ plot image map
     const imageMapData = await query('data/qq-plots/' + phenotype + '.imagemap.json');
     if (!imageMapData.error)
@@ -81,8 +86,8 @@ export function QQPlot({ drawFunctionRef }) {
       }); 
       setPopupTooltipStyle({
         ...popupTooltipStyle,
-        top: pos.position.y - 75,    // computed based on child and parent's height
-        left: pos.position.x - 50,  // computed based on child and parent's width
+        top: pos.position.y,    // computed based on child and parent's height
+        left: pos.position.x + 15,  // computed based on child and parent's width
         display: "block"
       });
       hoverMarkerLeave();
@@ -111,7 +116,7 @@ export function QQPlot({ drawFunctionRef }) {
         }); 
         setHoverTooltipStyle({
           ...hoverTooltipStyle,
-          top: pos.position.y - 60,    // computed based on child and parent's height
+          top: pos.position.y - 70,    // computed based on child and parent's height
           left: pos.position.x - 45,  // computed based on child and parent's width
           display: "block"
         });
@@ -144,20 +149,23 @@ export function QQPlot({ drawFunctionRef }) {
               <button type="button" className="close popup-tooltip-close" aria-label="Close" onClick={popupMarkerClose}>
                 <span aria-hidden="true">&times;</span>
               </button>
-              id: {popupTooltipData["point_#"]}
+              <b>id:</b> {popupTooltipData["point_#"]}
               <br/>
-              SNP: <Link to='/gwas/lookup'>{popupTooltipData.snp}</Link>
+              <b>snp:</b> {popupTooltipData.snp}
               <br/>
-              P-Value: {popupTooltipData["p-value"]}
+              <b>p-value:</b> {popupTooltipData["p-value"]}
+              <br/>
+              <Link to='/gwas/lookup' onClick={_ => onVariantLookup(popupTooltipData)}><b>Go to Variant Lookup</b></Link>
             </div>
 
             <div style={hoverTooltipStyle} className="hover-tooltip shadow">
-              SNP: {hoverTooltipData.snp}
+              <b>snp:</b> {hoverTooltipData.snp}
               <br/>
-              P-Value: {hoverTooltipData["p-value"]}
+              <b>p-value:</b> {hoverTooltipData["p-value"]}
             </div>
 
-            <div ref={plotContainer} className="qq-plot" onClick={e => popupMarkerClick(e)} />
+            {/* <div ref={plotContainer} className="qq-plot" onClick={e => popupMarkerClick(e)} /> */}
+            {qqplotSrc && <img src={qqplotSrc} alt="QQ Plot" useMap="#image-map" onClick={e => popupMarkerClick(e)}/>}
             <map name="image-map">
               {areaItems.map(function(area) {
                 return (
