@@ -74,7 +74,7 @@ export function VariantLookup() {
                         <div className="col-md-12">
                             <h4>{message}</h4>
                         </div>
-                        <div className="col-md-12" style={{display: results.length === 0 && message.length === 0 ? 'block' : 'none'}}>
+                        <div className="col-md-12" style={{display: results.length === 0 && message.length === 0 && !loading ? 'block' : 'none'}}>
                             <h4>No Results</h4>
                         </div>
                     </div>
