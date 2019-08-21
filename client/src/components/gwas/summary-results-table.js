@@ -61,10 +61,10 @@ export function SummaryResultsTable({updateFunctionRef}) {
         {
             dataField: 'p',
             text: 'P-Value',
-            headerFormatter: (column, index, { sortElement, filterElement }) => {
+            headerFormatter: (column) => {
                 return (
                   <div>
-                    {column.text} <span className="caret-4-asc"></span>
+                    {column.text}<span className="summary-results-table"><span className="caret-4-asc"></span></span>
                   </div>
                 );
               }
@@ -93,7 +93,6 @@ export function SummaryResultsTable({updateFunctionRef}) {
 
     return (
         <BootstrapTable
-            className="summary-results-table"
             bootstrap4
             remote
             keyField="variant_id"
