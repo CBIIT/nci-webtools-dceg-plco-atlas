@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Alert, Nav, Tab } from 'react-bootstrap';
+import { Alert, Button, Nav, Tab, ToggleButtonGroup } from 'react-bootstrap';
 import { SearchFormTrait } from '../forms/search-form-trait';
 import { ManhattanPlot } from '../plots/manhattan-plot';
 import { QQPlot } from '../plots/qq-plot';
@@ -124,6 +124,12 @@ export function SummaryResults() {
                 <div className="card-body">
                     <Tab.Content>
                         <Tab.Pane eventKey="manhattan-plot">
+                            <ToggleButtonGroup size="sm" name="plot-type">
+                              <Button>Combined</Button>
+                              <Button>Mirrored</Button>
+                              <Button>Male</Button>
+                              <Button>Female</Button>
+                            </ToggleButtonGroup>
                             <ManhattanPlot
                               drawFunctionRef={setDrawManhattanPlot}
                               onChromosomeChanged={handleChromosomeChanged}

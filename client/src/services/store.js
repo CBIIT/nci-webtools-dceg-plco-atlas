@@ -8,6 +8,7 @@ const initialState = {
         selectedListType: 'alphabetic',
         selectedPhenotype: null,
         selectedChromosome: null,
+        selectedManhattanPlotType: 'combined',
         ranges: [],
         results: [],
         resultsCount: 0,
