@@ -8,6 +8,7 @@ import { getScale } from '../../services/plots/scale';
 import { range, indexToColor, viewportToLocalCoordinates, colorToIndex, createElement as h } from '../../services/plots/utils';
 import { systemFont } from '../../services/plots/text';
 import { updateSummaryResults } from '../../services/actions';
+import { Spinner } from 'react-bootstrap';
 import * as d3 from 'd3';
 
 export function ManhattanPlot({ drawFunctionRef, onChromosomeChanged, onVariantLookup }) {
@@ -415,7 +416,12 @@ export function ManhattanPlot({ drawFunctionRef, onChromosomeChanged, onVariantL
   return (
     <div className="row">
       <div className="col-md-12">
-        <div ref={plotContainer} className="manhattan-plot" />
+        <div ref={plotContainer} className="manhattan-plot" style={{display: loading ? 'none' : 'block'}} />
+        <div className="text-center" style={{display: loading ? 'block' : 'none'}}>
+          <Spinner animation="border" variant="primary"  role="status">
+            <span className="sr-only">Loading...</span>
+          </Spinner>
+        </div>
         {/* <pre>{ JSON.stringify(params, null, 2) }</pre> */}
       </div>
       {/* <div class="col-md-12" style={{opacity: 0.5}}> */}

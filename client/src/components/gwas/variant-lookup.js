@@ -1,16 +1,17 @@
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { SearchFormTraitsVariant } from '../forms/search-form-traits-variant';
-import { query } from '../../services/query';
 import { updateVariantLookup, lookupVariants } from '../../services/actions';
 import BootstrapTable from 'react-bootstrap-table-next';
 import paginationFactory from 'react-bootstrap-table2-paginator';
 import filterFactory, { textFilter } from 'react-bootstrap-table2-filter';
+import { Spinner } from 'react-bootstrap';
+
 
 export function VariantLookup() {
     const dispatch = useDispatch();
     const variantLookup = useSelector(state => state.variantLookup);
-    const { selectedPhenotypes, selectedVariant, results, message } = variantLookup;
+    const { selectedPhenotypes, selectedVariant, results, message, loading } = variantLookup;
 
     const columns = [
         {
@@ -87,6 +88,12 @@ export function VariantLookup() {
                             pagination={ paginationFactory() }
                             filter={ filterFactory() }
                         />
+                    </div>
+                    
+                    <div className="text-center" style={{display: loading ? 'block' : 'none'}}>
+                        <Spinner animation="border" variant="primary"  role="status">
+                            <span className="sr-only">Loading...</span>
+                        </Spinner>
                     </div>
 
                     {/* <div className="row mt-3">
