@@ -163,3 +163,7 @@ h1 {
   margin-top: -10px;
   margin-right: -5px;
 }
+
+.caret-4-asc::after {
+  display: none;
+}
