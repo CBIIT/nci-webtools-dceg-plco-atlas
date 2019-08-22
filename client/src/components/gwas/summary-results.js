@@ -124,12 +124,24 @@ export function SummaryResults() {
                 <div className="card-body">
                     <Tab.Content>
                         <Tab.Pane eventKey="manhattan-plot">
-                            <ToggleButtonGroup size="sm" name="plot-type">
-                              <Button>Combined</Button>
-                              <Button>Mirrored</Button>
-                              <Button>Male</Button>
-                              <Button>Female</Button>
-                            </ToggleButtonGroup>
+                            <div>
+                              <label class="mr-3">
+                                <input type="radio" name="plot-type" value="combined" checked />
+                                Combined
+                              </label>
+                              <label class="mr-3">
+                                <input type="radio" name="plot-type" value="mirrored" />
+                                Mirrored
+                              </label>
+                              <label class="mr-3">
+                                <input type="radio" name="plot-type" value="male" />
+                                Male
+                              </label>
+                              <label class="mr-3">
+                                <input type="radio" name="plot-type" value="female" />
+                                Female
+                              </label>
+                            </div>
                             <ManhattanPlot
                               drawFunctionRef={setDrawManhattanPlot}
                               onChromosomeChanged={handleChromosomeChanged}
@@ -142,9 +154,9 @@ export function SummaryResults() {
                         </Tab.Pane>
 
                         <Tab.Pane eventKey="qq-plot">
-                            <QQPlot 
-                              drawFunctionRef={setDrawQQPlot} 
-                              onVariantLookup={handleVariantLookup} 
+                            <QQPlot
+                              drawFunctionRef={setDrawQQPlot}
+                              onVariantLookup={handleVariantLookup}
                               />
                         </Tab.Pane>
                     </Tab.Content>
