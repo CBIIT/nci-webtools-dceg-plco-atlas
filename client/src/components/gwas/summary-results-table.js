@@ -52,11 +52,15 @@ export function SummaryResultsTable({updateFunctionRef}) {
         },
         {
             dataField: 'a1',
-            text: 'Ref. Allele',
+            text: 'Reference Allele',
         },
         {
             dataField: 'a2',
-            text: 'Alt. Allele',
+            text: 'Alternate Allele',
+        },
+        {
+            dataField: 'or',
+            text: 'Odds Ratio',
         },
         {
             dataField: 'p',

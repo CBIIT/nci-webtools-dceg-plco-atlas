@@ -18,7 +18,7 @@ export function VariantLookup() {
             dataField: 'phenotype',
             text: 'Phenotype',
             filter: textFilter(),
-            sort: true,
+            sort: true
         },
         {
             dataField: 'snp',
@@ -37,19 +37,26 @@ export function VariantLookup() {
         },
         {
             dataField: 'a1',
-            text: 'Ref. Allele',
+            text: 'Reference Allele',
             filter: textFilter()
         },
         {
             dataField: 'a2',
-            text: 'Alt. Allele',
+            text: 'Alternate Allele',
             filter: textFilter()
+        },
+        {
+            dataField: 'or',
+            text: 'Odds Ratio',
+            filter: textFilter(),
+            sort: true
+
         },
         {
             dataField: 'p',
             text: 'P-value',
             filter: textFilter(),
-            sort: true,
+            sort: true
         },
     ];
 
