@@ -27,6 +27,7 @@
     "format": "prettier --single-quote --jsx-bracket-same-line --write \"src/**/*.{js,json,css,scss}\""
   },
   "homepage": ".",
+  "proxy": "http://localhost:9000",
   "eslintConfig": {
     "extends": "react-app"
   },
