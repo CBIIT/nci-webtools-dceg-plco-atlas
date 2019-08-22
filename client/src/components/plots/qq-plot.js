@@ -4,9 +4,8 @@ import { root, query } from '../../services/query';
 import { updateSummaryResults } from '../../services/actions';
 import { Link } from 'react-router-dom';
 import { Spinner } from 'react-bootstrap';
-
-
 import ReactCursorPosition from 'react-cursor-position';
+
 export function QQPlot({ drawFunctionRef, onVariantLookup }) {
   const dispatch = useDispatch();
   const summaryResults = useSelector(state => state.summaryResults);

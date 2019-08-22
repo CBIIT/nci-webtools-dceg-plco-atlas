@@ -34,9 +34,13 @@ const initialState = {
         loading: false,
     },
     phenotypeCorrelations: {
+        drawHeatmap: null,
         selectedListType: 'alphabetic',
         selectedPhenotypes: [],
         results: [],
+        loading: false,
+        submitted: null,
+        messages: [],
     }
 };
 

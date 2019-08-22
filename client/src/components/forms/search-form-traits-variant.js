@@ -4,11 +4,16 @@ import { Form, FormControl, InputGroup } from 'react-bootstrap';
 import { updateVariantLookup } from '../../services/actions';
 import Select, { components } from 'react-select';
 
-export function SearchFormTraitsVariant({ onSubmit }) {
+export function SearchFormTraitsVariant({ onChange, onSubmit }) {
   const dispatch = useDispatch();
   const phenotypes = useSelector(state => state.phenotypes);
   const variantLookup = useSelector(state => state.variantLookup);
   const { selectedListType, selectedPhenotypes, selectedVariant, selectedGender } = variantLookup;
+
+  const handleChange = params => {
+    setSelectedPhenotypes(params);
+    onChange(params);
+  }
 
   const setSelectedListType = selectedListType => {
     dispatch(updateVariantLookup({ selectedListType }));
@@ -103,7 +108,7 @@ export function SearchFormTraitsVariant({ onSubmit }) {
             <Select
               placeholder="(Select one or more phenotypes) *"
               value={selectedPhenotypes}
-              onChange={setSelectedPhenotypes}
+              onChange={handleChange}
               isOptionDisabled={(option) => option.value === null}
               options={selectedListType === 'categorical'
                 ? categorizedPhenotypes
