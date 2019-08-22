@@ -8,7 +8,7 @@ export function SearchFormTraitsVariant({ onSubmit }) {
   const dispatch = useDispatch();
   const phenotypes = useSelector(state => state.phenotypes);
   const variantLookup = useSelector(state => state.variantLookup);
-  const { selectedListType, selectedPhenotypes, selectedVariant } = variantLookup;
+  const { selectedListType, selectedPhenotypes, selectedVariant, selectedGender } = variantLookup;
 
   const setSelectedListType = selectedListType => {
     dispatch(updateVariantLookup({ selectedListType }));
@@ -20,6 +20,10 @@ export function SearchFormTraitsVariant({ onSubmit }) {
 
   const setSelectedVariant = selectedVariant => {
     dispatch(updateVariantLookup({selectedVariant}));
+  }
+
+  const setSelectedGender = selectedGender => {
+    dispatch(updateVariantLookup({selectedGender}));
   }
 
   const alphabetizedPhenotypes = [...phenotypes]
@@ -71,6 +75,18 @@ export function SearchFormTraitsVariant({ onSubmit }) {
           <b>Select Phenotype(s) and Input Variant</b>
         </Form.Label>
         <InputGroup>
+          {/* gender select */}
+          <InputGroup.Prepend>
+            <select
+              class="form-control"
+              value={selectedGender}
+              onChange={e => setSelectedGender(e.target.value)}>
+              <option value="combined">Combined</option>
+              <option value="male">Male</option>
+              <option value="female">Female</option>
+            </select>
+          </InputGroup.Prepend>
+
           {/* alpha/categorical select */}
           <InputGroup.Prepend>
             <select
@@ -83,7 +99,7 @@ export function SearchFormTraitsVariant({ onSubmit }) {
           </InputGroup.Prepend>
 
           {/* trait multi-select */}
-          <div style={{width: '60%'}}>
+          <div style={{width: '50%'}}>
             <Select
               placeholder="(Select one or more phenotypes) *"
               value={selectedPhenotypes}
