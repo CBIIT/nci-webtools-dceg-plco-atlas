@@ -28,6 +28,7 @@ const initialState = {
         selectedPhenotype: null,
         selectedPhenotypes: [],
         selectedVariant: null,
+        selectedGender: 'combined',
         results: [],
         message: '',
         loading: false,
