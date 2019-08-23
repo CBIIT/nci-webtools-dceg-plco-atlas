@@ -6,7 +6,6 @@ import { Spinner } from 'react-bootstrap';
 
 import Plot from 'react-plotly.js';
 
-
 export function Heatmap({ drawFunctionRef }) {
   const dispatch = useDispatch();
 
@@ -15,31 +14,31 @@ export function Heatmap({ drawFunctionRef }) {
     selectedPhenotypes,
     results,
     loading,
-    submitted,
+    submitted
   } = useSelector(state => state.phenotypeCorrelations);
 
   const setLoading = loading => {
-    dispatch(updatePhenotypeCorrelations({loading}));
-  }
+    dispatch(updatePhenotypeCorrelations({ loading }));
+  };
 
   const [data, setData] = useState([]);
 
   const layout = {
-    width: 1000, 
-    height: 1000, 
+    width: 1000,
+    height: 1000,
     margin: {
       t: 120
     },
     // title: 'Example Heatmap',
     xaxis: {
-      automargin: true, 
+      automargin: true,
       // title: 'Phenotypes',
       side: 'top',
       tickangle: -45,
       tickfont: {
         size: 10,
         color: 'black'
-      },
+      }
       // dtick: 5,
     },
     yaxis: {
@@ -49,9 +48,9 @@ export function Heatmap({ drawFunctionRef }) {
       tickfont: {
         size: 10,
         color: 'black'
-      },
+      }
       // dtick: 5
-    },
+    }
   };
 
   const config = {
@@ -62,7 +61,7 @@ export function Heatmap({ drawFunctionRef }) {
       // width: 800,
       scale: 1 // Multiply title/legend/axis/canvas sizes by this factor
     },
-    displaylogo: false,
+    displaylogo: false
     // responsive: true
   };
 
@@ -72,14 +71,19 @@ export function Heatmap({ drawFunctionRef }) {
     let x = [];
     let y = [];
     let z = [];
-    for (var i = 1; i <= n; i ++) {
-      let pheno = i + " " + Math.random().toString(36).substring(2, 6);
+    for (var i = 1; i <= n; i++) {
+      let pheno =
+        i +
+        ' ' +
+        Math.random()
+          .toString(36)
+          .substring(2, 6);
       x.push(pheno);
       y.unshift(pheno);
     }
-    for (var xidx = 0; xidx < n; xidx ++) {
+    for (var xidx = 0; xidx < n; xidx++) {
       let row = [];
-      for (var yidx = 0; yidx < n; yidx ++) {
+      for (var yidx = 0; yidx < n; yidx++) {
         if (x[xidx] === y[yidx]) {
           row.push(0.0);
         } else {
@@ -109,30 +113,36 @@ export function Heatmap({ drawFunctionRef }) {
     };
     setData([randomData]);
     setLoading(false);
-  }
+  };
 
   return (
     <div className="row">
       <div className="col-md-12">
-        <button className="ml-3" onClick={generateData}>Generate sample data 400x400</button>
+        <button className="ml-3" onClick={generateData}>
+          Generate sample data 400x400
+        </button>
       </div>
-      <div className="col-md-12" style={{display: data.length > 0 ? 'block' : 'none'}}>
-        <div style={{display: 'flex',  justifyContent:'center', alignItems:'center'}}>
-          <Plot
-            data={data}
-            layout={layout}
-            config={config}
-          />
+      <div
+        className="col-md-12"
+        style={{ display: data.length > 0 ? 'block' : 'none' }}>
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center'
+          }}>
+          <Plot data={data} layout={layout} config={config} />
         </div>
       </div>
       <div className="col-md-12">
-        <div className="text-center" style={{display: loading ? 'block' : 'none'}}>
-          <Spinner animation="border" variant="primary"  role="status">
+        <div
+          className="text-center"
+          style={{ display: loading ? 'block' : 'none' }}>
+          <Spinner animation="border" variant="primary" role="status">
             <span className="sr-only">Loading...</span>
           </Spinner>
         </div>
       </div>
     </div>
   );
-
 }

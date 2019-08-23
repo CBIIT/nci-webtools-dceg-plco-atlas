@@ -5,37 +5,46 @@ import { rawQuery, query } from '../../services/query';
 import { scatterPlot } from '../../services/plots/scatter-plot';
 import { axisBottom, axisLeft } from '../../services/plots/axis';
 import { getScale } from '../../services/plots/scale';
-import { range, indexToColor, viewportToLocalCoordinates, colorToIndex, createElement as h } from '../../services/plots/utils';
+import {
+  range,
+  indexToColor,
+  viewportToLocalCoordinates,
+  colorToIndex,
+  createElement as h
+} from '../../services/plots/utils';
 import { systemFont } from '../../services/plots/text';
 import { updateSummaryResults } from '../../services/actions';
 import { Spinner } from 'react-bootstrap';
 import * as d3 from 'd3';
 
-export function ManhattanPlot({ drawFunctionRef, onChromosomeChanged, onVariantLookup }) {
+export function ManhattanPlot({
+  drawFunctionRef,
+  onChromosomeChanged,
+  onVariantLookup
+}) {
   const dispatch = useDispatch();
   const plotContainer = useRef(null);
   const summaryResults = useSelector(state => state.summaryResults);
   const { selectedChromosome, phenotype, ranges, loading } = summaryResults;
 
   const setRanges = ranges => {
-    dispatch(updateSummaryResults({ranges}));
-  }
+    dispatch(updateSummaryResults({ ranges }));
+  };
 
   const setSelectedChromosome = selectedChromosome => {
-    dispatch(updateSummaryResults({selectedChromosome}));
-  }
+    dispatch(updateSummaryResults({ selectedChromosome }));
+  };
 
   const setLoading = loading => {
-    dispatch(updateSummaryResults({loading}));
-  }
+    dispatch(updateSummaryResults({ loading }));
+  };
 
   useEffect(() => {
     rawQuery('data/chromosome_ranges.json').then(e => setRanges(e));
-  }, [])
+  }, []);
 
   useEffect(() => {
-    if (drawFunctionRef)
-      drawFunctionRef(drawSummaryPlot);
+    if (drawFunctionRef) drawFunctionRef(drawSummaryPlot);
   }, [drawFunctionRef]);
 
   const drawSummaryPlot = async phenotype => {
@@ -104,7 +113,7 @@ export function ManhattanPlot({ drawFunctionRef, onChromosomeChanged, onVariantL
 
     // add a dotted line at -log10(p) = 5*10^-8
     const threshold = -Math.log10(5 * 10 ** -8);
-    console.log(threshold, scaleY(threshold))
+    console.log(threshold, scaleY(threshold));
 
     let context = canvas.getContext('2d');
     context.beginPath();
@@ -179,25 +188,24 @@ export function ManhattanPlot({ drawFunctionRef, onChromosomeChanged, onVariantL
           const args = {
             database: phenotype + '.db',
             chr: chromosome,
-            nlogpMin: 2,//Math.max(2, Math.floor(rangeSubset[idx].MIN_NLOG_P)),
-            nlogpMax: 20,//Math.ceil(rangeSubset[idx].MAX_NLOG_P),
+            nlogpMin: 2, //Math.max(2, Math.floor(rangeSubset[idx].MIN_NLOG_P)),
+            nlogpMax: 20, //Math.ceil(rangeSubset[idx].MAX_NLOG_P),
             bpMin: rangeSubset[idx].bp_min,
             bpMax: rangeSubset[idx].bp_max
           };
 
-         drawVariantsPlot(args);
-         setSelectedChromosome(chromosome);
-         if (onChromosomeChanged)
-           onChromosomeChanged(chromosome)
+          drawVariantsPlot(args);
+          setSelectedChromosome(chromosome);
+          if (onChromosomeChanged) onChromosomeChanged(chromosome);
         };
 
         plotContainer.current.appendChild(overlay);
       });
 
     setLoading(false);
-  }
+  };
 
-  const drawVariantsPlot = async(params) => {
+  const drawVariantsPlot = async params => {
     setLoading(true);
 
     const results = await rawQuery('variants', params);
@@ -206,8 +214,8 @@ export function ManhattanPlot({ drawFunctionRef, onChromosomeChanged, onVariantL
       variant_id: results.columns.indexOf('variant_id'),
       chr: results.columns.indexOf('chr'),
       bp: results.columns.indexOf('bp'),
-      nlog_p: results.columns.indexOf('nlog_p'),
-    }
+      nlog_p: results.columns.indexOf('nlog_p')
+    };
     const config = {
       data: data,
       canvas: {
@@ -257,9 +265,8 @@ export function ManhattanPlot({ drawFunctionRef, onChromosomeChanged, onVariantL
     interactiveCtx.globalCompositeOperation = 'copy';
 
     canvas.addEventListener('mousemove', e => {
-
       const ctx = backingCanvas.getContext('2d');
-      const {x, y} = viewportToLocalCoordinates(e.clientX, e.clientY, canvas);
+      const { x, y } = viewportToLocalCoordinates(e.clientX, e.clientY, canvas);
       const [r, g, b, a] = ctx.getImageData(x, y, 1, 1).data;
       if (!a) {
         canvas.style.cursor = 'default';
@@ -274,7 +281,7 @@ export function ManhattanPlot({ drawFunctionRef, onChromosomeChanged, onVariantL
 
     canvas.addEventListener('click', async e => {
       const ctx = backingCanvas.getContext('2d');
-      const {x, y} = viewportToLocalCoordinates(e.clientX, e.clientY, canvas);
+      const { x, y } = viewportToLocalCoordinates(e.clientX, e.clientY, canvas);
       const [r, g, b, a] = ctx.getImageData(x, y, 1, 1).data;
       if (!a) {
         clearTooltip();
@@ -288,37 +295,39 @@ export function ManhattanPlot({ drawFunctionRef, onChromosomeChanged, onVariantL
         variant_id: pointData[columnIndexes.variant_id],
         chr: pointData[columnIndexes.chr],
         bp: pointData[columnIndexes.bp],
-        nlog_p: pointData[columnIndexes.nlog_p],
-      }
+        nlog_p: pointData[columnIndexes.nlog_p]
+      };
 
       const response = await query('variant-by-id', {
         database: params.database,
-        id: point.variant_id,
+        id: point.variant_id
       });
 
       const record = response[0];
 
-      setTooltip(x, y, h('div', {className: ''}, [
-        h('div', null, [
-          h('b', null, 'position: '),
-          `${(record.bp / 1e6).toFixed(4)} MB`
-        ]),
-        h('div', null, [
-          h('b', null, 'p-value: '),
-          `${record.p}`
-        ]),
-        h('div', null, [
-          h('b', null, 'snp: '),
-          `${record.snp}`
-        ]),
-        h('div', null, [
-          h('a', {
-            className: 'font-weight-bold',
-            href: '#/gwas/lookup',
-            onclick: () => onVariantLookup && onVariantLookup(record)
-          }, 'Go to Variant Lookup'),
-        ]),
-      ]));
+      setTooltip(
+        x,
+        y,
+        h('div', { className: '' }, [
+          h('div', null, [
+            h('b', null, 'position: '),
+            `${(record.bp / 1e6).toFixed(4)} MB`
+          ]),
+          h('div', null, [h('b', null, 'p-value: '), `${record.p}`]),
+          h('div', null, [h('b', null, 'snp: '), `${record.snp}`]),
+          h('div', null, [
+            h(
+              'a',
+              {
+                className: 'font-weight-bold',
+                href: '#/gwas/lookup',
+                onclick: () => onVariantLookup && onVariantLookup(record)
+              },
+              'Go to Variant Lookup'
+            )
+          ])
+        ])
+      );
       console.log(point);
     });
 
@@ -389,7 +398,7 @@ export function ManhattanPlot({ drawFunctionRef, onChromosomeChanged, onVariantL
     });
 
     plotContainer.current.innerHTML = '';
-//    plotContainer.current.appendChild(backingCanvas);
+    //    plotContainer.current.appendChild(backingCanvas);
     plotContainer.current.appendChild(canvas);
     plotContainer.current.appendChild(interactiveCanvas);
 
@@ -411,32 +420,37 @@ export function ManhattanPlot({ drawFunctionRef, onChromosomeChanged, onVariantL
     }
 
     setLoading(false);
-  }
+  };
 
   return (
     <div className="row">
       <div className="col-md-12">
-        <div ref={plotContainer} className="manhattan-plot" style={{display: loading ? 'none' : 'block'}} />
-        <div className="text-center" style={{display: loading ? 'block' : 'none'}}>
-          <Spinner animation="border" variant="primary"  role="status">
+        <div
+          ref={plotContainer}
+          className="manhattan-plot"
+          style={{ display: loading ? 'none' : 'block' }}
+        />
+        <div
+          className="text-center"
+          style={{ display: loading ? 'block' : 'none' }}>
+          <Spinner animation="border" variant="primary" role="status">
             <span className="sr-only">Loading...</span>
           </Spinner>
         </div>
         {/* <pre>{ JSON.stringify(params, null, 2) }</pre> */}
       </div>
       {/* <div class="col-md-12" style={{opacity: 0.5}}> */}
-        <div class="btn-group" role="group" aria-label="Basic example">
-          {/* <button
+      <div class="btn-group" role="group" aria-label="Basic example">
+        {/* <button
             className="btn btn-primary btn-sm"
             onClick={e => drawSummaryPlot(phenotype.value)}
             disabled={loading}>
             Reset
           </button> */}
-        </div>
-        {/* {timestamp ? <span class="mx-2">{timestamp} s</span> : null} */}
       </div>
+      {/* {timestamp ? <span class="mx-2">{timestamp} s</span> : null} */}
+    </div>
 
     // </div>
   );
-
 }

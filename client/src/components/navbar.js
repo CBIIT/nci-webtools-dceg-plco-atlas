@@ -11,7 +11,7 @@ export function Navbar({ links }) {
           .map(({ route, title, exact }) => (
             <NavLink
               className="navlinks text-white py-2 px-4 d-inline-block "
-              style={{fontWeight: 600}}
+              style={{ fontWeight: 600 }}
               activeClassName="active-navlinks"
               exact={exact}
               to={route}>

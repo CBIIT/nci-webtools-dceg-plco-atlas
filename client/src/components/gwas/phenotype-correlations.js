@@ -1,82 +1,74 @@
 import React, { useState } from 'react';
-import { useSelector, useDispatch} from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { updatePhenotypeCorrelations } from '../../services/actions';
 import { SearchFormTraits } from '../forms/search-form-traits';
 import { Heatmap } from '../plots/heatmap-plot';
 
 export function PhenotypeCorrelations() {
-    const dispatch = useDispatch();
-    const phenotypeCorrelations = useSelector(state => state.phenotypeCorrelations);
-    const {
-        submitted,
-        messages,
-        drawHeatmap
-    } = phenotypeCorrelations;
+  const dispatch = useDispatch();
+  const phenotypeCorrelations = useSelector(
+    state => state.phenotypeCorrelations
+  );
+  const { submitted, messages, drawHeatmap } = phenotypeCorrelations;
 
-    const setSubmitted = submitted => {
-        dispatch(updatePhenotypeCorrelations({submitted}));
-    }
+  const setSubmitted = submitted => {
+    dispatch(updatePhenotypeCorrelations({ submitted }));
+  };
 
-    // registers a function we can use to draw the qq plot
-    const setDrawHeatmap = drawHeatmap => {
-        dispatch(updatePhenotypeCorrelations({drawHeatmap}));
-    }
+  // registers a function we can use to draw the qq plot
+  const setDrawHeatmap = drawHeatmap => {
+    dispatch(updatePhenotypeCorrelations({ drawHeatmap }));
+  };
 
-    const setMessages = messages => {
-        dispatch(updatePhenotypeCorrelations({messages}));
-      }
-    
-    const clearMessages = e => {
+  const setMessages = messages => {
+    dispatch(updatePhenotypeCorrelations({ messages }));
+  };
+
+  const clearMessages = e => {
     setMessages([]);
-    }
+  };
 
-    const handleChange = () => {
+  const handleChange = () => {
     clearMessages();
     setSubmitted(null);
-    }
+  };
 
-    const handleSubmit = params => {
-        setSubmitted(new Date());
-        // setSelectedChromosome(null);
-        console.log(params);
-    
-        if (!params || !params.value) {
-          setMessages([{
-            type: 'danger',
-            content: 'The selected phenotype has no data.'
-          }]);
-          return;
+  const handleSubmit = params => {
+    setSubmitted(new Date());
+    // setSelectedChromosome(null);
+    console.log(params);
+
+    if (!params || !params.value) {
+      setMessages([
+        {
+          type: 'danger',
+          content: 'The selected phenotype has no data.'
         }
-    
-        if (drawHeatmap)
-            drawHeatmap(params.value);
-    
+      ]);
+      return;
     }
 
-    return (
-        <>
-            <div className="card shadow-sm mb-4">
-                <div className="card-body">
-                    <SearchFormTraits onSubmit={handleSubmit} onChange={handleChange} />
-                </div>
+    if (drawHeatmap) drawHeatmap(params.value);
+  };
+
+  return (
+    <>
+      <div className="card shadow-sm mb-4">
+        <div className="card-body">
+          <SearchFormTraits onSubmit={handleSubmit} onChange={handleChange} />
+        </div>
+      </div>
+
+      <div className="card shadow-sm mb-4">
+        <div className="card-body">
+          <div className="row">
+            <div class="col-md-12 text-left">
+              <pre>{JSON.stringify(phenotypeCorrelations, null, 2)}</pre>
             </div>
-
-            <div className="card shadow-sm mb-4">
-
-                <div className="card-body">
-
-                    <div className="row">
-                        <div class="col-md-12 text-left">
-                            <pre>{JSON.stringify(phenotypeCorrelations, null, 2)}</pre>
-                        </div>
-                        <Heatmap
-                            drawFunctionRef={setDrawHeatmap}
-                        />
-                    </div>
-                    
-                </div>
-
-            </div>
-        </>
-    );
+            <Heatmap drawFunctionRef={setDrawHeatmap} />
+          </div>
+        </div>
+      </div>
+    </>
+  );
 }

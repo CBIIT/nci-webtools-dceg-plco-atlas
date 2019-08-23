@@ -4,7 +4,6 @@ import Card from 'react-bootstrap/Card';
 import { CardDeck } from 'react-bootstrap';
 
 export function Home({ links }) {
-
   return (
     <>
       <div className="video-banner-container text-center">
@@ -19,8 +18,9 @@ export function Home({ links }) {
         </div>
       </div>
 
-      <div className="container pt-4 align-middle text-center" style={{"margin-top": "-10vh"}}>
-        
+      <div
+        className="container pt-4 align-middle text-center"
+        style={{ 'margin-top': '-10vh' }}>
         <CardDeck>
           {links.map(({ exact, route, title, image }, index) => (
             <Card
@@ -53,10 +53,9 @@ export function Home({ links }) {
 
         <h3 className="font-weight-light mt-5">OUR FOCUS</h3>
         <h5 className="text-secondary mb-5">
-          Simplifying GWAS for the Prostate, Lung, Colorectal and Ovarian
-          Cancer Screening Trial
+          Simplifying GWAS for the Prostate, Lung, Colorectal and Ovarian Cancer
+          Screening Trial
         </h5>
-
       </div>
     </>
   );

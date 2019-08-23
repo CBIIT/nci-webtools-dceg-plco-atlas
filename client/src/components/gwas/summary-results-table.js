@@ -5,105 +5,110 @@ import { query } from '../../services/query';
 import BootstrapTable from 'react-bootstrap-table-next';
 import paginationFactory from 'react-bootstrap-table2-paginator';
 
-export function SummaryResultsTable({updateFunctionRef}) {
-    const dispatch = useDispatch();
-    const {
-        selectedPhenotype,
-        selectedChromosome,
-        results,
-        resultsCount,
-        page,
-        pageSize,
-    } = useSelector(state => state.summaryResults);
+export function SummaryResultsTable({ updateFunctionRef }) {
+  const dispatch = useDispatch();
+  const {
+    selectedPhenotype,
+    selectedChromosome,
+    results,
+    resultsCount,
+    page,
+    pageSize
+  } = useSelector(state => state.summaryResults);
 
-    const updateResults = results => {
-        dispatch(updateSummaryResults({results}));
+  const updateResults = results => {
+    dispatch(updateSummaryResults({ results }));
+  };
+
+  const updateResultsCount = resultsCount => {
+    dispatch(updateSummaryResults({ resultsCount }));
+  };
+
+  const updatePage = page => {
+    dispatch(updateSummaryResults({ page }));
+  };
+
+  const updatePageSize = pageSize => {
+    dispatch(updateSummaryResults({ pageSize }));
+  };
+
+  useEffect(() => {
+    if (updateFunctionRef) updateFunctionRef(updateTable);
+  }, [updateFunctionRef]);
+
+  const columns = [
+    {
+      dataField: 'chr',
+      text: 'Chromosome'
+    },
+    {
+      dataField: 'bp',
+      text: 'Position'
+    },
+    {
+      dataField: 'snp',
+      text: 'SNP'
+    },
+    {
+      dataField: 'a1',
+      text: 'Reference Allele'
+    },
+    {
+      dataField: 'a2',
+      text: 'Alternate Allele'
+    },
+    {
+      dataField: 'or',
+      text: 'Odds Ratio'
+    },
+    {
+      dataField: 'p',
+      text: 'P-Value',
+      headerFormatter: column => {
+        return (
+          <div>
+            {column.text}
+            <span className="summary-results-table">
+              <span className="caret-4-asc"></span>
+            </span>
+          </div>
+        );
+      }
+    }
+  ];
+
+  const updateTable = async (page, pageSize, database, chromosome) => {
+    const params = {
+      offset: (page - 1) * pageSize,
+      limit: pageSize,
+      database: database + '.db'
     };
+    if (chromosome) params.chr = chromosome;
+    const response = await query('variants-paginated', params);
 
-    const updateResultsCount = resultsCount => {
-        dispatch(updateSummaryResults({resultsCount}));
-    }
+    updatePage(page);
+    updatePageSize(pageSize);
+    updateResults(response);
+    updateResultsCount(70000000);
+  };
 
-    const updatePage = page => {
-        dispatch(updateSummaryResults({page}));
-    }
+  const handleTableChange = async (type, { page, sizePerPage }) => {
+    updateTable(page, sizePerPage, selectedPhenotype.value, selectedChromosome);
+  };
 
-    const updatePageSize = pageSize => {
-        dispatch(updateSummaryResults({pageSize}));
-    }
-
-    useEffect(() => {
-        if (updateFunctionRef)
-            updateFunctionRef(updateTable);
-    }, [updateFunctionRef]);
-
-    const columns = [
-        {
-            dataField: 'chr',
-            text: 'Chromosome',
-        },
-        {
-            dataField: 'bp',
-            text: 'Position',
-        },
-        {
-            dataField: 'snp',
-            text: 'SNP',
-        },
-        {
-            dataField: 'a1',
-            text: 'Reference Allele',
-        },
-        {
-            dataField: 'a2',
-            text: 'Alternate Allele',
-        },
-        {
-            dataField: 'or',
-            text: 'Odds Ratio',
-        },
-        {
-            dataField: 'p',
-            text: 'P-Value',
-            headerFormatter: (column) => {
-                return (
-                  <div>
-                    {column.text}<span className="summary-results-table"><span className="caret-4-asc"></span></span>
-                  </div>
-                );
-              }
-        },
-    ];
-
-    const updateTable = async (page, pageSize, database, chromosome) => {
-        const params = {
-            offset: (page - 1) * pageSize,
-            limit: pageSize,
-            database: database + '.db'
-        };
-        if (chromosome)
-            params.chr = chromosome;
-        const response = await query('variants-paginated', params);
-
-        updatePage(page);
-        updatePageSize(pageSize);
-        updateResults(response);
-        updateResultsCount(70000000);
-    }
-
-    const handleTableChange = async (type, { page, sizePerPage }) => {
-        updateTable(page, sizePerPage, selectedPhenotype.value, selectedChromosome);
-    }
-
-    return (
-        <BootstrapTable
-            bootstrap4
-            remote
-            keyField="variant_id"
-            data={results}
-            columns={columns}
-            onTableChange={handleTableChange}
-            pagination={paginationFactory({ page, sizePerPage: pageSize, totalSize: resultsCount })}
-        />
-    );
+  return (
+    <BootstrapTable
+      bootstrap4
+      remote
+      keyField="variant_id"
+      data={results}
+      columns={columns}
+      onTableChange={handleTableChange}
+      pagination={paginationFactory({
+        page,
+        sizePerPage: pageSize,
+        totalSize: resultsCount
+      })}
+    />
+  );
 }

@@ -13,50 +13,46 @@ import React, { useState, useEffect } from 'react';
 */
 
 export function Select({
-    className,
-    optionClassName,
-    onChange,
-    value: valueProp,
-    options: optionsProp,
-    isOptionDisabled,
-    placeholder,
-    multiple
+  className,
+  optionClassName,
+  onChange,
+  value: valueProp,
+  options: optionsProp,
+  isOptionDisabled,
+  placeholder,
+  multiple
 }) {
-    const selectOptions = [];
-    const [value, setValue] = useState(null);
-    const [options, setOptions] = useState([]);
+  const selectOptions = [];
+  const [value, setValue] = useState(null);
+  const [options, setOptions] = useState([]);
 
-    const updateValue = val => {
-        if (multiple)
-            val = Array.isArray(value)
-                ? value.concat(val)
-                : [val]
-        setValue(val);
-        onChange(val);
-    }
+  const updateValue = val => {
+    if (multiple) val = Array.isArray(value) ? value.concat(val) : [val];
+    setValue(val);
+    onChange(val);
+  };
 
+  useEffect(() => {
+    updateValue(valueProp);
+  }, [valueProp]);
 
-    useEffect(() => {
-        updateValue(valueProp);
-    }, [valueProp]);
+  useEffect(() => {
+    setOptions(optionsProp);
+  }, [optionsProp]);
 
-    useEffect(() => {
-        setOptions(optionsProp);
-    }, [optionsProp]);
+  const optionList = [];
 
-    const optionList = [];
-
-    return (
-        <div className={className}>
-            {options.map((label, value) => {
-                return (
-                    <div
-                        className={optionClassName}
-                        onClick={e => updateValue(option.value)}>
-                        {option.label}
-                    </div>
-                );
-            })}
-        </div>
-    )
+  return (
+    <div className={className}>
+      {options.map((label, value) => {
+        return (
+          <div
+            className={optionClassName}
+            onClick={e => updateValue(option.value)}>
+            {option.label}
+          </div>
+        );
+      })}
+    </div>
+  );
 }
