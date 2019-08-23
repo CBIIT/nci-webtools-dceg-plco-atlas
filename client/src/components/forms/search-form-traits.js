@@ -5,7 +5,7 @@ import { query } from '../../services/query';
 import Select, { components } from 'react-select';
 import { updatePhenotypeCorrelations } from '../../services/actions';
 
-export function SearchFormTraits({ onSubmit }) {
+export function SearchFormTraits({ onChange, onSubmit }) {
   const dispatch = useDispatch();
   const phenotypes = useSelector(state => state.phenotypes);
   const phenotypeCorrelations = useSelector(state => state.phenotypeCorrelations);
@@ -17,6 +17,11 @@ export function SearchFormTraits({ onSubmit }) {
 
   const setSelectedListType = selectedListType => {
     dispatch(updatePhenotypeCorrelations({selectedListType}));
+  }
+  
+  const handleChange = params => {
+    setSelectedPhenotypes(params);
+    onChange(params);
   }
 
   const alphabetizedPhenotypes = [...phenotypes]
@@ -55,7 +60,7 @@ export function SearchFormTraits({ onSubmit }) {
             <Select
                 placeholder="(Select two or more phenotypes) *"
                 value={selectedPhenotypes}
-                onChange={setSelectedPhenotypes}
+                onChange={handleChange}
                 // isOptionDisabled={option => option.value === null}
                 options={selectedListType === 'categorical' ?
                   categorizedPhenotypes :

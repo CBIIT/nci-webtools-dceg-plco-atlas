@@ -50,7 +50,6 @@ export function VariantLookup() {
             text: 'Odds Ratio',
             filter: textFilter(),
             sort: true
-
         },
         {
             dataField: 'p',

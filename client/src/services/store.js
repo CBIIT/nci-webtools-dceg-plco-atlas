@@ -1,4 +1,4 @@
-import { createStore, applyMiddleware } from 'redux';
+import { createStore, applyMiddleware, compose } from 'redux';
 import { rootReducer } from './reducers';
 import ReduxThunk from 'redux-thunk';
 
@@ -34,14 +34,23 @@ const initialState = {
         loading: false,
     },
     phenotypeCorrelations: {
+        drawHeatmap: null,
         selectedListType: 'alphabetic',
         selectedPhenotypes: [],
         results: [],
+        loading: false,
+        submitted: null,
+        messages: [],
     }
 };
 
 export const store = createStore(
     rootReducer,
     initialState,
-    applyMiddleware(ReduxThunk)
+    compose(
+        applyMiddleware(ReduxThunk),
+        window.__REDUX_DEVTOOLS_EXTENSION__ 
+            ? window.__REDUX_DEVTOOLS_EXTENSION__()
+            : e => e
+    )
 );
