@@ -109,7 +109,13 @@ export function Heatmap({ drawFunctionRef }) {
         ['0.888888888889', 'rgb(50,50,255)'],
         ['1.0', 'rgb(0,0,255)']
       ],
-      showscale: false
+      showscale: false,
+      hoverinfo:"x+y",
+      hovertemplate: '<br><b>Phenotype X</b>: %{x}<br>' +
+                      '<b>Phenotype Y</b>: %{y}<br>' +
+                      '<b>Correlation</b>: %{z}' +
+                      '<extra></extra>'
+                      
     };
     setData([randomData]);
     setLoading(false);
