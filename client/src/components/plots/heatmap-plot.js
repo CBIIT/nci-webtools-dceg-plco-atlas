@@ -18,7 +18,7 @@ export function Heatmap({ drawFunctionRef }) {
   } = useSelector(state => state.phenotypeCorrelations);
 
   const setLoading = loading => {
-    dispatch(updatePhenotypeCorrelations({ loading }));
+    dispatch(updatePhenotypeCorrelations({loading}));
   };
 
   const [data, setData] = useState([]);
@@ -36,6 +36,7 @@ export function Heatmap({ drawFunctionRef }) {
       side: 'top',
       tickangle: -45,
       tickfont: {
+        family: 'Arial',
         size: 10,
         color: 'black'
       }
@@ -46,6 +47,7 @@ export function Heatmap({ drawFunctionRef }) {
       // title: 'Phenotypes',
       tickangle: 'auto',
       tickfont: {
+        family: 'Arial',
         size: 10,
         color: 'black'
       }
@@ -65,7 +67,18 @@ export function Heatmap({ drawFunctionRef }) {
     // responsive: true
   };
 
-  const generateData = async () => {
+  const stringScore = (stringX, stringY) => {
+    var sum = 0;
+    for (var x = 0; x < stringX.length; x++) {
+      sum += stringX.charCodeAt(x);
+    }
+    for (var y = 0; y < stringY.length; y++) {
+      sum -= stringY.charCodeAt(y);
+    }
+    return Math.abs(sum);
+  }
+
+  const generateData = () => {
     setLoading(true);
     let n = 400;
     let x = [];
@@ -87,7 +100,7 @@ export function Heatmap({ drawFunctionRef }) {
         if (x[xidx] === y[yidx]) {
           row.push(0.0);
         } else {
-          row.push(Math.random());
+          row.push(stringScore(x[xidx], y[yidx]));
         }
       }
       z.push(row);
