@@ -62,15 +62,10 @@ export function PhenotypeCorrelations() {
             </div>
 
             <div className="card shadow-sm mb-4">
-                <div className="card-header bg-white font-weight-bolder border-bottom-0">
-                    selected phenotypes
-                </div>
 
                 <div className="card-body">
-                    <p>
-                        Placeholder for heatmap of specified phenotypes
-                    </p>
-                    <div className="row mt-3">
+
+                    <div className="row">
                         <div class="col-md-12 text-left">
                             <pre>{JSON.stringify(phenotypeCorrelations, null, 2)}</pre>
                         </div>
@@ -78,8 +73,9 @@ export function PhenotypeCorrelations() {
                             drawFunctionRef={setDrawHeatmap}
                         />
                     </div>
-
+                    
                 </div>
+
             </div>
         </>
     );
