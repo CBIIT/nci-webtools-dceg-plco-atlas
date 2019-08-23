@@ -46,7 +46,7 @@ export function SearchFormTraits({ onChange, onSubmit }) {
     <Form>
       <Form.Group controlId="phenotype-list">
         <Form.Label>
-          <b>Select Phenotype</b>
+          <b>Select Phenotypes</b>
         </Form.Label>
         <InputGroup>
           <InputGroup.Prepend>
