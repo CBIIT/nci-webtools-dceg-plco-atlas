@@ -15,9 +15,8 @@ export function Gwas() {
     const records = [];
     const populateRecords = node => {
       records.push(node);
-      if (node.children)
-        node.children.forEach(populateRecords);
-    }
+      if (node.children) node.children.forEach(populateRecords);
+    };
 
     query('data/phenotypes.json').then(data => {
       data.forEach(populateRecords, 0);
@@ -37,7 +36,7 @@ export function Gwas() {
     {
       pathId: 'correlations',
       name: 'Phenotype Correlations'
-    },
+    }
   ];
 
   return (
@@ -60,21 +59,11 @@ export function Gwas() {
         render={() => <Redirect to="/gwas/summary" />}
       />
 
-      <Route
-        path="/gwas/summary"
-        component={SummaryResults}
-      />
+      <Route path="/gwas/summary" component={SummaryResults} />
 
-      <Route
-        path="/gwas/lookup"
-        component={VariantLookup}
-      />
+      <Route path="/gwas/lookup" component={VariantLookup} />
 
-      <Route
-        path="/gwas/correlations"
-        component={PhenotypeCorrelations}
-      />
-
+      <Route path="/gwas/correlations" component={PhenotypeCorrelations} />
     </div>
   );
 }

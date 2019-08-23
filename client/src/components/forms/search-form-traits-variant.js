@@ -8,64 +8,74 @@ export function SearchFormTraitsVariant({ onChange, onSubmit }) {
   const dispatch = useDispatch();
   const phenotypes = useSelector(state => state.phenotypes);
   const variantLookup = useSelector(state => state.variantLookup);
-  const { selectedListType, selectedPhenotypes, selectedVariant, selectedGender } = variantLookup;
+  const {
+    selectedListType,
+    selectedPhenotypes,
+    selectedVariant,
+    selectedGender
+  } = variantLookup;
 
   const handleChange = params => {
     setSelectedPhenotypes(params);
     onChange(params);
-  }
+  };
 
   const setSelectedListType = selectedListType => {
     dispatch(updateVariantLookup({ selectedListType }));
-  }
+  };
 
   const setSelectedPhenotypes = selectedPhenotypes => {
-    dispatch(updateVariantLookup({selectedPhenotypes}));
-  }
+    dispatch(updateVariantLookup({ selectedPhenotypes }));
+  };
 
   const setSelectedVariant = selectedVariant => {
-    dispatch(updateVariantLookup({selectedVariant}));
-  }
+    dispatch(updateVariantLookup({ selectedVariant }));
+  };
 
   const setSelectedGender = selectedGender => {
-    dispatch(updateVariantLookup({selectedGender}));
-  }
+    dispatch(updateVariantLookup({ selectedGender }));
+  };
 
-  const alphabetizedPhenotypes = [...phenotypes]
-    .sort((a, b) => a.label.localeCompare(b.label))
+  const alphabetizedPhenotypes = [...phenotypes].sort((a, b) =>
+    a.label.localeCompare(b.label)
+  );
 
   const categorizedPhenotypes = phenotypes.map(e => {
     const spaces = String.fromCharCode(160).repeat(e.level * 2);
     let label = spaces + e.label;
-    return {...e, label};
+    return { ...e, label };
   });
 
-  const canSubmit = (selectedPhenotypes && selectedPhenotypes.length > 0) &&
-    (selectedVariant && selectedVariant.length > 0)
+  const canSubmit =
+    selectedPhenotypes &&
+    selectedPhenotypes.length > 0 &&
+    (selectedVariant && selectedVariant.length > 0);
 
-  const validateVariantInput = e=> {
+  const validateVariantInput = e => {
     e.preventDefault();
     // console.log(selectedVariant);
     // (/^rs\d+/i).test(selectedVariant)
 
     if (
       selectedVariant.match(/^[r|R][s|S][0-9]+$/) != null ||
-      selectedVariant.match(/^([c|C][h|H][r|R])?(([1-9]|[1][0-9]|[2][0-2])|[x|X|y|Y]):[0-9]+$/) != null
+      selectedVariant.match(
+        /^([c|C][h|H][r|R])?(([1-9]|[1][0-9]|[2][0-2])|[x|X|y|Y]):[0-9]+$/
+      ) != null
     ) {
       // console.log("valid");
       onSubmit({
         selectedPhenotypes,
         selectedVariant
-      })
+      });
     } else {
       // console.log("invalid");
       onSubmit({
         selectedPhenotypes,
         selectedVariant,
-        error: "Invalid variant input."
-      })
+        error: 'Invalid variant input.'
+      });
     }
-  }
+  };
 
   const MultiValue = props => (
     <components.MultiValue {...props}>
@@ -104,15 +114,17 @@ export function SearchFormTraitsVariant({ onChange, onSubmit }) {
           </InputGroup.Prepend>
 
           {/* trait multi-select */}
-          <div style={{width: '50%'}}>
+          <div style={{ width: '50%' }}>
             <Select
               placeholder="(Select one or more phenotypes) *"
               value={selectedPhenotypes}
               onChange={handleChange}
-              isOptionDisabled={(option) => option.value === null}
-              options={selectedListType === 'categorical'
-                ? categorizedPhenotypes
-                : alphabetizedPhenotypes}
+              isOptionDisabled={option => option.value === null}
+              options={
+                selectedListType === 'categorical'
+                  ? categorizedPhenotypes
+                  : alphabetizedPhenotypes
+              }
               isMulti
               components={{ MultiValue }}
             />

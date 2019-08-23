@@ -8,8 +8,9 @@
   },
   "scripts": {
     "start": "node server/plco-server.js",
-    "build": "cd client && npm run build",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "npm run format && cd client && npm run build",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "format": "prettier --single-quote --jsx-bracket-same-line --write \"server/**/*.{js,json}\""
   },
   "repository": {
     "type": "git",
