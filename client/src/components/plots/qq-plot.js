@@ -57,7 +57,7 @@ export function QQPlot({ drawFunctionRef, onVariantLookup }) {
 
   const drawQQPlot = async (phenotype) => {
     setLoading(true);
-    setQQplotSrc(root + '/data/qq-plots/' + phenotype + '.png');
+    setQQplotSrc('data/qq-plots/' + phenotype + '.png');
     const imageMapData = await query('data/qq-plots/' + phenotype + '.imagemap.json');
     if (!imageMapData.error)
       setAreaItems(imageMapData);
