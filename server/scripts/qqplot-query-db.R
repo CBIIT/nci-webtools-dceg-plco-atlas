@@ -12,8 +12,10 @@ qq <- function(o, e, pvector, ...) {
        pch=19, ann=FALSE,
        col="orange",
        # xlab=expression(Expected~~-log[10](italic(p))), ylab=expression(Observed~~-log[10](italic(p))), ## title for x and y axis
-       xlim=c(0, max(e)), ylim=c(0, max(o)), 
-       cex.axis=1.20, cex.main=1.20, cex.sub=1.20, ...)
+       xlim=c(0, max(e)), ylim=c(0, max(o)),
+       cex.axis=1.00, bty="l", ...)
+  
+  box(which = "plot", lty = "solid", bty="l", lwd=1, col="#000000", ...)
   
   points(x=e_tail, y=o_tail,
          col="blue")
@@ -21,8 +23,8 @@ qq <- function(o, e, pvector, ...) {
   abline(0, 1, col="gray")
   # mtext(paste("lambdaGC =", round(qchisq(1 - median(pvector), 1) / qchisq(0.5, 1), 4)), line=-1)
   # mtext(paste("N =", length(o_head250) + length(o_tail)))
-  title(xlab=expression(Expected~~-log[10](italic(p))), cex.lab=1.25, line=3)
-  title(ylab=expression(Observed~~-log[10](italic(p))), cex.lab=1.25, line=2)
+  title(xlab=expression(bold(Expected~~-log[10](p))), cex.lab=1.15, line=3)
+  title(ylab=expression(bold(Observed~~-log[10](p))), cex.lab=1.15, line=2)
   title(xlab=paste("lambdaGC =", round(qchisq(1 - median(pvector), 1) / qchisq(0.5, 1), 4)), cex.lab=1.5, line=-46)
   title(xlab=paste("N =", length(o_head250) + length(o_tail)), cex.lab=1.5, line=-48)
   # dev.off()
@@ -39,8 +41,8 @@ query <- function(phenotype) {
   sqlite.driver <- dbDriver("SQLite")
   conn <- dbConnect(sqlite.driver, dbname = filename)
   dbListTables(conn)
-  # query <- dbGetQuery(conn, "SELECT snp, p FROM variant WHERE nlog_p >= 3 ORDER BY p DESC")
-  query <- dbGetQuery(conn, "SELECT snp, p FROM variant ORDER BY p DESC")
+  query <- dbGetQuery(conn, "SELECT snp, p FROM variant WHERE nlog_p >= 3 ORDER BY p DESC")
+  # query <- dbGetQuery(conn, "SELECT snp, p FROM variant ORDER BY p DESC")
   pvector <- query[['p']]
   snpvector <- query[['snp']]
   pvector <- pvector[!is.na(pvector) & pvector<1 & pvector>0]
