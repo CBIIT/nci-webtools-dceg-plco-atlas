@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { root, query } from '../../services/query';
 import { updatePhenotypeCorrelations } from '../../services/actions';
-import { Spinner } from 'react-bootstrap';
+import { Spinner, Button, ButtonGroup, ToggleButton } from 'react-bootstrap';
 
 import Plot from 'react-plotly.js';
 
@@ -22,6 +22,7 @@ export function Heatmap({ drawFunctionRef }) {
   };
 
   const [data, setData] = useState([]);
+  const [numPhenotypes, setNumPhenotypes] = useState(2);
 
   const layout = {
     width: 1000,
@@ -80,7 +81,7 @@ export function Heatmap({ drawFunctionRef }) {
 
   const generateData = () => {
     setLoading(true);
-    let n = 400;
+    let n = numPhenotypes;
     let x = [];
     let y = [];
     let z = [];
@@ -136,10 +137,24 @@ export function Heatmap({ drawFunctionRef }) {
 
   return (
     <div className="row">
-      <div className="col-md-12">
-        <button className="ml-3" onClick={generateData}>
-          Generate sample data 400x400
-        </button>
+      <div className="col-md-12 py-3">
+        <ButtonGroup toggle className="ml-3" onChange={e => setNumPhenotypes(e.target.value)}>
+          <ToggleButton type="radio" name="radio" defaultChecked value="2">
+            2
+          </ToggleButton>
+          <ToggleButton type="radio" name="radio" value="50">
+            50
+          </ToggleButton>
+          <ToggleButton type="radio" name="radio" value="100">
+            100
+          </ToggleButton>
+          <ToggleButton type="radio" name="radio" value="400">
+            400
+          </ToggleButton>
+        </ButtonGroup>
+        <Button className="ml-3" onClick={generateData}>
+          Generate sample data
+        </Button>
       </div>
       <div
         className="col-md-12"
