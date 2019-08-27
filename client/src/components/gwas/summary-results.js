@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Alert, Button, Nav, Tab, ToggleButtonGroup } from 'react-bootstrap';
+import { Alert, Nav, Tab } from 'react-bootstrap';
 import { SearchFormTrait } from '../forms/search-form-trait';
 import { ManhattanPlot } from '../plots/manhattan-plot';
 import { QQPlot } from '../plots/qq-plot';
@@ -13,8 +13,6 @@ import {
 
 export function SummaryResults() {
   const dispatch = useDispatch();
-  const summaryResults = useSelector(state => state.summaryResults);
-  const variantLookup = useSelector(state => state.variantLookup);
   const {
     selectedPhenotype,
     submitted,
@@ -23,8 +21,8 @@ export function SummaryResults() {
     drawQQPlot,
     updateResultsTable,
     page,
-    pageSize
-  } = summaryResults;
+    pageSize,
+  } = useSelector(state => state.summaryResults);
 
   const setSubmitted = submitted => {
     dispatch(updateSummaryResults({ submitted }));
@@ -67,12 +65,10 @@ export function SummaryResults() {
     console.log(params);
 
     if (!params || !params.value) {
-      setMessages([
-        {
-          type: 'danger',
-          content: 'The selected phenotype has no data.'
-        }
-      ]);
+      setMessages([{
+        type: 'danger',
+        content: 'Please select a phenotype which has data associated with it.'
+      }]);
       return;
     }
 
@@ -80,22 +76,35 @@ export function SummaryResults() {
 
     if (drawQQPlot) drawQQPlot(params.value);
 
-    if (updateResultsTable) updateResultsTable(page, pageSize, params.value);
-  };
+    if (updateResultsTable)
+      updateResultsTable({page, pageSize, database: params.value + '.db'});
+  }
 
   const handleChromosomeChanged = chromosome => {
     if (updateResultsTable) {
-      updateResultsTable(1, 10, selectedPhenotype.value, chromosome);
-    }
-  };
-
-  const handleVariantLookup = ({ snp }) => {
-    dispatch(
-      updateVariantLookup({
-        selectedPhenotypes: [selectedPhenotype],
-        selectedVariant: snp
+      updateResultsTable({
+        page: 1,
+        pageSize: 10,
+        database: selectedPhenotype.value + '.db',
+        chr: chromosome,
       })
-    );
+    }
+  }
+
+  const handleZoom = zoomParams => {
+    updateResultsTable({
+      page: 1,
+      pageSize: 10,
+      ...zoomParams,
+    })
+    console.log('zoomed', zoomParams);
+  }
+
+  const handleVariantLookup = ({snp}) => {
+    dispatch(updateVariantLookup({
+      selectedPhenotypes: [selectedPhenotype],
+      selectedVariant: snp,
+    }));
     dispatch(lookupVariants([selectedPhenotype], snp));
   };
 
@@ -136,7 +145,7 @@ export function SummaryResults() {
                       type="radio"
                       name="plot-type"
                       value="combined"
-                      checked
+                      defaultChecked
                     />
                     Combined
                   </label>
@@ -153,19 +162,16 @@ export function SummaryResults() {
                     Female
                   </label>
                 </div>
-                <ManhattanPlot
-                  drawFunctionRef={setDrawManhattanPlot}
-                  onChromosomeChanged={handleChromosomeChanged}
-                  onVariantLookup={handleVariantLookup}
-                />
-                <div
-                  className="my-4"
-                  style={{ display: submitted ? 'block' : 'none' }}>
-                  <SummaryResultsTable
-                    className="mw-100"
-                    updateFunctionRef={setUpdateResultsTable}
-                  />
-                </div>
+                  <ManhattanPlot
+                    drawFunctionRef={setDrawManhattanPlot}
+                    onChromosomeChanged={handleChromosomeChanged}
+                    onVariantLookup={handleVariantLookup}
+                    onZoom={handleZoom} />
+                    <div className="my-4" style={{display: submitted ? 'block' : 'none'}}>
+                      <SummaryResultsTable
+                        className="mw-100"
+                        updateFunctionRef={setUpdateResultsTable} />
+                    </div>
               </Tab.Pane>
 
               <Tab.Pane eventKey="qq-plot">
