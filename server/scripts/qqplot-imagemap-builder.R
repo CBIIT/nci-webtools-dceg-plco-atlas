@@ -38,26 +38,29 @@ print.imagemap <- function(x,...){
   cat("Its an imagemap!: ",x$title,"\n")
 }
 
-createPage <- function(im,file='',imgTags=list()){
+createPage <- function(im, file='', lambdaGC='0.0', sampleSize='0', imgTags=list()){
   # out <- paste("<html><head><title>",im$title,"</title></head>\n",sep='')
   # out <- c(out,"<body>\n")
   out <- ""
-  out <- c(out,buildIM(im,imgTags))
+  out <- c(out, buildIM(im, imgTags, lambdaGC, sampleSize))
   # out <- c(out,"</body></html>\n")
   cat(out,file=file,sep='')
 }
 
-buildIM <- function(im,imgTags=list()){
+buildIM <- function(im, imgTags=list(), lambdaGC, sampleSize){
   # out <- paste("<img src=\"",paste("assets/images/qq-plots/",im$Filename,".png",sep=''),"\" alt=\"QQ-plot of selected trait","\" useMap=\"#",im$Filename,"\" ",moHTML(imgTags)," >\n",sep='')
   # out <- c(out,paste("<map name=\"",im$Filename,"\">\n",sep=''))
-  out <- "[\n"
+  out <- "{\n"
+  out <- c(out, paste0("\"lambdaGC\": \"", lambdaGC, "\",\n"))
+  out <- c(out, paste0("\"sampleSize\": \"", sampleSize, "\",\n"))
+  out <- c(out, "\"areaItems\": [\n")
   data <- c()
   for(region in im$HTML){
     data <- c(data,toHTML(region,im))
   }
   out <- c(out, str_c(data, collapse = ",\n"))
   # out <- c(out,"</map>\n")
-  out <- c(out, "\n]\n")
+  out <- c(out, "\n]\n}\n")
   
   return(out)
 }

@@ -16,7 +16,9 @@ export function QQPlot({ drawFunctionRef, onVariantLookup }) {
     selectedChromosome,
     loading,
     qqplotSrc,
-    areaItems
+    areaItems,
+    lambdaGC,
+    sampleSize
   } = useSelector(state => state.summaryResults);
   const setLoading = loading => {
     dispatch(updateSummaryResults({ loading }));
@@ -28,6 +30,14 @@ export function QQPlot({ drawFunctionRef, onVariantLookup }) {
 
   const setAreaItems = areaItems => {
     dispatch(updateSummaryResults({ areaItems }));
+  };
+
+  const setSampleSize = sampleSize => {
+    dispatch(updateSummaryResults({ sampleSize }));
+  };
+
+  const setLambdaGC = lambdaGC => {
+    dispatch(updateSummaryResults({ lambdaGC }));
   };
 
   // temporary set states
@@ -60,7 +70,11 @@ export function QQPlot({ drawFunctionRef, onVariantLookup }) {
     const imageMapData = await query(
       'data/qq-plots/' + phenotype + '.imagemap.json'
     );
-    if (!imageMapData.error) setAreaItems(imageMapData);
+    if (!imageMapData.error) {
+      setLambdaGC(imageMapData.lambdaGC);
+      setSampleSize(imageMapData.sampleSize);
+      setAreaItems(imageMapData.areaItems);
+    }
     setLoading(false);
   };
 
@@ -69,9 +83,10 @@ export function QQPlot({ drawFunctionRef, onVariantLookup }) {
     if (e.target && e.target.coords) {
       var variant = e.target.alt.split(',');
       setPopupTooltipData({
-        'point_#': variant[0],
-        snp: variant[1],
-        'p-value': variant[2]
+        'position': 'chr' + variant[0] + ':' + variant[1],
+        // 'point_#': variant[0],
+        'p-value': variant[3],
+        'snp': variant[2]
       });
       setPopupTooltipStyle({
         ...popupTooltipStyle,
@@ -99,9 +114,8 @@ export function QQPlot({ drawFunctionRef, onVariantLookup }) {
       var variant = e.target.alt.split(',');
       if (popupTooltipData && variant[0] !== popupTooltipData['point_#']) {
         setHoverTooltipData({
-          'point_#': variant[0],
-          snp: variant[1],
-          'p-value': variant[2]
+          'p-value': variant[3],
+          'snp': variant[2]
         });
         setHoverTooltipStyle({
           ...hoverTooltipStyle,
@@ -126,6 +140,13 @@ export function QQPlot({ drawFunctionRef, onVariantLookup }) {
   return (
     <>
       <div className="row mt-3">
+        {
+          qqplotSrc && (
+            <div className="col-md-12 text-center" style={{ display: loading ? 'none' : 'block' }}>
+              <b>&lambda;</b> = {lambdaGC} <b className="ml-4">Sample Size</b> = {sampleSize}
+            </div>
+          )
+        }
         <div className="col-md-12 text-center">
           <div
             className="qq-plot"
@@ -143,11 +164,12 @@ export function QQPlot({ drawFunctionRef, onVariantLookup }) {
                   onClick={popupMarkerClose}>
                   <span aria-hidden="true">&times;</span>
                 </button>
-                <b>id:</b> {popupTooltipData['point_#']}
-                <br />
-                <b>snp:</b> {popupTooltipData.snp}
+                {/* <b>id:</b> {popupTooltipData['point_#']} */}
+                <b>position:</b> {popupTooltipData.position}
                 <br />
                 <b>p-value:</b> {popupTooltipData['p-value']}
+                <br />
+                <b>snp:</b> {popupTooltipData.snp}
                 <br />
                 <Link
                   to="/gwas/lookup"
@@ -157,9 +179,9 @@ export function QQPlot({ drawFunctionRef, onVariantLookup }) {
               </div>
 
               <div style={hoverTooltipStyle} className="hover-tooltip shadow">
-                <b>snp:</b> {hoverTooltipData.snp}
-                <br />
                 <b>p-value:</b> {hoverTooltipData['p-value']}
+                <br />
+                <b>snp:</b> {hoverTooltipData.snp}
               </div>
 
               {qqplotSrc && (

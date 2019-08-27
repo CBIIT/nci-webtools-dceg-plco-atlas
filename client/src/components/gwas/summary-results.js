@@ -15,6 +15,7 @@ export function SummaryResults() {
   const dispatch = useDispatch();
   const {
     selectedPhenotype,
+    selectedPlot,
     submitted,
     messages,
     drawManhattanPlot,
@@ -44,6 +45,10 @@ export function SummaryResults() {
 
   const setSelectedChromosome = selectedChromosome => {
     dispatch(updateSummaryResults({ selectedChromosome }));
+  };
+
+  const setSelectedPlot = selectedPlot => {
+    dispatch(updateSummaryResults({ selectedPlot }));
   };
 
   const setMessages = messages => {
@@ -123,7 +128,7 @@ export function SummaryResults() {
       </div>
 
       <div className="card shadow-sm mb-4">
-        <Tab.Container defaultActiveKey="manhattan-plot">
+        <Tab.Container defaultActiveKey={selectedPlot} onSelect={setSelectedPlot}>
           <div className="card-header bg-white font-weight-bolder border-bottom-0">
             <Nav variant="pills" className="nav-pills-custom">
               <Nav.Item className="mr-2">
