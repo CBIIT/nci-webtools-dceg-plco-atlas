@@ -1,6 +1,5 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-
 import { rawQuery, query } from '../../services/query';
 import { scatterPlot } from '../../services/plots/scatter-plot';
 import { axisBottom, axisLeft } from '../../services/plots/axis';
@@ -17,11 +16,7 @@ import { updateSummaryResults } from '../../services/actions';
 import { Spinner } from 'react-bootstrap';
 import * as d3 from 'd3';
 
-export function ManhattanPlot({
-  drawFunctionRef,
-  onChromosomeChanged,
-  onVariantLookup
-}) {
+export function ManhattanPlot({ drawFunctionRef, onChromosomeChanged, onVariantLookup, onZoom }) {
   const dispatch = useDispatch();
   const plotContainer = useRef(null);
   const summaryResults = useSelector(state => state.summaryResults);
@@ -49,7 +44,6 @@ export function ManhattanPlot({
 
   const drawSummaryPlot = async phenotype => {
     let rangeSubset = ranges.slice(0, 22);
-    console.log(rangeSubset);
     setLoading(true);
     const results = await rawQuery('summary', {
       database: phenotype + '.db',
@@ -113,7 +107,6 @@ export function ManhattanPlot({
 
     // add a dotted line at -log10(p) = 5*10^-8
     const threshold = -Math.log10(5 * 10 ** -8);
-    console.log(threshold, scaleY(threshold));
 
     let context = canvas.getContext('2d');
     context.beginPath();
@@ -183,7 +176,6 @@ export function ManhattanPlot({
           scaleX(arr[idx] - (idx > 0 ? arr[idx - 1] : 0)) + 'px';
 
         overlay.onclick = () => {
-          console.log(rangeSubset[idx]);
           const chromosome = rangeSubset[idx].chr;
           const args = {
             database: phenotype + '.db',
@@ -205,10 +197,10 @@ export function ManhattanPlot({
     setLoading(false);
   };
 
-  const drawVariantsPlot = async params => {
+  const drawVariantsPlot = async(params, results) => {
     setLoading(true);
-
-    const results = await rawQuery('variants', params);
+    if (!results)
+      results = await rawQuery('variants', params);
     const data = results.data;
     const columnIndexes = {
       variant_id: results.columns.indexOf('variant_id'),
@@ -229,15 +221,14 @@ export function ManhattanPlot({
         bottom: 40
       },
       point: {
-        // fast: true,
-        opacity: 0.8,
+        opacity: 0.6,
         size: 3,
         color: '#005ea2'
       },
       x: {
         key: columnIndexes.bp,
-        min: 0,
-        max: ranges[params.chr - 1].bp_max
+        min: params.bpMin || 0,
+        max: params.bpMax || ranges[params.chr - 1].bp_max
       },
 
       y: {
@@ -256,26 +247,74 @@ export function ManhattanPlot({
         color: (d, i) => indexToColor(i)
       }
     });
+
     const interactiveCanvas = document.createElement('canvas');
+    interactiveCanvas.className = 'interactive-overlay';
     interactiveCanvas.width = canvas.width;
     interactiveCanvas.height = canvas.height;
-    interactiveCanvas.className = 'interactive-overlay';
+
     const interactiveCtx = interactiveCanvas.getContext('2d');
-    interactiveCtx.globalAlpha = 0.5;
-    interactiveCtx.globalCompositeOperation = 'copy';
+    interactiveCtx.globalAlpha = 0.4;
+   interactiveCtx.globalCompositeOperation = 'copy';
+
+    let isMouseDown = false;
+    let selectedArea = false;
+    let overlayPosition = {x1: 0, y1: 0, x2: 0, y2: 0};
+    const isWithinScatterplot = (x, y, config) => {
+      const { margins } = config;
+      const { width, height } = config.canvas;
+      return x >= margins.left && x <= (width - margins.right) &&
+        y >= margins.top && y <= (height - margins.bottom);
+    };
 
     canvas.addEventListener('mousemove', e => {
+      const {x, y} = viewportToLocalCoordinates(e.clientX, e.clientY, canvas);
+
       const ctx = backingCanvas.getContext('2d');
-      const { x, y } = viewportToLocalCoordinates(e.clientX, e.clientY, canvas);
       const [r, g, b, a] = ctx.getImageData(x, y, 1, 1).data;
       if (!a) {
-        canvas.style.cursor = 'default';
+        const withinScatterplot = isWithinScatterplot(x, y, config);
+        canvas.style.cursor = withinScatterplot
+          ? 'crosshair' : 'default';
         return;
       }
       const index = colorToIndex(r, g, b);
       const pointData = data[index];
       if (pointData) {
         canvas.style.cursor = 'pointer';
+      }
+    });
+
+    canvas.addEventListener('mousedown', e => {
+      const {x, y} = viewportToLocalCoordinates(e.clientX, e.clientY, canvas);
+      const withinScatterplot = isWithinScatterplot(x, y, config);
+      if (withinScatterplot) {
+        clearSelectionOverlay();
+        selectedArea = false;
+        isMouseDown = true;
+        overlayPosition.x1 = x;
+        overlayPosition.y1 = y;
+        overlayPosition.x2 = x;
+        overlayPosition.y2 = y;
+      }
+    });
+
+    canvas.addEventListener('mousemove', e => {
+      if (isMouseDown) {
+        const {x, y} = viewportToLocalCoordinates(e.clientX, e.clientY, canvas);
+        // const withinScatterplot = isWithinScatterplot(x, y, config);
+        overlayPosition.x2 = x;
+        overlayPosition.y2 = y;
+        updateSelectionOverlay();
+        selectedArea = true;
+      }
+    });
+
+    canvas.addEventListener('mouseup', e => {
+      isMouseDown = false;
+      const {x1, y1, x2, y2} = overlayPosition;
+      if ((Math.abs(y2 - y1) + Math.abs(x2 - x1)) > 50) {
+        finalizeSelectionOverlay();
       }
     });
 
@@ -356,8 +395,8 @@ export function ManhattanPlot({
     context.strokeStyle = '#888';
     context.lineWidth = 1;
     context.setLineDash([6, 4]);
-    context.moveTo(margins.left, thresholdScale(threshold));
-    context.lineTo(width, thresholdScale(threshold));
+    context.moveTo(margins.left, margins.top + thresholdScale(threshold));
+    context.lineTo(margins.left + width, margins.top + thresholdScale(threshold));
     context.stroke();
 
     let defaultDef = {
@@ -379,7 +418,7 @@ export function ManhattanPlot({
       xOffset: margins.left,
       yOffset: margins.top,
       scale: scaleY,
-      tickValues: range(config.y.min, config.y.max)
+      tickValues: scaleY.ticks()//range(config.y.min, config.y.max)
     });
 
     const scaleX = d3
@@ -406,6 +445,10 @@ export function ManhattanPlot({
     tooltip.className = 'custom-tooltip';
     plotContainer.current.appendChild(tooltip);
 
+    const selectionOverlay = document.createElement('div');
+    selectionOverlay.className = 'selection-overlay';
+    plotContainer.current.appendChild(selectionOverlay);
+
     function clearTooltip() {
       tooltip.style.display = 'none';
       tooltip.innerHTML = '';
@@ -419,38 +462,90 @@ export function ManhattanPlot({
       tooltip.appendChild(node);
     }
 
+    function clearSelectionOverlay() {
+      interactiveCtx.clearRect(
+        config.margins.left,
+        config.margins.top,
+        interactiveCanvas.width - config.margins.left - config.margins.right,
+        interactiveCanvas.height  - config.margins.top - config.margins.bottom
+      );
+    }
+
+    function updateSelectionOverlay() {
+      const {x1, y1, x2, y2} = overlayPosition;
+      interactiveCtx.fillStyle = '#000';
+      interactiveCtx.fillRect(
+        config.margins.left,
+        config.margins.top,
+        interactiveCanvas.width - config.margins.left - config.margins.right,
+        interactiveCanvas.height  - config.margins.top - config.margins.bottom
+      );
+
+      interactiveCtx.clearRect(
+        Math.min(x1, x2),
+        Math.min(y1, y2),
+        Math.abs(x2 - x1),
+        Math.abs(y2 - y1)
+      );
+    }
+
+    const selectionScaleX = getScale(
+      [0, width],
+      [config.x.min, scaleX.ticks()[scaleX.ticks().length - 1]]
+    )
+
+    const selectionScaleY = getScale(
+      [height, 0],
+      [config.y.min, config.y.max]
+    )
+
+
+    function finalizeSelectionOverlay() {
+      const {x1, y1, x2, y2} = overlayPosition;
+
+      const bpMin = selectionScaleX(Math.min(x1, x2) - margins.left);
+      const bpMax = selectionScaleX(Math.max(x1, x2) - margins.left);
+      const nlogpMin = selectionScaleY(Math.max(y1, y2) - margins.top);
+      const nlogpMax = selectionScaleY(Math.min(y1, y2) - margins.top);
+
+      const zoomParams = {
+        database: params.database,
+        chr: params.chr,
+        nlogpMin,
+        nlogpMax,
+        bpMin,
+        bpMax
+      };
+
+      onZoom && onZoom(zoomParams);
+      drawVariantsPlot(zoomParams, {
+        columns: results.columns,
+        data: results.data.filter(e =>
+          +e[columnIndexes.bp] >= Math.floor(+bpMin - 1e-6) &&
+          +e[columnIndexes.bp] <= Math.ceil(+bpMax + 1e6) &&
+          +e[columnIndexes.nlog_p] >= (+nlogpMin - 1e-6) &&
+          +e[columnIndexes.nlog_p] <= (+nlogpMax + 1e6)
+        )
+      });
+    }
+
     setLoading(false);
   };
 
   return (
-    <div className="row">
-      <div className="col-md-12">
-        <div
-          ref={plotContainer}
-          className="manhattan-plot"
-          style={{ display: loading ? 'none' : 'block' }}
-        />
-        <div
-          className="text-center"
-          style={{ display: loading ? 'block' : 'none' }}>
-          <Spinner animation="border" variant="primary" role="status">
-            <span className="sr-only">Loading...</span>
-          </Spinner>
-        </div>
-        {/* <pre>{ JSON.stringify(params, null, 2) }</pre> */}
+    <>
+      <div
+        ref={plotContainer}
+        className="manhattan-plot"
+        style={{ display: loading ? 'none' : 'block' }}
+      />
+      <div
+        className="text-center"
+        style={{ display: loading ? 'block' : 'none' }}>
+        <Spinner animation="border" variant="primary" role="status">
+          <span className="sr-only">Loading...</span>
+        </Spinner>
       </div>
-      {/* <div class="col-md-12" style={{opacity: 0.5}}> */}
-      <div class="btn-group" role="group" aria-label="Basic example">
-        {/* <button
-            className="btn btn-primary btn-sm"
-            onClick={e => drawSummaryPlot(phenotype.value)}
-            disabled={loading}>
-            Reset
-          </button> */}
-      </div>
-      {/* {timestamp ? <span class="mx-2">{timestamp} s</span> : null} */}
-    </div>
-
-    // </div>
+    </>
   );
 }

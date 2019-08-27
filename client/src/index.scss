@@ -132,7 +132,17 @@ h1 {
     left: 0;
   }
 
+  .selection-overlay {
+    position: absolute;
+    opacity: 0.2;
+    background-color: #888;
+    top: 0;
+    left: 0;
+    display: none;
+  }
+
   .custom-tooltip {
+    display: none;
     position: absolute;
     background-color: white;
     border: 1px solid #bbb;

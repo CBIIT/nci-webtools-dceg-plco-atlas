@@ -34,18 +34,28 @@ function getVariants(filepath, params) {
 }
 
 function getVariantsByPage(filepath, params) {
-    const stmt = new Database(filepath, {readonly: true}).prepare(
-        `SELECT * FROM variant
-        ${params.chr ? 'WHERE chr = :chr' : ''}
+    const sql = `SELECT * FROM variant
+        ${params.chr ? 'WHERE chr = :chr' : ' '}
+        ${params.bpMin ? ' AND bp >= :bpMin' : ' '}
+        ${params.bpMax ? ' AND bp <= :bpMax' : ' '}
+        ${params.nlogpMin ? ' AND nlog_p >= :nlogpMin' : ' '}
+        ${params.nlogpMax ? ' AND nlog_p <= :nlogpMax' : ' '}
         ORDER BY nlog_p DESC
         LIMIT :limit
-        OFFSET :offset`);
+        OFFSET :offset`;
 
-    const records = params.raw
-        ? getRawResults(stmt, params)
-        : stmt.all(params);
-
-    return records;
+    if (params.count) {
+        const countSql = `SELECT COUNT(*) FROM (${sql})`;
+        const countStmt = new Database(filepath, {readonly: true}).prepare(countSql);
+        const count = countStmt.all(params);
+        return count;
+    } else {
+        const stmt = new Database(filepath, {readonly: true}).prepare(sql);
+        const records = params.raw
+            ? getRawResults(stmt, params)
+            : stmt.all(params);
+        return records;
+    }
 }
 
 function getVariantById(filepath, params) {
