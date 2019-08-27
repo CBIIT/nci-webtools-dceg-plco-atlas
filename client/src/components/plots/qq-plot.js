@@ -100,7 +100,7 @@ export function QQPlot({ drawFunctionRef, onVariantLookup }) {
       if (popupTooltipData && variant[0] !== popupTooltipData['point_#']) {
         setHoverTooltipData({
           'point_#': variant[0],
-          snp: variant[1],
+          'snp': variant[1],
           'p-value': variant[2]
         });
         setHoverTooltipStyle({
