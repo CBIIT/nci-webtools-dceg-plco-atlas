@@ -87,6 +87,8 @@ export function SummaryResults() {
         pageSize: 10,
         database: selectedPhenotype.value + '.db',
         chr: chromosome,
+        orderBy: 'p',
+        order: 'asc',
       })
     }
   }

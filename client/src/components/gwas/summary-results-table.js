@@ -16,10 +16,12 @@ export function SummaryResultsTable({updateFunctionRef}) {
         pageSize,
     } = useSelector(state => state.summaryResults);
     const [currentParams, setCurrentParams] = useState({
-        bpMin: 0,
-        bpMax: 0,
-        nlogpMin: 0,
-        nlogpMax: 0,
+        bpMin: undefined,
+        bpMax: undefined,
+        nlogpMin: undefined,
+        nlogpMax: undefined,
+        orderBy: 'p',
+        order: 'asc',
     })
 
   const updateResults = results => {
@@ -42,14 +44,17 @@ export function SummaryResultsTable({updateFunctionRef}) {
         {
             dataField: 'chr',
             text: 'Chromosome',
+            sort: true,
         },
         {
             dataField: 'bp',
             text: 'Position',
+            sort: true,
         },
         {
             dataField: 'snp',
             text: 'SNP',
+            sort: true,
         },
         {
             dataField: 'a1',
@@ -66,13 +71,7 @@ export function SummaryResultsTable({updateFunctionRef}) {
         {
             dataField: 'p',
             text: 'P-Value',
-            headerFormatter: (column) => {
-                return (
-                  <div>
-                    {column.text}<span className="summary-results-table"><span className="caret-4-asc"></span></span>
-                  </div>
-                );
-              }
+            sort: true,
         },
     ];
 
@@ -84,6 +83,10 @@ export function SummaryResultsTable({updateFunctionRef}) {
         const response = await query('variants-paginated', params);
         setCurrentParams({
             ...currentParams,
+            bpMin: undefined,
+            bpMax: undefined,
+            nlogpMin: undefined,
+            nlogpMax: undefined,
             ...params
         });
         updatePage(page);
@@ -92,13 +95,15 @@ export function SummaryResultsTable({updateFunctionRef}) {
         updateResultsCount(70000000);
     }
 
-    const handleTableChange = async (type, { page, sizePerPage }) => {
+    const handleTableChange = async (type, { page, sizePerPage, sortField, sortOrder }) => {
         updateTable({
             ...currentParams,
             page,
             pageSize: sizePerPage,
             database: selectedPhenotype.value + '.db',
             chr: selectedChromosome,
+            orderBy: sortField,
+            order: sortOrder
         });
     }
 
