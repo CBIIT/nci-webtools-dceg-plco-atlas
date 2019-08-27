@@ -34,13 +34,20 @@ function getVariants(filepath, params) {
 }
 
 function getVariantsByPage(filepath, params) {
+    const orderBy = (/^(chr|bp|snp|p)$/i).test(params.orderBy)
+        ? params.orderBy
+        : 'p';
+    const order = (/^(asc|desc)$/i).test(params.order)
+        ? params.order
+        : 'asc';
+
     const sql = `SELECT * FROM variant
         ${params.chr ? 'WHERE chr = :chr' : ' '}
         ${params.bpMin ? ' AND bp >= :bpMin' : ' '}
         ${params.bpMax ? ' AND bp <= :bpMax' : ' '}
         ${params.nlogpMin ? ' AND nlog_p >= :nlogpMin' : ' '}
         ${params.nlogpMax ? ' AND nlog_p <= :nlogpMax' : ' '}
-        ORDER BY nlog_p DESC
+        ORDER BY ${orderBy} ${order}
         LIMIT :limit
         OFFSET :offset`;
 
