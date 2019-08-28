@@ -1,9 +1,10 @@
 CREATE INDEX idx_variant_id     ON variant(variant_id);
 CREATE INDEX idx_variant_chr    ON variant(chr);
 CREATE INDEX idx_variant_bp     ON variant(bp);
-CREATE INDEX idx_variant_nlog_p ON variant(nlog_p);
 CREATE INDEX idx_variant_snp    ON variant(snp);
-CREATE INDEX idx_variant_query  ON variant(variant_id, chr, bp, nlog_p);
+CREATE INDEX idx_variant_p      ON variant(p);
+CREATE INDEX idx_variant_nlog_p ON variant(nlog_p);
+CREATE INDEX idx_variant_query  ON variant(chr, bp, nlog_p);
 
 CREATE INDEX idx_variant_summary_chr           ON variant_summary(chr);
 CREATE INDEX idx_variant_summary_bp_abs_1000kb ON variant_summary(bp_abs_1000kb);
