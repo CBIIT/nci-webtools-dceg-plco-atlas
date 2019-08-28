@@ -34,15 +34,14 @@ function getVariants(filepath, params) {
 }
 
 function getVariantsByPage(filepath, params) {
+    const isDefined = e => !(/^(null|undefined)$/).test(e);
     const sql = `SELECT * FROM variant
-        ${params.chr ? 'WHERE chr = :chr' : ' '}
-        ${params.bpMin ? ' AND bp >= :bpMin' : ' '}
-        ${params.bpMax ? ' AND bp <= :bpMax' : ' '}
-        ${params.nlogpMin ? ' AND nlog_p >= :nlogpMin' : ' '}
-        ${params.nlogpMax ? ' AND nlog_p <= :nlogpMax' : ' '}
-        ORDER BY nlog_p DESC
-        LIMIT :limit
-        OFFSET :offset`;
+        WHERE p IS NOT NULL
+        ${isDefined(params.chr) ? ' AND chr = :chr' : ' '}
+        ${isDefined(params.bpMin) ? ' AND bp >= :bpMin' : ' '}
+        ${isDefined(params.bpMax) ? ' AND bp <= :bpMax' : ' '}
+        ${isDefined(params.nlogpMin) ? ' AND nlog_p >= :nlogpMin' : ' '}
+        ${isDefined(params.nlogpMax) ? ' AND nlog_p <= :nlogpMax' : ' '}`;
 
     if (params.count) {
         const countSql = `SELECT COUNT(*) FROM (${sql})`;
@@ -50,7 +49,17 @@ function getVariantsByPage(filepath, params) {
         const count = countStmt.all(params);
         return count;
     } else {
-        const stmt = new Database(filepath, {readonly: true}).prepare(sql);
+        const orderBy = ['chr', 'bp', 'snp', 'p'].includes(params.orderBy)
+            ? params.orderBy
+            : 'p';
+        const order = ['asc', 'desc'].includes(params.order)
+            ? params.order
+            : 'asc';
+        const querySql = `${sql}
+            ORDER BY "${orderBy}" ${order}
+            LIMIT :limit
+            OFFSET :offset`;
+        const stmt = new Database(filepath, {readonly: true}).prepare(querySql);
         const records = params.raw
             ? getRawResults(stmt, params)
             : stmt.all(params);
