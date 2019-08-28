@@ -11,6 +11,7 @@ import 'react-dropdown-tree-select/dist/styles.css';
 export function SearchFormTraitsVariant({ onSubmit }) {
   const dispatch = useDispatch();
   const phenotypes = useSelector(state => state.phenotypes);
+  const phenotypesTree = useSelector(state => state.phenotypesTree);
   const variantLookup = useSelector(state => state.variantLookup);
   const {
     selectedListType,
@@ -87,23 +88,6 @@ export function SearchFormTraitsVariant({ onSubmit }) {
     </components.MultiValue>
   );
 
-  const sampleData = {
-    label: 'search me',
-    value: 'searchme',
-    children: [
-      {
-        label: 'search me too',
-        value: 'searchmetoo',
-        children: [
-          {
-            label: 'No one can get me',
-            value: 'anonymous',
-          },
-        ],
-      },
-    ],
-  }
-
   return (
     <Form>
       <Form.Group controlId="trait-list">
@@ -136,22 +120,6 @@ export function SearchFormTraitsVariant({ onSubmit }) {
                 </select>
               </InputGroup.Prepend>
 
-              {/* trait multi-select */}
-              <div style={{ width: '50%' }}>
-                <Select
-                  placeholder="(Select one or more phenotypes) *"
-                  value={selectedPhenotypes}
-                  onChange={handleChange}
-                  isOptionDisabled={option => option.value === null}
-                  options={
-                    selectedListType === 'categorical'
-                      ? categorizedPhenotypes
-                      : alphabetizedPhenotypes
-                  }
-                  isMulti
-                  components={{ MultiValue }}
-                />
-              </div>
               {/* variant input */}
               <FormControl
                 class="form-control"
@@ -176,14 +144,30 @@ export function SearchFormTraitsVariant({ onSubmit }) {
               </InputGroup.Append>
             </InputGroup>
           </div>
-          {/* <div className="col-md-12">
+          <div className="col-md-12 mt-3">
+            <Select
+              placeholder="(Select one or more phenotypes) *"
+              value={selectedPhenotypes}
+              onChange={handleChange}
+              isOptionDisabled={option => option.value === null}
+              options={
+                selectedListType === 'categorical'
+                  ? categorizedPhenotypes
+                  : alphabetizedPhenotypes
+              }
+              isMulti
+              components={{ MultiValue }}
+            />
+          </div>
+          <div className="col-md-12 mt-3">
             <DropdownTreeSelect 
-              data={sampleData} 
+              className="dropdown-tree"
+              data={phenotypesTree} 
               // onChange={onChange} 
               // onAction={onAction} 
               // onNodeToggle={onNodeToggle} 
               />
-          </div> */}
+          </div>
         </div>
       </Form.Group>
     </Form>
