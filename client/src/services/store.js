@@ -4,6 +4,7 @@ import ReduxThunk from 'redux-thunk';
 
 const initialState = {
   phenotypes: [],
+  phenotypesTree: [],
   summaryResults: {
     selectedListType: 'alphabetic',
     selectedPhenotype: null,
@@ -30,7 +31,7 @@ const initialState = {
     selectedListType: 'alphabetic',
     selectedPhenotype: null,
     selectedPhenotypes: [],
-    selectedVariant: null,
+    selectedVariant: '',
     selectedGender: 'combined',
     results: [],
     message: '',
@@ -40,6 +41,7 @@ const initialState = {
     drawHeatmap: null,
     selectedListType: 'alphabetic',
     selectedPhenotypes: [],
+    heatmapData: [],
     results: [],
     loading: false,
     submitted: null,

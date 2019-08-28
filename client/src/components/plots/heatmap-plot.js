@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { root, query } from '../../services/query';
+import { rawQuery, query } from '../../services/query';
 import { updatePhenotypeCorrelations } from '../../services/actions';
 import { Spinner, Button, ButtonGroup, ToggleButton } from 'react-bootstrap';
 
@@ -10,18 +10,23 @@ export function Heatmap({ drawFunctionRef }) {
   const dispatch = useDispatch();
 
   const {
-    selectedListType,
-    selectedPhenotypes,
-    results,
+    // selectedListType,
+    // selectedPhenotypes,
+    // results,
+    heatmapData,
     loading,
-    submitted
+    // submitted
   } = useSelector(state => state.phenotypeCorrelations);
 
   const setLoading = loading => {
     dispatch(updatePhenotypeCorrelations({loading}));
   };
 
-  const [data, setData] = useState([]);
+  const setHeatmapData = heatmapData => {
+    dispatch(updatePhenotypeCorrelations({heatmapData}));
+  }
+
+  // const [heatmapData, setHeatmapData] = useState([]);
   const [numPhenotypes, setNumPhenotypes] = useState(2);
 
   const layout = {
@@ -110,6 +115,8 @@ export function Heatmap({ drawFunctionRef }) {
       x,
       y,
       z,
+      xgap: 1,
+      ygap: 1,
       type: 'heatmap',
       colorscale: [
         ['0.0', 'rgb(255,255,255)'],
@@ -131,9 +138,83 @@ export function Heatmap({ drawFunctionRef }) {
                       '<extra></extra>'
                       
     };
-    setData([randomData]);
+    console.log([randomData]);
+    setHeatmapData([randomData]);
     setLoading(false);
   };
+
+  const getZ = (phenotype1, phenotype2, correlationData) => {
+    let r2 = phenotype1 + " _ " + phenotype2;
+    for (var i = 0; i < correlationData.length; i++) {
+      if ((correlationData[i][1] === phenotype1 && correlationData[i][2] === phenotype2) ||
+          (correlationData[i][1] === phenotype2 && correlationData[i][2] === phenotype1)) {
+        r2 = correlationData[i][3]
+      }
+    }
+    return r2;
+  }
+
+  const loadSamplePhenotypes = async () => {
+    setLoading(true);
+
+    const correlationData = await rawQuery('correlations', {
+      database: 'sample_correlations.db'
+    });
+
+    let allPhenotypes = [];
+    for (var i = 0; i < correlationData.data.length; i++) {
+      allPhenotypes.push(correlationData.data[i][[1]]);
+    }
+    let uniquePhenotypes = [...new Set(allPhenotypes)];
+    let x = [];
+    let y = [];
+    let z = [];
+    for (var i = 0; i < uniquePhenotypes.length; i++) {
+      x.push(uniquePhenotypes[i]);
+      y.unshift(uniquePhenotypes[i]);
+    }
+
+    for (var xidx = 0; xidx < x.length; xidx++) {
+      let row = [];
+      for (var yidx = 0; yidx < y.length; yidx++) {
+        row.unshift(getZ(x[xidx], y[yidx], correlationData.data));
+      }
+      z.unshift(row);
+    }
+
+    let sampleData = {
+      x,
+      y,
+      z,
+      xgap: 1,
+      ygap: 1,
+      type: 'heatmap',
+      colorscale: [
+        ['0.0', 'rgb(255,255,255)'],
+        ['0.000000000001', 'rgb(0,0,255)'],
+        ['0.111111111111', 'rgb(50,50,255)'],
+        ['0.222222222222', 'rgb(127,127,255)'],
+        ['0.333333333333', 'rgb(178,178,255)'],
+        ['0.444444444444', 'rgb(255,255,255)'],
+        ['0.555555555556', 'rgb(255,255,255)'],
+        ['0.666666666667', 'rgb(255,153,153)'],
+        ['0.777777777778', 'rgb(255,102,102)'],
+        ['0.888888888889', 'rgb(255,50,50)'],
+        ['0.999999999999', 'rgb(255,0,0)'],
+        ['1.0', 'rgb(255,255,255)']
+      ],
+      showscale: false,
+      hoverinfo:"x+y",
+      hovertemplate: '<br><b>Phenotype X</b>: %{x}<br>' +
+                      '<b>Phenotype Y</b>: %{y}<br>' +
+                      '<b>Correlation</b>: %{z}' +
+                      '<extra></extra>'
+                      
+    };
+    console.log([sampleData]);
+    setHeatmapData([sampleData]);
+    setLoading(false);
+  }
 
   return (
     <div className="row">
@@ -153,19 +234,22 @@ export function Heatmap({ drawFunctionRef }) {
           </ToggleButton>
         </ButtonGroup>
         <Button className="ml-3" onClick={generateData}>
-          Generate sample data
+          Generate Sample Data
+        </Button>
+        <Button className="ml-3" onClick={loadSamplePhenotypes}>
+          Load Sample Phenotypes
         </Button>
       </div>
       <div
         className="col-md-12"
-        style={{ display: data.length > 0 ? 'block' : 'none' }}>
+        style={{ display: heatmapData.length > 0 && !loading ? 'block' : 'none' }}>
         <div
           style={{
             display: 'flex',
             justifyContent: 'center',
             alignItems: 'center'
           }}>
-          <Plot data={data} layout={layout} config={config} />
+          <Plot data={heatmapData} layout={layout} config={config} />
         </div>
       </div>
       <div className="col-md-12">

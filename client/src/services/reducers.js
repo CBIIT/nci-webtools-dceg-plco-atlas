@@ -2,7 +2,8 @@ import {
   UPDATE_SUMMARY_RESULTS,
   UPDATE_VARIANT_LOOKUP,
   UPDATE_PHENOTYPE_CORRELATIONS,
-  UPDATE_PHENOTYPES
+  UPDATE_PHENOTYPES,
+  UPDATE_PHENOTYPES_TREE
 } from './actions';
 
 export const rootReducer = (state, action) => {
@@ -35,6 +36,11 @@ export const rootReducer = (state, action) => {
       return {
         ...state,
         phenotypes: action.data
+      };
+    case UPDATE_PHENOTYPES_TREE:
+      return {
+        ...state,
+        phenotypesTree: action.data
       };
     default:
       return state;

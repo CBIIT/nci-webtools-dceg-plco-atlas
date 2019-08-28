@@ -5,7 +5,7 @@ import { ButtonGroup, Button } from 'react-bootstrap';
 import { SummaryResults } from '../gwas/summary-results';
 import { VariantLookup } from '../gwas/variant-lookup';
 import { PhenotypeCorrelations } from '../gwas/phenotype-correlations';
-import { updatePhenotypes } from '../../services/actions';
+import { updatePhenotypes, updatePhenotypesTree } from '../../services/actions';
 import { query } from '../../services/query';
 
 export function Gwas() {
@@ -21,6 +21,7 @@ export function Gwas() {
     query('data/phenotypes.json').then(data => {
       data.forEach(populateRecords, 0);
       dispatch(updatePhenotypes(records));
+      dispatch(updatePhenotypesTree(data));
     });
   }, []);
 

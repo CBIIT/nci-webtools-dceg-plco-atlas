@@ -62,10 +62,10 @@ export function PhenotypeCorrelations() {
       <div className="card shadow-sm mb-4">
         <div className="card-body">
           <div className="row">
-            <div class="col-md-12 text-left">
-              <pre>{JSON.stringify(phenotypeCorrelations, null, 2)}</pre>
-            </div>
             <Heatmap drawFunctionRef={setDrawHeatmap} />
+            {/* <div class="col-md-12 text-left">
+              <pre>{JSON.stringify(phenotypeCorrelations, null, 2)}</pre>
+            </div> */}
           </div>
         </div>
       </div>

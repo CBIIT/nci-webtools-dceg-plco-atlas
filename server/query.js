@@ -94,12 +94,14 @@ function getVariant(filepath, params) {
         : stmt.all(params);
 }
 
-// function getQQImageMapJSON(name) {
-//     let raw = fs.readFileSync('server/data/qq-plots/' + name + '.imagemap.json');
-//     let obj = JSON.parse(raw);
-//     return {
-//         data: obj
-//     };
-// }
+function getCorrelations(filepath, params) {
+    const stmt = new Database(filepath, {readonly: true}).prepare(`
+        SELECT * FROM correlations
+    `);
 
-module.exports = {getSummary, getVariants, getVariantsByPage, getVariant, getVariantById};
+    return params.raw
+        ? getRawResults(stmt, params)
+        : stmt.all(params);
+}
+
+module.exports = {getSummary, getVariants, getVariantsByPage, getVariant, getVariantById, getCorrelations};
