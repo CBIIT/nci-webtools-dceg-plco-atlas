@@ -40,6 +40,7 @@ const initialState = {
     drawHeatmap: null,
     selectedListType: 'alphabetic',
     selectedPhenotypes: [],
+    heatmapData: [],
     results: [],
     loading: false,
     submitted: null,

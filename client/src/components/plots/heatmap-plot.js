@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { root, query } from '../../services/query';
+import { rawQuery, query } from '../../services/query';
 import { updatePhenotypeCorrelations } from '../../services/actions';
 import { Spinner, Button, ButtonGroup, ToggleButton } from 'react-bootstrap';
 
@@ -10,18 +10,23 @@ export function Heatmap({ drawFunctionRef }) {
   const dispatch = useDispatch();
 
   const {
-    selectedListType,
-    selectedPhenotypes,
-    results,
+    // selectedListType,
+    // selectedPhenotypes,
+    // results,
+    heatmapData,
     loading,
-    submitted
+    // submitted
   } = useSelector(state => state.phenotypeCorrelations);
 
   const setLoading = loading => {
     dispatch(updatePhenotypeCorrelations({loading}));
   };
 
-  const [data, setData] = useState([]);
+  const setHeatmapData = heatmapData => {
+    dispatch(updatePhenotypeCorrelations({heatmapData}));
+  }
+
+  // const [heatmapData, setHeatmapData] = useState([]);
   const [numPhenotypes, setNumPhenotypes] = useState(2);
 
   const layout = {
@@ -131,9 +136,22 @@ export function Heatmap({ drawFunctionRef }) {
                       '<extra></extra>'
                       
     };
-    setData([randomData]);
+    console.log([randomData]);
+    setHeatmapData([randomData]);
     setLoading(false);
   };
+
+  const loadSamplePhenotypes = async () => {
+    setLoading(true);
+    console.log("Load Sample Phenotypes");
+
+    const results = await rawQuery('correlations', {
+      database: 'sample_correlations.db'
+    });
+    console.log(results);
+
+    setLoading(false);
+  }
 
   return (
     <div className="row">
@@ -153,19 +171,22 @@ export function Heatmap({ drawFunctionRef }) {
           </ToggleButton>
         </ButtonGroup>
         <Button className="ml-3" onClick={generateData}>
-          Generate sample data
+          Generate Sample Data
+        </Button>
+        <Button className="ml-3" onClick={loadSamplePhenotypes}>
+          Load Sample Phenotypes
         </Button>
       </div>
       <div
         className="col-md-12"
-        style={{ display: data.length > 0 ? 'block' : 'none' }}>
+        style={{ display: heatmapData.length > 0 ? 'block' : 'none' }}>
         <div
           style={{
             display: 'flex',
             justifyContent: 'center',
             alignItems: 'center'
           }}>
-          <Plot data={data} layout={layout} config={config} />
+          <Plot data={heatmapData} layout={layout} config={config} />
         </div>
       </div>
       <div className="col-md-12">
