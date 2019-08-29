@@ -14,25 +14,25 @@ function App() {
     {
       route: '/about',
       title: 'About',
-      image: 'assets/images/about-icon.svg',
+      image: 'assets/images/about.svg',
       navIndex: 3
     },
     {
       route: '/gwas',
       title: 'GWAS',
-      image: 'assets/images/gwas-icon.svg',
+      image: 'assets/images/gwas.svg',
       navIndex: 0
     },
     {
       route: '/phenotypes',
       title: 'Phenotypes',
-      image: 'assets/images/phenotypes-icon.svg',
+      image: 'assets/images/phenotypes.svg',
       navIndex: 1
     },
     {
       route: '/downloads',
       title: 'Downloads',
-      image: 'assets/images/downloads-icon.svg',
+      image: 'assets/images/downloads.svg',
       navIndex: 2
     }
   ];

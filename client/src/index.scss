@@ -17,7 +17,15 @@ $blue: #005ea2;
 }
 
 .bg-primary {
-  background-color: #005ea2;
+  background-color: #333C4E !important;
+}
+
+.bg-secondary {
+  background-color: #F0F1F7 !important;
+}
+
+.bg-egg {
+  background-color: #F7F5F4;
 }
 
 .bg-primary-vivid {
@@ -67,7 +75,7 @@ h1 {
   z-index: 0;
   overflow: hidden;
   display: block;
-  height: 50vh;
+  height: 420px;
   // height: 422px;
   position: relative;
 
@@ -95,8 +103,8 @@ h1 {
 }
 
 .active-navlinks {
-  background-color: white !important;
-  color: black !important;
+  background-color:#7A808C !important;
+  color: white !important;
   font-weight: bold !important;
 
   button {
@@ -105,9 +113,9 @@ h1 {
     font-weight: bold !important;
   }
 
-  &:hover {
-    color: black !important;
-  }
+  // &:hover {
+  //   color: black !important;
+  // }
 }
 
 .manhattan-plot {
