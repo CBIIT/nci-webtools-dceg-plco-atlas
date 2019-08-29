@@ -39,6 +39,7 @@ export function SummaryResults() {
     dispatch(updateSummaryResults({ drawQQPlot }));
   };
 
+  // registers a function we can use to update the results table
   const setUpdateResultsTable = updateResultsTable => {
     dispatch(updateSummaryResults({ updateResultsTable }));
   };
@@ -77,9 +78,11 @@ export function SummaryResults() {
       return;
     }
 
-    if (drawManhattanPlot) drawManhattanPlot(params.value);
+    if (drawManhattanPlot) 
+      drawManhattanPlot(params.value);
 
-    if (drawQQPlot) drawQQPlot(params.value);
+    if (drawQQPlot) 
+      drawQQPlot(params.value);
 
     if (updateResultsTable)
       updateResultsTable({page, pageSize, database: params.value + '.db'});
@@ -177,7 +180,8 @@ export function SummaryResults() {
                     <div className="my-4" style={{display: submitted ? 'block' : 'none'}}>
                       <SummaryResultsTable
                         className="mw-100"
-                        updateFunctionRef={setUpdateResultsTable} />
+                        updateFunctionRef={setUpdateResultsTable} 
+                        />
                     </div>
               </Tab.Pane>
 
