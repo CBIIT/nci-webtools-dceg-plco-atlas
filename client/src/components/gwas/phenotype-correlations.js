@@ -63,7 +63,7 @@ export function PhenotypeCorrelations() {
         <div className="card-body">
           <div className="row">
             <Heatmap drawFunctionRef={setDrawHeatmap} />
-            {/* <div class="col-md-12 text-left">
+            {/* <div className="col-md-12 text-left">
               <pre>{JSON.stringify(phenotypeCorrelations, null, 2)}</pre>
             </div> */}
           </div>

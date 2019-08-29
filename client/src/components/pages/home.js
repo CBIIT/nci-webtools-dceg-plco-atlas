@@ -20,10 +20,11 @@ export function Home({ links }) {
 
       <div
         className="container pt-4 align-middle text-center"
-        style={{ 'margin-top': '-10vh' }}>
+        style={{ 'marginTop': '-10vh' }}>
         <CardDeck>
           {links.map(({ exact, route, title, image }, index) => (
             <Card
+              key={title}
               className="shadow"
               style={{
                 width: '18rem',

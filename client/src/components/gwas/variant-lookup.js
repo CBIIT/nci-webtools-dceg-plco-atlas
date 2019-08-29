@@ -83,7 +83,7 @@ export function VariantLookup() {
 
         <div className="card-body">
           <div className="row text-center">
-            {/* <div class="col-md-12 text-left">
+            {/* <div className="col-md-12 text-left">
                             <pre>{JSON.stringify(variantLookup, null, 2)}</pre>
                         </div> */}
             <div className="col-md-12">

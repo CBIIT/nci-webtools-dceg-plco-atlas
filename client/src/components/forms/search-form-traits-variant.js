@@ -100,7 +100,7 @@ export function SearchFormTraitsVariant({ onSubmit }) {
               {/* gender select */}
               <InputGroup.Prepend>
                 <select
-                  class="form-control"
+                  className="form-control"
                   value={selectedGender}
                   onChange={e => setSelectedGender(e.target.value)}>
                   <option value="combined">Combined</option>
@@ -112,7 +112,7 @@ export function SearchFormTraitsVariant({ onSubmit }) {
               {/* alpha/categorical select */}
               <InputGroup.Prepend>
                 <select
-                  class="form-control"
+                  className="form-control"
                   value={selectedListType}
                   onChange={e => setSelectedListType(e.target.value)}>
                   <option value="alphabetic">Alphabetic</option>
@@ -122,7 +122,7 @@ export function SearchFormTraitsVariant({ onSubmit }) {
 
               {/* variant input */}
               <FormControl
-                class="form-control"
+                className="form-control"
                 placeholder="(Variant rsid or coordinate) *"
                 aria-label="Variant (required)"
                 value={selectedVariant}

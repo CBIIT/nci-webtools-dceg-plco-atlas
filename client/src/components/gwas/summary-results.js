@@ -147,7 +147,7 @@ export function SummaryResults() {
             <Tab.Content>
               <Tab.Pane eventKey="manhattan-plot">
                 <div>
-                  <label class="mr-3">
+                  <label className="mr-3">
                     <input
                       type="radio"
                       name="plot-type"
@@ -156,15 +156,15 @@ export function SummaryResults() {
                     />
                     Combined
                   </label>
-                  <label class="mr-3">
+                  <label className="mr-3">
                     <input type="radio" name="plot-type" value="mirrored" />
                     Mirrored
                   </label>
-                  <label class="mr-3">
+                  <label className="mr-3">
                     <input type="radio" name="plot-type" value="male" />
                     Male
                   </label>
-                  <label class="mr-3">
+                  <label className="mr-3">
                     <input type="radio" name="plot-type" value="female" />
                     Female
                   </label>

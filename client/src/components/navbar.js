@@ -10,6 +10,7 @@ export function Navbar({ links }) {
           .sort((a, b) => a.navIndex - b.navIndex)
           .map(({ route, title, exact }) => (
             <NavLink
+              key={title}
               className="navlinks text-white py-2 px-4 d-inline-block "
               style={{ fontWeight: 600 }}
               activeClassName="active-navlinks"

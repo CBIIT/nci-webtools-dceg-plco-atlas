@@ -200,6 +200,7 @@ export function QQPlot({ drawFunctionRef, onVariantLookup }) {
                 {areaItems.map(function(area) {
                   return (
                     <area
+                      key={area.alt}
                       shape={area.shape}
                       coords={area.coords}
                       alt={area.alt}
