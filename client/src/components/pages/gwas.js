@@ -45,6 +45,7 @@ export function Gwas() {
       <ButtonGroup className="mb-4">
         {gwasLinks.map(({ name, pathId }) => (
           <NavLink
+            key={pathId}
             className="mr-2"
             activeClassName="active-navlinks"
             exact={true}

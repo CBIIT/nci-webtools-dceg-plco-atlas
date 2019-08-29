@@ -51,7 +51,7 @@ export function SearchFormTraits({ onChange, onSubmit }) {
         <InputGroup>
           <InputGroup.Prepend>
             <select
-              class="form-control"
+              className="form-control"
               value={selectedListType}
               onChange={e => setSelectedListType(e.target.value)}>
               <option value="alphabetic">Alphabetic</option>
