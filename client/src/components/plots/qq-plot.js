@@ -142,7 +142,7 @@ export function QQPlot({ drawFunctionRef, onVariantLookup }) {
       <div className="row mt-3">
         {
           qqplotSrc && (
-            <div className="col-md-12 text-center" style={{ display: loading ? 'none' : 'block' }}>
+            <div className="col-md-12 text-center">
               <b>&lambda;</b> = {lambdaGC} <b className="ml-4">Sample Size</b> = {sampleSize}
             </div>
           )
@@ -183,16 +183,19 @@ export function QQPlot({ drawFunctionRef, onVariantLookup }) {
                 <br />
                 <b>snp:</b> {hoverTooltipData.snp}
               </div>
+              
+              {
+                qqplotSrc && (
+                  <img
+                    src={qqplotSrc}
+                    draggable={false}
+                    alt="QQ Plot"
+                    useMap="#image-map"
+                    onClick={e => popupMarkerClick(e)}
+                  />
+                )
+              }
 
-              {qqplotSrc && (
-                <img
-                  src={qqplotSrc}
-                  draggable={false}
-                  alt="QQ Plot"
-                  useMap="#image-map"
-                  onClick={e => popupMarkerClick(e)}
-                />
-              )}
               <map name="image-map">
                 {areaItems.map(function(area) {
                   return (
