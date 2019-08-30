@@ -26,6 +26,29 @@ export function updatePhenotypeCorrelations(data) {
   return { type: UPDATE_PHENOTYPE_CORRELATIONS, data };
 }
 
+export function drawQQPlot(phenotype) {
+  return async function (dispatch) {
+    const setLoading = loading => {
+      dispatch(updateSummaryResults({loading}))
+    }
+    setLoading(true);
+    const imageMapData = await query(
+      `data/qq-plots/${phenotype}.imagemap.json`
+    );
+    if (!imageMapData.error) {
+      dispatch(updateSummaryResults({
+        qqplotSrc: `data/qq-plots/${phenotype}.png`,
+        ...imageMapData
+      }))
+      // setLambdaGC(imageMapData.lambdaGC);
+      // setSampleSize(imageMapData.sampleSize);
+      // setAreaItems(imageMapData.areaItems);
+    }
+    setLoading(false);
+  
+  }
+};
+
 export function lookupVariants(phenotypes, variant) {
   return async function(dispatch) {
     dispatch(

@@ -8,7 +8,8 @@ import { SummaryResultsTable } from './summary-results-table';
 import {
   updateSummaryResults,
   updateVariantLookup,
-  lookupVariants
+  lookupVariants,
+  drawQQPlot,
 } from '../../services/actions';
 
 export function SummaryResults() {
@@ -19,7 +20,6 @@ export function SummaryResults() {
     submitted,
     messages,
     drawManhattanPlot,
-    drawQQPlot,
     updateResultsTable,
     page,
     pageSize,
@@ -30,19 +30,19 @@ export function SummaryResults() {
   };
 
   // registers a function we can use to draw the manhattan plot
-  const setDrawManhattanPlot = drawManhattanPlot => {
-    dispatch(updateSummaryResults({ drawManhattanPlot }));
-  };
+  // const setDrawManhattanPlot = drawManhattanPlot => {
+  //   dispatch(updateSummaryResults({ drawManhattanPlot }));
+  // };
 
   // registers a function we can use to draw the qq plot
-  const setDrawQQPlot = drawQQPlot => {
-    dispatch(updateSummaryResults({ drawQQPlot }));
-  };
+  // const setDrawQQPlot = drawQQPlot => {
+  //   dispatch(updateSummaryResults({ drawQQPlot }));
+  // };
 
-  // registers a function we can use to update the results table
-  const setUpdateResultsTable = updateResultsTable => {
-    dispatch(updateSummaryResults({ updateResultsTable }));
-  };
+  // // registers a function we can use to update the results table
+  // const setUpdateResultsTable = updateResultsTable => {
+  //   dispatch(updateSummaryResults({ updateResultsTable }));
+  // };
 
   const setSelectedChromosome = selectedChromosome => {
     dispatch(updateSummaryResults({ selectedChromosome }));
@@ -78,14 +78,13 @@ export function SummaryResults() {
       return;
     }
 
-    if (drawManhattanPlot) 
-      drawManhattanPlot(params.value);
+    // if (drawManhattanPlot) 
+    //   drawManhattanPlot(params.value);
 
-    if (drawQQPlot) 
-      drawQQPlot(params.value);
-
-    if (updateResultsTable)
-      updateResultsTable({page, pageSize, database: params.value + '.db'});
+    dispatch(drawQQPlot(params.value));
+    
+    // if (updateResultsTable)
+    //   updateResultsTable({page, pageSize, database: params.value + '.db'});
   }
 
   const handleChromosomeChanged = chromosome => {
@@ -173,21 +172,21 @@ export function SummaryResults() {
                   </label>
                 </div>
                   <ManhattanPlot
-                    drawFunctionRef={setDrawManhattanPlot}
+                    // drawFunctionRef={setDrawManhattanPlot}
                     onChromosomeChanged={handleChromosomeChanged}
                     onVariantLookup={handleVariantLookup}
                     onZoom={handleZoom} />
                     <div className="my-4" style={{display: submitted ? 'block' : 'none'}}>
                       <SummaryResultsTable
                         className="mw-100"
-                        updateFunctionRef={setUpdateResultsTable} 
+                        // updateFunctionRef={setUpdateResultsTable} 
                         />
                     </div>
               </Tab.Pane>
 
               <Tab.Pane eventKey="qq-plot">
                 <QQPlot
-                  drawFunctionRef={setDrawQQPlot}
+                  // drawFunctionRef={setDrawQQPlot}
                   onVariantLookup={handleVariantLookup}
                 />
               </Tab.Pane>

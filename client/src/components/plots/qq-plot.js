@@ -6,7 +6,7 @@ import { Link } from 'react-router-dom';
 import { Spinner } from 'react-bootstrap';
 import ReactCursorPosition from 'react-cursor-position';
 
-export function QQPlot({ drawFunctionRef, onVariantLookup }) {
+export function QQPlot({ onVariantLookup }) {
   const dispatch = useDispatch();
   const summaryResults = useSelector(state => state.summaryResults);
   // const { phenotype, loading, areaItems } = summaryResults;
@@ -20,25 +20,26 @@ export function QQPlot({ drawFunctionRef, onVariantLookup }) {
     lambdaGC,
     sampleSize
   } = useSelector(state => state.summaryResults);
-  const setLoading = loading => {
-    dispatch(updateSummaryResults({ loading }));
-  };
 
-  const setQQplotSrc = qqplotSrc => {
-    dispatch(updateSummaryResults({ qqplotSrc }));
-  };
+  // const setLoading = loading => {
+  //   dispatch(updateSummaryResults({ loading }));
+  // };
 
-  const setAreaItems = areaItems => {
-    dispatch(updateSummaryResults({ areaItems }));
-  };
+  // const setQQplotSrc = qqplotSrc => {
+  //   dispatch(updateSummaryResults({ qqplotSrc }));
+  // };
 
-  const setSampleSize = sampleSize => {
-    dispatch(updateSummaryResults({ sampleSize }));
-  };
+  // const setAreaItems = areaItems => {
+  //   dispatch(updateSummaryResults({ areaItems }));
+  // };
 
-  const setLambdaGC = lambdaGC => {
-    dispatch(updateSummaryResults({ lambdaGC }));
-  };
+  // const setSampleSize = sampleSize => {
+  //   dispatch(updateSummaryResults({ sampleSize }));
+  // };
+
+  // const setLambdaGC = lambdaGC => {
+  //   dispatch(updateSummaryResults({ lambdaGC }));
+  // };
 
   // temporary set states
   const [hoverTooltipData, setHoverTooltipData] = useState({});
@@ -60,23 +61,23 @@ export function QQPlot({ drawFunctionRef, onVariantLookup }) {
     display: 'none'
   });
 
-  useEffect(() => {
-    if (drawFunctionRef) drawFunctionRef(drawQQPlot);
-  }, [drawFunctionRef]);
+  // useEffect(() => {
+  //   if (drawFunctionRef) drawFunctionRef(drawQQPlot);
+  // }, [drawFunctionRef]);
 
-  const drawQQPlot = async phenotype => {
-    setLoading(true);
-    setQQplotSrc('data/qq-plots/' + phenotype + '.png');
-    const imageMapData = await query(
-      'data/qq-plots/' + phenotype + '.imagemap.json'
-    );
-    if (!imageMapData.error) {
-      setLambdaGC(imageMapData.lambdaGC);
-      setSampleSize(imageMapData.sampleSize);
-      setAreaItems(imageMapData.areaItems);
-    }
-    setLoading(false);
-  };
+  // const drawQQPlot = async phenotype => {
+  //   setLoading(true);
+  //   setQQplotSrc('data/qq-plots/' + phenotype + '.png');
+  //   const imageMapData = await query(
+  //     'data/qq-plots/' + phenotype + '.imagemap.json'
+  //   );
+  //   if (!imageMapData.error) {
+  //     setLambdaGC(imageMapData.lambdaGC);
+  //     setSampleSize(imageMapData.sampleSize);
+  //     setAreaItems(imageMapData.areaItems);
+  //   }
+  //   setLoading(false);
+  // };
 
   const popupMarkerClick = e => {
     // make sure action occurs on imagemap coord only
