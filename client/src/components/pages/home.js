@@ -6,32 +6,45 @@ import { CardDeck, Button } from 'react-bootstrap';
 export function Home({ links }) {
   return (
     <>
-      <div className="container video-banner-container text-center">
+      <div className="container video-banner-container text-center d-none d-md-block">
         <video id="video-banner" autoPlay muted loop>
           <source src="assets/images/plco-banner.mp4" type="video/mp4" />
         </video>
-        <div className="video-banner-overlay-text text-center text-light" style={{width: '100%'}}>
-          <h1 className="text-light">
-            <b>PLCO ATLAS</b>
-          </h1>
-          {/* <br/>
-          <div className="text-center" style={{width: '100%'}}>
+        <div className="video-banner-overlay-text row justify-content-center text-center text-light w-75">
+          <div className="col-12">
+            <h1 className="text-light">
+              <b>PLCO ATLAS</b>
+            </h1>
+          </div>
+          <div className="col-6 w-50 my-3 align-self-center" style={{borderTop: '2px solid orange'}}></div>
+          <div className="col-12 text-center mt-2" style={{width: '100%', fontSize: '14pt'}}>
             Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor 
             incididunt ut labore et dolore magna aliqua. Quam lacus suspendisse faucibus interdum 
             posuere lorem ipsum. Integer malesuada nunc vel risus commodo viverra maecenas accumsan lacus. 
-            Cursus metus aliquam eleifend mi in nulla posuere.
-          </div> */}
+          </div>
         </div>
       </div>
 
+      <div className="text-center mt-2 d-md-none">
+        <h1 className="text-dark">
+          <b>PLCO ATLAS</b>
+        </h1>
+        <hr className="w-75"></hr>
+        <div className="px-3 text-center">
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor 
+            incididunt ut labore et dolore magna aliqua. Quam lacus suspendisse faucibus interdum 
+            posuere lorem ipsum. Integer malesuada nunc vel risus commodo viverra maecenas accumsan lacus. 
+          </div>
+      </div>
+
       <div
-        className="container align-middle text-center mb-5"
+        className="container align-middle text-center"
         style={{'margin-top': '70px'}}>
         <CardDeck>
           {links.map(({ exact, route, title, image }, index) => (
             <Card
               key={title}
-              className=""
+              className="mb-5 align-self-center"
               style={{
                 width: '18rem',
                 justifyContent: 'center',

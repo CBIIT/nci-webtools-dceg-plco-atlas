@@ -9,6 +9,7 @@ export function Navbar({ links }) {
           .concat(links)
           .sort((a, b) => a.navIndex - b.navIndex)
           .map(({ route, title, exact }) => (
+            <>
             <NavLink
               key={title}
               className="navlinks text-white py-2 px-4 d-inline-block "
@@ -18,6 +19,8 @@ export function Navbar({ links }) {
               to={route}>
               {title}
             </NavLink>
+            <div className="d-sm-none"></div>
+            </>
           ))}
         {/* <pre>{JSON.stringify(links)}</pre> */}
       </div>
