@@ -5,7 +5,7 @@ import { updateVariantLookup, lookupVariants } from '../../services/actions';
 import BootstrapTable from 'react-bootstrap-table-next';
 import paginationFactory from 'react-bootstrap-table2-paginator';
 import filterFactory, { textFilter } from 'react-bootstrap-table2-filter';
-import { Spinner } from 'react-bootstrap';
+import { Spinner, Card } from 'react-bootstrap';
 
 export function VariantLookup() {
   const dispatch = useDispatch();
@@ -66,22 +66,18 @@ export function VariantLookup() {
 
   return (
     <>
-      <div className="card shadow-sm mb-4">
-        <div className="card-body">
+      <Card className="mb-4">
+        <Card.Body>
           <SearchFormTraitsVariant
             onSubmit={e =>
               dispatch(lookupVariants(selectedPhenotypes, selectedVariant))
             }
           />
-        </div>
-      </div>
+        </Card.Body>
+      </Card>
 
-      <div className="card shadow-sm mb-4">
-        {/* <div className="card-header bg-white font-weight-bolder border-bottom-0">
-                    display selected phenotype(s) and variant details in each phenotype
-                </div> */}
-
-        <div className="card-body">
+      <Card className="mb-4">
+        <Card.Body>
           <div className="row text-center">
             {/* <div className="col-md-12 text-left">
                             <pre>{JSON.stringify(variantLookup, null, 2)}</pre>
@@ -119,14 +115,8 @@ export function VariantLookup() {
               <span className="sr-only">Loading...</span>
             </Spinner>
           </div>
-
-          {/* <div className="row mt-3">
-                        <div className="col-md-12 text-left mt-3">
-                            <pre>{JSON.stringify(phenotypes, null, 2)}</pre>
-                        </div>
-                    </div> */}
-        </div>
-      </div>
+        </Card.Body>
+      </Card>
     </>
   );
 }

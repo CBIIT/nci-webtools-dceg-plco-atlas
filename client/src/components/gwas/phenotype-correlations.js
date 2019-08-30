@@ -3,6 +3,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { updatePhenotypeCorrelations } from '../../services/actions';
 import { SearchFormTraits } from '../forms/search-form-traits';
 import { Heatmap } from '../plots/heatmap-plot';
+import { Card } from 'react-bootstrap';
 
 export function PhenotypeCorrelations() {
   const dispatch = useDispatch();
@@ -53,22 +54,22 @@ export function PhenotypeCorrelations() {
 
   return (
     <>
-      <div className="card shadow-sm mb-4">
-        <div className="card-body">
+      <Card className="mb-4">
+        <Card.Body>
           <SearchFormTraits onSubmit={handleSubmit} onChange={handleChange} />
-        </div>
-      </div>
+        </Card.Body>
+      </Card>
 
-      <div className="card shadow-sm mb-4">
-        <div className="card-body">
+      <Card className="mb-4">
+        <Card.Body>
           <div className="row">
             <Heatmap drawFunctionRef={setDrawHeatmap} />
             {/* <div className="col-md-12 text-left">
               <pre>{JSON.stringify(phenotypeCorrelations, null, 2)}</pre>
             </div> */}
           </div>
-        </div>
-      </div>
+        </Card.Body>
+      </Card>
     </>
   );
 }

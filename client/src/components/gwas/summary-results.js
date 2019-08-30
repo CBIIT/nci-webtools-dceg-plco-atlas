@@ -1,6 +1,6 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Alert, Nav, Tab } from 'react-bootstrap';
+import { Alert, Nav, Tab, Card } from 'react-bootstrap';
 import { SearchFormTrait } from '../forms/search-form-trait';
 import { ManhattanPlot } from '../plots/manhattan-plot';
 import { QQPlot } from '../plots/qq-plot';
@@ -31,17 +31,17 @@ export function SummaryResults() {
 
   // registers a function we can use to draw the manhattan plot
   const setDrawManhattanPlot = drawManhattanPlot => {
-    dispatch(updateSummaryResults({ drawManhattanPlot }));
+    // dispatch(updateSummaryResults({ drawManhattanPlot }));
   };
 
   // registers a function we can use to draw the qq plot
   const setDrawQQPlot = drawQQPlot => {
-    dispatch(updateSummaryResults({ drawQQPlot }));
+    // dispatch(updateSummaryResults({ drawQQPlot }));
   };
 
   // registers a function we can use to update the results table
   const setUpdateResultsTable = updateResultsTable => {
-    dispatch(updateSummaryResults({ updateResultsTable }));
+    // dispatch(updateSummaryResults({ updateResultsTable }));
   };
 
   const setSelectedChromosome = selectedChromosome => {
@@ -120,8 +120,8 @@ export function SummaryResults() {
 
   return (
     <>
-      <div className="card shadow-sm mb-4">
-        <div className="card-body">
+      <Card className="mt-1 mb-4">
+        <Card.Body>
           <SearchFormTrait onSubmit={handleSubmit} onChange={handleChange} />
           {submitted &&
             messages.map(({ type, content }) => (
@@ -129,12 +129,12 @@ export function SummaryResults() {
                 {content}
               </Alert>
             ))}
-        </div>
-      </div>
+        </Card.Body>
+      </Card>
 
-      <div className="card shadow-sm mb-4">
+      <Card className="mb-4">
         <Tab.Container defaultActiveKey={selectedPlot} onSelect={setSelectedPlot}>
-          <div className="card-header bg-white font-weight-bolder border-bottom-0">
+          <Card.Header className="bg-egg font-weight-bolder">
             <Nav variant="pills" className="nav-pills-custom">
               <Nav.Item className="mr-2">
                 <Nav.Link eventKey="manhattan-plot">Manhattan Plots</Nav.Link>
@@ -144,9 +144,9 @@ export function SummaryResults() {
                 <Nav.Link eventKey="qq-plot">Q-Q Plot</Nav.Link>
               </Nav.Item>
             </Nav>
-          </div>
+          </Card.Header>
 
-          <div className="card-body">
+          <Card.Body>
             <Tab.Content>
               <Tab.Pane eventKey="manhattan-plot">
                 <div>
@@ -192,9 +192,9 @@ export function SummaryResults() {
                 />
               </Tab.Pane>
             </Tab.Content>
-          </div>
+          </Card.Body>
         </Tab.Container>
-      </div>
+      </Card>
     </>
   );
 }
