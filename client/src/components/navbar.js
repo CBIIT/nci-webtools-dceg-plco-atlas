@@ -19,7 +19,7 @@ export function Navbar({ links }) {
               to={route}>
               {title}
             </NavLink>
-            <div className="d-sm-none"></div>
+            <div className="d-md-none"></div>
             </>
           ))}
         {/* <pre>{JSON.stringify(links)}</pre> */}
