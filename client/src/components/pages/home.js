@@ -22,6 +22,10 @@ export function Home({ links }) {
             incididunt ut labore et dolore magna aliqua. Quam lacus suspendisse faucibus interdum 
             posuere lorem ipsum. Integer malesuada nunc vel risus commodo viverra maecenas accumsan lacus. 
           </div>
+          <div className="col-12 text-center mt-5" style={{width: '100%', fontSize: '14pt'}}>
+            <Button className="mr-5 px-4" style={{backgroundColor: '#F2711D', border: 'none'}}>Link</Button>
+            <Button className="px-4" style={{backgroundColor: '#01BDD4', border: 'none'}}>Link</Button>
+          </div>
         </div>
       </div>
 
@@ -31,10 +35,14 @@ export function Home({ links }) {
         </h1>
         <hr className="w-75"></hr>
         <div className="px-3 text-center">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor 
-            incididunt ut labore et dolore magna aliqua. Quam lacus suspendisse faucibus interdum 
-            posuere lorem ipsum. Integer malesuada nunc vel risus commodo viverra maecenas accumsan lacus. 
-          </div>
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor 
+          incididunt ut labore et dolore magna aliqua. Quam lacus suspendisse faucibus interdum 
+          posuere lorem ipsum. Integer malesuada nunc vel risus commodo viverra maecenas accumsan lacus. 
+        </div>
+        <div className="text-center mt-4" style={{width: '100%', fontSize: '14pt'}}>
+          <Button className="mr-5 px-4" style={{backgroundColor: '#F2711D', border: 'none'}}>Link</Button>
+          <Button className="px-4" style={{backgroundColor: '#01BDD4', border: 'none'}}>Link</Button>
+        </div>
       </div>
 
       <div
@@ -82,13 +90,13 @@ export function Home({ links }) {
                 </Card.Body>
                 <Card.Footer className="bg-secondary" style={{width: "100%"}}>
                   <Button 
-                    className="px-5 my-2"
-                    style={{backgroundColor: '#545871', borderRadius: '10px'}}>
+                    className="my-2"
+                    style={{backgroundColor: '#545871', borderRadius: '10px', width: '90%'}}>
                     <Link
                       className="stretched-link text-light"
                       exact={exact}
                       key={index}
-                      to={route}>Link</Link>
+                      to={route}>Click</Link>
                   </Button>
                 </Card.Footer>
               </Card>
@@ -105,10 +113,10 @@ export function Home({ links }) {
         </div>
         <div className="py-5">
           <h3 style={{color: '#545871'}}><b>OUR FOCUS</b></h3>
-          <h5 className="text-secondary">
+          <h4 className="text-secondary mt-3 text-orange">
             Simplifying GWAS for the Prostate, Lung, Colorectal and Ovarian Cancer
             Screening Trial
-          </h5>
+          </h4>
         </div>
       </div>
       <div className="bg-primary py-5">
