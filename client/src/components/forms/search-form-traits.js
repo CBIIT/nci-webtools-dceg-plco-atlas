@@ -65,7 +65,7 @@ export function SearchFormTraits({ onChange, onSubmit }) {
         </Form.Label>
         <Col sm={9}>
           <Select
-            placeholder="(Select two or more phenotypes) *"
+            placeholder="Select two or more phenotypes"
             value={selectedPhenotypes}
             onChange={handleChange}
             // isOptionDisabled={option => option.value === null}

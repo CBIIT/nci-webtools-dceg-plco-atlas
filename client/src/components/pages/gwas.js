@@ -46,17 +46,30 @@ export function Gwas() {
         <Card.Header className="bg-egg">
           <Nav variant="tabs" defaultActiveKey="summary">
             {gwasLinks.map(({ name, pathId }) => (
-              <NavItem className="mr-2">
-                <NavLink
-                  key={pathId}
-                  className="navlinks-card d-inline-block px-3 py-2 border border-bottom-0"
-                  activeClassName="active-navlinks-card bg-white border border-bottom-0"
-                  style={{textDecoration: 'none'}}
-                  exact={true}
-                  to={`/gwas/${pathId}`}>
-                  <b>{name}</b>
-                </NavLink>
-              </NavItem>
+              <>
+                <NavItem className="mr-2 d-none d-md-block">
+                  <NavLink
+                    key={pathId}
+                    className="navlinks-card d-inline-block px-3 py-2 border border-bottom-0"
+                    activeClassName="active-navlinks-card bg-white border border-bottom-0"
+                    style={{textDecoration: 'none'}}
+                    exact={true}
+                    to={`/gwas/${pathId}`}>
+                    <b>{name}</b>
+                  </NavLink>
+                </NavItem>
+                <div className="d-md-none mb-2 w-100">
+                  <NavLink
+                    key={pathId}
+                    // className="w-100"
+                    activeClassName="active-navlinks-card"
+                    style={{textDecoration: 'none'}}
+                    exact={true}
+                    to={`/gwas/${pathId}`}>
+                    <b>{name}</b>
+                  </NavLink>
+                </div>
+              </>
             ))}
           </Nav>
         </Card.Header>
