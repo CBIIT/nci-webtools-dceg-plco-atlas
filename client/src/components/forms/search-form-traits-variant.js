@@ -1,6 +1,6 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Form, FormControl, InputGroup } from 'react-bootstrap';
+import { Form, FormControl, InputGroup, Row, Col, Button } from 'react-bootstrap';
 import { updateVariantLookup } from '../../services/actions';
 import Select, { components } from 'react-select';
 import DropdownTreeSelect from 'react-dropdown-tree-select';
@@ -89,14 +89,114 @@ export function SearchFormTraitsVariant({ onSubmit }) {
 
   return (
     <Form>
-      <Form.Group controlId="trait-list">
+      <Row controlId="phenotype-list">
+        <Form.Label column sm={3}>
+          Choose gender
+        </Form.Label>
+        <Col sm={2}>
+          <select
+            className="form-control"
+            value={selectedGender}
+            onChange={e => setSelectedGender(e.target.value)}>
+            <option value="combined">Combined</option>
+            <option value="male">Male</option>
+            <option value="female">Female</option>
+          </select>
+        </Col>
+      </Row>
+
+      <Row className="mt-3" controlId="phenotype-list">
+        <Form.Label column sm={3}>
+          Sort phenotypes by
+        </Form.Label>
+        <Col sm={2}>
+          <select
+            className="form-control"
+            value={selectedListType}
+            onChange={e => setSelectedListType(e.target.value)}>
+            <option value="alphabetic">Alphabetic</option>
+            <option value="categorical">Categorical</option>
+          </select>
+        </Col>
+      </Row>
+
+      <Row className="mt-3" controlId="phenotype-list">
+        <Form.Label column sm={3}>
+          Choose phenotype(s)
+        </Form.Label>
+        <Col sm={9}>
+          <Select
+            placeholder="(Select one or more phenotypes) *"
+            value={selectedPhenotypes}
+            onChange={handleChange}
+            isOptionDisabled={option => option.value === null}
+            options={
+              selectedListType === 'categorical'
+                ? categorizedPhenotypes
+                : alphabetizedPhenotypes
+            }
+            isMulti
+            components={{ MultiValue }}
+          />
+        </Col>
+      </Row>
+
+      <Row className="mt-3" controlId="phenotype-list">
+        <Form.Label column sm={3}>
+          Choose phenotype(s) x2
+        </Form.Label>
+        <Col sm={9}>
+          <DropdownTreeSelect 
+            className="dropdown-tree"
+            data={phenotypesTree} 
+            // mode="radioSelect"
+            />
+        </Col>
+      </Row>
+
+      <Row className="mt-3" controlId="phenotype-list">
+        <Form.Label column sm={3}>
+          Input variant
+        </Form.Label>
+        <Col sm={3}>
+          <FormControl
+            className="form-control"
+            placeholder="(Variant rsid or coordinate) *"
+            aria-label="Variant (required)"
+            value={selectedVariant}
+            onChange={e => setSelectedVariant(e.target.value)}
+            type="text"
+            required
+          />
+        </Col>
+      </Row>
+
+      <Row className="mt-3" controlId="phenotype-list">
+        <Col sm={{ span: 9, offset: 3 }}>
+          <Button
+            variant="primary"
+            disabled={!(selectedPhenotypes && selectedPhenotypes.length >= 2)}
+            onClick={e => {
+              e.preventDefault();
+              onSubmit(selectedPhenotypes);
+            }}>
+            Submit
+          </Button>
+        </Col>
+      </Row>
+
+
+
+
+
+      {/* <Form.Group controlId="trait-list">
         <Form.Label>
           <b>Select Phenotype(s) and Input Variant</b>
         </Form.Label>
         <div className="row">
           <div className="col-md-12">
             <InputGroup>
-              {/* gender select */}
+
               <InputGroup.Prepend>
                 <select
                   className="form-control"
@@ -108,7 +208,6 @@ export function SearchFormTraitsVariant({ onSubmit }) {
                 </select>
               </InputGroup.Prepend>
 
-              {/* alpha/categorical select */}
               <InputGroup.Prepend>
                 <select
                   className="form-control"
@@ -119,23 +218,19 @@ export function SearchFormTraitsVariant({ onSubmit }) {
                 </select>
               </InputGroup.Prepend>
 
-              {/* variant input */}
               <FormControl
                 className="form-control"
                 placeholder="(Variant rsid or coordinate) *"
                 aria-label="Variant (required)"
                 value={selectedVariant}
                 onChange={e => setSelectedVariant(e.target.value)}
-                // onChange={e => validateVariantInput(e.target.value)}
                 type="text"
                 required
               />
-              {/* submit button */}
-              {/* disable submit button if required fields are empty */}
+            
               <InputGroup.Append>
                 <button
                   className="btn btn-primary"
-                  // onClick={e => onSubmit({selectedPhenotypes, selectedVariant})}
                   onClick={validateVariantInput}
                   disabled={!canSubmit}>
                   Submit
@@ -162,13 +257,16 @@ export function SearchFormTraitsVariant({ onSubmit }) {
             <DropdownTreeSelect 
               className="dropdown-tree"
               data={phenotypesTree} 
-              // onChange={onChange} 
-              // onAction={onAction} 
-              // onNodeToggle={onNodeToggle} 
               />
           </div>
         </div>
-      </Form.Group>
+      </Form.Group> */}
+
+
+
+
+
+
     </Form>
   );
 }

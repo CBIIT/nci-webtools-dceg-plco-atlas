@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { Form, InputGroup } from 'react-bootstrap';
+import { Form, Button, Row, Col } from 'react-bootstrap';
 import { query } from '../../services/query';
 import Select, { components } from 'react-select';
 import { updatePhenotypeCorrelations } from '../../services/actions';
@@ -44,7 +44,61 @@ export function SearchFormTraits({ onChange, onSubmit }) {
 
   return (
     <Form>
-      <Form.Group controlId="phenotype-list">
+      <Row controlId="phenotype-list">
+        <Form.Label column sm={3}>
+          Sort phenotypes by
+        </Form.Label>
+        <Col sm={2}>
+          <select
+            className="form-control"
+            value={selectedListType}
+            onChange={e => setSelectedListType(e.target.value)}>
+            <option value="alphabetic">Alphabetic</option>
+            <option value="categorical">Categorical</option>
+          </select>
+        </Col>
+      </Row>
+
+      <Row className="mt-3" controlId="phenotype-list">
+        <Form.Label column sm={3}>
+          Choose phenotypes
+        </Form.Label>
+        <Col sm={9}>
+          <Select
+            placeholder="(Select two or more phenotypes) *"
+            value={selectedPhenotypes}
+            onChange={handleChange}
+            // isOptionDisabled={option => option.value === null}
+            options={
+              selectedListType === 'categorical'
+                ? categorizedPhenotypes
+                : alphabetizedPhenotypes
+            }
+            isMulti
+            components={{ MultiValue }}
+          />
+        </Col>
+      </Row>
+
+      <Row className="mt-3" controlId="phenotype-list">
+        <Col sm={{ span: 9, offset: 3 }}>
+          <Button
+            variant="primary"
+            disabled={!(selectedPhenotypes && selectedPhenotypes.length >= 2)}
+            onClick={e => {
+              e.preventDefault();
+              onSubmit(selectedPhenotypes);
+            }}>
+            Submit
+          </Button>
+        </Col>
+      </Row>
+
+
+
+
+
+      {/* <Form.Group controlId="phenotype-list">
         <Form.Label>
           <b>Select Phenotypes</b>
         </Form.Label>
@@ -64,7 +118,6 @@ export function SearchFormTraits({ onChange, onSubmit }) {
               placeholder="(Select two or more phenotypes) *"
               value={selectedPhenotypes}
               onChange={handleChange}
-              // isOptionDisabled={option => option.value === null}
               options={
                 selectedListType === 'categorical'
                   ? categorizedPhenotypes
@@ -87,7 +140,12 @@ export function SearchFormTraits({ onChange, onSubmit }) {
             </button>
           </InputGroup.Append>
         </InputGroup>
-      </Form.Group>
+      </Form.Group> */}
+
+
+
+
+
     </Form>
   );
 }
