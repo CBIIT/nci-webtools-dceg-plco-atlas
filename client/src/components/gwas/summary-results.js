@@ -119,7 +119,7 @@ export function SummaryResults() {
 
   return (
     <>
-      <Card className="mt-1 mb-4">
+      <Card className="mb-4 border-0">
         <Card.Body>
           <SearchFormTrait onSubmit={handleSubmit} onChange={handleChange} />
           {submitted &&
@@ -131,11 +131,11 @@ export function SummaryResults() {
         </Card.Body>
       </Card>
 
-      <Card className="mb-4">
+      <Card className="mb-4 border-left-0 border-right-0 border-bottom-0 rounded-0">
         <Tab.Container defaultActiveKey={selectedPlot} onSelect={setSelectedPlot}>
           <Card.Header className="bg-egg font-weight-bolder">
-            <Nav variant="pills" className="nav-pills-custom">
-              <Nav.Item className="mr-2">
+            <Nav variant="pills" className="nav-pills-custom nav-justified px-2">
+              <Nav.Item>
                 <Nav.Link eventKey="manhattan-plot">Manhattan Plots</Nav.Link>
               </Nav.Item>
 

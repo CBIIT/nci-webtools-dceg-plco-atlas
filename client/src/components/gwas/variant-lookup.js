@@ -66,7 +66,7 @@ export function VariantLookup() {
 
   return (
     <>
-      <Card className="mb-4">
+      <Card className="mb-4 border-0">
         <Card.Body>
           <SearchFormTraitsVariant
             onSubmit={e =>
@@ -76,7 +76,10 @@ export function VariantLookup() {
         </Card.Body>
       </Card>
 
-      <Card className="mb-4">
+      <Card className="mb-4 border-left-0 border-right-0 border-bottom-0 rounded-0">
+        <Card.Header className="bg-egg font-weight-bolder text-center">
+          Variant-Phenotype(s) Table
+        </Card.Header>
         <Card.Body>
           <div className="row text-center">
             {/* <div className="col-md-12 text-left">

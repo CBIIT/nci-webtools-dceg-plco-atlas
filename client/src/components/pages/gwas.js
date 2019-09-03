@@ -50,17 +50,17 @@ export function Gwas() {
                 <NavLink
                   key={pathId}
                   className="navlinks-card d-inline-block px-3 py-2 border border-bottom-0"
-                  activeClassName="active-navlinks-card border border-bottom-0"
+                  activeClassName="active-navlinks-card bg-white border border-bottom-0"
                   style={{textDecoration: 'none'}}
                   exact={true}
                   to={`/gwas/${pathId}`}>
-                  {name}
+                  <b>{name}</b>
                 </NavLink>
               </NavItem>
             ))}
           </Nav>
         </Card.Header>
-        <Card.Body>
+        <Card.Body className="px-0">
           <Route
             exact
             path={`/gwas`}

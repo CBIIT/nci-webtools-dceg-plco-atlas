@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { Form, FormControl, InputGroup } from 'react-bootstrap';
+import { Form, InputGroup, Button } from 'react-bootstrap';
 import { updateSummaryResults } from '../../services/actions';
 import Select, { components } from 'react-select';
 import DropdownTreeSelect from 'react-dropdown-tree-select';
@@ -48,11 +48,11 @@ export function SearchFormTrait({ onChange, onSubmit }) {
       <div className="row">
         <div className="col-md-12">
           <Form.Group controlId="phenotype-list">
-          <Form.Label>
-            <b>Select Phenotype</b>
-          </Form.Label>
-          <InputGroup>
-            <InputGroup.Prepend>
+            <Form.Label>
+              Choose phenotype:
+            </Form.Label>
+            {/* <InputGroup> */}
+              {/* <InputGroup.Prepend> */}
               <select
                 className="form-control"
                 value={selectedListType}
@@ -60,9 +60,9 @@ export function SearchFormTrait({ onChange, onSubmit }) {
                 <option value="alphabetic">Alphabetic</option>
                 <option value="categorical">Categorical</option>
               </select>
-            </InputGroup.Prepend>
+              {/* </InputGroup.Prepend> */}
 
-            <div style={{ width: '60%' }}>
+              {/* <div> */}
               <Select
                 placeholder="(Select a phenotype)"
                 value={selectedPhenotype}
@@ -75,23 +75,12 @@ export function SearchFormTrait({ onChange, onSubmit }) {
                 }
                 components={{ SingleValue }}
               />
-            </div>
-
-            <InputGroup.Append>
-              <button
-                className="btn btn-primary"
-                onClick={e => {
-                  e.preventDefault();
-                  onSubmit(selectedPhenotype);
-                }}>
-                Submit
-              </button>
-            </InputGroup.Append>
-          </InputGroup>
-        </Form.Group>
+              {/* </div> */}
+            {/* </InputGroup> */}
+          </Form.Group>
         </div>
-      
-        <div className="col-md-12 mt-3">
+
+        <div className="col-md-12">
           <DropdownTreeSelect 
             className="dropdown-tree"
             data={phenotypesTree} 
@@ -101,6 +90,19 @@ export function SearchFormTrait({ onChange, onSubmit }) {
             // onNodeToggle={onNodeToggle} 
             />
         </div>
+
+        <div className="col-md-12">
+          <Button
+            variant="primary"
+            // className="btn btn-primary"
+            onClick={e => {
+              e.preventDefault();
+              onSubmit(selectedPhenotype);
+            }}>
+            Submit
+          </Button>
+        </div>
+      
       </div>
     </Form>
   );
