@@ -1,6 +1,6 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Alert, Nav, Tab } from 'react-bootstrap';
+import { Alert, Nav, Tab, Card } from 'react-bootstrap';
 import { SearchFormTrait } from '../forms/search-form-trait';
 import { ManhattanPlot } from '../plots/manhattan-plot';
 import { QQPlot } from '../plots/qq-plot';
@@ -119,8 +119,8 @@ export function SummaryResults() {
 
   return (
     <>
-      <div className="card shadow-sm mb-4">
-        <div className="card-body">
+      <Card className="mb-4 border-0">
+        <Card.Body>
           <SearchFormTrait onSubmit={handleSubmit} onChange={handleChange} />
           {submitted &&
             messages.map(({ type, content }) => (
@@ -128,14 +128,14 @@ export function SummaryResults() {
                 {content}
               </Alert>
             ))}
-        </div>
-      </div>
+        </Card.Body>
+      </Card>
 
-      <div className="card shadow-sm mb-4">
+      <Card className="mb-4 border-left-0 border-right-0 border-bottom-0 rounded-0">
         <Tab.Container defaultActiveKey={selectedPlot} onSelect={setSelectedPlot}>
-          <div className="card-header bg-white font-weight-bolder border-bottom-0">
-            <Nav variant="pills" className="nav-pills-custom">
-              <Nav.Item className="mr-2">
+          <Card.Header className="bg-egg font-weight-bolder">
+            <Nav variant="pills" className="nav-pills-custom nav-justified px-2">
+              <Nav.Item>
                 <Nav.Link eventKey="manhattan-plot">Manhattan Plots</Nav.Link>
               </Nav.Item>
 
@@ -143,9 +143,9 @@ export function SummaryResults() {
                 <Nav.Link eventKey="qq-plot">Q-Q Plot</Nav.Link>
               </Nav.Item>
             </Nav>
-          </div>
+          </Card.Header>
 
-          <div className="card-body">
+          <Card.Body>
             <Tab.Content>
               <Tab.Pane eventKey="manhattan-plot">
                 <div>
@@ -190,9 +190,9 @@ export function SummaryResults() {
                 />
               </Tab.Pane>
             </Tab.Content>
-          </div>
+          </Card.Body>
         </Tab.Container>
-      </div>
+      </Card>
     </>
   );
 }

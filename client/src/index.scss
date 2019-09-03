@@ -80,7 +80,6 @@ h1 {
   overflow: hidden;
   display: block;
   height: 420px;
-  // height: 422px;
   position: relative;
 
   #video-banner {
@@ -120,6 +119,19 @@ h1 {
   // &:hover {
   //   color: black !important;
   // }
+}
+
+.active-navlinks-card {
+  color: black !important;
+  border: 1px solid transparent;
+  border-top-left-radius: 0.25rem;
+  border-top-right-radius: 0.25rem;
+}
+
+.navlinks-card {
+  border: 1px solid transparent;
+  border-top-left-radius: 0.25rem;
+  border-top-right-radius: 0.25rem;
 }
 
 .manhattan-plot {
