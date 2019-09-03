@@ -8,7 +8,8 @@ import { SummaryResultsTable } from './summary-results-table';
 import {
   updateSummaryResults,
   updateVariantLookup,
-  lookupVariants
+  lookupVariants,
+  drawQQPlot,
 } from '../../services/actions';
 
 export function SummaryResults() {
@@ -19,7 +20,6 @@ export function SummaryResults() {
     submitted,
     messages,
     drawManhattanPlot,
-    drawQQPlot,
     updateResultsTable,
     page,
     pageSize,
@@ -35,11 +35,11 @@ export function SummaryResults() {
   };
 
   // registers a function we can use to draw the qq plot
-  const setDrawQQPlot = drawQQPlot => {
-    // dispatch(updateSummaryResults({ drawQQPlot }));
-  };
+  // const setDrawQQPlot = drawQQPlot => {
+  //   dispatch(updateSummaryResults({ drawQQPlot }));
+  // };
 
-  // registers a function we can use to update the results table
+  // // registers a function we can use to update the results table
   const setUpdateResultsTable = updateResultsTable => {
     // dispatch(updateSummaryResults({ updateResultsTable }));
   };
@@ -81,9 +81,8 @@ export function SummaryResults() {
     if (drawManhattanPlot) 
       drawManhattanPlot(params.value);
 
-    if (drawQQPlot) 
-      drawQQPlot(params.value);
-
+    dispatch(drawQQPlot(params.value));
+    
     if (updateResultsTable)
       updateResultsTable({page, pageSize, database: params.value + '.db'});
   }
@@ -187,7 +186,6 @@ export function SummaryResults() {
 
               <Tab.Pane eventKey="qq-plot">
                 <QQPlot
-                  drawFunctionRef={setDrawQQPlot}
                   onVariantLookup={handleVariantLookup}
                 />
               </Tab.Pane>
