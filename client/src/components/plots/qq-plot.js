@@ -1,45 +1,17 @@
-import React, { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { root, query } from '../../services/query';
-import { updateSummaryResults } from '../../services/actions';
+import React, { useState } from 'react';
+import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { Spinner } from 'react-bootstrap';
 import ReactCursorPosition from 'react-cursor-position';
 
 export function QQPlot({ onVariantLookup }) {
-  const dispatch = useDispatch();
-  const summaryResults = useSelector(state => state.summaryResults);
-  // const { phenotype, loading, areaItems } = summaryResults;
   const {
-    phenotype,
-    selectedPhenotype,
-    selectedChromosome,
     loading,
     qqplotSrc,
     areaItems,
     lambdaGC,
     sampleSize
   } = useSelector(state => state.summaryResults);
-
-  // const setLoading = loading => {
-  //   dispatch(updateSummaryResults({ loading }));
-  // };
-
-  // const setQQplotSrc = qqplotSrc => {
-  //   dispatch(updateSummaryResults({ qqplotSrc }));
-  // };
-
-  // const setAreaItems = areaItems => {
-  //   dispatch(updateSummaryResults({ areaItems }));
-  // };
-
-  // const setSampleSize = sampleSize => {
-  //   dispatch(updateSummaryResults({ sampleSize }));
-  // };
-
-  // const setLambdaGC = lambdaGC => {
-  //   dispatch(updateSummaryResults({ lambdaGC }));
-  // };
 
   // temporary set states
   const [hoverTooltipData, setHoverTooltipData] = useState({});
@@ -60,24 +32,6 @@ export function QQPlot({ onVariantLookup }) {
     left: 0, // computed based on child and parent's width
     display: 'none'
   });
-
-  // useEffect(() => {
-  //   if (drawFunctionRef) drawFunctionRef(drawQQPlot);
-  // }, [drawFunctionRef]);
-
-  // const drawQQPlot = async phenotype => {
-  //   setLoading(true);
-  //   setQQplotSrc('data/qq-plots/' + phenotype + '.png');
-  //   const imageMapData = await query(
-  //     'data/qq-plots/' + phenotype + '.imagemap.json'
-  //   );
-  //   if (!imageMapData.error) {
-  //     setLambdaGC(imageMapData.lambdaGC);
-  //     setSampleSize(imageMapData.sampleSize);
-  //     setAreaItems(imageMapData.areaItems);
-  //   }
-  //   setLoading(false);
-  // };
 
   const popupMarkerClick = e => {
     // make sure action occurs on imagemap coord only

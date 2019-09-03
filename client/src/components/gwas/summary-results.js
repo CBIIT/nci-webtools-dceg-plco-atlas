@@ -30,9 +30,9 @@ export function SummaryResults() {
   };
 
   // registers a function we can use to draw the manhattan plot
-  // const setDrawManhattanPlot = drawManhattanPlot => {
-  //   dispatch(updateSummaryResults({ drawManhattanPlot }));
-  // };
+  const setDrawManhattanPlot = drawManhattanPlot => {
+    dispatch(updateSummaryResults({ drawManhattanPlot }));
+  };
 
   // registers a function we can use to draw the qq plot
   // const setDrawQQPlot = drawQQPlot => {
@@ -40,9 +40,9 @@ export function SummaryResults() {
   // };
 
   // // registers a function we can use to update the results table
-  // const setUpdateResultsTable = updateResultsTable => {
-  //   dispatch(updateSummaryResults({ updateResultsTable }));
-  // };
+  const setUpdateResultsTable = updateResultsTable => {
+    dispatch(updateSummaryResults({ updateResultsTable }));
+  };
 
   const setSelectedChromosome = selectedChromosome => {
     dispatch(updateSummaryResults({ selectedChromosome }));
@@ -78,13 +78,13 @@ export function SummaryResults() {
       return;
     }
 
-    // if (drawManhattanPlot) 
-    //   drawManhattanPlot(params.value);
+    if (drawManhattanPlot) 
+      drawManhattanPlot(params.value);
 
     dispatch(drawQQPlot(params.value));
     
-    // if (updateResultsTable)
-    //   updateResultsTable({page, pageSize, database: params.value + '.db'});
+    if (updateResultsTable)
+      updateResultsTable({page, pageSize, database: params.value + '.db'});
   }
 
   const handleChromosomeChanged = chromosome => {
@@ -172,21 +172,20 @@ export function SummaryResults() {
                   </label>
                 </div>
                   <ManhattanPlot
-                    // drawFunctionRef={setDrawManhattanPlot}
+                    drawFunctionRef={setDrawManhattanPlot}
                     onChromosomeChanged={handleChromosomeChanged}
                     onVariantLookup={handleVariantLookup}
                     onZoom={handleZoom} />
                     <div className="my-4" style={{display: submitted ? 'block' : 'none'}}>
                       <SummaryResultsTable
                         className="mw-100"
-                        // updateFunctionRef={setUpdateResultsTable} 
+                        updateFunctionRef={setUpdateResultsTable} 
                         />
                     </div>
               </Tab.Pane>
 
               <Tab.Pane eventKey="qq-plot">
                 <QQPlot
-                  // drawFunctionRef={setDrawQQPlot}
                   onVariantLookup={handleVariantLookup}
                 />
               </Tab.Pane>

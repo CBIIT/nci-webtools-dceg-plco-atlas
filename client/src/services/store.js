@@ -24,7 +24,6 @@ const initialState = {
     submitted: null,
     loading: false,
     drawManhattanPlot: null,
-    drawQQPlot: null,
     updateResultsTable: null
   },
   variantLookup: {
