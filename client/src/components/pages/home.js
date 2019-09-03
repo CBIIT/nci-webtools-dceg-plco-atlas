@@ -88,7 +88,7 @@ export function Home({ links }) {
                     </small>
                   </Card.Text>
                 </Card.Body>
-                <Card.Footer className="bg-secondary" style={{width: "100%"}}>
+                <Card.Footer className="bg-egg" style={{width: "100%"}}>
                   <Button 
                     className="my-2"
                     style={{backgroundColor: '#545871', borderRadius: '10px', width: '90%'}}>
@@ -106,9 +106,9 @@ export function Home({ links }) {
         </CardDeck>
 
       </div>
-      <div className="bg-secondary text-center">
+      <div className="bg-white text-center">
         <div 
-          className="bg-white text-light text-center"
+          className="bg-secondary text-light text-center"
           style={{height: "50px", 'clip-path': 'polygon(50% 100%, 0 0, 100% 0)'}}>
         </div>
         <div className="py-5">
