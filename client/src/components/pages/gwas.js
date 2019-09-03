@@ -61,7 +61,6 @@ export function Gwas() {
                 <div className="d-md-none mb-2 w-100">
                   <NavLink
                     key={pathId}
-                    // className="w-100"
                     activeClassName="active-navlinks-card"
                     style={{textDecoration: 'none'}}
                     exact={true}

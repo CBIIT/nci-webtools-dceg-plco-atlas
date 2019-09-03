@@ -31,7 +31,7 @@ export function SummaryResults() {
 
   // registers a function we can use to draw the manhattan plot
   const setDrawManhattanPlot = drawManhattanPlot => {
-    // dispatch(updateSummaryResults({ drawManhattanPlot }));
+    dispatch(updateSummaryResults({ drawManhattanPlot }));
   };
 
   // registers a function we can use to draw the qq plot
@@ -41,7 +41,7 @@ export function SummaryResults() {
 
   // // registers a function we can use to update the results table
   const setUpdateResultsTable = updateResultsTable => {
-    // dispatch(updateSummaryResults({ updateResultsTable }));
+    dispatch(updateSummaryResults({ updateResultsTable }));
   };
 
   const setSelectedChromosome = selectedChromosome => {
