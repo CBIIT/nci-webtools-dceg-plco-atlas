@@ -5,16 +5,6 @@
         "level": 0
     },
     {
-        "label": "(test) Renal cell carcinoma",
-        "value": "rcc",
-        "level": 0
-    },
-    {
-        "label": "(test) Melanoma",
-        "value": "mel",
-        "level": 0
-    },
-    {
         "label": "Anthropometric measures",
         "value": null,
         "level": 0,
@@ -235,7 +225,7 @@
                             },
                             {
                                 "label": "Melanoma",
-                                "value": null,
+                                "value": "mel",
                                 "level": 3
                             },
                             {
@@ -289,7 +279,7 @@
                             },
                             {
                                 "label": "Renal cancer",
-                                "value": null,
+                                "value": "rcc",
                                 "level": 3
                             },
                             {

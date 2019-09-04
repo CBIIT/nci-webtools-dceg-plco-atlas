@@ -3,8 +3,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Form, FormControl, InputGroup, Row, Col, Button } from 'react-bootstrap';
 import { updateVariantLookup } from '../../services/actions';
 import Select, { components } from 'react-select';
-import DropdownTreeSelect from 'react-dropdown-tree-select';
-import 'react-dropdown-tree-select/dist/styles.css';
 
 
 export function SearchFormTraitsVariant({ onSubmit }) {
@@ -45,7 +43,7 @@ export function SearchFormTraitsVariant({ onSubmit }) {
   );
 
   const categorizedPhenotypes = phenotypes.map(e => {
-    const spaces = String.fromCharCode(160).repeat(e.level * 2);
+    const spaces = String.fromCharCode(160).repeat(e.level * 3);
     let label = spaces + e.label;
     return { ...e, label };
   });
@@ -81,11 +79,52 @@ export function SearchFormTraitsVariant({ onSubmit }) {
     }
   };
 
-  const MultiValue = props => (
-    <components.MultiValue {...props}>
-      {props.data.label.trim()}
-    </components.MultiValue>
-  );
+  const Option = props => { 
+    return ( 
+      <div> 
+        <components.Option {...props}> 
+          <input 
+            type="checkbox" 
+            checked={props.isSelected} 
+            onChange={() => null} 
+          />{" "}
+          <label>{props.label}</label> 
+        </components.Option> 
+      </div> 
+    ); 
+  };
+
+  const allOption = {
+    label: "Select all",
+    value: "*"
+  };
+
+  const ValueContainer = ({ children, ...props }) => {
+    const currentValues = props.getValue();
+    let toBeRendered = children;
+    if (currentValues.some(val => val.value === allOption.value)) {
+      toBeRendered = [[children[0][0]], children[1]];
+    }
+  
+    return (
+      <components.ValueContainer {...props}>
+        {toBeRendered}
+      </components.ValueContainer>
+    );
+  };
+
+  const MultiValue = props => {
+    let labelToBeDisplayed = `${props.data.label.trim()}`;
+    if (props.data.value === allOption.value) {
+      labelToBeDisplayed = "All is selected";
+    }
+    
+    return (
+      <components.MultiValue {...props}>
+        {labelToBeDisplayed}
+      </components.MultiValue>
+    );
+  }
 
   return (
     <Form>
@@ -136,21 +175,16 @@ export function SearchFormTraitsVariant({ onSubmit }) {
                 : alphabetizedPhenotypes
             }
             isMulti
-            components={{ MultiValue }}
+            components={{ 
+              Option,
+              MultiValue, 
+              ValueContainer, 
+            }}
+            closeMenuOnSelect={false} 
+            hideSelectedOptions={false}
+            allowSelectAll={true}
+            // backspaceRemovesValue={false}
           />
-        </Col>
-      </Row>
-
-      <Row className="mt-3" controlId="phenotype-list">
-        <Form.Label column sm={3}>
-          Choose phenotype(s) x2
-        </Form.Label>
-        <Col sm={9}>
-          <DropdownTreeSelect 
-            className="dropdown-tree"
-            data={phenotypesTree} 
-            // mode="radioSelect"
-            />
         </Col>
       </Row>
 
@@ -161,7 +195,7 @@ export function SearchFormTraitsVariant({ onSubmit }) {
         <Col sm={3}>
           <FormControl
             className="form-control"
-            placeholder="(Variant rsid or coordinate) *"
+            placeholder="Variant rsid or coordinate"
             aria-label="Variant (required)"
             value={selectedVariant}
             onChange={e => setSelectedVariant(e.target.value)}
@@ -175,11 +209,8 @@ export function SearchFormTraitsVariant({ onSubmit }) {
         <Col sm={{ span: 9, offset: 3 }}>
           <Button
             variant="primary"
-            disabled={!(selectedPhenotypes && selectedPhenotypes.length >= 2)}
-            onClick={e => {
-              e.preventDefault();
-              onSubmit(selectedPhenotypes);
-            }}>
+            disabled={!canSubmit}
+            onClick={validateVariantInput}>
             Submit
           </Button>
         </Col>
