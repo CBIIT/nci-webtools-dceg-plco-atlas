@@ -3,8 +3,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Form, FormControl, InputGroup, Row, Col, Button } from 'react-bootstrap';
 import { updateVariantLookup } from '../../services/actions';
 import Select, { components } from 'react-select';
-import DropdownTreeSelect from 'react-dropdown-tree-select';
-import 'react-dropdown-tree-select/dist/styles.css';
 
 
 export function SearchFormTraitsVariant({ onSubmit }) {
@@ -138,19 +136,6 @@ export function SearchFormTraitsVariant({ onSubmit }) {
             isMulti
             components={{ MultiValue }}
           />
-        </Col>
-      </Row>
-
-      <Row className="mt-3" controlId="phenotype-list">
-        <Form.Label column sm={3}>
-          Choose phenotype(s) x2
-        </Form.Label>
-        <Col sm={9}>
-          <DropdownTreeSelect 
-            className="dropdown-tree"
-            data={phenotypesTree} 
-            // mode="radioSelect"
-            />
         </Col>
       </Row>
 
