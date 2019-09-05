@@ -26,6 +26,20 @@ export function updatePhenotypeCorrelations(data) {
   return { type: UPDATE_PHENOTYPE_CORRELATIONS, data };
 }
 
+export function updateSummaryResultsTable(phenotype) {
+
+}
+
+export function drawManhattanPlot(phenotype) {
+  return async function (dispatch) {
+    const setLoading = loading => {
+      dispatch(updateSummaryResults({loading}))
+    }
+    setLoading(true);
+
+  }
+}
+
 export function drawQQPlot(phenotype) {
   return async function (dispatch) {
     const setLoading = loading => {
@@ -45,7 +59,7 @@ export function drawQQPlot(phenotype) {
       // setAreaItems(imageMapData.areaItems);
     }
     setLoading(false);
-  
+
   }
 };
 
