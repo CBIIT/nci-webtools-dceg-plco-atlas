@@ -3,8 +3,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { query } from '../../services/query';
 import { updatePhenotypeCorrelations } from '../../services/actions';
 import { Spinner, Button, ButtonGroup, ToggleButton } from 'react-bootstrap';
-
 import Plot from 'react-plotly.js';
+
 
 export function Heatmap({ drawFunctionRef }) {
   const dispatch = useDispatch();
@@ -26,8 +26,53 @@ export function Heatmap({ drawFunctionRef }) {
     dispatch(updatePhenotypeCorrelations({heatmapData}));
   }
 
-  // const [heatmapData, setHeatmapData] = useState([]);
   const [numPhenotypes, setNumPhenotypes] = useState(2);
+
+  const [popupTooltipData, setPopupTooltipData] = useState({});
+
+  const [popupTooltipStyle, setPopupTooltipStyle] = useState({
+    top: 0, // computed based on child and parent's height
+    left: 0, // computed based on child and parent's width
+    display: 'none'
+  });
+
+  const popupMarkerClose = e => {
+    setPopupTooltipStyle({
+      ...popupTooltipStyle,
+      display: 'none'
+    });
+    setPopupTooltipData({});
+  };
+
+  const popupMarkerClick = e => {
+    console.log(e);
+    // make sure action occurs on imagemap coord only
+    if (e.points[0]) {
+      console.log(e.points[0]);
+      setPopupTooltipData({
+        'phenotypeX': e.points[0].x,
+        'phenotypeY': e.points[0].y,
+        'r2': e.points[0].z
+      });
+      console.log(e.event.clientX, e.event.clientX);
+      setPopupTooltipStyle({
+        ...popupTooltipStyle,
+        top: e.event.clientY, // computed based on child and parent's height
+        left: e.event.clientX + 15, // computed based on child and parent's width
+        display: 'block'
+      });
+    } else {
+      popupMarkerClose();
+    }
+  };
+
+  // const clickPoint = (e) => {
+  //   console.log(e);
+  //   if (e.points[0]) {
+  //     console.log("x:", e.points[0].x);
+  //     console.log("y:", e.points[0].y);
+  //   }
+  // }
 
   const layout = {
     width: 1000,
@@ -197,50 +242,77 @@ export function Heatmap({ drawFunctionRef }) {
   }
 
   return (
-    <div className="row">
-      <div className="col-md-12 py-3">
-        <ButtonGroup toggle className="ml-3" onChange={e => setNumPhenotypes(e.target.value)}>
-          <ToggleButton type="radio" name="radio" defaultChecked value="2">
-            2
-          </ToggleButton>
-          <ToggleButton type="radio" name="radio" value="50">
-            50
-          </ToggleButton>
-          <ToggleButton type="radio" name="radio" value="100">
-            100
-          </ToggleButton>
-          <ToggleButton type="radio" name="radio" value="400">
-            400
-          </ToggleButton>
-        </ButtonGroup>
-        <Button className="ml-3" onClick={generateData}>
-          Generate Sample Data
-        </Button>
-        <Button className="ml-3" onClick={loadSamplePhenotypes}>
-          Load Sample Phenotypes
-        </Button>
-      </div>
-      <div
-        className="col-md-12"
-        style={{ display: heatmapData.length > 0 && !loading ? 'block' : 'none' }}>
+    <>
+      <div className="row">
+        <div className="col-md-12 py-3">
+          <ButtonGroup toggle className="ml-3" onChange={e => setNumPhenotypes(e.target.value)}>
+            <ToggleButton type="radio" name="radio" defaultChecked value="2">
+              2
+            </ToggleButton>
+            <ToggleButton type="radio" name="radio" value="50">
+              50
+            </ToggleButton>
+            <ToggleButton type="radio" name="radio" value="100">
+              100
+            </ToggleButton>
+            <ToggleButton type="radio" name="radio" value="400">
+              400
+            </ToggleButton>
+          </ButtonGroup>
+          <Button className="ml-3" onClick={generateData}>
+            Generate Sample Data
+          </Button>
+          <Button className="ml-3" onClick={loadSamplePhenotypes}>
+            Load Sample Phenotypes
+          </Button>
+        </div>
         <div
-          style={{
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center'
-          }}>
-          <Plot data={heatmapData} layout={layout} config={config} />
+          className="col-md-12"
+          style={{ display: heatmapData.length > 0 && !loading ? 'block' : 'none' }}>
+          <div style={popupTooltipStyle} className="popup-tooltip shadow">
+            <button
+              type="button"
+              className="close popup-tooltip-close"
+              aria-label="Close"
+              onClick={popupMarkerClose}>
+              <span aria-hidden="true">&times;</span>
+            </button>
+            <b>Phenotype X:</b> {popupTooltipData.phenotypeX}
+            <br />
+            <b>Phenotype Y:</b> {popupTooltipData.phenotypeY}
+            <br />
+            <b>Correlation:</b> {popupTooltipData.r2}
+            <br />
+          </div>
+          <div
+            // style={{
+            //   display: 'flex',
+            //   justifyContent: 'center',
+            //   alignItems: 'center'
+            // }}
+            >
+            <Plot 
+              data={heatmapData} 
+              layout={layout} 
+              config={config} 
+              onClick={e => popupMarkerClick(e)}
+              // onClick={clickPoint}
+            />
+          </div>
+        </div>
+        <div className="col-md-12">
+          <div
+            className="text-center"
+            style={{ display: loading ? 'block' : 'none' }}>
+            <Spinner animation="border" variant="primary" role="status">
+              <span className="sr-only">Loading...</span>
+            </Spinner>
+          </div>
         </div>
       </div>
-      <div className="col-md-12">
-        <div
-          className="text-center"
-          style={{ display: loading ? 'block' : 'none' }}>
-          <Spinner animation="border" variant="primary" role="status">
-            <span className="sr-only">Loading...</span>
-          </Spinner>
-        </div>
-      </div>
-    </div>
+      <script>
+      window.ReactCursorPosition = window.ReactCursorPosition.default;
+    </script>
+  </>
   );
 }
