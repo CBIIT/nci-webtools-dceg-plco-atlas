@@ -3,7 +3,7 @@ import { interpolateTicks } from './scale.js';
 
 export function axisLeft(config, ctx) {
   const margins = config.margins;
-  const [xMin, xMax] = config.xAxis.extent;
+  const [xMin ] = config.xAxis.extent;
   const [yMin, yMax] = config.yAxis.extent;
   const xScale = config.xAxis.scale;
   const yScale = config.yAxis.scale;
@@ -70,7 +70,7 @@ export function axisLeft(config, ctx) {
 export function axisBottom(config, ctx) {
   const margins = config.margins;
   const [xMin, xMax] = config.xAxis.extent;
-  const [yMin, yMax] = config.yAxis.extent;
+  const [yMin ] = config.yAxis.extent;
   const xScale = config.xAxis.scale;
   const yScale = config.yAxis.scale;
   let axisWidth = config.yAxis.width || 1;

@@ -78,7 +78,7 @@ export function rgbToColor(r, g, b) {
 
 // converts a color (given r, g, b) to an index
 export function colorToIndex(r, g, b, multiplier) {
-    multiplier = multipler || 50;
+    multiplier = multiplier || 50;
     return multiplier * (r * 65536 + g * 256 + b);
 }
 

@@ -52,7 +52,7 @@ export class ManhattanPlot {
         this.draw();
       }
       config.zoomOut = ev => {
-        if (!zoomStack.length) {
+        if (!config.zoomStack.length) {
           return config.resetZoom();
         }
 
