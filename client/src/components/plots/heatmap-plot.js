@@ -185,7 +185,7 @@ export function Heatmap({ drawFunctionRef }) {
         ['1.0', 'rgb(255,255,255)']
       ],
       showscale: false,
-      hoverinfo:"x+y",
+      hoverinfo: "x+y",
       hovertemplate: '<br><b>Phenotype X</b>: %{x}<br>' +
                       '<b>Phenotype Y</b>: %{y}<br>' +
                       '<b>Correlation</b>: %{z}' +
