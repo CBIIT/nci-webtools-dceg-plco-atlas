@@ -94,14 +94,4 @@ function getVariant(filepath, params) {
         : stmt.all(params);
 }
 
-function getCorrelations(filepath, params) {
-    const stmt = new Database(filepath, {readonly: true}).prepare(`
-        SELECT * FROM correlations
-    `);
-
-    return params.raw
-        ? getRawResults(stmt, params)
-        : stmt.all(params);
-}
-
-module.exports = {getSummary, getVariants, getVariantsByPage, getVariant, getVariantById, getCorrelations};
+module.exports = {getSummary, getVariants, getVariantsByPage, getVariant, getVariantById};
