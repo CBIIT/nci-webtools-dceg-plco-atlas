@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { rawQuery, query } from '../../services/query';
+import { query } from '../../services/query';
 import { updatePhenotypeCorrelations } from '../../services/actions';
 import { Spinner, Button, ButtonGroup, ToggleButton } from 'react-bootstrap';
 

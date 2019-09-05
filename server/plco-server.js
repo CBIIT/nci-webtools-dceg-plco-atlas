@@ -3,7 +3,7 @@ const server = require('fastify');
 const cors = require('fastify-cors');
 const static = require('fastify-static');
 const { port, dbpath } = require('./config.json');
-const { getSummary, getVariants, getVariantsByPage, getVariant, getVariantById, getCorrelations } = require('./query');
+const { getSummary, getVariants, getVariantsByPage, getVariant, getVariantById } = require('./query');
 
 const app = server({ignoreTrailingSlash: true});
 app.register(static, {root: path.resolve('www')});
@@ -42,18 +42,6 @@ app.get('/variant', async ({query}, res) => {
     res.header('Cache-Control', 'max-age=300');
     return getVariant(dbpath + query.database, query);
 });
-
-// retrieves all phenotype correlations
-app.get('/correlations', async ({query}, res) => {
-    res.header('Cache-Control', 'max-age=300');
-    return getCorrelations(dbpath + query.database, query);
-});
-
-// retrieves all variants within the specified range for QQ plot, sorted by p-values descending
-// app.get('/imagemapqq', async ({query}, res) => {
-//     res.header('Cache-Control', 'max-age=300');
-//     return getQQImageMapJSON(query.database);
-// });
 
 app.listen(port, '0.0.0.0')
     .then(addr => console.log(`Application is running on: ${addr}`))
