@@ -45,34 +45,27 @@ export function Heatmap({ drawFunctionRef }) {
   };
 
   const popupMarkerClick = e => {
-    console.log(e);
     // make sure action occurs on imagemap coord only
-    if (e.points[0]) {
-      console.log(e.points[0]);
+    if (e && e.points && e.points[0]) {
       setPopupTooltipData({
         'phenotypeX': e.points[0].x,
         'phenotypeY': e.points[0].y,
         'r2': e.points[0].z
       });
-      console.log(e.event.clientX, e.event.clientX);
+      // console.log(e.event);
+      let x = e.event.offsetX;
+      let y = e.event.offsetY;
+      // console.log(x, y);
       setPopupTooltipStyle({
         ...popupTooltipStyle,
-        top: e.event.clientY, // computed based on child and parent's height
-        left: e.event.clientX + 15, // computed based on child and parent's width
+        left: x + 65, // computed based on child and parent's width
+        top: y, // computed based on child and parent's height
         display: 'block'
       });
     } else {
       popupMarkerClose();
     }
   };
-
-  // const clickPoint = (e) => {
-  //   console.log(e);
-  //   if (e.points[0]) {
-  //     console.log("x:", e.points[0].x);
-  //     console.log("y:", e.points[0].y);
-  //   }
-  // }
 
   const layout = {
     width: 1000,
@@ -277,26 +270,24 @@ export function Heatmap({ drawFunctionRef }) {
               onClick={popupMarkerClose}>
               <span aria-hidden="true">&times;</span>
             </button>
-            <b>Phenotype X:</b> {popupTooltipData.phenotypeX}
+            <b>Phenotype X:</b> <a href="/">{popupTooltipData.phenotypeX}</a>
             <br />
-            <b>Phenotype Y:</b> {popupTooltipData.phenotypeY}
+            <b>Phenotype Y:</b> <a href="/">{popupTooltipData.phenotypeY}</a>
             <br />
             <b>Correlation:</b> {popupTooltipData.r2}
             <br />
           </div>
           <div
-            // style={{
-            //   display: 'flex',
-            //   justifyContent: 'center',
-            //   alignItems: 'center'
-            // }}
-            >
+            style={{
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center'
+            }}>
             <Plot 
               data={heatmapData} 
               layout={layout} 
               config={config} 
               onClick={e => popupMarkerClick(e)}
-              // onClick={clickPoint}
             />
           </div>
         </div>
