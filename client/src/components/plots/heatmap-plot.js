@@ -4,9 +4,10 @@ import { query } from '../../services/query';
 import { updatePhenotypeCorrelations } from '../../services/actions';
 import { Spinner, Button, ButtonGroup, ToggleButton } from 'react-bootstrap';
 import Plot from 'react-plotly.js';
+// import ReactCursorPosition from 'react-cursor-position';
 
 
-export function Heatmap({ drawFunctionRef }) {
+export function Heatmap() {
   const dispatch = useDispatch();
 
   const {
@@ -36,6 +37,13 @@ export function Heatmap({ drawFunctionRef }) {
     display: 'none'
   });
 
+  // const [pos, setPos] = useState({
+  //   position: {
+  //     x: 0,
+  //     y: 0
+  //   }
+  // });
+
   const popupMarkerClose = e => {
     setPopupTooltipStyle({
       ...popupTooltipStyle,
@@ -45,6 +53,7 @@ export function Heatmap({ drawFunctionRef }) {
   };
 
   const popupMarkerClick = e => {
+    console.log(e);
     // make sure action occurs on imagemap coord only
     if (e && e.points && e.points[0]) {
       setPopupTooltipData({
@@ -55,11 +64,14 @@ export function Heatmap({ drawFunctionRef }) {
       // console.log(e.event);
       let x = e.event.offsetX;
       let y = e.event.offsetY;
-      // console.log(x, y);
+      console.log(x, y);
+      // console.log(pos.position);
       setPopupTooltipStyle({
         ...popupTooltipStyle,
         left: x + 65, // computed based on child and parent's width
         top: y, // computed based on child and parent's height
+        // top: pos.position.y, // computed based on child and parent's height
+        // left: pos.position.x + 15, // computed based on child and parent's width
         display: 'block'
       });
     } else {
@@ -163,7 +175,7 @@ export function Heatmap({ drawFunctionRef }) {
         ['1.0', 'rgb(0,0,255)']
       ],
       showscale: false,
-      hoverinfo:"x+y",
+      hoverinfo: "x+y",
       hovertemplate: '<br><b>Phenotype X</b>: %{x}<br>' +
                       '<b>Phenotype Y</b>: %{y}<br>' +
                       '<b>Correlation</b>: %{z}' +
@@ -173,6 +185,10 @@ export function Heatmap({ drawFunctionRef }) {
     setHeatmapData([randomData]);
     setLoading(false);
   };
+
+  const normalize = (val) => {
+    return (val - 0.0) / (1.0 - 0.0);
+  }
 
   const getZ = (phenotype1, phenotype2, correlationData) => {
     var r2;
@@ -192,9 +208,11 @@ export function Heatmap({ drawFunctionRef }) {
     );
 
     let uniquePhenotypes = Object.keys(correlationData);
+    // uniquePhenotypes = uniquePhenotypes.slice(0, 2);
     let x = [];
     let y = [];
     let z = [];
+    let text = []
     for (var i = 0; i < uniquePhenotypes.length; i++) {
       x.push(uniquePhenotypes[i]);
       y.unshift(uniquePhenotypes[i]);
@@ -206,12 +224,16 @@ export function Heatmap({ drawFunctionRef }) {
         row.unshift(getZ(x[xidx], y[yidx], correlationData));
       }
       z.unshift(row);
+      text.unshift(row);
     }
-
+    console.log("x", x);
+    console.log("y", y);
+    console.log("z", z);
     let sampleData = {
       x,
       y,
       z,
+      text,
       xgap: 1,
       ygap: 1,
       type: 'heatmap',
@@ -226,7 +248,8 @@ export function Heatmap({ drawFunctionRef }) {
       hoverinfo: "x+y",
       hovertemplate: '<br><b>Phenotype X</b>: %{x}<br>' +
                       '<b>Phenotype Y</b>: %{y}<br>' +
-                      '<b>Correlation</b>: %{z}' +
+                      '<b>Correlation</b>: %{z}<br>' +
+                      '<b>Text</b>: %{text}' +
                       '<extra></extra>'
                       
     };
@@ -262,33 +285,44 @@ export function Heatmap({ drawFunctionRef }) {
         <div
           className="col-md-12"
           style={{ display: heatmapData.length > 0 && !loading ? 'block' : 'none' }}>
-          <div style={popupTooltipStyle} className="popup-tooltip shadow">
-            <button
-              type="button"
-              className="close popup-tooltip-close"
-              aria-label="Close"
-              onClick={popupMarkerClose}>
-              <span aria-hidden="true">&times;</span>
-            </button>
-            <b>Phenotype X:</b> <a href="/">{popupTooltipData.phenotypeX}</a>
-            <br />
-            <b>Phenotype Y:</b> <a href="/">{popupTooltipData.phenotypeY}</a>
-            <br />
-            <b>Correlation:</b> {popupTooltipData.r2}
-            <br />
-          </div>
           <div
-            style={{
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center'
-            }}>
-            <Plot 
-              data={heatmapData} 
-              layout={layout} 
-              config={config} 
-              onClick={e => popupMarkerClick(e)}
-            />
+            className="heatmap"
+            style={{ display: loading ? 'none' : 'block' }}>
+            {/* <ReactCursorPosition
+              {...{
+                className: 'heatmap-mouse-window',
+                onPositionChanged: newPos => console.log(newPos.position)
+                // onPositionChanged: newPos => setPos(newPos)
+              }}> */}
+              <div style={popupTooltipStyle} className="popup-tooltip shadow">
+                <button
+                  type="button"
+                  className="close popup-tooltip-close"
+                  aria-label="Close"
+                  onClick={popupMarkerClose}>
+                  <span aria-hidden="true">&times;</span>
+                </button>
+                <b>Phenotype X:</b> <a href="/">{popupTooltipData.phenotypeX}</a>
+                <br />
+                <b>Phenotype Y:</b> <a href="/">{popupTooltipData.phenotypeY}</a>
+                <br />
+                <b>Correlation:</b> {popupTooltipData.r2}
+                <br />
+              </div>
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center'
+                }}>
+                <Plot 
+                  data={heatmapData} 
+                  layout={layout} 
+                  config={config} 
+                  onClick={e => popupMarkerClick(e)}
+                />
+              </div>
+            {/* </ReactCursorPosition> */}
           </div>
         </div>
         <div className="col-md-12">
@@ -301,9 +335,9 @@ export function Heatmap({ drawFunctionRef }) {
           </div>
         </div>
       </div>
-      <script>
-      window.ReactCursorPosition = window.ReactCursorPosition.default;
-    </script>
+      {/* <script>
+        window.ReactCursorPosition = window.ReactCursorPosition.default;
+      </script> */}
   </>
   );
 }

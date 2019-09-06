@@ -37,7 +37,7 @@ const initialState = {
     loading: false
   },
   phenotypeCorrelations: {
-    drawHeatmap: null,
+    // drawHeatmap: null,
     selectedListType: 'alphabetic',
     selectedPhenotypes: [],
     heatmapData: [],

@@ -17,9 +17,9 @@ export function PhenotypeCorrelations() {
   };
 
   // registers a function we can use to draw the qq plot
-  const setDrawHeatmap = drawHeatmap => {
-    dispatch(updatePhenotypeCorrelations({ drawHeatmap }));
-  };
+  // const setDrawHeatmap = drawHeatmap => {
+  //   dispatch(updatePhenotypeCorrelations({ drawHeatmap }));
+  // };
 
   const setMessages = messages => {
     dispatch(updatePhenotypeCorrelations({ messages }));
@@ -66,7 +66,7 @@ export function PhenotypeCorrelations() {
         </Card.Header>
         <Card.Body>
           <div className="row">
-            <Heatmap drawFunctionRef={setDrawHeatmap} />
+            <Heatmap />
             {/* <div className="col-md-12 text-left">
               <pre>{JSON.stringify(phenotypeCorrelations, null, 2)}</pre>
             </div> */}
