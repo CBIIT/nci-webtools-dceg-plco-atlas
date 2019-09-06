@@ -32,6 +32,7 @@ export function drawQQPlot(phenotype) {
       dispatch(updateSummaryResults({loading}))
     }
     setLoading(true);
+    console.log("DRAW QQ PLOT", phenotype);
     const imageMapData = await query(
       `data/qq-plots/${phenotype}.imagemap.json`
     );
@@ -46,6 +47,81 @@ export function drawQQPlot(phenotype) {
     }
     setLoading(false);
   
+  }
+};
+
+export function drawHeatmap(phenotypes) {
+  return async function (dispatch) {
+    const setLoading = loading => {
+      dispatch(updateSummaryResults({loading}))
+    }
+    const setHeatmapData = heatmapData => {
+      dispatch(updatePhenotypeCorrelations({heatmapData}));
+    }
+    const stringScore = (stringX, stringY) => {
+      var sum = 0;
+      for (var x = 0; x < stringX.length; x++) {
+        sum += stringX.charCodeAt(x);
+      }
+      for (var y = 0; y < stringY.length; y++) {
+        sum -= stringY.charCodeAt(y);
+      }
+      return Math.abs(sum);
+    }
+
+    setLoading(true);
+
+    console.log("DRAW HEATMAP", phenotypes);
+
+    let n = phenotypes.length;
+    let x = [];
+    let y = [];
+    let z = [];
+    for (var i = 1; i <= n; i++) {
+      let pheno =
+        i +
+        ' ' +
+        Math.random()
+          .toString(36)
+          .substring(2, 6);
+      x.push(pheno);
+      y.unshift(pheno);
+    }
+    for (var xidx = 0; xidx < n; xidx++) {
+      let row = [];
+      for (var yidx = 0; yidx < n; yidx++) {
+        if (x[xidx] === y[yidx]) {
+          row.push(0.0);
+        } else {
+          row.push(stringScore(x[xidx], y[yidx]));
+        }
+      }
+      z.push(row);
+    }
+    let randomData = {
+      x,
+      y,
+      z,
+      xgap: 1,
+      ygap: 1,
+      type: 'heatmap',
+      colorscale: [
+        ['0.0', 'rgb(255,255,255)'],
+        ['0.444444444444', 'rgb(255,0,0)'],
+        ['0.5', 'rgb(255,255,255)'],
+        ['1.0', 'rgb(0,0,255)']
+      ],
+      showscale: false,
+      hoverinfo: "x+y",
+      hovertemplate: '<br><b>Phenotype X</b>: %{x}<br>' +
+                      '<b>Phenotype Y</b>: %{y}<br>' +
+                      '<b>Correlation</b>: %{z}' +
+                      '<extra></extra>'
+                      
+    };
+    setHeatmapData([randomData]);
+
+    setLoading(false);
   }
 };
 
