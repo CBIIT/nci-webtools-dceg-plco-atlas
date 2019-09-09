@@ -45,11 +45,11 @@ export function SearchFormTraitsVariant({ onSubmit }) {
     a.label.localeCompare(b.label)
   );
 
-  const categorizedPhenotypes = phenotypes.map(e => {
-    const spaces = String.fromCharCode(160).repeat(e.level * 3);
-    let label = spaces + e.label;
-    return { ...e, label };
-  });
+  // const categorizedPhenotypes = phenotypes.map(e => {
+  //   const spaces = String.fromCharCode(160).repeat(e.level * 3);
+  //   let label = spaces + e.label;
+  //   return { ...e, label };
+  // });
 
   const canSubmit =
     selectedPhenotypes &&
@@ -122,19 +122,17 @@ export function SearchFormTraitsVariant({ onSubmit }) {
         <Col sm={9}>
           <TreeSelect
             style={{ width: '100%' }}
-            // transitionName="rc-tree-select-dropdown-slide-up"
-            treeData={phenotypesTree}
+            dropdownStyle={{ maxHeight: 500, overflow: 'auto' }}
+            treeData={selectedListType === 'alphabetic' ? alphabetizedPhenotypes : phenotypesTree}
             value={selectedPhenotypes}
             onChange={handleChange}
-            // labelInValue
-            // showSearch
-            dropdownMatchSelectWidth={true}
+            treeNodeFilterProp="label"
+            dropdownMatchSelectWidth
             autoClearSearchValue
             treeCheckable
             treeLine
             multiple
             allowClear
-            treeNodeFilterProp="label"
             labelInValue
           />
         </Col>

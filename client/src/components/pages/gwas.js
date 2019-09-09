@@ -14,7 +14,8 @@ export function Gwas() {
   useEffect(() => {
     const records = [];
     const populateRecords = node => {
-      records.push(node);
+      // records.push(node);
+      records.push({label: node.label, value: node.value});
       if (node.children) node.children.forEach(populateRecords);
     };
 
