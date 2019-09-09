@@ -82,63 +82,6 @@ export function SearchFormTraitsVariant({ onSubmit }) {
     }
   };
 
-  // const Option = props => { 
-  //   return ( 
-  //     <div> 
-  //       <components.Option {...props}> 
-  //         <input 
-  //           type="checkbox" 
-  //           checked={props.isSelected} 
-  //           onChange={() => null} 
-  //         />{" "}
-  //         <label>{props.label}</label> 
-  //       </components.Option> 
-  //     </div> 
-  //   ); 
-  // };
-
-  // const allOption = {
-  //   label: "Select all",
-  //   value: "*"
-  // };
-
-  // const ValueContainer = ({ children, ...props }) => {
-  //   const currentValues = props.getValue();
-  //   let toBeRendered = children;
-  //   if (currentValues.some(val => val.value === allOption.value)) {
-  //     toBeRendered = [[children[0][0]], children[1]];
-  //   }
-  
-  //   return (
-  //     <components.ValueContainer {...props}>
-  //       {toBeRendered}
-  //     </components.ValueContainer>
-  //   );
-  // };
-
-  // const MultiValue = props => {
-  //   let labelToBeDisplayed = `${props.data.label.trim()}`;
-  //   if (props.data.value === allOption.value) {
-  //     labelToBeDisplayed = "All is selected";
-  //   }
-    
-  //   return (
-  //     <components.MultiValue {...props}>
-  //       {labelToBeDisplayed}
-  //     </components.MultiValue>
-  //   );
-  // }
-
-  // const Menu = props => {
-  //   return (
-  //     <components.Menu {...props}>
-  //       <div className="my-4">
-  //         {props.children}
-  //       </div>
-  //     </components.Menu>
-  //   );
-  // }
-
   return (
     <Form>
       <Row controlId="phenotype-list">
@@ -177,28 +120,6 @@ export function SearchFormTraitsVariant({ onSubmit }) {
           Choose phenotype(s)
         </Form.Label>
         <Col sm={9}>
-          {/* <Select
-            placeholder="Select one or more phenotypes"
-            value={selectedPhenotypes}
-            onChange={handleChange}
-            isOptionDisabled={option => option.value === null}
-            options={
-              selectedListType === 'categorical'
-                ? categorizedPhenotypes
-                : alphabetizedPhenotypes
-            }
-            isMulti
-            components={{ 
-              Option,
-              MultiValue, 
-              Menu,
-              ValueContainer, 
-            }}
-            closeMenuOnSelect={false} 
-            hideSelectedOptions={false}
-            allowSelectAll={true}
-            // backspaceRemovesValue={false}
-          /> */}
           <TreeSelect
             style={{ width: '100%' }}
             // transitionName="rc-tree-select-dropdown-slide-up"
@@ -214,6 +135,7 @@ export function SearchFormTraitsVariant({ onSubmit }) {
             multiple
             allowClear
             treeNodeFilterProp="label"
+            labelInValue
           />
         </Col>
       </Row>
