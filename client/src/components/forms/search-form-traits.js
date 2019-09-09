@@ -93,59 +93,6 @@ export function SearchFormTraits({ onChange, onSubmit }) {
           </Button>
         </Col>
       </Row>
-
-
-
-
-
-      {/* <Form.Group controlId="phenotype-list">
-        <Form.Label>
-          <b>Select Phenotypes</b>
-        </Form.Label>
-        <InputGroup>
-          <InputGroup.Prepend>
-            <select
-              className="form-control"
-              value={selectedListType}
-              onChange={e => setSelectedListType(e.target.value)}>
-              <option value="alphabetic">Alphabetic</option>
-              <option value="categorical">Categorical</option>
-            </select>
-          </InputGroup.Prepend>
-
-          <div style={{ width: '60%' }}>
-            <Select
-              placeholder="(Select two or more phenotypes) *"
-              value={selectedPhenotypes}
-              onChange={handleChange}
-              options={
-                selectedListType === 'categorical'
-                  ? categorizedPhenotypes
-                  : alphabetizedPhenotypes
-              }
-              isMulti
-              components={{ MultiValue }}
-            />
-          </div>
-
-          <InputGroup.Append>
-            <button
-              className="btn btn-primary"
-              disabled={!(selectedPhenotypes && selectedPhenotypes.length >= 2)}
-              onClick={e => {
-                e.preventDefault();
-                onSubmit(selectedPhenotypes);
-              }}>
-              Submit
-            </button>
-          </InputGroup.Append>
-        </InputGroup>
-      </Form.Group> */}
-
-
-
-
-
     </Form>
   );
 }
