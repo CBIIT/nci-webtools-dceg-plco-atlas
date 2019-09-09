@@ -59,7 +59,7 @@ export function Heatmap() {
       setPopupTooltipData({
         'phenotypeX': e.points[0].x,
         'phenotypeY': e.points[0].y,
-        'r2': e.points[0].z
+        'r2': e.points[0].text
       });
       // console.log(e.event);
       let x = e.event.offsetX;
