@@ -1,5 +1,6 @@
 import { createStore, applyMiddleware, compose } from 'redux';
 import { rootReducer } from './reducers';
+import { fetchRanges } from './actions';
 import ReduxThunk from 'redux-thunk';
 
 const initialState = {
@@ -10,7 +11,9 @@ const initialState = {
     selectedPhenotype: null,
     selectedChromosome: null,
     selectedPlot: 'manhattan-plot',
-    selectedManhattanPlotType: 'combined',
+    selectedManhattanPlotType: 'aggregate',
+    manhattanPlotData: {},
+    manhattanPlotView: '',
     ranges: [],
     results: [],
     resultsCount: 0,
@@ -58,3 +61,5 @@ export const store = createStore(
       : e => e
   )
 );
+
+store.dispatch(fetchRanges());

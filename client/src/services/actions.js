@@ -1,4 +1,4 @@
-import { query } from './query';
+import { query, rawQuery } from './query';
 
 export const UPDATE_SUMMARY_RESULTS = 'UPDATE_SUMMARY_RESULTS';
 export const UPDATE_VARIANT_LOOKUP = 'UPDATE_VARIANT_LOOKUP';
@@ -26,40 +26,49 @@ export function updatePhenotypeCorrelations(data) {
   return { type: UPDATE_PHENOTYPE_CORRELATIONS, data };
 }
 
-export function updateSummaryResultsTable(phenotype) {
-
+export function updateSummaryResultsTable(params) {
+  return async function (dispatch) {
+   dispatch(updateSummaryResults({loading: true}));
+    const results = await query('variants-paginated', params);
+    console.log(results);
+   dispatch(updateSummaryResults({results, loading: false}))
+  }
 }
 
-export function drawManhattanPlot(phenotype) {
+export function fetchRanges() {
   return async function (dispatch) {
-    const setLoading = loading => {
-      dispatch(updateSummaryResults({loading}))
-    }
-    setLoading(true);
+    const ranges = await query('data/chromosome_ranges.json');
+    dispatch(updateSummaryResults({ranges}));
+  }
+}
 
+/**
+ *
+ * @param {'summary'|'variants'} plotType
+ * @param {object} params - database, chr, bpMin, bpMax, nlogpMin, nlogPmax
+ */
+export function drawManhattanPlot(plotType, params) {
+  return async function (dispatch) {
+    dispatch(updateSummaryResults({loading: true}));
+    const manhattanPlotData = await rawQuery(plotType, params);
+    dispatch(updateSummaryResults({manhattanPlotData, loading: false}));
+    return manhattanPlotData;
   }
 }
 
 export function drawQQPlot(phenotype) {
   return async function (dispatch) {
-    const setLoading = loading => {
-      dispatch(updateSummaryResults({loading}))
-    }
-    setLoading(true);
+    dispatch(updateSummaryResults({loading: true}));
     const imageMapData = await query(
       `data/qq-plots/${phenotype}.imagemap.json`
     );
     if (!imageMapData.error) {
       dispatch(updateSummaryResults({
+        ...imageMapData, // lambdaGC, sampleSize, areaItems
         qqplotSrc: `data/qq-plots/${phenotype}.png`,
-        ...imageMapData
-      }))
-      // setLambdaGC(imageMapData.lambdaGC);
-      // setSampleSize(imageMapData.sampleSize);
-      // setAreaItems(imageMapData.areaItems);
+        loading: false
+      }));
     }
-    setLoading(false);
-
   }
 };
 
