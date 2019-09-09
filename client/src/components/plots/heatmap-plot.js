@@ -186,17 +186,29 @@ export function Heatmap() {
     setLoading(false);
   };
 
-  const normalize = (val) => {
-    return (val - 0.0) / (1.0 - 0.0);
-  }
-
-  const getZ = (phenotype1, phenotype2, correlationData) => {
+  const getZColor = (phenotype1, phenotype2, correlationData) => {
     var r2;
     if (phenotype2 in correlationData[phenotype1]) {
       r2 = correlationData[phenotype1][phenotype2];
     } else {
       r2 = correlationData[phenotype2][phenotype1];
     }
+
+    if (r2 === -1.0 || r2 === 1.0) {
+      r2 = 0.0;
+    }
+
+    return r2;
+  }
+
+  const getZText = (phenotype1, phenotype2, correlationData) => {
+    var r2;
+    if (phenotype2 in correlationData[phenotype1]) {
+      r2 = correlationData[phenotype1][phenotype2];
+    } else {
+      r2 = correlationData[phenotype2][phenotype1];
+    }
+
     return r2;
   }
 
@@ -208,48 +220,48 @@ export function Heatmap() {
     );
 
     let uniquePhenotypes = Object.keys(correlationData);
-    // uniquePhenotypes = uniquePhenotypes.slice(0, 2);
+    // uniquePhenotypes = uniquePhenotypes.slice(4, 9);
     let x = [];
     let y = [];
-    let z = [];
-    let text = []
+    let zColor = [];
+    let zText = []
     for (var i = 0; i < uniquePhenotypes.length; i++) {
       x.push(uniquePhenotypes[i]);
       y.unshift(uniquePhenotypes[i]);
     }
 
     for (var xidx = 0; xidx < x.length; xidx++) {
-      let row = [];
+      let rowColor = [];
+      let rowText = [];
       for (var yidx = 0; yidx < y.length; yidx++) {
-        row.unshift(getZ(x[xidx], y[yidx], correlationData));
+        rowColor.unshift(getZColor(x[xidx], y[yidx], correlationData));
+        rowText.unshift(getZText(x[xidx], y[yidx], correlationData));
       }
-      z.unshift(row);
-      text.unshift(row);
+      zColor.unshift(rowColor);
+      zText.unshift(rowText);
     }
-    console.log("x", x);
-    console.log("y", y);
-    console.log("z", z);
+
     let sampleData = {
       x,
       y,
-      z,
-      text,
+      z: zColor,
+      zmin: -1.0,
+      zmax: 1.0,
+      text: zText,
       xgap: 1,
       ygap: 1,
       type: 'heatmap',
       colorscale: [
-        ['0.0', 'rgb(255,255,255)'],
-        ['0.000000000001', 'rgb(0,0,255)'],
+        ['0.0', 'rgb(0,0,255)'],
         ['0.5', 'rgb(255,255,255)'],
-        ['0.999999999999', 'rgb(255,0,0)'],
-        ['1.0', 'rgb(255,255,255)']
+        ['1.0', 'rgb(255,0,0)']
       ],
       showscale: false,
       hoverinfo: "x+y",
       hovertemplate: '<br><b>Phenotype X</b>: %{x}<br>' +
                       '<b>Phenotype Y</b>: %{y}<br>' +
-                      '<b>Correlation</b>: %{z}<br>' +
-                      '<b>Text</b>: %{text}' +
+                      // '<b>Color</b>: %{z}<br>' +
+                      '<b>Correlation</b>: %{text}' +
                       '<extra></extra>'
                       
     };
