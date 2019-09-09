@@ -19,14 +19,18 @@ function getSummary(filepath, params) {
         : stmt.all(params);
 }
 
+function isDefined(e) {
+    return !(/^(null|undefined)$/).test(e);
+}
+
 function getVariants(filepath, params) {
     const stmt = new Database(filepath, {readonly: true}).prepare(
         `SELECT variant_id, chr, bp, nlog_p FROM variant WHERE
-            chr = :chr AND
-            bp >= :bpMin AND
-            bp <= :bpMax AND
-            nlog_p >= :nlogpMin AND
-            nlog_p <= :nlogpMax`);
+            chr = :chr
+            ${isDefined(params.bpMin) ? ' AND bp >= :bpMin' : ' '}
+            ${isDefined(params.bpMax) ? ' AND bp <= :bpMax' : ' '}
+            ${isDefined(params.nlogpMin) ? ' AND nlog_p >= :nlogpMin' : ' '}
+            ${isDefined(params.nlogpMax) ? ' AND nlog_p <= :nlogpMax' : ' '}`);
 
     return params.raw
         ? getRawResults(stmt, params)
@@ -34,7 +38,6 @@ function getVariants(filepath, params) {
 }
 
 function getVariantsByPage(filepath, params) {
-    const isDefined = e => !(/^(null|undefined)$/).test(e);
     const sql = `SELECT * FROM variant
         WHERE p IS NOT NULL
         ${isDefined(params.chr) ? ' AND chr = :chr' : ' '}
