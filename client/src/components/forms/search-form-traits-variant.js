@@ -2,7 +2,9 @@ import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Form, FormControl, InputGroup, Row, Col, Button } from 'react-bootstrap';
 import { updateVariantLookup } from '../../services/actions';
-import Select, { components } from 'react-select';
+// import Select, { components } from 'react-select';
+import TreeSelect, { TreeNode, SHOW_PARENT } from 'rc-tree-select';
+import 'rc-tree-select/assets/index.css';
 
 
 export function SearchFormTraitsVariant({ onSubmit }) {
@@ -18,6 +20,7 @@ export function SearchFormTraitsVariant({ onSubmit }) {
   } = variantLookup;
 
   const handleChange = params => {
+    console.log(params);
     setSelectedPhenotypes(params);
     // onChange(params);
   };
@@ -43,7 +46,7 @@ export function SearchFormTraitsVariant({ onSubmit }) {
   );
 
   const categorizedPhenotypes = phenotypes.map(e => {
-    const spaces = String.fromCharCode(160).repeat(e.level * 2);
+    const spaces = String.fromCharCode(160).repeat(e.level * 3);
     let label = spaces + e.label;
     return { ...e, label };
   });
@@ -78,12 +81,6 @@ export function SearchFormTraitsVariant({ onSubmit }) {
       });
     }
   };
-
-  const MultiValue = props => (
-    <components.MultiValue {...props}>
-      {props.data.label.trim()}
-    </components.MultiValue>
-  );
 
   return (
     <Form>
@@ -123,18 +120,22 @@ export function SearchFormTraitsVariant({ onSubmit }) {
           Choose phenotype(s)
         </Form.Label>
         <Col sm={9}>
-          <Select
-            placeholder="Select one or more phenotypes"
+          <TreeSelect
+            style={{ width: '100%' }}
+            // transitionName="rc-tree-select-dropdown-slide-up"
+            treeData={phenotypesTree}
             value={selectedPhenotypes}
             onChange={handleChange}
-            isOptionDisabled={option => option.value === null}
-            options={
-              selectedListType === 'categorical'
-                ? categorizedPhenotypes
-                : alphabetizedPhenotypes
-            }
-            isMulti
-            components={{ MultiValue }}
+            // labelInValue
+            // showSearch
+            dropdownMatchSelectWidth={true}
+            autoClearSearchValue
+            treeCheckable
+            treeLine
+            multiple
+            allowClear
+            treeNodeFilterProp="label"
+            labelInValue
           />
         </Col>
       </Row>
@@ -146,7 +147,7 @@ export function SearchFormTraitsVariant({ onSubmit }) {
         <Col sm={3}>
           <FormControl
             className="form-control"
-            placeholder="(Variant rsid or coordinate) *"
+            placeholder="Variant rsid or coordinate"
             aria-label="Variant (required)"
             value={selectedVariant}
             onChange={e => setSelectedVariant(e.target.value)}
@@ -160,11 +161,8 @@ export function SearchFormTraitsVariant({ onSubmit }) {
         <Col sm={{ span: 9, offset: 3 }}>
           <Button
             variant="primary"
-            disabled={!(selectedPhenotypes && selectedPhenotypes.length >= 2)}
-            onClick={e => {
-              e.preventDefault();
-              onSubmit(selectedPhenotypes);
-            }}>
+            disabled={!canSubmit}
+            onClick={validateVariantInput}>
             Submit
           </Button>
         </Col>

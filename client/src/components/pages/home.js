@@ -47,7 +47,7 @@ export function Home({ links }) {
 
       <div
         className="container align-middle text-center"
-        style={{'margin-top': '70px'}}>
+        style={{marginTop: '70px'}}>
         <CardDeck>
           {links.map(({ exact, route, title, image }, index) => (
             <>
@@ -109,7 +109,7 @@ export function Home({ links }) {
       <div className="bg-white text-center">
         <div 
           className="bg-secondary text-light text-center"
-          style={{height: "50px", 'clip-path': 'polygon(50% 100%, 0 0, 100% 0)'}}>
+          style={{height: "50px", clipPath: 'polygon(50% 100%, 0 0, 100% 0)'}}>
         </div>
         <div className="py-5">
           <h3 style={{color: '#545871'}}><b>OUR FOCUS</b></h3>
