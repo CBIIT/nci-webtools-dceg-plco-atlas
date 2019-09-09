@@ -44,6 +44,16 @@ $blue: #005ea2;
   color: orange !important;
 }
 
+.flex-shrink-auto {
+  flex: 0 1 auto;
+  width: auto;
+}
+
+.flex-grow-auto {
+  flex: 1 0 auto;
+  width: auto;
+}
+
 .nav-pills.nav-pills-inverse {
   .nav-link {
     color: white;
@@ -135,6 +145,8 @@ h1 {
 }
 
 .manhattan-plot {
+  min-width: 700px;
+  height: 100%;
   max-width: 100%;
   position: relative;
 
@@ -172,6 +184,13 @@ h1 {
     border: 1px solid #bbb;
     border-radius: 4px;
     padding: 10px;
+  }
+
+  .manhattan-plot-tooltip {
+    background-color: white;
+    border-radius: 0.25rem;
+    padding: 0.5rem 1rem;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
   }
 }
 
