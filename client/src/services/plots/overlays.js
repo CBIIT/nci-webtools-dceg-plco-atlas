@@ -64,8 +64,8 @@ export function drawZoomOverlay(config, ctx, overlayCtx) {
     function startZoom(ev) {
       let {x, y} = viewportToLocalCoordinates(ev.clientX, ev.clientY, ev.target);
       let withinMargins = isWithinMargins(x, y, canvas, margins);
-      if (!withinMargins) return false;
       zoomArea = { x1: x, x2: x, y1: y, y2: y };
+      if (!withinMargins) return false;
       mouseDown = true;
     }
 
@@ -139,6 +139,12 @@ export function drawZoomOverlay(config, ctx, overlayCtx) {
 
     function resetZoom(ev) {
       config.resetZoom && config.resetZoom();
+      const [xMin, xMax] = config.xAxis.extent;
+      const [yMin, yMax] = config.yAxis.extent;
+      const window = {
+        bounds: {xMin, xMax, yMin, yMax}
+      };
+      config.onZoom && config.onZoom(window);
     }
 }
 

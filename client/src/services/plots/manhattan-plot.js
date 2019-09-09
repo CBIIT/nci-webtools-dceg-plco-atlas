@@ -55,9 +55,7 @@ export class ManhattanPlot {
         if (!config.zoomStack.length) {
           return config.resetZoom();
         }
-
         const zoom = config.zoomStack.pop();
-
       }
 
       config.resetZoom = ev => {
@@ -85,6 +83,7 @@ export class ManhattanPlot {
     const margins = config.margins = {top: 40, right: 40, bottom: 60, left: 80, ...config.margins};
     const width = canvasWidth - margins.left - margins.right;
     const height = canvasHeight - margins.top - margins.bottom;
+    const lines = this.config.lines || [];
     config.pointMap = {}; // maps colors to data indexes
     config.zoomStack = [];
 
@@ -121,6 +120,25 @@ export class ManhattanPlot {
     drawPoints(config, ctx, hiddenCtx);
     axisLeft(config, ctx);
     axisBottom(config, ctx);
+    for (let line of lines) {
+      this.drawLine(line);
+    }
+  }
+
+  drawLine(line) {
+    // draw a horizontal line
+    if (line.y) {
+      let margins = this.config.margins;
+      let y = this.config.yAxis.scale(line.y) + margins.top;
+      this.ctx.beginPath();
+      this.ctx.globalAlpha = 0.6;
+      this.ctx.strokeStyle = '#888';
+      this.ctx.lineWidth = 1;
+      this.ctx.setLineDash([6, 4]);
+      this.ctx.moveTo(margins.left, y);
+      this.ctx.lineTo(this.canvas.width - margins.right, y);
+      this.ctx.stroke();
+    }
   }
 
   isWithinMargins(x, y) {
