@@ -1,24 +1,20 @@
 import React, { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { updatePhenotypeCorrelations } from '../../services/actions';
 import { SearchFormTraits } from '../forms/search-form-traits';
 import { Heatmap } from '../plots/heatmap-plot';
 import { Card } from 'react-bootstrap';
+import { updatePhenotypeCorrelations, drawHeatmap } from '../../services/actions';
+
 
 export function PhenotypeCorrelations() {
   const dispatch = useDispatch();
   const phenotypeCorrelations = useSelector(
     state => state.phenotypeCorrelations
   );
-  const { submitted, messages, drawHeatmap } = phenotypeCorrelations;
+  const { submitted, messages } = phenotypeCorrelations;
 
   const setSubmitted = submitted => {
     dispatch(updatePhenotypeCorrelations({ submitted }));
-  };
-
-  // registers a function we can use to draw the qq plot
-  const setDrawHeatmap = drawHeatmap => {
-    dispatch(updatePhenotypeCorrelations({ drawHeatmap }));
   };
 
   const setMessages = messages => {
@@ -36,20 +32,19 @@ export function PhenotypeCorrelations() {
 
   const handleSubmit = params => {
     setSubmitted(new Date());
-    // setSelectedChromosome(null);
-    console.log(params);
+    console.log("submit");
 
-    if (!params || !params.value) {
+    if (!params) {
       setMessages([
         {
           type: 'danger',
-          content: 'The selected phenotype has no data.'
+          content: 'The selected phenotypes have no data.'
         }
       ]);
       return;
     }
 
-    if (drawHeatmap) drawHeatmap(params.value);
+    dispatch(drawHeatmap(params));
   };
 
   return (
@@ -66,7 +61,7 @@ export function PhenotypeCorrelations() {
         </Card.Header>
         <Card.Body>
           <div className="row">
-            <Heatmap drawFunctionRef={setDrawHeatmap} />
+            <Heatmap />
             {/* <div className="col-md-12 text-left">
               <pre>{JSON.stringify(phenotypeCorrelations, null, 2)}</pre>
             </div> */}

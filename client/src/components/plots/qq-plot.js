@@ -43,6 +43,7 @@ export function QQPlot({ onVariantLookup }) {
         'p-value': variant[3],
         'snp': variant[2]
       });
+      console.log(pos.position);
       setPopupTooltipStyle({
         ...popupTooltipStyle,
         top: pos.position.y, // computed based on child and parent's height
