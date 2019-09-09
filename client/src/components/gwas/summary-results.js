@@ -1,47 +1,34 @@
-import React from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { Alert, Nav, Tab, Card } from 'react-bootstrap';
-import { SearchFormTrait } from '../forms/search-form-trait';
-import { ManhattanPlot } from '../plots/manhattan-plot';
-import { QQPlot } from '../plots/qq-plot';
-import { SummaryResultsTable } from './summary-results-table';
+import React from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { Alert, Nav, Tab, Tabs } from "react-bootstrap";
+import { SearchFormTrait } from "../forms/search-form-trait";
+import { ManhattanPlot } from "../plots/manhattan-plot";
+import { QQPlot } from "../plots/qq-plot";
+import { SummaryResultsTable } from "./summary-results-table";
 import {
   updateSummaryResults,
   updateVariantLookup,
   lookupVariants,
   drawQQPlot,
-} from '../../services/actions';
+  drawManhattanPlot,
+  updateSummaryResultsTable,
+} from "../../services/actions";
 
 export function SummaryResults() {
   const dispatch = useDispatch();
   const {
+    selectedChromosome,
     selectedPhenotype,
     selectedPlot,
     submitted,
+    ranges,
     messages,
-    drawManhattanPlot,
-    updateResultsTable,
     page,
-    pageSize,
+    pageSize
   } = useSelector(state => state.summaryResults);
 
   const setSubmitted = submitted => {
     dispatch(updateSummaryResults({ submitted }));
-  };
-
-  // registers a function we can use to draw the manhattan plot
-  const setDrawManhattanPlot = drawManhattanPlot => {
-    dispatch(updateSummaryResults({ drawManhattanPlot }));
-  };
-
-  // registers a function we can use to draw the qq plot
-  // const setDrawQQPlot = drawQQPlot => {
-  //   dispatch(updateSummaryResults({ drawQQPlot }));
-  // };
-
-  // // registers a function we can use to update the results table
-  const setUpdateResultsTable = updateResultsTable => {
-    dispatch(updateSummaryResults({ updateResultsTable }));
   };
 
   const setSelectedChromosome = selectedChromosome => {
@@ -66,133 +53,135 @@ export function SummaryResults() {
   };
 
   const handleSubmit = params => {
+    const phenotype = params ? params.value : null;
     setSubmitted(new Date());
     setSelectedChromosome(null);
-    console.log(params);
 
-    if (!params || !params.value) {
-      setMessages([{
-        type: 'danger',
-        content: 'Please select a phenotype which has data associated with it.'
-      }]);
+    if (!phenotype) {
+      setMessages([
+        {
+          type: "danger",
+          content:
+            "Please select a phenotype which has data associated with it."
+        }
+      ]);
+      console.log('not selected');
       return;
     }
 
-    if (drawManhattanPlot) 
-      drawManhattanPlot(params.value);
-
-    dispatch(drawQQPlot(params.value));
-    
-    if (updateResultsTable)
-      updateResultsTable({page, pageSize, database: params.value + '.db'});
-  }
-
-  const handleChromosomeChanged = chromosome => {
-    if (updateResultsTable) {
-      updateResultsTable({
-        page: 1,
-        pageSize: 10,
-        database: selectedPhenotype.value + '.db',
-        chr: chromosome,
-        orderBy: 'p',
-        order: 'asc',
-      })
-    }
-  }
-
-  const handleZoom = zoomParams => {
-    updateResultsTable({
-      page: 1,
-      pageSize: 10,
-      ...zoomParams,
-    })
-    console.log('zoomed', zoomParams);
-  }
-
-  const handleVariantLookup = ({snp}) => {
-    dispatch(updateVariantLookup({
-      selectedPhenotypes: [selectedPhenotype],
-      selectedVariant: snp,
+    dispatch(updateSummaryResults({
+      manhattanPlotView: 'summary',
+      selectedChromosome: null,
     }));
+    dispatch(drawQQPlot(phenotype));
+    dispatch(drawManhattanPlot('summary', {
+      database: phenotype + '.db',
+      nlogpMin: 3,
+    }));
+    dispatch(updateSummaryResultsTable({
+      database: phenotype + ".db",
+      offset: (page - 1) * pageSize,
+      limit: pageSize,
+    }));
+  };
+
+  const handleReset = params => {
+
+  }
+
+  const onChromosomeSelected = chr => {
+    const database = selectedPhenotype.value + ".db"
+    const range = ranges.find(r => r.chr === chr);
+    const page = 1;
+    const pageSize = 10;
+
+    dispatch(updateSummaryResults({
+      manhattanPlotView: 'variants',
+      selectedChromosome: chr,
+    }));
+
+    dispatch(drawManhattanPlot('variants', {
+      database,
+      chr,
+      nlogpMin: 2,
+      bpMin: range.bp_min,
+      bpMax: range.bp_max,
+    }));
+
+    dispatch(updateSummaryResults({
+      selectedChromsome: chr,
+      page,
+      pageSize,
+    }))
+
+    dispatch(updateSummaryResultsTable({
+      database,
+      chr,
+      offset: (page - 1) * pageSize,
+      limit: pageSize,
+      orderBy: "p",
+      order: "asc"
+    }));
+  };
+
+  const handleZoom = ({bounds}) => {
+    const database = selectedPhenotype.value + ".db"
+    const chr = selectedChromosome;
+    const page = 1;
+    const pageSize = 10;
+
+    dispatch(
+      updateSummaryResultsTable({
+        database,
+        chr,
+        offset: (page - 1) * pageSize,
+        limit: pageSize,
+        bpMin: bounds.xMin,
+        bpMax: bounds.xMax,
+        nlogpMin: bounds.yMin,
+        nlogpMax: bounds.yMax,
+      })
+    );
+  };
+
+  const handleVariantLookup = ({ snp }) => {
+    dispatch(
+      updateVariantLookup({
+        selectedPhenotypes: [selectedPhenotype],
+        selectedVariant: snp
+      })
+    );
     dispatch(lookupVariants([selectedPhenotype], snp));
   };
 
   return (
-    <>
-      <Card className="mb-4 border-0">
-        <Card.Body>
-          <SearchFormTrait onSubmit={handleSubmit} onChange={handleChange} />
-          {submitted &&
-            messages.map(({ type, content }) => (
-              <Alert variant={type} onClose={clearMessages} dismissible>
-                {content}
-              </Alert>
-            ))}
-        </Card.Body>
-      </Card>
+    <div>
+      <SearchFormTrait onSubmit={handleSubmit} onChange={handleChange} />
+      {submitted && messages.map(({ type, content }) => (
+        <Alert variant={type} onClose={clearMessages} dismissible>
+          {content}
+        </Alert>
+      ))}
 
-      <Card className="mb-4 border-left-0 border-right-0 border-bottom-0 rounded-0">
-        <Tab.Container defaultActiveKey={selectedPlot} onSelect={setSelectedPlot}>
-          <Card.Header className="bg-egg font-weight-bolder">
-            <Nav variant="pills" className="nav-pills-custom nav-justified px-2">
-              <Nav.Item>
-                <Nav.Link eventKey="manhattan-plot">Manhattan Plots</Nav.Link>
-              </Nav.Item>
-
-              <Nav.Item>
-                <Nav.Link eventKey="qq-plot">Q-Q Plot</Nav.Link>
-              </Nav.Item>
-            </Nav>
-          </Card.Header>
-
-          <Card.Body>
-            <Tab.Content>
-              <Tab.Pane eventKey="manhattan-plot">
-                <div>
-                  <label className="mr-3">
-                    <input
-                      type="radio"
-                      name="plot-type"
-                      value="combined"
-                      defaultChecked
-                    />
-                    Combined
-                  </label>
-                  <label className="mr-3">
-                    <input type="radio" name="plot-type" value="mirrored" />
-                    Mirrored
-                  </label>
-                  <label className="mr-3">
-                    <input type="radio" name="plot-type" value="male" />
-                    Male
-                  </label>
-                  <label className="mr-3">
-                    <input type="radio" name="plot-type" value="female" />
-                    Female
-                  </label>
-                </div>
-                  <ManhattanPlot
-                    drawFunctionRef={setDrawManhattanPlot}
-                    onChromosomeChanged={handleChromosomeChanged}
-                    onVariantLookup={handleVariantLookup}
-                    onZoom={handleZoom} />
-                    <div className="my-4" style={{display: submitted ? 'block' : 'none'}}>
-                      <SummaryResultsTable
-                        className="mw-100"
-                        updateFunctionRef={setUpdateResultsTable} 
-                        />
-                    </div>
-              </Tab.Pane>
-
-              <Tab.Pane eventKey="qq-plot">
-                <QQPlot
-                  onVariantLookup={handleVariantLookup}
-                />
-              </Tab.Pane>
-            </Tab.Content>
-          </Card.Body>
-        </Tab.Container>
-      </Card>
-    </>
+      <Tabs
+        defaultActiveKey={selectedPlot}
+        onSelect={setSelectedPlot}
+        className="p-3">
+        <Tab eventKey="manhattan-plot" title="Manhattan Plot" className="p-2">
+          <ManhattanPlot
+            onChromosomeSelected={onChromosomeSelected}
+            onVariantLookup={handleVariantLookup}
+            onZoom={handleZoom}
+          />
+          <SummaryResultsTable
+            className="mw-100 my-4"
+            style={{ display: submitted ? "block" : "none" }}
+          />
+        </Tab>
+        <Tab eventKey="qq-plot" title="Q-Q Plot" className="p-2">
+          <QQPlot onVariantLookup={handleVariantLookup} />
+        </Tab>
+      </Tabs>
+    </div>
   );
 }

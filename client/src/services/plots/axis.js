@@ -1,97 +1,133 @@
-import { systemFont, renderText, measureWidth } from './text';
+import { renderText, measureWidth } from './text.js';
+import { interpolateTicks } from './scale.js';
 
-const min = array => array.reduce((acc, curr) => (curr < acc ? curr : acc));
-const max = array => array.reduce((acc, curr) => (curr > acc ? curr : acc));
+export function axisLeft(config, ctx) {
+  const margins = config.margins;
+  const [xMin ] = config.xAxis.extent;
+  const [yMin, yMax] = config.yAxis.extent;
+  const xScale = config.xAxis.scale;
+  const yScale = config.yAxis.scale;
+  let axisWidth = config.xAxis.width || 1;
+  let title = config.yAxis.title || 'Y Axis';
+  let ticks = config.yAxis.ticks;
+  let interpolatedTicks = interpolateTicks(ticks);
+  let labelsBetweenTicks = config.yAxis.labelsBetweenTicks;
+  let tickFormat = config.yAxis.tickFormat;
+  let tickLength = 10;
+  let labelPadding = 15;
+  let maxLabelWidth = 0;
 
-/**
- *
- * @param {HTMLCanvasElement} canvas
- * @param {*} config
- */
-export function axisLeft(canvas, config) {
-  let font = config.font || systemFont;
-  let { xOffset, yOffset, scale, tickValues, tickSize } = config;
-  tickSize = tickSize || 6;
-  tickValues = tickValues || scale.ticks();
-  let interpolatedTickValues = tickValues.map(
-    (val, idx, arr) => (val + (idx > 0 ? arr[idx - 1] : 0)) / 2
+  ctx.save();
+  ctx.globalAlpha = 0.5;
+
+  ctx.translate(
+    margins.left,
+    margins.top
   );
 
-  let yCoords = tickValues.map(scale);
-  let padding = 2;
+  // draw axis line
+  ctx.fillRect(
+    xScale(xMin),
+    yScale(yMin),
+    axisWidth,
+    yScale(yMax) - yScale(yMin),
+  );
 
-  const context = canvas.getContext('2d');
-  context.translate((xOffset || 0) - tickSize - padding, yOffset || 0);
-  context.fillStyle = '#444';
-  context.font = '600 10px ' + font;
-  context.textAlign = 'right';
-  context.textBaseline = 'middle';
-  context.globalAlpha = 0.5;
+  ctx.textAlign = 'right';
+  ctx.textBaseline = 'middle';
+  // draw each tick and its label
+  for (let i = 0; i < ticks.length; i ++) {
+    const tick = ticks[i];
+    const y = yScale(tick);
+    const yInterpolated = yScale(interpolatedTicks[i]);
 
-  context.fillRect(tickSize, 0, 1, scale(tickValues[0]));
-  yCoords.forEach((yCoord, i) => {
-    context.globalAlpha = 0.5;
-    context.fillRect(0, yCoord, tickSize, 1);
-    context.globalAlpha = 1;
-    context.fillText(tickValues[i], -padding, yCoord + 2);
-  });
+    ctx.globalAlpha = 0.5;
+    ctx.fillRect(0, y, -tickLength, 1);
 
-  context.save();
+    ctx.globalAlpha = 1;
+    let label = tickFormat ? tickFormat(tick, i) : tick;
+    let labelOffset = labelsBetweenTicks ? yInterpolated : y;
+    ctx.fillText(label, -tickLength - 2, labelOffset + 1);
 
-  let title = config.title || 'Y Axis';
-  let titleWidth = measureWidth(context, title);
+    // update maximum tick label width (for determining title offset)
+    maxLabelWidth = Math.max(maxLabelWidth, measureWidth(ctx, label));
+  }
 
-  const midpoint = scale((min(tickValues) + max(tickValues)) / 2);
-  context.rotate((90 * Math.PI) / -180);
-  //context.rotate((90 * Math.PI) / 180);
-  context.font = '600 14px ' + font;
-  context.translate(-midpoint - titleWidth / 2, -(tickSize * 2 + padding * 6));
-  context.textAlign = 'center';
+  // draw axis title (rotated -90 degrees)
+  let titleWidth = measureWidth(ctx, title);
+  let midpoint = (yScale(yMax) - yScale(yMin)) / 2;
+  ctx.rotate(Math.PI / -2)
+  ctx.translate(
+    midpoint - titleWidth / 2,
+    -(tickLength + labelPadding + maxLabelWidth)
+  );
+  ctx.textAlign = 'center';
+  renderText(ctx, title);
 
-  renderText(context, title);
-
-  //  context.fillText(config.title || 'Y Axis', 0, 0);
-
-  context.restore();
-  context.setTransform(1, 0, 0, 1, 0, 0);
+  ctx.restore();
 }
 
-export function axisBottom(canvas, config) {
-  let font = config.font || systemFont;
-  let { xOffset, yOffset, scale, tickValues, tickSize, tickFormat } = config;
-  tickSize = tickSize || 6;
-  tickValues = tickValues || scale.ticks();
-  let interpolatedTickValues = tickValues.map(
-    (val, idx, arr) => (val + (idx > 0 ? arr[idx - 1] : 0)) / 2
+export function axisBottom(config, ctx) {
+  const margins = config.margins;
+  const [xMin, xMax] = config.xAxis.extent;
+  const [yMin ] = config.yAxis.extent;
+  const xScale = config.xAxis.scale;
+  const yScale = config.yAxis.scale;
+  let axisWidth = config.yAxis.width || 1;
+  let title = config.xAxis.title || 'X Axis';
+  let ticks = config.xAxis.ticks;
+  let interpolatedTicks = interpolateTicks(ticks);
+  let labelsBetweenTicks = config.xAxis.labelsBetweenTicks;
+  let tickFormat = config.xAxis.tickFormat;
+  let tickPadding = 10;
+  let tickLength = 10;
+  let labelPadding = 20;
+
+  ctx.save();
+  ctx.globalAlpha = 0.5;
+
+  ctx.translate(
+    margins.left,
+    margins.top + yScale(yMin),
   );
 
-  let coords = tickValues.map(scale);
-  let padding = 2;
+  // draw axis line
+  ctx.fillRect(
+    xScale(xMin),
+    0,
+    xScale(xMax) - xScale(xMin),
+    axisWidth,
+  );
 
-  const context = canvas.getContext('2d');
-  context.translate(xOffset || 0, yOffset || 0);
-  context.fillStyle = '#444';
-  context.font = '600 10px ' + font;
-  context.textAlign = 'center';
-  context.textBaseline = 'top';
-  context.globalAlpha = 0.5;
+  // draw each tick (do not use forEach to avoid creating new scopes)
+  for (let i = 0; i < ticks.length; i ++) {
+    const tick = ticks[i];
+    const x = xScale(tick);
+    const xInterpolated = xScale(interpolatedTicks[i]);
 
-  context.fillRect(0, 0, scale(max(tickValues)), 1);
-  coords.forEach((coord, i) => {
-    context.globalAlpha = 0.5;
-    context.fillRect(coord, 0, 1, tickSize);
-    const label = tickFormat ? tickFormat(tickValues[i], i) : tickValues[i];
-    const labelOffset = config.labelsBetweenTicks
-      ? scale(interpolatedTickValues[i])
-      : coord;
-    context.globalAlpha = 1;
-    context.fillText(label, labelOffset + 1, padding + tickSize);
-  });
+    ctx.globalAlpha = 0.5;
+    ctx.fillRect(x, 0, 1, tickLength);
 
-  const midpoint = scale(max(tickValues) / 2);
+    ctx.globalAlpha = 1;
+    ctx.textAlign = 'center';
+    let label = tickFormat ? tickFormat(tick, i) : tick;
+    let labelOffset = labelsBetweenTicks ? xInterpolated : x;
+    ctx.fillText(
+      label,
+      labelOffset,
+      tickLength + tickPadding
+    );
+  }
 
-  context.font = '600 14px ' + font;
-  context.fillText(config.title || 'X Axis', midpoint, padding + 25);
+  // draw axis title
+  let titleWidth = measureWidth(ctx, title);
+  let midpoint = (xScale(xMax) - xScale(xMin)) / 2;
+  ctx.translate(
+    midpoint - titleWidth / 2,
+    (tickLength + tickPadding + labelPadding),
+  );
+  ctx.textAlign = 'center';
+  renderText(ctx, title);
 
-  context.setTransform(1, 0, 0, 1, 0, 0);
+  ctx.restore();
 }
