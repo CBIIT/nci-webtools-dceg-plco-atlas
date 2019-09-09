@@ -6,219 +6,219 @@
     },
     {
         "label": "Anthropometric measures",
-        "value": null,
+        "value": "none_8482",
         "level": 0,
         "children": [
             {
                 "label": "Height",
-                "value": null,
+                "value": "none_962",
                 "level": 1,
                 "children": [
                     {
                         "label": "Height when standing",
-                        "value": null,
+                        "value": "none_4478",
                         "level": 2
                     },
                     {
                         "label": "Height when sitting",
-                        "value": null,
+                        "value": "none_5981",
                         "level": 2
                     }
                 ]
             },
             {
                 "label": "Weight",
-                "value": null,
+                "value": "none_2935",
                 "level": 1,
                 "children": [
                     {
                         "label": "BMI",
-                        "value": null,
+                        "value": "none_8108",
                         "level": 2
                     },
                     {
                         "label": "Weight Gain Area",
-                        "value": null,
+                        "value": "none_7702",
                         "level": 2
                     },
                     {
                         "label": "Weight Loss Area",
-                        "value": null,
+                        "value": "none_9528",
                         "level": 2
                     },
                     {
                         "label": "Waist-Hip Comparison",
-                        "value": null,
+                        "value": "none_8702",
                         "level": 2
                     }
                 ]
             },
             {
                 "label": "Hair pattern at 45",
-                "value": null,
+                "value": "none_5270",
                 "level": 1
             }
         ]
     },
     {
         "label": "Cancer",
-        "value": null,
+        "value": "none_8484",
         "level": 0,
         "children": [
             {
                 "label": "All cancers",
-                "value": null,
+                "value": "none_2881",
                 "level": 1,
                 "children": [
                     {
                         "label": "By location",
-                        "value": null,
+                        "value": "none_7014",
                         "level": 2,
                         "children": [
                             {
                                 "label": "Biliary cancer",
-                                "value": null,
+                                "value": "none_1005",
                                 "level": 3
                             },
                             {
                                 "label": "Bladder cancer",
-                                "value": null,
+                                "value": "none_9533",
                                 "level": 3
                             },
                             {
                                 "label": "Breast cancer",
-                                "value": null,
+                                "value": "none_3416",
                                 "level": 3,
                                 "children": [
                                     {
                                         "label": "Breast cancer (lobular)",
-                                        "value": null,
+                                        "value": "none_6574",
                                         "level": 4
                                     },
                                     {
                                         "label": "Breast cancer (ER positive)",
-                                        "value": null,
+                                        "value": "none_1651",
                                         "level": 4
                                     },
                                     {
                                         "label": "Breast cancer (PR positive)",
-                                        "value": null,
+                                        "value": "none_9891",
                                         "level": 4
                                     },
                                     {
                                         "label": "Breast cancer (ER/PR negative)",
-                                        "value": null,
+                                        "value": "none_3350",
                                         "level": 4
                                     },
                                     {
                                         "label": "Breast cancer (tubular)",
-                                        "value": null,
+                                        "value": "none_2865",
                                         "level": 4
                                     }
                                 ]
                             },
                             {
                                 "label": "Colorectal cancer",
-                                "value": null,
+                                "value": "none_1740",
                                 "level": 3,
                                 "children": [
                                     {
                                         "label": "Colon cancer (distal)",
-                                        "value": null,
+                                        "value": "none_6604",
                                         "level": 4
                                     },
                                     {
                                         "label": "Colon cancer (proximal)",
-                                        "value": null,
+                                        "value": "none_7515",
                                         "level": 4
                                     },
                                     {
                                         "label": "Colorectal cancer (adenocarcinoma)",
-                                        "value": null,
+                                        "value": "none_2940",
                                         "level": 4
                                     },
                                     {
                                         "label": "Colorectal cancer (advanced)",
-                                        "value": null,
+                                        "value": "none_2734",
                                         "level": 4
                                     },
                                     {
                                         "label": "Rectal cancer",
-                                        "value": null,
+                                        "value": "none_7543",
                                         "level": 4
                                     }
                                 ]
                             },
                             {
                                 "label": "Endometrial cancer",
-                                "value": null,
+                                "value": "none_1857",
                                 "level": 3
                             },
                             {
                                 "label": "Glioma cancer",
-                                "value": null,
+                                "value": "none_4860",
                                 "level": 3
                             },
                             {
                                 "label": "Head and neck cancer",
-                                "value": null,
+                                "value": "none_4638",
                                 "level": 3
                             },
                             {
                                 "label": "Hematologic malignancies",
-                                "value": null,
+                                "value": "none_3843",
                                 "level": 3,
                                 "children": [
                                     {
                                         "label": "Hodgkin lymphoma",
-                                        "value": null,
+                                        "value": "none_2153",
                                         "level": 4
                                     },
                                     {
                                         "label": "Lymphocytic leukemia",
-                                        "value": null,
+                                        "value": "none_5272",
                                         "level": 4
                                     },
                                     {
                                         "label": "Myeloid/Monocytic leukemia",
-                                        "value": null,
+                                        "value": "none_4332",
                                         "level": 4
                                     },
                                     {
                                         "label": "Myeloma",
-                                        "value": null,
+                                        "value": "none_1577",
                                         "level": 4
                                     },
                                     {
                                         "label": "Non-Hodgkin lymphoma",
-                                        "value": null,
+                                        "value": "none_4564",
                                         "level": 4
                                     }
                                 ]
                             },
                             {
                                 "label": "Liver cancer",
-                                "value": null,
+                                "value": "none_2479",
                                 "level": 3
                             },
                             {
                                 "label": "Lung cancer",
-                                "value": null,
+                                "value": "none_1730",
                                 "level": 3,
                                 "children": [
                                     {
                                         "label": "Lung cancer (small cell)",
-                                        "value": null,
+                                        "value": "none_8794",
                                         "level": 4
                                     },
                                     {
                                         "label": "Lung cancer (adenocarcinoma)",
-                                        "value": null,
+                                        "value": "none_1098",
                                         "level": 4
                                     },
                                     {
                                         "label": "Lung cancer (squamous cell)",
-                                        "value": null,
+                                        "value": "none_1153",
                                         "level": 4
                                     }
                                 ]
@@ -230,49 +230,49 @@
                             },
                             {
                                 "label": "Non-melanoma skin cancer",
-                                "value": null,
+                                "value": "none_6744",
                                 "level": 3,
                                 "children": [
                                     {
                                         "label": "Basal cell only",
-                                        "value": null,
+                                        "value": "none_5859",
                                         "level": 4
                                     },
                                     {
                                         "label": "Basal and squamous cell",
-                                        "value": null,
+                                        "value": "none_8359",
                                         "level": 4
                                     },
                                     {
                                         "label": "Squamous cell only",
-                                        "value": null,
+                                        "value": "none_1339",
                                         "level": 4
                                     }
                                 ]
                             },
                             {
                                 "label": "Ovarian cancer",
-                                "value": null,
+                                "value": "none_8331",
                                 "level": 3
                             },
                             {
                                 "label": "Pancreatic cancer",
-                                "value": null,
+                                "value": "none_8924",
                                 "level": 3
                             },
                             {
                                 "label": "Prostate cancer",
-                                "value": null,
+                                "value": "none_5934",
                                 "level": 3,
                                 "children": [
                                     {
                                         "label": "Prostate cancer (advanced)",
-                                        "value": null,
+                                        "value": "none_1279",
                                         "level": 4
                                     },
                                     {
                                         "label": "Prostate cancer (not advanced)",
-                                        "value": null,
+                                        "value": "none_8342",
                                         "level": 4
                                     }
                                 ]
@@ -284,315 +284,315 @@
                             },
                             {
                                 "label": "Thyroid cancer",
-                                "value": null,
+                                "value": "none_2404",
                                 "level": 3
                             },
                             {
                                 "label": "Upper GI cancer",
-                                "value": null,
+                                "value": "none_1685",
                                 "level": 3,
                                 "children": [
                                     {
                                         "label": "Esophageal cancer",
-                                        "value": null,
+                                        "value": "none_7808",
                                         "level": 4
                                     },
                                     {
                                         "label": "Gastric cancer",
-                                        "value": null,
+                                        "value": "none_6910",
                                         "level": 4
                                     }
                                 ]
                             },
                             {
                                 "label": "By pathology",
-                                "value": null,
+                                "value": "none_9816",
                                 "level": 2,
                                 "children": [
                                     {
                                         "label": "Solid tumors",
-                                        "value": null,
+                                        "value": "none_2837",
                                         "level": 3,
                                         "children": [
                                             {
                                                 "label": "Carcinomas",
-                                                "value": null,
+                                                "value": "none_217",
                                                 "level": 4,
                                                 "children": [
                                                     {
                                                         "label": "Adenocarcinomas",
-                                                        "value": null,
+                                                        "value": "none_653",
                                                         "level": 5,
                                                         "children": [
                                                             {
                                                                 "label": "Breast (adenocarcinoma)",
-                                                                "value": null,
+                                                                "value": "none_1617",
                                                                 "level": 6
                                                             },
                                                             {
                                                                 "label": "Colorectal cancer (adenocarcinoma)",
-                                                                "value": null,
+                                                                "value": "none_827",
                                                                 "level": 6
                                                             },
                                                             {
                                                                 "label": "Endometrial cancer (adenocarcinoma)",
-                                                                "value": null,
+                                                                "value": "none_9262",
                                                                 "level": 6
                                                             },
                                                             {
                                                                 "label": "Lung cancer (adenocarcinoma)",
-                                                                "value": null,
+                                                                "value": "none_1842",
                                                                 "level": 6
                                                             },
                                                             {
                                                                 "label": "Pancreatic cancer (adenocarcinoma)",
-                                                                "value": null,
+                                                                "value": "none_4760",
                                                                 "level": 6
                                                             },
                                                             {
                                                                 "label": "Prostate cancer (adenocarcinoma)",
-                                                                "value": null,
+                                                                "value": "none_363",
                                                                 "level": 6
                                                             },
                                                             {
                                                                 "label": "Thyroid cancer (adenocarcinoma)",
-                                                                "value": null,
+                                                                "value": "none_3809",
                                                                 "level": 6
                                                             }
                                                         ]
                                                     },
                                                     {
                                                         "label": "Squamous cell cancers",
-                                                        "value": null,
+                                                        "value": "none_9830",
                                                         "level": 5,
                                                         "children": [
                                                             {
                                                                 "label": "Esophageal cancer (squamous cell)",
-                                                                "value": null,
+                                                                "value": "none_3637",
                                                                 "level": 6
                                                             },
                                                             {
                                                                 "label": "Lung cancer (squamous cell)",
-                                                                "value": null,
+                                                                "value": "none_2950",
                                                                 "level": 6
                                                             }
                                                         ]
                                                     },
                                                     {
                                                         "label": "Urothelial cancers",
-                                                        "value": null,
+                                                        "value": "none_9236",
                                                         "level": 5,
                                                         "children": [
                                                             {
                                                                 "label": "Bladder cancer (urothelial)",
-                                                                "value": null,
+                                                                "value": "none_2962",
                                                                 "level": 6
                                                             },
                                                             {
                                                                 "label": "Renal cancer (urothelial)",
-                                                                "value": null,
+                                                                "value": "none_6976",
                                                                 "level": 6
                                                             }
                                                         ]
                                                     },
                                                     {
                                                         "label": "Sarcomas",
-                                                        "value": null,
+                                                        "value": "none_2678",
                                                         "level": 4,
                                                         "children": [
                                                             {
                                                                 "label": "Need to look into",
-                                                                "value": null,
+                                                                "value": "none_429",
                                                                 "level": 5
                                                             }
                                                         ]
                                                     },
                                                     {
                                                         "label": "Neuroendocrine related cancers",
-                                                        "value": null,
+                                                        "value": "none_8325",
                                                         "level": 4,
                                                         "children": [
                                                             {
                                                                 "label": "Lung cancer (neuroendocrine)",
-                                                                "value": null,
+                                                                "value": "none_9876",
                                                                 "level": 5
                                                             },
                                                             {
                                                                 "label": "Pancreatic cancer (neuroendocrine)",
-                                                                "value": null,
+                                                                "value": "none_9197",
                                                                 "level": 5
                                                             },
                                                             {
                                                                 "label": "Thyroid cancer (neuroendocrine)",
-                                                                "value": null,
+                                                                "value": "none_2628",
                                                                 "level": 5
                                                             }
                                                         ]
                                                     },
                                                     {
                                                         "label": "Hematologic malignancies",
-                                                        "value": null,
+                                                        "value": "none_9543",
                                                         "level": 3,
                                                         "children": [
                                                             {
                                                                 "label": "Hodgkin’s lymphoma",
-                                                                "value": null,
+                                                                "value": "none_5774",
                                                                 "level": 4
                                                             },
                                                             {
                                                                 "label": "Non-Hodgkin’s lymphoma",
-                                                                "value": null,
+                                                                "value": "none_209",
                                                                 "level": 4
                                                             },
                                                             {
                                                                 "label": "Multiple myeloma",
-                                                                "value": null,
+                                                                "value": "none_4198",
                                                                 "level": 4
                                                             }
                                                         ]
                                                     },
                                                     {
                                                         "label": "By risk factor",
-                                                        "value": null,
+                                                        "value": "none_2637",
                                                         "level": 2,
                                                         "children": [
                                                             {
                                                                 "label": "Smoking related cancers",
-                                                                "value": null,
+                                                                "value": "none_8062",
                                                                 "level": 3,
                                                                 "children": [
                                                                     {
                                                                         "label": "Lung cancer",
-                                                                        "value": null,
+                                                                        "value": "none_5292",
                                                                         "level": 4
                                                                     },
                                                                     {
                                                                         "label": "Bladder cancer",
-                                                                        "value": null,
+                                                                        "value": "none_8395",
                                                                         "level": 4
                                                                     }
                                                                 ]
                                                             },
                                                             {
                                                                 "label": "Obesity related cancers",
-                                                                "value": null,
+                                                                "value": "none_4368",
                                                                 "level": 3,
                                                                 "children": [
                                                                     {
                                                                         "label": "Breast cancer",
-                                                                        "value": null,
+                                                                        "value": "none_923",
                                                                         "level": 4
                                                                     },
                                                                     {
                                                                         "label": "Colorectal cancer",
-                                                                        "value": null,
+                                                                        "value": "none_2466",
                                                                         "level": 4
                                                                     },
                                                                     {
                                                                         "label": "Esophageal cancer",
-                                                                        "value": null,
+                                                                        "value": "none_6280",
                                                                         "level": 4
                                                                     },
                                                                     {
                                                                         "label": "Kidney cancer",
-                                                                        "value": null,
+                                                                        "value": "none_5467",
                                                                         "level": 4
                                                                     }
                                                                 ]
                                                             },
                                                             {
                                                                 "label": "Hormone-related cancers",
-                                                                "value": null,
+                                                                "value": "none_5782",
                                                                 "level": 3,
                                                                 "children": [
                                                                     {
                                                                         "label": "Breast cancer",
-                                                                        "value": null,
+                                                                        "value": "none_3986",
                                                                         "level": 4
                                                                     },
                                                                     {
                                                                         "label": "Endometrial cancer",
-                                                                        "value": null,
+                                                                        "value": "none_3966",
                                                                         "level": 4
                                                                     },
                                                                     {
                                                                         "label": "Ovarian cancer",
-                                                                        "value": null,
+                                                                        "value": "none_8838",
                                                                         "level": 4
                                                                     },
                                                                     {
                                                                         "label": "Prostate cancer",
-                                                                        "value": null,
+                                                                        "value": "none_9281",
                                                                         "level": 4
                                                                     }
                                                                 ]
                                                             },
                                                             {
                                                                 "label": "Physical activity related cancers",
-                                                                "value": null,
+                                                                "value": "none_9189",
                                                                 "level": 3,
                                                                 "children": [
                                                                     {
                                                                         "label": "Need to look into",
-                                                                        "value": null,
+                                                                        "value": "none_8628",
                                                                         "level": 4
                                                                     }
                                                                 ]
                                                             },
                                                             {
                                                                 "label": "Alcohol-related cancers",
-                                                                "value": null,
+                                                                "value": "none_5314",
                                                                 "level": 3,
                                                                 "children": [
                                                                     {
                                                                         "label": "Breast cancer",
-                                                                        "value": null,
+                                                                        "value": "none_4782",
                                                                         "level": 4
                                                                     },
                                                                     {
                                                                         "label": "Liver cancer",
-                                                                        "value": null,
+                                                                        "value": "none_7107",
                                                                         "level": 4
                                                                     }
                                                                 ]
                                                             },
                                                             {
                                                                 "label": "Infection-related cancers",
-                                                                "value": null,
+                                                                "value": "none_3780",
                                                                 "level": 3,
                                                                 "children": [
                                                                     {
                                                                         "label": "H. pylori cancers",
-                                                                        "value": null,
+                                                                        "value": "none_4635",
                                                                         "level": 4,
                                                                         "children": [
                                                                             {
                                                                                 "label": "Gastric cancer",
-                                                                                "value": null,
+                                                                                "value": "none_3545",
                                                                                 "level": 5
                                                                             }
                                                                         ]
                                                                     },
                                                                     {
                                                                         "label": "HPV-related cancers",
-                                                                        "value": null,
+                                                                        "value": "none_9767",
                                                                         "level": 4,
                                                                         "children": [
                                                                             {
                                                                                 "label": "Cervical cancer",
-                                                                                "value": null,
+                                                                                "value": "none_8284",
                                                                                 "level": 5
                                                                             },
                                                                             {
                                                                                 "label": "Head and neck cancer",
-                                                                                "value": null,
+                                                                                "value": "none_4008",
                                                                                 "level": 5
                                                                             }
                                                                         ]
                                                                     },
                                                                     {
                                                                         "label": "Family history of cancer",
-                                                                        "value": null,
+                                                                        "value": "none_4342",
                                                                         "level": 1
                                                                     }
                                                                 ]
@@ -613,131 +613,131 @@
     },
     {
         "label": "Lifestyle factors",
-        "value": null,
+        "value": "none_9856",
         "level": 0,
         "children": [
             {
                 "label": "Alcohol consumption",
-                "value": null,
+                "value": "none_6802",
                 "level": 1
             },
             {
                 "label": "Diet",
-                "value": null,
+                "value": "none_1578",
                 "level": 1,
                 "children": [
                     {
                         "label": "Caffeine intake",
-                        "value": null,
+                        "value": "none_9975",
                         "level": 2
                     },
                     {
                         "label": "Fat intake",
-                        "value": null,
+                        "value": "none_661",
                         "level": 2
                     },
                     {
                         "label": "Protein intake",
-                        "value": null,
+                        "value": "none_5746",
                         "level": 2
                     }
                 ]
             },
             {
                 "label": "Exercise",
-                "value": null,
+                "value": "none_3330",
                 "level": 1,
                 "children": [
                     {
                         "label": "Flights of stairs",
-                        "value": null,
+                        "value": "none_186",
                         "level": 2
                     },
                     {
                         "label": "Light activity duration",
-                        "value": null,
+                        "value": "none_564",
                         "level": 2
                     },
                     {
                         "label": "Mile walk frequency",
-                        "value": null,
+                        "value": "none_6641",
                         "level": 2
                     },
                     {
                         "label": "Moderate activity duration",
-                        "value": null,
+                        "value": "none_4419",
                         "level": 2
                     },
                     {
                         "label": "Strenuous activity frequency",
-                        "value": null,
+                        "value": "none_1142",
                         "level": 2
                     },
                     {
                         "label": "Strenuous activity duration",
-                        "value": null,
+                        "value": "none_7673",
                         "level": 2
                     },
                     {
                         "label": "Vigorous activity at 40",
-                        "value": null,
+                        "value": "none_5113",
                         "level": 2
                     },
                     {
                         "label": "Vigorous activity current",
-                        "value": null,
+                        "value": "none_2606",
                         "level": 2
                     },
                     {
                         "label": "Walking pace",
-                        "value": null,
+                        "value": "none_2072",
                         "level": 2
                     }
                 ]
             },
             {
                 "label": "Smoking",
-                "value": null,
+                "value": "none_5080",
                 "level": 1,
                 "children": [
                     {
                         "label": "Cigarette smoking status",
-                        "value": null,
+                        "value": "none_8656",
                         "level": 2
                     },
                     {
                         "label": "Cigarette type",
-                        "value": null,
+                        "value": "none_1344",
                         "level": 2
                     },
                     {
                         "label": "Cigarettes per day",
-                        "value": null,
+                        "value": "none_5657",
                         "level": 2
                     },
                     {
                         "label": "Experience cigarette cravings",
-                        "value": null,
+                        "value": "none_1468",
                         "level": 2
                     },
                     {
                         "label": "Filtered or Non-filtered",
-                        "value": null,
+                        "value": "none_8485",
                         "level": 2
                     },
                     {
                         "label": "Menthol or non-menthol",
-                        "value": null,
+                        "value": "none_8667",
                         "level": 2
                     },
                     {
                         "label": "Number of cigarettes smoked per day",
-                        "value": null,
+                        "value": "none_4954",
                         "level": 2
                     },
                     {
                         "label": "Wake up smoke",
-                        "value": null,
+                        "value": "none_9888",
                         "level": 2
                     }
                 ]
@@ -746,188 +746,188 @@
     },
     {
         "label": "Medical conditions",
-        "value": null,
+        "value": "none_9645",
         "level": 0,
         "children": [
             {
                 "label": "Arthritis",
-                "value": null,
+                "value": "none_5077",
                 "level": 1
             },
             {
                 "label": "Asthma",
-                "value": null,
+                "value": "none_6259",
                 "level": 1
             },
             {
                 "label": "Benign ovarian cyst/tumor",
-                "value": null,
+                "value": "none_6373",
                 "level": 1
             },
             {
                 "label": "Broken bone",
-                "value": null,
+                "value": "none_4883",
                 "level": 1,
                 "children": [
                     {
                         "label": "Broken arm",
-                        "value": null,
+                        "value": "none_5431",
                         "level": 2
                     },
                     {
                         "label": "Broken hip",
-                        "value": null,
+                        "value": "none_8227",
                         "level": 2
                     },
                     {
                         "label": "Broken vertebra",
-                        "value": null,
+                        "value": "none_3452",
                         "level": 2
                     },
                     {
                         "label": "Broken other",
-                        "value": null,
+                        "value": "none_5335",
                         "level": 2
                     }
                 ]
             },
             {
                 "label": "Bronchitis",
-                "value": null,
+                "value": "none_9336",
                 "level": 1
             },
             {
                 "label": "Cirrhosis",
-                "value": null,
+                "value": "none_5164",
                 "level": 1
             },
             {
                 "label": "Colorectal polyps",
-                "value": null,
+                "value": "none_7533",
                 "level": 1
             },
             {
                 "label": "Crohn’s disease",
-                "value": null,
+                "value": "none_2401",
                 "level": 1
             },
             {
                 "label": "Diabetes",
-                "value": null,
+                "value": "none_9530",
                 "level": 1
             },
             {
                 "label": "Diverticulitis/Diverticulosis",
-                "value": null,
+                "value": "none_6127",
                 "level": 1
             },
             {
                 "label": "Emphysema",
-                "value": null,
+                "value": "none_757",
                 "level": 1
             },
             {
                 "label": "Endometriosis",
-                "value": null,
+                "value": "none_2601",
                 "level": 1
             },
             {
                 "label": "Enlarged prostate of BPH",
-                "value": null,
+                "value": "none_4991",
                 "level": 1
             },
             {
                 "label": "Fibrotic breast disease",
-                "value": null,
+                "value": "none_9021",
                 "level": 1
             },
             {
                 "label": "Gallbladder stones or inflammation",
-                "value": null,
+                "value": "none_2761",
                 "level": 1
             },
             {
                 "label": "Heart attack",
-                "value": null,
+                "value": "none_204",
                 "level": 1
             },
             {
                 "label": "Hepatitis",
-                "value": null,
+                "value": "none_2954",
                 "level": 1
             },
             {
                 "label": "High cholesterol",
-                "value": null,
+                "value": "none_5463",
                 "level": 1
             },
             {
                 "label": "Hypertension",
-                "value": null,
+                "value": "none_8195",
                 "level": 1
             },
             {
                 "label": "Inflamed prostate",
-                "value": null,
+                "value": "none_2143",
                 "level": 1
             },
             {
                 "label": "Osteoporosis",
-                "value": null,
+                "value": "none_1696",
                 "level": 1
             },
             {
                 "label": "Stroke",
-                "value": null,
+                "value": "none_7058",
                 "level": 1
             },
             {
                 "label": "Ulcerative colitis",
-                "value": null,
+                "value": "none_1838",
                 "level": 1
             },
             {
                 "label": "Uterine fibroid tumors",
-                "value": null,
+                "value": "none_2510",
                 "level": 1
             }
         ]
     },
     {
         "label": "Reproductive factors",
-        "value": null,
+        "value": "none_2736",
         "level": 0,
         "children": [
             {
                 "label": "Age of menarche",
-                "value": null,
+                "value": "none_7280",
                 "level": 1
             },
             {
                 "label": "Age of menopause",
-                "value": null,
+                "value": "none_1296",
                 "level": 1
             },
             {
                 "label": "Ever try to become pregnant without success",
-                "value": null,
+                "value": "none_5150",
                 "level": 1
             }
         ]
     },
     {
         "label": "Mortality",
-        "value": null,
+        "value": "none_4085",
         "level": 0,
         "children": [
             {
                 "label": "All-cause mortality",
-                "value": null,
+                "value": "none_922",
                 "level": 1
             },
             {
                 "label": "Cancer-specific mortality",
-                "value": null,
+                "value": "none_7340",
                 "level": 1
             }
         ]
