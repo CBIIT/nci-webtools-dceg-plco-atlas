@@ -43,26 +43,31 @@ export function Gwas() {
 
   return (
     <>
-      <div className="container">
-        <Card className="border-top-0" style={{borderRadius: '0 0 0.25em 0.25em'}}>
-          <Nav defaultActiveKey="summary">
-            {gwasLinks.map(({ name, pathId }) => (
-              <>
-                {/* <NavItem className="mr-2"> */}
-                <NavLink
-                  key={pathId}
-                  className="text-secondary ml-1 px-3 py-2 d-inline-block"
-                  activeClassName="active-secondary-navlinks border-primary border-bottom text-secondary"
-                  style={{textDecoration: 'none', fontSize: '11pt', fontWeight: '600'}}
-                  exact={true}
-                  to={`/gwas/${pathId}`}>
-                  {name}
-                </NavLink>
-                <div className="d-md-none"></div>
-              </>
-            ))}
-          </Nav>
-        </Card>
+      <div 
+        // className="border-top-0" 
+        // style={{borderRadius: '0 0 0.25em 0.25em'}}
+        className="bg-white shadow-sm" 
+        style={{borderRadius: '0 0 0 0'}}
+        >
+        <div className="container">
+            <Nav defaultActiveKey="summary">
+              {gwasLinks.map(({ name, pathId }) => (
+                <>
+                  {/* <NavItem className="mr-2"> */}
+                  <NavLink
+                    key={pathId}
+                    className="text-secondary px-3 py-2 d-inline-block"
+                    activeClassName="active-secondary-navlinks border-primary border-bottom text-secondary"
+                    style={{textDecoration: 'none', fontSize: '11pt', fontWeight: '600'}}
+                    exact={true}
+                    to={`/gwas/${pathId}`}>
+                    {name}
+                  </NavLink>
+                  <div className="d-md-none w-100"></div>
+                </>
+              ))}
+            </Nav>
+        </div>
       </div>
       <div className="container my-4">
         <Route

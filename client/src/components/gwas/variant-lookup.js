@@ -66,15 +66,11 @@ export function VariantLookup() {
 
   return (
     <>
-      {/* <Card className="mb-4 border-0">
-        <Card.Body> */}
       <SearchFormTraitsVariant
         onSubmit={e =>
           dispatch(lookupVariants(selectedPhenotypes, selectedVariant))
         }
       />
-        {/* </Card.Body>
-      </Card> */}
 
       <Card className="mb-4">
         <Card.Header className="bg-egg font-weight-bolder text-center">
@@ -82,9 +78,6 @@ export function VariantLookup() {
         </Card.Header>
         <Card.Body>
           <div className="row text-center">
-            {/* <div className="col-md-12 text-left">
-                            <pre>{JSON.stringify(variantLookup, null, 2)}</pre>
-                        </div> */}
             <div className="col-md-12">
               <h4>{message}</h4>
             </div>
