@@ -15,7 +15,7 @@ export function Gwas() {
     const records = [];
     const populateRecords = node => {
       // records.push(node);
-      records.push({label: node.label, value: node.value});
+      records.push({label: node.label, value: node.value, disabled: node.disabled});
       if (node.children) node.children.forEach(populateRecords);
     };
 

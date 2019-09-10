@@ -235,3 +235,11 @@ h1 {
 .ul.rc-tree-select-selection__rendered {
   padding-top: 4px;
 }
+
+.rc-tree-select-tree-treenode-disabled > span, .rc-tree-select-tree-treenode-disabled > a, .rc-tree-select-tree-treenode-disabled > a span {
+  color: black !important;
+}
+
+.rc-tree-select-tree li {
+  cursor: pointer;
+}
