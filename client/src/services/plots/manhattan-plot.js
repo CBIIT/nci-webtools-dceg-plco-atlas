@@ -171,7 +171,7 @@ export class ManhattanPlot {
 
     if (config.point.onhover || config.point.tooltip) {
       canvas.addEventListener('mousemove', debounce(async ev => {
-        this.hideTooltip();
+        // this.hideTooltip();
         const {tooltip, onhover} = config.point;
         const {trigger, content} = tooltip;
         const point = this.getPointFromEvent(ev);
