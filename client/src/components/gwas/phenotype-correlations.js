@@ -49,11 +49,7 @@ export function PhenotypeCorrelations() {
 
   return (
     <>
-      {/* <Card className="mb-4 border-0">
-        <Card.Body> */}
       <SearchFormTraits onSubmit={handleSubmit} onChange={handleChange} />
-        {/* </Card.Body>
-      </Card> */}
 
       <Card className="mb-4">
         <Card.Header className="bg-egg font-weight-bolder text-center">

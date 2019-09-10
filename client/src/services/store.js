@@ -43,6 +43,7 @@ const initialState = {
     // drawHeatmap: null,
     selectedListType: 'alphabetic',
     selectedPhenotypes: [],
+    selectedGender: 'combined',
     heatmapData: [],
     results: [],
     loading: false,
