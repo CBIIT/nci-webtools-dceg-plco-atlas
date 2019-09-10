@@ -80,6 +80,12 @@ $blue: #005ea2;
   }
 }
 
+.tab-pane.tab-pane-bordered {
+  border-left: 1px solid #dee2e6;
+  border-right: 1px solid #dee2e6;
+  border-bottom: 1px solid #dee2e6;
+}
+
 h1 {
   color: #ff8c00;
 }

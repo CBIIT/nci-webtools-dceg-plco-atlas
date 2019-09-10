@@ -182,7 +182,7 @@ export class ManhattanPlot {
 
         if (content && trigger === 'hover')
           this.showTooltip(ev, await content(point, this.tooltip));
-      }, 300));
+      }, config.point.tooltipDelay || 300));
     }
 
     // call click event callbacks
