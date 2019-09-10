@@ -81,89 +81,143 @@ export function SearchFormTraitsVariant({ onSubmit }) {
   };
 
   return (
-    <Form>
-      <Row controlId="phenotype-list">
-        <Form.Label column sm={3}>
-          Choose gender
-        </Form.Label>
-        <Col sm={2}>
-          <select
-            className="form-control"
-            value={selectedGender}
-            onChange={e => setSelectedGender(e.target.value)}>
-            <option value="combined">Combined</option>
-            <option value="male">Male</option>
-            <option value="female">Female</option>
-          </select>
-        </Col>
-      </Row>
+    <div className="d-flex mb-4">
+      <select
+        className="form-control flex-shrink-auto"
+        value={selectedListType}
+        onChange={e => setSelectedListType(e.target.value)}>
+        <option value="alphabetic">Alphabetic</option>
+        <option value="categorical">Categorical</option>
+      </select>
 
-      <Row className="mt-3" controlId="phenotype-list">
-        <Form.Label column sm={3}>
-          Sort phenotypes by
-        </Form.Label>
-        <Col sm={2}>
-          <select
-            className="form-control"
-            value={selectedListType}
-            onChange={e => setSelectedListType(e.target.value)}>
-            <option value="alphabetic">Alphabetic</option>
-            <option value="categorical">Categorical</option>
-          </select>
-        </Col>
-      </Row>
+      <TreeSelect
+        style={{ width: '100%' }}
+        dropdownStyle={{ maxHeight: 500, overflow: 'auto' }}
+        treeData={selectedListType === 'alphabetic' ? alphabetizedPhenotypes : phenotypesTree}
+        value={selectedPhenotypes}
+        onChange={handleChange}
+        treeNodeFilterProp="label"
+        dropdownMatchSelectWidth
+        autoClearSearchValue
+        treeCheckable
+        treeLine
+        multiple
+        allowClear
+        labelInValue
+      />
 
-      <Row className="mt-3" controlId="phenotype-list">
-        <Form.Label column sm={3}>
-          Choose phenotype(s)
-        </Form.Label>
-        <Col sm={9}>
-          <TreeSelect
-            style={{ width: '100%' }}
-            dropdownStyle={{ maxHeight: 500, overflow: 'auto' }}
-            treeData={selectedListType === 'alphabetic' ? alphabetizedPhenotypes : phenotypesTree}
-            value={selectedPhenotypes}
-            onChange={handleChange}
-            treeNodeFilterProp="label"
-            dropdownMatchSelectWidth
-            autoClearSearchValue
-            treeCheckable
-            treeLine
-            multiple
-            allowClear
-            labelInValue
-          />
-        </Col>
-      </Row>
+      <FormControl
+        className="form-control ml-2"
+        style={{width: '450px'}}
+        placeholder="(Variant rsid or coordinate)"
+        aria-label="Variant (required)"
+        value={selectedVariant}
+        onChange={e => setSelectedVariant(e.target.value)}
+        type="text"
+        required
+      />
 
-      <Row className="mt-3" controlId="phenotype-list">
-        <Form.Label column sm={3}>
-          Input variant
-        </Form.Label>
-        <Col sm={3}>
-          <FormControl
-            className="form-control"
-            placeholder="Variant rsid or coordinate"
-            aria-label="Variant (required)"
-            value={selectedVariant}
-            onChange={e => setSelectedVariant(e.target.value)}
-            type="text"
-            required
-          />
-        </Col>
-      </Row>
+      <select
+        className="form-control flex-shrink-auto ml-2"
+        value={selectedGender}
+        onChange={e => setSelectedGender(e.target.value)}>
+        <option value="combined">Combined</option>
+        <option value="male">Male</option>
+        <option value="female">Female</option>
+      </select>
 
-      <Row className="mt-3" controlId="phenotype-list">
-        <Col sm={{ span: 9, offset: 3 }}>
-          <Button
-            variant="primary"
-            disabled={!canSubmit}
-            onClick={validateVariantInput}>
-            Submit
-          </Button>
-        </Col>
-      </Row>
+      <Button
+        className="ml-2"
+        variant="primary"
+        disabled={!canSubmit}
+        onClick={validateVariantInput}>
+        Submit
+      </Button>
 
-    </Form>
+    </div>
+    // <Form>
+    //   <Row controlId="phenotype-list">
+    //     <Form.Label column sm={3}>
+    //       Choose gender
+    //     </Form.Label>
+    //     <Col sm={2}>
+    //       <select
+    //         className="form-control"
+    //         value={selectedGender}
+    //         onChange={e => setSelectedGender(e.target.value)}>
+    //         <option value="combined">Combined</option>
+    //         <option value="male">Male</option>
+    //         <option value="female">Female</option>
+    //       </select>
+    //     </Col>
+    //   </Row>
+
+    //   <Row className="mt-3" controlId="phenotype-list">
+    //     <Form.Label column sm={3}>
+    //       Sort phenotypes by
+    //     </Form.Label>
+    //     <Col sm={2}>
+    //       <select
+    //         className="form-control"
+    //         value={selectedListType}
+    //         onChange={e => setSelectedListType(e.target.value)}>
+    //         <option value="alphabetic">Alphabetic</option>
+    //         <option value="categorical">Categorical</option>
+    //       </select>
+    //     </Col>
+    //   </Row>
+
+    //   <Row className="mt-3" controlId="phenotype-list">
+    //     <Form.Label column sm={3}>
+    //       Choose phenotype(s)
+    //     </Form.Label>
+    //     <Col sm={9}>
+    //       <TreeSelect
+    //         style={{ width: '100%' }}
+    //         dropdownStyle={{ maxHeight: 500, overflow: 'auto' }}
+    //         treeData={selectedListType === 'alphabetic' ? alphabetizedPhenotypes : phenotypesTree}
+    //         value={selectedPhenotypes}
+    //         onChange={handleChange}
+    //         treeNodeFilterProp="label"
+    //         dropdownMatchSelectWidth
+    //         autoClearSearchValue
+    //         treeCheckable
+    //         treeLine
+    //         multiple
+    //         allowClear
+    //         labelInValue
+    //       />
+    //     </Col>
+    //   </Row>
+
+    //   <Row className="mt-3" controlId="phenotype-list">
+    //     <Form.Label column sm={3}>
+    //       Input variant
+    //     </Form.Label>
+    //     <Col sm={3}>
+    //       <FormControl
+    //         className="form-control"
+    //         placeholder="Variant rsid or coordinate"
+    //         aria-label="Variant (required)"
+    //         value={selectedVariant}
+    //         onChange={e => setSelectedVariant(e.target.value)}
+    //         type="text"
+    //         required
+    //       />
+    //     </Col>
+    //   </Row>
+
+    //   <Row className="mt-3" controlId="phenotype-list">
+    //     <Col sm={{ span: 9, offset: 3 }}>
+    //       <Button
+    //         variant="primary"
+    //         disabled={!canSubmit}
+    //         onClick={validateVariantInput}>
+    //         Submit
+    //       </Button>
+    //     </Col>
+    //   </Row>
+
+    // </Form>
   );
 }

@@ -49,71 +49,42 @@ export function SearchFormTraits({ onChange, onSubmit }) {
   // );
 
   return (
-    <Form>
-      <Row controlId="phenotype-list">
-        <Form.Label column sm={3}>
-          Sort phenotypes by
-        </Form.Label>
-        <Col sm={2}>
-          <select
-            className="form-control"
-            value={selectedListType}
-            onChange={e => setSelectedListType(e.target.value)}>
-            <option value="alphabetic">Alphabetic</option>
-            <option value="categorical">Categorical</option>
-          </select>
-        </Col>
-      </Row>
+    <div className="d-flex mb-4">
+      <select
+        className="form-control flex-shrink-auto"
+        value={selectedListType}
+        onChange={e => setSelectedListType(e.target.value)}>
+        <option value="alphabetic">Alphabetic</option>
+        <option value="categorical">Categorical</option>
+      </select>
 
-      <Row className="mt-3" controlId="phenotype-list">
-        <Form.Label column sm={3}>
-          Choose phenotypes
-        </Form.Label>
-        <Col sm={9}>
-          {/* <Select
-            placeholder="Select two or more phenotypes"
-            value={selectedPhenotypes}
-            onChange={handleChange}
-            // isOptionDisabled={option => option.value === null}
-            options={
-              selectedListType === 'categorical'
-                ? categorizedPhenotypes
-                : alphabetizedPhenotypes
-            }
-            isMulti
-            components={{ MultiValue }}
-          /> */}
-          <TreeSelect
-            style={{ width: '100%' }}
-            dropdownStyle={{ maxHeight: 500, overflow: 'auto' }}
-            treeData={selectedListType === 'alphabetic' ? alphabetizedPhenotypes : phenotypesTree}
-            value={selectedPhenotypes}
-            onChange={handleChange}
-            treeNodeFilterProp="label"
-            dropdownMatchSelectWidth
-            autoClearSearchValue
-            treeCheckable
-            treeLine
-            multiple
-            allowClear
-            labelInValue
-          />
-        </Col>
-      </Row>
+      <TreeSelect
+        style={{ width: '100%' }}
+        dropdownStyle={{ maxHeight: 500, overflow: 'auto' }}
+        treeData={selectedListType === 'alphabetic' ? alphabetizedPhenotypes : phenotypesTree}
+        value={selectedPhenotypes}
+        onChange={handleChange}
+        treeNodeFilterProp="label"
+        dropdownMatchSelectWidth
+        autoClearSearchValue
+        treeCheckable
+        treeLine
+        multiple
+        allowClear
+        labelInValue
+      />
 
-      <Row className="mt-3" controlId="phenotype-list">
-        <Col sm={{ span: 9, offset: 3 }}>
-          <Button
-            variant="primary"
-            disabled={!(selectedPhenotypes && selectedPhenotypes.length >= 2)}
-            onClick={e => {
-              e.preventDefault();
-              onSubmit(selectedPhenotypes);
-            }}>
-            Submit
-          </Button>
-        </Col>
-      </Row>
-    </Form>
+      <Button
+        className="ml-2"
+        variant="primary"
+        disabled={!(selectedPhenotypes && selectedPhenotypes.length >= 2)}
+        onClick={e => {
+          e.preventDefault();
+          onSubmit(selectedPhenotypes);
+        }}>
+        Submit
+      </Button>
+
+    </div>
   );
 }

@@ -66,17 +66,17 @@ export function VariantLookup() {
 
   return (
     <>
-      <Card className="mb-4 border-0">
-        <Card.Body>
-          <SearchFormTraitsVariant
-            onSubmit={e =>
-              dispatch(lookupVariants(selectedPhenotypes, selectedVariant))
-            }
-          />
-        </Card.Body>
-      </Card>
+      {/* <Card className="mb-4 border-0">
+        <Card.Body> */}
+      <SearchFormTraitsVariant
+        onSubmit={e =>
+          dispatch(lookupVariants(selectedPhenotypes, selectedVariant))
+        }
+      />
+        {/* </Card.Body>
+      </Card> */}
 
-      <Card className="mb-4 border-left-0 border-right-0 border-bottom-0 rounded-0">
+      <Card className="mb-4">
         <Card.Header className="bg-egg font-weight-bolder text-center">
           Variant-Phenotype(s) Table
         </Card.Header>

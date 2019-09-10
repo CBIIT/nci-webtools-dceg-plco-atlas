@@ -53,10 +53,9 @@ export function SearchFormTrait({ onChange, onSubmit }) {
   return (
     <div className="d-flex mb-4">
       <select
-        className="form-control flex-shrink-auto mx-2"
+        className="form-control flex-shrink-auto"
         value={selectedListType}
-        onChange={e => setSelectedListType(e.target.value)}
-      >
+        onChange={e => setSelectedListType(e.target.value)}>
         <option value="alphabetic">Alphabetic</option>
         <option value="categorical">Categorical</option>
       </select>
@@ -77,23 +76,8 @@ export function SearchFormTrait({ onChange, onSubmit }) {
         labelInValue
       />
 
-      {/* <Select
-        className="flex-grow-auto mx-2"
-        placeholder="(Select a phenotype)"
-        value={selectedPhenotype}
-        onChange={handleChange}
-        isOptionDisabled={option => option.value === null}
-        options={
-          selectedListType === "categorical"
-            ? categorizedPhenotypes
-            : alphabetizedPhenotypes
-        }
-        components={{ SingleValue }}
-        aria-label="Select the phenotype "
-      /> */}
-
       <select
-        className="form-control flex-shrink-auto mx-2"
+        className="form-control flex-shrink-auto ml-2"
         value={selectedManhattanPlotType}
         onChange={e => setSelectedManhattanPlotType(e.target.value)}
         aria-label="Select the type of data you wish to plot">
@@ -103,14 +87,15 @@ export function SearchFormTrait({ onChange, onSubmit }) {
         <option value="female">Female</option>
       </select>
 
-      <button
-        className="btn btn-primary mx-2"
+      <Button
+        className="ml-2"
+        variant="primary"
         onClick={e => {
           e.preventDefault();
           onSubmit(selectedPhenotype);
         }}>
         Submit
-      </button>
+      </Button>
     </div>
   );
 }

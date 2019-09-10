@@ -49,13 +49,13 @@ export function PhenotypeCorrelations() {
 
   return (
     <>
-      <Card className="mb-4 border-0">
-        <Card.Body>
-          <SearchFormTraits onSubmit={handleSubmit} onChange={handleChange} />
-        </Card.Body>
-      </Card>
+      {/* <Card className="mb-4 border-0">
+        <Card.Body> */}
+      <SearchFormTraits onSubmit={handleSubmit} onChange={handleChange} />
+        {/* </Card.Body>
+      </Card> */}
 
-      <Card className="mb-4 border-left-0 border-right-0 border-bottom-0 rounded-0">
+      <Card className="mb-4">
         <Card.Header className="bg-egg font-weight-bolder text-center">
           Heatmap
         </Card.Header>
