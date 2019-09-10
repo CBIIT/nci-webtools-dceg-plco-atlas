@@ -1,8 +1,6 @@
 import React, { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { Form, Button, Row, Col } from 'react-bootstrap';
-// import { query } from '../../services/query';
-// import Select, { components } from 'react-select';
 import { updatePhenotypeCorrelations } from '../../services/actions';
 import TreeSelect, { TreeNode, SHOW_PARENT } from 'rc-tree-select';
 import 'rc-tree-select/assets/index.css';
@@ -17,7 +15,11 @@ export function SearchFormTraits({ onChange, onSubmit }) {
   const phenotypeCorrelations = useSelector(
     state => state.phenotypeCorrelations
   );
-  const { selectedListType, selectedPhenotypes } = phenotypeCorrelations;
+  const { 
+    selectedListType, 
+    selectedPhenotypes,
+    selectedGender,
+  } = phenotypeCorrelations;
 
   const setSelectedPhenotypes = selectedPhenotypes => {
     dispatch(updatePhenotypeCorrelations({ selectedPhenotypes }));
@@ -27,26 +29,31 @@ export function SearchFormTraits({ onChange, onSubmit }) {
     dispatch(updatePhenotypeCorrelations({ selectedListType }));
   };
 
+  const setSelectedGender = selectedGender => {
+    dispatch(updatePhenotypeCorrelations({ selectedGender }));
+  }
+
   const handleChange = params => {
     setSelectedPhenotypes(params);
     onChange(params);
   };
 
+  const handleReset = params => {
+    dispatch(updatePhenotypeCorrelations({ 
+      selectedListType: 'alphabetic',
+      selectedPhenotypes: [],
+      selectedGender: 'combined',
+      heatmapData: [],
+      results: [],
+      loading: false,
+      submitted: null,
+      messages: []
+    }));
+  }
+
   const alphabetizedPhenotypes = [...phenotypes].sort((a, b) =>
     a.label.localeCompare(b.label)
   );
-
-  // const categorizedPhenotypes = phenotypes.map(e => {
-  //   const spaces = String.fromCharCode(160).repeat(e.level * 2);
-  //   let label = spaces + e.label;
-  //   return { ...e, label };
-  // });
-
-  // const MultiValue = props => (
-  //   <components.MultiValue {...props}>
-  //     {props.data.label.trim()}
-  //   </components.MultiValue>
-  // );
 
   return (
     <div className="d-flex mb-4">
@@ -74,6 +81,15 @@ export function SearchFormTraits({ onChange, onSubmit }) {
         labelInValue
       />
 
+      <select
+        className="form-control flex-shrink-auto ml-2"
+        value={selectedGender}
+        onChange={e => setSelectedGender(e.target.value)}>
+        <option value="combined">Combined</option>
+        <option value="male">Male</option>
+        <option value="female">Female</option>
+      </select>
+
       <Button
         className="ml-2"
         variant="primary"
@@ -83,6 +99,16 @@ export function SearchFormTraits({ onChange, onSubmit }) {
           onSubmit(selectedPhenotypes);
         }}>
         Submit
+      </Button>
+
+      <Button
+        className="ml-2"
+        variant="secondary"
+        onClick={e => {
+          e.preventDefault();
+          handleReset(e);
+        }}>
+        Reset
       </Button>
 
     </div>

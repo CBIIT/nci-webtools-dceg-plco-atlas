@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { Form, InputGroup, Button, Row, Col } from "react-bootstrap";
 import { updateSummaryResults } from "../../services/actions";
-// import Select, { components } from "react-select";
 import TreeSelect, { TreeNode, SHOW_PARENT } from 'rc-tree-select';
 import 'rc-tree-select/assets/index.css';
 
@@ -34,21 +33,35 @@ export function SearchFormTrait({ onChange, onSubmit }) {
     onChange(params);
   };
 
+  const handleReset = params => {
+    dispatch(updateSummaryResults({ 
+      selectedListType: 'alphabetic',
+      selectedPhenotype: null,
+      selectedChromosome: null,
+      selectedPlot: 'manhattan-plot',
+      selectedManhattanPlotType: 'aggregate',
+      manhattanPlotData: {},
+      manhattanPlotView: '',
+      ranges: [],
+      results: [],
+      resultsCount: 0,
+      page: 1,
+      pageSize: 10,
+      messages: [],
+      qqplotSrc: '',
+      areaItems: [],
+      lambdaGC: '',
+      sampleSize: '',
+      submitted: null,
+      loading: false,
+      drawManhattanPlot: null,
+      updateResultsTable: null
+    }));
+  }
+
   const alphabetizedPhenotypes = [...phenotypes].sort((a, b) =>
     a.label.localeCompare(b.label)
   );
-
-  // const categorizedPhenotypes = phenotypes.map(e => {
-  //   const spaces = String.fromCharCode(160).repeat(e.level * 2);
-  //   let label = spaces + e.label;
-  //   return { ...e, label };
-  // });
-
-  // const SingleValue = props => (
-  //   <components.SingleValue {...props}>
-  //     {props.data.label.trim()}
-  //   </components.SingleValue>
-  // );
 
   return (
     <div className="d-flex mb-4">
@@ -69,11 +82,11 @@ export function SearchFormTrait({ onChange, onSubmit }) {
         treeNodeFilterProp="label"
         dropdownMatchSelectWidth
         autoClearSearchValue
-        // treeCheckable
         treeLine
-        // multiple
         allowClear
         labelInValue
+        // treeCheckable
+        // multiple
       />
 
       <select
@@ -95,6 +108,16 @@ export function SearchFormTrait({ onChange, onSubmit }) {
           onSubmit(selectedPhenotype);
         }}>
         Submit
+      </Button>
+
+      <Button
+        className="ml-2"
+        variant="secondary"
+        onClick={e => {
+          e.preventDefault();
+          handleReset(e);
+        }}>
+        Reset
       </Button>
     </div>
   );
