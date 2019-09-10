@@ -1,6 +1,6 @@
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Alert, Nav, Tab, Tabs } from "react-bootstrap";
+import { Alert, Nav, Tab, Tabs, Card } from "react-bootstrap";
 import { SearchFormTrait } from "../forms/search-form-trait";
 import { ManhattanPlot } from "../plots/manhattan-plot";
 import { QQPlot } from "../plots/qq-plot";
@@ -155,7 +155,7 @@ export function SummaryResults() {
   };
 
   return (
-    <div>
+    <>
       <SearchFormTrait onSubmit={handleSubmit} onChange={handleChange} />
       {submitted && messages.map(({ type, content }) => (
         <Alert variant={type} onClose={clearMessages} dismissible>
@@ -163,25 +163,27 @@ export function SummaryResults() {
         </Alert>
       ))}
 
-      <Tabs
-        defaultActiveKey={selectedPlot}
-        onSelect={setSelectedPlot}
-        className="p-3">
-        <Tab eventKey="manhattan-plot" title="Manhattan Plot" className="p-2">
-          <ManhattanPlot
-            onChromosomeSelected={onChromosomeSelected}
-            onVariantLookup={handleVariantLookup}
-            onZoom={handleZoom}
-          />
-          <SummaryResultsTable
-            className="mw-100 my-4"
-            style={{ display: submitted ? "block" : "none" }}
-          />
-        </Tab>
-        <Tab eventKey="qq-plot" title="Q-Q Plot" className="p-2">
-          <QQPlot onVariantLookup={handleVariantLookup} />
-        </Tab>
-      </Tabs>
-    </div>
+      <Card>
+        <Tabs
+          defaultActiveKey={selectedPlot}
+          onSelect={setSelectedPlot}
+          className="p-3">
+          <Tab eventKey="manhattan-plot" title="Manhattan Plot" className="p-2">
+            <ManhattanPlot
+              onChromosomeSelected={onChromosomeSelected}
+              onVariantLookup={handleVariantLookup}
+              onZoom={handleZoom}
+            />
+            <SummaryResultsTable
+              className="mw-100 my-4"
+              style={{ display: submitted ? "block" : "none" }}
+            />
+          </Tab>
+          <Tab eventKey="qq-plot" title="Q-Q Plot" className="p-2">
+            <QQPlot onVariantLookup={handleVariantLookup} />
+          </Tab>
+        </Tabs>
+      </Card>
+    </>
   );
 }

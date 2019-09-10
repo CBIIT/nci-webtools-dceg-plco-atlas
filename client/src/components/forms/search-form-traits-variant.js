@@ -2,7 +2,6 @@ import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Form, FormControl, InputGroup, Row, Col, Button } from 'react-bootstrap';
 import { updateVariantLookup } from '../../services/actions';
-// import Select, { components } from 'react-select';
 import TreeSelect, { TreeNode, SHOW_PARENT } from 'rc-tree-select';
 import 'rc-tree-select/assets/index.css';
 
@@ -20,7 +19,6 @@ export function SearchFormTraitsVariant({ onSubmit }) {
   } = variantLookup;
 
   const handleChange = params => {
-    console.log(params);
     setSelectedPhenotypes(params);
     // onChange(params);
   };
@@ -45,11 +43,11 @@ export function SearchFormTraitsVariant({ onSubmit }) {
     a.label.localeCompare(b.label)
   );
 
-  const categorizedPhenotypes = phenotypes.map(e => {
-    const spaces = String.fromCharCode(160).repeat(e.level * 3);
-    let label = spaces + e.label;
-    return { ...e, label };
-  });
+  // const categorizedPhenotypes = phenotypes.map(e => {
+  //   const spaces = String.fromCharCode(160).repeat(e.level * 3);
+  //   let label = spaces + e.label;
+  //   return { ...e, label };
+  // });
 
   const canSubmit =
     selectedPhenotypes &&
@@ -83,173 +81,143 @@ export function SearchFormTraitsVariant({ onSubmit }) {
   };
 
   return (
-    <Form>
-      <Row controlId="phenotype-list">
-        <Form.Label column sm={3}>
-          Choose gender
-        </Form.Label>
-        <Col sm={2}>
-          <select
-            className="form-control"
-            value={selectedGender}
-            onChange={e => setSelectedGender(e.target.value)}>
-            <option value="combined">Combined</option>
-            <option value="male">Male</option>
-            <option value="female">Female</option>
-          </select>
-        </Col>
-      </Row>
+    <div className="d-flex mb-4">
+      <select
+        className="form-control flex-shrink-auto"
+        value={selectedListType}
+        onChange={e => setSelectedListType(e.target.value)}>
+        <option value="alphabetic">Alphabetic</option>
+        <option value="categorical">Categorical</option>
+      </select>
 
-      <Row className="mt-3" controlId="phenotype-list">
-        <Form.Label column sm={3}>
-          Sort phenotypes by
-        </Form.Label>
-        <Col sm={2}>
-          <select
-            className="form-control"
-            value={selectedListType}
-            onChange={e => setSelectedListType(e.target.value)}>
-            <option value="alphabetic">Alphabetic</option>
-            <option value="categorical">Categorical</option>
-          </select>
-        </Col>
-      </Row>
+      <TreeSelect
+        style={{ width: '100%' }}
+        dropdownStyle={{ maxHeight: 500, overflow: 'auto' }}
+        treeData={selectedListType === 'alphabetic' ? alphabetizedPhenotypes : phenotypesTree}
+        value={selectedPhenotypes}
+        onChange={handleChange}
+        treeNodeFilterProp="label"
+        dropdownMatchSelectWidth
+        autoClearSearchValue
+        treeCheckable
+        treeLine
+        multiple
+        allowClear
+        labelInValue
+      />
 
-      <Row className="mt-3" controlId="phenotype-list">
-        <Form.Label column sm={3}>
-          Choose phenotype(s)
-        </Form.Label>
-        <Col sm={9}>
-          <TreeSelect
-            style={{ width: '100%' }}
-            // transitionName="rc-tree-select-dropdown-slide-up"
-            treeData={phenotypesTree}
-            value={selectedPhenotypes}
-            onChange={handleChange}
-            // labelInValue
-            // showSearch
-            dropdownMatchSelectWidth={true}
-            autoClearSearchValue
-            treeCheckable
-            treeLine
-            multiple
-            allowClear
-            treeNodeFilterProp="label"
-            labelInValue
-          />
-        </Col>
-      </Row>
+      <FormControl
+        className="form-control ml-2"
+        style={{width: '450px'}}
+        placeholder="(Variant rsid or coordinate)"
+        aria-label="Variant (required)"
+        value={selectedVariant}
+        onChange={e => setSelectedVariant(e.target.value)}
+        type="text"
+        required
+      />
 
-      <Row className="mt-3" controlId="phenotype-list">
-        <Form.Label column sm={3}>
-          Input variant
-        </Form.Label>
-        <Col sm={3}>
-          <FormControl
-            className="form-control"
-            placeholder="Variant rsid or coordinate"
-            aria-label="Variant (required)"
-            value={selectedVariant}
-            onChange={e => setSelectedVariant(e.target.value)}
-            type="text"
-            required
-          />
-        </Col>
-      </Row>
+      <select
+        className="form-control flex-shrink-auto ml-2"
+        value={selectedGender}
+        onChange={e => setSelectedGender(e.target.value)}>
+        <option value="combined">Combined</option>
+        <option value="male">Male</option>
+        <option value="female">Female</option>
+      </select>
 
-      <Row className="mt-3" controlId="phenotype-list">
-        <Col sm={{ span: 9, offset: 3 }}>
-          <Button
-            variant="primary"
-            disabled={!canSubmit}
-            onClick={validateVariantInput}>
-            Submit
-          </Button>
-        </Col>
-      </Row>
+      <Button
+        className="ml-2"
+        variant="primary"
+        disabled={!canSubmit}
+        onClick={validateVariantInput}>
+        Submit
+      </Button>
 
+    </div>
+    // <Form>
+    //   <Row controlId="phenotype-list">
+    //     <Form.Label column sm={3}>
+    //       Choose gender
+    //     </Form.Label>
+    //     <Col sm={2}>
+    //       <select
+    //         className="form-control"
+    //         value={selectedGender}
+    //         onChange={e => setSelectedGender(e.target.value)}>
+    //         <option value="combined">Combined</option>
+    //         <option value="male">Male</option>
+    //         <option value="female">Female</option>
+    //       </select>
+    //     </Col>
+    //   </Row>
 
+    //   <Row className="mt-3" controlId="phenotype-list">
+    //     <Form.Label column sm={3}>
+    //       Sort phenotypes by
+    //     </Form.Label>
+    //     <Col sm={2}>
+    //       <select
+    //         className="form-control"
+    //         value={selectedListType}
+    //         onChange={e => setSelectedListType(e.target.value)}>
+    //         <option value="alphabetic">Alphabetic</option>
+    //         <option value="categorical">Categorical</option>
+    //       </select>
+    //     </Col>
+    //   </Row>
 
+    //   <Row className="mt-3" controlId="phenotype-list">
+    //     <Form.Label column sm={3}>
+    //       Choose phenotype(s)
+    //     </Form.Label>
+    //     <Col sm={9}>
+    //       <TreeSelect
+    //         style={{ width: '100%' }}
+    //         dropdownStyle={{ maxHeight: 500, overflow: 'auto' }}
+    //         treeData={selectedListType === 'alphabetic' ? alphabetizedPhenotypes : phenotypesTree}
+    //         value={selectedPhenotypes}
+    //         onChange={handleChange}
+    //         treeNodeFilterProp="label"
+    //         dropdownMatchSelectWidth
+    //         autoClearSearchValue
+    //         treeCheckable
+    //         treeLine
+    //         multiple
+    //         allowClear
+    //         labelInValue
+    //       />
+    //     </Col>
+    //   </Row>
 
+    //   <Row className="mt-3" controlId="phenotype-list">
+    //     <Form.Label column sm={3}>
+    //       Input variant
+    //     </Form.Label>
+    //     <Col sm={3}>
+    //       <FormControl
+    //         className="form-control"
+    //         placeholder="Variant rsid or coordinate"
+    //         aria-label="Variant (required)"
+    //         value={selectedVariant}
+    //         onChange={e => setSelectedVariant(e.target.value)}
+    //         type="text"
+    //         required
+    //       />
+    //     </Col>
+    //   </Row>
 
-      {/* <Form.Group controlId="trait-list">
-        <Form.Label>
-          <b>Select Phenotype(s) and Input Variant</b>
-        </Form.Label>
-        <div className="row">
-          <div className="col-md-12">
-            <InputGroup>
+    //   <Row className="mt-3" controlId="phenotype-list">
+    //     <Col sm={{ span: 9, offset: 3 }}>
+    //       <Button
+    //         variant="primary"
+    //         disabled={!canSubmit}
+    //         onClick={validateVariantInput}>
+    //         Submit
+    //       </Button>
+    //     </Col>
+    //   </Row>
 
-              <InputGroup.Prepend>
-                <select
-                  className="form-control"
-                  value={selectedGender}
-                  onChange={e => setSelectedGender(e.target.value)}>
-                  <option value="combined">Combined</option>
-                  <option value="male">Male</option>
-                  <option value="female">Female</option>
-                </select>
-              </InputGroup.Prepend>
-
-              <InputGroup.Prepend>
-                <select
-                  className="form-control"
-                  value={selectedListType}
-                  onChange={e => setSelectedListType(e.target.value)}>
-                  <option value="alphabetic">Alphabetic</option>
-                  <option value="categorical">Categorical</option>
-                </select>
-              </InputGroup.Prepend>
-
-              <FormControl
-                className="form-control"
-                placeholder="(Variant rsid or coordinate) *"
-                aria-label="Variant (required)"
-                value={selectedVariant}
-                onChange={e => setSelectedVariant(e.target.value)}
-                type="text"
-                required
-              />
-            
-              <InputGroup.Append>
-                <button
-                  className="btn btn-primary"
-                  onClick={validateVariantInput}
-                  disabled={!canSubmit}>
-                  Submit
-                </button>
-              </InputGroup.Append>
-            </InputGroup>
-          </div>
-          <div className="col-md-12 mt-3">
-            <Select
-              placeholder="(Select one or more phenotypes) *"
-              value={selectedPhenotypes}
-              onChange={handleChange}
-              isOptionDisabled={option => option.value === null}
-              options={
-                selectedListType === 'categorical'
-                  ? categorizedPhenotypes
-                  : alphabetizedPhenotypes
-              }
-              isMulti
-              components={{ MultiValue }}
-            />
-          </div>
-          <div className="col-md-12 mt-3">
-            <DropdownTreeSelect 
-              className="dropdown-tree"
-              data={phenotypesTree} 
-              />
-          </div>
-        </div>
-      </Form.Group> */}
-
-
-
-
-
-
-    </Form>
+    // </Form>
   );
 }

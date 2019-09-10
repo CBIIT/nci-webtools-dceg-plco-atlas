@@ -131,18 +131,13 @@ h1 {
   // }
 }
 
-.active-navlinks-card {
-  color: black !important;
-  border: 1px solid transparent;
-  border-top-left-radius: 0.25rem;
-  border-top-right-radius: 0.25rem;
+.active-secondary-navlinks {
+  border-width: 3px !important;
 }
 
-.navlinks-card {
-  border: 1px solid transparent;
-  border-top-left-radius: 0.25rem;
-  border-top-right-radius: 0.25rem;
-}
+// .navlinks-card {
+//   font-size: 10pt;
+// }
 
 .manhattan-plot {
   min-width: 700px;

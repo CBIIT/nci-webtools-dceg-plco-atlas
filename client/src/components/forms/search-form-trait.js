@@ -2,11 +2,15 @@ import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { Form, InputGroup, Button, Row, Col } from "react-bootstrap";
 import { updateSummaryResults } from "../../services/actions";
-import Select, { components } from "react-select";
+// import Select, { components } from "react-select";
+import TreeSelect, { TreeNode, SHOW_PARENT } from 'rc-tree-select';
+import 'rc-tree-select/assets/index.css';
 
 export function SearchFormTrait({ onChange, onSubmit }) {
   const dispatch = useDispatch();
   const phenotypes = useSelector(state => state.phenotypes);
+  const phenotypesTree = useSelector(state => state.phenotypesTree);
+
   const {
     selectedListType,
     selectedPhenotype,
@@ -34,46 +38,46 @@ export function SearchFormTrait({ onChange, onSubmit }) {
     a.label.localeCompare(b.label)
   );
 
-  const categorizedPhenotypes = phenotypes.map(e => {
-    const spaces = String.fromCharCode(160).repeat(e.level * 2);
-    let label = spaces + e.label;
-    return { ...e, label };
-  });
+  // const categorizedPhenotypes = phenotypes.map(e => {
+  //   const spaces = String.fromCharCode(160).repeat(e.level * 2);
+  //   let label = spaces + e.label;
+  //   return { ...e, label };
+  // });
 
-  const SingleValue = props => (
-    <components.SingleValue {...props}>
-      {props.data.label.trim()}
-    </components.SingleValue>
-  );
+  // const SingleValue = props => (
+  //   <components.SingleValue {...props}>
+  //     {props.data.label.trim()}
+  //   </components.SingleValue>
+  // );
 
   return (
     <div className="d-flex mb-4">
       <select
-        className="form-control flex-shrink-auto mx-2"
+        className="form-control flex-shrink-auto"
         value={selectedListType}
-        onChange={e => setSelectedListType(e.target.value)}
-      >
+        onChange={e => setSelectedListType(e.target.value)}>
         <option value="alphabetic">Alphabetic</option>
         <option value="categorical">Categorical</option>
       </select>
 
-      <Select
-        className="flex-grow-auto mx-2"
-        placeholder="(Select a phenotype)"
+      <TreeSelect
+        style={{ width: '100%' }}
+        dropdownStyle={{ maxHeight: 500, overflow: 'auto' }}
+        treeData={selectedListType === 'alphabetic' ? alphabetizedPhenotypes : phenotypesTree}
         value={selectedPhenotype}
         onChange={handleChange}
-        isOptionDisabled={option => option.value === null}
-        options={
-          selectedListType === "categorical"
-            ? categorizedPhenotypes
-            : alphabetizedPhenotypes
-        }
-        components={{ SingleValue }}
-        aria-label="Select the phenotype "
+        treeNodeFilterProp="label"
+        dropdownMatchSelectWidth
+        autoClearSearchValue
+        // treeCheckable
+        treeLine
+        // multiple
+        allowClear
+        labelInValue
       />
 
       <select
-        className="form-control flex-shrink-auto mx-2"
+        className="form-control flex-shrink-auto ml-2"
         value={selectedManhattanPlotType}
         onChange={e => setSelectedManhattanPlotType(e.target.value)}
         aria-label="Select the type of data you wish to plot">
@@ -83,14 +87,15 @@ export function SearchFormTrait({ onChange, onSubmit }) {
         <option value="female">Female</option>
       </select>
 
-      <button
-        className="btn btn-primary mx-2"
+      <Button
+        className="ml-2"
+        variant="primary"
         onClick={e => {
           e.preventDefault();
           onSubmit(selectedPhenotype);
         }}>
         Submit
-      </button>
+      </Button>
     </div>
   );
 }

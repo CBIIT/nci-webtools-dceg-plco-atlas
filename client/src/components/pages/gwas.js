@@ -14,7 +14,8 @@ export function Gwas() {
   useEffect(() => {
     const records = [];
     const populateRecords = node => {
-      records.push(node);
+      // records.push(node);
+      records.push({label: node.label, value: node.value});
       if (node.children) node.children.forEach(populateRecords);
     };
 
@@ -41,74 +42,38 @@ export function Gwas() {
   ];
 
   return (
-    <div className="container my-4">
-      <Card>
-        <Card.Header className="bg-egg">
-          <Nav variant="tabs" defaultActiveKey="summary">
+    <>
+      <div className="container">
+        <Card className="border-top-0" style={{borderRadius: '0 0 0.25em 0.25em'}}>
+          <Nav defaultActiveKey="summary">
             {gwasLinks.map(({ name, pathId }) => (
               <>
-                <NavItem className="mr-2 d-none d-md-block">
-                  <NavLink
-                    key={pathId}
-                    className="navlinks-card d-inline-block px-3 py-2 border border-bottom-0"
-                    activeClassName="active-navlinks-card bg-white border border-bottom-0"
-                    style={{textDecoration: 'none'}}
-                    exact={true}
-                    to={`/gwas/${pathId}`}>
-                    <b>{name}</b>
-                  </NavLink>
-                </NavItem>
-                <div className="d-md-none mb-2 w-100">
-                  <NavLink
-                    key={pathId}
-                    activeClassName="active-navlinks-card"
-                    style={{textDecoration: 'none'}}
-                    exact={true}
-                    to={`/gwas/${pathId}`}>
-                    <b>{name}</b>
-                  </NavLink>
-                </div>
+                {/* <NavItem className="mr-2"> */}
+                <NavLink
+                  key={pathId}
+                  className="text-secondary ml-1 px-3 py-2 d-inline-block"
+                  activeClassName="active-secondary-navlinks border-primary border-bottom text-secondary"
+                  style={{textDecoration: 'none', fontSize: '11pt', fontWeight: '600'}}
+                  exact={true}
+                  to={`/gwas/${pathId}`}>
+                  {name}
+                </NavLink>
+                <div className="d-md-none"></div>
               </>
             ))}
           </Nav>
-        </Card.Header>
-        <Card.Body className="px-0">
-          <Route
-            exact
-            path={`/gwas`}
-            render={() => <Redirect to="/gwas/summary" />}
-          />
-          <Route path="/gwas/summary" component={SummaryResults} />
-          <Route path="/gwas/lookup" component={VariantLookup} />
-          <Route path="/gwas/correlations" component={PhenotypeCorrelations} />
-        </Card.Body>
-      </Card>
-    </div>
-    // <div className="container my-4">
-    //   <ButtonGroup className="mb-4">
-    //     {gwasLinks.map(({ name, pathId }) => (
-    //       <NavLink
-    //         key={pathId}
-    //         className="mr-2"
-    //         activeClassName="active-navlinks"
-    //         exact={true}
-    //         to={`/gwas/${pathId}`}>
-    //         <Button>{name}</Button>
-    //       </NavLink>
-    //     ))}
-    //   </ButtonGroup>
-
-    //   <Route
-    //     exact
-    //     path={`/gwas`}
-    //     render={() => <Redirect to="/gwas/summary" />}
-    //   />
-
-    //   <Route path="/gwas/summary" component={SummaryResults} />
-
-    //   <Route path="/gwas/lookup" component={VariantLookup} />
-
-    //   <Route path="/gwas/correlations" component={PhenotypeCorrelations} />
-    // </div>
+        </Card>
+      </div>
+      <div className="container my-4">
+        <Route
+          exact
+          path={`/gwas`}
+          render={() => <Redirect to="/gwas/summary" />}
+        />
+        <Route path="/gwas/summary" component={SummaryResults} />
+        <Route path="/gwas/lookup" component={VariantLookup} />
+        <Route path="/gwas/correlations" component={PhenotypeCorrelations} />
+      </div>
+    </>
   );
 }
