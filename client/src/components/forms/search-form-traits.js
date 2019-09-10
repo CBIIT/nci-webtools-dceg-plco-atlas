@@ -103,6 +103,7 @@ export function SearchFormTraits({ onChange, onSubmit }) {
 
       <Button
         className="ml-2"
+        style={{alignItems: 'top'}}
         variant="secondary"
         onClick={e => {
           e.preventDefault();
