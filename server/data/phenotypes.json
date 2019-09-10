@@ -1,8 +1,25 @@
 [
     {
-        "label": "(test) Ewing's sarcoma",
-        "value": "meta_fixed_assoc",
-        "level": 0
+        "label": "Test",
+        "value": "test",
+        "level": 0,
+        "children": [
+            {
+                "label": "Ewing's sarcoma",
+                "value": "meta_fixed_assoc",
+                "level": 1
+            },
+            {
+                "label": "Renal Cell Carcinoma",
+                "value": "rcc",
+                "level": 1
+            },
+            {
+                "label": "Melanoma",
+                "value": "mel",
+                "level": 1
+            }
+        ]
     },
     {
         "label": "Anthropometric measures",
@@ -225,7 +242,7 @@
                             },
                             {
                                 "label": "Melanoma",
-                                "value": "mel",
+                                "value": "none_312344",
                                 "level": 3
                             },
                             {
@@ -279,7 +296,7 @@
                             },
                             {
                                 "label": "Renal cancer",
-                                "value": "rcc",
+                                "value": "none_432432",
                                 "level": 3
                             },
                             {
