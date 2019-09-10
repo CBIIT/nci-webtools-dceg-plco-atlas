@@ -2,11 +2,15 @@ import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { Form, InputGroup, Button, Row, Col } from "react-bootstrap";
 import { updateSummaryResults } from "../../services/actions";
-import Select, { components } from "react-select";
+// import Select, { components } from "react-select";
+import TreeSelect, { TreeNode, SHOW_PARENT } from 'rc-tree-select';
+import 'rc-tree-select/assets/index.css';
 
 export function SearchFormTrait({ onChange, onSubmit }) {
   const dispatch = useDispatch();
   const phenotypes = useSelector(state => state.phenotypes);
+  const phenotypesTree = useSelector(state => state.phenotypesTree);
+
   const {
     selectedListType,
     selectedPhenotype,
@@ -34,17 +38,17 @@ export function SearchFormTrait({ onChange, onSubmit }) {
     a.label.localeCompare(b.label)
   );
 
-  const categorizedPhenotypes = phenotypes.map(e => {
-    const spaces = String.fromCharCode(160).repeat(e.level * 2);
-    let label = spaces + e.label;
-    return { ...e, label };
-  });
+  // const categorizedPhenotypes = phenotypes.map(e => {
+  //   const spaces = String.fromCharCode(160).repeat(e.level * 2);
+  //   let label = spaces + e.label;
+  //   return { ...e, label };
+  // });
 
-  const SingleValue = props => (
-    <components.SingleValue {...props}>
-      {props.data.label.trim()}
-    </components.SingleValue>
-  );
+  // const SingleValue = props => (
+  //   <components.SingleValue {...props}>
+  //     {props.data.label.trim()}
+  //   </components.SingleValue>
+  // );
 
   return (
     <div className="d-flex mb-4">
@@ -57,7 +61,23 @@ export function SearchFormTrait({ onChange, onSubmit }) {
         <option value="categorical">Categorical</option>
       </select>
 
-      <Select
+      <TreeSelect
+        style={{ width: '100%' }}
+        dropdownStyle={{ maxHeight: 500, overflow: 'auto' }}
+        treeData={selectedListType === 'alphabetic' ? alphabetizedPhenotypes : phenotypesTree}
+        value={selectedPhenotype}
+        onChange={handleChange}
+        treeNodeFilterProp="label"
+        dropdownMatchSelectWidth
+        autoClearSearchValue
+        // treeCheckable
+        treeLine
+        // multiple
+        allowClear
+        labelInValue
+      />
+
+      {/* <Select
         className="flex-grow-auto mx-2"
         placeholder="(Select a phenotype)"
         value={selectedPhenotype}
@@ -70,7 +90,7 @@ export function SearchFormTrait({ onChange, onSubmit }) {
         }
         components={{ SingleValue }}
         aria-label="Select the phenotype "
-      />
+      /> */}
 
       <select
         className="form-control flex-shrink-auto mx-2"

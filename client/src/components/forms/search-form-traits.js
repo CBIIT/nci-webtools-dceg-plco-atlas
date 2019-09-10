@@ -1,13 +1,19 @@
 import React, { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { Form, Button, Row, Col } from 'react-bootstrap';
-import { query } from '../../services/query';
-import Select, { components } from 'react-select';
+// import { query } from '../../services/query';
+// import Select, { components } from 'react-select';
 import { updatePhenotypeCorrelations } from '../../services/actions';
+import TreeSelect, { TreeNode, SHOW_PARENT } from 'rc-tree-select';
+import 'rc-tree-select/assets/index.css';
+
 
 export function SearchFormTraits({ onChange, onSubmit }) {
   const dispatch = useDispatch();
   const phenotypes = useSelector(state => state.phenotypes);
+  const phenotypesTree = useSelector(state => state.phenotypesTree);
+
+
   const phenotypeCorrelations = useSelector(
     state => state.phenotypeCorrelations
   );
@@ -30,17 +36,17 @@ export function SearchFormTraits({ onChange, onSubmit }) {
     a.label.localeCompare(b.label)
   );
 
-  const categorizedPhenotypes = phenotypes.map(e => {
-    const spaces = String.fromCharCode(160).repeat(e.level * 2);
-    let label = spaces + e.label;
-    return { ...e, label };
-  });
+  // const categorizedPhenotypes = phenotypes.map(e => {
+  //   const spaces = String.fromCharCode(160).repeat(e.level * 2);
+  //   let label = spaces + e.label;
+  //   return { ...e, label };
+  // });
 
-  const MultiValue = props => (
-    <components.MultiValue {...props}>
-      {props.data.label.trim()}
-    </components.MultiValue>
-  );
+  // const MultiValue = props => (
+  //   <components.MultiValue {...props}>
+  //     {props.data.label.trim()}
+  //   </components.MultiValue>
+  // );
 
   return (
     <Form>
@@ -64,7 +70,7 @@ export function SearchFormTraits({ onChange, onSubmit }) {
           Choose phenotypes
         </Form.Label>
         <Col sm={9}>
-          <Select
+          {/* <Select
             placeholder="Select two or more phenotypes"
             value={selectedPhenotypes}
             onChange={handleChange}
@@ -76,6 +82,21 @@ export function SearchFormTraits({ onChange, onSubmit }) {
             }
             isMulti
             components={{ MultiValue }}
+          /> */}
+          <TreeSelect
+            style={{ width: '100%' }}
+            dropdownStyle={{ maxHeight: 500, overflow: 'auto' }}
+            treeData={selectedListType === 'alphabetic' ? alphabetizedPhenotypes : phenotypesTree}
+            value={selectedPhenotypes}
+            onChange={handleChange}
+            treeNodeFilterProp="label"
+            dropdownMatchSelectWidth
+            autoClearSearchValue
+            treeCheckable
+            treeLine
+            multiple
+            allowClear
+            labelInValue
           />
         </Col>
       </Row>

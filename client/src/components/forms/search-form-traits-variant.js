@@ -2,7 +2,6 @@ import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Form, FormControl, InputGroup, Row, Col, Button } from 'react-bootstrap';
 import { updateVariantLookup } from '../../services/actions';
-// import Select, { components } from 'react-select';
 import TreeSelect, { TreeNode, SHOW_PARENT } from 'rc-tree-select';
 import 'rc-tree-select/assets/index.css';
 
@@ -20,7 +19,6 @@ export function SearchFormTraitsVariant({ onSubmit }) {
   } = variantLookup;
 
   const handleChange = params => {
-    console.log(params);
     setSelectedPhenotypes(params);
     // onChange(params);
   };
@@ -165,88 +163,6 @@ export function SearchFormTraitsVariant({ onSubmit }) {
           </Button>
         </Col>
       </Row>
-
-
-
-
-
-      {/* <Form.Group controlId="trait-list">
-        <Form.Label>
-          <b>Select Phenotype(s) and Input Variant</b>
-        </Form.Label>
-        <div className="row">
-          <div className="col-md-12">
-            <InputGroup>
-
-              <InputGroup.Prepend>
-                <select
-                  className="form-control"
-                  value={selectedGender}
-                  onChange={e => setSelectedGender(e.target.value)}>
-                  <option value="combined">Combined</option>
-                  <option value="male">Male</option>
-                  <option value="female">Female</option>
-                </select>
-              </InputGroup.Prepend>
-
-              <InputGroup.Prepend>
-                <select
-                  className="form-control"
-                  value={selectedListType}
-                  onChange={e => setSelectedListType(e.target.value)}>
-                  <option value="alphabetic">Alphabetic</option>
-                  <option value="categorical">Categorical</option>
-                </select>
-              </InputGroup.Prepend>
-
-              <FormControl
-                className="form-control"
-                placeholder="(Variant rsid or coordinate) *"
-                aria-label="Variant (required)"
-                value={selectedVariant}
-                onChange={e => setSelectedVariant(e.target.value)}
-                type="text"
-                required
-              />
-            
-              <InputGroup.Append>
-                <button
-                  className="btn btn-primary"
-                  onClick={validateVariantInput}
-                  disabled={!canSubmit}>
-                  Submit
-                </button>
-              </InputGroup.Append>
-            </InputGroup>
-          </div>
-          <div className="col-md-12 mt-3">
-            <Select
-              placeholder="(Select one or more phenotypes) *"
-              value={selectedPhenotypes}
-              onChange={handleChange}
-              isOptionDisabled={option => option.value === null}
-              options={
-                selectedListType === 'categorical'
-                  ? categorizedPhenotypes
-                  : alphabetizedPhenotypes
-              }
-              isMulti
-              components={{ MultiValue }}
-            />
-          </div>
-          <div className="col-md-12 mt-3">
-            <DropdownTreeSelect 
-              className="dropdown-tree"
-              data={phenotypesTree} 
-              />
-          </div>
-        </div>
-      </Form.Group> */}
-
-
-
-
-
 
     </Form>
   );
