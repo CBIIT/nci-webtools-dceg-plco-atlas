@@ -118,7 +118,7 @@ export function ManhattanPlot({ onChromosomeSelected, onVariantLookup, onZoom })
         opacity: 0.6,
         color: '#005ea2',
         tooltip: {
-          trigger: 'click',
+          trigger: 'hover',
           class: 'custom-tooltip',
           style: 'width: 300px;',
           content: async data => {

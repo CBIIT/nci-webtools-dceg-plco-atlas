@@ -50,14 +50,6 @@ export function About() {
         of phenotypes, and links to other pertinent genomic resources are
         available.
       </p>
-
-      {/* <hr /> */}
-
-      {/* <h2 className="font-weight-light">General Statistics</h2>
-      <p>Placeholder Text</p>
-      <hr />
-      <h2 className="font-weight-light">Summary</h2>
-      <p>Placeholder Text</p> */}
     </div>
   );
 }

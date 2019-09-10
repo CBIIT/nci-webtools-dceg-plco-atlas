@@ -163,27 +163,30 @@ export function SummaryResults() {
         </Alert>
       ))}
 
-      <Card>
         <Tabs
           defaultActiveKey={selectedPlot}
-          onSelect={setSelectedPlot}
-          className="p-3">
-          <Tab eventKey="manhattan-plot" title="Manhattan Plot" className="p-2">
+          onSelect={setSelectedPlot}>
+          <Tab
+            eventKey="manhattan-plot"
+            title="Manhattan Plot"
+            className="p-2 bg-white tab-pane-bordered">
             <ManhattanPlot
               onChromosomeSelected={onChromosomeSelected}
               onVariantLookup={handleVariantLookup}
               onZoom={handleZoom}
             />
             <SummaryResultsTable
-              className="mw-100 my-4"
+              className="mw-100 my-4  tab-pane-bordered"
               style={{ display: submitted ? "block" : "none" }}
             />
           </Tab>
-          <Tab eventKey="qq-plot" title="Q-Q Plot" className="p-2">
+          <Tab
+            eventKey="qq-plot"
+            title="Q-Q Plot"
+            className="p-2 bg-white">
             <QQPlot onVariantLookup={handleVariantLookup} />
           </Tab>
         </Tabs>
-      </Card>
     </>
   );
 }

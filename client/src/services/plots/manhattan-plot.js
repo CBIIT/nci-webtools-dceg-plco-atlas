@@ -169,21 +169,37 @@ export class ManhattanPlot {
       canvas.style.cursor = cursor
     };
 
-    // call click event callbacks
-    if (config.point.onclick || config.point.tooltip)
-      canvas.onclick = async ev => {
+    if (config.point.onhover || config.point.tooltip) {
+      canvas.addEventListener('mousemove', debounce(async ev => {
         this.hideTooltip();
-        const {tooltip, onClick} = config.point;
+        const {tooltip, onhover} = config.point;
         const {trigger, content} = tooltip;
         const point = this.getPointFromEvent(ev);
         if (!point) return;
 
-        if (onClick)
-          onClick(point);
+        if (onhover)
+          onhover(point);
+
+        if (content && trigger === 'hover')
+          this.showTooltip(ev, await content(point, this.tooltip));
+      }, config.point.tooltipDelay || 300));
+    }
+
+    // call click event callbacks
+    if (config.point.onclick || config.point.tooltip)
+      canvas.addEventListener('click', async ev => {
+        this.hideTooltip();
+        const {tooltip, onclick} = config.point;
+        const {trigger, content} = tooltip;
+        const point = this.getPointFromEvent(ev);
+        if (!point) return;
+
+        if (onclick)
+          onclick(point);
 
         if (content && trigger === 'click')
           this.showTooltip(ev, await content(point, this.tooltip));
-      };
+      });
   }
 
   createTooltip() {
@@ -198,8 +214,8 @@ export class ManhattanPlot {
     let {x, y} = viewportToLocalCoordinates(ev.clientX, ev.clientY, ev.target);
     this.tooltip.innerHTML = '';
     this.tooltip.style.display = 'inline-block';
-    this.tooltip.style.left = x + 'px';
-    this.tooltip.style.top = y + 'px';
+    this.tooltip.style.left = (x - 2) + 'px';
+    this.tooltip.style.top = (y - 2) + 'px';
     if (html instanceof Element)
       this.tooltip.insertAdjacentElement('beforeend', html);
     else
