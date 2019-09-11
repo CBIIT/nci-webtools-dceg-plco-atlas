@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { Form, Button, Row, Col } from 'react-bootstrap';
 import { updatePhenotypeCorrelations } from '../../services/actions';
-import TreeSelect, { TreeNode, SHOW_PARENT } from 'rc-tree-select';
+import TreeSelect, { TreeNode } from 'rc-tree-select';
 import 'rc-tree-select/assets/index.css';
 
 

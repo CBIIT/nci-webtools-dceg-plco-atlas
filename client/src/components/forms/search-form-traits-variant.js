@@ -2,7 +2,7 @@ import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Form, FormControl, InputGroup, Row, Col, Button } from 'react-bootstrap';
 import { updateVariantLookup } from '../../services/actions';
-import TreeSelect, { TreeNode, SHOW_PARENT } from 'rc-tree-select';
+import TreeSelect, { TreeNode } from 'rc-tree-select';
 import 'rc-tree-select/assets/index.css';
 
 
@@ -19,9 +19,22 @@ export function SearchFormTraitsVariant({ onSubmit }) {
   } = variantLookup;
 
   const handleChange = params => {
+    console.log(params);
     setSelectedPhenotypes(params);
     // onChange(params);
   };
+
+  // const handleSelect = (value, node, extra) => {
+  //   console.log("value", value);
+  //   console.log("node", node);
+  //   console.log("extra", extra);
+  //   if (node.props.children.length === 0) {
+  //     // setSelectedPhenotype(value);
+  //     console.log("leaf");
+  //   } else {
+  //     console.log("parent", node.props.children);
+  //   }
+  // };
 
   const setSelectedListType = selectedListType => {
     dispatch(updateVariantLookup({ selectedListType }));
@@ -104,6 +117,7 @@ export function SearchFormTraitsVariant({ onSubmit }) {
         treeData={selectedListType === 'alphabetic' ? alphabetizedPhenotypes : phenotypesTree}
         value={selectedPhenotypes}
         onChange={handleChange}
+        // onSelect={handleSelect}
         treeNodeFilterProp="label"
         dropdownMatchSelectWidth
         autoClearSearchValue

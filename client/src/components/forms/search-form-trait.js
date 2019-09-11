@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { Form, InputGroup, Button, Row, Col } from "react-bootstrap";
 import { updateSummaryResults } from "../../services/actions";
-import TreeSelect, { TreeNode, SHOW_PARENT } from 'rc-tree-select';
+import TreeSelect, { TreeNode } from 'rc-tree-select';
 import 'rc-tree-select/assets/index.css';
 
 export function SearchFormTrait({ onChange, onSubmit }) {
@@ -34,9 +34,12 @@ export function SearchFormTrait({ onChange, onSubmit }) {
     }
   };
 
-  const handleSelect = params => {
-    setSelectedPhenotype(params);
-    onChange(params);
+  const handleSelect = (value, node, extra) => {
+    // can only select leaf nodes
+    if (node.props.children.length === 0) {
+      setSelectedPhenotype(value);
+      onChange(value);
+    }
   }
 
   const handleReset = params => {
@@ -71,6 +74,7 @@ export function SearchFormTrait({ onChange, onSubmit }) {
 
   return (
     <div className="d-flex mb-4">
+
       <select
         className="form-control flex-shrink-auto"
         value={selectedListType}
@@ -80,7 +84,7 @@ export function SearchFormTrait({ onChange, onSubmit }) {
       </select>
 
       <TreeSelect
-        className="form-control flex-shrink-auto h-100 p-0"
+        className="form-control flex-shrink-auto h-100 p-0 mr-2"
         style={{ width: '100%' }}
         dropdownStyle={{ maxHeight: 500, overflow: 'auto' }}
         treeData={selectedListType === 'alphabetic' ? alphabetizedPhenotypes : phenotypesTree}
@@ -98,7 +102,7 @@ export function SearchFormTrait({ onChange, onSubmit }) {
       />
 
       <select
-        className="form-control flex-shrink-auto ml-2"
+        className="form-control flex-shrink-auto mr-2"
         value={selectedManhattanPlotType}
         onChange={e => setSelectedManhattanPlotType(e.target.value)}
         aria-label="Select the type of data you wish to plot">
@@ -109,7 +113,7 @@ export function SearchFormTrait({ onChange, onSubmit }) {
       </select>
 
       <Button
-        className="ml-2"
+        className="mr-2"
         variant="primary"
         onClick={e => {
           e.preventDefault();
@@ -119,7 +123,7 @@ export function SearchFormTrait({ onChange, onSubmit }) {
       </Button>
 
       <Button
-        className="ml-2"
+        className=""
         variant="secondary"
         onClick={e => {
           e.preventDefault();
@@ -127,6 +131,7 @@ export function SearchFormTrait({ onChange, onSubmit }) {
         }}>
         Reset
       </Button>
+
     </div>
   );
 }

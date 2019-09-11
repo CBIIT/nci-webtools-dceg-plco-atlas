@@ -14,8 +14,10 @@ export function Gwas() {
   useEffect(() => {
     const records = [];
     const populateRecords = node => {
-      // records.push(node);
-      records.push({label: node.label, value: node.value, disabled: node.disabled});
+      // only populate alphabetic phenotype list with leaf nodes
+      if (node.children === undefined) {
+        records.push({label: node.label, value: node.value, disabled: node.disabled});
+      }
       if (node.children) node.children.forEach(populateRecords);
     };
 
