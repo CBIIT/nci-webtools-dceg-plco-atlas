@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { SearchFormTraitsVariant } from '../forms/search-form-traits-variant';
 import { updateVariantLookup, lookupVariants } from '../../services/actions';
-import BootstrapTable from 'react-bootstrap-table-next';
+import { Table } from '../controls/table';
 import paginationFactory from 'react-bootstrap-table2-paginator';
 import filterFactory, { textFilter } from 'react-bootstrap-table2-filter';
 import { Spinner, Card } from 'react-bootstrap';
@@ -94,7 +94,7 @@ export function VariantLookup() {
           </div>
 
           <div style={{ display: results.length > 0 ? 'block' : 'none' }}>
-            <BootstrapTable
+            <Table
               bootstrap4
               keyField="id"
               data={results}
