@@ -22,47 +22,42 @@ export function VariantLookup() {
     {
       dataField: 'phenotype',
       text: 'Phenotype',
-      filter: textFilter(),
       sort: true
     },
     {
       dataField: 'snp',
       text: 'SNP',
-      filter: textFilter()
     },
     {
       dataField: 'chr',
       text: 'Chromosome',
-      filter: textFilter()
     },
     {
       dataField: 'bp',
       text: 'Position',
-      filter: textFilter()
     },
     {
       dataField: 'a1',
       text: 'Reference Allele',
-      filter: textFilter()
     },
     {
       dataField: 'a2',
       text: 'Alternate Allele',
-      filter: textFilter()
     },
     {
       dataField: 'or',
       text: 'Odds Ratio',
-      filter: textFilter(),
       sort: true
     },
     {
       dataField: 'p',
       text: 'P-value',
-      filter: textFilter(),
       sort: true
     }
-  ];
+  ].map(c => {
+    c.filter = textFilter({className: 'form-control-sm'});
+    return c;
+  });
 
   return (
     <>
