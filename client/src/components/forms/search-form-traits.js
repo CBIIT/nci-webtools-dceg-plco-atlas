@@ -66,7 +66,8 @@ export function SearchFormTraits({ onChange, onSubmit }) {
       </select>
 
       <TreeSelect
-        style={{ width: '100%' }}
+        className="form-control flex-shrink-auto h-100 p-0"
+        style={{ width: '100%', maxHeight: 76, overflow: 'auto' }}
         dropdownStyle={{ maxHeight: 500, overflow: 'auto' }}
         treeData={selectedListType === 'alphabetic' ? alphabetizedPhenotypes : phenotypesTree}
         value={selectedPhenotypes}
@@ -92,6 +93,7 @@ export function SearchFormTraits({ onChange, onSubmit }) {
 
       <Button
         className="ml-2"
+        style={{maxHeight: '38px'}}
         variant="primary"
         disabled={!(selectedPhenotypes && selectedPhenotypes.length >= 2)}
         onClick={e => {
@@ -103,7 +105,7 @@ export function SearchFormTraits({ onChange, onSubmit }) {
 
       <Button
         className="ml-2"
-        style={{alignItems: 'top'}}
+        style={{maxHeight: '38px'}}
         variant="secondary"
         onClick={e => {
           e.preventDefault();

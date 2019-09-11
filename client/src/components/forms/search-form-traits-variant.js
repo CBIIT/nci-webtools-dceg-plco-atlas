@@ -98,7 +98,8 @@ export function SearchFormTraitsVariant({ onSubmit }) {
       </select>
 
       <TreeSelect
-        style={{ width: '100%' }}
+        className="form-control flex-shrink-auto h-100 p-0"
+        style={{ width: '100%', maxHeight: 76, overflow: 'auto' }}
         dropdownStyle={{ maxHeight: 500, overflow: 'auto' }}
         treeData={selectedListType === 'alphabetic' ? alphabetizedPhenotypes : phenotypesTree}
         value={selectedPhenotypes}
@@ -114,7 +115,7 @@ export function SearchFormTraitsVariant({ onSubmit }) {
       />
 
       <FormControl
-        className="form-control ml-2"
+        className="form-control flex-shrink-auto ml-2"
         style={{width: '450px'}}
         placeholder="(Variant rsid or coordinate)"
         aria-label="Variant (required)"
@@ -134,7 +135,8 @@ export function SearchFormTraitsVariant({ onSubmit }) {
       </select>
 
       <Button
-        className="ml-2"
+        className="ml-2 flex-shrink-auto"
+        style={{maxHeight: '38px'}}
         variant="primary"
         disabled={!canSubmit}
         onClick={validateVariantInput}>
@@ -142,7 +144,8 @@ export function SearchFormTraitsVariant({ onSubmit }) {
       </Button>
 
       <Button
-        className="ml-2"
+        className="ml-2 flex-shrink-auto"
+        style={{maxHeight: '38px'}}
         variant="secondary"
         onClick={e => {
           e.preventDefault();

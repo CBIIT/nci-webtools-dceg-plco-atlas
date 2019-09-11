@@ -29,9 +29,15 @@ export function SearchFormTrait({ onChange, onSubmit }) {
   };
 
   const handleChange = params => {
+    if (params.length === 0) {
+      setSelectedPhenotype(params);
+    }
+  };
+
+  const handleSelect = params => {
     setSelectedPhenotype(params);
     onChange(params);
-  };
+  }
 
   const handleReset = params => {
     dispatch(updateSummaryResults({ 
@@ -74,11 +80,13 @@ export function SearchFormTrait({ onChange, onSubmit }) {
       </select>
 
       <TreeSelect
+        className="form-control flex-shrink-auto h-100 p-0"
         style={{ width: '100%' }}
         dropdownStyle={{ maxHeight: 500, overflow: 'auto' }}
         treeData={selectedListType === 'alphabetic' ? alphabetizedPhenotypes : phenotypesTree}
         value={selectedPhenotype}
         onChange={handleChange}
+        onSelect={handleSelect}
         treeNodeFilterProp="label"
         dropdownMatchSelectWidth
         autoClearSearchValue
@@ -86,7 +94,7 @@ export function SearchFormTrait({ onChange, onSubmit }) {
         allowClear
         labelInValue
         // treeCheckable
-        // multiple
+        multiple
       />
 
       <select

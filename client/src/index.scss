@@ -223,22 +223,10 @@ h1 {
   margin-right: -5px;
 }
 
-.rc-tree-select-selection {
-  height: 100%;
-}
-
-.rc-tree-select-selection__rendered {
-  padding-top: 4px;
-  // margin-top: 4px;
-}
-
-.ul.rc-tree-select-selection__rendered {
-  padding-top: 4px;
-}
-
+/** overwrite rc-tree-select styles*/
 .rc-tree-select-selection--multiple .rc-tree-select-selection__rendered  {
-  padding-top: 4px;
-  padding-bottom: 4px;
+  padding-top: 4px !important;
+  padding-bottom: 8px !important;
 }
 
 .rc-tree-select-tree-treenode-disabled > span, .rc-tree-select-tree-treenode-disabled > a, .rc-tree-select-tree-treenode-disabled > a span {
@@ -248,4 +236,18 @@ h1 {
 .rc-tree-select-tree li {
   color: black !important;
   cursor: pointer !important;
+}
+
+.rc-tree-select-selection {
+  border: none !important;
+  box-shadow: none !important;
+}
+
+// .rc-tree-select-tree-checkbox-disabled {
+//   display: none !important;
+// }
+
+.rc-tree-select-tree li.filter-node > .rc-tree-select-tree-node-content-wrapper {
+  color: black !important;
+  font-weight: normal !important;
 }

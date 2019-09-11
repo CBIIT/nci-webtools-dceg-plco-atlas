@@ -24,56 +24,56 @@
     {
         "label": "Anthropometric measures",
         "value": "none_8482",
-        "disabled": true,
+        "disabled": false,
         "children": [
             {
                 "label": "Height",
                 "value": "none_962",
-                "disabled": true,
+                "disabled": false,
                 "children": [
                     {
                         "label": "Height when standing",
                         "value": "none_4478",
-                        "disabled": true
+                        "disabled": false
                     },
                     {
                         "label": "Height when sitting",
                         "value": "none_5981",
-                        "disabled": true
+                        "disabled": false
                     }
                 ]
             },
             {
                 "label": "Weight",
                 "value": "none_2935",
-                "disabled": true,
+                "disabled": false,
                 "children": [
                     {
                         "label": "BMI",
                         "value": "none_8108",
-                        "disabled": true
+                        "disabled": false
                     },
                     {
                         "label": "Weight Gain Area",
                         "value": "none_7702",
-                        "disabled": true
+                        "disabled": false
                     },
                     {
                         "label": "Weight Loss Area",
                         "value": "none_9528",
-                        "disabled": true
+                        "disabled": false
                     },
                     {
                         "label": "Waist-Hip Comparison",
                         "value": "none_8702",
-                        "disabled": true
+                        "disabled": false
                     }
                 ]
             },
             {
                 "label": "Hair pattern at 45",
                 "value": "none_5270",
-                "disabled": true
+                "disabled": false
             }
         ]
     },
