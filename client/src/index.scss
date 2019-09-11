@@ -17,15 +17,15 @@ $blue: #005ea2;
 }
 
 .bg-primary {
-  background-color: #333C4E !important;
+  background-color: #333c4e !important;
 }
 
 .bg-secondary {
-  background-color: #F0F1F7 !important;
+  background-color: #f0f1f7 !important;
 }
 
 .bg-egg {
-  background-color: #F7F5F4;
+  background-color: #f7f5f4;
 }
 
 .bg-primary-vivid {
@@ -122,7 +122,7 @@ h1 {
 }
 
 .active-navlinks {
-  background-color:#7A808C !important;
+  background-color: #7a808c !important;
   color: white !important;
   font-weight: bold !important;
 
@@ -224,12 +224,14 @@ h1 {
 }
 
 /** overwrite rc-tree-select styles*/
-.rc-tree-select-selection--multiple .rc-tree-select-selection__rendered  {
+.rc-tree-select-selection--multiple .rc-tree-select-selection__rendered {
   padding-top: 4px !important;
   padding-bottom: 8px !important;
 }
 
-.rc-tree-select-tree-treenode-disabled > span, .rc-tree-select-tree-treenode-disabled > a, .rc-tree-select-tree-treenode-disabled > a span {
+.rc-tree-select-tree-treenode-disabled > span,
+.rc-tree-select-tree-treenode-disabled > a,
+.rc-tree-select-tree-treenode-disabled > a span {
   // color: black !important;
 }
 
@@ -247,7 +249,9 @@ h1 {
 //   display: none !important;
 // }
 
-.rc-tree-select-tree li.filter-node > .rc-tree-select-tree-node-content-wrapper {
+.rc-tree-select-tree
+  li.filter-node
+  > .rc-tree-select-tree-node-content-wrapper {
   color: black !important;
   font-weight: normal !important;
 }

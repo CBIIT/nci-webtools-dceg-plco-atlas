@@ -6,7 +6,6 @@ import { Spinner, Button, ButtonGroup, ToggleButton } from 'react-bootstrap';
 import Plot from 'react-plotly.js';
 // import ReactCursorPosition from 'react-cursor-position';
 
-
 export function Heatmap() {
   const dispatch = useDispatch();
 
@@ -15,17 +14,17 @@ export function Heatmap() {
     // selectedPhenotypes,
     // results,
     heatmapData,
-    loading,
+    loading
     // submitted
   } = useSelector(state => state.phenotypeCorrelations);
 
   const setLoading = loading => {
-    dispatch(updatePhenotypeCorrelations({loading}));
+    dispatch(updatePhenotypeCorrelations({ loading }));
   };
 
   const setHeatmapData = heatmapData => {
-    dispatch(updatePhenotypeCorrelations({heatmapData}));
-  }
+    dispatch(updatePhenotypeCorrelations({ heatmapData }));
+  };
 
   const [numPhenotypes, setNumPhenotypes] = useState(2);
 
@@ -57,9 +56,9 @@ export function Heatmap() {
     // make sure action occurs on imagemap coord only
     if (e && e.points && e.points[0]) {
       setPopupTooltipData({
-        'phenotypeX': e.points[0].x,
-        'phenotypeY': e.points[0].y,
-        'r2': e.points[0].text
+        phenotypeX: e.points[0].x,
+        phenotypeY: e.points[0].y,
+        r2: e.points[0].text
       });
       // console.log(e.event);
       let x = e.event.offsetX;
@@ -132,7 +131,7 @@ export function Heatmap() {
       sum -= stringY.charCodeAt(y);
     }
     return Math.abs(sum);
-  }
+  };
 
   const generateData = () => {
     setLoading(true);
@@ -175,12 +174,12 @@ export function Heatmap() {
         ['1.0', 'rgb(0,0,255)']
       ],
       showscale: false,
-      hoverinfo: "x+y",
-      hovertemplate: '<br><b>Phenotype X</b>: %{x}<br>' +
-                      '<b>Phenotype Y</b>: %{y}<br>' +
-                      '<b>Correlation</b>: %{z}' +
-                      '<extra></extra>'
-                      
+      hoverinfo: 'x+y',
+      hovertemplate:
+        '<br><b>Phenotype X</b>: %{x}<br>' +
+        '<b>Phenotype Y</b>: %{y}<br>' +
+        '<b>Correlation</b>: %{z}' +
+        '<extra></extra>'
     };
     setHeatmapData([randomData]);
     setLoading(false);
@@ -199,7 +198,7 @@ export function Heatmap() {
     }
 
     return r2;
-  }
+  };
 
   const getZText = (phenotype1, phenotype2, correlationData) => {
     var r2;
@@ -210,21 +209,19 @@ export function Heatmap() {
     }
 
     return r2;
-  }
+  };
 
   const loadSamplePhenotypes = async () => {
     setLoading(true);
 
-    const correlationData = await query(
-      `data/sample_correlations.json`
-    );
+    const correlationData = await query(`data/sample_correlations.json`);
 
     let uniquePhenotypes = Object.keys(correlationData);
     // uniquePhenotypes = uniquePhenotypes.slice(4, 9);
     let x = [];
     let y = [];
     let zColor = [];
-    let zText = []
+    let zText = [];
     for (var i = 0; i < uniquePhenotypes.length; i++) {
       x.push(uniquePhenotypes[i]);
       y.unshift(uniquePhenotypes[i]);
@@ -257,23 +254,26 @@ export function Heatmap() {
         ['1.0', 'rgb(255,0,0)']
       ],
       showscale: false,
-      hoverinfo: "x+y",
-      hovertemplate: '<br><b>Phenotype X</b>: %{x}<br>' +
-                      '<b>Phenotype Y</b>: %{y}<br>' +
-                      // '<b>Color</b>: %{z}<br>' +
-                      '<b>Correlation</b>: %{text}' +
-                      '<extra></extra>'
-                      
+      hoverinfo: 'x+y',
+      hovertemplate:
+        '<br><b>Phenotype X</b>: %{x}<br>' +
+        '<b>Phenotype Y</b>: %{y}<br>' +
+        // '<b>Color</b>: %{z}<br>' +
+        '<b>Correlation</b>: %{text}' +
+        '<extra></extra>'
     };
     setHeatmapData([sampleData]);
     setLoading(false);
-  }
+  };
 
   return (
     <>
       <div className="row">
         <div className="col-md-12 py-3">
-          <ButtonGroup toggle className="ml-3" onChange={e => setNumPhenotypes(e.target.value)}>
+          <ButtonGroup
+            toggle
+            className="ml-3"
+            onChange={e => setNumPhenotypes(e.target.value)}>
             <ToggleButton type="radio" name="radio" defaultChecked value="2">
               2
             </ToggleButton>
@@ -296,7 +296,9 @@ export function Heatmap() {
         </div>
         <div
           className="col-md-12"
-          style={{ display: heatmapData.length > 0 && !loading ? 'block' : 'none' }}>
+          style={{
+            display: heatmapData.length > 0 && !loading ? 'block' : 'none'
+          }}>
           <div
             className="heatmap"
             style={{ display: loading ? 'none' : 'block' }}>
@@ -306,34 +308,34 @@ export function Heatmap() {
                 onPositionChanged: newPos => console.log(newPos.position)
                 // onPositionChanged: newPos => setPos(newPos)
               }}> */}
-              <div style={popupTooltipStyle} className="popup-tooltip shadow">
-                <button
-                  type="button"
-                  className="close popup-tooltip-close"
-                  aria-label="Close"
-                  onClick={popupMarkerClose}>
-                  <span aria-hidden="true">&times;</span>
-                </button>
-                <b>Phenotype X:</b> <a href="/">{popupTooltipData.phenotypeX}</a>
-                <br />
-                <b>Phenotype Y:</b> <a href="/">{popupTooltipData.phenotypeY}</a>
-                <br />
-                <b>Correlation:</b> {popupTooltipData.r2}
-                <br />
-              </div>
-              <div
-                style={{
-                  display: 'flex',
-                  justifyContent: 'center',
-                  alignItems: 'center'
-                }}>
-                <Plot 
-                  data={heatmapData} 
-                  layout={layout} 
-                  config={config} 
-                  onClick={e => popupMarkerClick(e)}
-                />
-              </div>
+            <div style={popupTooltipStyle} className="popup-tooltip shadow">
+              <button
+                type="button"
+                className="close popup-tooltip-close"
+                aria-label="Close"
+                onClick={popupMarkerClose}>
+                <span aria-hidden="true">&times;</span>
+              </button>
+              <b>Phenotype X:</b> <a href="/">{popupTooltipData.phenotypeX}</a>
+              <br />
+              <b>Phenotype Y:</b> <a href="/">{popupTooltipData.phenotypeY}</a>
+              <br />
+              <b>Correlation:</b> {popupTooltipData.r2}
+              <br />
+            </div>
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center'
+              }}>
+              <Plot
+                data={heatmapData}
+                layout={layout}
+                config={config}
+                onClick={e => popupMarkerClick(e)}
+              />
+            </div>
             {/* </ReactCursorPosition> */}
           </div>
         </div>
@@ -350,6 +352,6 @@ export function Heatmap() {
       {/* <script>
         window.ReactCursorPosition = window.ReactCursorPosition.default;
       </script> */}
-  </>
+    </>
   );
 }

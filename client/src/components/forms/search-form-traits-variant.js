@@ -1,10 +1,16 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Form, FormControl, InputGroup, Row, Col, Button } from 'react-bootstrap';
+import {
+  Form,
+  FormControl,
+  InputGroup,
+  Row,
+  Col,
+  Button
+} from 'react-bootstrap';
 import { updateVariantLookup } from '../../services/actions';
 import TreeSelect, { TreeNode } from 'rc-tree-select';
 import 'rc-tree-select/assets/index.css';
-
 
 export function SearchFormTraitsVariant({ onSubmit }) {
   const dispatch = useDispatch();
@@ -88,17 +94,19 @@ export function SearchFormTraitsVariant({ onSubmit }) {
   };
 
   const handleReset = params => {
-    dispatch(updateVariantLookup({ 
-      selectedListType: 'alphabetic',
-      selectedPhenotype: null,
-      selectedPhenotypes: [],
-      selectedVariant: '',
-      selectedGender: 'combined',
-      results: [],
-      message: '',
-      loading: false 
-    }));
-  }
+    dispatch(
+      updateVariantLookup({
+        selectedListType: 'alphabetic',
+        selectedPhenotype: null,
+        selectedPhenotypes: [],
+        selectedVariant: '',
+        selectedGender: 'combined',
+        results: [],
+        message: '',
+        loading: false
+      })
+    );
+  };
 
   return (
     <div className="d-flex mb-4">
@@ -114,7 +122,11 @@ export function SearchFormTraitsVariant({ onSubmit }) {
         className="form-control flex-shrink-auto h-100 p-0"
         style={{ width: '100%', maxHeight: 76, overflow: 'auto' }}
         dropdownStyle={{ maxHeight: 500, overflow: 'auto' }}
-        treeData={selectedListType === 'alphabetic' ? alphabetizedPhenotypes : phenotypesTree}
+        treeData={
+          selectedListType === 'alphabetic'
+            ? alphabetizedPhenotypes
+            : phenotypesTree
+        }
         value={selectedPhenotypes}
         onChange={handleChange}
         // onSelect={handleSelect}
@@ -130,7 +142,7 @@ export function SearchFormTraitsVariant({ onSubmit }) {
 
       <FormControl
         className="form-control flex-shrink-auto ml-2"
-        style={{width: '450px'}}
+        style={{ width: '450px' }}
         placeholder="(Variant rsid or coordinate)"
         aria-label="Variant (required)"
         value={selectedVariant}
@@ -150,7 +162,7 @@ export function SearchFormTraitsVariant({ onSubmit }) {
 
       <Button
         className="ml-2 flex-shrink-auto"
-        style={{maxHeight: '38px'}}
+        style={{ maxHeight: '38px' }}
         variant="primary"
         disabled={!canSubmit}
         onClick={validateVariantInput}>
@@ -159,7 +171,7 @@ export function SearchFormTraitsVariant({ onSubmit }) {
 
       <Button
         className="ml-2 flex-shrink-auto"
-        style={{maxHeight: '38px'}}
+        style={{ maxHeight: '38px' }}
         variant="secondary"
         onClick={e => {
           e.preventDefault();
@@ -167,7 +179,6 @@ export function SearchFormTraitsVariant({ onSubmit }) {
         }}>
         Reset
       </Button>
-
     </div>
   );
 }

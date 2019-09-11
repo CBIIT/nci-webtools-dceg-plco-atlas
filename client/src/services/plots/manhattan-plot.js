@@ -1,4 +1,9 @@
-import { debounce, extent, rgbToColor, viewportToLocalCoordinates } from './utils.js';
+import {
+  debounce,
+  extent,
+  rgbToColor,
+  viewportToLocalCoordinates
+} from './utils.js';
 import { getScale, getTicks } from './scale.js';
 import { axisLeft, axisBottom } from './axis.js';
 import { drawPoints } from './points.js';
@@ -8,7 +13,7 @@ export class ManhattanPlot {
   constructor(container, config) {
     const containerStyle = getComputedStyle(container);
     if (containerStyle.position === 'static')
-      container.style.position = 'relative'
+      container.style.position = 'relative';
     this.container = container;
 
     this.canvas = document.createElement('canvas');
@@ -42,21 +47,20 @@ export class ManhattanPlot {
     // allow either selection or zoom, but not both
     if (config.xAxis.allowSelection)
       drawSelectionOverlay(config, this.ctx, this.overlayCtx);
-
     else if (config.allowZoom) {
       drawZoomOverlay(config, this.ctx, this.overlayCtx);
       config.setZoomWindow = ev => {
-        let {xMin, xMax, yMin, yMax} = ev.bounds;
+        let { xMin, xMax, yMin, yMax } = ev.bounds;
         config.xAxis.extent = [xMin, xMax];
         config.yAxis.extent = [yMin, yMax];
         this.draw();
-      }
+      };
       config.zoomOut = ev => {
         if (!config.zoomStack.length) {
           return config.resetZoom();
         }
         const zoom = config.zoomStack.pop();
-      }
+      };
 
       config.resetZoom = ev => {
         const xData = config.data.map(d => d[config.xAxis.key]);
@@ -65,7 +69,7 @@ export class ManhattanPlot {
         config.yAxis.extent = config.yAxis.defaultExtent || extent(yData);
         config.zoomStack = [];
         this.draw();
-      }
+      };
     }
   }
 
@@ -80,7 +84,13 @@ export class ManhattanPlot {
     const data = this.config.data;
     const canvasWidth = this.container.clientWidth;
     const canvasHeight = this.container.clientHeight;
-    const margins = config.margins = {top: 40, right: 40, bottom: 60, left: 80, ...config.margins};
+    const margins = (config.margins = {
+      top: 40,
+      right: 40,
+      bottom: 60,
+      left: 80,
+      ...config.margins
+    });
     const width = canvasWidth - margins.left - margins.right;
     const height = canvasHeight - margins.top - margins.bottom;
     const lines = this.config.lines || [];
@@ -99,11 +109,9 @@ export class ManhattanPlot {
     const xData = data.map(d => d[config.xAxis.key]);
     const yData = data.map(d => d[config.yAxis.key]);
 
-    if (!config.xAxis.extent)
-      config.xAxis.extent = extent(xData);
+    if (!config.xAxis.extent) config.xAxis.extent = extent(xData);
 
-    if (!config.yAxis.extent)
-      config.yAxis.extent = extent(yData);
+    if (!config.yAxis.extent) config.yAxis.extent = extent(yData);
 
     if (!config.xAxis.ticks || config.allowZoom)
       config.xAxis.ticks = getTicks(...config.xAxis.extent, 10);
@@ -156,46 +164,52 @@ export class ManhattanPlot {
 
     // change mouse cursor depending on what is being hovered over
     canvas.onmousemove = ev => {
-      let {x, y} = viewportToLocalCoordinates(ev.clientX, ev.clientY, ev.target);
+      let { x, y } = viewportToLocalCoordinates(
+        ev.clientX,
+        ev.clientY,
+        ev.target
+      );
       let withinMargins = this.isWithinMargins(x, y);
       let cursor = 'default';
 
-      if ((withinMargins && config.xAxis.allowSelection) || this.getPointFromEvent(ev))
+      if (
+        (withinMargins && config.xAxis.allowSelection) ||
+        this.getPointFromEvent(ev)
+      )
         cursor = 'pointer';
+      else if (withinMargins && config.allowZoom) cursor = 'crosshair';
 
-      else if (withinMargins && config.allowZoom)
-        cursor = 'crosshair';
-
-      canvas.style.cursor = cursor
+      canvas.style.cursor = cursor;
     };
 
     if (config.point.onhover || config.point.tooltip) {
-      canvas.addEventListener('mousemove', debounce(async ev => {
-        // this.hideTooltip();
-        const {tooltip, onhover} = config.point;
-        const {trigger, content} = tooltip;
-        const point = this.getPointFromEvent(ev);
-        if (!point) return;
+      canvas.addEventListener(
+        'mousemove',
+        debounce(async ev => {
+          // this.hideTooltip();
+          const { tooltip, onhover } = config.point;
+          const { trigger, content } = tooltip;
+          const point = this.getPointFromEvent(ev);
+          if (!point) return;
 
-        if (onhover)
-          onhover(point);
+          if (onhover) onhover(point);
 
-        if (content && trigger === 'hover')
-          this.showTooltip(ev, await content(point, this.tooltip));
-      }, config.point.tooltipDelay || 300));
+          if (content && trigger === 'hover')
+            this.showTooltip(ev, await content(point, this.tooltip));
+        }, config.point.tooltipDelay || 300)
+      );
     }
 
     // call click event callbacks
     if (config.point.onclick || config.point.tooltip)
       canvas.addEventListener('click', async ev => {
         this.hideTooltip();
-        const {tooltip, onclick} = config.point;
-        const {trigger, content} = tooltip;
+        const { tooltip, onclick } = config.point;
+        const { trigger, content } = tooltip;
         const point = this.getPointFromEvent(ev);
         if (!point) return;
 
-        if (onclick)
-          onclick(point);
+        if (onclick) onclick(point);
 
         if (content && trigger === 'click')
           this.showTooltip(ev, await content(point, this.tooltip));
@@ -204,32 +218,35 @@ export class ManhattanPlot {
 
   createTooltip() {
     const tooltip = document.createElement('div');
-    tooltip.classList.add('manhattan-plot-tooltip')
+    tooltip.classList.add('manhattan-plot-tooltip');
     tooltip.style.display = 'none';
     tooltip.style.position = 'absolute';
     return tooltip;
   }
 
   showTooltip(ev, html) {
-    let {x, y} = viewportToLocalCoordinates(ev.clientX, ev.clientY, ev.target);
+    let { x, y } = viewportToLocalCoordinates(
+      ev.clientX,
+      ev.clientY,
+      ev.target
+    );
     this.tooltip.innerHTML = '';
     this.tooltip.style.display = 'inline-block';
-    this.tooltip.style.left = (x - 2) + 'px';
-    this.tooltip.style.top = (y - 2) + 'px';
+    this.tooltip.style.left = x - 2 + 'px';
+    this.tooltip.style.top = y - 2 + 'px';
     if (html instanceof Element)
       this.tooltip.insertAdjacentElement('beforeend', html);
-    else
-      this.tooltip.insertAdjacentHTML('beforeend', html);
+    else this.tooltip.insertAdjacentHTML('beforeend', html);
   }
 
   hideTooltip() {
     this.tooltip.style.display = 'none';
   }
 
-  getPointFromEvent({clientX, clientY, target}) {
-    let {x, y} = viewportToLocalCoordinates(clientX, clientY, target);
+  getPointFromEvent({ clientX, clientY, target }) {
+    let { x, y } = viewportToLocalCoordinates(clientX, clientY, target);
     const [r, g, b, a] = this.hiddenCtx.getImageData(x, y, 1, 1).data;
-    return a ? this.config.pointMap[rgbToColor(r, g, b)] : null
+    return a ? this.config.pointMap[rgbToColor(r, g, b)] : null;
   }
 
   /** remove references to objects for garbage collection */

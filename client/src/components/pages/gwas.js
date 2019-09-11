@@ -16,7 +16,11 @@ export function Gwas() {
     const populateRecords = node => {
       // only populate alphabetic phenotype list with leaf nodes
       if (node.children === undefined) {
-        records.push({label: node.label, value: node.value, disabled: node.disabled});
+        records.push({
+          label: node.label,
+          value: node.value,
+          disabled: node.disabled
+        });
       }
       if (node.children) node.children.forEach(populateRecords);
     };
@@ -45,30 +49,33 @@ export function Gwas() {
 
   return (
     <>
-      <div 
-        // className="border-top-0" 
+      <div
+        // className="border-top-0"
         // style={{borderRadius: '0 0 0.25em 0.25em'}}
-        className="bg-white shadow-sm" 
-        style={{borderRadius: '0 0 0 0'}}
-        >
+        className="bg-white shadow-sm"
+        style={{ borderRadius: '0 0 0 0' }}>
         <div className="container">
-            <Nav defaultActiveKey="summary">
-              {gwasLinks.map(({ name, pathId }) => (
-                <>
-                  {/* <NavItem className="mr-2"> */}
-                  <NavLink
-                    key={pathId}
-                    className="text-secondary px-3 py-2 d-inline-block"
-                    activeClassName="active-secondary-navlinks border-primary border-bottom text-secondary"
-                    style={{textDecoration: 'none', fontSize: '11pt', fontWeight: '600'}}
-                    exact={true}
-                    to={`/gwas/${pathId}`}>
-                    {name}
-                  </NavLink>
-                  <div className="d-md-none w-100"></div>
-                </>
-              ))}
-            </Nav>
+          <Nav defaultActiveKey="summary">
+            {gwasLinks.map(({ name, pathId }) => (
+              <>
+                {/* <NavItem className="mr-2"> */}
+                <NavLink
+                  key={pathId}
+                  className="text-secondary px-3 py-2 d-inline-block"
+                  activeClassName="active-secondary-navlinks border-primary border-bottom text-secondary"
+                  style={{
+                    textDecoration: 'none',
+                    fontSize: '11pt',
+                    fontWeight: '600'
+                  }}
+                  exact={true}
+                  to={`/gwas/${pathId}`}>
+                  {name}
+                </NavLink>
+                <div className="d-md-none w-100"></div>
+              </>
+            ))}
+          </Nav>
         </div>
       </div>
       <div className="container my-4">

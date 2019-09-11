@@ -15,15 +15,17 @@ import { systemFont } from './text.js';
   let withKeys = data => ({
     chr: data[columnIndexes.chr],
     bp: data[columnIndexes.bp],
-    nLogP: data[columnIndexes.nlog_p],
+    nLogP: data[columnIndexes.nlog_p]
   });
 
   let config = {
     data: data,
     xAxis: {
-      title: [{text: `Ewing's Sarcoma - Chr 10`, font: `600 14px ${systemFont}`}],
+      title: [
+        { text: `Ewing's Sarcoma - Chr 10`, font: `600 14px ${systemFont}` }
+      ],
       key: columnIndexes.bp,
-      tickFormat: tick => (tick / 1e6).toFixed(3) + ' MB',
+      tickFormat: tick => (tick / 1e6).toFixed(3) + ' MB'
       // ticks: ranges.map(r => r.max_bp_abs),
       // tickFormat: (tick, i) => ranges[i].chr,
       // labelsBetweenTicks: true,
@@ -34,12 +36,12 @@ import { systemFont } from './text.js';
     },
     yAxis: {
       title: [
-        {text: `-log`, font: `600 14px ${systemFont}`},
-        {text: '10', textBaseline: 'middle', font: `600 10px ${systemFont}`},
-        {text: `(p)`, font: `600 14px ${systemFont}`}
+        { text: `-log`, font: `600 14px ${systemFont}` },
+        { text: '10', textBaseline: 'middle', font: `600 10px ${systemFont}` },
+        { text: `(p)`, font: `600 14px ${systemFont}` }
       ],
       key: columnIndexes.nLogP,
-      tickFormat: tick => (tick).toFixed(3),
+      tickFormat: tick => tick.toFixed(3)
     },
     point: {
       size: 4,
@@ -60,7 +62,7 @@ import { systemFont } from './text.js';
       }
     },
     allowZoom: true,
-    onZoom: e => console.log(e),
+    onZoom: e => console.log(e)
   };
 
   let container = document.querySelector('#plot-container');

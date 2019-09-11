@@ -7,7 +7,11 @@ import { createElement as h } from '../../services/plots/utils';
 import { systemFont } from '../../services/plots/text';
 import { updateSummaryResults } from '../../services/actions';
 
-export function ManhattanPlot({ onChromosomeSelected, onVariantLookup, onZoom }) {
+export function ManhattanPlot({
+  onChromosomeSelected,
+  onVariantLookup,
+  onZoom
+}) {
   const plotContainer = useRef(null);
   const {
     selectedPlot,
@@ -16,18 +20,20 @@ export function ManhattanPlot({ onChromosomeSelected, onVariantLookup, onZoom })
     selectedManhattanPlotType,
     selectedPhenotype,
     selectedChromosome,
-    ranges,
+    ranges
   } = useSelector(state => state.summaryResults);
   const hasData = () =>
-    manhattanPlotData && manhattanPlotData.data && manhattanPlotData.data.length;
+    manhattanPlotData &&
+    manhattanPlotData.data &&
+    manhattanPlotData.data.length;
 
   useEffect(() => {
-    if (selectedPlot != 'manhattan-plot' || !hasData())
-      return;
+    if (selectedPlot != 'manhattan-plot' || !hasData()) return;
 
-    let params = manhattanPlotView === 'summary'
-      ? getSummaryPlot(manhattanPlotData)
-      : getChromosomePlot(manhattanPlotData);
+    let params =
+      manhattanPlotView === 'summary'
+        ? getSummaryPlot(manhattanPlotData)
+        : getChromosomePlot(manhattanPlotData);
     let manhattanPlot = new Plot(plotContainer.current, params);
     return () => manhattanPlot.destroy();
   }, [manhattanPlotData, selectedPlot]);
@@ -42,10 +48,12 @@ export function ManhattanPlot({ onChromosomeSelected, onVariantLookup, onZoom })
     return {
       data: plotData.data,
       xAxis: {
-        title: [{
-          text: selectedPhenotype.label,
-          font: `600 14px ${systemFont}`
-        }],
+        title: [
+          {
+            text: selectedPhenotype.label,
+            font: `600 14px ${systemFont}`
+          }
+        ],
         key: columnIndexes.bp,
         tickFormat: tick => (tick / 1e6).toPrecision(3) + ' MB',
         ticks: ranges.filter(r => r.chr <= 22).map(r => r.max_bp_abs),
@@ -58,22 +66,24 @@ export function ManhattanPlot({ onChromosomeSelected, onVariantLookup, onZoom })
       },
       yAxis: {
         title: [
-          {text: `-log`, font: `600 14px ${systemFont}`},
-          {text: '10', textBaseline: 'middle', font: `600 10px ${systemFont}`},
-          {text: `(p)`, font: `600 14px ${systemFont}`}
+          { text: `-log`, font: `600 14px ${systemFont}` },
+          {
+            text: '10',
+            textBaseline: 'middle',
+            font: `600 10px ${systemFont}`
+          },
+          { text: `(p)`, font: `600 14px ${systemFont}` }
         ],
         key: columnIndexes.nLogP,
-        tickFormat: tick => (tick).toPrecision(3),
+        tickFormat: tick => tick.toPrecision(3)
       },
       point: {
         size: 2,
         opacity: 0.6,
-        color: (d, i) => d[columnIndexes.chr] % 2 ? '#005ea2' : '#e47833',
+        color: (d, i) => (d[columnIndexes.chr] % 2 ? '#005ea2' : '#e47833')
       },
-      lines: [
-        {y: -Math.log10(5e-8)}
-      ],
-    }
+      lines: [{ y: -Math.log10(5e-8) }]
+    };
   }
 
   function getChromosomePlot(plotData) {
@@ -88,30 +98,34 @@ export function ManhattanPlot({ onChromosomeSelected, onVariantLookup, onZoom })
       variantId: data[columnIndexes.variantId],
       chr: data[columnIndexes.chr],
       bp: data[columnIndexes.bp],
-      nLogP: data[columnIndexes.nLogP],
+      nLogP: data[columnIndexes.nLogP]
     });
 
-    let title = `${selectedPhenotype.label} - Chr ${selectedChromosome}`
-    let range = ranges.find(r => r.chr === selectedChromosome)
+    let title = `${selectedPhenotype.label} - Chr ${selectedChromosome}`;
+    let range = ranges.find(r => r.chr === selectedChromosome);
 
     return {
       data: plotData.data,
       allowZoom: true,
       onZoom: e => onZoom(e),
       xAxis: {
-        title: [{text: title, font: `600 14px ${systemFont}`}],
+        title: [{ text: title, font: `600 14px ${systemFont}` }],
         key: columnIndexes.bp,
         tickFormat: tick => (tick / 1e6).toPrecision(4) + ' MB',
         extent: [range.bp_min, range.bp_max]
       },
       yAxis: {
         title: [
-          {text: `-log`, font: `600 14px ${systemFont}`},
-          {text: '10', textBaseline: 'middle', font: `600 10px ${systemFont}`},
-          {text: `(p)`, font: `600 14px ${systemFont}`}
+          { text: `-log`, font: `600 14px ${systemFont}` },
+          {
+            text: '10',
+            textBaseline: 'middle',
+            font: `600 10px ${systemFont}`
+          },
+          { text: `(p)`, font: `600 14px ${systemFont}` }
         ],
         key: columnIndexes.nLogP,
-        tickFormat: tick => (tick).toPrecision(3),
+        tickFormat: tick => tick.toPrecision(3)
       },
       point: {
         size: 2,
@@ -147,27 +161,23 @@ export function ManhattanPlot({ onChromosomeSelected, onVariantLookup, onZoom })
                   'Go to Variant Lookup'
                 )
               ])
-            ])
+            ]);
           }
-        },
+        }
       },
-      lines: [
-        {y: -Math.log10(5e-8)}
-      ],
-    }
+      lines: [{ y: -Math.log10(5e-8) }]
+    };
   }
 
   return (
-    <div style={{
-      overflowX: 'auto',
-      overflowY: 'hidden',
-      height: '600px',
-      display: hasData() ? 'block' : 'none'
-    }}>
-      <div
-        ref={plotContainer}
-        className="manhattan-plot" />
+    <div
+      style={{
+        overflowX: 'auto',
+        overflowY: 'hidden',
+        height: '600px',
+        display: hasData() ? 'block' : 'none'
+      }}>
+      <div ref={plotContainer} className="manhattan-plot" />
     </div>
   );
-
 }

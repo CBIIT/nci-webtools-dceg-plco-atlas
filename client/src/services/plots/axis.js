@@ -3,7 +3,7 @@ import { interpolateTicks } from './scale.js';
 
 export function axisLeft(config, ctx) {
   const margins = config.margins;
-  const [xMin ] = config.xAxis.extent;
+  const [xMin] = config.xAxis.extent;
   const [yMin, yMax] = config.yAxis.extent;
   const xScale = config.xAxis.scale;
   const yScale = config.yAxis.scale;
@@ -20,23 +20,20 @@ export function axisLeft(config, ctx) {
   ctx.save();
   ctx.globalAlpha = 0.5;
 
-  ctx.translate(
-    margins.left,
-    margins.top
-  );
+  ctx.translate(margins.left, margins.top);
 
   // draw axis line
   ctx.fillRect(
     xScale(xMin),
     yScale(yMin),
     axisWidth,
-    yScale(yMax) - yScale(yMin),
+    yScale(yMax) - yScale(yMin)
   );
 
   ctx.textAlign = 'right';
   ctx.textBaseline = 'middle';
   // draw each tick and its label
-  for (let i = 0; i < ticks.length; i ++) {
+  for (let i = 0; i < ticks.length; i++) {
     const tick = ticks[i];
     const y = yScale(tick);
     const yInterpolated = yScale(interpolatedTicks[i]);
@@ -56,7 +53,7 @@ export function axisLeft(config, ctx) {
   // draw axis title (rotated -90 degrees)
   let titleWidth = measureWidth(ctx, title);
   let midpoint = (yScale(yMax) - yScale(yMin)) / 2;
-  ctx.rotate(Math.PI / -2)
+  ctx.rotate(Math.PI / -2);
   ctx.translate(
     midpoint - titleWidth / 2,
     -(tickLength + labelPadding + maxLabelWidth)
@@ -70,7 +67,7 @@ export function axisLeft(config, ctx) {
 export function axisBottom(config, ctx) {
   const margins = config.margins;
   const [xMin, xMax] = config.xAxis.extent;
-  const [yMin ] = config.yAxis.extent;
+  const [yMin] = config.yAxis.extent;
   const xScale = config.xAxis.scale;
   const yScale = config.yAxis.scale;
   let axisWidth = config.yAxis.width || 1;
@@ -86,21 +83,13 @@ export function axisBottom(config, ctx) {
   ctx.save();
   ctx.globalAlpha = 0.5;
 
-  ctx.translate(
-    margins.left,
-    margins.top + yScale(yMin),
-  );
+  ctx.translate(margins.left, margins.top + yScale(yMin));
 
   // draw axis line
-  ctx.fillRect(
-    xScale(xMin),
-    0,
-    xScale(xMax) - xScale(xMin),
-    axisWidth,
-  );
+  ctx.fillRect(xScale(xMin), 0, xScale(xMax) - xScale(xMin), axisWidth);
 
   // draw each tick (do not use forEach to avoid creating new scopes)
-  for (let i = 0; i < ticks.length; i ++) {
+  for (let i = 0; i < ticks.length; i++) {
     const tick = ticks[i];
     const x = xScale(tick);
     const xInterpolated = xScale(interpolatedTicks[i]);
@@ -112,11 +101,7 @@ export function axisBottom(config, ctx) {
     ctx.textAlign = 'center';
     let label = tickFormat ? tickFormat(tick, i) : tick;
     let labelOffset = labelsBetweenTicks ? xInterpolated : x;
-    ctx.fillText(
-      label,
-      labelOffset,
-      tickLength + tickPadding
-    );
+    ctx.fillText(label, labelOffset, tickLength + tickPadding);
   }
 
   // draw axis title
@@ -124,7 +109,7 @@ export function axisBottom(config, ctx) {
   let midpoint = (xScale(xMax) - xScale(xMin)) / 2;
   ctx.translate(
     midpoint - titleWidth / 2,
-    (tickLength + tickPadding + labelPadding),
+    tickLength + tickPadding + labelPadding
   );
   ctx.textAlign = 'center';
   renderText(ctx, title);

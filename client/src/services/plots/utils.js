@@ -1,51 +1,44 @@
 export function min(values) {
-    let length = values.length;
-    let min = values[0];
-    for (let i = 1; i < length; i ++)
-        if (values[i] < min)
-            min = values[i];
-    return min;
+  let length = values.length;
+  let min = values[0];
+  for (let i = 1; i < length; i++) if (values[i] < min) min = values[i];
+  return min;
 }
 
 export function max(values) {
-    let length = values.length;
-    let max = values[0];
-    for (let i = 1; i < length; i ++)
-        if (values[i] > max)
-            max = values[i];
-    return max;
+  let length = values.length;
+  let max = values[0];
+  for (let i = 1; i < length; i++) if (values[i] > max) max = values[i];
+  return max;
 }
 
 export function extent(values) {
-    let length = values.length;
-    let min = values[0];
-    let max = values[0];
+  let length = values.length;
+  let min = values[0];
+  let max = values[0];
 
-    for (let i = 1; i < length; i ++) {
-        let value = values[i];
-        if (value > max)
-            max = value;
-        if (value < min)
-            min = value;
-    }
+  for (let i = 1; i < length; i++) {
+    let value = values[i];
+    if (value > max) max = value;
+    if (value < min) min = value;
+  }
 
-    return [min, max];
+  return [min, max];
 }
 
 export function range(min, max) {
-    var size = Math.abs(max - min);
-    var nums = new Array(size);
-    for (let i = 0; i < size; i++)
-        nums[i] = min + i;
-    return nums;
+  var size = Math.abs(max - min);
+  var nums = new Array(size);
+  for (let i = 0; i < size; i++) nums[i] = min + i;
+  return nums;
 }
 
 export function debounce(callback, interval) {
-    let id;
-    return function() {
-        if (id) clearTimeout(id);
-        id = setTimeout(callback.bind(this, ...arguments), interval);
-    }
+  let id;
+  return function() {
+    if (id) clearTimeout(id);
+    id = setTimeout(callback.bind(this, ...arguments), interval);
+  };
 }
 
 // generates a color based on an index
@@ -60,26 +53,26 @@ export function debounce(callback, interval) {
  * by color.
  */
 export function indexToColor(index, multiplier) {
-    multiplier = multiplier || 50;
-    index = index * multiplier
-    const r = index >> 16;
-    index -= r * 65536;
+  multiplier = multiplier || 50;
+  index = index * multiplier;
+  const r = index >> 16;
+  index -= r * 65536;
 
-    const g = index >> 8;
-    index -= g * 256;
+  const g = index >> 8;
+  index -= g * 256;
 
-    const b = index;
-    return rgbToColor(r, g, b);
+  const b = index;
+  return rgbToColor(r, g, b);
 }
 
 export function rgbToColor(r, g, b) {
-    return `rgb(${r},${g},${b})`;
+  return `rgb(${r},${g},${b})`;
 }
 
 // converts a color (given r, g, b) to an index
 export function colorToIndex(r, g, b, multiplier) {
-    multiplier = multiplier || 50;
-    return multiplier * (r * 65536 + g * 256 + b);
+  multiplier = multiplier || 50;
+  return multiplier * (r * 65536 + g * 256 + b);
 }
 
 /**
@@ -90,38 +83,33 @@ export function colorToIndex(r, g, b, multiplier) {
  * @param {*} element
  */
 export function viewportToLocalCoordinates(x, y, element) {
-    const boundingRect = element.getBoundingClientRect(element);
-    const style = getComputedStyle(element);
+  const boundingRect = element.getBoundingClientRect(element);
+  const style = getComputedStyle(element);
 
-    const xOffset = Math.floor(
-        boundingRect.left +
-        parseInt(style.borderLeftWidth, 10)
-    );
+  const xOffset = Math.floor(
+    boundingRect.left + parseInt(style.borderLeftWidth, 10)
+  );
 
-    const yOffset = Math.floor(
-        boundingRect.top +
-        parseInt(style.borderTopWidth, 10)
-    );
+  const yOffset = Math.floor(
+    boundingRect.top + parseInt(style.borderTopWidth, 10)
+  );
 
-    return {
-        x: x - xOffset,
-        y: y - yOffset
-    };
+  return {
+    x: x - xOffset,
+    y: y - yOffset
+  };
 }
 
 export function createElement(tagName, props, children) {
-    let el = document.createElement(tagName);
-    for (let key in props || {})
-        el[key] = props[key];
+  let el = document.createElement(tagName);
+  for (let key in props || {}) el[key] = props[key];
 
-    if (!Array.isArray(children))
-        children = [children];
+  if (!Array.isArray(children)) children = [children];
 
-    for (let child of children || []) {
-        if (child.constructor === String)
-            child = document.createTextNode(child);
-        el.appendChild(child)
-    }
+  for (let child of children || []) {
+    if (child.constructor === String) child = document.createTextNode(child);
+    el.appendChild(child);
+  }
 
-    return el;
+  return el;
 }

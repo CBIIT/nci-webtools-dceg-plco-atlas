@@ -5,20 +5,18 @@ import { updatePhenotypeCorrelations } from '../../services/actions';
 import TreeSelect, { TreeNode } from 'rc-tree-select';
 import 'rc-tree-select/assets/index.css';
 
-
 export function SearchFormTraits({ onChange, onSubmit }) {
   const dispatch = useDispatch();
   const phenotypes = useSelector(state => state.phenotypes);
   const phenotypesTree = useSelector(state => state.phenotypesTree);
 
-
   const phenotypeCorrelations = useSelector(
     state => state.phenotypeCorrelations
   );
-  const { 
-    selectedListType, 
+  const {
+    selectedListType,
     selectedPhenotypes,
-    selectedGender,
+    selectedGender
   } = phenotypeCorrelations;
 
   const setSelectedPhenotypes = selectedPhenotypes => {
@@ -31,7 +29,7 @@ export function SearchFormTraits({ onChange, onSubmit }) {
 
   const setSelectedGender = selectedGender => {
     dispatch(updatePhenotypeCorrelations({ selectedGender }));
-  }
+  };
 
   const handleChange = params => {
     setSelectedPhenotypes(params);
@@ -39,17 +37,19 @@ export function SearchFormTraits({ onChange, onSubmit }) {
   };
 
   const handleReset = params => {
-    dispatch(updatePhenotypeCorrelations({ 
-      selectedListType: 'alphabetic',
-      selectedPhenotypes: [],
-      selectedGender: 'combined',
-      heatmapData: [],
-      results: [],
-      loading: false,
-      submitted: null,
-      messages: []
-    }));
-  }
+    dispatch(
+      updatePhenotypeCorrelations({
+        selectedListType: 'alphabetic',
+        selectedPhenotypes: [],
+        selectedGender: 'combined',
+        heatmapData: [],
+        results: [],
+        loading: false,
+        submitted: null,
+        messages: []
+      })
+    );
+  };
 
   const alphabetizedPhenotypes = [...phenotypes].sort((a, b) =>
     a.label.localeCompare(b.label)
@@ -69,7 +69,11 @@ export function SearchFormTraits({ onChange, onSubmit }) {
         className="form-control flex-shrink-auto h-100 p-0"
         style={{ width: '100%', maxHeight: 76, overflow: 'auto' }}
         dropdownStyle={{ maxHeight: 500, overflow: 'auto' }}
-        treeData={selectedListType === 'alphabetic' ? alphabetizedPhenotypes : phenotypesTree}
+        treeData={
+          selectedListType === 'alphabetic'
+            ? alphabetizedPhenotypes
+            : phenotypesTree
+        }
         value={selectedPhenotypes}
         onChange={handleChange}
         treeNodeFilterProp="label"
@@ -93,7 +97,7 @@ export function SearchFormTraits({ onChange, onSubmit }) {
 
       <Button
         className="ml-2"
-        style={{maxHeight: '38px'}}
+        style={{ maxHeight: '38px' }}
         variant="primary"
         disabled={!(selectedPhenotypes && selectedPhenotypes.length >= 2)}
         onClick={e => {
@@ -105,7 +109,7 @@ export function SearchFormTraits({ onChange, onSubmit }) {
 
       <Button
         className="ml-2"
-        style={{maxHeight: '38px'}}
+        style={{ maxHeight: '38px' }}
         variant="secondary"
         onClick={e => {
           e.preventDefault();
@@ -113,7 +117,6 @@ export function SearchFormTraits({ onChange, onSubmit }) {
         }}>
         Reset
       </Button>
-
     </div>
   );
 }

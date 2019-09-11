@@ -4,7 +4,7 @@ export function drawPoints(config, ctx, hiddenCtx) {
   const data = config.data;
   const margins = config.margins;
   const xKey = config.xAxis.key;
-  const yKey = config.yAxis.key
+  const yKey = config.yAxis.key;
   const xScale = config.xAxis.scale;
   const yScale = config.yAxis.scale;
   const [xMin, xMax] = config.xAxis.extent;
@@ -25,18 +25,17 @@ export function drawPoints(config, ctx, hiddenCtx) {
   for (let i = 0; i < data.length; i++) {
     const d = data[i];
     const dx = d[xKey];
-    const dy = d[yKey]
+    const dy = d[yKey];
 
-    if (dx < xMin || dx > xMax || dy < yMin || dy > yMax)
-      continue;
+    if (dx < xMin || dx > xMax || dy < yMin || dy > yMax) continue;
 
     const x = xScale(dx);
     const y = yScale(dy);
 
     ctx.beginPath();
     ctx.arc(x, y, pointSize, 0, 2 * Math.PI, true);
-    ctx.fillStyle = typeof pointColor === 'function'
-      ? pointColor(d, i) : pointColor;
+    ctx.fillStyle =
+      typeof pointColor === 'function' ? pointColor(d, i) : pointColor;
     ctx.fill();
 
     hiddenCtx.beginPath();

@@ -5,13 +5,9 @@ import { Spinner } from 'react-bootstrap';
 import ReactCursorPosition from 'react-cursor-position';
 
 export function QQPlot({ onVariantLookup }) {
-  const {
-    loading,
-    qqplotSrc,
-    areaItems,
-    lambdaGC,
-    sampleSize
-  } = useSelector(state => state.summaryResults);
+  const { loading, qqplotSrc, areaItems, lambdaGC, sampleSize } = useSelector(
+    state => state.summaryResults
+  );
 
   // temporary set states
   const [hoverTooltipData, setHoverTooltipData] = useState({});
@@ -38,10 +34,10 @@ export function QQPlot({ onVariantLookup }) {
     if (e.target && e.target.coords) {
       var variant = e.target.alt.split(',');
       setPopupTooltipData({
-        'position': 'chr' + variant[0] + ':' + variant[1],
+        position: 'chr' + variant[0] + ':' + variant[1],
         // 'point_#': variant[0],
         'p-value': variant[3],
-        'snp': variant[2]
+        snp: variant[2]
       });
       console.log(pos.position);
       setPopupTooltipStyle({
@@ -71,7 +67,7 @@ export function QQPlot({ onVariantLookup }) {
       if (popupTooltipData && variant[0] !== popupTooltipData['point_#']) {
         setHoverTooltipData({
           'p-value': variant[3],
-          'snp': variant[2]
+          snp: variant[2]
         });
         setHoverTooltipStyle({
           ...hoverTooltipStyle,
@@ -96,13 +92,12 @@ export function QQPlot({ onVariantLookup }) {
   return (
     <>
       <div className="row mt-3">
-        {
-          qqplotSrc && (
-            <div className="col-md-12 text-center">
-              <b>&lambda;</b> = {lambdaGC} <b className="ml-4">Sample Size</b> = {sampleSize}
-            </div>
-          )
-        }
+        {qqplotSrc && (
+          <div className="col-md-12 text-center">
+            <b>&lambda;</b> = {lambdaGC} <b className="ml-4">Sample Size</b> ={' '}
+            {sampleSize}
+          </div>
+        )}
         <div className="col-md-12 text-center">
           <div
             className="qq-plot"
@@ -139,18 +134,16 @@ export function QQPlot({ onVariantLookup }) {
                 <br />
                 <b>snp:</b> {hoverTooltipData.snp}
               </div>
-              
-              {
-                qqplotSrc && (
-                  <img
-                    src={qqplotSrc}
-                    draggable={false}
-                    alt="QQ Plot"
-                    useMap="#image-map"
-                    onClick={e => popupMarkerClick(e)}
-                  />
-                )
-              }
+
+              {qqplotSrc && (
+                <img
+                  src={qqplotSrc}
+                  draggable={false}
+                  alt="QQ Plot"
+                  useMap="#image-map"
+                  onClick={e => popupMarkerClick(e)}
+                />
+              )}
 
               <map name="image-map">
                 {areaItems.map(function(area) {

@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from "react";
-import { useSelector, useDispatch } from "react-redux";
-import { Form, InputGroup, Button, Row, Col } from "react-bootstrap";
-import { updateSummaryResults } from "../../services/actions";
+import React, { useState, useEffect } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { Form, InputGroup, Button, Row, Col } from 'react-bootstrap';
+import { updateSummaryResults } from '../../services/actions';
 import TreeSelect, { TreeNode } from 'rc-tree-select';
 import 'rc-tree-select/assets/index.css';
 
@@ -40,33 +40,35 @@ export function SearchFormTrait({ onChange, onSubmit }) {
       setSelectedPhenotype(value);
       onChange(value);
     }
-  }
+  };
 
   const handleReset = params => {
-    dispatch(updateSummaryResults({ 
-      selectedListType: 'alphabetic',
-      selectedPhenotype: null,
-      selectedChromosome: null,
-      selectedPlot: 'manhattan-plot',
-      selectedManhattanPlotType: 'aggregate',
-      manhattanPlotData: {},
-      manhattanPlotView: '',
-      ranges: [],
-      results: [],
-      resultsCount: 0,
-      page: 1,
-      pageSize: 10,
-      messages: [],
-      qqplotSrc: '',
-      areaItems: [],
-      lambdaGC: '',
-      sampleSize: '',
-      submitted: null,
-      loading: false,
-      drawManhattanPlot: null,
-      updateResultsTable: null
-    }));
-  }
+    dispatch(
+      updateSummaryResults({
+        selectedListType: 'alphabetic',
+        selectedPhenotype: null,
+        selectedChromosome: null,
+        selectedPlot: 'manhattan-plot',
+        selectedManhattanPlotType: 'aggregate',
+        manhattanPlotData: {},
+        manhattanPlotView: '',
+        ranges: [],
+        results: [],
+        resultsCount: 0,
+        page: 1,
+        pageSize: 10,
+        messages: [],
+        qqplotSrc: '',
+        areaItems: [],
+        lambdaGC: '',
+        sampleSize: '',
+        submitted: null,
+        loading: false,
+        drawManhattanPlot: null,
+        updateResultsTable: null
+      })
+    );
+  };
 
   const alphabetizedPhenotypes = [...phenotypes].sort((a, b) =>
     a.label.localeCompare(b.label)
@@ -74,7 +76,6 @@ export function SearchFormTrait({ onChange, onSubmit }) {
 
   return (
     <div className="d-flex mb-4">
-
       <select
         className="form-control flex-shrink-auto"
         value={selectedListType}
@@ -87,7 +88,11 @@ export function SearchFormTrait({ onChange, onSubmit }) {
         className="form-control flex-shrink-auto h-100 p-0 mr-2"
         style={{ width: '100%' }}
         dropdownStyle={{ maxHeight: 500, overflow: 'auto' }}
-        treeData={selectedListType === 'alphabetic' ? alphabetizedPhenotypes : phenotypesTree}
+        treeData={
+          selectedListType === 'alphabetic'
+            ? alphabetizedPhenotypes
+            : phenotypesTree
+        }
         value={selectedPhenotype}
         onChange={handleChange}
         onSelect={handleSelect}
@@ -131,7 +136,6 @@ export function SearchFormTrait({ onChange, onSubmit }) {
         }}>
         Reset
       </Button>
-
     </div>
   );
 }

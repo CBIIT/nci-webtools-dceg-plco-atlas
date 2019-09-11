@@ -27,19 +27,19 @@ export function updatePhenotypeCorrelations(data) {
 }
 
 export function updateSummaryResultsTable(params) {
-  return async function (dispatch) {
-   dispatch(updateSummaryResults({loading: true}));
+  return async function(dispatch) {
+    dispatch(updateSummaryResults({ loading: true }));
     const results = await query('variants-paginated', params);
     console.log(results);
-   dispatch(updateSummaryResults({results, loading: false}))
-  }
+    dispatch(updateSummaryResults({ results, loading: false }));
+  };
 }
 
 export function fetchRanges() {
-  return async function (dispatch) {
+  return async function(dispatch) {
     const ranges = await query('data/chromosome_ranges.json');
-    dispatch(updateSummaryResults({ranges}));
-  }
+    dispatch(updateSummaryResults({ ranges }));
+  };
 }
 
 /**
@@ -48,39 +48,41 @@ export function fetchRanges() {
  * @param {object} params - database, chr, bpMin, bpMax, nlogpMin, nlogPmax
  */
 export function drawManhattanPlot(plotType, params) {
-  return async function (dispatch) {
-    dispatch(updateSummaryResults({loading: true}));
+  return async function(dispatch) {
+    dispatch(updateSummaryResults({ loading: true }));
     const manhattanPlotData = await rawQuery(plotType, params);
-    dispatch(updateSummaryResults({manhattanPlotData, loading: false}));
+    dispatch(updateSummaryResults({ manhattanPlotData, loading: false }));
     return manhattanPlotData;
-  }
+  };
 }
 
 export function drawQQPlot(phenotype) {
-  return async function (dispatch) {
-    dispatch(updateSummaryResults({loading: true}));
-    console.log("DRAW QQ PLOT", phenotype);
+  return async function(dispatch) {
+    dispatch(updateSummaryResults({ loading: true }));
+    console.log('DRAW QQ PLOT', phenotype);
     const imageMapData = await query(
       `data/qq-plots/${phenotype}.imagemap.json`
     );
     if (!imageMapData.error) {
-      dispatch(updateSummaryResults({
-        ...imageMapData, // lambdaGC, sampleSize, areaItems
-        qqplotSrc: `data/qq-plots/${phenotype}.png`,
-        loading: false
-      }));
+      dispatch(
+        updateSummaryResults({
+          ...imageMapData, // lambdaGC, sampleSize, areaItems
+          qqplotSrc: `data/qq-plots/${phenotype}.png`,
+          loading: false
+        })
+      );
     }
-  }
-};
+  };
+}
 
 export function drawHeatmap(phenotypes) {
-  return async function (dispatch) {
+  return async function(dispatch) {
     const setLoading = loading => {
-      dispatch(updateSummaryResults({loading}))
-    }
+      dispatch(updateSummaryResults({ loading }));
+    };
     const setHeatmapData = heatmapData => {
-      dispatch(updatePhenotypeCorrelations({heatmapData}));
-    }
+      dispatch(updatePhenotypeCorrelations({ heatmapData }));
+    };
     const stringScore = (stringX, stringY) => {
       var sum = 0;
       for (var x = 0; x < stringX.length; x++) {
@@ -90,11 +92,11 @@ export function drawHeatmap(phenotypes) {
         sum -= stringY.charCodeAt(y);
       }
       return Math.abs(sum);
-    }
+    };
 
     setLoading(true);
 
-    console.log("DRAW HEATMAP", phenotypes);
+    console.log('DRAW HEATMAP', phenotypes);
 
     let n = phenotypes.length;
     let x = [];
@@ -135,18 +137,18 @@ export function drawHeatmap(phenotypes) {
         ['1.0', 'rgb(0,0,255)']
       ],
       showscale: false,
-      hoverinfo: "x+y",
-      hovertemplate: '<br><b>Phenotype X</b>: %{x}<br>' +
-                      '<b>Phenotype Y</b>: %{y}<br>' +
-                      '<b>Correlation</b>: %{z}' +
-                      '<extra></extra>'
-
+      hoverinfo: 'x+y',
+      hovertemplate:
+        '<br><b>Phenotype X</b>: %{x}<br>' +
+        '<b>Phenotype Y</b>: %{y}<br>' +
+        '<b>Correlation</b>: %{z}' +
+        '<extra></extra>'
     };
     setHeatmapData([randomData]);
 
     setLoading(false);
-  }
-};
+  };
+}
 
 export function lookupVariants(phenotypes, variant) {
   return async function(dispatch) {

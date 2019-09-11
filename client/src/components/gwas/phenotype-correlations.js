@@ -3,8 +3,10 @@ import { useSelector, useDispatch } from 'react-redux';
 import { SearchFormTraits } from '../forms/search-form-traits';
 import { Heatmap } from '../plots/heatmap-plot';
 import { Card } from 'react-bootstrap';
-import { updatePhenotypeCorrelations, drawHeatmap } from '../../services/actions';
-
+import {
+  updatePhenotypeCorrelations,
+  drawHeatmap
+} from '../../services/actions';
 
 export function PhenotypeCorrelations() {
   const dispatch = useDispatch();
@@ -32,7 +34,7 @@ export function PhenotypeCorrelations() {
 
   const handleSubmit = params => {
     setSubmitted(new Date());
-    console.log("submit");
+    console.log('submit');
 
     if (!params) {
       setMessages([

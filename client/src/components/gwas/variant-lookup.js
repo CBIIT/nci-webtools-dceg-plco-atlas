@@ -26,23 +26,23 @@ export function VariantLookup() {
     },
     {
       dataField: 'snp',
-      text: 'SNP',
+      text: 'SNP'
     },
     {
       dataField: 'chr',
-      text: 'Chromosome',
+      text: 'Chromosome'
     },
     {
       dataField: 'bp',
-      text: 'Position',
+      text: 'Position'
     },
     {
       dataField: 'a1',
-      text: 'Reference Allele',
+      text: 'Reference Allele'
     },
     {
       dataField: 'a2',
-      text: 'Alternate Allele',
+      text: 'Alternate Allele'
     },
     {
       dataField: 'or',
@@ -55,7 +55,7 @@ export function VariantLookup() {
       sort: true
     }
   ].map(c => {
-    c.filter = textFilter({className: 'form-control-sm'});
+    c.filter = textFilter({ className: 'form-control-sm' });
     return c;
   });
 
