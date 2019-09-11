@@ -20,6 +20,7 @@ export function drawPoints(config, ctx, hiddenCtx) {
   // draw points on canvas and backing canvas
   const pointSize = config.point.size;
   const pointColor = config.point.color;
+  const interactivePointSize = config.point.interactiveSize || pointSize;
   ctx.globalAlpha = config.point.opacity;
   for (let i = 0; i < data.length; i++) {
     const d = data[i];
