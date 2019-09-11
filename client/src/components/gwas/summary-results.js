@@ -154,6 +154,14 @@ export function SummaryResults() {
     dispatch(lookupVariants([selectedPhenotype], snp));
   };
 
+  const placeholder = (
+    <div style={{ display: submitted ? "none" : "block"}}>
+      <p className="h4 text-center my-5">
+        Please select a phenotype to view this plot.
+      </p>
+    </div>
+  )
+
   return (
     <>
       <SearchFormTrait onSubmit={handleSubmit} onChange={handleChange} />
@@ -175,16 +183,23 @@ export function SummaryResults() {
               onVariantLookup={handleVariantLookup}
               onZoom={handleZoom}
             />
-            <SummaryResultsTable
-              className="mw-100 my-4  tab-pane-bordered"
-              style={{ display: submitted ? "block" : "none" }}
-            />
+            <div
+              className="mw-100 my-4"
+              style={{ display: submitted ? "block" : "none" }}>
+              <SummaryResultsTable />
+            </div>
+            {placeholder}
           </Tab>
           <Tab
             eventKey="qq-plot"
             title="Q-Q Plot"
-            className="p-2 bg-white">
-            <QQPlot onVariantLookup={handleVariantLookup} />
+            className="p-2 bg-white tab-pane-bordered">
+            <div
+              className="mw-100 my-4"
+              style={{ display: submitted ? "block" : "none" }}>
+              <QQPlot onVariantLookup={handleVariantLookup} />
+            </div>
+            {placeholder}
           </Tab>
         </Tabs>
     </>
