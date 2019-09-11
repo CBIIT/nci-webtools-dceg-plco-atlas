@@ -66,7 +66,7 @@ export function ManhattanPlot({ onChromosomeSelected, onVariantLookup, onZoom })
         tickFormat: tick => (tick).toPrecision(3),
       },
       point: {
-        size: 3,
+        size: 2,
         opacity: 0.6,
         color: (d, i) => d[columnIndexes.chr] % 2 ? '#005ea2' : '#e47833',
       },
@@ -114,7 +114,8 @@ export function ManhattanPlot({ onChromosomeSelected, onVariantLookup, onZoom })
         tickFormat: tick => (tick).toPrecision(3),
       },
       point: {
-        size: 4,
+        size: 2,
+        interactiveSize: 3,
         opacity: 0.6,
         color: '#005ea2',
         tooltip: {

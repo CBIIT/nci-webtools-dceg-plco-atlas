@@ -2,8 +2,9 @@ import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { updateSummaryResults } from '../../services/actions';
 import { query } from '../../services/query';
-import BootstrapTable from 'react-bootstrap-table-next';
+import { Table } from '../controls/table';
 import paginationFactory from 'react-bootstrap-table2-paginator';
+
 
 export function SummaryResultsTable({updateFunctionRef}) {
     const dispatch = useDispatch();
@@ -73,7 +74,7 @@ export function SummaryResultsTable({updateFunctionRef}) {
             text: 'P-Value',
             sort: true,
         },
-    ];
+    ]
 
     const updateTable = async params => {
       console.log('called update', params);
@@ -113,8 +114,7 @@ export function SummaryResultsTable({updateFunctionRef}) {
     }, [updateFunctionRef, updateTable]);
 
     return (
-        <BootstrapTable
-            bootstrap4
+        <Table
             remote
             keyField="variant_id"
             data={results}
