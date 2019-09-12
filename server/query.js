@@ -37,37 +37,62 @@ function getVariants(filepath, params) {
         : stmt.all(params);
 }
 
-function getVariantsByPage(filepath, params) {
-    const sql = `SELECT * FROM variant
-        WHERE p IS NOT NULL
-        ${isDefined(params.chr) ? ' AND chr = :chr' : ' '}
-        ${isDefined(params.bpMin) ? ' AND bp >= :bpMin' : ' '}
-        ${isDefined(params.bpMax) ? ' AND bp <= :bpMax' : ' '}
-        ${isDefined(params.nlogpMin) ? ' AND nlog_p >= :nlogpMin' : ' '}
-        ${isDefined(params.nlogpMax) ? ' AND nlog_p <= :nlogpMax' : ' '}`;
+function getVariantsByPage(filepath, params, config) {
+    const coalesce = (condition, value) => isDefined(condition) ? value : '';
+    const wrapColumnName = name => `"${name}"`;
+    const validColumns = [
+        'variant_id', 'chr', 'bp', 'snp','a1','a2', 'n',
+        'p','nlog_p', 'p_r', 'or', 'or_r', 'q', 'i',
+    ];
 
-    if (params.count) {
-        const countSql = `SELECT COUNT(*) FROM (${sql})`;
+    // if column names are provided, check each name and wrap in quotes
+    // otherwise, retrieve default columns
+    let columnNames = (config && config.columnNames)
+        ? config.columnNames.filter(c => validColumns.includes(c))
+        : validColumns;
+
+    // filter by id, chr, base position, and -log10(p), if provided
+    let sql = `SELECT ${columnNames.map(wrapColumnName).join(',')} FROM variant
+        WHERE p IS NOT NULL AND ` + [
+            coalesce(params.id, `variant_id = :id`),
+            coalesce(params.chr, `chr = :chr`),
+            coalesce(params.bpMin, `bp >= :bpMin`),
+            coalesce(params.bpMax, `bp <= :bpMax`),
+            coalesce(params.nlogpMin, `bp <= :nlogpMin`),
+            coalesce(params.nlogpMax, `bp <= :nlogpMax`),
+        ].filter(str => str.length).join(' AND ');
+
+    // add counts to results, if required
+    let countSql = `SELECT COUNT(*) FROM (${sql})`;
+
+    // adds "order by" to sql, if both order and orderBy are provided
+    let { order, orderBy } = params;
+    if (order && orderBy) {
+        // by default, sort by p-value ascending
+        if (!['asc', 'desc'].includes(order))
+            order = 'asc';
+        if (!validColumns.includes(orderBy))
+            orderBy = 'p';
+        sql += ` ORDER BY "${orderBy}" ${order} `;
+    }
+
+    // adds limit and offset, if provided
+    if (params.limit) sql += ' LIMIT :limit ';
+    if (params.offset) sql += ' OFFSET :offset ';
+
+    const stmt = new Database(filepath, {readonly: true}).prepare(querySql);
+    const records = params.raw
+        ? getRawResults(stmt, params)
+        : stmt.all(params);
+
+    if (config.count) {
         const countStmt = new Database(filepath, {readonly: true}).prepare(countSql);
         const count = countStmt.all(params);
-        return count;
-    } else {
-        const orderBy = ['chr', 'bp', 'snp', 'p'].includes(params.orderBy)
-            ? params.orderBy
-            : 'p';
-        const order = ['asc', 'desc'].includes(params.order)
-            ? params.order
-            : 'asc';
-        const querySql = `${sql}
-            ORDER BY "${orderBy}" ${order}
-            LIMIT :limit
-            OFFSET :offset`;
-        const stmt = new Database(filepath, {readonly: true}).prepare(querySql);
-        const records = params.raw
-            ? getRawResults(stmt, params)
-            : stmt.all(params);
-        return records;
+        if (params.raw)
+            records.count = count;
     }
+
+    return records;
 }
 
 function getVariantById(filepath, params) {
