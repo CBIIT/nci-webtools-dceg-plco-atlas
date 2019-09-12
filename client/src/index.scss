@@ -86,6 +86,17 @@ $blue: #005ea2;
   border-bottom: 1px solid #dee2e6;
 }
 
+.link {
+  cursor: pointer;
+  text-decoration: underline;
+  font-weight: 600;
+  color: $blue !important;
+}
+
+.link:hover {
+  color: #1a4480 !important;
+}
+
 h1 {
   color: #ff8c00;
 }

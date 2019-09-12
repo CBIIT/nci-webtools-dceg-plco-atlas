@@ -3,16 +3,20 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Spinner } from 'react-bootstrap';
 import { rawQuery, query } from '../../services/query';
 import { ManhattanPlot as Plot } from '../../services/plots/manhattan-plot';
+import { Icon } from '../controls/icon';
 import { createElement as h } from '../../services/plots/utils';
 import { systemFont } from '../../services/plots/text';
 import { updateSummaryResults } from '../../services/actions';
 
 export function ManhattanPlot({
+  onAllChromosomeSelected,
   onChromosomeSelected,
   onVariantLookup,
-  onZoom
+  onZoom,
 }) {
+  const [zoomStack, setZoomStack] = useState([]);
   const plotContainer = useRef(null);
+  const plot = useRef(null);
   const {
     selectedPlot,
     manhattanPlotData,
@@ -29,13 +33,15 @@ export function ManhattanPlot({
 
   useEffect(() => {
     if (selectedPlot != 'manhattan-plot' || !hasData()) return;
-
     let params =
       manhattanPlotView === 'summary'
         ? getSummaryPlot(manhattanPlotData)
         : getChromosomePlot(manhattanPlotData);
-    let manhattanPlot = new Plot(plotContainer.current, params);
-    return () => manhattanPlot.destroy();
+    plot.current = new Plot(plotContainer.current, params);
+    setZoomStack([])
+    return () => {
+      plot.current.destroy()
+    };
   }, [manhattanPlotData, selectedPlot]);
 
   function getSummaryPlot(plotData) {
@@ -107,7 +113,11 @@ export function ManhattanPlot({
     return {
       data: plotData.data,
       allowZoom: true,
-      onZoom: e => onZoom(e),
+      onZoom: (e) => {
+        let stack = [...plot.current.config.zoomStack];
+        setZoomStack(stack);
+        onZoom(e);
+      },
       xAxis: {
         title: [{ text: title, font: `600 14px ${systemFont}` }],
         key: columnIndexes.bp,
@@ -165,19 +175,47 @@ export function ManhattanPlot({
           }
         }
       },
-      lines: [{ y: -Math.log10(5e-8) }]
+      lines: [{ y: -Math.log10(5e-8) }],
+      zoomStack: plot.current && plot.current.zoomStack || []
     };
   }
 
+  function resetZoom() {
+    if (plot.current && plot.current.config.resetZoom) {
+      plot.current.config.resetZoom();
+    }
+  }
+
+  function zoomOut() {
+    if (plot.current && plot.current.config.zoomOut) {
+      plot.current.config.zoomOut();
+    }
+  }
+
   return (
-    <div
-      style={{
-        overflowX: 'auto',
-        overflowY: 'hidden',
-        height: '600px',
-        display: hasData() ? 'block' : 'none'
-      }}>
-      <div ref={plotContainer} className="manhattan-plot" />
+    <div style={{display: hasData() ? 'block' : 'none'}}>
+      <div
+        className="px-2 pt-3"
+        style={{visibility: selectedChromosome ? 'visible' : 'hidden'}}>
+        <a className="link" onClick={e => onAllChromosomeSelected && onAllChromosomeSelected()}>All Chromosomes</a>
+        <Icon name="angle-right" className="mx-1" width="6" />
+        <a className="link" onClick={resetZoom}>
+          Chromosome {selectedChromosome}
+        </a>
+
+        {zoomStack.length ? <>
+            <Icon name="angle-right" className="mx-1" width="6" />
+            <a className="link" onClick={zoomOut}>Previous Zoom</a>
+          </> : null}
+      </div>
+      <div
+        style={{
+          overflowX: 'auto',
+          overflowY: 'hidden',
+          height: '600px',
+        }}>
+        <div ref={plotContainer} className="manhattan-plot" />
+      </div>
     </div>
   );
 }

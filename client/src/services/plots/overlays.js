@@ -68,7 +68,7 @@ export function drawZoomOverlay(config, ctx, overlayCtx) {
   canvas.removeEventListener('mousedown', startZoom);
   canvas.removeEventListener('mousemove', updateZoomWindow);
   canvas.removeEventListener('mouseup', endZoom);
-  canvas.removeEventListener('dblclick', updateZoomWindow);
+  canvas.removeEventListener('dblclick', resetZoom);
 
   canvas.addEventListener('mousedown', startZoom);
   canvas.addEventListener('mousemove', updateZoomWindow);
@@ -151,19 +151,20 @@ export function drawZoomOverlay(config, ctx, overlayCtx) {
       bounds: { xMin, xMax, yMin, yMax }
     };
 
-    config.setZoomWindow && config.setZoomWindow(window);
-    config.onZoom && config.onZoom(window);
+    if (config.setZoomWindow) {
+      config.zoomStack.push(window);
+      config.setZoomWindow(window);
+    }
   }
 
   function resetZoom(ev) {
     config.resetZoom && config.resetZoom();
-    const [xMin, xMax] = config.xAxis.extent;
-    const [yMin, yMax] = config.yAxis.extent;
-    const window = {
-      bounds: { xMin, xMax, yMin, yMax }
-    };
-    config.onZoom && config.onZoom(window);
   }
+
+  function zoomOut(ev) {
+    config.zoomOut && config.zoomOut();
+  }
+
 }
 
 function getSectionBounds(value, ticks) {
