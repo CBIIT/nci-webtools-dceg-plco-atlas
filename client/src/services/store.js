@@ -37,7 +37,8 @@ const initialState = {
     selectedGender: 'combined',
     results: [],
     message: '',
-    loading: false
+    loading: false,
+    submitted: null
   },
   phenotypeCorrelations: {
     // drawHeatmap: null,
