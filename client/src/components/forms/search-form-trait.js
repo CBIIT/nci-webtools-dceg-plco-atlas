@@ -45,7 +45,7 @@ export function SearchFormTrait({ onChange, onSubmit }) {
   const handleReset = params => {
     dispatch(
       updateSummaryResults({
-        selectedListType: 'alphabetic',
+        selectedListType: 'categorical',
         selectedPhenotype: null,
         selectedChromosome: null,
         selectedPlot: 'manhattan-plot',
@@ -99,6 +99,7 @@ export function SearchFormTrait({ onChange, onSubmit }) {
         treeNodeFilterProp="label"
         dropdownMatchSelectWidth
         autoClearSearchValue
+        treeDefaultExpandAll
         treeLine
         allowClear
         labelInValue
