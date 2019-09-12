@@ -26,19 +26,21 @@ export function updatePhenotypeCorrelations(data) {
   return { type: UPDATE_PHENOTYPE_CORRELATIONS, data };
 }
 
-export function updateSummaryResultsTable(params) {
-  return async function(dispatch) {
-    dispatch(updateSummaryResults({ loading: true }));
-    const results = await query('variants-paginated', params);
-    console.log(results);
-    dispatch(updateSummaryResults({ results, loading: false }));
-  };
-}
-
 export function fetchRanges() {
   return async function(dispatch) {
     const ranges = await query('data/chromosome_ranges.json');
     dispatch(updateSummaryResults({ ranges }));
+  };
+}
+
+export function updateSummaryResultsTable(params) {
+  return async function(dispatch) {
+    dispatch(updateSummaryResults({ loading: true }));
+    const results = await query('variants-paginated', params);
+    if (!results.error)
+      dispatch(updateSummaryResults({ results, loading: false }));
+    dispatch(updateSummaryResults({ loading: false }));
+    return results;
   };
 }
 
@@ -51,7 +53,9 @@ export function drawManhattanPlot(plotType, params) {
   return async function(dispatch) {
     dispatch(updateSummaryResults({ loading: true }));
     const manhattanPlotData = await rawQuery(plotType, params);
-    dispatch(updateSummaryResults({ manhattanPlotData, loading: false }));
+    if (!manhattanPlotData.error)
+      dispatch(updateSummaryResults({ manhattanPlotData }));
+    dispatch(updateSummaryResults({ loading: false }));
     return manhattanPlotData;
   };
 }
