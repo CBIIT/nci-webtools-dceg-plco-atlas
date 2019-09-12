@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { SearchFormTraits } from '../forms/search-form-traits';
 import { Heatmap } from '../plots/heatmap-plot';
-import { Card } from 'react-bootstrap';
+import { Alert, Tabs, Tab } from 'react-bootstrap';
 import {
   updatePhenotypeCorrelations,
   drawHeatmap
@@ -27,9 +27,17 @@ export function PhenotypeCorrelations() {
     setMessages([]);
   };
 
+  const placeholder = (
+    <div style={{ display: submitted ? 'none' : 'block' }}>
+      <p className="h4 text-center my-5">
+        Please select phenotype(s) and input variant to view this table.
+      </p>
+    </div>
+  );
+
   const handleChange = () => {
     clearMessages();
-    setSubmitted(null);
+    // setSubmitted(null);
   };
 
   const handleSubmit = params => {
@@ -52,20 +60,27 @@ export function PhenotypeCorrelations() {
   return (
     <>
       <SearchFormTraits onSubmit={handleSubmit} onChange={handleChange} />
+      {submitted &&
+        messages.map(({ type, content }) => (
+          <Alert variant={type} onClose={clearMessages} dismissible>
+            {content}
+          </Alert>
+        ))}
 
-      <Card className="mb-4">
-        <Card.Header className="bg-egg font-weight-bolder text-center">
-          Heatmap
-        </Card.Header>
-        <Card.Body>
-          <div className="row">
+      <Tabs defaultActiveKey="phenotype-correlations">
+        <Tab
+          eventKey="phenotype-correlations"
+          title="Heatmap"
+          className="p-2 bg-white tab-pane-bordered">
+          
+          <div
+            className="mw-100 my-4"
+            style={{ display: submitted ? 'block' : 'none' }}>
             <Heatmap />
-            {/* <div className="col-md-12 text-left">
-              <pre>{JSON.stringify(phenotypeCorrelations, null, 2)}</pre>
-            </div> */}
           </div>
-        </Card.Body>
-      </Card>
+          {placeholder}
+        </Tab>
+      </Tabs>
     </>
   );
 }

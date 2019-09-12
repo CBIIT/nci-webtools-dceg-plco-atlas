@@ -5,7 +5,7 @@ import { updateVariantLookup, lookupVariants } from '../../services/actions';
 import { Table } from '../controls/table';
 import paginationFactory from 'react-bootstrap-table2-paginator';
 import filterFactory, { textFilter } from 'react-bootstrap-table2-filter';
-import { Spinner, Card } from 'react-bootstrap';
+import { Spinner, Card, Tabs, Tab } from 'react-bootstrap';
 
 export function VariantLookup() {
   const dispatch = useDispatch();
@@ -15,7 +15,8 @@ export function VariantLookup() {
     selectedVariant,
     results,
     message,
-    loading
+    loading,
+    submitted
   } = variantLookup;
 
   const columns = [
@@ -59,36 +60,46 @@ export function VariantLookup() {
     return c;
   });
 
+  const placeholder = (
+    <div style={{ display: submitted ? 'none' : 'block' }}>
+      <p className="h4 text-center my-5">
+        Please select phenotype(s) and input variant to view this table.
+      </p>
+    </div>
+  );
+
+  const placeholderMessage = (
+    <div style={{ display: message.length > 1 ? 'block' : 'none' }}>
+      <p className="h4 text-center mb-5">
+        {message}
+      </p>
+    </div>
+  );
+
+  const setSubmitted = submitted => {
+    dispatch(updateVariantLookup({ submitted }));
+  };
+
+  const handleSubmit = params => {
+    setSubmitted(new Date());
+    dispatch(lookupVariants(selectedPhenotypes, selectedVariant));
+  }
+
   return (
     <>
       <SearchFormTraitsVariant
-        onSubmit={e =>
-          dispatch(lookupVariants(selectedPhenotypes, selectedVariant))
-        }
+        onSubmit={handleSubmit}
       />
 
-      <Card className="mb-4">
-        <Card.Header className="bg-egg font-weight-bolder text-center">
-          Variant-Phenotype(s) Table
-        </Card.Header>
-        <Card.Body>
-          <div className="row text-center">
-            <div className="col-md-12">
-              <h4>{message}</h4>
-            </div>
-            <div
-              className="col-md-12"
-              style={{
-                display:
-                  results.length === 0 && message.length === 0 && !loading
-                    ? 'block'
-                    : 'none'
-              }}>
-              <h4>No Results</h4>
-            </div>
-          </div>
-
-          <div style={{ display: results.length > 0 ? 'block' : 'none' }}>
+      <Tabs defaultActiveKey="variant-lookup">
+        <Tab
+          eventKey="variant-lookup"
+          title="Table"
+          className="p-2 bg-white tab-pane-bordered">
+          
+          <div
+            className="mw-100 my-4"
+            style={{ display: submitted ? 'block' : 'none' }}>
             <Table
               bootstrap4
               keyField="id"
@@ -98,16 +109,17 @@ export function VariantLookup() {
               filter={filterFactory()}
             />
           </div>
-
-          <div
-            className="text-center"
-            style={{ display: loading ? 'block' : 'none' }}>
-            <Spinner animation="border" variant="primary" role="status">
-              <span className="sr-only">Loading...</span>
-            </Spinner>
-          </div>
-        </Card.Body>
-      </Card>
+          {placeholder}
+          {placeholderMessage}
+        </Tab>
+      </Tabs>
+      {/* <div
+        className="text-center"
+        style={{ display: loading ? 'block' : 'none' }}>
+        <Spinner animation="border" variant="primary" role="status">
+          <span className="sr-only">Loading...</span>
+        </Spinner>
+      </div> */}
     </>
   );
 }

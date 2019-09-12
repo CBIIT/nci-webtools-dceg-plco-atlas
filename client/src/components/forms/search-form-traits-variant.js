@@ -103,7 +103,8 @@ export function SearchFormTraitsVariant({ onSubmit }) {
         selectedGender: 'combined',
         results: [],
         message: '',
-        loading: false
+        loading: false,
+        submitted: null
       })
     );
   };
