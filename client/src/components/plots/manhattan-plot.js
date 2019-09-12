@@ -195,16 +195,16 @@ export function ManhattanPlot({
   return (
     <div style={{display: hasData() ? 'block' : 'none'}}>
       <div
-        className="px-2 pt-3"
+        className="px-2 pt-3 small"
         style={{visibility: selectedChromosome ? 'visible' : 'hidden'}}>
         <a className="link" onClick={e => onAllChromosomeSelected && onAllChromosomeSelected()}>All Chromosomes</a>
-        <Icon name="angle-right" className="mx-1" width="6" />
+        <Icon name="angle-right" className="mx-1" width="4" />
         <a className="link" onClick={resetZoom}>
           Chromosome {selectedChromosome}
         </a>
 
         {zoomStack.length ? <>
-            <Icon name="angle-right" className="mx-1" width="6" />
+            <Icon name="angle-right" className="mx-1" width="4" />
             <a className="link" onClick={zoomOut}>Previous Zoom</a>
           </> : null}
       </div>
