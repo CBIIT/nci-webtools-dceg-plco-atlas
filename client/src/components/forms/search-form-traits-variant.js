@@ -24,23 +24,91 @@ export function SearchFormTraitsVariant({ onSubmit }) {
     selectedGender
   } = variantLookup;
 
-  const handleChange = params => {
-    console.log(params);
-    setSelectedPhenotypes(params);
-    // onChange(params);
-  };
+  const containsVal = (arr, val) => {
+    let result = false;
+    for (var i = 0; i < arr.length; i++) {
+      if (arr[i].value === val) {
+        result = true;
+      }
+    }
 
-  // const handleSelect = (value, node, extra) => {
-  //   console.log("value", value);
-  //   console.log("node", node);
-  //   console.log("extra", extra);
-  //   if (node.props.children.length === 0) {
-  //     // setSelectedPhenotype(value);
-  //     console.log("leaf");
-  //   } else {
-  //     console.log("parent", node.props.children);
-  //   }
-  // };
+    return result;
+  }
+
+  const containsAllVals = (arr, vals) => {
+    let result = true;
+    for (var i = 0; i < vals.length; i++) {
+      if (!containsVal(arr, vals[i].value)) {
+        result = false;
+      } 
+    }
+    return result;
+  }
+
+  const removeVal = (arr, val) => {
+    for (var i = 0; i < arr.length; i++) {
+      if (arr[i].value === val) {
+        arr.splice(i, 1);
+      }
+    }
+    return arr;
+  }
+
+  const removeAllVals = (arr, vals) => {
+    for (var i = 0; i < vals.length; i++) {
+      removeVal(arr, vals[i].value);
+    }
+    return arr;
+  }
+
+  const getLeafs = (extra, node, allLeafs = []) => {
+    if(node.children.length === 0){
+      allLeafs.push(node);
+    }else{
+      for (var i = 0; i < node.children.length; i++) {
+        allLeafs = getLeafs(extra, node.children[i].props, allLeafs);
+      }
+    }
+    return allLeafs;
+  }
+
+  const getAllLeafs = (extra) => {
+    let allLeafs = [];
+    let children = extra.triggerNode.props.children.map(child => child.props);
+    if (children.length > 0) {
+      for (var i = 0; i < children.length; i++) {
+        let child = children[i];
+        allLeafs = allLeafs.concat(getLeafs(extra, child));
+      }
+    } else {
+      allLeafs.push(extra.triggerNode.props);
+    }
+
+    return allLeafs;
+  }
+
+  const handleChange = (value, label, extra) => {
+    let values = extra.preValue;
+    let newValues = getAllLeafs(extra);
+    if (containsAllVals(values, newValues) && values.length >= newValues.length) {
+      // remove all leafs if parent is clicked and all leafs were already selected
+      values = removeAllVals(values, newValues);
+    } else {
+      for (var i = 0; i < newValues.length; i++) {
+        if (!containsVal(values, newValues[i].value)) {
+          // only add if value did not exist before
+          values.push(newValues[i]);
+        } else {
+          // remove if new selected leaf was already selected
+          if (newValues.length === 1) {
+            console.log("REMOVE ONE", newValues[i]);
+            values = removeVal(values, newValues[i].value);
+          } 
+        }
+      }
+    }
+    setSelectedPhenotypes(values);
+  };
 
   const setSelectedListType = selectedListType => {
     dispatch(updateVariantLookup({ selectedListType }));
@@ -96,7 +164,7 @@ export function SearchFormTraitsVariant({ onSubmit }) {
   const handleReset = params => {
     dispatch(
       updateVariantLookup({
-        selectedListType: 'alphabetic',
+        selectedListType: 'categorical',
         selectedPhenotype: null,
         selectedPhenotypes: [],
         selectedVariant: '',
@@ -130,11 +198,10 @@ export function SearchFormTraitsVariant({ onSubmit }) {
         }
         value={selectedPhenotypes}
         onChange={handleChange}
-        // onSelect={handleSelect}
         treeNodeFilterProp="label"
         dropdownMatchSelectWidth
         autoClearSearchValue
-        treeCheckable
+        treeDefaultExpandAll
         treeLine
         multiple
         allowClear
