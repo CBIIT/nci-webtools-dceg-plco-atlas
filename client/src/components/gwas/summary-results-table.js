@@ -99,6 +99,9 @@ export function SummaryResultsTable({ updateFunctionRef }) {
     type,
     { page, sizePerPage, sortField, sortOrder }
   ) => {
+    if (!selectedPhenotype || !selectedPhenotype.value)
+      return;
+
     updateTable({
       ...currentParams,
       page,
@@ -126,6 +129,9 @@ export function SummaryResultsTable({ updateFunctionRef }) {
         sizePerPage: pageSize,
         totalSize: resultsCount
       })}
+      defaultSorted={[
+        {dataField: 'p', order: 'asc'}
+      ]}
     />
   );
 }
