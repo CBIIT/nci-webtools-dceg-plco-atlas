@@ -45,30 +45,45 @@ export class ManhattanPlot {
     this.attachEventHandlers(this.canvas);
 
     // allow either selection or zoom, but not both
-    if (config.xAxis.allowSelection)
+    if (config.xAxis.allowSelection) {
       drawSelectionOverlay(config, this.ctx, this.overlayCtx);
-    else if (config.allowZoom) {
+    } else if (config.allowZoom) {
+      config.zoomStack = config.zoomStack || [];
       drawZoomOverlay(config, this.ctx, this.overlayCtx);
       config.setZoomWindow = ev => {
+        config.zoomWindow = ev;
         let { xMin, xMax, yMin, yMax } = ev.bounds;
         config.xAxis.extent = [xMin, xMax];
         config.yAxis.extent = [yMin, yMax];
         this.draw();
+        if (config.onZoom)
+          config.onZoom(config.zoomWindow);
       };
       config.zoomOut = ev => {
-        if (!config.zoomStack.length) {
-          return config.resetZoom();
+        let stack = config.zoomStack;
+        if (stack.length < 2) {
+          config.resetZoom();
+        } else {
+          // stack has the current zoom level, we need the previous level
+          stack.pop();
+          let window = stack[stack.length - 1];
+          config.setZoomWindow(window);
         }
-        const zoom = config.zoomStack.pop();
       };
-
-      config.resetZoom = ev => {
+      config.resetZoom = window => {
         const xData = config.data.map(d => d[config.xAxis.key]);
         const yData = config.data.map(d => d[config.yAxis.key]);
         config.xAxis.extent = config.xAxis.defaultExtent || extent(xData);
         config.yAxis.extent = config.yAxis.defaultExtent || extent(yData);
         config.zoomStack = [];
         this.draw();
+        if (config.onZoom) {
+          const [xMin, xMax] = config.xAxis.extent;
+          const [yMin, yMax] = config.yAxis.extent;
+          config.onZoom({
+            bounds: {xMin, xMax, yMin, yMax}
+          });
+        }
       };
     }
   }
@@ -95,7 +110,6 @@ export class ManhattanPlot {
     const height = canvasHeight - margins.top - margins.bottom;
     const lines = this.config.lines || [];
     config.pointMap = {}; // maps colors to data indexes
-    config.zoomStack = [];
 
     canvas.width = canvasWidth;
     canvas.height = canvasHeight;
@@ -244,8 +258,10 @@ export class ManhattanPlot {
   }
 
   getPointFromEvent({ clientX, clientY, target }) {
+    let ctx = this.hiddenCtx;
+    if (!ctx) return null;
     let { x, y } = viewportToLocalCoordinates(clientX, clientY, target);
-    const [r, g, b, a] = this.hiddenCtx.getImageData(x, y, 1, 1).data;
+    const [r, g, b, a] = ctx.getImageData(x, y, 1, 1).data;
     return a ? this.config.pointMap[rgbToColor(r, g, b)] : null;
   }
 
