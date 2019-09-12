@@ -93,6 +93,10 @@ export function SummaryResults() {
 
   const handleReset = params => {};
 
+  const onAllChromosomeSelected = () => {
+    handleSubmit(selectedPhenotype)
+  }
+
   const onChromosomeSelected = chr => {
     const database = selectedPhenotype.value + '.db';
     const range = ranges.find(r => r.chr === chr);
@@ -191,6 +195,7 @@ export function SummaryResults() {
           className="p-2 bg-white tab-pane-bordered">
           <ManhattanPlot
             onChromosomeSelected={onChromosomeSelected}
+            onAllChromosomeSelected={onAllChromosomeSelected}
             onVariantLookup={handleVariantLookup}
             onZoom={handleZoom}
           />
