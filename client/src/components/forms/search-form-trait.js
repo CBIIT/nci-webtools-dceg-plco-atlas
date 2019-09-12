@@ -105,6 +105,7 @@ export function SearchFormTrait({ onChange, onSubmit }) {
         labelInValue
         // treeCheckable
         multiple
+        placeholder="(Select Phenotype)"
       />
 
       <select

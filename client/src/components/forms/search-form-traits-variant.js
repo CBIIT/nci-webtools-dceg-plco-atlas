@@ -206,6 +206,7 @@ export function SearchFormTraitsVariant({ onSubmit }) {
         multiple
         allowClear
         labelInValue
+        placeholder="(Select Phenotypes)"
       />
 
       <FormControl
