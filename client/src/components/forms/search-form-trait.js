@@ -86,6 +86,7 @@ export function SearchFormTrait({ onChange, onSubmit }) {
 
       <TreeSelect
         className="form-control flex-shrink-auto h-100 p-0 mr-2"
+        dropdownClassName="summary-results"
         style={{ width: '100%' }}
         dropdownStyle={{ maxHeight: 500, overflow: 'auto' }}
         treeData={

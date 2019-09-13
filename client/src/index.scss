@@ -264,10 +264,7 @@ h1 {
   li.filter-node
   > .rc-tree-select-tree-node-content-wrapper {
   color: black !important;
-  // // font-weight: normal !important;
-  //   .disabled {
-  //     color: #ccc !important;
-  //   }
+  // font-weight: normal !important;
 }
 
 // rc-tree-select option parents
@@ -276,3 +273,11 @@ h1 {
   font-weight: bold !important;
   text-decoration: underline !important;
 }
+
+.summary-results 
+.rc-tree-select-tree-node-content-wrapper-close, 
+.summary-results 
+.rc-tree-select-tree-node-content-wrapper-open {
+  cursor: not-allowed !important;
+}
+
