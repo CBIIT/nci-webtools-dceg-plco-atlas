@@ -29,14 +29,19 @@ export function SearchFormTrait({ onChange, onSubmit }) {
   };
 
   const handleChange = params => {
+    console.log("params", params);
+    // only clear selection
     if (params.length === 0) {
       setSelectedPhenotype(params);
     }
   };
 
   const handleSelect = (value, node, extra) => {
+    console.log("value", value);
+    console.log("node", node);
+    console.log("extra", extra);
     // can only select leaf nodes
-    if (node.props.children.length === 0) {
+    if (node.props.children.length === 0 && !node.props.parent) {
       setSelectedPhenotype(value);
       onChange(value);
     }
