@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { Form, InputGroup, Button, Row, Col } from 'react-bootstrap';
+import { FormControl, InputGroup, Button, Row, Col } from 'react-bootstrap';
 import { updateSummaryResults } from '../../services/actions';
 import TreeSelect, { TreeNode } from 'rc-tree-select';
 import 'rc-tree-select/assets/index.css';

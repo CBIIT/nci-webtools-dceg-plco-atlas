@@ -49,7 +49,7 @@ export function SummaryResults() {
 
   const handleChange = () => {
     clearMessages();
-    setSubmitted(null);
+    // setSubmitted(null);
   };
 
   const handleSubmit = params => {
@@ -68,14 +68,13 @@ export function SummaryResults() {
       console.log('not selected');
       return;
     }
-
+    dispatch(drawQQPlot(phenotype));
     dispatch(
       updateSummaryResults({
         manhattanPlotView: 'summary',
         selectedChromosome: null
       })
     );
-    dispatch(drawQQPlot(phenotype));
     dispatch(
       drawManhattanPlot('summary', {
         database: phenotype + '.db',
