@@ -8,6 +8,12 @@ import {
   Col,
   Button
 } from 'react-bootstrap';
+import { 
+  containsVal, 
+  containsAllVals, 
+  removeVal, 
+  removeAllVals,
+  getAllLeafs } from '../controls/tree-select';
 import { updateVariantLookup } from '../../services/actions';
 import TreeSelect, { TreeNode } from 'rc-tree-select';
 import 'rc-tree-select/assets/index.css';
@@ -23,69 +29,6 @@ export function SearchFormTraitsVariant({ onSubmit }) {
     selectedVariant,
     selectedGender
   } = variantLookup;
-
-  const containsVal = (arr, val) => {
-    let result = false;
-    for (var i = 0; i < arr.length; i++) {
-      if (arr[i].value === val) {
-        result = true;
-      }
-    }
-
-    return result;
-  }
-
-  const containsAllVals = (arr, vals) => {
-    let result = true;
-    for (var i = 0; i < vals.length; i++) {
-      if (!containsVal(arr, vals[i].value)) {
-        result = false;
-      } 
-    }
-    return result;
-  }
-
-  const removeVal = (arr, val) => {
-    for (var i = 0; i < arr.length; i++) {
-      if (arr[i].value === val) {
-        arr.splice(i, 1);
-      }
-    }
-    return arr;
-  }
-
-  const removeAllVals = (arr, vals) => {
-    for (var i = 0; i < vals.length; i++) {
-      removeVal(arr, vals[i].value);
-    }
-    return arr;
-  }
-
-  const getLeafs = (extra, node, allLeafs = []) => {
-    if(node.children.length === 0){
-      allLeafs.push(node);
-    }else{
-      for (var i = 0; i < node.children.length; i++) {
-        allLeafs = getLeafs(extra, node.children[i].props, allLeafs);
-      }
-    }
-    return allLeafs;
-  }
-
-  const getAllLeafs = (extra) => {
-    let allLeafs = [];
-    let children = extra.triggerNode.props.children.map(child => child.props);
-    if (children.length > 0) {
-      for (var i = 0; i < children.length; i++) {
-        let child = children[i];
-        allLeafs = allLeafs.concat(getLeafs(extra, child));
-      }
-    } else {
-      allLeafs.push(extra.triggerNode.props);
-    }
-
-    return allLeafs;
-  }
 
   const handleChange = (value, label, extra) => {
     let values = extra.preValue;
