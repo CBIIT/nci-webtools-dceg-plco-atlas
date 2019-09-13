@@ -83,7 +83,9 @@ export function getAllLeafs(extra) {
       allLeafs = allLeafs.concat(getLeafs(extra, child));
     }
   } else {
-    allLeafs.push(extra.triggerNode.props);
+    if (!extra.triggerNode.props.parent) {
+      allLeafs.push(extra.triggerNode.props);
+    }
   }
 
   return allLeafs;

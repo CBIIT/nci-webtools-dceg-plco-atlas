@@ -240,29 +240,39 @@ h1 {
   padding-bottom: 8px !important;
 }
 
+// rc-tree-select disabled options
 .rc-tree-select-tree-treenode-disabled > span,
 .rc-tree-select-tree-treenode-disabled > a,
 .rc-tree-select-tree-treenode-disabled > a span {
   // color: black !important;
 }
 
+// rc-tree-select leaf options
 .rc-tree-select-tree li {
   color: black !important;
   cursor: pointer !important;
 }
 
+// rc-tree-select container
 .rc-tree-select-selection {
   border: none !important;
   box-shadow: none !important;
 }
 
-// .rc-tree-select-tree-checkbox-disabled {
-//   display: none !important;
-// }
-
+// rc-tree-select filtered options
 .rc-tree-select-tree
   li.filter-node
   > .rc-tree-select-tree-node-content-wrapper {
   color: black !important;
-  font-weight: normal !important;
+  // // font-weight: normal !important;
+  //   .disabled {
+  //     color: #ccc !important;
+  //   }
+}
+
+// rc-tree-select option parents
+.rc-tree-select-tree-node-content-wrapper-close,
+.rc-tree-select-tree-node-content-wrapper-open {
+  font-weight: bold !important;
+  text-decoration: underline !important;
 }
