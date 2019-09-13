@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { updateSummaryResults } from '../../services/actions';
+import { updateSummaryResults, updateSummaryResultsTable } from '../../services/actions';
 import { query } from '../../services/query';
 import { Table } from '../controls/table';
 import paginationFactory from 'react-bootstrap-table2-paginator';
 
-export function SummaryResultsTable({ updateFunctionRef }) {
+export function SummaryResultsTable() {
   const dispatch = useDispatch();
   const {
     selectedPhenotype,
@@ -13,32 +13,12 @@ export function SummaryResultsTable({ updateFunctionRef }) {
     results,
     resultsCount,
     page,
-    pageSize
+    pageSize,
+    nlogpMin,
+    nlogpMax,
+    bpMin,
+    bpMax,
   } = useSelector(state => state.summaryResults);
-  const [currentParams, setCurrentParams] = useState({
-    bpMin: undefined,
-    bpMax: undefined,
-    nlogpMin: undefined,
-    nlogpMax: undefined,
-    orderBy: 'p',
-    order: 'asc'
-  });
-
-  const updateResults = results => {
-    dispatch(updateSummaryResults({ results }));
-  };
-
-  const updateResultsCount = resultsCount => {
-    dispatch(updateSummaryResults({ resultsCount }));
-  };
-
-  const updatePage = page => {
-    dispatch(updateSummaryResults({ page }));
-  };
-
-  const updatePageSize = pageSize => {
-    dispatch(updateSummaryResults({ pageSize }));
-  };
 
   const columns = [
     {
@@ -75,47 +55,31 @@ export function SummaryResultsTable({ updateFunctionRef }) {
     }
   ];
 
-  const updateTable = async params => {
-    console.log('called update', params);
-    const { page, pageSize } = params;
-    params.offset = (page - 1) * pageSize;
-    params.limit = pageSize;
-    const response = await query('variants-paginated', params);
-    setCurrentParams({
-      ...currentParams,
-      bpMin: undefined,
-      bpMax: undefined,
-      nlogpMin: undefined,
-      nlogpMax: undefined,
-      ...params
-    });
-    updatePage(page);
-    updatePageSize(pageSize);
-    updateResults(response);
-    updateResultsCount(70000000);
-  };
-
   const handleTableChange = async (
     type,
-    { page, sizePerPage, sortField, sortOrder }
+    { page, sizePerPage: limit, sortField: orderBy, sortOrder: order }
   ) => {
     if (!selectedPhenotype || !selectedPhenotype.value)
       return;
 
-    updateTable({
-      ...currentParams,
-      page,
-      pageSize: sizePerPage,
-      database: selectedPhenotype.value + '.db',
-      chr: selectedChromosome,
-      orderBy: sortField,
-      order: sortOrder
-    });
-  };
+    console.log({order, orderBy, limit, page})
 
-  useEffect(() => {
-    if (updateFunctionRef) updateFunctionRef(updateTable);
-  }, [updateFunctionRef, updateTable]);
+    dispatch(updateSummaryResultsTable({
+      database: selectedPhenotype.value + '.db',
+      offset: limit * (page - 1),
+      chr: selectedChromosome,
+      limit,
+      orderBy,
+      order,
+      nlogpMin,
+      nlogpMax,
+      bpMin,
+      bpMax,
+      order: false,
+    }));
+
+    dispatch(updateSummaryResults({pageSize: limit, page}));
+  };
 
   return (
     <Table

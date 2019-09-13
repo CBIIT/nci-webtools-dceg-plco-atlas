@@ -19,53 +19,41 @@ function getSummary(filepath, params) {
         : stmt.all(params);
 }
 
-function isDefined(e) {
-    return !(/^(null|undefined)$/).test(e);
-}
-
+/**
+ * Params ar
+ * @param {*} filepath
+ * @param {*} params
+ */
 function getVariants(filepath, params) {
-    const stmt = new Database(filepath, {readonly: true}).prepare(
-        `SELECT variant_id, chr, bp, nlog_p FROM variant WHERE
-            chr = :chr
-            ${isDefined(params.bpMin) ? ' AND bp >= :bpMin' : ' '}
-            ${isDefined(params.bpMax) ? ' AND bp <= :bpMax' : ' '}
-            ${isDefined(params.nlogpMin) ? ' AND nlog_p >= :nlogpMin' : ' '}
-            ${isDefined(params.nlogpMax) ? ' AND nlog_p <= :nlogpMax' : ' '}`);
-
-    return params.raw
-        ? getRawResults(stmt, params)
-        : stmt.all(params);
-}
-
-function getVariantsByPage(filepath, params, config) {
-    const coalesce = (condition, value) => isDefined(condition) ? value : '';
+    const isDefined = value => !(/^(null|undefined)$/).test(value);
+    const coalesce = (condition, value) => isDefined(condition) ? value : null;
     const wrapColumnName = name => `"${name}"`;
     const validColumns = [
         'variant_id', 'chr', 'bp', 'snp','a1','a2', 'n',
         'p','nlog_p', 'p_r', 'or', 'or_r', 'q', 'i',
     ];
-
-    // if column names are provided, check each name and wrap in quotes
-    // otherwise, retrieve default columns
-    let columnNames = (config && config.columnNames)
-        ? config.columnNames.filter(c => validColumns.includes(c))
+    const columns = params.columns // given as a comma-separated list
+        ? params.columns.split(',').filter(c => validColumns.includes(c))
         : validColumns;
 
     // filter by id, chr, base position, and -log10(p), if provided
-    let sql = `SELECT ${columnNames.map(wrapColumnName).join(',')} FROM variant
-        WHERE p IS NOT NULL AND ` + [
+    let sql = `
+        SELECT ${columns.map(wrapColumnName).join(',')}
+        FROM variant
+        WHERE ` + [
+            `p IS NOT NULL`,
             coalesce(params.id, `variant_id = :id`),
             coalesce(params.chr, `chr = :chr`),
             coalesce(params.bpMin, `bp >= :bpMin`),
             coalesce(params.bpMax, `bp <= :bpMax`),
-            coalesce(params.nlogpMin, `bp <= :nlogpMin`),
-            coalesce(params.nlogpMax, `bp <= :nlogpMax`),
-        ].filter(str => str.length).join(' AND ');
+            coalesce(params.nlogpMin, `nlog_p >= :nlogpMin`),
+            coalesce(params.nlogpMax, `nlog_p <= :nlogpMax`),
+        ].filter(Boolean).join(' AND ');
 
-    // add counts to results, if required
+    // create count sql based on original query
     let countSql = `SELECT COUNT(*) FROM (${sql})`;
 
-    // adds "order by" to sql, if both order and orderBy are provided
+    // adds "order by" statement, if both order and orderBy are provided
     let { order, orderBy } = params;
     if (order && orderBy) {
         // by default, sort by p-value ascending
@@ -80,29 +68,16 @@ function getVariantsByPage(filepath, params, config) {
     if (params.limit) sql += ' LIMIT :limit ';
     if (params.offset) sql += ' OFFSET :offset ';
 
-    const stmt = new Database(filepath, {readonly: true}).prepare(querySql);
+    // query database
+    const db = new Database(filepath, {readonly: true});
+    const stmt = db.prepare(sql);
     const records = params.raw
         ? getRawResults(stmt, params)
-        : stmt.all(params);
+        : {data: stmt.all(params)};
 
-    if (config.count) {
-        const countStmt = new Database(filepath, {readonly: true}).prepare(countSql);
-        const count = countStmt.all(params);
-        if (params.raw)
-            records.count = count;
-    }
-
-    return records;
-}
-
-function getVariantById(filepath, params) {
-    const stmt = new Database(filepath, {readonly: true}).prepare(
-        `SELECT * FROM variant WHERE variant_id = :id`
-    );
-
-    const records = params.raw
-        ? getRawResults(stmt, params)
-        : stmt.all(params);
+    // add counts if necessary
+    if (params.count)
+        records.count = db.prepare(countSql).pluck().get(params);
 
     return records;
 }
@@ -122,4 +97,4 @@ function getVariant(filepath, params) {
         : stmt.all(params);
 }
 
-module.exports = {getSummary, getVariants, getVariantsByPage, getVariant, getVariantById};
+module.exports = {getSummary, getVariants, getVariant};

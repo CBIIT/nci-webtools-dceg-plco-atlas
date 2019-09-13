@@ -148,11 +148,11 @@ export function ManhattanPlot({
           style: 'width: 300px;',
           content: async data => {
             let point = withKeys(data);
-            const response = await query('variant-by-id', {
+            const response = await query('variants', {
               database: selectedPhenotype.value + '.db',
               id: point.variantId
             });
-            const record = response[0];
+            const record = response.data[0];
             return h('div', { className: '' }, [
               h('div', null, [
                 h('b', null, 'position: '),
