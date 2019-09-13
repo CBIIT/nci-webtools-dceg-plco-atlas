@@ -62,8 +62,10 @@ export function removeAllVals(arr, vals) {
 }
 
 export function getLeafs(extra, node, allLeafs = []) {
-  if(node.children.length === 0){
-    allLeafs.push(node);
+  if(node.children.length === 0) {
+    if (!node.disabled) {
+      allLeafs.push(node);
+    }
   }else{
     for (var i = 0; i < node.children.length; i++) {
       allLeafs = getLeafs(extra, node.children[i].props, allLeafs);
