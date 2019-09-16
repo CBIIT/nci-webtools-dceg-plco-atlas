@@ -7,7 +7,7 @@ const initialState = {
   phenotypes: [],
   phenotypesTree: [],
   summaryResults: {
-    selectedListType: 'alphabetic',
+    selectedListType: 'categorical',
     selectedPhenotype: null,
     selectedChromosome: null,
     selectedPlot: 'manhattan-plot',
@@ -34,7 +34,7 @@ const initialState = {
     updateResultsTable: null
   },
   variantLookup: {
-    selectedListType: 'alphabetic',
+    selectedListType: 'categorical',
     selectedPhenotype: null,
     selectedPhenotypes: [],
     selectedVariant: '',
@@ -46,7 +46,7 @@ const initialState = {
   },
   phenotypeCorrelations: {
     // drawHeatmap: null,
-    selectedListType: 'alphabetic',
+    selectedListType: 'categorical',
     selectedPhenotypes: [],
     selectedGender: 'combined',
     heatmapData: [],

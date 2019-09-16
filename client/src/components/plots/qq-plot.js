@@ -64,6 +64,7 @@ export function QQPlot({ onVariantLookup }) {
     // make sure action occurs on imagemap coord only
     if (e.target && e.target.coords) {
       var variant = e.target.alt.split(',');
+      console.log(variant);
       if (popupTooltipData && variant[0] !== popupTooltipData['point_#']) {
         setHoverTooltipData({
           'p-value': variant[3],
@@ -71,8 +72,10 @@ export function QQPlot({ onVariantLookup }) {
         });
         setHoverTooltipStyle({
           ...hoverTooltipStyle,
-          top: pos.position.y - 70, // computed based on child and parent's height
-          left: pos.position.x - 45, // computed based on child and parent's width
+          top: pos.position.y, 
+          left: pos.position.x + 15, 
+          // top: pos.position.y - 70, // computed based on child and parent's height
+          // left: pos.position.x - 45, // computed based on child and parent's width
           display: 'block'
         });
       }
@@ -108,13 +111,13 @@ export function QQPlot({ onVariantLookup }) {
                 onPositionChanged: newPos => setPos(newPos)
               }}>
               <div style={popupTooltipStyle} className="popup-tooltip shadow">
-                <button
+                {/* <button
                   type="button"
                   className="close popup-tooltip-close"
                   aria-label="Close"
                   onClick={popupMarkerClose}>
                   <span aria-hidden="true">&times;</span>
-                </button>
+                </button> */}
                 {/* <b>id:</b> {popupTooltipData['point_#']} */}
                 <b>position:</b> {popupTooltipData.position}
                 <br />

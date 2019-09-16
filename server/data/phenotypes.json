@@ -2,6 +2,7 @@
     {
         "label": "Test",
         "value": "test",
+        "parent": true,
         "disabled": false,
         "children": [
             {
@@ -24,11 +25,13 @@
     {
         "label": "Anthropometric measures",
         "value": "none_8482",
+        "parent": true,
         "disabled": false,
         "children": [
             {
                 "label": "Height",
                 "value": "none_962",
+                "parent": true,
                 "disabled": false,
                 "children": [
                     {
@@ -46,6 +49,7 @@
             {
                 "label": "Weight",
                 "value": "none_2935",
+                "parent": true,
                 "disabled": false,
                 "children": [
                     {
@@ -81,16 +85,19 @@
         "label": "Cancer",
         "value": "none_8484",
         "disabled": true,
+        "parent": true, 
         "children": [
             {
                 "label": "All cancers",
                 "value": "none_2881",
                 "disabled": true,
+                "parent": true, 
                 "children": [
                     {
                         "label": "By location",
                         "value": "none_7014",
                         "disabled": true,
+                        "parent": true, 
                         "children": [
                             {
                                 "label": "Biliary cancer",
@@ -106,6 +113,7 @@
                                 "label": "Breast cancer",
                                 "value": "none_3416",
                                 "disabled": true,
+                                "parent": true, 
                                 "children": [
                                     {
                                         "label": "Breast cancer (lobular)",
@@ -138,6 +146,7 @@
                                 "label": "Colorectal cancer",
                                 "value": "none_1740",
                                 "disabled": true,
+                                "parent": true, 
                                 "children": [
                                     {
                                         "label": "Colon cancer (distal)",
@@ -185,6 +194,7 @@
                                 "label": "Hematologic malignancies",
                                 "value": "none_3843",
                                 "disabled": true,
+                                "parent": true, 
                                 "children": [
                                     {
                                         "label": "Hodgkin lymphoma",
@@ -222,6 +232,7 @@
                                 "label": "Lung cancer",
                                 "value": "none_1730",
                                 "disabled": true,
+                                "parent": true, 
                                 "children": [
                                     {
                                         "label": "Lung cancer (small cell)",
@@ -249,6 +260,7 @@
                                 "label": "Non-melanoma skin cancer",
                                 "value": "none_6744",
                                 "disabled": true,
+                                "parent": true, 
                                 "children": [
                                     {
                                         "label": "Basal cell only",
@@ -281,6 +293,7 @@
                                 "label": "Prostate cancer",
                                 "value": "none_5934",
                                 "disabled": true,
+                                "parent": true, 
                                 "children": [
                                     {
                                         "label": "Prostate cancer (advanced)",
@@ -308,6 +321,7 @@
                                 "label": "Upper GI cancer",
                                 "value": "none_1685",
                                 "disabled": true,
+                                "parent": true, 
                                 "children": [
                                     {
                                         "label": "Esophageal cancer",
@@ -325,21 +339,25 @@
                                 "label": "By pathology",
                                 "value": "none_9816",
                                 "disabled": true,
+                                "parent": true, 
                                 "children": [
                                     {
                                         "label": "Solid tumors",
                                         "value": "none_2837",
                                         "disabled": true,
+                                        "parent": true, 
                                         "children": [
                                             {
                                                 "label": "Carcinomas",
                                                 "value": "none_217",
                                                 "disabled": true,
+                                                "parent": true, 
                                                 "children": [
                                                     {
                                                         "label": "Adenocarcinomas",
                                                         "value": "none_653",
                                                         "disabled": true,
+                                                        "parent": true, 
                                                         "children": [
                                                             {
                                                                 "label": "Breast (adenocarcinoma)",
@@ -382,6 +400,7 @@
                                                         "label": "Squamous cell cancers",
                                                         "value": "none_9830",
                                                         "disabled": true,
+                                                        "parent": true, 
                                                         "children": [
                                                             {
                                                                 "label": "Esophageal cancer (squamous cell)",
@@ -399,6 +418,7 @@
                                                         "label": "Urothelial cancers",
                                                         "value": "none_9236",
                                                         "disabled": true,
+                                                        "parent": true, 
                                                         "children": [
                                                             {
                                                                 "label": "Bladder cancer (urothelial)",
@@ -416,6 +436,7 @@
                                                         "label": "Sarcomas",
                                                         "value": "none_2678",
                                                         "disabled": true,
+                                                        "parent": true, 
                                                         "children": [
                                                             {
                                                                 "label": "Need to look into",
@@ -428,6 +449,7 @@
                                                         "label": "Neuroendocrine related cancers",
                                                         "value": "none_8325",
                                                         "disabled": true,
+                                                        "parent": true, 
                                                         "children": [
                                                             {
                                                                 "label": "Lung cancer (neuroendocrine)",
@@ -450,6 +472,7 @@
                                                         "label": "Hematologic malignancies",
                                                         "value": "none_9543",
                                                         "disabled": true,
+                                                        "parent": true, 
                                                         "children": [
                                                             {
                                                                 "label": "Hodgkin’s lymphoma",
@@ -472,11 +495,13 @@
                                                         "label": "By risk factor",
                                                         "value": "none_2637",
                                                         "disabled": true,
+                                                        "parent": true, 
                                                         "children": [
                                                             {
                                                                 "label": "Smoking related cancers",
                                                                 "value": "none_8062",
                                                                 "disabled": true,
+                                                                "parent": true, 
                                                                 "children": [
                                                                     {
                                                                         "label": "Lung cancer",
@@ -494,6 +519,7 @@
                                                                 "label": "Obesity related cancers",
                                                                 "value": "none_4368",
                                                                 "disabled": true,
+                                                                "parent": true, 
                                                                 "children": [
                                                                     {
                                                                         "label": "Breast cancer",
@@ -521,6 +547,7 @@
                                                                 "label": "Hormone-related cancers",
                                                                 "value": "none_5782",
                                                                 "disabled": true,
+                                                                "parent": true, 
                                                                 "children": [
                                                                     {
                                                                         "label": "Breast cancer",
@@ -548,6 +575,7 @@
                                                                 "label": "Physical activity related cancers",
                                                                 "value": "none_9189",
                                                                 "disabled": true,
+                                                                "parent": true, 
                                                                 "children": [
                                                                     {
                                                                         "label": "Need to look into",
@@ -560,6 +588,7 @@
                                                                 "label": "Alcohol-related cancers",
                                                                 "value": "none_5314",
                                                                 "disabled": true,
+                                                                "parent": true, 
                                                                 "children": [
                                                                     {
                                                                         "label": "Breast cancer",
@@ -577,11 +606,13 @@
                                                                 "label": "Infection-related cancers",
                                                                 "value": "none_3780",
                                                                 "disabled": true,
+                                                                "parent": true, 
                                                                 "children": [
                                                                     {
                                                                         "label": "H. pylori cancers",
                                                                         "value": "none_4635",
                                                                         "disabled": true,
+                                                                        "parent": true, 
                                                                         "children": [
                                                                             {
                                                                                 "label": "Gastric cancer",
@@ -594,6 +625,7 @@
                                                                         "label": "HPV-related cancers",
                                                                         "value": "none_9767",
                                                                         "disabled": true,
+                                                                        "parent": true, 
                                                                         "children": [
                                                                             {
                                                                                 "label": "Cervical cancer",
@@ -632,6 +664,7 @@
         "label": "Lifestyle factors",
         "value": "none_9856",
         "disabled": true,
+        "parent": true, 
         "children": [
             {
                 "label": "Alcohol consumption",
@@ -642,6 +675,7 @@
                 "label": "Diet",
                 "value": "none_1578",
                 "disabled": true,
+                "parent": true, 
                 "children": [
                     {
                         "label": "Caffeine intake",
@@ -664,6 +698,7 @@
                 "label": "Exercise",
                 "value": "none_3330",
                 "disabled": true,
+                "parent": true, 
                 "children": [
                     {
                         "label": "Flights of stairs",
@@ -716,6 +751,7 @@
                 "label": "Smoking",
                 "value": "none_5080",
                 "disabled": true,
+                "parent": true, 
                 "children": [
                     {
                         "label": "Cigarette smoking status",
@@ -765,6 +801,7 @@
         "label": "Medical conditions",
         "value": "none_9645",
         "disabled": true,
+        "parent": true, 
         "children": [
             {
                 "label": "Arthritis",
@@ -785,6 +822,7 @@
                 "label": "Broken bone",
                 "value": "none_4883",
                 "disabled": true,
+                "parent": true, 
                 "children": [
                     {
                         "label": "Broken arm",
@@ -914,6 +952,7 @@
         "label": "Reproductive factors",
         "value": "none_2736",
         "disabled": true,
+        "parent": true, 
         "children": [
             {
                 "label": "Age of menarche",
@@ -936,6 +975,7 @@
         "label": "Mortality",
         "value": "none_4085",
         "disabled": true,
+        "parent": true, 
         "children": [
             {
                 "label": "All-cause mortality",

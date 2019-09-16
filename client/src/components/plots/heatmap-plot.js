@@ -309,13 +309,13 @@ export function Heatmap() {
                 // onPositionChanged: newPos => setPos(newPos)
               }}> */}
             <div style={popupTooltipStyle} className="popup-tooltip shadow">
-              <button
+              {/* <button
                 type="button"
                 className="close popup-tooltip-close"
                 aria-label="Close"
                 onClick={popupMarkerClose}>
                 <span aria-hidden="true">&times;</span>
-              </button>
+              </button> */}
               <b>Phenotype X:</b> <a href="/">{popupTooltipData.phenotypeX}</a>
               <br />
               <b>Phenotype Y:</b> <a href="/">{popupTooltipData.phenotypeY}</a>

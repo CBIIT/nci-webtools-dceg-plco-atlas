@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { Form, InputGroup, Button, Row, Col } from 'react-bootstrap';
+import { FormControl, InputGroup, Button, Row, Col } from 'react-bootstrap';
 import { updateSummaryResults } from '../../services/actions';
 import TreeSelect, { TreeNode } from 'rc-tree-select';
 import 'rc-tree-select/assets/index.css';
@@ -29,14 +29,19 @@ export function SearchFormTrait({ onChange, onSubmit }) {
   };
 
   const handleChange = params => {
+    console.log("params", params);
+    // only clear selection
     if (params.length === 0) {
       setSelectedPhenotype(params);
     }
   };
 
   const handleSelect = (value, node, extra) => {
+    console.log("value", value);
+    console.log("node", node);
+    console.log("extra", extra);
     // can only select leaf nodes
-    if (node.props.children.length === 0) {
+    if (node.props.children.length === 0 && !node.props.parent) {
       setSelectedPhenotype(value);
       onChange(value);
     }
@@ -45,7 +50,7 @@ export function SearchFormTrait({ onChange, onSubmit }) {
   const handleReset = params => {
     dispatch(
       updateSummaryResults({
-        selectedListType: 'alphabetic',
+        selectedListType: 'categorical',
         selectedPhenotype: null,
         selectedChromosome: null,
         selectedPlot: 'manhattan-plot',
@@ -86,6 +91,7 @@ export function SearchFormTrait({ onChange, onSubmit }) {
 
       <TreeSelect
         className="form-control flex-shrink-auto h-100 p-0 mr-2"
+        dropdownClassName="summary-results"
         style={{ width: '100%' }}
         dropdownStyle={{ maxHeight: 500, overflow: 'auto' }}
         treeData={
@@ -99,11 +105,13 @@ export function SearchFormTrait({ onChange, onSubmit }) {
         treeNodeFilterProp="label"
         dropdownMatchSelectWidth
         autoClearSearchValue
+        treeDefaultExpandAll
         treeLine
         allowClear
         labelInValue
         // treeCheckable
         multiple
+        placeholder="(Select Phenotype)"
       />
 
       <select

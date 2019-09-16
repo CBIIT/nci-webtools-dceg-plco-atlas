@@ -87,9 +87,7 @@ export function VariantLookup() {
 
   return (
     <>
-      <SearchFormTraitsVariant
-        onSubmit={handleSubmit}
-      />
+      <SearchFormTraitsVariant onSubmit={handleSubmit} />
 
       <Tabs defaultActiveKey="variant-lookup">
         <Tab

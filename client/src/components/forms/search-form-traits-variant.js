@@ -8,6 +8,12 @@ import {
   Col,
   Button
 } from 'react-bootstrap';
+import { 
+  containsVal, 
+  containsAllVals, 
+  removeVal, 
+  removeAllVals,
+  getAllLeafs } from '../controls/tree-select';
 import { updateVariantLookup } from '../../services/actions';
 import TreeSelect, { TreeNode } from 'rc-tree-select';
 import 'rc-tree-select/assets/index.css';
@@ -24,23 +30,28 @@ export function SearchFormTraitsVariant({ onSubmit }) {
     selectedGender
   } = variantLookup;
 
-  const handleChange = params => {
-    console.log(params);
-    setSelectedPhenotypes(params);
-    // onChange(params);
+  const handleChange = (value, label, extra) => {
+    let values = extra.preValue;
+    let newValues = getAllLeafs(extra);
+    if (containsAllVals(values, newValues) && values.length >= newValues.length) {
+      // remove all leafs if parent is clicked and all leafs were already selected
+      values = removeAllVals(values, newValues);
+    } else {
+      for (var i = 0; i < newValues.length; i++) {
+        if (!containsVal(values, newValues[i].value)) {
+          // only add if value did not exist before
+          values.push(newValues[i]);
+        } else {
+          // remove if new selected leaf was already selected
+          if (newValues.length === 1) {
+            console.log("REMOVE ONE", newValues[i]);
+            values = removeVal(values, newValues[i].value);
+          } 
+        }
+      }
+    }
+    setSelectedPhenotypes(values);
   };
-
-  // const handleSelect = (value, node, extra) => {
-  //   console.log("value", value);
-  //   console.log("node", node);
-  //   console.log("extra", extra);
-  //   if (node.props.children.length === 0) {
-  //     // setSelectedPhenotype(value);
-  //     console.log("leaf");
-  //   } else {
-  //     console.log("parent", node.props.children);
-  //   }
-  // };
 
   const setSelectedListType = selectedListType => {
     dispatch(updateVariantLookup({ selectedListType }));
@@ -96,7 +107,7 @@ export function SearchFormTraitsVariant({ onSubmit }) {
   const handleReset = params => {
     dispatch(
       updateVariantLookup({
-        selectedListType: 'alphabetic',
+        selectedListType: 'categorical',
         selectedPhenotype: null,
         selectedPhenotypes: [],
         selectedVariant: '',
@@ -130,15 +141,15 @@ export function SearchFormTraitsVariant({ onSubmit }) {
         }
         value={selectedPhenotypes}
         onChange={handleChange}
-        // onSelect={handleSelect}
         treeNodeFilterProp="label"
         dropdownMatchSelectWidth
         autoClearSearchValue
-        treeCheckable
+        treeDefaultExpandAll
         treeLine
         multiple
         allowClear
         labelInValue
+        placeholder="(Select Phenotypes)"
       />
 
       <FormControl
