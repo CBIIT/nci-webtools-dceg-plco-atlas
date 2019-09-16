@@ -106,7 +106,8 @@ export function VariantLookup() {
               filter={filterFactory()}
               pagination={paginationFactory({
                 paginationTotalRenderer: paginationText,
-                showTotal: true,
+                sizePerPageList: [10, 25, 50, 100],
+                showTotal: results.length > 0,
               })}
             />
           </div>

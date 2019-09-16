@@ -91,8 +91,9 @@ export function SummaryResultsTable() {
         page,
         sizePerPage: pageSize,
         totalSize: resultsCount,
-        showTotal: true,
+        showTotal: results.length > 0,
         paginationTotalRenderer: paginationText,
+        sizePerPageList: [10, 25, 50, 100],
       })}
       defaultSorted={[
         {dataField: 'p', order: 'asc'}

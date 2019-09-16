@@ -9,6 +9,7 @@ export const defaultProps = {
     striped: true,
     condensed: true,
     className: 'table-borderless',
+    noDataIndication: () => <div>No data is available</div>
 }
 
 export const paginationText = (from, to, size) => {
