@@ -19,65 +19,65 @@ function getSummary(filepath, params) {
         : stmt.all(params);
 }
 
-function isDefined(e) {
-    return !(/^(null|undefined)$/).test(e);
-}
-
+/**
+ * Params ar
+ * @param {*} filepath
+ * @param {*} params
+ */
 function getVariants(filepath, params) {
-    const stmt = new Database(filepath, {readonly: true}).prepare(
-        `SELECT variant_id, chr, bp, nlog_p FROM variant WHERE
-            chr = :chr
-            ${isDefined(params.bpMin) ? ' AND bp >= :bpMin' : ' '}
-            ${isDefined(params.bpMax) ? ' AND bp <= :bpMax' : ' '}
-            ${isDefined(params.nlogpMin) ? ' AND nlog_p >= :nlogpMin' : ' '}
-            ${isDefined(params.nlogpMax) ? ' AND nlog_p <= :nlogpMax' : ' '}`);
+    const isDefined = value => !(/^(null|undefined)$/).test(value);
+    const coalesce = (condition, value) => isDefined(condition) ? value : null;
+    const wrapColumnName = name => `"${name}"`;
+    const validColumns = [
+        'variant_id', 'chr', 'bp', 'snp','a1','a2', 'n',
+        'p','nlog_p', 'p_r', 'or', 'or_r', 'q', 'i',
+    ];
+    const columns = params.columns // given as a comma-separated list
+        ? params.columns.split(',').filter(c => validColumns.includes(c))
+        : validColumns;
 
-    return params.raw
-        ? getRawResults(stmt, params)
-        : stmt.all(params);
-}
+    // filter by id, chr, base position, and -log10(p), if provided
+    let sql = `
+        SELECT ${columns.map(wrapColumnName).join(',')}
+        FROM variant
+        WHERE ` + [
+            `p IS NOT NULL`,
+            coalesce(params.id, `variant_id = :id`),
+            coalesce(params.chr, `chr = :chr`),
+            coalesce(params.bpMin, `bp >= :bpMin`),
+            coalesce(params.bpMax, `bp <= :bpMax`),
+            coalesce(params.nlogpMin, `nlog_p >= :nlogpMin`),
+            coalesce(params.nlogpMax, `nlog_p <= :nlogpMax`),
+        ].filter(Boolean).join(' AND ');
 
-function getVariantsByPage(filepath, params) {
-    const sql = `SELECT * FROM variant
-        WHERE p IS NOT NULL
-        ${isDefined(params.chr) ? ' AND chr = :chr' : ' '}
-        ${isDefined(params.bpMin) ? ' AND bp >= :bpMin' : ' '}
-        ${isDefined(params.bpMax) ? ' AND bp <= :bpMax' : ' '}
-        ${isDefined(params.nlogpMin) ? ' AND nlog_p >= :nlogpMin' : ' '}
-        ${isDefined(params.nlogpMax) ? ' AND nlog_p <= :nlogpMax' : ' '}`;
+    // create count sql based on original query
+    let countSql = `SELECT COUNT(*) FROM (${sql})`;
 
-    if (params.count) {
-        const countSql = `SELECT COUNT(*) FROM (${sql})`;
-        const countStmt = new Database(filepath, {readonly: true}).prepare(countSql);
-        const count = countStmt.all(params);
-        return count;
-    } else {
-        const orderBy = ['chr', 'bp', 'snp', 'p'].includes(params.orderBy)
-            ? params.orderBy
-            : 'p';
-        const order = ['asc', 'desc'].includes(params.order)
-            ? params.order
-            : 'asc';
-        const querySql = `${sql}
-            ORDER BY "${orderBy}" ${order}
-            LIMIT :limit
-            OFFSET :offset`;
-        const stmt = new Database(filepath, {readonly: true}).prepare(querySql);
-        const records = params.raw
-            ? getRawResults(stmt, params)
-            : stmt.all(params);
-        return records;
+    // adds "order by" statement, if both order and orderBy are provided
+    let { order, orderBy } = params;
+    if (order && orderBy) {
+        // by default, sort by p-value ascending
+        if (!['asc', 'desc'].includes(order))
+            order = 'asc';
+        if (!validColumns.includes(orderBy))
+            orderBy = 'p';
+        sql += ` ORDER BY "${orderBy}" ${order} `;
     }
-}
 
-function getVariantById(filepath, params) {
-    const stmt = new Database(filepath, {readonly: true}).prepare(
-        `SELECT * FROM variant WHERE variant_id = :id`
-    );
+    // adds limit and offset, if provided
+    if (params.limit) sql += ' LIMIT :limit ';
+    if (params.offset) sql += ' OFFSET :offset ';
 
+    // query database
+    const db = new Database(filepath, {readonly: true});
+    const stmt = db.prepare(sql);
     const records = params.raw
         ? getRawResults(stmt, params)
-        : stmt.all(params);
+        : {data: stmt.all(params)};
+
+    // add counts if necessary
+    if (params.count)
+        records.count = db.prepare(countSql).pluck().get(params);
 
     return records;
 }
@@ -97,4 +97,4 @@ function getVariant(filepath, params) {
         : stmt.all(params);
 }
 
-module.exports = {getSummary, getVariants, getVariantsByPage, getVariant, getVariantById};
+module.exports = {getSummary, getVariants, getVariant};

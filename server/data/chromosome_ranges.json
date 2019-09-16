@@ -2,145 +2,145 @@
     {
         "chr": 1,
         "bp_min": 0,
-        "bp_max": 248956422,
-        "max_bp_abs": 248956422
+        "bp_max": 249698942,
+        "max_bp_abs": 249698942
     },
     {
         "chr": 2,
         "bp_min": 0,
-        "bp_max": 242193529,
-        "max_bp_abs": 491149951
+        "bp_max": 242508799,
+        "max_bp_abs": 492207741
     },
     {
         "chr": 3,
         "bp_min": 0,
-        "bp_max": 198295559,
-        "max_bp_abs": 689445510
+        "bp_max": 198450956,
+        "max_bp_abs": 690658697
     },
     {
         "chr": 4,
         "bp_min": 0,
-        "bp_max": 190214555,
-        "max_bp_abs": 879660065
+        "bp_max": 190424264,
+        "max_bp_abs": 881082961
     },
     {
         "chr": 5,
         "bp_min": 0,
-        "bp_max": 181538259,
-        "max_bp_abs": 1061198324
+        "bp_max": 181630948,
+        "max_bp_abs": 1062713909
     },
     {
         "chr": 6,
         "bp_min": 0,
         "bp_max": 170805979,
-        "max_bp_abs": 1232004303
+        "max_bp_abs": 1233519888
     },
     {
         "chr": 7,
         "bp_min": 0,
         "bp_max": 159345973,
-        "max_bp_abs": 1391350276
+        "max_bp_abs": 1392865861
     },
     {
         "chr": 8,
         "bp_min": 0,
         "bp_max": 145138636,
-        "max_bp_abs": 1536488912
+        "max_bp_abs": 1538004497
     },
     {
         "chr": 9,
         "bp_min": 0,
-        "bp_max": 138394717,
-        "max_bp_abs": 1674883629
+        "bp_max": 138688728,
+        "max_bp_abs": 1676693225
     },
     {
         "chr": 10,
         "bp_min": 0,
         "bp_max": 133797422,
-        "max_bp_abs": 1808681051
+        "max_bp_abs": 1810490647
     },
     {
         "chr": 11,
         "bp_min": 0,
-        "bp_max": 135086622,
-        "max_bp_abs": 1943767673
+        "bp_max": 135186938,
+        "max_bp_abs": 1945677585
     },
     {
         "chr": 12,
         "bp_min": 0,
         "bp_max": 133275309,
-        "max_bp_abs": 2077042982
+        "max_bp_abs": 2078952894
     },
     {
         "chr": 13,
         "bp_min": 0,
         "bp_max": 114364328,
-        "max_bp_abs": 2191407310
+        "max_bp_abs": 2193317222
     },
     {
         "chr": 14,
         "bp_min": 0,
-        "bp_max": 107043718,
-        "max_bp_abs": 2298451028
+        "bp_max": 108136338,
+        "max_bp_abs": 2301453560
     },
     {
         "chr": 15,
         "bp_min": 0,
-        "bp_max": 101991189,
-        "max_bp_abs": 2400442217
+        "bp_max": 102439437,
+        "max_bp_abs": 2403892997
     },
     {
         "chr": 16,
         "bp_min": 0,
-        "bp_max": 90338345,
-        "max_bp_abs": 2490780562
+        "bp_max": 92211104,
+        "max_bp_abs": 2496104101
     },
     {
         "chr": 17,
         "bp_min": 0,
-        "bp_max": 83257441,
-        "max_bp_abs": 2574038003
+        "bp_max": 83836422,
+        "max_bp_abs": 2579940523
     },
     {
         "chr": 18,
         "bp_min": 0,
         "bp_max": 80373285,
-        "max_bp_abs": 2654411288
+        "max_bp_abs": 2660313808
     },
     {
         "chr": 19,
         "bp_min": 0,
         "bp_max": 58617616,
-        "max_bp_abs": 2713028904
+        "max_bp_abs": 2718931424
     },
     {
         "chr": 20,
         "bp_min": 0,
         "bp_max": 64444167,
-        "max_bp_abs": 2777473071
+        "max_bp_abs": 2783375591
     },
     {
         "chr": 21,
         "bp_min": 0,
         "bp_max": 46709983,
-        "max_bp_abs": 2824183054
+        "max_bp_abs": 2830085574
     },
     {
         "chr": 22,
         "bp_min": 0,
-        "bp_max": 50818468,
-        "max_bp_abs": 2875001522
+        "bp_max": 51857516,
+        "max_bp_abs": 2881943090
     },
     {
         "chr": 23,
         "bp_min": 0,
         "bp_max": 156040895,
-        "max_bp_abs": 3031042417
+        "max_bp_abs": 3037983985
     },
     {
         "chr": 24,
         "bp_min": 0,
-        "bp_max": 57227415,
-        "max_bp_abs": 3088269832
+        "bp_max": 57264655,
+        "max_bp_abs": 3095248640
     }
 ]

@@ -36,11 +36,15 @@ export function fetchRanges() {
 export function updateSummaryResultsTable(params) {
   return async function(dispatch) {
     dispatch(updateSummaryResults({ loading: true }));
-    const results = await query('variants-paginated', params);
-    if (!results.error)
-      dispatch(updateSummaryResults({ results, loading: false }));
+    const response = await query('variants', params);
+    if (!response.error) {
+      let data = {results: response.data};
+      if (response.count)
+        data.resultsCount = response.count;
+      dispatch(updateSummaryResults(data));
+    }
     dispatch(updateSummaryResults({ loading: false }));
-    return results;
+    return response;
   };
 }
 

@@ -24,7 +24,8 @@ export function SummaryResults() {
     ranges,
     messages,
     page,
-    pageSize
+    pageSize,
+    resultsCount,
   } = useSelector(state => state.summaryResults);
 
   const setSubmitted = submitted => {
@@ -77,20 +78,30 @@ export function SummaryResults() {
     dispatch(
       updateSummaryResults({
         manhattanPlotView: 'summary',
-        selectedChromosome: null
+        selectedChromosome: null,
+        nlogpMin: null,
+        nlogpMax: null,
+        bpMin: null,
+        bpMax: null,
+        results: [],
+        resultsCount: null,
       })
     );
     dispatch(
       drawManhattanPlot('summary', {
         database: phenotype + '.db',
-        nlogpMin: 3
+        nlogpMin: 3,
       })
     );
     dispatch(
       updateSummaryResultsTable({
         database: phenotype + '.db',
         offset: (page - 1) * pageSize,
-        limit: pageSize
+        limit: pageSize,
+        columns: ['chr', 'bp', 'snp', 'a1', 'a2', 'or', 'p'],
+        count: true,
+        orderBy: 'p',
+        order: 'asc',
       })
     );
   };
@@ -130,14 +141,23 @@ export function SummaryResults() {
 
   const onChromosomeSelected = chr => {
     const database = selectedPhenotype.value + '.db';
-    const range = ranges.find(r => r.chr === chr);
     const page = 1;
     const pageSize = 10;
+    const range = ranges.find(r => r.chr === chr);
+    const bpRange = {
+      bpMin: range.bp_min,
+      bpMax: range.bp_max,
+    };
 
     dispatch(
       updateSummaryResults({
         manhattanPlotView: 'variants',
-        selectedChromosome: chr
+        selectedChromosome: chr,
+        page,
+        pageSize,
+        nlogpMin: 2,
+        nlogpMax: null,
+        ...bpRange,
       })
     );
 
@@ -146,16 +166,8 @@ export function SummaryResults() {
         database,
         chr,
         nlogpMin: 2,
-        bpMin: range.bp_min,
-        bpMax: range.bp_max
-      })
-    );
-
-    dispatch(
-      updateSummaryResults({
-        selectedChromsome: chr,
-        page,
-        pageSize
+        ...bpRange,
+        columns: ['variant_id', 'chr', 'bp', 'nlog_p']
       })
     );
 
@@ -163,10 +175,13 @@ export function SummaryResults() {
       updateSummaryResultsTable({
         database,
         chr,
+        ...bpRange,
         offset: (page - 1) * pageSize,
         limit: pageSize,
         orderBy: 'p',
-        order: 'asc'
+        order: 'asc',
+        nlogpMin: 2,
+        count: true,
       })
     );
   };
@@ -177,16 +192,31 @@ export function SummaryResults() {
     const page = 1;
     const pageSize = 10;
 
+    let params = {
+      bpMin: bounds.xMin,
+      bpMax: bounds.xMax,
+      nlogpMin: bounds.yMin,
+      nlogpMax: bounds.yMax,
+    };
+
+    dispatch(
+      updateSummaryResults({
+        page,
+        pageSize,
+        ...params,
+      })
+    );
+
     dispatch(
       updateSummaryResultsTable({
         database,
         chr,
         offset: (page - 1) * pageSize,
         limit: pageSize,
-        bpMin: bounds.xMin,
-        bpMax: bounds.xMax,
-        nlogpMin: bounds.yMin,
-        nlogpMax: bounds.yMax
+        orderBy: 'p',
+        order: 'asc',
+        count: true,
+        ...params
       })
     );
   };

@@ -7,8 +7,11 @@ export const root = window.location.pathname.replace(/\/+$/, '');
  */
 function asQueryString(obj) {
   const query = [];
-  for (let key in obj)
-    query.push([key, obj[key]].map(encodeURIComponent).join('='));
+  for (let key in obj) {
+    let value = obj[key];
+    if (![undefined, null, false].includes(value))
+      query.push([key, value].map(encodeURIComponent).join('='));
+  }
   return '?' + query.join('&');
 }
 

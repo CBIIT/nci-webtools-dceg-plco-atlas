@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { SearchFormTraitsVariant } from '../forms/search-form-traits-variant';
 import { updateVariantLookup, lookupVariants } from '../../services/actions';
-import { Table } from '../controls/table';
+import { Table, paginationText } from '../controls/table';
 import paginationFactory from 'react-bootstrap-table2-paginator';
 import filterFactory, { textFilter } from 'react-bootstrap-table2-filter';
 import { Spinner, Card, Tabs, Tab } from 'react-bootstrap';
@@ -110,7 +110,7 @@ export function VariantLookup() {
           eventKey="variant-lookup"
           title="Table"
           className="p-2 bg-white tab-pane-bordered">
-          
+
           <div
             className="mw-100 my-4"
             style={{ display: submitted ? 'block' : 'none' }}>
@@ -119,8 +119,11 @@ export function VariantLookup() {
               keyField="id"
               data={results}
               columns={columns}
-              pagination={paginationFactory()}
               filter={filterFactory()}
+              pagination={paginationFactory({
+                paginationTotalRenderer: paginationText,
+                showTotal: true,
+              })}
             />
           </div>
           {placeholder}

@@ -148,11 +148,11 @@ export function ManhattanPlot({
           style: 'width: 300px;',
           content: async data => {
             let point = withKeys(data);
-            const response = await query('variant-by-id', {
+            const response = await query('variants', {
               database: selectedPhenotype.value + '.db',
               id: point.variantId
             });
-            const record = response[0];
+            const record = response.data[0];
             return h('div', { className: '' }, [
               h('div', null, [
                 h('b', null, 'position: '),
@@ -195,16 +195,16 @@ export function ManhattanPlot({
   return (
     <div style={{display: hasData() ? 'block' : 'none'}}>
       <div
-        className="px-2 pt-3"
+        className="px-2 pt-3 small"
         style={{visibility: selectedChromosome ? 'visible' : 'hidden'}}>
         <a className="link" onClick={e => onAllChromosomeSelected && onAllChromosomeSelected()}>All Chromosomes</a>
-        <Icon name="angle-right" className="mx-1" width="6" />
+        <Icon name="angle-right" className="mx-1" width="4" />
         <a className="link" onClick={resetZoom}>
           Chromosome {selectedChromosome}
         </a>
 
         {zoomStack.length ? <>
-            <Icon name="angle-right" className="mx-1" width="6" />
+            <Icon name="angle-right" className="mx-1" width="4" />
             <a className="link" onClick={zoomOut}>Previous Zoom</a>
           </> : null}
       </div>
