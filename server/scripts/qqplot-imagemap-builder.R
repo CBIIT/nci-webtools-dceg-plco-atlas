@@ -39,17 +39,12 @@ print.imagemap <- function(x,...){
 }
 
 createPage <- function(im, file='', lambdaGC='0.0', sampleSize='0', imgTags=list()){
-  # out <- paste("<html><head><title>",im$title,"</title></head>\n",sep='')
-  # out <- c(out,"<body>\n")
   out <- ""
   out <- c(out, buildIM(im, imgTags, lambdaGC, sampleSize))
-  # out <- c(out,"</body></html>\n")
   cat(out,file=file,sep='')
 }
 
 buildIM <- function(im, imgTags=list(), lambdaGC, sampleSize){
-  # out <- paste("<img src=\"",paste("assets/images/qq-plots/",im$Filename,".png",sep=''),"\" alt=\"QQ-plot of selected trait","\" useMap=\"#",im$Filename,"\" ",moHTML(imgTags)," >\n",sep='')
-  # out <- c(out,paste("<map name=\"",im$Filename,"\">\n",sep=''))
   out <- "{\n"
   out <- c(out, paste0("\"lambdaGC\": \"", lambdaGC, "\",\n"))
   out <- c(out, paste0("\"sampleSize\": \"", sampleSize, "\",\n"))
@@ -123,7 +118,7 @@ toHTML.imagemap <- function(ob,im){
     out <- c(out,toHTML(region,ob))
   }
   out <- c(out,"</map>\n")
-  
+
   out
 }
 
@@ -147,10 +142,7 @@ toHTML.imCircle <- function(ob,im){
 toHTML.imRect <- function(ob,im){
   xycorns <- usr2png(rbind(c(ob$xleft,ob$ytop),c(ob$xright,ob$ybottom)),im)
   coords <- paste(xycorns[1,1],xycorns[2,2],xycorns[2,1],xycorns[1,2],sep=",")
-  # line <- paste("<area shape=\"rect\" coords=\"",coords,"\" ",sep='')
-  # line <- paste(line, moHTML(ob$extra), " onClick={e => clickPoint(e)} />\n",sep='')
   line <- paste0("{ \"shape\": \"rect\", ", "\"coords\": \"", coords,"\", ", moHTML(ob$extra), " }")
-  # line <- paste(line, moHTML(ob$extra), " onClick={e => clickPoint(e)} />\n",sep='')
   line
 }
 

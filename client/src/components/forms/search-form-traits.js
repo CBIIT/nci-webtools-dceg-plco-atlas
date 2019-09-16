@@ -51,7 +51,6 @@ export function SearchFormTraits({ onChange, onSubmit, onReset }) {
         } else {
           // remove if new selected leaf was already selected
           if (newValues.length === 1) {
-            console.log("REMOVE ONE", newValues[i]);
             values = removeVal(values, newValues[i].value);
           } 
         }
@@ -90,8 +89,6 @@ export function SearchFormTraits({ onChange, onSubmit, onReset }) {
           treeNodeFilterProp="label"
           dropdownMatchSelectWidth
           autoClearSearchValue
-          // treeCheckable={selectedListType === 'categorical' ? true : false}
-          // treeCheckStrictly
           treeDefaultExpandAll
           treeLine
           multiple

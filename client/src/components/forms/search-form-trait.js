@@ -77,7 +77,6 @@ export function SearchFormTrait({ onChange, onSubmit, onReset }) {
         treeLine
         allowClear
         labelInValue
-        // treeCheckable
         multiple
         placeholder="(Select Phenotype)"
       />
