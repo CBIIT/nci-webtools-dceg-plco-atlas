@@ -11,7 +11,7 @@ import {
 import TreeSelect, { TreeNode } from 'rc-tree-select';
 import 'rc-tree-select/assets/index.css';
 
-export function SearchFormTraits({ onChange, onSubmit }) {
+export function SearchFormTraits({ onChange, onSubmit, onReset }) {
   const dispatch = useDispatch();
   const phenotypes = useSelector(state => state.phenotypes);
   const phenotypesTree = useSelector(state => state.phenotypesTree);
@@ -59,21 +59,6 @@ export function SearchFormTraits({ onChange, onSubmit }) {
     }
     setSelectedPhenotypes(values);
     onChange(values);
-  };
-
-  const handleReset = params => {
-    dispatch(
-      updatePhenotypeCorrelations({
-        selectedListType: 'categorical',
-        selectedPhenotypes: [],
-        selectedGender: 'combined',
-        heatmapData: [],
-        results: [],
-        loading: false,
-        submitted: null,
-        messages: []
-      })
-    );
   };
 
   const alphabetizedPhenotypes = [...phenotypes].sort((a, b) =>
@@ -142,7 +127,7 @@ export function SearchFormTraits({ onChange, onSubmit }) {
           variant="secondary"
           onClick={e => {
             e.preventDefault();
-            handleReset(e);
+            onReset(e);
           }}>
           Reset
         </Button>

@@ -5,7 +5,7 @@ import { updateSummaryResults } from '../../services/actions';
 import TreeSelect, { TreeNode } from 'rc-tree-select';
 import 'rc-tree-select/assets/index.css';
 
-export function SearchFormTrait({ onChange, onSubmit }) {
+export function SearchFormTrait({ onChange, onSubmit, onReset }) {
   const dispatch = useDispatch();
   const phenotypes = useSelector(state => state.phenotypes);
   const phenotypesTree = useSelector(state => state.phenotypesTree);
@@ -29,7 +29,6 @@ export function SearchFormTrait({ onChange, onSubmit }) {
   };
 
   const handleChange = params => {
-    console.log("params", params);
     // only clear selection
     if (params.length === 0) {
       setSelectedPhenotype(params);
@@ -37,42 +36,11 @@ export function SearchFormTrait({ onChange, onSubmit }) {
   };
 
   const handleSelect = (value, node, extra) => {
-    console.log("value", value);
-    console.log("node", node);
-    console.log("extra", extra);
     // can only select leaf nodes
     if (node.props.children.length === 0 && !node.props.parent) {
       setSelectedPhenotype(value);
       onChange(value);
     }
-  };
-
-  const handleReset = params => {
-    dispatch(
-      updateSummaryResults({
-        selectedListType: 'categorical',
-        selectedPhenotype: null,
-        selectedChromosome: null,
-        selectedPlot: 'manhattan-plot',
-        selectedManhattanPlotType: 'aggregate',
-        manhattanPlotData: {},
-        manhattanPlotView: '',
-        ranges: [],
-        results: [],
-        resultsCount: 0,
-        page: 1,
-        pageSize: 10,
-        messages: [],
-        qqplotSrc: '',
-        areaItems: [],
-        lambdaGC: '',
-        sampleSize: '',
-        submitted: null,
-        loading: false,
-        drawManhattanPlot: null,
-        updateResultsTable: null
-      })
-    );
   };
 
   const alphabetizedPhenotypes = [...phenotypes].sort((a, b) =>
@@ -140,7 +108,7 @@ export function SearchFormTrait({ onChange, onSubmit }) {
         variant="secondary"
         onClick={e => {
           e.preventDefault();
-          handleReset(e);
+          onReset(e);
         }}>
         Reset
       </Button>

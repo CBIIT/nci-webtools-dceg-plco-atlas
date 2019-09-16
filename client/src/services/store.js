@@ -2,6 +2,7 @@ import { createStore, applyMiddleware, compose } from 'redux';
 import { rootReducer } from './reducers';
 import { fetchRanges } from './actions';
 import ReduxThunk from 'redux-thunk';
+import { NavItem } from 'react-bootstrap';
 
 const initialState = {
   phenotypes: [],
@@ -27,7 +28,8 @@ const initialState = {
     submitted: null,
     loading: false,
     drawManhattanPlot: null,
-    updateResultsTable: null
+    updateResultsTable: null,
+    popupTooltipData: null
   },
   variantLookup: {
     selectedListType: 'categorical',
@@ -49,7 +51,8 @@ const initialState = {
     results: [],
     loading: false,
     submitted: null,
-    messages: []
+    messages: [],
+    popupTooltipData: null
   }
 };
 
