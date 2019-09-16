@@ -63,7 +63,6 @@ export function drawManhattanPlot(plotType, params) {
 export function drawQQPlot(phenotype) {
   return async function(dispatch) {
     dispatch(updateSummaryResults({ loading: true }));
-    console.log('DRAW QQ PLOT', phenotype);
     const imageMapData = await query(
       `data/qq-plots/${phenotype}.imagemap.json`
     );
