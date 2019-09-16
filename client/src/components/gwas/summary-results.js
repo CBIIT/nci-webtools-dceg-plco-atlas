@@ -108,9 +108,13 @@ export function SummaryResults() {
 
   const onChromosomeSelected = chr => {
     const database = selectedPhenotype.value + '.db';
-    const range = ranges.find(r => r.chr === chr);
     const page = 1;
     const pageSize = 10;
+    const range = ranges.find(r => r.chr === chr);
+    const bpRange = {
+      bpMin: range.bp_min,
+      bpMax: range.bp_max,
+    };
 
     dispatch(
       updateSummaryResults({
@@ -120,8 +124,7 @@ export function SummaryResults() {
         pageSize,
         nlogpMin: 2,
         nlogpMax: null,
-        bpMin: range.bp_min,
-        bpMax: range.bp_min,
+        ...bpRange,
       })
     );
 
@@ -130,8 +133,7 @@ export function SummaryResults() {
         database,
         chr,
         nlogpMin: 2,
-        bpMin: range.bp_min,
-        bpMax: range.bp_max,
+        ...bpRange,
         columns: ['variant_id', 'chr', 'bp', 'nlog_p']
       })
     );
@@ -140,8 +142,7 @@ export function SummaryResults() {
       updateSummaryResultsTable({
         database,
         chr,
-        bpMin: range.bp_min,
-        bpMax: range.bp_max,
+        ...bpRange,
         offset: (page - 1) * pageSize,
         limit: pageSize,
         orderBy: 'p',
@@ -226,7 +227,6 @@ export function SummaryResults() {
             onVariantLookup={handleVariantLookup}
             onZoom={handleZoom}
           />
-          { resultsCount }
           <div
             className="mw-100 my-4"
             style={{ display: submitted ? 'block' : 'none' }}>

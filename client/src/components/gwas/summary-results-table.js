@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { updateSummaryResults, updateSummaryResultsTable } from '../../services/actions';
 import { query } from '../../services/query';
-import { Table } from '../controls/table';
+import { Table, paginationText } from '../controls/table';
 import paginationFactory from 'react-bootstrap-table2-paginator';
 
 export function SummaryResultsTable() {
@@ -62,7 +62,7 @@ export function SummaryResultsTable() {
     if (!selectedPhenotype || !selectedPhenotype.value)
       return;
 
-    console.log({order, orderBy, limit, page})
+    console.log({order, orderBy, limit, page, bpMin, bpMax})
 
     dispatch(updateSummaryResultsTable({
       database: selectedPhenotype.value + '.db',
@@ -75,7 +75,6 @@ export function SummaryResultsTable() {
       nlogpMax,
       bpMin,
       bpMax,
-      order: false,
     }));
 
     dispatch(updateSummaryResults({pageSize: limit, page}));
@@ -91,7 +90,9 @@ export function SummaryResultsTable() {
       pagination={paginationFactory({
         page,
         sizePerPage: pageSize,
-        totalSize: resultsCount
+        totalSize: resultsCount,
+        showTotal: true,
+        paginationTotalRenderer: paginationText,
       })}
       defaultSorted={[
         {dataField: 'p', order: 'asc'}

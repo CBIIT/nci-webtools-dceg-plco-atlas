@@ -11,6 +11,17 @@ export const defaultProps = {
     className: 'table-borderless',
 }
 
+export const paginationText = (from, to, size) => {
+    return size > 0 ? (
+        <span className="react-bootstrap-table-pagination-total ml-2">
+            Showing&nbsp;
+            { (1 + to - from) < size && `${from} to ${to} of `}
+            { size.toLocaleString() }
+            { size === 1 ? ' variant' : ' variants'}
+        </span>
+    ) : null;
+}
+
 export const Table = props => {
     props.columns.forEach(c => {
         if (c.sort) {
