@@ -12,7 +12,7 @@ qq <- function(o, e, pvector, ...) {
   
   plot(x=e_head250, y=o_head250,
        pch=16, ann=FALSE,
-       col=rgb(red = 1, green = 0.65, blue = 0, alpha = 0.55),
+       col=rgb(red = 0, green = 0, blue = 0.70, alpha = 0.50),
        xlim=c(0, max(e)+1), ylim=c(0, max(o)+1), 
        yaxs="i", xaxs="i", 
        cex=1.4,
@@ -22,7 +22,7 @@ qq <- function(o, e, pvector, ...) {
   
   box(which = "plot", lty = "solid", bty="l", lwd=1, col="#000000", ...)
   
-  points(x=e_tail, y=o_tail, pch=16, col=rgb(red = 0, green = 0, blue = 1, alpha = 0.55), cex=1.4)
+  points(x=e_tail, y=o_tail, pch=16, col=rgb(red = 0.20, green = 0.20, blue = 1, alpha = 0.25), cex=1.4)
   
   # Set minor tick mark
   minor.tick(nx = 5, 
@@ -51,16 +51,18 @@ query <- function(phenotype) {
   sqlite.driver <- dbDriver("SQLite")
   conn <- dbConnect(sqlite.driver, dbname = filename)
   dbListTables(conn)
+  
   # query <- dbGetQuery(conn, "SELECT chr, bp, snp, p FROM variant WHERE nlog_p >= 3 ORDER BY p DESC")
   query <- dbGetQuery(conn, "SELECT chr, bp, snp, p FROM variant ORDER BY p DESC")
+  
   chrvector <- query[['chr']]
   bpvector <- query[['bp']]
   pvector <- query[['p']]
   snpvector <- query[['snp']]
-  pvector <- pvector[!is.na(pvector) & pvector<1 & pvector>0]
+  pvector <- as.numeric(pvector[!is.na(pvector) & pvector<1 & pvector>0])
   dbDisconnect(conn)
   # store pvector lists and first 250 observable markers in lists
-  o <- -log10(sort(pvector,decreasing=F))
+  o <-  -log10(sort(pvector,decreasing=F))
   e <- -log10(ppoints(length(pvector)))
   o_head250 <- o[1:250]
   e_head250 <- e[1:250]
@@ -69,7 +71,7 @@ query <- function(phenotype) {
   qq(o, e, pvector)
   # generate imagemap
   for (i in 1:250) {
-    addRegion(im) <- imPoint(e_head250[i], o_head250[i], .065, .2, alt=paste0(chrvector[i], ",", bpvector[i], ",", snpvector[i], ",", pvector[i]))
+    addRegion(im) <- imPoint(e_head250[i], o_head250[i], .07, .5, alt=paste0(chrvector[i], ",", bpvector[i], ",", snpvector[i], ",", pvector[i]))
   }
   lambdaGC <- round(qchisq(1 - median(pvector), 1) / qchisq(0.5, 1), 4)
   sampleSize <- length(o)
