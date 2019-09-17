@@ -159,11 +159,13 @@ export function drawHeatmap(phenotypes) {
 
 export function lookupVariants(phenotypes, variant) {
   return async function(dispatch) {
+
     dispatch(
       updateVariantLookup({
         loading: true,
         results: [],
-        message: ''
+        message: '',
+        submitted: new Date()
       })
     );
 
