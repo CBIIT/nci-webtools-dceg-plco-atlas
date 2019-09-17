@@ -102,13 +102,30 @@ $blue: #005ea2;
   cursor: pointer;
   text-decoration: underline;
   font-weight: 600;
-  color: $blue !important;
+  color: #595959 !important;
   opacity: 0.8;
 }
 
 .link:hover {
-  color: #1a4480 !important;
+  color: #444 !important;
   text-decoration: underline !important;
+}
+
+select.form-control-sm {
+  padding-right: 0;
+}
+
+.pagination {
+  .page-item.active .page-link {
+    background-color: transparent;
+    color: steelblue;
+    font-weight: 600;
+    text-decoration: underline;
+  }
+
+  .page-link:focus {
+    box-shadow: none;
+  }
 }
 
 h1 {
@@ -299,10 +316,9 @@ h1 {
   text-decoration: underline !important;
 }
 
-.summary-results 
-.rc-tree-select-tree-node-content-wrapper-close, 
-.summary-results 
+.summary-results
+.rc-tree-select-tree-node-content-wrapper-close,
+.summary-results
 .rc-tree-select-tree-node-content-wrapper-open {
   cursor: not-allowed !important;
 }
-

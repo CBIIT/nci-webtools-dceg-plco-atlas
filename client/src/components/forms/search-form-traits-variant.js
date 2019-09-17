@@ -8,10 +8,10 @@ import {
   Col,
   Button
 } from 'react-bootstrap';
-import { 
-  containsVal, 
-  containsAllVals, 
-  removeVal, 
+import {
+  containsVal,
+  containsAllVals,
+  removeVal,
   removeAllVals,
   getAllLeafs } from '../controls/tree-select';
 import { updateVariantLookup } from '../../services/actions';
@@ -46,7 +46,7 @@ export function SearchFormTraitsVariant({ onSubmit }) {
           if (newValues.length === 1) {
             console.log("REMOVE ONE", newValues[i]);
             values = removeVal(values, newValues[i].value);
-          } 
+          }
         }
       }
     }
@@ -121,7 +121,7 @@ export function SearchFormTraitsVariant({ onSubmit }) {
   };
 
   return (
-    <div className="d-flex mb-4">
+    <div className="d-flex mb-2">
       <select
         className="form-control flex-shrink-auto"
         value={selectedListType}

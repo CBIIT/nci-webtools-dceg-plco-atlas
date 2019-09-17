@@ -100,7 +100,7 @@ export function VariantLookup() {
             style={{ display: submitted ? 'block' : 'none' }}>
             <Table
               bootstrap4
-              keyField="id"
+              keyField="variant_id"
               data={results}
               columns={columns}
               filter={filterFactory()}
@@ -117,13 +117,6 @@ export function VariantLookup() {
           {placeholderMessage}
         </Tab>
       </Tabs>
-      {/* <div
-        className="text-center"
-        style={{ display: loading ? 'block' : 'none' }}>
-        <Spinner animation="border" variant="primary" role="status">
-          <span className="sr-only">Loading...</span>
-        </Spinner>
-      </div> */}
     </>
   );
 }

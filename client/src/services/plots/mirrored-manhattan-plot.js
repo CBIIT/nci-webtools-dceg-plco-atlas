@@ -6,10 +6,10 @@ import {
 } from './utils.js';
 import { getScale, getTicks } from './scale.js';
 import { axisLeft, axisBottom } from './axis.js';
-import { drawPoints } from './points.js';
+import { drawPoints, drawMirroredPoints } from './points.js';
 import { drawSelectionOverlay, drawZoomOverlay } from './overlays.js';
 
-export class ManhattanPlot {
+export class MirroredManhattanPlot {
   constructor(container, config) {
     const containerStyle = getComputedStyle(container);
     if (containerStyle.position === 'static')
@@ -100,8 +100,8 @@ export class ManhattanPlot {
     const canvasWidth = this.container.clientWidth;
     const canvasHeight = this.container.clientHeight;
     const margins = (config.margins = {
-      top: 60,
-      right: 60,
+      top: 40,
+      right: 40,
       bottom: 60,
       left: 80,
       ...config.margins
@@ -134,14 +134,19 @@ export class ManhattanPlot {
       config.yAxis.ticks = getTicks(...config.yAxis.extent, 10);
 
     config.xAxis.scale = getScale(config.xAxis.extent, [0, width]);
-    config.yAxis.scale = getScale(config.yAxis.extent, [height, 0]);
+    config.yAxis.scale = getScale(config.yAxis.extent, [height, height/2]);
+
+    config.xAxis2.scale = getScale(config.xAxis.extent, [0, width]);
+    config.yAxis2.scale = getScale(config.yAxis.extent, [height/2, 0]);
+
     config.xAxis.inverseScale = getScale([0, width], config.xAxis.extent);
     config.yAxis.inverseScale = getScale([height, 0], config.yAxis.extent);
 
     ctx.clearRect(0, 0, width, height);
-    drawPoints(config, ctx, hiddenCtx);
+    drawMirroredPoints(config, ctx, hiddenCtx);
     axisLeft(config, ctx);
     axisBottom(config, ctx);
+    axisTop(config, ctx);
     for (let line of lines) {
       this.drawLine(line);
     }
@@ -152,9 +157,6 @@ export class ManhattanPlot {
     if (line.y) {
       let margins = this.config.margins;
       let y = this.config.yAxis.scale(line.y) + margins.top;
-      if (y > this.canvas.height - margins.bottom || y < margins.top)
-        return;
-
       this.ctx.beginPath();
       this.ctx.globalAlpha = 0.6;
       this.ctx.strokeStyle = '#888';
