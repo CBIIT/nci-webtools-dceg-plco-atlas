@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { SearchFormTraitsVariant } from '../forms/search-form-traits-variant';
 import { updateVariantLookup, lookupVariants } from '../../services/actions';
-import { Table, paginationText } from '../controls/table';
+import { Table, paginationText, paginationSizeSelector, paginationButton } from '../controls/table';
 import paginationFactory from 'react-bootstrap-table2-paginator';
 import filterFactory, { textFilter } from 'react-bootstrap-table2-filter';
 import { Spinner, Card, Tabs, Tab } from 'react-bootstrap';
@@ -121,8 +121,11 @@ export function VariantLookup() {
               columns={columns}
               filter={filterFactory()}
               pagination={paginationFactory({
+                showTotal: results.length > 0,
+                sizePerPageList: [10, 25, 50, 100],
                 paginationTotalRenderer: paginationText,
-                showTotal: true,
+                sizePerPageRenderer: paginationSizeSelector,
+                pageButtonRenderer: paginationButton,
               })}
             />
           </div>
