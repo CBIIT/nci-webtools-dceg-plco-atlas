@@ -51,7 +51,7 @@ function getVariants(filepath, params) {
         ].filter(Boolean).join(' AND ');
 
     // create count sql based on original query
-    let countSql = `SELECT COUNT(*) FROM (${sql})`;
+    let countSql = `SELECT COUNT(1) FROM (${sql})`;
 
     // adds "order by" statement, if both order and orderBy are provided
     let { order, orderBy } = params;
