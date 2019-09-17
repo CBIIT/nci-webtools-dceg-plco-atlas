@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { updateSummaryResults, updateSummaryResultsTable } from '../../services/actions';
 import { query } from '../../services/query';
-import { Table, paginationText } from '../controls/table';
+import { Table, paginationText, paginationSizeSelector, paginationButton } from '../controls/table';
 import paginationFactory from 'react-bootstrap-table2-paginator';
 
 export function SummaryResultsTable() {
@@ -92,8 +92,10 @@ export function SummaryResultsTable() {
         sizePerPage: pageSize,
         totalSize: resultsCount,
         showTotal: results.length > 0,
-        paginationTotalRenderer: paginationText,
         sizePerPageList: [10, 25, 50, 100],
+        paginationTotalRenderer: paginationText,
+        sizePerPageRenderer: paginationSizeSelector,
+        pageButtonRenderer: paginationButton,
       })}
       defaultSorted={[
         {dataField: 'p', order: 'asc'}
