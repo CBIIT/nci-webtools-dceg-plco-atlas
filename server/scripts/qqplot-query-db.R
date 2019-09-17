@@ -59,10 +59,10 @@ query <- function(phenotype) {
   bpvector <- query[['bp']]
   pvector <- query[['p']]
   snpvector <- query[['snp']]
-  pvector <- pvector[!is.na(pvector) & pvector<1 & pvector>0 & is.numeric(pvector)]
+  pvector <- as.numeric(pvector[!is.na(pvector) & pvector<1 & pvector>0])
   dbDisconnect(conn)
   # store pvector lists and first 250 observable markers in lists
-  o <- -log10(sort(pvector,decreasing=F))
+  o <-  -log10(sort(pvector,decreasing=F))
   e <- -log10(ppoints(length(pvector)))
   o_head250 <- o[1:250]
   e_head250 <- e[1:250]
