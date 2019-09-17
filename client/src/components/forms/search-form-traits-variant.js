@@ -18,7 +18,7 @@ import { updateVariantLookup } from '../../services/actions';
 import TreeSelect, { TreeNode } from 'rc-tree-select';
 import 'rc-tree-select/assets/index.css';
 
-export function SearchFormTraitsVariant({ onSubmit }) {
+export function SearchFormTraitsVariant({ onSubmit, onReset }) {
   const dispatch = useDispatch();
   const phenotypes = useSelector(state => state.phenotypes);
   const phenotypesTree = useSelector(state => state.phenotypesTree);
@@ -104,22 +104,6 @@ export function SearchFormTraitsVariant({ onSubmit }) {
     }
   };
 
-  const handleReset = params => {
-    dispatch(
-      updateVariantLookup({
-        selectedListType: 'categorical',
-        selectedPhenotype: null,
-        selectedPhenotypes: [],
-        selectedVariant: '',
-        selectedGender: 'combined',
-        results: [],
-        message: '',
-        loading: false,
-        submitted: null
-      })
-    );
-  };
-
   return (
     <div className="d-flex mb-4">
       <select
@@ -187,7 +171,7 @@ export function SearchFormTraitsVariant({ onSubmit }) {
         variant="secondary"
         onClick={e => {
           e.preventDefault();
-          handleReset(e);
+          onReset(e);
         }}>
         Reset
       </Button>

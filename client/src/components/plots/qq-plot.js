@@ -1,17 +1,23 @@
 import React, { useState } from 'react';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { updateSummaryResults } from '../../services/actions';
 import { Link } from 'react-router-dom';
 import { Spinner } from 'react-bootstrap';
 import ReactCursorPosition from 'react-cursor-position';
 
 export function QQPlot({ onVariantLookup }) {
-  const { loading, qqplotSrc, areaItems, lambdaGC, sampleSize } = useSelector(
+  const dispatch = useDispatch();
+  const { loading, qqplotSrc, areaItems, lambdaGC, sampleSize, popupTooltipData } = useSelector(
     state => state.summaryResults
   );
 
   // temporary set states
   const [hoverTooltipData, setHoverTooltipData] = useState({});
-  const [popupTooltipData, setPopupTooltipData] = useState({});
+
+  const setPopupTooltipData = popupTooltipData => {
+    dispatch(updateSummaryResults({ popupTooltipData }));
+  };
+
   const [pos, setPos] = useState({
     position: {
       x: 0,
@@ -57,15 +63,14 @@ export function QQPlot({ onVariantLookup }) {
       ...popupTooltipStyle,
       display: 'none'
     });
-    setPopupTooltipData({});
+    setPopupTooltipData(null);
   };
 
   const hoverMarkerEnter = e => {
     // make sure action occurs on imagemap coord only
     if (e.target && e.target.coords) {
       var variant = e.target.alt.split(',');
-      console.log(variant);
-      if (popupTooltipData && variant[0] !== popupTooltipData['point_#']) {
+      // if (popupTooltipData && variant[0] !== popupTooltipData['point_#']) {
         setHoverTooltipData({
           'p-value': variant[3],
           snp: variant[2]
@@ -78,7 +83,7 @@ export function QQPlot({ onVariantLookup }) {
           // left: pos.position.x - 45, // computed based on child and parent's width
           display: 'block'
         });
-      }
+      // }
     } else {
       hoverMarkerLeave();
     }
@@ -110,27 +115,29 @@ export function QQPlot({ onVariantLookup }) {
                 className: 'qq-plot-mouse-window',
                 onPositionChanged: newPos => setPos(newPos)
               }}>
-              <div style={popupTooltipStyle} className="popup-tooltip shadow">
-                {/* <button
-                  type="button"
-                  className="close popup-tooltip-close"
-                  aria-label="Close"
-                  onClick={popupMarkerClose}>
-                  <span aria-hidden="true">&times;</span>
-                </button> */}
-                {/* <b>id:</b> {popupTooltipData['point_#']} */}
-                <b>position:</b> {popupTooltipData.position}
-                <br />
-                <b>p-value:</b> {popupTooltipData['p-value']}
-                <br />
-                <b>snp:</b> {popupTooltipData.snp}
-                <br />
-                <Link
-                  to="/gwas/lookup"
-                  onClick={_ => onVariantLookup(popupTooltipData)}>
-                  <b>Go to Variant Lookup</b>
-                </Link>
-              </div>
+              {popupTooltipData && (
+                <div style={popupTooltipStyle} className="popup-tooltip shadow">
+                  {/* <button
+                    type="button"
+                    className="close popup-tooltip-close"
+                    aria-label="Close"
+                    onClick={popupMarkerClose}>
+                    <span aria-hidden="true">&times;</span>
+                  </button> */}
+                  {/* <b>id:</b> {popupTooltipData['point_#']} */}
+                  <b>position:</b> {popupTooltipData.position}
+                  <br />
+                  <b>p-value:</b> {popupTooltipData['p-value']}
+                  <br />
+                  <b>snp:</b> {popupTooltipData.snp}
+                  <br />
+                  <Link
+                    to="/gwas/lookup"
+                    onClick={_ => onVariantLookup(popupTooltipData)}>
+                    <b>Go to Variant Lookup</b>
+                  </Link>
+                </div>
+              )}
 
               <div style={hoverTooltipStyle} className="hover-tooltip shadow">
                 <b>p-value:</b> {hoverTooltipData['p-value']}

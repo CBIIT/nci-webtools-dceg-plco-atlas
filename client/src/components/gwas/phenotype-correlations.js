@@ -23,6 +23,10 @@ export function PhenotypeCorrelations() {
     dispatch(updatePhenotypeCorrelations({ messages }));
   };
 
+  const setPopupTooltipData = popupTooltipData => {
+    dispatch(updatePhenotypeCorrelations({ popupTooltipData }));
+  };
+
   const clearMessages = e => {
     setMessages([]);
   };
@@ -42,6 +46,7 @@ export function PhenotypeCorrelations() {
 
   const handleSubmit = params => {
     setSubmitted(new Date());
+    setPopupTooltipData(null);
     console.log('submit');
 
     if (!params) {
@@ -57,9 +62,25 @@ export function PhenotypeCorrelations() {
     dispatch(drawHeatmap(params));
   };
 
+  const handleReset = params => {
+    dispatch(
+      updatePhenotypeCorrelations({
+        selectedListType: 'categorical',
+        selectedPhenotypes: [],
+        selectedGender: 'combined',
+        heatmapData: [],
+        results: [],
+        loading: false,
+        submitted: null,
+        messages: [],
+        popupTooltipData: null
+      })
+    );
+  };
+
   return (
     <>
-      <SearchFormTraits onSubmit={handleSubmit} onChange={handleChange} />
+      <SearchFormTraits onSubmit={handleSubmit} onChange={handleChange} onReset={handleReset} />
       {submitted &&
         messages.map(({ type, content }) => (
           <Alert variant={type} onClose={clearMessages} dismissible>

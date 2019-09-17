@@ -36,6 +36,10 @@ export function SummaryResults() {
     dispatch(updateSummaryResults({ selectedChromosome }));
   };
 
+  const setPopupTooltipData = popupTooltipData => {
+    dispatch(updateSummaryResults({ popupTooltipData }));
+  };
+
   const setSelectedPlot = selectedPlot => {
     dispatch(updateSummaryResults({ selectedPlot }));
   };
@@ -57,6 +61,7 @@ export function SummaryResults() {
     const phenotype = params ? params.value : null;
     setSubmitted(new Date());
     setSelectedChromosome(null);
+    setPopupTooltipData(null);
 
     if (!phenotype) {
       setMessages([
@@ -97,6 +102,35 @@ export function SummaryResults() {
         count: true,
         orderBy: 'p',
         order: 'asc',
+      })
+    );
+  };
+
+  const handleReset = params => {
+    dispatch(
+      updateSummaryResults({
+        selectedListType: 'categorical',
+        selectedPhenotype: null,
+        selectedChromosome: null,
+        selectedPlot: 'manhattan-plot',
+        selectedManhattanPlotType: 'aggregate',
+        manhattanPlotData: {},
+        manhattanPlotView: '',
+        ranges: [],
+        results: [],
+        resultsCount: 0,
+        page: 1,
+        pageSize: 10,
+        messages: [],
+        qqplotSrc: '',
+        areaItems: [],
+        lambdaGC: '',
+        sampleSize: '',
+        submitted: null,
+        loading: false,
+        drawManhattanPlot: null,
+        updateResultsTable: null,
+        popupTooltipData: null
       })
     );
   };
@@ -207,7 +241,7 @@ export function SummaryResults() {
 
   return (
     <>
-      <SearchFormTrait onSubmit={handleSubmit} onChange={handleChange} />
+      <SearchFormTrait onSubmit={handleSubmit} onChange={handleChange} onReset={handleReset} />
       {submitted &&
         messages.map(({ type, content }) => (
           <Alert variant={type} onClose={clearMessages} dismissible>

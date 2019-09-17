@@ -85,9 +85,25 @@ export function VariantLookup() {
     dispatch(lookupVariants(selectedPhenotypes, selectedVariant));
   }
 
+  const handleReset = params => {
+    dispatch(
+      updateVariantLookup({
+        selectedListType: 'categorical',
+        selectedPhenotype: null,
+        selectedPhenotypes: [],
+        selectedVariant: '',
+        selectedGender: 'combined',
+        results: [],
+        message: '',
+        loading: false,
+        submitted: null
+      })
+    );
+  };
+
   return (
     <>
-      <SearchFormTraitsVariant onSubmit={handleSubmit} />
+      <SearchFormTraitsVariant onSubmit={handleSubmit} onReset={handleReset} />
 
       <Tabs defaultActiveKey="variant-lookup">
         <Tab

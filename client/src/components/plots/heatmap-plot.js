@@ -14,7 +14,8 @@ export function Heatmap() {
     // selectedPhenotypes,
     // results,
     heatmapData,
-    loading
+    loading,
+    popupTooltipData
     // submitted
   } = useSelector(state => state.phenotypeCorrelations);
 
@@ -28,7 +29,9 @@ export function Heatmap() {
 
   const [numPhenotypes, setNumPhenotypes] = useState(2);
 
-  const [popupTooltipData, setPopupTooltipData] = useState({});
+  const setPopupTooltipData = popupTooltipData => {
+    dispatch(updatePhenotypeCorrelations({ popupTooltipData }));
+  };
 
   const [popupTooltipStyle, setPopupTooltipStyle] = useState({
     top: 0, // computed based on child and parent's height
@@ -48,7 +51,7 @@ export function Heatmap() {
       ...popupTooltipStyle,
       display: 'none'
     });
-    setPopupTooltipData({});
+    setPopupTooltipData(null);
   };
 
   const popupMarkerClick = e => {
@@ -135,6 +138,7 @@ export function Heatmap() {
 
   const generateData = () => {
     setLoading(true);
+    setPopupTooltipData(null);
     let n = numPhenotypes;
     let x = [];
     let y = [];
@@ -213,6 +217,7 @@ export function Heatmap() {
 
   const loadSamplePhenotypes = async () => {
     setLoading(true);
+    setPopupTooltipData(null);
 
     const correlationData = await query(`data/sample_correlations.json`);
 
@@ -308,21 +313,23 @@ export function Heatmap() {
                 onPositionChanged: newPos => console.log(newPos.position)
                 // onPositionChanged: newPos => setPos(newPos)
               }}> */}
-            <div style={popupTooltipStyle} className="popup-tooltip shadow">
-              {/* <button
-                type="button"
-                className="close popup-tooltip-close"
-                aria-label="Close"
-                onClick={popupMarkerClose}>
-                <span aria-hidden="true">&times;</span>
-              </button> */}
-              <b>Phenotype X:</b> <a href="/">{popupTooltipData.phenotypeX}</a>
-              <br />
-              <b>Phenotype Y:</b> <a href="/">{popupTooltipData.phenotypeY}</a>
-              <br />
-              <b>Correlation:</b> {popupTooltipData.r2}
-              <br />
-            </div>
+            {popupTooltipData && (
+              <div style={popupTooltipStyle} className="popup-tooltip shadow">
+                {/* <button
+                  type="button"
+                  className="close popup-tooltip-close"
+                  aria-label="Close"
+                  onClick={popupMarkerClose}>
+                  <span aria-hidden="true">&times;</span>
+                </button> */}
+                <b>Phenotype X:</b> <a href="/">{popupTooltipData.phenotypeX}</a>
+                <br />
+                <b>Phenotype Y:</b> <a href="/">{popupTooltipData.phenotypeY}</a>
+                <br />
+                <b>Correlation:</b> {popupTooltipData.r2}
+                <br />
+              </div>
+            )}
             <div
               style={{
                 display: 'flex',
