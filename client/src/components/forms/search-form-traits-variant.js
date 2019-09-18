@@ -116,6 +116,7 @@ export function SearchFormTraitsVariant({ onSubmit, onReset }) {
 
       <TreeSelect
         className="form-control flex-shrink-auto h-100 p-0"
+        dropdownClassName="variant-lookup"
         style={{ width: '100%', maxHeight: 76, overflow: 'auto' }}
         dropdownStyle={{ maxHeight: 500, overflow: 'auto' }}
         treeData={
@@ -138,7 +139,7 @@ export function SearchFormTraitsVariant({ onSubmit, onReset }) {
 
       <FormControl
         className="form-control flex-shrink-auto ml-2"
-        style={{ width: '450px' }}
+        style={{ width: '470px' }}
         placeholder="(Variant rsid or coordinate)"
         aria-label="Variant (required)"
         value={selectedVariant}
@@ -151,7 +152,7 @@ export function SearchFormTraitsVariant({ onSubmit, onReset }) {
         className="form-control flex-shrink-auto ml-2"
         value={selectedGender}
         onChange={e => setSelectedGender(e.target.value)}>
-        <option value="combined">Combined</option>
+        <option value="combined">Both Genders</option>
         <option value="male">Male</option>
         <option value="female">Female</option>
       </select>

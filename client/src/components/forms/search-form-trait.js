@@ -86,8 +86,8 @@ export function SearchFormTrait({ onChange, onSubmit, onReset }) {
         value={selectedManhattanPlotType}
         onChange={e => setSelectedManhattanPlotType(e.target.value)}
         aria-label="Select the type of data you wish to plot">
-        <option value="aggregate">Combined (Aggregate)</option>
-        <option value="stacked">Combined (Stacked)</option>
+        <option value="aggregate">Both Genders</option>
+        <option value="stacked">Both (Stacked)</option>
         <option value="male">Male</option>
         <option value="female">Female</option>
       </select>
