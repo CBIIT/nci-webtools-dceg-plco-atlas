@@ -109,7 +109,8 @@ export function VariantLookup() {
         <Tab
           eventKey="variant-lookup"
           title="Table"
-          className="p-2 bg-white tab-pane-bordered">
+          className="p-2 bg-white tab-pane-bordered" 
+          style={{minHeight: '50vh'}}>
 
           <div
             className="mw-100 my-4"

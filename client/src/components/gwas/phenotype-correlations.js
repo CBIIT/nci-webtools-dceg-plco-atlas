@@ -92,7 +92,8 @@ export function PhenotypeCorrelations() {
         <Tab
           eventKey="phenotype-correlations"
           title="Heatmap"
-          className="p-2 bg-white tab-pane-bordered">
+          className="p-2 bg-white tab-pane-bordered"
+          style={{minHeight: '50vh'}}>
           
           <div
             className="mw-100 my-4"
