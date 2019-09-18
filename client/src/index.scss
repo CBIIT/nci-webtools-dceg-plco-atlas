@@ -295,13 +295,15 @@ h1 {
   // color: black !important;
 // }
 
-// rc-tree-select leaf options
+// all rc-tree-select options
 .rc-tree-select-tree li {
   color: black !important;
 }
 
-.rc-tree-select-tree li span {
-  cursor: pointer;
+// leaf options
+.rc-tree-select-tree-node-content-wrapper-normal 
+.rc-tree-select-tree-title {
+  cursor: pointer !important;
 }
 
 // rc-tree-select container
@@ -315,10 +317,10 @@ h1 {
   li.filter-node
   > .rc-tree-select-tree-node-content-wrapper {
   color: black !important;
-  // font-weight: normal !important;
+  font-weight: normal !important;
 }
 
-// rc-tree-select option parents
+// rc-tree-select all option parents
 // .rc-tree-select-tree-node-content-wrapper-close,
 // .rc-tree-select-tree-node-content-wrapper-open {
 //   // font-weight: bold !important;
@@ -342,8 +344,8 @@ h1 {
 
 // show disabled cursor just for summary results tree select
 .summary-results
-.rc-tree-select-tree-node-content-wrapper-close,
+.rc-tree-select-tree-node-content-wrapper-close span,
 .summary-results
-.rc-tree-select-tree-node-content-wrapper-open {
+.rc-tree-select-tree-node-content-wrapper-open span{
   cursor: not-allowed !important;
 }

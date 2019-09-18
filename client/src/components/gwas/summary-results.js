@@ -253,7 +253,7 @@ export function SummaryResults() {
         <Tab
           eventKey="manhattan-plot"
           title="Manhattan Plot"
-          className="p-2 bg-white tab-pane-bordered">
+          className="p-2 bg-white tab-pane-bordered" style={{minHeight: '50vh'}}>
           <ManhattanPlot
             onChromosomeSelected={onChromosomeSelected}
             onAllChromosomeSelected={onAllChromosomeSelected}
@@ -270,7 +270,7 @@ export function SummaryResults() {
         <Tab
           eventKey="qq-plot"
           title="Q-Q Plot"
-          className="p-2 bg-white tab-pane-bordered">
+          className="p-2 bg-white tab-pane-bordered" style={{minHeight: '50vh'}}>
           <div
             className="mw-100 my-4"
             style={{ display: submitted ? 'block' : 'none' }}>
