@@ -41,6 +41,7 @@ export class MirroredManhattanPlot {
     this.container.appendChild(this.overlayCanvas);
     this.container.appendChild(this.tooltip);
     this.draw();
+    return;
 
     this.attachEventHandlers(this.canvas);
 
@@ -134,10 +135,10 @@ export class MirroredManhattanPlot {
       config.yAxis.ticks = getTicks(...config.yAxis.extent, 10);
 
     config.xAxis.scale = getScale(config.xAxis.extent, [0, width]);
-    config.yAxis.scale = getScale(config.yAxis.extent, [height, height/2]);
+    config.yAxis.scale = getScale(config.yAxis.extent, [height/2, 0]);
 
     config.xAxis2.scale = getScale(config.xAxis.extent, [0, width]);
-    config.yAxis2.scale = getScale(config.yAxis.extent, [height/2, 0]);
+    config.yAxis2.scale = getScale(config.yAxis.extent, [height/2, height]);
 
     config.xAxis.inverseScale = getScale([0, width], config.xAxis.extent);
     config.yAxis.inverseScale = getScale([height, 0], config.yAxis.extent);
@@ -146,7 +147,7 @@ export class MirroredManhattanPlot {
     drawMirroredPoints(config, ctx, hiddenCtx);
     axisLeft(config, ctx);
     axisBottom(config, ctx);
-    axisTop(config, ctx);
+    // axisTop(config, ctx);
     for (let line of lines) {
       this.drawLine(line);
     }

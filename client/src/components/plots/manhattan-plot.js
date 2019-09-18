@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Spinner } from 'react-bootstrap';
 import { rawQuery, query } from '../../services/query';
 import { ManhattanPlot as Plot } from '../../services/plots/manhattan-plot';
+import { MirroredManhattanPlot as MirroredPlot } from '../../services/plots/mirrored-manhattan-plot';
 import { Icon } from '../controls/icon';
 import { createElement as h } from '../../services/plots/utils';
 import { systemFont } from '../../services/plots/text';
@@ -24,7 +25,7 @@ export function ManhattanPlot({
     selectedManhattanPlotType,
     selectedPhenotype,
     selectedChromosome,
-    ranges
+    ranges,
   } = useSelector(state => state.summaryResults);
   const hasData = () =>
     manhattanPlotData &&
@@ -33,16 +34,72 @@ export function ManhattanPlot({
 
   useEffect(() => {
     if (selectedPlot != 'manhattan-plot' || !hasData()) return;
-    let params =
-      manhattanPlotView === 'summary'
-        ? getSummaryPlot(manhattanPlotData)
-        : getChromosomePlot(manhattanPlotData);
-    plot.current = new Plot(plotContainer.current, params);
+    let params;
+    if (selectedManhattanPlotType != 'stacked') {
+      params =
+        manhattanPlotView === 'summary'
+          ? getSummaryPlot(manhattanPlotData)
+          : getChromosomePlot(manhattanPlotData)
+          plot.current = new Plot(plotContainer.current, params);
+    } else {
+      params = getMirroredPlot(manhattanPlotData);
+      plot.current = new MirroredPlot(plotContainer.current, params);
+    }
     setZoomStack([])
     return () => {
       plot.current.destroy()
     };
   }, [manhattanPlotData, selectedPlot]);
+
+  function getMirroredPlot(plotData) {
+    let columnIndexes = {
+      chr: plotData.columns.indexOf('chr'),
+      bp: plotData.columns.indexOf('bp_abs_1000kb'),
+      nLogP: plotData.columns.indexOf('nlog_p2')
+    };
+
+    return {
+      data: plotData.data,
+      xAxis: {
+        title: [
+          {
+            text: selectedPhenotype.label,
+            font: `600 14px ${systemFont}`
+          }
+        ],
+        key: columnIndexes.bp,
+        tickFormat: tick => (tick / 1e6).toPrecision(3) + ' MB',
+        ticks: ranges.filter(r => r.chr <= 22).map(r => r.max_bp_abs),
+        tickFormat: (tick, i) => ranges[i].chr,
+        labelsBetweenTicks: true,
+        allowSelection: true,
+        onSelected: (range, i) => {
+          onChromosomeSelected(ranges[i].chr);
+        }
+      },
+      xAxis2: {},
+      yAxis2: {},
+      yAxis: {
+        title: [
+          { text: `-log`, font: `600 14px ${systemFont}` },
+          {
+            text: '10',
+            textBaseline: 'middle',
+            font: `600 10px ${systemFont}`
+          },
+          { text: `(p)`, font: `600 14px ${systemFont}` }
+        ],
+        key: columnIndexes.nLogP,
+        tickFormat: tick => tick.toPrecision(3)
+      },
+      point: {
+        size: 2,
+        opacity: 0.6,
+        color: (d, i) => (d[columnIndexes.chr] % 2 ? '#005ea2' : '#e47833')
+      },
+      // lines: [{ y: -Math.log10(5e-8) }]
+    };
+  }
 
   function getSummaryPlot(plotData) {
     let columnIndexes = {
