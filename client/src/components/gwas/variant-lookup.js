@@ -55,10 +55,12 @@ export function VariantLookup() {
       text: 'P-value',
       sort: true
     }
-  ].map(c => {
-    c.filter = textFilter({ className: 'form-control-sm' });
-    return c;
-  });
+  ];
+  // add filter to column headers
+  // .map(c => {
+  //   c.filter = textFilter({ className: 'form-control-sm' });
+  //   return c;
+  // });
 
   const placeholder = (
     <div style={{ display: submitted ? 'none' : 'block' }}>

@@ -152,7 +152,7 @@ export function SearchFormTraitsVariant({ onSubmit, onReset }) {
         className="form-control flex-shrink-auto ml-2"
         value={selectedGender}
         onChange={e => setSelectedGender(e.target.value)}>
-        <option value="combined">Both Genders</option>
+        <option value="combined">All</option>
         <option value="male">Male</option>
         <option value="female">Female</option>
       </select>
