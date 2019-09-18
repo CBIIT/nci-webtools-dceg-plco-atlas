@@ -261,7 +261,7 @@ export function SummaryResults() {
             onZoom={handleZoom}
           />
           <div
-            className="mw-100 my-4"
+            className="mw-100 my-4 px-5"
             style={{ display: submitted ? 'block' : 'none' }}>
             <SummaryResultsTable />
           </div>

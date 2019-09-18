@@ -89,6 +89,16 @@ $enable-shadows: true;
   border-bottom: 1px solid #dee2e6;
 }
 
+
+.table {
+  thead th {
+    border-bottom: 1px solid #ddd;
+  }
+  td {
+    overflow-x: auto;
+    word-wrap: break-word;
+  }
+}
 .table.table-striped th, .table.table-striped td {
   border-top: none;
 }
