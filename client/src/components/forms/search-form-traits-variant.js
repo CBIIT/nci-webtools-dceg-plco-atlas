@@ -129,7 +129,7 @@ export function SearchFormTraitsVariant({ onSubmit, onReset }) {
         treeNodeFilterProp="label"
         dropdownMatchSelectWidth
         autoClearSearchValue
-        treeDefaultExpandAll
+        // treeDefaultExpandAll
         treeLine
         multiple
         allowClear
