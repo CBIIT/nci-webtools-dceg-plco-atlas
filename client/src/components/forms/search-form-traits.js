@@ -2,10 +2,10 @@ import React, { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { Form, Button, Row, Col } from 'react-bootstrap';
 import { updatePhenotypeCorrelations } from '../../services/actions';
-import { 
-  containsVal, 
-  containsAllVals, 
-  removeVal, 
+import {
+  containsVal,
+  containsAllVals,
+  removeVal,
   removeAllVals,
   getAllLeafs } from '../controls/tree-select';
 import TreeSelect, { TreeNode } from 'rc-tree-select';
@@ -53,7 +53,7 @@ export function SearchFormTraits({ onChange, onSubmit, onReset }) {
           if (newValues.length === 1) {
             console.log("REMOVE ONE", newValues[i]);
             values = removeVal(values, newValues[i].value);
-          } 
+          }
         }
       }
     }
@@ -67,7 +67,7 @@ export function SearchFormTraits({ onChange, onSubmit, onReset }) {
 
   return (
     <>
-      <div className="d-flex mb-4">
+      <div className="d-flex mb-2">
         <select
           className="form-control flex-shrink-auto"
           value={selectedListType}

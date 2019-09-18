@@ -56,6 +56,27 @@ export function drawSelectionOverlay(config, ctx, overlayCtx) {
   }
 }
 
+export function drawMirroredZoomOverlay(config, ctx, overlayCtx) {
+  let canvas = ctx.canvas;
+  let margins = config.margins;
+  let width = canvas.width - margins.left - margins.right;
+  let height = canvas.height - margins.top - margins.bottom;
+  let zoomArea = { x1: 0, x2: 0, y1: 0, y2: 0 };
+  let mouseDown = false;
+
+  function startZoom() {
+
+  }
+
+  function updateZoomWindow() {
+
+  }
+
+  function endZoom() {
+
+  }
+}
+
 export function drawZoomOverlay(config, ctx, overlayCtx) {
   let canvas = ctx.canvas;
   let margins = config.margins;
@@ -93,11 +114,9 @@ export function drawZoomOverlay(config, ctx, overlayCtx) {
       ev.clientY,
       ev.target
     );
-    if (
-      !mouseDown ||
-      Math.abs(x - zoomArea.x1) < 10 ||
-      Math.abs(y - zoomArea.y1) < 10
-    )
+    let dx = Math.abs(x - zoomArea.x1);
+    let dy = Math.abs(y - zoomArea.y1);
+    if (!mouseDown || dx * dy < 100)
       return false;
 
     zoomArea.x2 = x;
@@ -130,7 +149,7 @@ export function drawZoomOverlay(config, ctx, overlayCtx) {
     let y1 = Math.min(zoomArea.y1, zoomArea.y2) - margins.top; // top value (yMax)
     let x2 = Math.max(zoomArea.x1, zoomArea.x2) - margins.left; // right value (xMax)
     let y2 = Math.max(zoomArea.y1, zoomArea.y2) - margins.top; // bottom value (yMin)
-    if (x2 - x1 < 20 || y2 - y1 < 20) return false;
+    if ((x2 - x1) * (y2 - y1) < 100) return false;
 
     // make sure coordinates are within bounds
     x1 = Math.max(x1, 0);

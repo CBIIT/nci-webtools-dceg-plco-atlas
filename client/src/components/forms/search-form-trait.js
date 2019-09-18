@@ -48,7 +48,7 @@ export function SearchFormTrait({ onChange, onSubmit, onReset }) {
   );
 
   return (
-    <div className="d-flex mb-4">
+    <div className="d-flex mb-2">
       <select
         className="form-control flex-shrink-auto"
         value={selectedListType}

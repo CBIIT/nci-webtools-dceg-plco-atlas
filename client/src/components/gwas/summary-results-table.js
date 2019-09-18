@@ -4,10 +4,12 @@ import { updateSummaryResults, updateSummaryResultsTable } from '../../services/
 import { query } from '../../services/query';
 import { Table, paginationText, paginationSizeSelector, paginationButton } from '../controls/table';
 import paginationFactory from 'react-bootstrap-table2-paginator';
+// import overlayFactory from 'react-bootstrap-table2-overlay';
 
 export function SummaryResultsTable() {
   const dispatch = useDispatch();
   const {
+    loading,
     selectedPhenotype,
     selectedChromosome,
     results,
@@ -84,9 +86,11 @@ export function SummaryResultsTable() {
     <Table
       remote
       keyField="variant_id"
+      loading={loading}
       data={results}
       columns={columns}
       onTableChange={handleTableChange}
+      // overlay={overlayFactory()}
       pagination={paginationFactory({
         page,
         sizePerPage: pageSize,

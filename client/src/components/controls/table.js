@@ -14,7 +14,7 @@ export const defaultProps = {
 
 export const paginationText = (from, to, size) => {
     return size > 0 ? (
-        <span className="react-bootstrap-table-pagination-total ml-2">
+        <span className="react-bootstrap-table-pagination-total ml-2 small text-muted">
             Showing&nbsp;
             { (1 + to - from) < size && `${from} to ${to} of `}
             { size.toLocaleString() }
