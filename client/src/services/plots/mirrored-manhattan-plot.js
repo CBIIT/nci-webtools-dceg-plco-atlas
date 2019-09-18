@@ -179,6 +179,7 @@ export class MirroredManhattanPlot {
   }
 
   attachEventHandlers(canvas) {
+    return false;
     const config = this.config;
 
     // change mouse cursor depending on what is being hovered over
