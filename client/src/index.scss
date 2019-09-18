@@ -163,7 +163,7 @@ h1 {
 }
 
 .active-navlinks {
-  background-color: #7a808c !important;
+  background-color: rgb(242, 113, 29) !important;
   color: white !important;
   font-weight: bold !important;
 
@@ -179,7 +179,7 @@ h1 {
 }
 
 .active-secondary-navlinks {
-  border-width: 3px !important;
+  border-width: 2px !important;
 }
 
 // .navlinks-card {
@@ -279,11 +279,11 @@ h1 {
 }
 
 // rc-tree-select disabled options
-.rc-tree-select-tree-treenode-disabled > span,
-.rc-tree-select-tree-treenode-disabled > a,
-.rc-tree-select-tree-treenode-disabled > a span {
+// .rc-tree-select-tree-treenode-disabled > span,
+// .rc-tree-select-tree-treenode-disabled > a,
+// .rc-tree-select-tree-treenode-disabled > a span {
   // color: black !important;
-}
+// }
 
 // rc-tree-select leaf options
 .rc-tree-select-tree li {
@@ -291,7 +291,7 @@ h1 {
 }
 
 .rc-tree-select-tree li span {
-  cursor: pointer !important;
+  cursor: pointer;
 }
 
 // rc-tree-select container
@@ -309,12 +309,28 @@ h1 {
 }
 
 // rc-tree-select option parents
+// .rc-tree-select-tree-node-content-wrapper-close,
+// .rc-tree-select-tree-node-content-wrapper-open {
+//   // font-weight: bold !important;
+//   // text-decoration: underline !important;
+// }
+
+// show click cursor just for variamt lookup and phenotype correlations tree select
+.variant-lookup
 .rc-tree-select-tree-node-content-wrapper-close,
+.variant-lookup
 .rc-tree-select-tree-node-content-wrapper-open {
-  font-weight: bold !important;
-  text-decoration: underline !important;
+  cursor: pointer !important;
 }
 
+.phenotype-correlations
+.rc-tree-select-tree-node-content-wrapper-close,
+.phenotype-correlations
+.rc-tree-select-tree-node-content-wrapper-open {
+  cursor: pointer !important;
+}
+
+// show disabled cursor just for summary results tree select
 .summary-results
 .rc-tree-select-tree-node-content-wrapper-close,
 .summary-results

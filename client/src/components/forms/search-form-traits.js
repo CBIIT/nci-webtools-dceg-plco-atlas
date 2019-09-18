@@ -77,6 +77,7 @@ export function SearchFormTraits({ onChange, onSubmit, onReset }) {
 
         <TreeSelect
           className="form-control flex-shrink-auto h-100 p-0"
+          dropdownClassName="phenotype-correlations"
           style={{ width: '100%', maxHeight: 76, overflow: 'auto' }}
           dropdownStyle={{ maxHeight: 500, overflow: 'auto' }}
           treeData={
@@ -101,7 +102,7 @@ export function SearchFormTraits({ onChange, onSubmit, onReset }) {
           className="form-control flex-shrink-auto ml-2"
           value={selectedGender}
           onChange={e => setSelectedGender(e.target.value)}>
-          <option value="combined">Combined</option>
+          <option value="combined">Both Genders</option>
           <option value="male">Male</option>
           <option value="female">Female</option>
         </select>

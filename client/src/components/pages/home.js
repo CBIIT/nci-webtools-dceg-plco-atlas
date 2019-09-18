@@ -153,8 +153,8 @@ export function Home({ links }) {
           </h4>
         </div>
       </div>
-      <div className="bg-primary py-5">
-        <div className="container my-4 text-light">
+      <div className="bg-egg py-4">
+        <div className="container my-3 text-dark">
           Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
           eiusmod tempor incididunt ut labore et dolore magna aliqua. Magna
           fringilla urna porttitor rhoncus dolor purus. Risus sed vulputate odio
