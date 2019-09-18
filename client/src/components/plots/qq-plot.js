@@ -163,6 +163,7 @@ export function QQPlot({ onVariantLookup }) {
                       shape={area.shape}
                       coords={area.coords}
                       alt={area.alt}
+                      // href="javascript:void(0);"
                       onClick={e => popupMarkerClick(e)}
                       onMouseEnter={e => hoverMarkerEnter(e)}
                       onMouseLeave={e => hoverMarkerLeave(e)}

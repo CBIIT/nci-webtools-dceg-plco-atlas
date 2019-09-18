@@ -1,7 +1,6 @@
 /** We must specify variables before importing bootstrap in order to customize the generated css */
 
 $enable-shadows: true;
-$blue: #005ea2;
 
 @import '~bootstrap/scss/bootstrap';
 @import '~react-bootstrap-table-next/dist/react-bootstrap-table2.min.css';

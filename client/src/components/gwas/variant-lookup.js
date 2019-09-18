@@ -130,7 +130,7 @@ export function VariantLookup() {
             />
           </div>
           {placeholder}
-          {placeholderMessage}
+          {/* {placeholderMessage} */}
         </Tab>
       </Tabs>
     </>
