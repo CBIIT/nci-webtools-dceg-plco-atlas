@@ -14,7 +14,8 @@ import 'rc-tree-select/assets/index.css';
 export function SearchFormTraits({ onChange, onSubmit, onReset }) {
   const dispatch = useDispatch();
   const phenotypes = useSelector(state => state.phenotypes);
-  const phenotypesTree = useSelector(state => state.phenotypesTree);
+  // const phenotypesTree = useSelector(state => state.phenotypesTree);
+  const phenotypesHeatmapTree = useSelector(state => state.phenotypesHeatmapTree);
 
   const phenotypeCorrelations = useSelector(
     state => state.phenotypeCorrelations
@@ -60,6 +61,13 @@ export function SearchFormTraits({ onChange, onSubmit, onReset }) {
     onChange(values);
   };
 
+  const removeFlatDisabled = (phenoList) => phenoList.map(node => {
+    return {
+      value: node.value,
+      label: node.label
+    };
+  });
+
   const alphabetizedPhenotypes = [...phenotypes].sort((a, b) =>
     a.label.localeCompare(b.label)
   );
@@ -82,8 +90,8 @@ export function SearchFormTraits({ onChange, onSubmit, onReset }) {
           dropdownStyle={{ maxHeight: 500, overflow: 'auto' }}
           treeData={
             selectedListType === 'alphabetic'
-              ? alphabetizedPhenotypes
-              : phenotypesTree
+              ? removeFlatDisabled(alphabetizedPhenotypes)
+              : phenotypesHeatmapTree
           }
           value={selectedPhenotypes}
           onChange={handleChange}

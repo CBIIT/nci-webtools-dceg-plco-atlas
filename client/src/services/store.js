@@ -2,11 +2,11 @@ import { createStore, applyMiddleware, compose } from 'redux';
 import { rootReducer } from './reducers';
 import { fetchRanges } from './actions';
 import ReduxThunk from 'redux-thunk';
-import { NavItem } from 'react-bootstrap';
 
 const initialState = {
   phenotypes: [],
   phenotypesTree: [],
+  phenotypesHeatmapTree: [],
   summaryResults: {
     selectedListType: 'categorical',
     selectedPhenotype: null,
