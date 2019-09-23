@@ -164,7 +164,6 @@ export function drawHeatmap(phenotypes) {
 
 export function lookupVariants(phenotypes, variant) {
   return async function(dispatch) {
-
     dispatch(
       updateVariantLookup({
         loading: true,
@@ -185,7 +184,7 @@ export function lookupVariants(phenotypes, variant) {
       console.log(variantData);
       for (let j = 0; j < variantData.length; j++) {
         console.log(variantData[j]);
-        variantData[j]['phenotype'] = phenotypes[i].label;
+        variantData[j]['phenotype'] = phenotypes[i].title ? phenotypes[i].title : phenotypes[i].label;
         tableList.push(variantData[j]);
       }
     }

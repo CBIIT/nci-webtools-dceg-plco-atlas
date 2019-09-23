@@ -1,646 +1,646 @@
 [
     {
-        "label": "Test",
+        "title": "Test",
         "value": "test",
         "parent": true,
         "disabled": false,
         "children": [
             {
-                "label": "Ewing's sarcoma",
+                "title": "Ewing's sarcoma",
                 "value": "meta_fixed_assoc",
                 "disabled": false
             },
             {
-                "label": "Renal Cell Carcinoma",
+                "title": "Renal Cell Carcinoma",
                 "value": "rcc",
                 "disabled": false
             },
             {
-                "label": "Melanoma",
+                "title": "Melanoma",
                 "value": "mel",
                 "disabled": false
             }
         ]
     },
     {
-        "label": "Anthropometric measures",
+        "title": "Anthropometric measures",
         "value": "none_8482",
         "parent": true,
         "disabled": false,
         "children": [
             {
-                "label": "Height",
+                "title": "Height",
                 "value": "none_962",
                 "parent": true,
                 "disabled": false,
                 "children": [
                     {
-                        "label": "Height when standing",
+                        "title": "Height when standing",
                         "value": "none_4478",
                         "disabled": false
                     },
                     {
-                        "label": "Height when sitting",
+                        "title": "Height when sitting",
                         "value": "none_5981",
                         "disabled": false
                     }
                 ]
             },
             {
-                "label": "Weight",
+                "title": "Weight",
                 "value": "none_2935",
                 "parent": true,
                 "disabled": false,
                 "children": [
                     {
-                        "label": "BMI",
+                        "title": "BMI",
                         "value": "none_8108",
                         "disabled": false
                     },
                     {
-                        "label": "Weight Gain Area",
+                        "title": "Weight Gain Area",
                         "value": "none_7702",
                         "disabled": false
                     },
                     {
-                        "label": "Weight Loss Area",
+                        "title": "Weight Loss Area",
                         "value": "none_9528",
                         "disabled": false
                     },
                     {
-                        "label": "Waist-Hip Comparison",
+                        "title": "Waist-Hip Comparison",
                         "value": "none_8702",
                         "disabled": false
                     }
                 ]
             },
             {
-                "label": "Hair pattern at 45",
+                "title": "Hair pattern at 45",
                 "value": "none_5270",
                 "disabled": false
             }
         ]
     },
     {
-        "label": "Cancer",
+        "title": "Cancer",
         "value": "none_8484",
         "disabled": false,
         "parent": true, 
         "children": [
             {
-                "label": "All cancers",
+                "title": "All cancers",
                 "value": "none_2881",
                 "disabled": false,
                 "parent": true, 
                 "children": [
                     {
-                        "label": "By location",
+                        "title": "By location",
                         "value": "none_7014",
                         "disabled": false,
                         "parent": true, 
                         "children": [
                             {
-                                "label": "Biliary cancer",
+                                "title": "Biliary cancer",
                                 "value": "none_1005",
                                 "disabled": false
                             },
                             {
-                                "label": "Bladder cancer",
+                                "title": "Bladder cancer",
                                 "value": "none_9533",
                                 "disabled": false
                             },
                             {
-                                "label": "Breast cancer",
+                                "title": "Breast cancer",
                                 "value": "none_3416",
                                 "disabled": false,
                                 "parent": true, 
                                 "children": [
                                     {
-                                        "label": "Breast cancer (lobular)",
+                                        "title": "Breast cancer (lobular)",
                                         "value": "none_6574",
                                         "disabled": false
                                     },
                                     {
-                                        "label": "Breast cancer (ER positive)",
+                                        "title": "Breast cancer (ER positive)",
                                         "value": "none_1651",
                                         "disabled": false
                                     },
                                     {
-                                        "label": "Breast cancer (PR positive)",
+                                        "title": "Breast cancer (PR positive)",
                                         "value": "none_9891",
                                         "disabled": false
                                     },
                                     {
-                                        "label": "Breast cancer (ER/PR negative)",
+                                        "title": "Breast cancer (ER/PR negative)",
                                         "value": "none_3350",
                                         "disabled": false
                                     },
                                     {
-                                        "label": "Breast cancer (tubular)",
+                                        "title": "Breast cancer (tubular)",
                                         "value": "none_2865",
                                         "disabled": false
                                     }
                                 ]
                             },
                             {
-                                "label": "Colorectal cancer",
+                                "title": "Colorectal cancer",
                                 "value": "none_1740",
                                 "disabled": false,
                                 "parent": true, 
                                 "children": [
                                     {
-                                        "label": "Colon cancer (distal)",
+                                        "title": "Colon cancer (distal)",
                                         "value": "none_6604",
                                         "disabled": false
                                     },
                                     {
-                                        "label": "Colon cancer (proximal)",
+                                        "title": "Colon cancer (proximal)",
                                         "value": "none_7515",
                                         "disabled": false
                                     },
                                     {
-                                        "label": "Colorectal cancer (adenocarcinoma)",
+                                        "title": "Colorectal cancer (adenocarcinoma)",
                                         "value": "none_2940",
                                         "disabled": false
                                     },
                                     {
-                                        "label": "Colorectal cancer (advanced)",
+                                        "title": "Colorectal cancer (advanced)",
                                         "value": "none_2734",
                                         "disabled": false
                                     },
                                     {
-                                        "label": "Rectal cancer",
+                                        "title": "Rectal cancer",
                                         "value": "none_7543",
                                         "disabled": false
                                     }
                                 ]
                             },
                             {
-                                "label": "Endometrial cancer",
+                                "title": "Endometrial cancer",
                                 "value": "none_1857",
                                 "disabled": false
                             },
                             {
-                                "label": "Glioma cancer",
+                                "title": "Glioma cancer",
                                 "value": "none_4860",
                                 "disabled": false
                             },
                             {
-                                "label": "Head and neck cancer",
+                                "title": "Head and neck cancer",
                                 "value": "none_4638",
                                 "disabled": false
                             },
                             {
-                                "label": "Hematologic malignancies",
+                                "title": "Hematologic malignancies",
                                 "value": "none_3843",
                                 "disabled": false,
                                 "parent": true, 
                                 "children": [
                                     {
-                                        "label": "Hodgkin lymphoma",
+                                        "title": "Hodgkin lymphoma",
                                         "value": "none_2153",
                                         "disabled": false
                                     },
                                     {
-                                        "label": "Lymphocytic leukemia",
+                                        "title": "Lymphocytic leukemia",
                                         "value": "none_5272",
                                         "disabled": false
                                     },
                                     {
-                                        "label": "Myeloid/Monocytic leukemia",
+                                        "title": "Myeloid/Monocytic leukemia",
                                         "value": "none_4332",
                                         "disabled": false
                                     },
                                     {
-                                        "label": "Myeloma",
+                                        "title": "Myeloma",
                                         "value": "none_1577",
                                         "disabled": false
                                     },
                                     {
-                                        "label": "Non-Hodgkin lymphoma",
+                                        "title": "Non-Hodgkin lymphoma",
                                         "value": "none_4564",
                                         "disabled": false
                                     }
                                 ]
                             },
                             {
-                                "label": "Liver cancer",
+                                "title": "Liver cancer",
                                 "value": "none_2479",
                                 "disabled": false
                             },
                             {
-                                "label": "Lung cancer",
+                                "title": "Lung cancer",
                                 "value": "none_1730",
                                 "disabled": false,
                                 "parent": true, 
                                 "children": [
                                     {
-                                        "label": "Lung cancer (small cell)",
+                                        "title": "Lung cancer (small cell)",
                                         "value": "none_8794",
                                         "disabled": false
                                     },
                                     {
-                                        "label": "Lung cancer (adenocarcinoma)",
+                                        "title": "Lung cancer (adenocarcinoma)",
                                         "value": "none_1098",
                                         "disabled": false
                                     },
                                     {
-                                        "label": "Lung cancer (squamous cell)",
+                                        "title": "Lung cancer (squamous cell)",
                                         "value": "none_1153",
                                         "disabled": false
                                     }
                                 ]
                             },
                             {
-                                "label": "Melanoma",
+                                "title": "Melanoma",
                                 "value": "none_312344",
                                 "disabled": false
                             },
                             {
-                                "label": "Non-melanoma skin cancer",
+                                "title": "Non-melanoma skin cancer",
                                 "value": "none_6744",
                                 "disabled": false,
                                 "parent": true, 
                                 "children": [
                                     {
-                                        "label": "Basal cell only",
+                                        "title": "Basal cell only",
                                         "value": "none_5859",
                                         "disabled": false
                                     },
                                     {
-                                        "label": "Basal and squamous cell",
+                                        "title": "Basal and squamous cell",
                                         "value": "none_8359",
                                         "disabled": false
                                     },
                                     {
-                                        "label": "Squamous cell only",
+                                        "title": "Squamous cell only",
                                         "value": "none_1339",
                                         "disabled": false
                                     }
                                 ]
                             },
                             {
-                                "label": "Ovarian cancer",
+                                "title": "Ovarian cancer",
                                 "value": "none_8331",
                                 "disabled": false
                             },
                             {
-                                "label": "Pancreatic cancer",
+                                "title": "Pancreatic cancer",
                                 "value": "none_8924",
                                 "disabled": false
                             },
                             {
-                                "label": "Prostate cancer",
+                                "title": "Prostate cancer",
                                 "value": "none_5934",
                                 "disabled": false,
                                 "parent": true, 
                                 "children": [
                                     {
-                                        "label": "Prostate cancer (advanced)",
+                                        "title": "Prostate cancer (advanced)",
                                         "value": "none_1279",
                                         "disabled": false
                                     },
                                     {
-                                        "label": "Prostate cancer (not advanced)",
+                                        "title": "Prostate cancer (not advanced)",
                                         "value": "none_8342",
                                         "disabled": false
                                     }
                                 ]
                             },
                             {
-                                "label": "Renal cancer",
+                                "title": "Renal cancer",
                                 "value": "none_432432",
                                 "disabled": false
                             },
                             {
-                                "label": "Thyroid cancer",
+                                "title": "Thyroid cancer",
                                 "value": "none_2404",
                                 "disabled": false
                             },
                             {
-                                "label": "Upper GI cancer",
+                                "title": "Upper GI cancer",
                                 "value": "none_1685",
                                 "disabled": false,
                                 "parent": true, 
                                 "children": [
                                     {
-                                        "label": "Esophageal cancer",
+                                        "title": "Esophageal cancer",
                                         "value": "none_7808",
                                         "disabled": false
                                     },
                                     {
-                                        "label": "Gastric cancer",
+                                        "title": "Gastric cancer",
                                         "value": "none_6910",
                                         "disabled": false
                                     }
                                 ]
                             },
                             {
-                                "label": "By pathology",
+                                "title": "By pathology",
                                 "value": "none_9816",
                                 "disabled": false,
                                 "parent": true, 
                                 "children": [
                                     {
-                                        "label": "Solid tumors",
+                                        "title": "Solid tumors",
                                         "value": "none_2837",
                                         "disabled": false,
                                         "parent": true, 
                                         "children": [
                                             {
-                                                "label": "Carcinomas",
+                                                "title": "Carcinomas",
                                                 "value": "none_217",
                                                 "disabled": false,
                                                 "parent": true, 
                                                 "children": [
                                                     {
-                                                        "label": "Adenocarcinomas",
+                                                        "title": "Adenocarcinomas",
                                                         "value": "none_653",
                                                         "disabled": false,
                                                         "parent": true, 
                                                         "children": [
                                                             {
-                                                                "label": "Breast (adenocarcinoma)",
+                                                                "title": "Breast (adenocarcinoma)",
                                                                 "value": "none_1617",
                                                                 "disabled": false
                                                             },
                                                             {
-                                                                "label": "Colorectal cancer (adenocarcinoma)",
+                                                                "title": "Colorectal cancer (adenocarcinoma)",
                                                                 "value": "none_827",
                                                                 "disabled": false
                                                             },
                                                             {
-                                                                "label": "Endometrial cancer (adenocarcinoma)",
+                                                                "title": "Endometrial cancer (adenocarcinoma)",
                                                                 "value": "none_9262",
                                                                 "disabled": false
                                                             },
                                                             {
-                                                                "label": "Lung cancer (adenocarcinoma)",
+                                                                "title": "Lung cancer (adenocarcinoma)",
                                                                 "value": "none_1842",
                                                                 "disabled": false
                                                             },
                                                             {
-                                                                "label": "Pancreatic cancer (adenocarcinoma)",
+                                                                "title": "Pancreatic cancer (adenocarcinoma)",
                                                                 "value": "none_4760",
                                                                 "disabled": false
                                                             },
                                                             {
-                                                                "label": "Prostate cancer (adenocarcinoma)",
+                                                                "title": "Prostate cancer (adenocarcinoma)",
                                                                 "value": "none_363",
                                                                 "disabled": false
                                                             },
                                                             {
-                                                                "label": "Thyroid cancer (adenocarcinoma)",
+                                                                "title": "Thyroid cancer (adenocarcinoma)",
                                                                 "value": "none_3809",
                                                                 "disabled": false
                                                             }
                                                         ]
                                                     },
                                                     {
-                                                        "label": "Squamous cell cancers",
+                                                        "title": "Squamous cell cancers",
                                                         "value": "none_9830",
                                                         "disabled": false,
                                                         "parent": true, 
                                                         "children": [
                                                             {
-                                                                "label": "Esophageal cancer (squamous cell)",
+                                                                "title": "Esophageal cancer (squamous cell)",
                                                                 "value": "none_3637",
                                                                 "disabled": false
                                                             },
                                                             {
-                                                                "label": "Lung cancer (squamous cell)",
+                                                                "title": "Lung cancer (squamous cell)",
                                                                 "value": "none_2950",
                                                                 "disabled": false
                                                             }
                                                         ]
                                                     },
                                                     {
-                                                        "label": "Urothelial cancers",
+                                                        "title": "Urothelial cancers",
                                                         "value": "none_9236",
                                                         "disabled": false,
                                                         "parent": true, 
                                                         "children": [
                                                             {
-                                                                "label": "Bladder cancer (urothelial)",
+                                                                "title": "Bladder cancer (urothelial)",
                                                                 "value": "none_2962",
                                                                 "disabled": false
                                                             },
                                                             {
-                                                                "label": "Renal cancer (urothelial)",
+                                                                "title": "Renal cancer (urothelial)",
                                                                 "value": "none_6976",
                                                                 "disabled": false
                                                             }
                                                         ]
                                                     },
                                                     {
-                                                        "label": "Sarcomas",
+                                                        "title": "Sarcomas",
                                                         "value": "none_2678",
                                                         "disabled": false,
                                                         "parent": true, 
                                                         "children": [
                                                             {
-                                                                "label": "Need to look into",
+                                                                "title": "Need to look into",
                                                                 "value": "none_429",
                                                                 "disabled": false
                                                             }
                                                         ]
                                                     },
                                                     {
-                                                        "label": "Neuroendocrine related cancers",
+                                                        "title": "Neuroendocrine related cancers",
                                                         "value": "none_8325",
                                                         "disabled": false,
                                                         "parent": true, 
                                                         "children": [
                                                             {
-                                                                "label": "Lung cancer (neuroendocrine)",
+                                                                "title": "Lung cancer (neuroendocrine)",
                                                                 "value": "none_9876",
                                                                 "disabled": false
                                                             },
                                                             {
-                                                                "label": "Pancreatic cancer (neuroendocrine)",
+                                                                "title": "Pancreatic cancer (neuroendocrine)",
                                                                 "value": "none_9197",
                                                                 "disabled": false
                                                             },
                                                             {
-                                                                "label": "Thyroid cancer (neuroendocrine)",
+                                                                "title": "Thyroid cancer (neuroendocrine)",
                                                                 "value": "none_2628",
                                                                 "disabled": false
                                                             }
                                                         ]
                                                     },
                                                     {
-                                                        "label": "Hematologic malignancies",
+                                                        "title": "Hematologic malignancies",
                                                         "value": "none_9543",
                                                         "disabled": false,
                                                         "parent": true, 
                                                         "children": [
                                                             {
-                                                                "label": "Hodgkin’s lymphoma",
+                                                                "title": "Hodgkin’s lymphoma",
                                                                 "value": "none_5774",
                                                                 "disabled": false
                                                             },
                                                             {
-                                                                "label": "Non-Hodgkin’s lymphoma",
+                                                                "title": "Non-Hodgkin’s lymphoma",
                                                                 "value": "none_209",
                                                                 "disabled": false
                                                             },
                                                             {
-                                                                "label": "Multiple myeloma",
+                                                                "title": "Multiple myeloma",
                                                                 "value": "none_4198",
                                                                 "disabled": false
                                                             }
                                                         ]
                                                     },
                                                     {
-                                                        "label": "By risk factor",
+                                                        "title": "By risk factor",
                                                         "value": "none_2637",
                                                         "disabled": false,
                                                         "parent": true, 
                                                         "children": [
                                                             {
-                                                                "label": "Smoking related cancers",
+                                                                "title": "Smoking related cancers",
                                                                 "value": "none_8062",
                                                                 "disabled": false,
                                                                 "parent": true, 
                                                                 "children": [
                                                                     {
-                                                                        "label": "Lung cancer",
+                                                                        "title": "Lung cancer",
                                                                         "value": "none_5292",
                                                                         "disabled": false
                                                                     },
                                                                     {
-                                                                        "label": "Bladder cancer",
+                                                                        "title": "Bladder cancer",
                                                                         "value": "none_8395",
                                                                         "disabled": false
                                                                     }
                                                                 ]
                                                             },
                                                             {
-                                                                "label": "Obesity related cancers",
+                                                                "title": "Obesity related cancers",
                                                                 "value": "none_4368",
                                                                 "disabled": false,
                                                                 "parent": true, 
                                                                 "children": [
                                                                     {
-                                                                        "label": "Breast cancer",
+                                                                        "title": "Breast cancer",
                                                                         "value": "none_923",
                                                                         "disabled": false
                                                                     },
                                                                     {
-                                                                        "label": "Colorectal cancer",
+                                                                        "title": "Colorectal cancer",
                                                                         "value": "none_2466",
                                                                         "disabled": false
                                                                     },
                                                                     {
-                                                                        "label": "Esophageal cancer",
+                                                                        "title": "Esophageal cancer",
                                                                         "value": "none_6280",
                                                                         "disabled": false
                                                                     },
                                                                     {
-                                                                        "label": "Kidney cancer",
+                                                                        "title": "Kidney cancer",
                                                                         "value": "none_5467",
                                                                         "disabled": false
                                                                     }
                                                                 ]
                                                             },
                                                             {
-                                                                "label": "Hormone-related cancers",
+                                                                "title": "Hormone-related cancers",
                                                                 "value": "none_5782",
                                                                 "disabled": false,
                                                                 "parent": true, 
                                                                 "children": [
                                                                     {
-                                                                        "label": "Breast cancer",
+                                                                        "title": "Breast cancer",
                                                                         "value": "none_3986",
                                                                         "disabled": false
                                                                     },
                                                                     {
-                                                                        "label": "Endometrial cancer",
+                                                                        "title": "Endometrial cancer",
                                                                         "value": "none_3966",
                                                                         "disabled": false
                                                                     },
                                                                     {
-                                                                        "label": "Ovarian cancer",
+                                                                        "title": "Ovarian cancer",
                                                                         "value": "none_8838",
                                                                         "disabled": false
                                                                     },
                                                                     {
-                                                                        "label": "Prostate cancer",
+                                                                        "title": "Prostate cancer",
                                                                         "value": "none_9281",
                                                                         "disabled": false
                                                                     }
                                                                 ]
                                                             },
                                                             {
-                                                                "label": "Physical activity related cancers",
+                                                                "title": "Physical activity related cancers",
                                                                 "value": "none_9189",
                                                                 "disabled": false,
                                                                 "parent": true, 
                                                                 "children": [
                                                                     {
-                                                                        "label": "Need to look into",
+                                                                        "title": "Need to look into",
                                                                         "value": "none_8628",
                                                                         "disabled": false
                                                                     }
                                                                 ]
                                                             },
                                                             {
-                                                                "label": "Alcohol-related cancers",
+                                                                "title": "Alcohol-related cancers",
                                                                 "value": "none_5314",
                                                                 "disabled": false,
                                                                 "parent": true, 
                                                                 "children": [
                                                                     {
-                                                                        "label": "Breast cancer",
+                                                                        "title": "Breast cancer",
                                                                         "value": "none_4782",
                                                                         "disabled": false
                                                                     },
                                                                     {
-                                                                        "label": "Liver cancer",
+                                                                        "title": "Liver cancer",
                                                                         "value": "none_7107",
                                                                         "disabled": false
                                                                     }
                                                                 ]
                                                             },
                                                             {
-                                                                "label": "Infection-related cancers",
+                                                                "title": "Infection-related cancers",
                                                                 "value": "none_3780",
                                                                 "disabled": false,
                                                                 "parent": true, 
                                                                 "children": [
                                                                     {
-                                                                        "label": "H. pylori cancers",
+                                                                        "title": "H. pylori cancers",
                                                                         "value": "none_4635",
                                                                         "disabled": false,
                                                                         "parent": true, 
                                                                         "children": [
                                                                             {
-                                                                                "label": "Gastric cancer",
+                                                                                "title": "Gastric cancer",
                                                                                 "value": "none_3545",
                                                                                 "disabled": false
                                                                             }
                                                                         ]
                                                                     },
                                                                     {
-                                                                        "label": "HPV-related cancers",
+                                                                        "title": "HPV-related cancers",
                                                                         "value": "none_9767",
                                                                         "disabled": false,
                                                                         "parent": true, 
                                                                         "children": [
                                                                             {
-                                                                                "label": "Cervical cancer",
+                                                                                "title": "Cervical cancer",
                                                                                 "value": "none_8284",
                                                                                 "disabled": false
                                                                             },
                                                                             {
-                                                                                "label": "Head and neck cancer",
+                                                                                "title": "Head and neck cancer",
                                                                                 "value": "none_4008",
                                                                                 "disabled": false
                                                                             }
                                                                         ]
                                                                     },
                                                                     {
-                                                                        "label": "Family history of cancer",
+                                                                        "title": "Family history of cancer",
                                                                         "value": "none_4342",
                                                                         "disabled": false
                                                                     }
@@ -661,135 +661,135 @@
         ]
     },
     {
-        "label": "Lifestyle factors",
+        "title": "Lifestyle factors",
         "value": "none_9856",
         "disabled": false,
         "parent": true, 
         "children": [
             {
-                "label": "Alcohol consumption",
+                "title": "Alcohol consumption",
                 "value": "none_6802",
                 "disabled": false
             },
             {
-                "label": "Diet",
+                "title": "Diet",
                 "value": "none_1578",
                 "disabled": false,
                 "parent": true, 
                 "children": [
                     {
-                        "label": "Caffeine intake",
+                        "title": "Caffeine intake",
                         "value": "none_9975",
                         "disabled": false
                     },
                     {
-                        "label": "Fat intake",
+                        "title": "Fat intake",
                         "value": "none_661",
                         "disabled": false
                     },
                     {
-                        "label": "Protein intake",
+                        "title": "Protein intake",
                         "value": "none_5746",
                         "disabled": false
                     }
                 ]
             },
             {
-                "label": "Exercise",
+                "title": "Exercise",
                 "value": "none_3330",
                 "disabled": false,
                 "parent": true, 
                 "children": [
                     {
-                        "label": "Flights of stairs",
+                        "title": "Flights of stairs",
                         "value": "none_186",
                         "disabled": false
                     },
                     {
-                        "label": "Light activity duration",
+                        "title": "Light activity duration",
                         "value": "none_564",
                         "disabled": false
                     },
                     {
-                        "label": "Mile walk frequency",
+                        "title": "Mile walk frequency",
                         "value": "none_6641",
                         "disabled": false
                     },
                     {
-                        "label": "Moderate activity duration",
+                        "title": "Moderate activity duration",
                         "value": "none_4419",
                         "disabled": false
                     },
                     {
-                        "label": "Strenuous activity frequency",
+                        "title": "Strenuous activity frequency",
                         "value": "none_1142",
                         "disabled": false
                     },
                     {
-                        "label": "Strenuous activity duration",
+                        "title": "Strenuous activity duration",
                         "value": "none_7673",
                         "disabled": false
                     },
                     {
-                        "label": "Vigorous activity at 40",
+                        "title": "Vigorous activity at 40",
                         "value": "none_5113",
                         "disabled": false
                     },
                     {
-                        "label": "Vigorous activity current",
+                        "title": "Vigorous activity current",
                         "value": "none_2606",
                         "disabled": false
                     },
                     {
-                        "label": "Walking pace",
+                        "title": "Walking pace",
                         "value": "none_2072",
                         "disabled": false
                     }
                 ]
             },
             {
-                "label": "Smoking",
+                "title": "Smoking",
                 "value": "none_5080",
                 "disabled": false,
                 "parent": true, 
                 "children": [
                     {
-                        "label": "Cigarette smoking status",
+                        "title": "Cigarette smoking status",
                         "value": "none_8656",
                         "disabled": false
                     },
                     {
-                        "label": "Cigarette type",
+                        "title": "Cigarette type",
                         "value": "none_1344",
                         "disabled": false
                     },
                     {
-                        "label": "Cigarettes per day",
+                        "title": "Cigarettes per day",
                         "value": "none_5657",
                         "disabled": false
                     },
                     {
-                        "label": "Experience cigarette cravings",
+                        "title": "Experience cigarette cravings",
                         "value": "none_1468",
                         "disabled": false
                     },
                     {
-                        "label": "Filtered or Non-filtered",
+                        "title": "Filtered or Non-filtered",
                         "value": "none_8485",
                         "disabled": false
                     },
                     {
-                        "label": "Menthol or non-menthol",
+                        "title": "Menthol or non-menthol",
                         "value": "none_8667",
                         "disabled": false
                     },
                     {
-                        "label": "Number of cigarettes smoked per day",
+                        "title": "Number of cigarettes smoked per day",
                         "value": "none_4954",
                         "disabled": false
                     },
                     {
-                        "label": "Wake up smoke",
+                        "title": "Wake up smoke",
                         "value": "none_9888",
                         "disabled": false
                     }
@@ -798,192 +798,192 @@
         ]
     },
     {
-        "label": "Medical conditions",
+        "title": "Medical conditions",
         "value": "none_9645",
         "disabled": false,
         "parent": true, 
         "children": [
             {
-                "label": "Arthritis",
+                "title": "Arthritis",
                 "value": "none_5077",
                 "disabled": false
             },
             {
-                "label": "Asthma",
+                "title": "Asthma",
                 "value": "none_6259",
                 "disabled": false
             },
             {
-                "label": "Benign ovarian cyst/tumor",
+                "title": "Benign ovarian cyst/tumor",
                 "value": "none_6373",
                 "disabled": false
             },
             {
-                "label": "Broken bone",
+                "title": "Broken bone",
                 "value": "none_4883",
                 "disabled": false,
                 "parent": true, 
                 "children": [
                     {
-                        "label": "Broken arm",
+                        "title": "Broken arm",
                         "value": "none_5431",
                         "disabled": false
                     },
                     {
-                        "label": "Broken hip",
+                        "title": "Broken hip",
                         "value": "none_8227",
                         "disabled": false
                     },
                     {
-                        "label": "Broken vertebra",
+                        "title": "Broken vertebra",
                         "value": "none_3452",
                         "disabled": false
                     },
                     {
-                        "label": "Broken other",
+                        "title": "Broken other",
                         "value": "none_5335",
                         "disabled": false
                     }
                 ]
             },
             {
-                "label": "Bronchitis",
+                "title": "Bronchitis",
                 "value": "none_9336",
                 "disabled": false
             },
             {
-                "label": "Cirrhosis",
+                "title": "Cirrhosis",
                 "value": "none_5164",
                 "disabled": false
             },
             {
-                "label": "Colorectal polyps",
+                "title": "Colorectal polyps",
                 "value": "none_7533",
                 "disabled": false
             },
             {
-                "label": "Crohn’s disease",
+                "title": "Crohn’s disease",
                 "value": "none_2401",
                 "disabled": false
             },
             {
-                "label": "Diabetes",
+                "title": "Diabetes",
                 "value": "none_9530",
                 "disabled": false
             },
             {
-                "label": "Diverticulitis/Diverticulosis",
+                "title": "Diverticulitis/Diverticulosis",
                 "value": "none_6127",
                 "disabled": false
             },
             {
-                "label": "Emphysema",
+                "title": "Emphysema",
                 "value": "none_757",
                 "disabled": false
             },
             {
-                "label": "Endometriosis",
+                "title": "Endometriosis",
                 "value": "none_2601",
                 "disabled": false
             },
             {
-                "label": "Enlarged prostate of BPH",
+                "title": "Enlarged prostate of BPH",
                 "value": "none_4991",
                 "disabled": false
             },
             {
-                "label": "Fibrotic breast disease",
+                "title": "Fibrotic breast disease",
                 "value": "none_9021",
                 "disabled": false
             },
             {
-                "label": "Gallbladder stones or inflammation",
+                "title": "Gallbladder stones or inflammation",
                 "value": "none_2761",
                 "disabled": false
             },
             {
-                "label": "Heart attack",
+                "title": "Heart attack",
                 "value": "none_204",
                 "disabled": false
             },
             {
-                "label": "Hepatitis",
+                "title": "Hepatitis",
                 "value": "none_2954",
                 "disabled": false
             },
             {
-                "label": "High cholesterol",
+                "title": "High cholesterol",
                 "value": "none_5463",
                 "disabled": false
             },
             {
-                "label": "Hypertension",
+                "title": "Hypertension",
                 "value": "none_8195",
                 "disabled": false
             },
             {
-                "label": "Inflamed prostate",
+                "title": "Inflamed prostate",
                 "value": "none_2143",
                 "disabled": false
             },
             {
-                "label": "Osteoporosis",
+                "title": "Osteoporosis",
                 "value": "none_1696",
                 "disabled": false
             },
             {
-                "label": "Stroke",
+                "title": "Stroke",
                 "value": "none_7058",
                 "disabled": false
             },
             {
-                "label": "Ulcerative colitis",
+                "title": "Ulcerative colitis",
                 "value": "none_1838",
                 "disabled": false
             },
             {
-                "label": "Uterine fibroid tumors",
+                "title": "Uterine fibroid tumors",
                 "value": "none_2510",
                 "disabled": false
             }
         ]
     },
     {
-        "label": "Reproductive factors",
+        "title": "Reproductive factors",
         "value": "none_2736",
         "disabled": false,
         "parent": true, 
         "children": [
             {
-                "label": "Age of menarche",
+                "title": "Age of menarche",
                 "value": "none_7280",
                 "disabled": false
             },
             {
-                "label": "Age of menopause",
+                "title": "Age of menopause",
                 "value": "none_1296",
                 "disabled": false
             },
             {
-                "label": "Ever try to become pregnant without success",
+                "title": "Ever try to become pregnant without success",
                 "value": "none_5150",
                 "disabled": false
             }
         ]
     },
     {
-        "label": "Mortality",
+        "title": "Mortality",
         "value": "none_4085",
         "disabled": false,
         "parent": true, 
         "children": [
             {
-                "label": "All-cause mortality",
+                "title": "All-cause mortality",
                 "value": "none_922",
                 "disabled": false
             },
             {
-                "label": "Cancer-specific mortality",
+                "title": "Cancer-specific mortality",
                 "value": "none_7340",
                 "disabled": false
             }

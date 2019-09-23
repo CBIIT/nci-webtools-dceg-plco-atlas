@@ -64,12 +64,12 @@ export function SearchFormTraits({ onChange, onSubmit, onReset }) {
   const removeFlatDisabled = (phenoList) => phenoList.map(node => {
     return {
       value: node.value,
-      label: node.label
+      title: node.title
     };
   });
 
   const alphabetizedPhenotypes = [...phenotypes].sort((a, b) =>
-    a.label.localeCompare(b.label)
+    a.title.localeCompare(b.title)
   );
 
   return (
@@ -95,7 +95,7 @@ export function SearchFormTraits({ onChange, onSubmit, onReset }) {
           }
           value={selectedPhenotypes}
           onChange={handleChange}
-          treeNodeFilterProp="label"
+          treeNodeFilterProp="title"
           dropdownMatchSelectWidth
           autoClearSearchValue
           // treeDefaultExpandAll
@@ -111,8 +111,8 @@ export function SearchFormTraits({ onChange, onSubmit, onReset }) {
           value={selectedGender}
           onChange={e => setSelectedGender(e.target.value)}>
           <option value="combined">All</option>
-          <option value="male">Male</option>
           <option value="female">Female</option>
+          <option value="male">Male</option>
         </select>
 
         <Button
