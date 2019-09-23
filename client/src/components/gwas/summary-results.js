@@ -26,6 +26,8 @@ export function SummaryResults() {
     page,
     pageSize,
     resultsCount,
+    selectedGender,
+    selectedManhattanPlotType
   } = useSelector(state => state.summaryResults);
 
   const setSubmitted = submitted => {
@@ -225,7 +227,8 @@ export function SummaryResults() {
     dispatch(
       updateVariantLookup({
         selectedPhenotypes: [selectedPhenotype],
-        selectedVariant: snp
+        selectedVariant: snp,
+        selectedGender: selectedManhattanPlotType === 'male' || selectedManhattanPlotType === 'female' ? selectedManhattanPlotType : 'combined'
       })
     );
     dispatch(lookupVariants([selectedPhenotype], snp));

@@ -190,12 +190,19 @@ export function Heatmap() {
   };
 
   const getZColor = (phenotype1, phenotype2, correlationData) => {
-    var r2;
-    if (phenotype2 in correlationData[phenotype1]) {
-      r2 = correlationData[phenotype1][phenotype2];
-    } else {
-      r2 = correlationData[phenotype2][phenotype1];
-    }
+    var r2 = 0.0;
+    // for (var i = 0; i < correlationData.length; i++) {
+    //   if ((correlationData[i][0] === phenotype1 && correlationData[i][2] === phenotype2) ||
+    //       (correlationData[i][0] === phenotype2 && correlationData[i][2] === phenotype1)) {
+    //     r2 = correlationData[i][4];
+    //     break;
+    //   }
+    // }
+    // if (phenotype2 in correlationData[phenotype1]) {
+    //   r2 = correlationData[phenotype1][phenotype2];
+    // } else {
+    //   r2 = correlationData[phenotype2][phenotype1];
+    // }
 
     if (r2 === -1.0 || r2 === 1.0) {
       r2 = 0.0;
@@ -205,28 +212,38 @@ export function Heatmap() {
   };
 
   const getZText = (phenotype1, phenotype2, correlationData) => {
-    var r2;
-    if (phenotype2 in correlationData[phenotype1]) {
-      r2 = correlationData[phenotype1][phenotype2];
-    } else {
-      r2 = correlationData[phenotype2][phenotype1];
-    }
+    var r2 = 0.0;
+    // for (var i = 0; i < correlationData.length; i++) {
+    //   if ((correlationData[i][0] === phenotype1 && correlationData[i][2] === phenotype2) ||
+    //       (correlationData[i][0] === phenotype2 && correlationData[i][2] === phenotype1)) {
+    //     r2 = correlationData[i][4];
+    //     break;
+    //   }
+    // }
 
     return r2;
   };
+
+  const distinct = (val, idx, self) => {
+    return self.indexOf(val) === idx;
+  }
 
   const loadSamplePhenotypes = async () => {
     setLoading(true);
     setPopupTooltipData(null);
 
-    const correlationData = await query(`data/sample_correlations.json`);
-
-    let uniquePhenotypes = Object.keys(correlationData);
+    const correlationData = await query(`data/sample_correlations_sanitized.json`);
+    console.log("correlationData", correlationData.data);
+    let uniquePhenotypes = correlationData.data.map(item => item[0])
+    uniquePhenotypes = uniquePhenotypes.filter(distinct);
+    console.log("uniquePhenotypes", uniquePhenotypes);
+    // let uniquePhenotypes = Object.keys(correlationData);
     // uniquePhenotypes = uniquePhenotypes.slice(4, 9);
     let x = [];
     let y = [];
     let zColor = [];
     let zText = [];
+
     for (var i = 0; i < uniquePhenotypes.length; i++) {
       x.push(uniquePhenotypes[i]);
       y.unshift(uniquePhenotypes[i]);
@@ -236,8 +253,8 @@ export function Heatmap() {
       let rowColor = [];
       let rowText = [];
       for (var yidx = 0; yidx < y.length; yidx++) {
-        rowColor.unshift(getZColor(x[xidx], y[yidx], correlationData));
-        rowText.unshift(getZText(x[xidx], y[yidx], correlationData));
+        rowColor.unshift(getZColor(x[xidx], y[yidx], correlationData.data));
+        rowText.unshift(getZText(x[xidx], y[yidx], correlationData.data));
       }
       zColor.unshift(rowColor);
       zText.unshift(rowText);

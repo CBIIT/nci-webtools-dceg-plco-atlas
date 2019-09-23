@@ -63,7 +63,7 @@ export function ManhattanPlot({
       xAxis: {
         title: [
           {
-            text: selectedPhenotype.label,
+            text: selectedPhenotype.title,
             font: `600 14px ${systemFont}`
           }
         ],
@@ -113,7 +113,7 @@ export function ManhattanPlot({
       xAxis: {
         title: [
           {
-            text: selectedPhenotype.label,
+            text: selectedPhenotype.title,
             font: `600 14px ${systemFont}`
           }
         ],
@@ -164,7 +164,7 @@ export function ManhattanPlot({
       nLogP: data[columnIndexes.nLogP]
     });
 
-    let title = `${selectedPhenotype.label} - Chr ${selectedChromosome}`;
+    let title = `${selectedPhenotype.title} - Chr ${selectedChromosome}`;
     let range = ranges.find(r => r.chr === selectedChromosome);
 
     return {

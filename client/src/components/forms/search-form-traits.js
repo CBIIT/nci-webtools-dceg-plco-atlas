@@ -14,7 +14,8 @@ import 'rc-tree-select/assets/index.css';
 export function SearchFormTraits({ onChange, onSubmit, onReset }) {
   const dispatch = useDispatch();
   const phenotypes = useSelector(state => state.phenotypes);
-  const phenotypesTree = useSelector(state => state.phenotypesTree);
+  // const phenotypesTree = useSelector(state => state.phenotypesTree);
+  const phenotypesHeatmapTree = useSelector(state => state.phenotypesHeatmapTree);
 
   const phenotypeCorrelations = useSelector(
     state => state.phenotypeCorrelations
@@ -60,8 +61,15 @@ export function SearchFormTraits({ onChange, onSubmit, onReset }) {
     onChange(values);
   };
 
+  const removeFlatDisabled = (phenoList) => phenoList.map(node => {
+    return {
+      value: node.value,
+      title: node.title
+    };
+  });
+
   const alphabetizedPhenotypes = [...phenotypes].sort((a, b) =>
-    a.label.localeCompare(b.label)
+    a.title.localeCompare(b.title)
   );
 
   return (
@@ -82,12 +90,12 @@ export function SearchFormTraits({ onChange, onSubmit, onReset }) {
           dropdownStyle={{ maxHeight: 500, overflow: 'auto' }}
           treeData={
             selectedListType === 'alphabetic'
-              ? alphabetizedPhenotypes
-              : phenotypesTree
+              ? removeFlatDisabled(alphabetizedPhenotypes)
+              : phenotypesHeatmapTree
           }
           value={selectedPhenotypes}
           onChange={handleChange}
-          treeNodeFilterProp="label"
+          treeNodeFilterProp="title"
           dropdownMatchSelectWidth
           autoClearSearchValue
           // treeDefaultExpandAll
@@ -103,8 +111,8 @@ export function SearchFormTraits({ onChange, onSubmit, onReset }) {
           value={selectedGender}
           onChange={e => setSelectedGender(e.target.value)}>
           <option value="combined">All</option>
-          <option value="male">Male</option>
           <option value="female">Female</option>
+          <option value="male">Male</option>
         </select>
 
         <Button

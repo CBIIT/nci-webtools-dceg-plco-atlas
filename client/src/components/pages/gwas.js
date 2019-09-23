@@ -5,7 +5,7 @@ import { ButtonGroup, Button, Card, Nav, NavItem } from 'react-bootstrap';
 import { SummaryResults } from '../gwas/summary-results';
 import { VariantLookup } from '../gwas/variant-lookup';
 import { PhenotypeCorrelations } from '../gwas/phenotype-correlations';
-import { updatePhenotypes, updatePhenotypesTree } from '../../services/actions';
+import { updatePhenotypes, updatePhenotypesTree, updatePhenotypesHeatmapTree } from '../../services/actions';
 import { query } from '../../services/query';
 
 export function Gwas() {
@@ -17,7 +17,7 @@ export function Gwas() {
       // only populate alphabetic phenotype list with leaf nodes
       if (node.children === undefined) {
         records.push({
-          label: node.label,
+          title: node.title,
           value: node.value,
           disabled: node.disabled
         });
@@ -29,6 +29,10 @@ export function Gwas() {
       data.forEach(populateRecords, 0);
       dispatch(updatePhenotypes(records));
       dispatch(updatePhenotypesTree(data));
+    });
+
+    query('data/phenotypes-heatmap.json').then(data => {
+      dispatch(updatePhenotypesHeatmapTree(data));
     });
   }, []);
 
@@ -49,7 +53,7 @@ export function Gwas() {
 
   return (
     <>
-      <div class="container">
+      <div className="container">
         <div
           // className="border-top-0"
           // style={{borderRadius: '0 0 0.25em 0.25em'}}

@@ -38,13 +38,13 @@ export function SearchFormTrait({ onChange, onSubmit, onReset }) {
   const handleSelect = (value, node, extra) => {
     // can only select leaf nodes
     if (node.props.children.length === 0 && !node.props.parent) {
-      setSelectedPhenotype(value);
-      onChange(value);
+      setSelectedPhenotype({value: value.value, title: value.label});
+      onChange({value: value.value, title: value.label});
     }
   };
 
   const alphabetizedPhenotypes = [...phenotypes].sort((a, b) =>
-    a.label.localeCompare(b.label)
+    a.title.localeCompare(b.title)
   );
 
   return (
@@ -70,7 +70,7 @@ export function SearchFormTrait({ onChange, onSubmit, onReset }) {
         value={selectedPhenotype}
         onChange={handleChange}
         onSelect={handleSelect}
-        treeNodeFilterProp="label"
+        treeNodeFilterProp="title"
         dropdownMatchSelectWidth
         autoClearSearchValue
         // treeDefaultExpandAll
@@ -87,9 +87,9 @@ export function SearchFormTrait({ onChange, onSubmit, onReset }) {
         onChange={e => setSelectedManhattanPlotType(e.target.value)}
         aria-label="Select the type of data you wish to plot">
         <option value="aggregate">All</option>
-        <option value="stacked">Male/Female (Stacked)</option>
-        <option value="male">Male</option>
+        <option value="stacked">Female/Male (Stacked)</option>
         <option value="female">Female</option>
+        <option value="male">Male</option>
       </select>
 
       <Button

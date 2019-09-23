@@ -49,7 +49,7 @@ export function Select({
           <div
             className={optionClassName}
             onClick={e => updateValue(option.value)}>
-            {option.label}
+            {option.title}
           </div>
         );
       })}
