@@ -7,7 +7,7 @@ const sqlite = require('better-sqlite3');
 // retrieve arguments
 const argv = process.argv.slice(2);
 if (argv.length !== 3 || argv.includes('-h')) {
-    console.log(`USAGE: node import.js input.meta phenotypes.json output.json`)
+    console.log(`USAGE: node import.js input.txt phenotypes.json output.json`)
     process.exit(0);
 }
 
@@ -27,7 +27,7 @@ if (!fs.existsSync(phenotypesFilePath)) {
     process.exit(1);
 }
 
-// db file should not already exist
+// json file should not already exist
 if (fs.existsSync(jsonFilePath)) {
     console.error(`ERROR: ${jsonFilePath} already exists.`)
     process.exit(2);
@@ -77,23 +77,24 @@ const populatePhenotypes = node => {
 phenotypesTree.forEach(populatePhenotypes, 0);
 console.log("# of phenotypes = ", phenotypes.length);
 
-var phenotypeCorrelations = { data: [] };
+// var phenotypeCorrelations = { data: [] };
+var phenotypeCorrelations = {};
 
 // create phenotype correlations object for all phenotype combinations
 for (let x = 0; x < phenotypes.length; x ++) {
     for (let y = 0; y < phenotypes.length; y ++) {
-        // if (!(phenotypes[x].title in phenotypeCorrelations)) {
-        //     let corr = {};
-        //     corr[phenotypes[y].title] = 0;
-        //     phenotypeCorrelations[phenotypes[x].title] = corr;
-        // } else {
-        //     phenotypeCorrelations[phenotypes[x].title][phenotypes[y].title] = 0;
-        // }
-        phenotypeCorrelations.data.push([phenotypes[x].title, phenotypes[x].value, phenotypes[y].title, phenotypes[y].value, 0]);
+        if (!(phenotypes[x].title in phenotypeCorrelations)) {
+            let corr = {};
+            corr[phenotypes[y].title] = null;
+            phenotypeCorrelations[phenotypes[x].title] = corr;
+        } else {
+            phenotypeCorrelations[phenotypes[x].title][phenotypes[y].title] = 0;
+        }
+        // phenotypeCorrelations.data.push([phenotypes[x].title, phenotypes[x].value, phenotypes[y].title, phenotypes[y].value, 0]);
     }
 }
 
-console.log(phenotypeCorrelations);
+// console.log(phenotypeCorrelations);
 
 let count = 0;
 // var out_obj = {};
@@ -104,14 +105,25 @@ readerCorrelations.on('line', line => {
     // trim, split by spaces, and parse 'NA' as null
     const values = parseLine(line);
     const [phenotype1, phenotype2, r2] = values;    
-    for (let i = 0; i < phenotypeCorrelations.data.length; i++) {
-        if (phenotypeCorrelations.data[i][0] === phenotype1 && phenotypeCorrelations.data[i][2] === phenotype2) {
-            phenotypeCorrelations.data[i][4] = r2
+
+    if (phenotype1 in phenotypeCorrelations || phenotype2 in phenotypeCorrelations) {
+        if (phenotype1 in phenotypeCorrelations) {
+            phenotypeCorrelations[phenotype1][phenotype2] = r2;
         }
-        if (phenotypeCorrelations.data[i][0] === phenotype2 && phenotypeCorrelations.data[i][2] === phenotype1) {
-            phenotypeCorrelations.data[i][4] = r2
+        if (phenotype2 in phenotypeCorrelations) {
+            phenotypeCorrelations[phenotype2][phenotype1] = r2;
         }
+    } else {
+        console.log("No match", line);
     }
+    // for (let i = 0; i < phenotypeCorrelations.data.length; i++) {
+    //     if (phenotypeCorrelations.data[i][0] === phenotype1 && phenotypeCorrelations.data[i][2] === phenotype2) {
+    //         phenotypeCorrelations.data[i][4] = r2
+    //     }
+    //     if (phenotypeCorrelations.data[i][0] === phenotype2 && phenotypeCorrelations.data[i][2] === phenotype1) {
+    //         phenotypeCorrelations.data[i][4] = r2
+    //     }
+    // }
 });
 
 readerCorrelations.on('close', () => {
