@@ -1,14 +1,18 @@
 CREATE TABLE correlations_stage
 (
-    "phenotype1"    TEXT,
-    "phenotype2"    TEXT,
-    "r2"            REAL
+    "phenotype1_title"      TEXT,
+    "phenotype1_value"      TEXT,
+    "phenotype2_title"      TEXT,
+    "phenotype2_value"      TEXT,
+    "r2"                    REAL
 );
 
 CREATE TABLE correlations
 (
-    "variant_id"    INTEGER PRIMARY KEY,
-    "phenotype1"    TEXT,
-    "phenotype2"    TEXT,
-    "r2"            REAL
+    "correlations_id"       INTEGER PRIMARY KEY,
+    "phenotype1_title"      TEXT,
+    "phenotype1_value"      TEXT,
+    "phenotype2_title"      TEXT,
+    "phenotype2_value"      TEXT,
+    "r2"                    REAL
 );

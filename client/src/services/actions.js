@@ -89,78 +89,113 @@ export function drawQQPlot(phenotype) {
 
 export function drawHeatmap(phenotypes) {
   return async function(dispatch) {
+    const getZColor = (phenotype1, phenotype2, correlationData) => {
+      var r2 = 0.0;
+      if (phenotype1 in correlationData && phenotype2 in correlationData) {
+        if (phenotype2 in correlationData[phenotype1] || phenotype1 in correlationData[phenotype2]) {
+          if (phenotype2 in correlationData[phenotype1]) {
+            r2 = correlationData[phenotype1][phenotype2];
+          } else {
+            r2 = correlationData[phenotype2][phenotype1];
+          }
+        } else {
+          r2 = 0.0;
+        }
+      } else {
+        r2 = 0.0;
+      }
+      
+  
+      if (r2 === -1.0 || r2 === 1.0) {
+        r2 = 0.0;
+      }
+  
+      return r2;
+    };
+    const getZText = (phenotype1, phenotype2, correlationData) => {
+      var r2 = 0.0;
+      if (phenotype1 in correlationData && phenotype2 in correlationData) {
+        if (phenotype2 in correlationData[phenotype1] || phenotype1 in correlationData[phenotype2]) {
+          if (phenotype2 in correlationData[phenotype1]) {
+            r2 = correlationData[phenotype1][phenotype2];
+          } else {
+            r2 = correlationData[phenotype2][phenotype1];
+          }
+        } else {
+          r2 = 0.0;
+        }
+      } else {
+        r2 = 0.0;
+      }
+  
+      return r2;
+    };
     const setLoading = loading => {
       dispatch(updateSummaryResults({ loading }));
     };
     const setHeatmapData = heatmapData => {
       dispatch(updatePhenotypeCorrelations({ heatmapData }));
     };
-    const stringScore = (stringX, stringY) => {
-      var sum = 0;
-      for (var x = 0; x < stringX.length; x++) {
-        sum += stringX.charCodeAt(x);
-      }
-      for (var y = 0; y < stringY.length; y++) {
-        sum -= stringY.charCodeAt(y);
-      }
-      return Math.abs(sum);
+    const setPopupTooltipData = popupTooltipData => {
+      dispatch(updatePhenotypeCorrelations({ popupTooltipData }));
     };
-
+    const setPlottedPhenotypes = plottedPhenotypes => {
+      dispatch(updatePhenotypeCorrelations({ plottedPhenotypes }));
+    }
     setLoading(true);
+    setPopupTooltipData(null);
 
-    console.log('DRAW HEATMAP', phenotypes);
+    setHeatmapData([]);
+    setPlottedPhenotypes([]);
 
-    let n = phenotypes.length;
-    let x = [];
-    let y = [];
-    let z = [];
-    for (var i = 1; i <= n; i++) {
-      let pheno =
-        i +
-        ' ' +
-        Math.random()
-          .toString(36)
-          .substring(2, 6);
-      x.push(pheno);
-      y.unshift(pheno);
-    }
+    const correlationData = await query(`data/sample_correlations_sanitized.json`);
+    
+    var uniquePhenotypes = phenotypes.map(phenotype => phenotype.title ? phenotype.title : phenotype.label);
+    setPlottedPhenotypes(uniquePhenotypes);
+    let n = uniquePhenotypes.length;
+    let x = uniquePhenotypes;
+    let y = uniquePhenotypes;
+    let zColor = [];
+    let zText = [];
+
     for (var xidx = 0; xidx < n; xidx++) {
-      let row = [];
+      let rowColor = [];
+      let rowText = [];
       for (var yidx = 0; yidx < n; yidx++) {
-        if (x[xidx] === y[yidx]) {
-          row.push(0.0);
-        } else {
-          row.push(stringScore(x[xidx], y[yidx]));
-        }
+        rowColor.push(getZColor(x[xidx], y[yidx], correlationData));
+        rowText.push(getZText(x[xidx], y[yidx], correlationData));
       }
-      z.push(row);
+      zColor.push(rowColor);
+      zText.push(rowText);
     }
-    let randomData = {
+
+    let sampleData = {
       x,
       y,
-      z,
+      z: zColor,
+      zmin: -1.0,
+      zmax: 1.0,
+      text: zText,
       xgap: 1,
       ygap: 1,
       type: 'heatmap',
       colorscale: [
-        ['0.0', 'rgb(255,255,255)'],
-        ['0.444444444444', 'rgb(255,0,0)'],
+        ['0.0', 'rgb(0,0,255)'],
         ['0.5', 'rgb(255,255,255)'],
-        ['1.0', 'rgb(0,0,255)']
+        ['1.0', 'rgb(255,0,0)']
       ],
       showscale: false,
       hoverinfo: 'x+y',
       hovertemplate:
         '<br><b>Phenotype X</b>: %{x}<br>' +
         '<b>Phenotype Y</b>: %{y}<br>' +
-        '<b>Correlation</b>: %{z}' +
+        '<b>Correlation</b>: %{text}' +
         '<extra></extra>'
     };
-    setHeatmapData([randomData]);
-
+    setHeatmapData([sampleData]);
     setLoading(false);
-  };
-}
+  }
+};
 
 export function lookupVariants(phenotypes, variant) {
   return async function(dispatch) {

@@ -50,6 +50,7 @@ const initialState = {
     // drawHeatmap: null,
     selectedListType: 'categorical',
     selectedPhenotypes: [],
+    plottedPhenotypes: [],
     selectedGender: 'combined',
     heatmapData: [],
     results: [],

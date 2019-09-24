@@ -34,7 +34,7 @@ export function PhenotypeCorrelations() {
   const placeholder = (
     <div style={{ display: submitted ? 'none' : 'block' }}>
       <p className="h4 text-center my-5">
-        Please select phenotype(s) and input variant to view this table.
+        Please select phenotypes to view this plot.
       </p>
     </div>
   );
@@ -67,6 +67,7 @@ export function PhenotypeCorrelations() {
       updatePhenotypeCorrelations({
         selectedListType: 'categorical',
         selectedPhenotypes: [],
+        plottedPhenotypes: [],
         selectedGender: 'combined',
         heatmapData: [],
         results: [],
