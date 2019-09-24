@@ -23,11 +23,12 @@ export function VariantLookup() {
     {
       dataField: 'phenotype',
       text: 'Phenotype',
-      sort: true
-    },
-    {
-      dataField: 'snp',
-      text: 'SNP'
+      sort: true,
+      style: {
+        overflowX: 'hidden',
+        textOverflow: 'ellipsis',
+        whiteSpace: 'nowrap'
+      },
     },
     {
       dataField: 'chr',
@@ -115,7 +116,7 @@ export function VariantLookup() {
           style={{minHeight: '50vh'}}>
 
           <div
-            className="mw-100 my-4"
+            className="mw-100 my-4 px-5"
             style={{ display: submitted ? 'block' : 'none' }}>
             <Table
               bootstrap4
