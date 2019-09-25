@@ -14,8 +14,7 @@ import 'rc-tree-select/assets/index.css';
 export function SearchFormTraits({ onChange, onSubmit, onReset }) {
   const dispatch = useDispatch();
   const phenotypes = useSelector(state => state.phenotypes);
-  // const phenotypesTree = useSelector(state => state.phenotypesTree);
-  const phenotypesHeatmapTree = useSelector(state => state.phenotypesHeatmapTree);
+  const phenotypesTree = useSelector(state => state.phenotypesTree);
 
   const phenotypeCorrelations = useSelector(
     state => state.phenotypeCorrelations
@@ -61,6 +60,14 @@ export function SearchFormTraits({ onChange, onSubmit, onReset }) {
     onChange(values);
   };
 
+  const removeTreeDisabled = (phenoTree) => {
+    let phenoTreeAllEnabled = [...phenoTree];
+    let phenoTreeAllEnabledString = JSON.stringify(phenoTreeAllEnabled)
+    phenoTreeAllEnabledString = phenoTreeAllEnabledString.replace(/\"disabled\":true/g, `\"disabled\":false`);
+    phenoTreeAllEnabled = JSON.parse(phenoTreeAllEnabledString);
+    return phenoTreeAllEnabled;
+  }
+
   const removeFlatDisabled = (phenoList) => phenoList.map(node => {
     return {
       value: node.value,
@@ -91,7 +98,7 @@ export function SearchFormTraits({ onChange, onSubmit, onReset }) {
           treeData={
             selectedListType === 'alphabetic'
               ? removeFlatDisabled(alphabetizedPhenotypes)
-              : phenotypesHeatmapTree
+              : removeTreeDisabled(phenotypesTree)
           }
           value={selectedPhenotypes}
           onChange={handleChange}

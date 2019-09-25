@@ -26,36 +26,45 @@ export function Heatmap() {
     display: 'none'
   });
 
+  const [showTooltip, setShowTooltip] = useState(false);
+
   const popupMarkerClose = e => {
     setPopupTooltipStyle({
       ...popupTooltipStyle,
       display: 'none'
     });
     setPopupTooltipData(null);
+    setShowTooltip(false);
   };
 
   const popupMarkerClick = e => {
     console.log(e);
+    console.log("showTooltip", showTooltip);
     // make sure action occurs on imagemap coord only
-    if (e && e.points && e.points[0]) {
-      setPopupTooltipData({
-        phenotypeX: e.points[0].x,
-        phenotypeY: e.points[0].y,
-        r2: e.points[0].text
-      });
-      // console.log(e.event);
-      let x = e.event.offsetX;
-      let y = e.event.offsetY;
-      console.log(x, y);
-      // console.log(pos.position);
-      setPopupTooltipStyle({
-        ...popupTooltipStyle,
-        left: x + 65, // computed based on child and parent's width
-        top: y, // computed based on child and parent's height
-        display: 'block'
-      });
-    } else {
+    if (showTooltip) {
       popupMarkerClose();
+    } else {
+      if (e && e.points && e.points[0]) {
+        setPopupTooltipData({
+          phenotypeX: e.points[0].x,
+          phenotypeY: e.points[0].y,
+          r2: e.points[0].text
+        });
+        // console.log(e.event);
+        let x = e.event.offsetX;
+        let y = e.event.offsetY;
+        console.log(x, y);
+        // console.log(pos.position);
+        setPopupTooltipStyle({
+          ...popupTooltipStyle,
+          left: x + 65, // computed based on child and parent's width
+          top: y, // computed based on child and parent's height
+          display: 'block'
+        });
+        setShowTooltip(true);
+      } else {
+        popupMarkerClose();
+      }
     }
   };
 

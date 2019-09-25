@@ -5,7 +5,6 @@ export const UPDATE_VARIANT_LOOKUP = 'UPDATE_VARIANT_LOOKUP';
 export const UPDATE_PHENOTYPE_CORRELATIONS = 'UPDATE_PHENOTYPE_CORRELATIONS';
 export const UPDATE_PHENOTYPES = 'UPDATE_PHENOTYPES';
 export const UPDATE_PHENOTYPES_TREE = 'UPDATE_PHENOTYPES_TREE';
-export const UPDATE_PHENOTYPES_HEATMAP_TREE = 'UPDATE_PHENOTYPES_HEATMAP_TREE';
 
 export function updatePhenotypes(data) {
   return { type: UPDATE_PHENOTYPES, data };
@@ -13,10 +12,6 @@ export function updatePhenotypes(data) {
 
 export function updatePhenotypesTree(data) {
   return { type: UPDATE_PHENOTYPES_TREE, data };
-}
-
-export function updatePhenotypesHeatmapTree(data) {
-  return { type: UPDATE_PHENOTYPES_HEATMAP_TREE, data};
 }
 
 export function updateSummaryResults(data) {
