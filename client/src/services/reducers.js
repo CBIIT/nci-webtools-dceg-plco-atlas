@@ -43,11 +43,6 @@ export const rootReducer = (state, action) => {
         ...state,
         phenotypesTree: action.data
       };
-    case UPDATE_PHENOTYPES_HEATMAP_TREE:
-      return {
-        ...state,
-        phenotypesHeatmapTree: action.data
-      }
     default:
       return state;
   }

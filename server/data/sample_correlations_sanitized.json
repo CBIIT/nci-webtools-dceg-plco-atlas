@@ -1233,7 +1233,7 @@
     "Biliary cancer": 1,
     "Bladder cancer": -0.892871647,
     "Breast cancer (lobular)": 0.996631204,
-    "Breast cancer (ER positive)": 0,
+    "Breast cancer (ER positive)": 0.984882178,
     "Breast cancer (PR positive)": 0.945225644,
     "Breast cancer (ER/PR negative)": 0.868512978,
     "Breast cancer (tubular)": 0.052861451,
@@ -1339,8 +1339,7 @@
     "Age of menopause": 0,
     "Ever try to become pregnant without success": 0,
     "All-cause mortality": 0,
-    "Cancer-specific mortality": 0,
-    "Breast cancer (ER positive) ": 0.984882178
+    "Cancer-specific mortality": 0
   },
   "Bladder cancer": {
     "Ewing's sarcoma": 0,
@@ -1356,7 +1355,7 @@
     "Biliary cancer": -0.892871647,
     "Bladder cancer": 1,
     "Breast cancer (lobular)": -0.920079721,
-    "Breast cancer (ER positive)": 0,
+    "Breast cancer (ER positive)": -0.870901212,
     "Breast cancer (PR positive)": -0.882902916,
     "Breast cancer (ER/PR negative)": -0.705428293,
     "Breast cancer (tubular)": -0.035015514,
@@ -1462,8 +1461,7 @@
     "Age of menopause": 0,
     "Ever try to become pregnant without success": 0,
     "All-cause mortality": 0,
-    "Cancer-specific mortality": 0,
-    "Breast cancer (ER positive) ": -0.870901212
+    "Cancer-specific mortality": 0
   },
   "Breast cancer (lobular)": {
     "Ewing's sarcoma": 0,
@@ -1479,7 +1477,7 @@
     "Biliary cancer": 0.996631204,
     "Bladder cancer": -0.920079721,
     "Breast cancer (lobular)": 1,
-    "Breast cancer (ER positive)": 0,
+    "Breast cancer (ER positive)": 0.975593934,
     "Breast cancer (PR positive)": 0.962312328,
     "Breast cancer (ER/PR negative)": 0.843326927,
     "Breast cancer (tubular)": 0.038273277,
@@ -1585,8 +1583,7 @@
     "Age of menopause": 0,
     "Ever try to become pregnant without success": 0,
     "All-cause mortality": 0,
-    "Cancer-specific mortality": 0,
-    "Breast cancer (ER positive) ": 0.975593934
+    "Cancer-specific mortality": 0
   },
   "Breast cancer (ER positive)": {
     "Ewing's sarcoma": 0,
@@ -1599,13 +1596,13 @@
     "Weight Loss Area": 0,
     "Waist-Hip Comparison": 0,
     "Hair pattern at 45": 0,
-    "Biliary cancer": 0,
-    "Bladder cancer": 0,
-    "Breast cancer (lobular)": 0,
-    "Breast cancer (ER positive)": 0,
-    "Breast cancer (PR positive)": 0,
-    "Breast cancer (ER/PR negative)": 0,
-    "Breast cancer (tubular)": 0,
+    "Biliary cancer": 0.984882178,
+    "Bladder cancer": -0.870901212,
+    "Breast cancer (lobular)": 0.975593934,
+    "Breast cancer (ER positive)": 1,
+    "Breast cancer (PR positive)": 0.895451981,
+    "Breast cancer (ER/PR negative)": 0.85426233,
+    "Breast cancer (tubular)": -0.045400312,
     "Colon cancer (distal)": 0,
     "Colon cancer (proximal)": 0,
     "Colorectal cancer (adenocarcinoma)": 0,
@@ -1650,7 +1647,7 @@
     "Non-Hodgkin’s lymphoma": 0,
     "Multiple myeloma": 0,
     "Lung cancer": 0,
-    "Breast cancer": 0,
+    "Breast cancer": 0.975593934,
     "Colorectal cancer": 0,
     "Kidney cancer": 0,
     "Prostate cancer": 0,
@@ -1724,7 +1721,7 @@
     "Biliary cancer": 0.945225644,
     "Bladder cancer": -0.882902916,
     "Breast cancer (lobular)": 0.962312328,
-    "Breast cancer (ER positive)": 0,
+    "Breast cancer (ER positive)": 0.895451981,
     "Breast cancer (PR positive)": 1,
     "Breast cancer (ER/PR negative)": 0.712872577,
     "Breast cancer (tubular)": 0.009207712,
@@ -1830,8 +1827,7 @@
     "Age of menopause": 0,
     "Ever try to become pregnant without success": 0,
     "All-cause mortality": 0,
-    "Cancer-specific mortality": 0,
-    "Breast cancer (ER positive) ": 0.895451981
+    "Cancer-specific mortality": 0
   },
   "Breast cancer (ER/PR negative)": {
     "Ewing's sarcoma": 0,
@@ -1847,7 +1843,7 @@
     "Biliary cancer": 0.868512978,
     "Bladder cancer": -0.705428293,
     "Breast cancer (lobular)": 0.843326927,
-    "Breast cancer (ER positive)": 0,
+    "Breast cancer (ER positive)": 0.85426233,
     "Breast cancer (PR positive)": 0.712872577,
     "Breast cancer (ER/PR negative)": 1,
     "Breast cancer (tubular)": 0.179198445,
@@ -1953,8 +1949,7 @@
     "Age of menopause": 0,
     "Ever try to become pregnant without success": 0,
     "All-cause mortality": 0,
-    "Cancer-specific mortality": 0,
-    "Breast cancer (ER positive) ": 0.85426233
+    "Cancer-specific mortality": 0
   },
   "Breast cancer (tubular)": {
     "Ewing's sarcoma": 0,
@@ -1970,7 +1965,7 @@
     "Biliary cancer": 0.052861451,
     "Bladder cancer": -0.035015514,
     "Breast cancer (lobular)": 0.038273277,
-    "Breast cancer (ER positive)": 0,
+    "Breast cancer (ER positive)": -0.045400312,
     "Breast cancer (PR positive)": 0.009207712,
     "Breast cancer (ER/PR negative)": 0.179198445,
     "Breast cancer (tubular)": 1,
@@ -2076,8 +2071,7 @@
     "Age of menopause": 0,
     "Ever try to become pregnant without success": 0,
     "All-cause mortality": 0,
-    "Cancer-specific mortality": 0,
-    "Breast cancer (ER positive) ": -0.045400312
+    "Cancer-specific mortality": 0
   },
   "Colon cancer (distal)": {
     "Ewing's sarcoma": 0,
@@ -7461,7 +7455,7 @@
     "Biliary cancer": 0.996631204,
     "Bladder cancer": -0.920079721,
     "Breast cancer (lobular)": 1,
-    "Breast cancer (ER positive)": 0,
+    "Breast cancer (ER positive)": 0.975593934,
     "Breast cancer (PR positive)": 0.962312328,
     "Breast cancer (ER/PR negative)": 0.843326927,
     "Breast cancer (tubular)": 0.038273277,
@@ -7567,8 +7561,7 @@
     "Age of menopause": 0,
     "Ever try to become pregnant without success": 0,
     "All-cause mortality": 0,
-    "Cancer-specific mortality": 0,
-    "Breast cancer (ER positive) ": 0.975593934
+    "Cancer-specific mortality": 0
   },
   "Colorectal cancer": {
     "Ewing's sarcoma": 0,
