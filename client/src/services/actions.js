@@ -176,7 +176,9 @@ export function drawHeatmap(phenotypes) {
       type: 'heatmap',
       colorscale: [
         ['0.0', 'rgb(0,0,255)'],
-        ['0.5', 'rgb(255,255,255)'],
+        ['0.49999999', 'rgb(255,255,255)'],
+        ['0.5', 'rgb(204,204,204)'],
+        ['0.50000001', 'rgb(255,255,255)'],
         ['1.0', 'rgb(255,0,0)']
       ],
       showscale: false,
