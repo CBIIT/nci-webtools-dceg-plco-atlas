@@ -43,6 +43,7 @@ function getVariants(filepath, params) {
         WHERE ` + [
             `p IS NOT NULL`,
             coalesce(params.id, `variant_id = :id`),
+            coalesce(params.snp, `snp = :snp`),
             coalesce(params.chr, `chr = :chr`),
             coalesce(params.bpMin, `bp >= :bpMin`),
             coalesce(params.bpMax, `bp <= :bpMax`),
