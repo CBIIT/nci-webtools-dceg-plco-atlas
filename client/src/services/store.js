@@ -41,7 +41,7 @@ const initialState = {
     selectedVariant: '',
     selectedGender: 'combined',
     results: [],
-    message: '',
+    messages: [],
     loading: false,
     submitted: null
   },

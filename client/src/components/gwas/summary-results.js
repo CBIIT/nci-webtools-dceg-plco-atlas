@@ -61,21 +61,23 @@ export function SummaryResults() {
 
   const handleSubmit = params => {
     const phenotype = params ? params.value : null;
-    setSubmitted(new Date());
-    setSelectedChromosome(null);
-    setPopupTooltipData(null);
-
+    
     if (!phenotype) {
       setMessages([
         {
           type: 'danger',
           content:
-            'Please select a phenotype which has data associated with it.'
+            'Please select a phenotype.'
         }
       ]);
       console.log('not selected');
       return;
     }
+
+    setSubmitted(new Date());
+    setSelectedChromosome(null);
+    setPopupTooltipData(null);
+
     dispatch(drawQQPlot(phenotype));
     dispatch(
       updateSummaryResults({
@@ -245,7 +247,7 @@ export function SummaryResults() {
   return (
     <>
       <SearchFormTrait onSubmit={handleSubmit} onChange={handleChange} onReset={handleReset} />
-      {submitted &&
+      {messages &&
         messages.map(({ type, content }) => (
           <Alert variant={type} onClose={clearMessages} dismissible>
             {content}

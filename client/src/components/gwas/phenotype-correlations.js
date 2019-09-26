@@ -45,19 +45,19 @@ export function PhenotypeCorrelations() {
   };
 
   const handleSubmit = params => {
-    setSubmitted(new Date());
-    setPopupTooltipData(null);
-    console.log('submit');
-
-    if (!params) {
+    if (params.length < 2) {
       setMessages([
         {
           type: 'danger',
-          content: 'The selected phenotypes have no data.'
+          content: 'Please select two or more phenotypes.'
         }
       ]);
       return;
     }
+
+    setSubmitted(new Date());
+    setPopupTooltipData(null);
+    console.log('submit');
 
     dispatch(drawHeatmap(params));
   };
@@ -82,7 +82,7 @@ export function PhenotypeCorrelations() {
   return (
     <>
       <SearchFormTraits onSubmit={handleSubmit} onChange={handleChange} onReset={handleReset} />
-      {submitted &&
+      {messages &&
         messages.map(({ type, content }) => (
           <Alert variant={type} onClose={clearMessages} dismissible>
             {content}

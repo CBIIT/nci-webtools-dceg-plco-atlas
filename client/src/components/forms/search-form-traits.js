@@ -126,7 +126,7 @@ export function SearchFormTraits({ onChange, onSubmit, onReset }) {
           className="ml-2"
           style={{ maxHeight: '38px' }}
           variant="primary"
-          disabled={!(selectedPhenotypes && selectedPhenotypes.length >= 2)}
+          // disabled={!(selectedPhenotypes && selectedPhenotypes.length >= 2)}
           onClick={e => {
             e.preventDefault();
             onSubmit(selectedPhenotypes);

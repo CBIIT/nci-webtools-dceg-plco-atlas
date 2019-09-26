@@ -18,7 +18,7 @@ import { updateVariantLookup } from '../../services/actions';
 import TreeSelect, { TreeNode } from 'rc-tree-select';
 import 'rc-tree-select/assets/index.css';
 
-export function SearchFormTraitsVariant({ onSubmit, onReset }) {
+export function SearchFormTraitsVariant({ onChange, onSubmit, onReset }) {
   const dispatch = useDispatch();
   const phenotypes = useSelector(state => state.phenotypes);
   const phenotypesTree = useSelector(state => state.phenotypesTree);
@@ -51,6 +51,7 @@ export function SearchFormTraitsVariant({ onSubmit, onReset }) {
       }
     }
     setSelectedPhenotypes(values);
+    onChange(values);
   };
 
   const setSelectedListType = selectedListType => {
@@ -143,7 +144,10 @@ export function SearchFormTraitsVariant({ onSubmit, onReset }) {
         placeholder="(Variant rsid or coordinate)"
         aria-label="Variant (required)"
         value={selectedVariant}
-        onChange={e => setSelectedVariant(e.target.value)}
+        onChange={e => {
+          setSelectedVariant(e.target.value);
+          onChange(e.target.value);
+        }}
         type="text"
         required
       />
@@ -161,7 +165,7 @@ export function SearchFormTraitsVariant({ onSubmit, onReset }) {
         className="ml-2 flex-shrink-auto"
         style={{ maxHeight: '38px' }}
         variant="primary"
-        disabled={!canSubmit}
+        // disabled={!canSubmit}
         onClick={validateVariantInput}>
         Submit
       </Button>
