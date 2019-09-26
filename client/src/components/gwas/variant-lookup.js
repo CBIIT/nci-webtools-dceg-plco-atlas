@@ -14,7 +14,6 @@ export function VariantLookup() {
     selectedPhenotypes,
     selectedVariant,
     results,
-    // message,
     messages,
     loading,
     submitted
@@ -71,14 +70,6 @@ export function VariantLookup() {
       </p>
     </div>
   );
-
-  // const placeholderMessage = (
-  //   <div style={{ display: message.length > 1 ? 'block' : 'none' }}>
-  //     <p className="h4 text-center mb-5">
-  //       {message}
-  //     </p>
-  //   </div>
-  // );
 
   const setMessages = messages => {
     dispatch(updateVariantLookup({ messages }));
@@ -212,7 +203,6 @@ export function VariantLookup() {
             />
           </div>
           {placeholder}
-          {/* {placeholderMessage} */}
         </Tab>
       </Tabs>
     </>
