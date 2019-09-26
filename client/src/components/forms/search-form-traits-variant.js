@@ -74,37 +74,6 @@ export function SearchFormTraitsVariant({ onChange, onSubmit, onReset }) {
     a.title.localeCompare(b.title)
   );
 
-  const canSubmit =
-    selectedPhenotypes &&
-    selectedPhenotypes.length > 0 &&
-    (selectedVariant && selectedVariant.length > 0);
-
-  const validateVariantInput = e => {
-    e.preventDefault();
-    // console.log(selectedVariant);
-    // (/^rs\d+/i).test(selectedVariant)
-
-    if (
-      selectedVariant.match(/^[r|R][s|S][0-9]+$/) != null ||
-      selectedVariant.match(
-        /^([c|C][h|H][r|R])?(([1-9]|[1][0-9]|[2][0-2])|[x|X|y|Y]):[0-9]+$/
-      ) != null
-    ) {
-      // console.log("valid");
-      onSubmit({
-        selectedPhenotypes,
-        selectedVariant
-      });
-    } else {
-      // console.log("invalid");
-      onSubmit({
-        selectedPhenotypes,
-        selectedVariant,
-        error: 'Invalid variant input.'
-      });
-    }
-  };
-
   return (
     <div className="d-flex mb-2">
       <select
@@ -166,7 +135,10 @@ export function SearchFormTraitsVariant({ onChange, onSubmit, onReset }) {
         style={{ maxHeight: '38px' }}
         variant="primary"
         // disabled={!canSubmit}
-        onClick={validateVariantInput}>
+        onClick={e => {
+          e.preventDefault();
+          onSubmit({selectedPhenotypes, selectedVariant});
+        }}>
         Submit
       </Button>
 
