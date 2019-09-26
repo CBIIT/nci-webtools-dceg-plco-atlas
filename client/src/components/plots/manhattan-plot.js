@@ -255,11 +255,15 @@ export function ManhattanPlot({
         className="px-2 pt-3 small"
         style={{visibility: selectedChromosome ? 'visible' : 'hidden'}}>
         <a className="link" onClick={e => onAllChromosomeSelected && onAllChromosomeSelected()}>All Chromosomes</a>
+
         {zoomStack.length ? <>
             <Icon name="angle-right" className="mx-1" width="4" />
             <a className="link" onClick={resetZoom}>
               Chromosome {selectedChromosome}
             </a>
+          </> : null}
+
+        {zoomStack.length > 1 ? <>
             <Icon name="angle-right" className="mx-1" width="4" />
             <a className="link" onClick={zoomOut}>Previous Zoom</a>
           </> : null}
