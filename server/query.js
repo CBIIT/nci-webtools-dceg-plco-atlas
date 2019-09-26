@@ -83,19 +83,4 @@ function getVariants(filepath, params) {
     return records;
 }
 
-
-function getVariant(filepath, params) {
-    // console.log("filepath", filepath);
-    // console.log("params", params);
-    const stmt = new Database(filepath, {readonly: true}).prepare(`
-        SELECT * FROM variant WHERE
-        snp = :snp
-        OR (chr = :chr AND bp = :bp)
-    `);
-
-    return params.raw
-        ? getRawResults(stmt, params)
-        : stmt.all(params);
-}
-
-module.exports = {getSummary, getVariants, getVariant};
+module.exports = {getSummary, getVariants};

@@ -3,7 +3,7 @@ const server = require('fastify');
 const cors = require('fastify-cors');
 const static = require('fastify-static');
 const { port, dbpath } = require('./config.json');
-const { getSummary, getVariants, getVariant } = require('./query');
+const { getSummary, getVariants } = require('./query');
 
 const app = server({ignoreTrailingSlash: true});
 app.register(static, {root: path.resolve('www')});
@@ -23,12 +23,6 @@ app.get('/summary', async ({query}, res) => {
 app.get('/variants', async ({query}, res) => {
     res.header('Cache-Control', 'max-age=300');
     return getVariants(dbpath + query.database, query);
-});
-
-// retrieves single variant details given the snp or chr:pos
-app.get('/variant', async ({query}, res) => {
-    res.header('Cache-Control', 'max-age=300');
-    return getVariant(dbpath + query.database, query);
 });
 
 app.listen(port, '0.0.0.0')

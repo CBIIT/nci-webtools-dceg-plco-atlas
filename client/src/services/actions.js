@@ -207,17 +207,17 @@ export function lookupVariants(phenotypes, variant) {
 
     var tableList = [];
     for (let i = 0; i < phenotypes.length; i++) {
-      const variantData = await query('variant', {
+      const { data } = await query('variants', {
         database: phenotypes[i].value + '.db',
         snp: variant,
-        chr: '',
-        bp: ''
+        // chr: '',
+        // bp: ''
       });
-      console.log(variantData);
-      for (let j = 0; j < variantData.length; j++) {
-        console.log(variantData[j]);
-        variantData[j]['phenotype'] = phenotypes[i].title ? phenotypes[i].title : phenotypes[i].label;
-        tableList.push(variantData[j]);
+      console.log(data);
+      for (let j = 0; j < data.length; j++) {
+        console.log(data[j]);
+        data[j]['phenotype'] = phenotypes[i].title ? phenotypes[i].title : phenotypes[i].label;
+        tableList.push(data[j]);
       }
     }
     dispatch(
