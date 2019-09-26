@@ -27,7 +27,8 @@ export function SummaryResults() {
     pageSize,
     resultsCount,
     selectedGender,
-    selectedManhattanPlotType
+    selectedManhattanPlotType,
+    loadingManhattanPlot,
   } = useSelector(state => state.summaryResults);
 
   const setSubmitted = submitted => {
@@ -132,6 +133,7 @@ export function SummaryResults() {
         sampleSize: '',
         submitted: null,
         loading: false,
+        loadingManhattanPlot: false,
         drawManhattanPlot: null,
         updateResultsTable: null,
         popupTooltipData: null
@@ -264,6 +266,7 @@ export function SummaryResults() {
             onAllChromosomeSelected={onAllChromosomeSelected}
             onVariantLookup={handleVariantLookup}
             onZoom={handleZoom}
+            loading={loadingManhattanPlot}
           />
           <div
             className="mw-100 my-4 px-5"

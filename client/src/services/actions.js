@@ -55,11 +55,11 @@ export function updateSummaryResultsTable(params) {
  */
 export function drawManhattanPlot(plotType, params) {
   return async function(dispatch) {
-    dispatch(updateSummaryResults({ loading: true }));
+    dispatch(updateSummaryResults({ loadingManhattanPlot: true }));
     const manhattanPlotData = await rawQuery(plotType, params);
     if (!manhattanPlotData.error)
       dispatch(updateSummaryResults({ manhattanPlotData }));
-    dispatch(updateSummaryResults({ loading: false }));
+    dispatch(updateSummaryResults({ loadingManhattanPlot: false }));
     return manhattanPlotData;
   };
 }
@@ -99,12 +99,12 @@ export function drawHeatmap(phenotypes) {
       } else {
         r2 = 0.0;
       }
-      
-  
+
+
       if (r2 === -1.0 || r2 === 1.0) {
         r2 = 0.0;
       }
-  
+
       return r2;
     };
     const getZText = (phenotype1, phenotype2, correlationData) => {
@@ -122,7 +122,7 @@ export function drawHeatmap(phenotypes) {
       } else {
         r2 = 0.0;
       }
-  
+
       return r2;
     };
     const setLoading = loading => {
@@ -149,7 +149,7 @@ export function drawHeatmap(phenotypes) {
     setHeatmapData([]);
 
     const correlationData = await query(`data/sample_correlations_sanitized.json`);
-    
+
     var uniquePhenotypes = phenotypes.map(phenotype => phenotype.title ? phenotype.title : phenotype.label);
     let n = uniquePhenotypes.length;
     let x = uniquePhenotypes;

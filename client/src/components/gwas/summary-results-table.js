@@ -2,9 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { updateSummaryResults, updateSummaryResultsTable } from '../../services/actions';
 import { query } from '../../services/query';
-import { Table, paginationText, paginationSizeSelector, paginationButton } from '../controls/table';
+import { Table, paginationText, paginationSizeSelector, paginationButton, loadingOverlay } from '../controls/table';
 import paginationFactory from 'react-bootstrap-table2-paginator';
-// import overlayFactory from 'react-bootstrap-table2-overlay';
 
 export function SummaryResultsTable() {
   const dispatch = useDispatch();
@@ -90,7 +89,7 @@ export function SummaryResultsTable() {
       data={results}
       columns={columns}
       onTableChange={handleTableChange}
-      // overlay={overlayFactory()}
+      overlay={loadingOverlay}
       pagination={paginationFactory({
         page,
         sizePerPage: pageSize,

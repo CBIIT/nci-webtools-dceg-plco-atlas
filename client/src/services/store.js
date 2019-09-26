@@ -30,6 +30,7 @@ const initialState = {
     sampleSize: '',
     submitted: null,
     loading: false,
+    loadingManhattanPlot: false,
     drawManhattanPlot: null,
     updateResultsTable: null,
     popupTooltipData: null
