@@ -200,7 +200,6 @@ export function lookupVariants(phenotypes, variant) {
       updateVariantLookup({
         loading: true,
         results: [],
-        message: '',
         submitted: new Date()
       })
     );
@@ -210,8 +209,6 @@ export function lookupVariants(phenotypes, variant) {
       const { data } = await query('variants', {
         database: phenotypes[i].value + '.db',
         snp: variant,
-        // chr: '',
-        // bp: ''
       });
       console.log(data);
       for (let j = 0; j < data.length; j++) {
@@ -223,11 +220,7 @@ export function lookupVariants(phenotypes, variant) {
     dispatch(
       updateVariantLookup({
         loading: false,
-        results: tableList,
-        message:
-          tableList.length === 0
-            ? 'Variant not found in selected phenotype(s).'
-            : ''
+        results: tableList
       })
     );
   };

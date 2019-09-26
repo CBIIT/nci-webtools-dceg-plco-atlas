@@ -5,7 +5,7 @@ import { updateSummaryResults } from '../../services/actions';
 import TreeSelect, { TreeNode } from 'rc-tree-select';
 import 'rc-tree-select/assets/index.css';
 
-export function SearchFormTrait({ onChange, onSubmit, onReset }) {
+export function SummaryResultsForm({ onChange, onSubmit, onReset }) {
   const dispatch = useDispatch();
   const phenotypes = useSelector(state => state.phenotypes);
   const phenotypesTree = useSelector(state => state.phenotypesTree);

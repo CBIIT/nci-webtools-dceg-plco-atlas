@@ -18,7 +18,7 @@ import { updateVariantLookup } from '../../services/actions';
 import TreeSelect, { TreeNode } from 'rc-tree-select';
 import 'rc-tree-select/assets/index.css';
 
-export function SearchFormTraitsVariant({ onSubmit, onReset }) {
+export function VariantLookupForm({ onChange, onSubmit, onReset }) {
   const dispatch = useDispatch();
   const phenotypes = useSelector(state => state.phenotypes);
   const phenotypesTree = useSelector(state => state.phenotypesTree);
@@ -51,6 +51,7 @@ export function SearchFormTraitsVariant({ onSubmit, onReset }) {
       }
     }
     setSelectedPhenotypes(values);
+    onChange(values);
   };
 
   const setSelectedListType = selectedListType => {
@@ -72,37 +73,6 @@ export function SearchFormTraitsVariant({ onSubmit, onReset }) {
   const alphabetizedPhenotypes = [...phenotypes].sort((a, b) =>
     a.title.localeCompare(b.title)
   );
-
-  const canSubmit =
-    selectedPhenotypes &&
-    selectedPhenotypes.length > 0 &&
-    (selectedVariant && selectedVariant.length > 0);
-
-  const validateVariantInput = e => {
-    e.preventDefault();
-    // console.log(selectedVariant);
-    // (/^rs\d+/i).test(selectedVariant)
-
-    if (
-      selectedVariant.match(/^[r|R][s|S][0-9]+$/) != null ||
-      selectedVariant.match(
-        /^([c|C][h|H][r|R])?(([1-9]|[1][0-9]|[2][0-2])|[x|X|y|Y]):[0-9]+$/
-      ) != null
-    ) {
-      // console.log("valid");
-      onSubmit({
-        selectedPhenotypes,
-        selectedVariant
-      });
-    } else {
-      // console.log("invalid");
-      onSubmit({
-        selectedPhenotypes,
-        selectedVariant,
-        error: 'Invalid variant input.'
-      });
-    }
-  };
 
   return (
     <div className="d-flex mb-2">
@@ -143,7 +113,10 @@ export function SearchFormTraitsVariant({ onSubmit, onReset }) {
         placeholder="(Variant rsid or coordinate)"
         aria-label="Variant (required)"
         value={selectedVariant}
-        onChange={e => setSelectedVariant(e.target.value)}
+        onChange={e => {
+          setSelectedVariant(e.target.value);
+          onChange(e.target.value);
+        }}
         type="text"
         required
       />
@@ -161,8 +134,11 @@ export function SearchFormTraitsVariant({ onSubmit, onReset }) {
         className="ml-2 flex-shrink-auto"
         style={{ maxHeight: '38px' }}
         variant="primary"
-        disabled={!canSubmit}
-        onClick={validateVariantInput}>
+        // disabled={!canSubmit}
+        onClick={e => {
+          e.preventDefault();
+          onSubmit({selectedPhenotypes, selectedVariant});
+        }}>
         Submit
       </Button>
 

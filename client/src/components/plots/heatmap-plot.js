@@ -26,22 +26,21 @@ export function Heatmap() {
     display: 'none'
   });
 
-  const [showTooltip, setShowTooltip] = useState(false);
-
   const popupMarkerClose = e => {
     setPopupTooltipStyle({
       ...popupTooltipStyle,
       display: 'none'
     });
     setPopupTooltipData(null);
-    setShowTooltip(false);
   };
 
+  const isPopupDisplayed = () => {
+    var ele = document.getElementById("heatmap-tooltip");
+    return ele.offsetWidth > 0 && ele.offsetHeight > 0;
+  }
+
   const popupMarkerClick = e => {
-    console.log(e);
-    console.log("showTooltip", showTooltip);
-    // make sure action occurs on imagemap coord only
-    if (showTooltip) {
+    if (isPopupDisplayed()) {
       popupMarkerClose();
     } else {
       if (e && e.points && e.points[0]) {
@@ -61,7 +60,6 @@ export function Heatmap() {
           top: y, // computed based on child and parent's height
           display: 'block'
         });
-        setShowTooltip(true);
       } else {
         popupMarkerClose();
       }
@@ -133,8 +131,8 @@ export function Heatmap() {
                 onPositionChanged: newPos => console.log(newPos.position)
                 // onPositionChanged: newPos => setPos(newPos)
               }}> */}
-            {popupTooltipData && (
-              <div style={popupTooltipStyle} className="popup-tooltip shadow">
+            {/* {popupTooltipData && ( */}
+              <div style={popupTooltipStyle} className="popup-tooltip shadow" id="heatmap-tooltip">
                 {/* <button
                   type="button"
                   className="close popup-tooltip-close"
@@ -142,14 +140,14 @@ export function Heatmap() {
                   onClick={popupMarkerClose}>
                   <span aria-hidden="true">&times;</span>
                 </button> */}
-                <b>Phenotype X:</b> <a href="/">{popupTooltipData.phenotypeX}</a>
+                <b>Phenotype X:</b> <a href="/">{popupTooltipData ? popupTooltipData.phenotypeX : ''}</a>
                 <br />
-                <b>Phenotype Y:</b> <a href="/">{popupTooltipData.phenotypeY}</a>
+                <b>Phenotype Y:</b> <a href="/">{popupTooltipData ? popupTooltipData.phenotypeY : ''}</a>
                 <br />
-                <b>Correlation:</b> {popupTooltipData.r2}
+                <b>Correlation:</b> {popupTooltipData ? popupTooltipData.r2 : ''}
                 <br />
               </div>
-            )}
+            {/* )} */}
             <div
               style={{
                 display: 'flex',
@@ -161,6 +159,18 @@ export function Heatmap() {
                 layout={layout}
                 config={config}
                 onClick={e => popupMarkerClick(e)}
+                onRelayout={e => {
+                  console.log("onRelayout", e);
+                  if (isPopupDisplayed()) {
+                    popupMarkerClose();
+                    return;
+                  }
+                }}
+                // onRelayout={e => {
+                //   if (isPopupDisplayed()) {
+                //     popupMarkerClose();
+                //   }
+                // }}
               />
             </div>
             {/* </ReactCursorPosition> */}

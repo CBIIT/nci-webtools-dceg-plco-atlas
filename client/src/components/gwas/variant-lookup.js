@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { SearchFormTraitsVariant } from '../forms/search-form-traits-variant';
+import { VariantLookupForm } from '../forms/variant-lookup-form';
 import { updateVariantLookup, lookupVariants } from '../../services/actions';
 import { Table, paginationText, paginationSizeSelector, paginationButton } from '../controls/table';
 import paginationFactory from 'react-bootstrap-table2-paginator';
 import filterFactory, { textFilter } from 'react-bootstrap-table2-filter';
-import { Spinner, Card, Tabs, Tab } from 'react-bootstrap';
+import { Alert, Spinner, Card, Tabs, Tab } from 'react-bootstrap';
 
 export function VariantLookup() {
   const dispatch = useDispatch();
@@ -14,7 +14,7 @@ export function VariantLookup() {
     selectedPhenotypes,
     selectedVariant,
     results,
-    message,
+    messages,
     loading,
     submitted
   } = variantLookup;
@@ -71,19 +71,82 @@ export function VariantLookup() {
     </div>
   );
 
-  const placeholderMessage = (
-    <div style={{ display: message.length > 1 ? 'block' : 'none' }}>
-      <p className="h4 text-center mb-5">
-        {message}
-      </p>
-    </div>
-  );
+  const setMessages = messages => {
+    dispatch(updateVariantLookup({ messages }));
+  };
+
+  const clearMessages = e => {
+    setMessages([]);
+  };
 
   const setSubmitted = submitted => {
     dispatch(updateVariantLookup({ submitted }));
   };
 
+  const validateVariantInput = (variant) => {
+    if (
+      variant.match(/^[r|R][s|S][0-9]+$/) != null 
+      ||
+      variant.match(
+        /^([c|C][h|H][r|R])?(([1-9]|[1][0-9]|[2][0-2])|[x|X|y|Y]):[0-9]+/
+      ) != null
+      // ||
+      // selectedVariant.match(
+      //   /^([c|C][h|H][r|R])?(([1-9]|[1][0-9]|[2][0-2])|[x|X|y|Y]):[0-9]+$/
+      // ) != null
+    ) {
+      return true;
+    } else {
+      return false;
+    }
+  };
+
+  const handleChange = () => {
+    clearMessages();
+    // setSubmitted(null);
+  };
+
   const handleSubmit = params => {
+    if (params.selectedPhenotypes.length < 1 && params.selectedVariant.length < 1) {
+      setMessages([
+        {
+          type: 'danger',
+          content:
+            'Please select one or more phenotypes and input a variant.'
+        }
+      ]);
+      return;
+    }
+    if (params.selectedPhenotypes.length < 1) {
+      setMessages([
+        {
+          type: 'danger',
+          content:
+            'Please select one or more phenotypes.'
+        }
+      ]);
+      return;
+    }
+    if (params.selectedVariant.length < 1) {
+      setMessages([
+        {
+          type: 'danger',
+          content:
+            'Please input a variant.'
+        }
+      ]);
+      return;
+    }
+    if (!validateVariantInput(params.selectedVariant)) {
+      setMessages([
+        {
+          type: 'danger',
+          content:
+            'Please input a valid variant rsid or coordinate.'
+        }
+      ]);
+      return;
+    }
     setSubmitted(new Date());
     dispatch(lookupVariants(selectedPhenotypes, selectedVariant));
   }
@@ -97,7 +160,7 @@ export function VariantLookup() {
         selectedVariant: '',
         selectedGender: 'combined',
         results: [],
-        message: '',
+        messages: [],
         loading: false,
         submitted: null
       })
@@ -106,7 +169,13 @@ export function VariantLookup() {
 
   return (
     <>
-      <SearchFormTraitsVariant onSubmit={handleSubmit} onReset={handleReset} />
+      <VariantLookupForm onSubmit={handleSubmit} onChange={handleChange} onReset={handleReset} />
+      {messages &&
+        messages.map(({ type, content }) => (
+          <Alert variant={type} onClose={clearMessages} dismissible>
+            {content}
+          </Alert>
+        ))}
 
       <Tabs defaultActiveKey="variant-lookup">
         <Tab
@@ -134,7 +203,6 @@ export function VariantLookup() {
             />
           </div>
           {placeholder}
-          {/* {placeholderMessage} */}
         </Tab>
       </Tabs>
     </>
