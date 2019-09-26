@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import BootstrapTable from 'react-bootstrap-table-next'
+import overlayFactory from 'react-bootstrap-table2-overlay';
 import { Icon } from './icon';
 
 export const defaultProps = {
@@ -9,7 +10,13 @@ export const defaultProps = {
     striped: true,
     condensed: true,
     className: 'table-borderless',
-    noDataIndication: () => <div>No data is available</div>
+    noDataIndication: () => (
+        <div
+            className="d-flex align-items-center justify-content-center"
+            style={{minHeight: '60px'}}>
+            No data
+        </div>
+    )
 }
 
 export const paginationText = (from, to, size) => {
@@ -70,6 +77,39 @@ export const paginationSizeSelector = ({options, currSizePerPage, onSizePerPageC
         </select>
     )
 }
+
+export const overlayConfig = {
+    spinner: true,
+    styles: {
+        spinner: base => ({
+        ...base,
+        marginTop: '10px',
+        width: '40px',
+        '& svg circle': {
+            stroke: '#888'
+        }
+        }),
+        overlay: base => ({
+        ...base,
+        background: 'rgba(255, 255, 255, 0.4)'
+        }),
+    }
+}
+
+export const plotOverlayConfig = {
+    spinner: true,
+    styles: {
+        ...overlayConfig.styles,
+        wrapper: base => ({
+            ...base,
+            position: 'absolute',
+            width: '100%',
+            height: '100%',
+        })
+    }
+}
+
+export const loadingOverlay = overlayFactory(overlayConfig);
 
 export const Table = props => {
     props.columns.forEach(c => {

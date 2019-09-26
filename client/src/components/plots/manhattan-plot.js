@@ -1,6 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Spinner } from 'react-bootstrap';
+import LoadingOverlay from 'react-loading-overlay';
+import { plotOverlayConfig } from '../controls/table';
 import { rawQuery, query } from '../../services/query';
 import { ManhattanPlot as Plot } from '../../services/plots/manhattan-plot';
 import { MirroredManhattanPlot as MirroredPlot } from '../../services/plots/mirrored-manhattan-plot';
@@ -14,6 +16,7 @@ export function ManhattanPlot({
   onChromosomeSelected,
   onVariantLookup,
   onZoom,
+  loading,
 }) {
   const [zoomStack, setZoomStack] = useState([]);
   const plotContainer = useRef(null);
@@ -213,7 +216,8 @@ export function ManhattanPlot({
             return h('div', { className: '' }, [
               h('div', null, [
                 h('b', null, 'position: '),
-                `${(record.bp / 1e6).toFixed(4)} MB`
+                // `${(record.bp / 1e6).toFixed(4)} MB`
+                `${record.chr}:${record.bp}`
               ]),
               h('div', null, [h('b', null, 'p-value: '), `${record.p}`]),
               h('div', null, [h('b', null, 'snp: '), `${record.snp}`]),
@@ -250,7 +254,8 @@ export function ManhattanPlot({
   }
 
   return (
-    <div style={{display: hasData() ? 'block' : 'none'}}>
+    <div style={{display: hasData() ? 'block' : 'none', position: 'relative'}}>
+      <LoadingOverlay active={loading} {...plotOverlayConfig} />
       <div
         className="px-2 pt-3 small"
         style={{visibility: selectedChromosome ? 'visible' : 'hidden'}}>
