@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { SearchFormTraits } from '../forms/search-form-traits';
+import { PhenotypeCorrelationsForm } from '../forms/phenotype-correlations-form';
 import { Heatmap } from '../plots/heatmap-plot';
 import { Alert, Tabs, Tab } from 'react-bootstrap';
 import {
@@ -81,7 +81,7 @@ export function PhenotypeCorrelations() {
 
   return (
     <>
-      <SearchFormTraits onSubmit={handleSubmit} onChange={handleChange} onReset={handleReset} />
+      <PhenotypeCorrelationsForm onSubmit={handleSubmit} onChange={handleChange} onReset={handleReset} />
       {messages &&
         messages.map(({ type, content }) => (
           <Alert variant={type} onClose={clearMessages} dismissible>

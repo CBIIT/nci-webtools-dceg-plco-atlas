@@ -1,7 +1,7 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Alert, Nav, Tab, Tabs, Card } from 'react-bootstrap';
-import { SearchFormTrait } from '../forms/search-form-trait';
+import { SummaryResultsForm } from '../forms/summary-results-form';
 import { ManhattanPlot } from '../plots/manhattan-plot';
 import { QQPlot } from '../plots/qq-plot';
 import { SummaryResultsTable } from './summary-results-table';
@@ -246,7 +246,7 @@ export function SummaryResults() {
 
   return (
     <>
-      <SearchFormTrait onSubmit={handleSubmit} onChange={handleChange} onReset={handleReset} />
+      <SummaryResultsForm onSubmit={handleSubmit} onChange={handleChange} onReset={handleReset} />
       {messages &&
         messages.map(({ type, content }) => (
           <Alert variant={type} onClose={clearMessages} dismissible>

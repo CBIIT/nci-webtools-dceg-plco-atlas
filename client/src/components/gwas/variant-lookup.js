@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { SearchFormTraitsVariant } from '../forms/search-form-traits-variant';
+import { VariantLookupForm } from '../forms/variant-lookup-form';
 import { updateVariantLookup, lookupVariants } from '../../services/actions';
 import { Table, paginationText, paginationSizeSelector, paginationButton } from '../controls/table';
 import paginationFactory from 'react-bootstrap-table2-paginator';
@@ -169,7 +169,7 @@ export function VariantLookup() {
 
   return (
     <>
-      <SearchFormTraitsVariant onSubmit={handleSubmit} onChange={handleChange} onReset={handleReset} />
+      <VariantLookupForm onSubmit={handleSubmit} onChange={handleChange} onReset={handleReset} />
       {messages &&
         messages.map(({ type, content }) => (
           <Alert variant={type} onClose={clearMessages} dismissible>
