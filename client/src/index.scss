@@ -125,9 +125,13 @@ select.form-control-sm {
 }
 
 .pagination {
+  .page-item .page-link {
+    color: black;
+  }
+
   .page-item.active .page-link {
     background-color: transparent;
-    color: steelblue;
+    color: #007bff;
     font-weight: 600;
     text-decoration: underline;
   }
@@ -301,7 +305,7 @@ h1 {
 }
 
 // leaf options
-.rc-tree-select-tree-node-content-wrapper-normal 
+.rc-tree-select-tree-node-content-wrapper-normal
 .rc-tree-select-tree-title {
   cursor: pointer !important;
 }
