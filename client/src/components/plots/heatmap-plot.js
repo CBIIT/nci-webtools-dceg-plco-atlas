@@ -10,25 +10,25 @@ export function Heatmap() {
   const dispatch = useDispatch();
 
   const {
-    plottedPhenotypes,
     heatmapData,
+    heatmapLayout,
     loading,
-    popupTooltipData
+    popupTooltipData,
+    popupTooltipStyle
   } = useSelector(state => state.phenotypeCorrelations);
 
   const setPopupTooltipData = popupTooltipData => {
     dispatch(updatePhenotypeCorrelations({ popupTooltipData }));
   };
 
-  const [popupTooltipStyle, setPopupTooltipStyle] = useState({
-    top: 0, // computed based on child and parent's height
-    left: 0, // computed based on child and parent's width
-    display: 'none'
-  });
+  const setPopupTooltipStyle = popupTooltipStyle => {
+    dispatch(updatePhenotypeCorrelations({ popupTooltipStyle }));
+  }
 
   const popupMarkerClose = e => {
     setPopupTooltipStyle({
-      ...popupTooltipStyle,
+      top: 0, // computed based on child and parent's height
+      left: 0, // computed based on child and parent's width
       display: 'none'
     });
     setPopupTooltipData(null);
@@ -55,7 +55,6 @@ export function Heatmap() {
         console.log(x, y);
         // console.log(pos.position);
         setPopupTooltipStyle({
-          ...popupTooltipStyle,
           left: x + 65, // computed based on child and parent's width
           top: y, // computed based on child and parent's height
           display: 'block'
@@ -63,42 +62,6 @@ export function Heatmap() {
       } else {
         popupMarkerClose();
       }
-    }
-  };
-
-  const layout = {
-    width: 1000,
-    height: 1000,
-    margin: {
-      t: 120
-    },
-    // title: 'Example Heatmap',
-    xaxis: {
-      automargin: true,
-      // autorange: 'reversed',
-      side: 'top',
-      tickangle: -45,
-      tickfont: {
-        family: 'Arial',
-        size: 10,
-        color: 'black'
-      },
-      tickvals: plottedPhenotypes,
-      ticktext: plottedPhenotypes.map(phenotype => phenotype.length > 20 ? phenotype.substring(0, 20) + "..." : phenotype),
-      // dtick: 5,
-    },
-    yaxis: {
-      automargin: true,
-      autorange: 'reversed',
-      tickangle: 'auto',
-      tickfont: {
-        family: 'Arial',
-        size: 10,
-        color: 'black'
-      },
-      tickvals: plottedPhenotypes,
-      ticktext: plottedPhenotypes.map(phenotype => phenotype.length > 20 ? phenotype.substring(0, 20) + "..." : phenotype),
-      // dtick: 5
     }
   };
 
@@ -133,13 +96,6 @@ export function Heatmap() {
               }}> */}
             {/* {popupTooltipData && ( */}
               <div style={popupTooltipStyle} className="popup-tooltip shadow" id="heatmap-tooltip">
-                {/* <button
-                  type="button"
-                  className="close popup-tooltip-close"
-                  aria-label="Close"
-                  onClick={popupMarkerClose}>
-                  <span aria-hidden="true">&times;</span>
-                </button> */}
                 <b>Phenotype X:</b> <a href="/">{popupTooltipData ? popupTooltipData.phenotypeX : ''}</a>
                 <br />
                 <b>Phenotype Y:</b> <a href="/">{popupTooltipData ? popupTooltipData.phenotypeY : ''}</a>
@@ -156,21 +112,14 @@ export function Heatmap() {
               }}>
               <Plot
                 data={heatmapData}
-                layout={layout}
+                layout={heatmapLayout}
                 config={config}
                 onClick={e => popupMarkerClick(e)}
-                onRelayout={e => {
-                  console.log("onRelayout", e);
+                onRelayout={relayout => {
                   if (isPopupDisplayed()) {
                     popupMarkerClose();
-                    return;
                   }
                 }}
-                // onRelayout={e => {
-                //   if (isPopupDisplayed()) {
-                //     popupMarkerClose();
-                //   }
-                // }}
               />
             </div>
             {/* </ReactCursorPosition> */}

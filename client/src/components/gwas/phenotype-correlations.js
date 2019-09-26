@@ -67,13 +67,14 @@ export function PhenotypeCorrelations() {
       updatePhenotypeCorrelations({
         selectedListType: 'categorical',
         selectedPhenotypes: [],
-        plottedPhenotypes: [],
         selectedGender: 'combined',
         heatmapData: [],
+        heatmapLayout: {},
         results: [],
         loading: false,
         submitted: null,
         messages: [],
+        popupTooltipStyle: {display: 'none'},
         popupTooltipData: null
       })
     );

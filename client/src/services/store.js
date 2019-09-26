@@ -46,16 +46,16 @@ const initialState = {
     submitted: null
   },
   phenotypeCorrelations: {
-    // drawHeatmap: null,
     selectedListType: 'categorical',
     selectedPhenotypes: [],
-    plottedPhenotypes: [],
     selectedGender: 'combined',
     heatmapData: [],
+    heatmapLayout: {},
     results: [],
     loading: false,
     submitted: null,
     messages: [],
+    popupTooltipStyle: {display: 'none'},
     popupTooltipData: null
   }
 };

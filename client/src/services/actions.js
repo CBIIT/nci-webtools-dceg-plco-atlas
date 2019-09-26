@@ -131,22 +131,26 @@ export function drawHeatmap(phenotypes) {
     const setHeatmapData = heatmapData => {
       dispatch(updatePhenotypeCorrelations({ heatmapData }));
     };
+    const setHeatmapLayout = heatmapLayout => {
+      dispatch(updatePhenotypeCorrelations({ heatmapLayout }));
+    }
+    const setPopupTooltipStyle = popupTooltipStyle => {
+      dispatch(updatePhenotypeCorrelations({ popupTooltipStyle }));
+    };
     const setPopupTooltipData = popupTooltipData => {
       dispatch(updatePhenotypeCorrelations({ popupTooltipData }));
     };
-    const setPlottedPhenotypes = plottedPhenotypes => {
-      dispatch(updatePhenotypeCorrelations({ plottedPhenotypes }));
-    }
+
     setLoading(true);
+    setPopupTooltipStyle({display: 'none'});
     setPopupTooltipData(null);
 
+    setHeatmapLayout({});
     setHeatmapData([]);
-    setPlottedPhenotypes([]);
 
     const correlationData = await query(`data/sample_correlations_sanitized.json`);
     
     var uniquePhenotypes = phenotypes.map(phenotype => phenotype.title ? phenotype.title : phenotype.label);
-    setPlottedPhenotypes(uniquePhenotypes);
     let n = uniquePhenotypes.length;
     let x = uniquePhenotypes;
     let y = uniquePhenotypes;
@@ -189,6 +193,42 @@ export function drawHeatmap(phenotypes) {
         '<b>Correlation</b>: %{text}' +
         '<extra></extra>'
     };
+    let layout = {
+      width: 1000,
+      height: 1000,
+      margin: {
+        t: 120
+      },
+      // title: 'Example Heatmap',
+      xaxis: {
+        automargin: true,
+        // autorange: 'reversed',
+        side: 'top',
+        tickangle: -45,
+        tickfont: {
+          family: 'Arial',
+          size: 10,
+          color: 'black'
+        },
+        tickvals: uniquePhenotypes,
+        ticktext: uniquePhenotypes.map(phenotype => phenotype.length > 20 ? phenotype.substring(0, 20) + "..." : phenotype),
+        // dtick: 5,
+      },
+      yaxis: {
+        automargin: true,
+        autorange: 'reversed',
+        tickangle: 'auto',
+        tickfont: {
+          family: 'Arial',
+          size: 10,
+          color: 'black'
+        },
+        tickvals: uniquePhenotypes,
+        ticktext: uniquePhenotypes.map(phenotype => phenotype.length > 20 ? phenotype.substring(0, 20) + "..." : phenotype),
+        // dtick: 5
+      }
+    };
+    setHeatmapLayout(layout);
     setHeatmapData([sampleData]);
     setLoading(false);
   }
