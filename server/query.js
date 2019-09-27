@@ -10,7 +10,7 @@ function getRawResults(stmt, params) {
 function getSummary(filepath, params) {
     const stmt = new Database(filepath, {readonly: true}).prepare(`
         SELECT chr, bp_abs_1000kb, nlog_p2
-            FROM variant_summary
+            FROM aggregate_all
             WHERE nlog_p2 >= :nlogpMin;
     `);
 
@@ -39,7 +39,7 @@ function getVariants(filepath, params) {
     // filter by id, chr, base position, and -log10(p), if provided
     let sql = `
         SELECT ${columns.map(wrapColumnName).join(',')}
-        FROM variant
+        FROM variant_all
         WHERE ` + [
             `p IS NOT NULL`,
             coalesce(params.id, `variant_id = :id`),
