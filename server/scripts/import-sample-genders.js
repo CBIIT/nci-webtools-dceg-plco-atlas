@@ -8,29 +8,29 @@ const ranges = require('../data/chromosome_ranges.json');
 // retrieve arguments
 const argv = process.argv.slice(2);
 if (argv.length !== 4 || argv.includes('-h')) {
-    console.log(`USAGE: node import.js all.data female.data male.data  output.db`)
+    console.log(`USAGE: node import.js RCC.data MEL.data EWING.data  output.db`)
     process.exit(0);
 }
 
 // parse arguments and set defaults
-let [ allInputFilePath, femaleInputFilePath, maleInputFilePath, databaseFilePath ] = argv;
+let [ RCCInputFilePath, MELInputFilePath, EWINGInputFilePath, databaseFilePath ] = argv;
 databaseFilePath = databaseFilePath || 'output.db';
 
-// all input file should exist
-if (!fs.existsSync(allInputFilePath)) {
-    console.error(`ERROR: ${allInputFilePath} does not exist.`)
+// RCC input file should exist
+if (!fs.existsSync(RCCInputFilePath)) {
+    console.error(`ERROR: ${RCCInputFilePath} does not exist.`)
     process.exit(1);
 }
 
-// female input file should exist
-if (!fs.existsSync(femaleInputFilePath)) {
-    console.error(`ERROR: ${femaleInputFilePath} does not exist.`)
+// MEL input file should exist
+if (!fs.existsSync(MELInputFilePath)) {
+    console.error(`ERROR: ${MELInputFilePath} does not exist.`)
     process.exit(1);
 }
 
-// male input file should exist
-if (!fs.existsSync(maleInputFilePath)) {
-    console.error(`ERROR: ${maleInputFilePath} does not exist.`)
+// EWING input file should exist
+if (!fs.existsSync(EWINGInputFilePath)) {
+    console.error(`ERROR: ${EWINGInputFilePath} does not exist.`)
     process.exit(1);
 }
 
@@ -74,19 +74,19 @@ const getFirstLine = filepath => {
 }
 
 // validate headers rcc
-const headersAll = ['SNP','CHR','LOC','GROUP','CATEGORY','INFO','NUM_CONTROL','NUM_CASE','REFERENCE_ALLELE','EFFECT_ALLELE','EFFECT_ALLELE_FREQ_CONTROL', "EFFECT_ALLELE_FREQ_CASE",'OR','CI','P','Phet','I2'];
-const firstLineAll = parseLine(getFirstLine(allInputFilePath));
-assert.deepStrictEqual(firstLineAll, headersAll, `Headers do not match expected values: ${headersAll}`);
+const headersRCC = ['SNP','CHR','LOC','GROUP','CATEGORY','INFO','NUM_CONTROL','NUM_CASE','REFERENCE_ALLELE','EFFECT_ALLELE','EFFECT_ALLELE_FREQ_CONTROL', "EFFECT_ALLELE_FREQ_CASE",'OR','CI','P','Phet','I2'];
+const firstLineRCC = parseLine(getFirstLine(RCCInputFilePath));
+assert.deepStrictEqual(firstLineRCC, headersRCC, `Headers do not match expected values: ${headersRCC}`);
 
 // validate headers mel
-const headersFemale = ["CHR","BP","SNP","A1","A2","N","P","P.R.","OR","OR.R.","Q","I","Case_N","Control_N","Sample_N","SE_fixed","Z_fixed","RSID"];
-const firstLineFemale = parseLine(getFirstLine(femaleInputFilePath));
-assert.deepStrictEqual(firstLineFemale, headersFemale, `Headers do not match expected values: ${headersFemale}`);
+const headersMEL = ["CHR","BP","SNP","A1","A2","N","P","P.R.","OR","OR.R.","Q","I","Case_N","Control_N","Sample_N","SE_fixed","Z_fixed","RSID"];
+const firstLineMEL = parseLine(getFirstLine(MELInputFilePath));
+assert.deepStrictEqual(firstLineMEL, headersMEL, `Headers do not match expected values: ${headersMEL}`);
 
 // validate headers ewings
-const headersMale = ['CHR','BP','SNP','A1','A2','N','P','P(R)','OR','OR(R)','Q','I'];
-const firstLineMale = parseLine(getFirstLine(maleInputFilePath));
-assert.deepStrictEqual(firstLineMale, headersMale, `Headers do not match expected values: ${headersMale}`);
+const headersEWING = ['CHR','BP','SNP','A1','A2','N','P','P(R)','OR','OR(R)','Q','I'];
+const firstLineEWING = parseLine(getFirstLine(EWINGInputFilePath));
+assert.deepStrictEqual(firstLineEWING, headersEWING, `Headers do not match expected values: ${headersEWING}`);
 
 
 // create variant_stage (temp), variant, variant_summary, and variant_lookup
@@ -99,8 +99,8 @@ const db = new sqlite(databaseFilePath);
 
 
 // // RCC
-// const insertAll = db.prepare(`
-//     INSERT INTO variant_all_stage VALUES (
+// const insertRCC = db.prepare(`
+//     INSERT INTO variant_RCC_stage VALUES (
 //         :snp,
 //         :chr,
 //         :loc,
@@ -127,19 +127,19 @@ const db = new sqlite(databaseFilePath);
 // `);
 
 // // stream the input file line by line
-// const readerAll = readline.createInterface({
-//     input: fs.createReadStream(allInputFilePath)
+// const readerRCC = readline.createInterface({
+//     input: fs.createReadStream(RCCInputFilePath)
 // });
 
-// let countAll = 0;
-// let previousChrAll = 1;
-// let bpOffsetAll = 0;
+// let countRCC = 0;
+// let previousChrRCC = 1;
+// let bpOffsetRCC = 0;
 
 // db.exec('BEGIN TRANSACTION');
 
-// readerAll.on('line', line => {
+// readerRCC.on('line', line => {
 //     // skip first line
-//     if (countAll++ === 0) return;
+//     if (countRCC++ === 0) return;
 
 //     // trim, split by spaces, and parse 'NA' as null
 //     const values = parseLine(line);
@@ -161,47 +161,47 @@ const db = new sqlite(databaseFilePath);
 //     params.nlog_p2 = groupFunc(params.nlog_p, 10**-2);
 
 //     // determine absolute position of variant relative to the start of the genome
-//     // if (+params.chr > +previousChrAll) {
+//     // if (+params.chr > +previousChrRCC) {
 
-//         // bpOffsetAll = ranges[params.chr - 1].max_bp_abs;
-//         // previousChrAll = +params.chr;
+//         // bpOffsetRCC = ranges[params.chr - 1].max_bp_abs;
+//         // previousChrRCC = +params.chr;
 //     // }
-//     bpOffsetAll = params.chr > 1
+//     bpOffsetRCC = params.chr > 1
 //         ? ranges[params.chr - 2].max_bp_abs
 //         : 0;
 
 //     // store the absolute BP and group by megabases
-//     params.bp_abs = bpOffsetAll + loc;
+//     params.bp_abs = bpOffsetRCC + loc;
 //     params.bp_abs_1000kb = groupFunc(params.bp_abs, 10**6);
 
-//     insertAll.run(params);
+//     insertRCC.run(params);
 
 //     // show progress message every 10000 rows
-//     if (countAll % 10000 === 0)
-//         console.log(`[${duration()} s] Inserted ${countAll} all rows`);
+//     if (countRCC % 10000 === 0)
+//         console.log(`[${duration()} s] Inserted ${countRCC} RCC rows`);
 // });
 
-// readerAll.on('close', () => {
+// readerRCC.on('close', () => {
 //     db.exec('COMMIT');
 
 //     // store variant table
-//     console.log(`[${duration()} s] Storing all variants...`);
+//     console.log(`[${duration()} s] Storing RCC variants...`);
 //     db.exec(`
-//         INSERT INTO variant_all SELECT
+//         INSERT INTO variant_RCC SELECT
 //             null, "chr", "bp", "snp", "a1", "a2", "p", "nlog_p", "or", "i2"
-//         FROM variant_all_stage;
+//         FROM variant_RCC_stage;
 //     `);
 
 //     // store summary table for variants
-//     console.log(`[${duration()} s] Storing all summary...`);
+//     console.log(`[${duration()} s] Storing RCC summary...`);
 //     db.exec(`
-//         INSERT INTO aggregate_all SELECT DISTINCT
+//         INSERT INTO aggregate_RCC SELECT DISTINCT
 //             chr, bp_abs_1000kb, nlog_p2
-//         FROM variant_all_stage;
+//         FROM variant_RCC_stage;
 //     `);
 
 //     // drop staging table
-//     db.exec(`DROP TABLE variant_all_stage`);
+//     db.exec(`DROP TABLE variant_RCC_stage`);
 
 //     // create indexes
 //     // console.log(`[${duration()} s] Indexing...`);
@@ -216,115 +216,115 @@ const db = new sqlite(databaseFilePath);
 
 
 
-// MELAMONA
-const insertFemale = db.prepare(`
-    INSERT INTO variant_female_stage VALUES (
-        :chr,
-        :bp,
-        :bp_1000kb,
-        :bp_abs,
-        :bp_abs_1000kb,
-        :snp,
-        :a1,
-        :a2,
-        :n,
-        :p,
-        :nlog_p,
-        :nlog_p2,
-        :pr,
-        :or,
-        :orr,
-        :q,
-        :i,
-        :case_n,
-        :control_n,
-        :sample_n,
-        :se_fixed,
-        :z_fixed,
-        :rsid
-    )
-`);
+// // MELAMONA
+// const insertMEL = db.prepare(`
+//     INSERT INTO variant_MEL_stage VALUES (
+//         :chr,
+//         :bp,
+//         :bp_1000kb,
+//         :bp_abs,
+//         :bp_abs_1000kb,
+//         :snp,
+//         :a1,
+//         :a2,
+//         :n,
+//         :p,
+//         :nlog_p,
+//         :nlog_p2,
+//         :pr,
+//         :or,
+//         :orr,
+//         :q,
+//         :i,
+//         :case_n,
+//         :control_n,
+//         :sample_n,
+//         :se_fixed,
+//         :z_fixed,
+//         :rsid
+//     )
+// `);
 
-// stream the input file line by line
-const readerFemale = readline.createInterface({
-    input: fs.createReadStream(femaleInputFilePath)
-});
+// // stream the input file line by line
+// const readerMEL = readline.createInterface({
+//     input: fs.createReadStream(MELInputFilePath)
+// });
 
-let countFemale = 0;
-let previousChrFemale = 1;
-let bpOffsetFemale = 0;
+// let countMEL = 0;
+// let previousChrMEL = 1;
+// let bpOffsetMEL = 0;
 
-db.exec('BEGIN TRANSACTION');
+// db.exec('BEGIN TRANSACTION');
 
-readerFemale.on('line', line => {
-    // skip first line
-    if (countFemale++ === 0) return;
+// readerMEL.on('line', line => {
+//     // skip first line
+//     if (countMEL++ === 0) return;
 
-    // trim, split by spaces, and parse 'NA' as null
-    const values = parseLine(line);
-    // const [chr, bp, snp, a1, a2, n, p, p_r, or, or_r, q, i] = values;
-    const [chr, bp, snp, a1, a2, n, p, pr, or, orr, q, i, case_n, control_n, sample_n, se_fixed, z_fixed, rsid] = values;
-    const params = {chr, bp, snp, a1, a2, n, p, pr, or, orr, q, i, case_n, control_n, sample_n, se_fixed, z_fixed, rsid};
+//     // trim, split by spaces, and parse 'NA' as null
+//     const values = parseLine(line);
+//     // const [chr, bp, snp, a1, a2, n, p, p_r, or, or_r, q, i] = values;
+//     const [chr, bp, snp, a1, a2, n, p, pr, or, orr, q, i, case_n, control_n, sample_n, se_fixed, z_fixed, rsid] = values;
+//     const params = {chr, bp, snp, a1, a2, n, p, pr, or, orr, q, i, case_n, control_n, sample_n, se_fixed, z_fixed, rsid};
 
-    // group base pairs
-    params.bp_1000kb = groupFunc(params.bp, 10**6);
+//     // group base pairs
+//     params.bp_1000kb = groupFunc(params.bp, 10**6);
 
-    // calculate -log10(p) and group its values
-    params.nlog_p = params.p ? -Math.log10(params.p) : null;
-    params.nlog_p2 = groupFunc(params.nlog_p, 10**-2);
+//     // calculate -log10(p) and group its values
+//     params.nlog_p = params.p ? -Math.log10(params.p) : null;
+//     params.nlog_p2 = groupFunc(params.nlog_p, 10**-2);
 
-    // determine absolute position of variant relative to the start of the genome
-    // if (params.chr > previousChrFemale) {
-    //     bpOffsetFemale = ranges[previousChrFemale - 1].max_bp_abs;
-    //     previousChrFemale = +params.chr;
-    // }
-    bpOffsetFemale = params.chr > 1
-        ? ranges[params.chr - 2].max_bp_abs
-        : 0;
+//     // determine absolute position of variant relative to the start of the genome
+//     // if (params.chr > previousChrMEL) {
+//     //     bpOffsetMEL = ranges[previousChrMEL - 1].max_bp_abs;
+//     //     previousChrMEL = +params.chr;
+//     // }
+//     bpOffsetMEL = params.chr > 1
+//         ? ranges[params.chr - 2].max_bp_abs
+//         : 0;
 
-    // store the absolute BP and group by megabases
-    params.bp_abs = bpOffsetFemale + bp;
-    params.bp_abs_1000kb = groupFunc(params.bp_abs, 10**6);
+//     // store the absolute BP and group by megabases
+//     params.bp_abs = bpOffsetMEL + bp;
+//     params.bp_abs_1000kb = groupFunc(params.bp_abs, 10**6);
 
-    insertFemale.run(params);
+//     insertMEL.run(params);
 
-    // show progress message every 10000 rows
-    if (countFemale % 10000 === 0)
-        console.log(`[${duration()} s] Inserted ${countFemale} female rows`);
-});
+//     // show progress message every 10000 rows
+//     if (countMEL % 10000 === 0)
+//         console.log(`[${duration()} s] Inserted ${countMEL} MEL rows`);
+// });
 
-readerFemale.on('close', () => {
-    db.exec('COMMIT');
+// readerMEL.on('close', () => {
+//     db.exec('COMMIT');
 
-    // store variant table
-    console.log(`[${duration()} s] Storing female variants...`);
-    db.exec(`
-        INSERT INTO variant_female SELECT
-            null, "chr", "bp", "rsid", "a1", "a2", "n", "p", "nlog_p", "pr", "or", "orr", "q", "i"
-        FROM variant_female_stage;
-    `);
+//     // store variant table
+//     console.log(`[${duration()} s] Storing MEL variants...`);
+//     db.exec(`
+//         INSERT INTO variant_MEL SELECT
+//             null, "chr", "bp", "rsid", "a1", "a2", "n", "p", "nlog_p", "pr", "or", "orr", "q", "i"
+//         FROM variant_MEL_stage;
+//     `);
 
-    // store summary table for variants
-    console.log(`[${duration()} s] Storing female summary...`);
-    db.exec(`
-        INSERT INTO aggregate_female SELECT DISTINCT
-            chr, bp_abs_1000kb, nlog_p2
-        FROM variant_female_stage;
-    `);
+//     // store summary table for variants
+//     console.log(`[${duration()} s] Storing MEL summary...`);
+//     db.exec(`
+//         INSERT INTO aggregate_MEL SELECT DISTINCT
+//             chr, bp_abs_1000kb, nlog_p2
+//         FROM variant_MEL_stage;
+//     `);
 
-    // drop staging table
-    db.exec(`DROP TABLE variant_female_stage`);
+//     // drop staging table
+//     db.exec(`DROP TABLE variant_MEL_stage`);
 
-    // create indexes
-    // console.log(`[${duration()} s] Indexing...`);
-    // db.exec(readFile('indexes-sample-genders.sql'));
+//     // create indexes
+//     // console.log(`[${duration()} s] Indexing...`);
+//     // db.exec(readFile('indexes-sample-genders.sql'));
 
-    // close database
-    console.log(`[${duration()} s] Finalizing database...`);
-    db.close();
-    console.log(`[${duration()} s] Created database`);
+//     // close database
+//     console.log(`[${duration()} s] Finalizing database...`);
+//     db.close();
+//     console.log(`[${duration()} s] Created database`);
 
-});
+// });
 
 
 
@@ -332,8 +332,8 @@ readerFemale.on('close', () => {
 
 
 // // EWING
-// const insertMale = db.prepare(`
-//     INSERT INTO variant_male_stage VALUES (
+// const insertEWING = db.prepare(`
+//     INSERT INTO variant_EWING_stage VALUES (
 //         :chr,
 //         :bp,
 //         :bp_1000kb,
@@ -355,19 +355,19 @@ readerFemale.on('close', () => {
 // `);
 
 // // stream the input file line by line
-// const readerMale = readline.createInterface({
-//     input: fs.createReadStream(maleInputFilePath)
+// const readerEWING = readline.createInterface({
+//     input: fs.createReadStream(EWINGInputFilePath)
 // });
 
-// let countMale = 0;
-// let previousChrMale = 1;
-// let bpOffsetMale = 0;
+// let countEWING = 0;
+// let previousChrEWING = 1;
+// let bpOffsetEWING = 0;
 
 // db.exec('BEGIN TRANSACTION');
 
-// readerMale.on('line', line => {
+// readerEWING.on('line', line => {
 //     // skip first line
-//     if (countMale++ === 0) return;
+//     if (countEWING++ === 0) return;
 
 //     // trim, split by spaces, and parse 'NA' as null
 //     const values = parseLine(line);
@@ -383,43 +383,43 @@ readerFemale.on('close', () => {
 //     params.nlog_p2 = group(params.nlog_p, 10**-2);
 
 //     // determine absolute position of variant relative to the start of the genome
-//     if (chr != previousChrMale) {
-//         bpOffsetMale = chr > 1 ? ranges[chr - 2].max_bp_abs : 0;
-//         previousChrMale = chr;
+//     if (chr != previousChrEWING) {
+//         bpOffsetEWING = chr > 1 ? ranges[chr - 2].max_bp_abs : 0;
+//         previousChrEWING = chr;
 //     }
 
 //     // store the absolute BP and group by megabases
-//     params.bp_abs = bpOffsetMale + bp;
+//     params.bp_abs = bpOffsetEWING + bp;
 //     params.bp_abs_1000kb = group(params.bp_abs, 10**6);
 
-//     insertMale.run(params);
+//     insertEWING.run(params);
 
 //     // show progress message every 10000 rows
-//     if (countMale % 10000 === 0)
-//         console.log(`[${duration()} s] Inserted ${countMale} male rows`);
+//     if (countEWING % 10000 === 0)
+//         console.log(`[${duration()} s] Inserted ${countEWING} EWING rows`);
 // });
 
-// readerMale.on('close', () => {
+// readerEWING.on('close', () => {
 //     db.exec('COMMIT');
 
 //     // store variant table
-//     console.log(`[${duration()} s] Storing male variants...`);
+//     console.log(`[${duration()} s] Storing EWING variants...`);
 //     db.exec(`
-//         INSERT INTO variant_male SELECT
+//         INSERT INTO variant_EWING SELECT
 //             null, "chr", "bp", "snp", "a1", "a2", "n", "p", "nlog_p", "p_r", "or", "or_r", "q", "i"
-//         FROM variant_male_stage;
+//         FROM variant_EWING_stage;
 //     `);
 
 //     // store summary table for variants
-//     console.log(`[${duration()} s] Storing male summary...`);
+//     console.log(`[${duration()} s] Storing EWING summary...`);
 //     db.exec(`
-//         INSERT INTO aggregate_male SELECT DISTINCT
+//         INSERT INTO aggregate_EWING SELECT DISTINCT
 //             chr, bp_abs_1000kb, nlog_p2
-//         FROM variant_male_stage;
+//         FROM variant_EWING_stage;
 //     `);
 
 //     // drop staging table
-//     db.exec(`DROP TABLE variant_male_stage`);
+//     db.exec(`DROP TABLE variant_EWING_stage`);
 
 //     // create indexes
 //     // console.log(`[${duration()} s] Indexing...`);
@@ -430,3 +430,24 @@ readerFemale.on('close', () => {
 //     db.close();
 //     console.log(`[${duration()} s] Created database`);
 // });
+
+
+
+
+
+// // rename all tables
+// db.exec(`
+//     ALTER TABLE 'variant_RCC' RENAME TO 'variant_all';
+//     ALTER TABLE 'aggregate_RCC' RENAME TO 'aggregate_all';
+//     ALTER TABLE 'variant_MEL' RENAME TO 'variant_female';
+//     ALTER TABLE 'aggregate_MEL' RENAME TO 'aggregate_female';
+//     ALTER TABLE 'variant_EWING' RENAME TO 'variant_male';
+//     ALTER TABLE 'aggregate_EWING' RENAME TO 'aggregate_male';
+// `);
+
+// create indexes
+console.log(`[${duration()} s] Indexing...`);
+db.exec(readFile('indexes-sample-genders.sql'));
+
+// // close database
+db.close();

@@ -1,5 +1,5 @@
--- ALL (Renal Cell Carcinoma)
-CREATE TABLE variant_all_stage
+-- RCC (Renal Cell Carcinoma)
+CREATE TABLE variant_RCC_stage
 (
     "snp"                           TEXT,
     "chr"                           INTEGER,
@@ -24,7 +24,7 @@ CREATE TABLE variant_all_stage
     "ci"                            TEXT,
     "phet"                          TEXT
 );
-CREATE TABLE variant_all
+CREATE TABLE variant_RCC
 (
     "variant_id"    INTEGER PRIMARY KEY,
     "chr"           INTEGER,
@@ -37,15 +37,15 @@ CREATE TABLE variant_all
     "or"            REAL,
     "i2"            REAL
 );
-CREATE TABLE aggregate_all
+CREATE TABLE aggregate_RCC
 (
     "chr"           INTEGER,
     "bp_abs_1000kb" INTEGER, -- Absolute BP floored to the nearest multiple of 10^6 (1000 kilobases)
     "nlog_p2"       REAL -- negative log10(P) floored to the nearest multiple of 10^-2
 );
 
--- FEMALE (Melanoma)
-CREATE TABLE variant_female_stage
+-- MEL (Melanoma)
+CREATE TABLE variant_MEL_stage
 (
     "chr"                           INTEGER,
     "bp"                            INTEGER,
@@ -72,7 +72,7 @@ CREATE TABLE variant_female_stage
     "rsid"                          TEXT
 );
 
-CREATE TABLE variant_female
+CREATE TABLE variant_MEL
 (
     "variant_id"    INTEGER PRIMARY KEY,
     "chr"           INTEGER,
@@ -90,15 +90,15 @@ CREATE TABLE variant_female
     "i"             REAL
 );
 
-CREATE TABLE aggregate_female
+CREATE TABLE aggregate_MEL
 (
     "chr"           INTEGER,
     "bp_abs_1000kb" INTEGER, -- Absolute BP floored to the nearest multiple of 10^6 (1000 kilobases)
     "nlog_p2"       REAL -- negative log10(P) floored to the nearest multiple of 10^-2
 );
 
--- MALE (Ewing's Sarcoma)
-CREATE TABLE variant_male_stage
+-- EWING (Ewing's Sarcoma)
+CREATE TABLE variant_EWING_stage
 (
     "chr"           INTEGER,
     "bp"            INTEGER,
@@ -118,7 +118,7 @@ CREATE TABLE variant_male_stage
     "q"             REAL,
     "i"             REAL
 );
-CREATE TABLE variant_male
+CREATE TABLE variant_EWING
 (
     "variant_id"    INTEGER PRIMARY KEY,
     "chr"           INTEGER,
@@ -135,7 +135,7 @@ CREATE TABLE variant_male
     "q"             REAL,
     "i"             REAL
 );
-CREATE TABLE aggregate_male
+CREATE TABLE aggregate_EWING
 (
     "chr"           INTEGER,
     "bp_abs_1000kb" INTEGER, -- Absolute BP floored to the nearest multiple of 10^6 (1000 kilobases)
