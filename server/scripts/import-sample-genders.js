@@ -434,20 +434,19 @@ const db = new sqlite(databaseFilePath);
 
 
 
-
-// // rename all tables
-// db.exec(`
-//     ALTER TABLE 'variant_RCC' RENAME TO 'variant_all';
-//     ALTER TABLE 'aggregate_RCC' RENAME TO 'aggregate_all';
-//     ALTER TABLE 'variant_MEL' RENAME TO 'variant_female';
-//     ALTER TABLE 'aggregate_MEL' RENAME TO 'aggregate_female';
-//     ALTER TABLE 'variant_EWING' RENAME TO 'variant_male';
-//     ALTER TABLE 'aggregate_EWING' RENAME TO 'aggregate_male';
-// `);
-
 // create indexes
-console.log(`[${duration()} s] Indexing...`);
-db.exec(readFile('indexes-sample-genders.sql'));
+// console.log(`[${duration()} s] Indexing...`);
+// db.exec(readFile('indexes-sample-genders.sql'));
+
+// rename all tables
+db.exec(`
+    ALTER TABLE 'variant_MEL' RENAME TO 'variant_all';
+    ALTER TABLE 'aggregate_MEL' RENAME TO 'aggregate_all';   
+    ALTER TABLE 'variant_EWING' RENAME TO 'variant_female';
+    ALTER TABLE 'aggregate_EWING' RENAME TO 'aggregate_female';
+    ALTER TABLE 'variant_RCC' RENAME TO 'variant_male';
+    ALTER TABLE 'aggregate_RCC' RENAME TO 'aggregate_male';
+`);
 
 // // close database
 db.close();
