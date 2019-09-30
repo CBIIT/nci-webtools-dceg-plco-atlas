@@ -7,17 +7,17 @@
         "children": [
             {
                 "title": "Ewing's sarcoma",
-                "value": "sample_all_genders_indexed_ewing",
+                "value": "meta_fixed_assoc",
                 "disabled": false
             },
             {
                 "title": "Renal Cell Carcinoma",
-                "value": "sample_all_genders_indexed_rcc",
+                "value": "rcc",
                 "disabled": false
             },
             {
                 "title": "Melanoma",
-                "value": "sample_all_genders_indexed_mel",
+                "value": "mel",
                 "disabled": false
             }
         ]
