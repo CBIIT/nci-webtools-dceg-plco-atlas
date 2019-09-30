@@ -5,6 +5,7 @@ import { updateVariantLookup, lookupVariants } from '../../services/actions';
 import { Table, paginationText, paginationSizeSelector, paginationButton } from '../controls/table';
 import paginationFactory from 'react-bootstrap-table2-paginator';
 import filterFactory, { textFilter } from 'react-bootstrap-table2-filter';
+import ToolkitProvider, { CSVExport } from 'react-bootstrap-table2-toolkit';
 import { Alert, Spinner, Card, Tabs, Tab } from 'react-bootstrap';
 
 export function VariantLookup() {
@@ -18,6 +19,8 @@ export function VariantLookup() {
     loading,
     submitted
   } = variantLookup;
+
+  const { ExportCSVButton } = CSVExport;
 
   const columns = [
     {
@@ -183,24 +186,46 @@ export function VariantLookup() {
           title="Table"
           className="p-2 bg-white tab-pane-bordered" 
           style={{minHeight: '50vh'}}>
-
           <div
             className="mw-100 my-4 px-5"
             style={{ display: submitted ? 'block' : 'none' }}>
-            <Table
-              bootstrap4
-              keyField="variant_id"
-              data={results}
-              columns={columns}
-              filter={filterFactory()}
-              pagination={paginationFactory({
-                showTotal: results.length > 0,
-                sizePerPageList: [10, 25, 50, 100],
-                paginationTotalRenderer: paginationText,
-                sizePerPageRenderer: paginationSizeSelector,
-                pageButtonRenderer: paginationButton,
-              })}
-            />
+              <ToolkitProvider
+                keyField="variant_id"
+                data={ results }
+                columns={ columns }
+                exportCSV={{
+                  fileName: 'variant_lookup.csv'
+                }}> 
+              {
+                props => (
+                  <div>
+                    <Table
+                      { ...props.baseProps }
+                      bootstrap4
+                      // keyField="variant_id"
+                      // data={results}
+                      // columns={columns}
+                      filter={filterFactory()}
+                      pagination={paginationFactory({
+                        showTotal: results.length > 0,
+                        sizePerPageList: [10, 25, 50, 100],
+                        paginationTotalRenderer: paginationText,
+                        sizePerPageRenderer: paginationSizeSelector,
+                        pageButtonRenderer: paginationButton,
+                      })}
+                    />
+                    <br />
+                    <ExportCSVButton 
+                      class="btn btn-outline-secondary btn-sm"
+                      { ...props.csvProps }>
+                      Export CSV
+                    </ExportCSVButton>
+
+
+                  </div>
+                )
+              }
+            </ToolkitProvider>
           </div>
           {placeholder}
         </Tab>
