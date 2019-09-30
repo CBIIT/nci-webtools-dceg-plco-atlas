@@ -199,6 +199,12 @@ export function VariantLookup() {
               {
                 props => (
                   <div>
+                    <ExportCSVButton 
+                      class="btn btn-secondary btn-sm float-right"
+                      { ...props.csvProps }>
+                      Export CSV
+                    </ExportCSVButton>
+                    <br />
                     <Table
                       { ...props.baseProps }
                       bootstrap4
@@ -214,14 +220,6 @@ export function VariantLookup() {
                         pageButtonRenderer: paginationButton,
                       })}
                     />
-                    <br />
-                    <ExportCSVButton 
-                      class="btn btn-outline-secondary btn-sm"
-                      { ...props.csvProps }>
-                      Export CSV
-                    </ExportCSVButton>
-
-
                   </div>
                 )
               }
