@@ -41,7 +41,7 @@ $enable-shadows: true;
 
 .btn-primary {
   // background-color:#D3D3D3;
-  background-image: 
+  background-image:
     linear-gradient(
       #ffffff, #dfdfdf
     );
@@ -50,7 +50,7 @@ $enable-shadows: true;
 }
 
 .btn-primary:hover {
-  background-image: 
+  background-image:
     linear-gradient(
       #ffffff, #dfdfdf
     );
@@ -59,7 +59,7 @@ $enable-shadows: true;
 }
 
 .btn-primary:active {
-  background-image: 
+  background-image:
     linear-gradient(
       #dfdfdf, #e5e5e5
     ) !important;
@@ -79,6 +79,10 @@ $enable-shadows: true;
 .flex-grow-auto {
   flex: 1 0 auto;
   width: auto;
+}
+
+.opacity-50 {
+  opacity: 0.5;
 }
 
 .nav-pills.nav-pills-inverse {
@@ -143,7 +147,7 @@ $enable-shadows: true;
 }
 
 .table.table-striped tbody tr:nth-of-type(odd) {
-  background-color: #f6f6f6;
+  background-color: #fafafa;
 }
 
 .link {
@@ -169,7 +173,7 @@ select.form-control-sm {
 
 .pagination {
   .page-item .page-link {
-    color: black;
+    color: #595959;
   }
 
   .page-item.active .page-link {

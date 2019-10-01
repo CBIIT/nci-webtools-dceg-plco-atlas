@@ -257,20 +257,21 @@ export function ManhattanPlot({
     <div style={{display: hasData() ? 'block' : 'none', position: 'relative'}}>
       <LoadingOverlay active={loading} {...plotOverlayConfig} />
       <div
-        className="px-2 pt-3 small"
+        className="mx-2 mt-3 small d-flex align-items-center"
         style={{visibility: selectedChromosome ? 'visible' : 'hidden'}}>
+          <Icon name="arrow-left" className="mr-2 opacity-50" width="10" />
         <a className="link" onClick={e => onAllChromosomeSelected && onAllChromosomeSelected()}>All Chromosomes</a>
 
         {zoomStack.length ? <>
-            <Icon name="angle-right" className="mx-1" width="4" />
+            <Icon name="arrow-left" className="mx-2 opacity-50" width="10" />
             <a className="link" onClick={resetZoom}>
               Chromosome {selectedChromosome}
             </a>
           </> : null}
 
         {zoomStack.length > 1 ? <>
-            <Icon name="angle-right" className="mx-1" width="4" />
-            <a className="link" onClick={zoomOut}>Previous Zoom</a>
+          <Icon name="arrow-left" className="mx-2 opacity-50" width="10" />
+          <a className="link" onClick={zoomOut}>Previous Zoom</a>
           </> : null}
       </div>
       <div
