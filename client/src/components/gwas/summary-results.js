@@ -2,6 +2,7 @@ import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Alert, Nav, Tab, Tabs, Card } from 'react-bootstrap';
 import { SummaryResultsForm } from '../forms/summary-results-form';
+import { SnpSearchForm } from '../forms/snp-search-form';
 import { ManhattanPlot } from '../plots/manhattan-plot';
 import { QQPlot } from '../plots/qq-plot';
 import { SummaryResultsTable } from './summary-results-table';
@@ -29,6 +30,8 @@ export function SummaryResults() {
     selectedGender,
     selectedManhattanPlotType,
     loadingManhattanPlot,
+    showSnpResults,
+
   } = useSelector(state => state.summaryResults);
 
   const setSubmitted = submitted => {
@@ -62,7 +65,7 @@ export function SummaryResults() {
 
   const handleSubmit = params => {
     const phenotype = params ? params.value : null;
-    
+
     if (!phenotype) {
       setMessages([
         {
@@ -237,7 +240,6 @@ export function SummaryResults() {
     );
     dispatch(lookupVariants([selectedPhenotype], snp));
   };
-
   const placeholder = (
     <div style={{ display: submitted ? 'none' : 'block' }}>
       <p className="h4 text-center my-5">
@@ -271,7 +273,11 @@ export function SummaryResults() {
           <div
             className="mw-100 my-4 px-5"
             style={{ display: submitted ? 'block' : 'none' }}>
-            <SummaryResultsTable />
+            <SnpSearchForm />
+
+            <div style={{ display: showSnpResults ? 'none' : 'block' }}>
+              <SummaryResultsTable />
+            </div>
           </div>
           {placeholder}
         </Tab>
