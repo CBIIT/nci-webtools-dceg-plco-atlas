@@ -8,9 +8,19 @@ function getRawResults(stmt, params) {
 }
 
 function getSummary(filepath, params) {
+    const validTables = [
+        'aggregate_all',
+        'aggregate_female',
+        'aggregate_male',
+    ];
+
+    const table = validTables.includes(params.table)
+        ? params.table
+        : validTables[0];
+
     const stmt = new Database(filepath, {readonly: true}).prepare(`
         SELECT chr, bp_abs_1000kb, nlog_p2
-            FROM variant_summary
+            FROM ${table}
             WHERE nlog_p2 >= :nlogpMin;
     `);
 
@@ -44,7 +54,7 @@ function getVariants(filepath, params) {
 
     const table = validTables.includes(params.table)
         ? params.table
-        : 'variant_all'
+        : validTables[0];
 
     // filter by id, chr, base position, and -log10(p), if provided
     let sql = `
