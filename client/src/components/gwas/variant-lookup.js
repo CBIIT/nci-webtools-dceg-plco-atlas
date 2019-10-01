@@ -183,11 +183,11 @@ export function VariantLookup() {
       <Tabs defaultActiveKey="variant-lookup">
         <Tab
           eventKey="variant-lookup"
-          title="Table"
+          // title="Table"
           className="p-2 bg-white tab-pane-bordered" 
           style={{minHeight: '50vh'}}>
           <div
-            className="mw-100 my-4 px-5"
+            className="mw-100 my-4 px-4"
             style={{ display: submitted ? 'block' : 'none' }}>
               <ToolkitProvider
                 keyField="variant_id"
@@ -200,7 +200,7 @@ export function VariantLookup() {
                 props => (
                   <div>
                     <ExportCSVButton 
-                      class="btn btn-secondary btn-sm float-right"
+                      class="btn btn-primary btn-sm float-right"
                       { ...props.csvProps }>
                       Export CSV
                     </ExportCSVButton>

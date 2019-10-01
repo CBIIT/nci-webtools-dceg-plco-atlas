@@ -53,8 +53,8 @@ export function Gwas() {
         <div
           // className="border-top-0"
           // style={{borderRadius: '0 0 0.25em 0.25em'}}
-          className="bg-white shadow-sm"
-          style={{ borderRadius: '0 0 0 0' }}>
+          className="bg-white shadow-sm border border-top-0"
+          style={{ borderRadius: '0 0 0.25em 0.25em' }}>
           <div className="container">
             <Nav defaultActiveKey="summary">
               {gwasLinks.map(({ name, pathId }) => (

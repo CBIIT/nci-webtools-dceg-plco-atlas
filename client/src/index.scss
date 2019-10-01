@@ -39,6 +39,34 @@ $enable-shadows: true;
   background-color: #162e51;
 }
 
+.btn-primary {
+  // background-color:#D3D3D3;
+  background-image: 
+    linear-gradient(
+      #ffffff, #dfdfdf
+    );
+  color: black;
+  border-color:#dee2e6;
+}
+
+.btn-primary:hover {
+  background-image: 
+    linear-gradient(
+      #ffffff, #dfdfdf
+    );
+  color: black;
+  border-color:#dee2e6;
+}
+
+.btn-primary:active {
+  background-image: 
+    linear-gradient(
+      #dfdfdf, #e5e5e5
+    ) !important;
+  color: black !important;
+  border-color:#dee2e6 !important;
+}
+
 .text-orange {
   color: orange !important;
 }
@@ -83,10 +111,21 @@ $enable-shadows: true;
   font-weight: 600;
 }
 
+.nav-tabs {
+  margin-bottom: -1px;
+  border: 0;
+  :hover {
+    border-bottom: 0;
+  }
+}
+
 .tab-pane.tab-pane-bordered {
-  border-left: 1px solid #dee2e6;
-  border-right: 1px solid #dee2e6;
-  border-bottom: 1px solid #dee2e6;
+  border: 1px solid #dee2e6;
+  // border-left: 1px solid #dee2e6;
+  // border-right: 1px solid #dee2e6;
+  // border-bottom: 1px solid #dee2e6;
+  // border-radius: 0 0 0.25em 0.25em;
+  border-radius: 0.25em;
 }
 
 
@@ -122,6 +161,10 @@ $enable-shadows: true;
 
 select.form-control-sm {
   padding-right: 0;
+}
+
+.form-control {
+  border-color: #dee2e6;
 }
 
 .pagination {

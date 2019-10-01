@@ -86,8 +86,8 @@ export function PhenotypeCorrelationsForm({ onChange, onSubmit, onReset }) {
           className="form-control flex-shrink-auto"
           value={selectedListType}
           onChange={e => setSelectedListType(e.target.value)}>
-          <option value="alphabetic">Alphabetic</option>
           <option value="categorical">Categorical</option>
+          <option value="alphabetic">Alphabetic</option>
         </select>
 
         <TreeSelect
@@ -137,7 +137,7 @@ export function PhenotypeCorrelationsForm({ onChange, onSubmit, onReset }) {
         <Button
           className="ml-2"
           style={{ maxHeight: '38px' }}
-          variant="secondary"
+          variant="primary"
           onClick={e => {
             e.preventDefault();
             onReset(e);
