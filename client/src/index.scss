@@ -171,6 +171,12 @@ select.form-control-sm {
   border-color: #dee2e6;
 }
 
+.form-control::-webkit-input-placeholder { color: #aaa; }  /* WebKit, Blink, Edge */
+.form-control:-moz-placeholder { color: #aaa; }  /* Mozilla Firefox 4 to 18 */
+.form-control::-moz-placeholder { color: #aaa; }  /* Mozilla Firefox 19+ */
+.form-control:-ms-input-placeholder { color: #aaa; }  /* Internet Explorer 10-11 */
+.form-control::-ms-input-placeholder { color: #aaa; }  /* Microsoft Edge */
+
 .pagination {
   .page-item .page-link {
     color: #595959;
