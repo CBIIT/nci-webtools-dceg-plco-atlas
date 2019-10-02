@@ -34,10 +34,14 @@ export function VariantLookup() {
         textOverflow: 'ellipsis',
         whiteSpace: 'nowrap'
       },
+      // events: {
+      //   onClick: (e, column, columnIndex, row, rowIndex) => { console.log(e.target.title) },
+      // }
     },
     {
+      headerTitle: () => "Chromosome",
       dataField: 'chr',
-      text: 'Chromosome'
+      text: 'Chr.'
     },
     {
       dataField: 'bp',
