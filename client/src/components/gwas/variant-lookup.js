@@ -24,6 +24,8 @@ export function VariantLookup() {
 
   const columns = [
     {
+      // title: true,
+      title: (cell, row, rowIndex, colIndex) => cell,
       dataField: 'phenotype',
       text: 'Phenotype',
       sort: true,
