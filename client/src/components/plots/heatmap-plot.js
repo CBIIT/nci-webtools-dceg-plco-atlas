@@ -96,9 +96,9 @@ export function Heatmap() {
               }}> */}
             {/* {popupTooltipData && ( */}
               <div style={popupTooltipStyle} className="popup-tooltip shadow" id="heatmap-tooltip">
-                <b>Phenotype X:</b> <a href="/">{popupTooltipData ? popupTooltipData.phenotypeX : ''}</a>
+                <a href="/">{popupTooltipData ? popupTooltipData.phenotypeX : ''}</a>
                 <br />
-                <b>Phenotype Y:</b> <a href="/">{popupTooltipData ? popupTooltipData.phenotypeY : ''}</a>
+                <a href="/">{popupTooltipData ? popupTooltipData.phenotypeY : ''}</a>
                 <br />
                 <b>Correlation:</b> {popupTooltipData ? popupTooltipData.r2 : ''}
                 <br />

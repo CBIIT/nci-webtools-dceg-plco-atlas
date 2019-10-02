@@ -208,8 +208,8 @@ export function drawHeatmap(phenotypes) {
       showscale: false,
       hoverinfo: 'x+y',
       hovertemplate:
-        '<br><b>Phenotype X</b>: %{x}<br>' +
-        '<b>Phenotype Y</b>: %{y}<br>' +
+        '%{x}<br>' +
+        '%{y}<br>' +
         '<b>Correlation</b>: %{text}' +
         '<extra></extra>'
     };
