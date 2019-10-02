@@ -109,7 +109,7 @@ export class MirroredManhattanPlot {
     });
     const width = canvasWidth - margins.left - margins.right;
     const height = canvasHeight - margins.top - margins.bottom;
-    const lines = this.config.lines || [];
+    const lines = this.config.lines || [{y: 3}];
     config.pointMap = {}; // maps colors to data indexes
 
     canvas.width = canvasWidth;
@@ -159,10 +159,10 @@ export class MirroredManhattanPlot {
       let margins = this.config.margins;
       let y = this.config.yAxis.scale(line.y) + margins.top;
       this.ctx.beginPath();
-      this.ctx.globalAlpha = 0.6;
-      this.ctx.strokeStyle = '#888';
+      this.ctx.globalAlpha = 0.8;
+      this.ctx.strokeStyle = '#444';
       this.ctx.lineWidth = 1;
-      this.ctx.setLineDash([6, 4]);
+//      this.ctx.setLineDash([6, 4]);
       this.ctx.moveTo(margins.left, y);
       this.ctx.lineTo(this.canvas.width - margins.right, y);
       this.ctx.stroke();

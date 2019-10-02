@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { updateSummaryResults } from "../../services/actions";
 import { query } from "../../services/query";
 import { Table } from "../controls/table";
+import { Icon } from '../controls/icon';
 
 export const SnpSearchForm = () => {
   const dispatch = useDispatch();
@@ -86,25 +87,27 @@ export const SnpSearchForm = () => {
 
   return (
     <div>
-      <div className="d-flex mb-5">
+      <div className="d-flex mb-2">
         <input
           type="text"
+          style={{maxWidth: '400px'}}
           className="form-control"
           placeholder="Search for a SNP"
           value={snp}
           onChange={e => setSnp(e.target.value)}
         />
         <button
+          className="btn btn-silver flex-shrink-auto d-flex"
+          onClick={handleSnpReset}
+        >
+          <Icon className="opacity-50" name="times" width="12" />
+          <span class="sr-only">Clear</span>
+        </button>
+        <button
           className="btn btn-silver flex-shrink-auto mx-2"
           onClick={handleSnpLookup}
         >
           Search
-        </button>
-        <button
-          className="btn btn-silver flex-shrink-auto"
-          onClick={handleSnpReset}
-        >
-          Reset
         </button>
       </div>
 
