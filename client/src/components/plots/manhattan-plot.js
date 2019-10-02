@@ -259,7 +259,6 @@ export function ManhattanPlot({
       <div
         className="mx-2 mt-3 small d-flex align-items-center"
         style={{visibility: selectedChromosome ? 'visible' : 'hidden'}}>
-          <Icon name="arrow-left" className="mr-2 opacity-50" width="10" />
         <a className="link" onClick={e => onAllChromosomeSelected && onAllChromosomeSelected()}>All Chromosomes</a>
 
         {zoomStack.length ? <>
@@ -273,6 +272,7 @@ export function ManhattanPlot({
           <Icon name="arrow-left" className="mx-2 opacity-50" width="10" />
           <a className="link" onClick={zoomOut}>Previous Zoom</a>
           </> : null}
+          <Icon name="arrow-left" className="mx-2 opacity-50" width="10" />
       </div>
       <div
         style={{
