@@ -200,7 +200,7 @@ export function VariantLookup() {
                 props => (
                   <div>
                     <ExportCSVButton 
-                      class="btn btn-silver btn-sm float-right"
+                      className="btn btn-silver btn-sm float-right"
                       { ...props.csvProps }>
                       Export CSV
                     </ExportCSVButton>
