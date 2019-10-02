@@ -133,7 +133,7 @@ export function VariantLookupForm({ onChange, onSubmit, onReset }) {
       <Button
         className="ml-2 flex-shrink-auto"
         style={{ maxHeight: '38px' }}
-        variant="primary"
+        variant="silver"
         // disabled={!canSubmit}
         onClick={e => {
           e.preventDefault();
@@ -145,7 +145,7 @@ export function VariantLookupForm({ onChange, onSubmit, onReset }) {
       <Button
         className="ml-2 flex-shrink-auto"
         style={{ maxHeight: '38px' }}
-        variant="primary"
+        variant="silver"
         onClick={e => {
           e.preventDefault();
           onReset(e);

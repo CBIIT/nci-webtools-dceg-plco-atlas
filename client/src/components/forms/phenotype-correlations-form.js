@@ -125,7 +125,7 @@ export function PhenotypeCorrelationsForm({ onChange, onSubmit, onReset }) {
         <Button
           className="ml-2"
           style={{ maxHeight: '38px' }}
-          variant="primary"
+          variant="silver"
           // disabled={!(selectedPhenotypes && selectedPhenotypes.length >= 2)}
           onClick={e => {
             e.preventDefault();
@@ -137,7 +137,7 @@ export function PhenotypeCorrelationsForm({ onChange, onSubmit, onReset }) {
         <Button
           className="ml-2"
           style={{ maxHeight: '38px' }}
-          variant="primary"
+          variant="silver"
           onClick={e => {
             e.preventDefault();
             onReset(e);
