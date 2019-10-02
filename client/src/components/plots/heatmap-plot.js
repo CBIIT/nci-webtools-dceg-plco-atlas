@@ -73,7 +73,8 @@ export function Heatmap() {
       // width: 800,
       scale: 1 // Multiply title/legend/axis/canvas sizes by this factor
     },
-    displaylogo: false
+    displaylogo: false,
+    modeBarButtonsToRemove: ['autoScale2d', 'hoverClosestCartesian', 'hoverCompareCartesian']
     // responsive: true
   };
 
