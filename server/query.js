@@ -8,9 +8,19 @@ function getRawResults(stmt, params) {
 }
 
 function getSummary(filepath, params) {
+    const validTables = [
+        'aggregate_all',
+        'aggregate_female',
+        'aggregate_male',
+    ];
+
+    const table = validTables.includes(params.table)
+        ? params.table
+        : validTables[0];
+
     const stmt = new Database(filepath, {readonly: true}).prepare(`
         SELECT chr, bp_abs_1000kb, nlog_p2
-            FROM aggregate_all
+            FROM ${table}
             WHERE nlog_p2 >= :nlogpMin;
     `);
 
@@ -32,14 +42,24 @@ function getVariants(filepath, params) {
         'variant_id', 'chr', 'bp', 'snp','a1','a2', 'n',
         'p','nlog_p', 'p_r', 'or', 'or_r', 'q', 'i',
     ];
+    const validTables = [
+        'variant_all',
+        'variant_female',
+        'variant_male',
+    ];
+
     const columns = params.columns // given as a comma-separated list
         ? params.columns.split(',').filter(c => validColumns.includes(c))
         : validColumns;
 
+    const table = validTables.includes(params.table)
+        ? params.table
+        : validTables[0];
+
     // filter by id, chr, base position, and -log10(p), if provided
     let sql = `
         SELECT ${columns.map(wrapColumnName).join(',')}
-        FROM variant_all
+        FROM ${table}
         WHERE ` + [
             `p IS NOT NULL`,
             coalesce(params.id, `variant_id = :id`),
@@ -81,6 +101,12 @@ function getVariants(filepath, params) {
         records.count = db.prepare(countSql).pluck().get(params);
 
     return records;
+}
+
+function exportVariants(filepath, params) {
+    params = {...params, raw: true, count: false};
+    const { columns, data } = getVariants(filepath, params);
+    // todo: stream csv contents
 }
 
 module.exports = {getSummary, getVariants};

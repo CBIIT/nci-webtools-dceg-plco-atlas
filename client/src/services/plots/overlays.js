@@ -96,6 +96,9 @@ export function drawZoomOverlay(config, ctx, overlayCtx) {
   canvas.addEventListener('mouseup', endZoom);
   canvas.addEventListener('dblclick', resetZoom);
 
+  //
+  config.zoomOverlayActive = false;
+
   function startZoom(ev) {
     let { x, y } = viewportToLocalCoordinates(
       ev.clientX,
@@ -106,6 +109,7 @@ export function drawZoomOverlay(config, ctx, overlayCtx) {
     zoomArea = { x1: x, x2: x, y1: y, y2: y };
     if (!withinMargins) return false;
     mouseDown = true;
+    config.zoomOverlayActive = true;
   }
 
   function updateZoomWindow(ev) {
@@ -140,6 +144,7 @@ export function drawZoomOverlay(config, ctx, overlayCtx) {
       ev.target
     );
     overlayCtx.clearRect(margins.left, margins.top, width, height);
+    config.zoomOverlayActive = false;
     mouseDown = false;
     zoomArea.x2 = x;
     zoomArea.y2 = y;

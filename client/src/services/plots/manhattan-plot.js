@@ -211,9 +211,9 @@ export class ManhattanPlot {
 
           if (onhover) onhover(point);
 
-          if (content && trigger === 'hover')
+          if (content && trigger === 'hover' && !config.zoomOverlayActive)
             this.showTooltip(ev, await content(point, this.tooltip));
-        }, config.point.tooltipDelay || 300)
+        }, config.point.tooltipDelay || 100)
       );
     }
 

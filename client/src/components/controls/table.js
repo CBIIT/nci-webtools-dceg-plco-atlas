@@ -48,7 +48,7 @@ export const paginationButton = ({page, active, disabled, title, onPageChange}) 
     let content = icons[title] || <span>{title}</span>;
 
     return (
-        <li className={["page-item", active ? 'active' : ''].join(' ')}
+        <li className={['page-item', active ? 'active' : 'text-muted'].join(' ')}
             onClick={e => onPageChange(page)}>
             <a
                 className="page-link d-flex align-items-center h-100"
