@@ -38,7 +38,6 @@ export const paginationIcons = {
 }
 
 export const paginationButton = ({page, active, disabled, title, onPageChange}) => {
-    console.log('paged', {page, active, disabled, title, onPageChange})
     let icons = {
         'first page': <Icon name="angle-double-left" alt="first page" width="16" height="12"  />,
         'last page': <Icon name="angle-double-right" alt="last page" width="16" height="12"  />,

@@ -56,7 +56,7 @@ export function SummaryResultsForm({ onChange, onSubmit, onReset }) {
         <option value="categorical">Categorical</option>
         <option value="alphabetic">Alphabetic</option>
       </select>
-      
+
       <TreeSelect
         className="form-control flex-shrink-auto h-100 p-0 mr-2"
         dropdownClassName="summary-results"
@@ -86,7 +86,7 @@ export function SummaryResultsForm({ onChange, onSubmit, onReset }) {
         value={selectedManhattanPlotType}
         onChange={e => setSelectedManhattanPlotType(e.target.value)}
         aria-label="Select the type of data you wish to plot">
-        <option value="aggregate">All</option>
+        <option value="all">All</option>
         <option value="stacked">Female/Male (Stacked)</option>
         <option value="female">Female</option>
         <option value="male">Male</option>
@@ -97,7 +97,7 @@ export function SummaryResultsForm({ onChange, onSubmit, onReset }) {
         variant="primary"
         onClick={e => {
           e.preventDefault();
-          onSubmit(selectedPhenotype);
+          onSubmit(selectedPhenotype, selectedManhattanPlotType);
         }}>
         Submit
       </Button>

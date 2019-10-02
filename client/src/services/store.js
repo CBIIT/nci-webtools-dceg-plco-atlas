@@ -11,7 +11,7 @@ const initialState = {
     selectedPhenotype: null,
     selectedChromosome: null,
     selectedPlot: 'manhattan-plot',
-    selectedManhattanPlotType: 'aggregate',
+    selectedManhattanPlotType: 'all',
     manhattanPlotData: {},
     manhattanPlotView: '',
     ranges: [],
@@ -33,7 +33,10 @@ const initialState = {
     loadingManhattanPlot: false,
     drawManhattanPlot: null,
     updateResultsTable: null,
-    popupTooltipData: null
+    popupTooltipData: null,
+    snp: '',
+    snpResults: null,
+    showSnpResults: null,
   },
   variantLookup: {
     selectedListType: 'categorical',

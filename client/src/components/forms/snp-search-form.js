@@ -11,6 +11,7 @@ export const SnpSearchForm = () => {
     snpResults,
     showSnpResults,
     selectedPhenotype,
+    selectedChromosome,
     selectedManhattanPlotType
   } = useSelector(
     state => state.summaryResults
@@ -54,11 +55,11 @@ export const SnpSearchForm = () => {
   const handleSnpLookup = async () => {
     if (!snp) return;
     const table = {
-      aggregate: 'variant_all',
+      all: 'variant_all',
       stacked: 'variant_all',
       female: 'variant_female',
       male: 'variant_male',
-    }[selectedManhattanPlotType]
+    }[selectedManhattanPlotType];
 
     const { data } = await query('variants', {
       database: selectedPhenotype.value + '.db',
@@ -76,7 +77,7 @@ export const SnpSearchForm = () => {
   const handleSnpReset = () => {
     dispatch(
       updateSummaryResults({
-        snp: null,
+        snp: '',
         snpResults: [],
         showSnpResults: false
       })
@@ -87,10 +88,11 @@ export const SnpSearchForm = () => {
     <div>
       <div className="d-flex mb-5">
         <input
+          type="text"
           className="form-control"
           placeholder="Search for a SNP"
-          onChange={e => setSnp(e.target.value)}
           value={snp}
+          onChange={e => setSnp(e.target.value)}
         />
         <button
           className="btn btn-primary flex-shrink-auto mx-2"

@@ -63,8 +63,8 @@ export function SummaryResults() {
     // setSubmitted(null);
   };
 
-  const handleSubmit = params => {
-    const phenotype = params ? params.value : null;
+  const handleSubmit = (phenotype, manhattanPlotType) => {
+    phenotype = phenotype ? phenotype.value : null;
 
     if (!phenotype) {
       setMessages([
@@ -77,6 +77,14 @@ export function SummaryResults() {
       console.log('not selected');
       return;
     }
+
+    const table = {
+      all: 'variant_all',
+      stacked: 'variant_all',
+      female: 'variant_female',
+      male: 'variant_male',
+    }[manhattanPlotType];
+    console.log('selected table', manhattanPlotType, table);
 
     setSubmitted(new Date());
     setSelectedChromosome(null);
@@ -98,12 +106,14 @@ export function SummaryResults() {
     dispatch(
       drawManhattanPlot('summary', {
         database: phenotype + '.db',
+        table,
         nlogpMin: 3,
       })
     );
     dispatch(
       updateSummaryResultsTable({
         database: phenotype + '.db',
+        table,
         offset: (page - 1) * pageSize,
         limit: pageSize,
         columns: ['chr', 'bp', 'snp', 'a1', 'a2', 'or', 'p'],
@@ -121,7 +131,7 @@ export function SummaryResults() {
         selectedPhenotype: null,
         selectedChromosome: null,
         selectedPlot: 'manhattan-plot',
-        selectedManhattanPlotType: 'aggregate',
+        selectedManhattanPlotType: 'all',
         manhattanPlotData: {},
         manhattanPlotView: '',
         ranges: [],
@@ -139,7 +149,9 @@ export function SummaryResults() {
         loadingManhattanPlot: false,
         drawManhattanPlot: null,
         updateResultsTable: null,
-        popupTooltipData: null
+        popupTooltipData: null,
+        showSnpResults: false,
+        snp: '',
       })
     );
   };
@@ -157,11 +169,19 @@ export function SummaryResults() {
       bpMin: range.bp_min,
       bpMax: range.bp_max,
     };
+    const table = {
+      all: 'variant_all',
+      stacked: 'variant_all',
+      female: 'variant_female',
+      male: 'variant_male',
+    }[selectedManhattanPlotType];
+    console.log('selected table', table);
 
     dispatch(
       updateSummaryResults({
         manhattanPlotView: 'variants',
         selectedChromosome: chr,
+        table,
         page,
         pageSize,
         nlogpMin: 2,
@@ -173,6 +193,7 @@ export function SummaryResults() {
     dispatch(
       drawManhattanPlot('variants', {
         database,
+        table,
         chr,
         nlogpMin: 2,
         ...bpRange,
@@ -183,6 +204,7 @@ export function SummaryResults() {
     dispatch(
       updateSummaryResultsTable({
         database,
+        table,
         chr,
         ...bpRange,
         offset: (page - 1) * pageSize,
@@ -200,6 +222,12 @@ export function SummaryResults() {
     const chr = selectedChromosome;
     const page = 1;
     const pageSize = 10;
+    const table = {
+      all: 'variant_all',
+      stacked: 'variant_all',
+      female: 'variant_female',
+      male: 'variant_male',
+    }[selectedManhattanPlotType];
 
     let params = {
       bpMin: bounds.xMin,
@@ -219,6 +247,7 @@ export function SummaryResults() {
     dispatch(
       updateSummaryResultsTable({
         database,
+        table,
         chr,
         offset: (page - 1) * pageSize,
         limit: pageSize,
