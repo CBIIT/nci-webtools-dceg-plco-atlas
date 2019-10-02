@@ -95,13 +95,13 @@ export const SnpSearchForm = () => {
           onChange={e => setSnp(e.target.value)}
         />
         <button
-          className="btn btn-primary flex-shrink-auto mx-2"
+          className="btn btn-silver flex-shrink-auto mx-2"
           onClick={handleSnpLookup}
         >
           Search
         </button>
         <button
-          className="btn btn-primary flex-shrink-auto"
+          className="btn btn-silver flex-shrink-auto"
           onClick={handleSnpReset}
         >
           Reset

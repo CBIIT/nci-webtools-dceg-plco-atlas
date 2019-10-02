@@ -39,7 +39,7 @@ $enable-shadows: true;
   background-color: #162e51;
 }
 
-.btn-primary {
+.btn-silver {
   // background-color:#D3D3D3;
   background-image:
     linear-gradient(
@@ -49,8 +49,8 @@ $enable-shadows: true;
   border-color:#dee2e6;
 }
 
-.btn-primary:hover {
-  background-image:
+.btn-silver:hover {
+  background-image: 
     linear-gradient(
       #ffffff, #dfdfdf
     );
@@ -58,8 +58,8 @@ $enable-shadows: true;
   border-color:#dee2e6;
 }
 
-.btn-primary:active {
-  background-image:
+.btn-silver:active {
+  background-image: 
     linear-gradient(
       #dfdfdf, #e5e5e5
     ) !important;

@@ -94,7 +94,7 @@ export function SummaryResultsForm({ onChange, onSubmit, onReset }) {
 
       <Button
         className="mr-2"
-        variant="primary"
+        variant="silver"
         onClick={e => {
           e.preventDefault();
           onSubmit(selectedPhenotype, selectedManhattanPlotType);
@@ -104,7 +104,7 @@ export function SummaryResultsForm({ onChange, onSubmit, onReset }) {
 
       <Button
         className=""
-        variant="primary"
+        variant="silver"
         onClick={e => {
           e.preventDefault();
           onReset(e);
