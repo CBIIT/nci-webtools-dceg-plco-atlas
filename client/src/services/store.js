@@ -13,6 +13,7 @@ const initialState = {
     selectedPlot: 'manhattan-plot',
     selectedManhattanPlotType: 'all',
     manhattanPlotData: {},
+    manhattanMirroredData: {},
     manhattanPlotView: '',
     ranges: [],
     results: [],

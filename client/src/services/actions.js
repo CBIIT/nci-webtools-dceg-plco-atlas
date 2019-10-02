@@ -56,11 +56,31 @@ export function updateSummaryResultsTable(params) {
 export function drawManhattanPlot(plotType, params) {
   return async function(dispatch) {
     dispatch(updateSummaryResults({ loadingManhattanPlot: true }));
-    const manhattanPlotData = await rawQuery(plotType, params);
-    if (!manhattanPlotData.error)
-      dispatch(updateSummaryResults({ manhattanPlotData }));
+    if (params.table.length == 2) {
+      // if 2 tables are provided, this is a mirrored plot
+      const manhattanPlotData = await rawQuery(plotType, {
+        ...params,
+        table: params.table[0]
+      });
+
+      const manhattanPlotMirroredData = await rawQuery(plotType, {
+        ...params,
+        table: params.table[1]
+      });
+
+      dispatch(updateSummaryResults({
+        manhattanPlotData,
+        manhattanPlotMirroredData,
+      }));
+    } else {
+      const manhattanPlotData = await rawQuery(plotType, params);
+      dispatch(updateSummaryResults({
+        manhattanPlotData,
+        manhattanPlotMirroredData: {}
+      }));
+    }
+
     dispatch(updateSummaryResults({ loadingManhattanPlot: false }));
-    return manhattanPlotData;
   };
 }
 

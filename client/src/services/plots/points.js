@@ -51,8 +51,8 @@ export function drawPoints(config, ctx, hiddenCtx) {
 
 
 export function drawMirroredPoints(config, ctx, hiddenCtx) {
-  const data = config.data;
-  const margins = config.margins;
+  console.log('mirrored points', config);
+  const {data, data2, margins} = config;
   const xKey = config.xAxis.key;
   const yKey = config.yAxis.key;
   const xScale = config.xAxis.scale;
@@ -89,17 +89,28 @@ export function drawMirroredPoints(config, ctx, hiddenCtx) {
     ctx.fillStyle =
       typeof pointColor === 'function' ? pointColor(d, i) : pointColor;
     ctx.fill();
-
-    x = xScale2(dx);
-    y = yScale2(dy);
-
-    ctx.beginPath();
-    ctx.arc(x, y, pointSize, 0, 2 * Math.PI, true);
-    ctx.fillStyle =
-      typeof pointColor === 'function' ? pointColor(d, i) : pointColor;
-    ctx.fill();
-
   }
+
+  if (data2 && xScale2 && yScale2) {
+    for (let i = 0; i < data2.length; i++) {
+      const d = data2[i];
+      const dx = d[xKey];
+      const dy = d[yKey];
+
+      if (dx < xMin || dx > xMax || dy < yMin || dy > yMax) continue;
+
+      let x = xScale2(dx);
+      let  y = yScale2(dy);
+
+      ctx.beginPath();
+      ctx.arc(x, y, pointSize, 0, 2 * Math.PI, true);
+      ctx.fillStyle =
+        typeof pointColor === 'function' ? pointColor(d, i) : pointColor;
+      ctx.fill();
+    }
+  }
+
+
   ctx.restore();
   hiddenCtx.restore();
 }

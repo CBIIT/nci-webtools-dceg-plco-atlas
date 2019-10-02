@@ -24,6 +24,7 @@ export function ManhattanPlot({
   const {
     selectedPlot,
     manhattanPlotData,
+    manhattanPlotMirroredData,
     manhattanPlotView,
     selectedManhattanPlotType,
     selectedPhenotype,
@@ -37,6 +38,7 @@ export function ManhattanPlot({
 
   useEffect(() => {
     if (selectedPlot != 'manhattan-plot' || !hasData()) return;
+
     let params;
     if (selectedManhattanPlotType != 'stacked') {
       params =
@@ -45,16 +47,16 @@ export function ManhattanPlot({
           : getChromosomePlot(manhattanPlotData)
           plot.current = new Plot(plotContainer.current, params);
     } else {
-      params = getMirroredPlot(manhattanPlotData);
+      params = getMirroredPlot(manhattanPlotData, manhattanPlotMirroredData);
       plot.current = new MirroredPlot(plotContainer.current, params);
     }
     setZoomStack([])
     return () => {
       plot.current.destroy()
     };
-  }, [manhattanPlotData, selectedPlot]);
+  }, [manhattanPlotData, manhattanPlotMirroredData, selectedPlot]);
 
-  function getMirroredPlot(plotData) {
+  function getMirroredPlot(plotData, mirroredPlotData) {
     let columnIndexes = {
       chr: plotData.columns.indexOf('chr'),
       bp: plotData.columns.indexOf('bp_abs_1000kb'),
@@ -62,7 +64,9 @@ export function ManhattanPlot({
     };
 
     return {
+      mirrored: true,
       data: plotData.data,
+      data2: mirroredPlotData.data,
       xAxis: {
         title: [
           {
@@ -167,7 +171,7 @@ export function ManhattanPlot({
       nLogP: data[columnIndexes.nLogP]
     });
 
-    let title = `${selectedPhenotype.title} - Chr ${selectedChromosome}`;
+    let title = `${selectedPhenotype.title} - Chromosome ${selectedChromosome}`;
     let range = ranges.find(r => r.chr === selectedChromosome);
 
     return {

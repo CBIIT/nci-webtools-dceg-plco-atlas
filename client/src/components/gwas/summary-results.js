@@ -80,11 +80,10 @@ export function SummaryResults() {
 
     const table = {
       all: 'variant_all',
-      stacked: 'variant_all',
+      stacked: ['variant_male', 'variant_female'],
       female: 'variant_female',
       male: 'variant_male',
     }[manhattanPlotType];
-    console.log('selected table', manhattanPlotType, table);
 
     setSubmitted(new Date());
     setSelectedChromosome(null);
@@ -113,7 +112,7 @@ export function SummaryResults() {
     dispatch(
       updateSummaryResultsTable({
         database: phenotype + '.db',
-        table,
+        table: Array.isArray(table) ? table[0] : 'table',
         offset: (page - 1) * pageSize,
         limit: pageSize,
         columns: ['chr', 'bp', 'snp', 'a1', 'a2', 'or', 'p'],
@@ -133,6 +132,7 @@ export function SummaryResults() {
         selectedPlot: 'manhattan-plot',
         selectedManhattanPlotType: 'all',
         manhattanPlotData: {},
+        manhattanPlotMirroredData: {},
         manhattanPlotView: '',
         ranges: [],
         results: [],
