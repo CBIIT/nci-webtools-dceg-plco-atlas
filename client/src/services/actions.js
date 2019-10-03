@@ -271,7 +271,7 @@ export function lookupVariants(phenotypes, variant) {
         snp: variant,
       });
       console.log("data", data);
-      if (data.length === 0) {
+      if (!data || data.length === 0) {
         tableList.push({
           phenotype: phenotypes[i].title ? phenotypes[i].title : phenotypes[i].label,
           a1: '-',

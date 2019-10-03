@@ -32,8 +32,11 @@ export function VariantLookup() {
       style: {
         overflowX: 'hidden',
         textOverflow: 'ellipsis',
-        whiteSpace: 'nowrap'
+        whiteSpace: 'nowrap',
       },
+      headerStyle: {
+        width: '290px'
+      }
       // events: {
       //   onClick: (e, column, columnIndex, row, rowIndex) => { console.log(e.target.title) },
       // }
@@ -41,11 +44,19 @@ export function VariantLookup() {
     {
       headerTitle: () => "Chromosome",
       dataField: 'chr',
-      text: 'Chr.'
+      text: 'Chr.',
+      // headerAlign: 'center',
+      // align: 'center'
+      headerStyle: {
+        width: '50px'
+      }
     },
     {
       dataField: 'bp',
-      text: 'Position'
+      text: 'Position',
+      headerStyle: {
+        width: '100px'
+      }
     },
     {
       dataField: 'a1',
