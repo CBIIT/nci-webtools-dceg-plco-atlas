@@ -109,4 +109,13 @@ function exportVariants(filepath, params) {
     // todo: stream csv contents
 }
 
-module.exports = {getSummary, getVariants};
+function getMetadata(filepath) {
+    const db = new Database(filepath, {readonly: true});
+    const records = db.prepare(`SELECT * FROM variant_metadata`).all();
+    return records.reduce((obj, {key, value}) => {
+        obj[key] = value;
+        return obj;
+    }, {});
+}
+
+module.exports = {getSummary, getVariants, getMetadata};
