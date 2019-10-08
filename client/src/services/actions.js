@@ -37,10 +37,10 @@ export function updateSummaryResultsTable(params) {
   return async function(dispatch) {
     dispatch(updateSummaryResults({ loading: true }));
     const response = await query('variants', params);
+    const metadata = await query('metadata');
     if (!response.error) {
       let data = {results: response.data};
-      if (response.count)
-        data.resultsCount = response.count;
+      data.resultsCount = metadata[`count_${params.gender}`];
       dispatch(updateSummaryResults(data));
     }
     dispatch(updateSummaryResults({ loading: false }));

@@ -116,7 +116,6 @@ export function SummaryResults() {
         offset: (page - 1) * pageSize,
         limit: pageSize,
         columns: ['chr', 'bp', 'snp', 'a1', 'a2', 'or', 'p'],
-        count: true,
         orderBy: 'p',
         order: 'asc',
       })
