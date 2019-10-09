@@ -204,7 +204,7 @@ export function VariantLookup() {
           className="p-2 bg-white tab-pane-bordered" 
           style={{minHeight: '50vh'}}>
           <div
-            className="mw-100 my-4 px-4"
+            className="mw-100 my-2 px-4"
             style={{ display: submitted ? 'block' : 'none' }}>
               <ToolkitProvider
                 keyField="variant_id"
@@ -217,7 +217,8 @@ export function VariantLookup() {
                 props => (
                   <div>
                     <ExportCSVButton 
-                      className="btn btn-silver btn-sm float-right"
+                      className="float-right"
+                      style={{all: 'unset', textDecoration: 'underline', cursor: 'pointer', color: '#007bff'}}
                       { ...props.csvProps }>
                       Export CSV
                     </ExportCSVButton>
@@ -231,11 +232,14 @@ export function VariantLookup() {
                       filter={filterFactory()}
                       pagination={paginationFactory({
                         showTotal: results.length > 0,
-                        sizePerPageList: [10, 25, 50, 100],
+                        sizePerPageList: [25, 50, 100],
                         paginationTotalRenderer: paginationText,
                         sizePerPageRenderer: paginationSizeSelector,
                         pageButtonRenderer: paginationButton,
                       })}
+                      defaultSorted={[
+                        {dataField: 'p', order: 'asc'}
+                      ]}
                     />
                   </div>
                 )
