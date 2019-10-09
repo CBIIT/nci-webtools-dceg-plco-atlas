@@ -11,6 +11,7 @@ const initialState = {
     selectedPhenotype: null,
     selectedChromosome: null,
     selectedPlot: 'manhattan-plot',
+    selectedTable: '',
     selectedManhattanPlotType: 'all',
     manhattanPlotData: {},
     manhattanMirroredData: {},
