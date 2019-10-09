@@ -78,7 +78,14 @@ export function SummaryResults() {
       return;
     }
 
-    const table = {
+    const aggregateTable = {
+      all: 'aggregate_all',
+      stacked: ['aggregate_male', 'aggregate_female'],
+      female: 'aggregate_female',
+      male: 'aggregate_male',
+    }[manhattanPlotType];
+
+    const variantTable = {
       all: 'variant_all',
       stacked: ['variant_male', 'variant_female'],
       female: 'variant_female',
@@ -88,6 +95,9 @@ export function SummaryResults() {
     setSubmitted(new Date());
     setSelectedChromosome(null);
     setPopupTooltipData(null);
+    dispatch(updateSummaryResults({
+      selectedTable: aggregateTable
+    }))
 
     dispatch(drawQQPlot(phenotype));
     dispatch(
@@ -105,20 +115,21 @@ export function SummaryResults() {
     dispatch(
       drawManhattanPlot('summary', {
         database: phenotype + '.db',
-        table,
+        table: aggregateTable,
         nlogpMin: 3,
       })
     );
     dispatch(
       updateSummaryResultsTable({
         database: phenotype + '.db',
-        table: Array.isArray(table) ? table[0] : 'table',
+        table: Array.isArray(variantTable) ? variantTable[0] : variantTable,
+        gender: manhattanPlotType,
         offset: (page - 1) * pageSize,
         limit: pageSize,
         columns: ['chr', 'bp', 'snp', 'a1', 'a2', 'or', 'p'],
         orderBy: 'p',
         order: 'asc',
-      })
+      }, true)
     );
   };
 
@@ -156,7 +167,7 @@ export function SummaryResults() {
   };
 
   const onAllChromosomeSelected = () => {
-    handleSubmit(selectedPhenotype)
+    handleSubmit(selectedPhenotype, selectedManhattanPlotType)
   }
 
   const onChromosomeSelected = chr => {

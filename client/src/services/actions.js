@@ -33,14 +33,19 @@ export function fetchRanges() {
   };
 }
 
-export function updateSummaryResultsTable(params) {
+export function updateSummaryResultsTable(params, includeCounts) {
   return async function(dispatch) {
     dispatch(updateSummaryResults({ loading: true }));
     const response = await query('variants', params);
-    const metadata = await query('metadata');
+    const metadata = await query('metadata', params);
     if (!response.error) {
       let data = {results: response.data};
-      data.resultsCount = metadata[`count_${params.gender}`];
+      if (response.count) {
+        data.resultsCount = response.count;
+      }
+
+      if (includeCounts)
+        data.resultsCount = +metadata[`count_${params.gender}`];
       dispatch(updateSummaryResults(data));
     }
     dispatch(updateSummaryResults({ loading: false }));
@@ -54,6 +59,7 @@ export function updateSummaryResultsTable(params) {
  * @param {object} params - database, chr, bpMin, bpMax, nlogpMin, nlogPmax
  */
 export function drawManhattanPlot(plotType, params) {
+  console.log('drawing plot', plotType, params);
   return async function(dispatch) {
     dispatch(updateSummaryResults({ loadingManhattanPlot: true }));
     if (params.table.length == 2) {

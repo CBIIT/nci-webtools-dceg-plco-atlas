@@ -11,6 +11,7 @@ export function SummaryResultsTable() {
     loading,
     selectedPhenotype,
     selectedChromosome,
+    selectedTable,
     results,
     resultsCount,
     page,
@@ -68,6 +69,7 @@ export function SummaryResultsTable() {
     dispatch(updateSummaryResultsTable({
       database: selectedPhenotype.value + '.db',
       offset: limit * (page - 1),
+      table: selectedTable,
       chr: selectedChromosome,
       limit,
       orderBy,
