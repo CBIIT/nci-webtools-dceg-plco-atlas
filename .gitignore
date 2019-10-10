@@ -10,4 +10,5 @@ config.json
 /server/data/**/*.txt
 /server/data/**/*.txt.gz
 /server/data/qq-plots/
+/server/logs/
 /www/

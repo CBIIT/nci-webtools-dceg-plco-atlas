@@ -4,29 +4,37 @@ const cors = require('fastify-cors');
 const static = require('fastify-static');
 const { port, dbpath } = require('./config.json');
 const { getSummary, getVariants, getMetadata } = require('./query');
+const logger = require('./logger');
 
 const app = server({ignoreTrailingSlash: true});
 app.register(static, {root: path.resolve('www')});
 app.register(static, {root: path.resolve(dbpath), prefix: '/data/', decorateReply: false});
 app.register(cors);
+logger.info("Server started.");
 
 // todo: check connectivity to database
 app.get('/ping', (req, res) => res.send(true));
 
 // retrieves all variant groups for all chroms. at the lowest granularity (in MBases)
 app.get('/summary', async ({query}, res) => {
+    logger.info("Execute summary query.");
+    logger.info("Query:", query);
     res.header('Cache-Control', 'max-age=300');
     return getSummary(dbpath + query.database, query);
 });
 
 // retrieves all variants within the specified range
 app.get('/variants', async ({query}, res) => {
+    logger.info("Execute variants query.");
+    logger.info("Query:", query);
     res.header('Cache-Control', 'max-age=300');
     return getVariants(dbpath + query.database, query);
 });
 
 // retrieves metadata
 app.get('/metadata', async ({query}, res) => {
+    logger.info("Execute metadata query.");
+    logger.info("Query:", query);
     res.header('Cache-Control', 'max-age=300');
     return getMetadata(dbpath + query.database);
 });
@@ -34,6 +42,7 @@ app.get('/metadata', async ({query}, res) => {
 app.listen(port, '0.0.0.0')
     .then(addr => console.log(`Application is running on: ${addr}`))
     .catch(error => {
+        logger.info("Error:", error);
         console.error(error);
         process.exit(1);
     });
