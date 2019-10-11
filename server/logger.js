@@ -5,27 +5,40 @@
 'use strict';
 
 const winston = require('winston');
+const { createLogger, format, transports } = winston;
 const { logpath } = require('./config.json');
 require('winston-daily-rotate-file');
 // winston.emitErrs = true;
 
-var logger = new winston.createLogger({
+var logger = new createLogger({
+  format: format.combine(
+    format.label({ label: '[PLCO-SERVER]' }),
+    format.timestamp({
+      format: 'YYYY-MM-DD HH:mm:ss'
+    }),
+    //
+    // The simple format outputs
+    // `${level}: ${message} ${[Object with everything else]}`
+    //
+    format.simple()
+    //
+    // Alternatively you could use this custom printf format if you
+    // want to control where the timestamp comes in your final message.
+    // Try replacing `format.simple()` above with this:
+    //
+    // format.printf(info => `${info.timestamp} ${info.level}: ${info.message}`)
+  ),
   transports: [
-    new (winston.transports.DailyRotateFile)({
-          filename: logpath + 'application-%DATE%.log',
-          datePattern: 'YYYY-MM-DD-HH',
-          zippedArchive: false,
-          maxSize: '1024m',
-          timestamp: true,
-          maxFiles: '1d',
-          prepend: true
-        }),
-      new winston.transports.Console({
-          level: 'debug',
-          handleExceptions: true,
-          json: false,
-          colorize: true
-      })
+    new (transports.DailyRotateFile)({
+      filename: logpath + 'application-%DATE%.log',
+      datePattern: 'YYYY-MM-DD-HH',
+      zippedArchive: false,
+      maxSize: '1024m',
+      timestamp: true,
+      maxFiles: '1d',
+      prepend: true
+    }),
+    new transports.Console()
   ],
   exitOnError: false
 });
