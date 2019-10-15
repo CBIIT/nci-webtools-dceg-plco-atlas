@@ -96,7 +96,8 @@ export class ManhattanPlot {
     const ctx = this.ctx;
     const hiddenCtx = this.hiddenCtx;
     const overlayCtx = this.overlayCtx;
-    const data = this.config.data;
+    const {data, data2} = this.config;
+    const {mirrored} = this.config;
     const canvasWidth = this.container.clientWidth;
     const canvasHeight = this.container.clientHeight;
     const margins = (config.margins = {
@@ -111,6 +112,13 @@ export class ManhattanPlot {
     const lines = this.config.lines || [];
     config.pointMap = {}; // maps colors to data indexes
 
+    if (mirrored) {
+      // copy axis configs if mirrored
+      config.xAxis2 = {...config.xAxis, ...config.xAxis2}
+      config.yAxis2 = {...config.yAxis, ...config.yAxis2}
+      config.point2 = {...config.point, ...config.point2}
+    }
+
     canvas.width = canvasWidth;
     canvas.height = canvasHeight;
 
@@ -120,23 +128,88 @@ export class ManhattanPlot {
     overlayCanvas.width = canvasWidth;
     overlayCanvas.height = canvasHeight;
 
-    const xData = data.map(d => d[config.xAxis.key]);
-    const yData = data.map(d => d[config.yAxis.key]);
+    let xData, xData2, yData, yData2;
 
-    if (!config.xAxis.extent) config.xAxis.extent = extent(xData);
+    // generate extents
+    if (data) {
+      xData = data.map(d => d[config.xAxis.key]);
+      yData = data.map(d => d[config.yAxis.key]);
 
-    if (!config.yAxis.extent) config.yAxis.extent = extent(yData);
+      if (!config.xAxis.extent)
+        config.xAxis.extent = extent(xData);
 
-    if (!config.xAxis.ticks || config.allowZoom)
-      config.xAxis.ticks = getTicks(...config.xAxis.extent, 10);
+      if (!config.yAxis.extent)
+        config.yAxis.extent = extent(yData);
+    }
 
-    if (!config.yAxis.ticks || config.allowZoom)
-      config.yAxis.ticks = getTicks(...config.yAxis.extent, 10);
+    if (data2) {
+      xData2 = data2.map(d => d[config.xAxis2.key]);
+      yData2 = data2.map(d => d[config.yAxis2.key]);
 
-    config.xAxis.scale = getScale(config.xAxis.extent, [0, width]);
-    config.yAxis.scale = getScale(config.yAxis.extent, [height, 0]);
-    config.xAxis.inverseScale = getScale([0, width], config.xAxis.extent);
-    config.yAxis.inverseScale = getScale([height, 0], config.yAxis.extent);
+      if (!config.xAxis2.extent)
+        config.xAxis2.extent = extent(xData2);
+
+      if (!config.yAxis2.extent)
+        config.yAxis2.extent = extent(yData2);
+
+      // extend extents if 2 datasets are provided
+      config.xAxis.extent = [
+        Math.min(config.xAxis.extent[0], config.xAxis2.extent[0]),
+        Math.max(config.xAxis.extent[1], config.xAxis2.extent[1]),
+      ];
+      config.xAxis2.extent = [...config.xAxis.extent];
+
+      config.yAxis.extent = [
+        Math.min(config.yAxis.extent[0], config.yAxis2.extent[0]),
+        Math.max(config.yAxis.extent[1], config.yAxis2.extent[1]),
+      ];
+      config.yAxis2.extent = [...config.yAxis.extent];
+    }
+
+    // generate ticks
+    const numTicks = 10;
+    if (data) {
+      if (!config.xAxis.ticks || config.allowZoom)
+        config.xAxis.ticks = getTicks(...config.xAxis.extent, numTicks);
+
+      if (!config.yAxis.ticks || config.allowZoom)
+        config.yAxis.ticks = getTicks(...config.yAxis.extent, numTicks);
+    }
+
+    if (data2) {
+      if (!config.xAxis2.ticks || config.allowZoom)
+      config.xAxis2.ticks = getTicks(...config.xAxis2.extent, numTicks);
+
+      if (!config.yAxis2.ticks || config.allowZoom)
+        config.yAxis2.ticks = getTicks(...config.yAxis2.extent, numTicks);
+    }
+
+    // generate scales
+    if (!config.mirrored) {
+      // if not mirrored, we only generate scales for the first dataset
+      config.xAxis.scale = getScale(config.xAxis.extent, [0, width]);
+      config.xAxis.inverseScale = getScale([0, width], config.xAxis.extent);
+      config.yAxis.scale = getScale(config.yAxis.extent, [height, 0]);
+      config.yAxis.inverseScale = getScale([height, 0], config.yAxis.extent);
+    } else {
+      // otherwise, generate scales for both sets, and map each scale to the top/bottom
+      // half of the plot area
+
+      // both scales are full-width
+      config.xAxis.scale = getScale(config.xAxis.extent, [0, width]);
+      config.xAxis.inverseScale = getScale([0, width], config.xAxis.extent);
+
+      config.xAxis2.scale = getScale(config.xAxis2.extent, [0, width]);
+      config.xAxis2.inverseScale = getScale([0, width], config.xAxis2.extent);
+
+      // top half covers height -> height/2
+      config.yAxis.scale = getScale(config.yAxis.extent, [height/2, 0]);
+      config.yAxis.inverseScale = getScale([height/2, 0], config.yAxis.extent);
+
+      // bottom half covers height/2 -> 0, inverted
+      config.yAxis2.scale = getScale(config.yAxis2.extent, [height/2, height]);
+      config.yAxis.inverseScale = getScale([height/2, height], config.yAxis.extent);
+    }
 
     ctx.clearRect(0, 0, width, height);
     drawPoints(config, ctx, hiddenCtx);
@@ -145,9 +218,29 @@ export class ManhattanPlot {
     for (let line of lines) {
       this.drawLine(line);
     }
+    console.log(config);
   }
 
+
+
   drawLine(line) {
+
+    const draw = (x1, y1, x2, y2, style) => {
+      this.ctx.save();
+      this.ctx.beginPath();
+      this.ctx.globalAlpha = 0.6;
+      this.ctx.strokeStyle = '#999';
+      this.ctx.lineWidth = 0.5;
+
+      if (style === 'dashed')
+        this.ctx.setLineDash([6, 4]);
+
+        this.ctx.moveTo(x1, y1);
+      this.ctx.lineTo(x2, y2);
+      this.ctx.stroke();
+      this.ctx.restore();
+    }
+
     // draw a horizontal line
     if (line.y) {
       let margins = this.config.margins;
@@ -155,14 +248,14 @@ export class ManhattanPlot {
       if (y > this.canvas.height - margins.bottom || y < margins.top)
         return;
 
-      this.ctx.beginPath();
-      this.ctx.globalAlpha = 0.6;
-      this.ctx.strokeStyle = '#888';
-      this.ctx.lineWidth = 1;
-      this.ctx.setLineDash([6, 4]);
-      this.ctx.moveTo(margins.left, y);
-      this.ctx.lineTo(this.canvas.width - margins.right, y);
-      this.ctx.stroke();
+      draw(margins.left, y, this.canvas.width - margins.right, y, line.style);
+
+      if (this.config.mirrored) {
+        let y2 = this.config.yAxis2.scale(line.y) + margins.top;
+        if (y2 > this.canvas.height - margins.bottom || y2 < margins.top)
+          return;
+          draw(margins.left, y2, this.canvas.width - margins.right, y2, line.style);
+      }
     }
   }
 
