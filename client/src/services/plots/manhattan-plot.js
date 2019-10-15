@@ -221,15 +221,13 @@ export class ManhattanPlot {
     console.log(config);
   }
 
-
-
   drawLine(line) {
 
     const draw = (x1, y1, x2, y2, style) => {
       this.ctx.save();
       this.ctx.beginPath();
       this.ctx.globalAlpha = 0.6;
-      this.ctx.strokeStyle = '#999';
+      this.ctx.strokeStyle = '#444';
       this.ctx.lineWidth = 0.5;
 
       if (style === 'dashed')

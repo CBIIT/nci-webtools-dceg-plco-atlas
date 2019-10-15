@@ -162,7 +162,7 @@ export function ManhattanPlot({
         size: 2,
         interactiveSize: 3,
         opacity: 0.6,
-        color: '#005ea2',
+        color: '#3ea559',
         tooltip: {
           trigger: 'hover',
           class: 'custom-tooltip',
@@ -305,7 +305,7 @@ export function ManhattanPlot({
         size: 2,
         interactiveSize: 3,
         opacity: 0.6,
-        color: '#005ea2',
+        color: '#3ea559',
         tooltip: {
           trigger: 'hover',
           class: 'custom-tooltip',
