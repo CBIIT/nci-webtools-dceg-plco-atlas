@@ -179,12 +179,14 @@ export function SummaryResults() {
       bpMin: range.bp_min,
       bpMax: range.bp_max,
     };
+
     const table = {
       all: 'variant_all',
-      stacked: 'variant_all',
+      stacked: ['variant_male', 'variant_female'],
       female: 'variant_female',
       male: 'variant_male',
     }[selectedManhattanPlotType];
+
     console.log('selected table', table);
 
     dispatch(

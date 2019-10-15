@@ -2,6 +2,7 @@ import { indexToColor } from './utils.js';
 
 export function drawPoints(config, ctx, hiddenCtx) {
   const data = config.data;
+  const data2 = config.data2;
   const margins = config.margins;
   const xKey = config.xAxis.key;
   const yKey = config.yAxis.key;
@@ -22,7 +23,8 @@ export function drawPoints(config, ctx, hiddenCtx) {
   const pointColor = config.point.color;
   const interactivePointSize = config.point.interactiveSize || pointSize;
   ctx.globalAlpha = config.point.opacity;
-  for (let i = 0; i < data.length; i++) {
+  let i;
+  for (i = 0; i < data.length; i++) {
     const d = data[i];
     const dx = d[xKey];
     const dy = d[yKey];
@@ -45,6 +47,38 @@ export function drawPoints(config, ctx, hiddenCtx) {
     config.pointMap[hiddenPointColor] = d;
     hiddenCtx.fill();
   }
+
+  if (config.mirrored) {
+    const xKey2 = config.xAxis2.key;
+    const yKey2 = config.yAxis2.key;
+    const xScale2 = config.xAxis2.scale;
+    const yScale2 = config.yAxis2.scale;
+    const pointSize = config.point2.size;
+    const pointColor = config.point2.color;
+
+    for (let j = 0; j < data2.length; j++) {
+      const d = data2[j];
+      const dx = d[xKey2];
+      const dy = d[yKey2];
+
+      const x = xScale2(dx);
+      const y = yScale2(dy);
+
+      ctx.beginPath();
+      ctx.arc(x, y, pointSize, 0, 2 * Math.PI, true);
+      ctx.fillStyle =
+        typeof pointColor === 'function' ? pointColor(d, j) : pointColor;
+      ctx.fill();
+
+      hiddenCtx.beginPath();
+      hiddenCtx.arc(x, y, pointSize + 1, 0, 2 * Math.PI, true);
+      const hiddenPointColor = indexToColor(i + j);
+      hiddenCtx.fillStyle = hiddenPointColor;
+      config.pointMap[hiddenPointColor] = d;
+      hiddenCtx.fill();
+    }
+  }
+
   ctx.restore();
   hiddenCtx.restore();
 }

@@ -5,7 +5,6 @@ import LoadingOverlay from 'react-loading-overlay';
 import { plotOverlayConfig } from '../controls/table';
 import { rawQuery, query } from '../../services/query';
 import { ManhattanPlot as Plot } from '../../services/plots/manhattan-plot';
-import { MirroredManhattanPlot as MirroredPlot } from '../../services/plots/mirrored-manhattan-plot';
 import { Icon } from '../controls/icon';
 import { createElement as h } from '../../services/plots/utils';
 import { systemFont } from '../../services/plots/text';
@@ -40,23 +39,26 @@ export function ManhattanPlot({
     if (selectedPlot != 'manhattan-plot' || !hasData()) return;
 
     let params;
-    if (selectedManhattanPlotType != 'stacked') {
+    if (selectedManhattanPlotType === 'stacked') {
+      params =
+        manhattanPlotView === 'summary'
+          ? getMirroredSummaryPlot(manhattanPlotData, manhattanPlotMirroredData)
+          : getMirroredChromosomePlot(manhattanPlotData, manhattanPlotMirroredData)
+    } else {
       params =
         manhattanPlotView === 'summary'
           ? getSummaryPlot(manhattanPlotData)
           : getChromosomePlot(manhattanPlotData)
-          plot.current = new Plot(plotContainer.current, params);
-    } else {
-      params = getMirroredPlot(manhattanPlotData, manhattanPlotMirroredData);
-      plot.current = new MirroredPlot(plotContainer.current, params);
     }
+    plot.current = new Plot(plotContainer.current, params);
     setZoomStack([])
     return () => {
-      plot.current.destroy()
+      plot.current.destroy();
     };
   }, [manhattanPlotData, manhattanPlotMirroredData, selectedPlot]);
 
-  function getMirroredPlot(plotData, mirroredPlotData) {
+
+  function getMirroredSummaryPlot(plotData, mirroredPlotData) {
     let columnIndexes = {
       chr: plotData.columns.indexOf('chr'),
       bp: plotData.columns.indexOf('bp_abs_1000kb'),
@@ -84,8 +86,6 @@ export function ManhattanPlot({
           onChromosomeSelected(ranges[i].chr);
         }
       },
-      xAxis2: {},
-      yAxis2: {},
       yAxis: {
         title: [
           { text: `-log`, font: `600 14px ${systemFont}` },
@@ -104,8 +104,108 @@ export function ManhattanPlot({
         opacity: 0.6,
         color: (d, i) => (d[columnIndexes.chr] % 2 ? '#005ea2' : '#e47833')
       },
-      // lines: [{ y: -Math.log10(5e-8) }]
+      lines: [
+        { y: -Math.log10(5e-8), style: 'dashed' },
+        { y: 3 },
+      ]
     };
+  }
+
+  function getMirroredChromosomePlot(plotData, mirroredPlotData) {
+    let columnIndexes = {
+      variantId: plotData.columns.indexOf('variant_id'),
+      chr: plotData.columns.indexOf('chr'),
+      bp: plotData.columns.indexOf('bp'),
+      nLogP: plotData.columns.indexOf('nlog_p')
+    };
+
+    let withKeys = data => ({
+      variantId: data[columnIndexes.variantId],
+      chr: data[columnIndexes.chr],
+      bp: data[columnIndexes.bp],
+      nLogP: data[columnIndexes.nLogP]
+    });
+
+    let title = `${selectedPhenotype.title} - Chromosome ${selectedChromosome}`;
+    let range = ranges.find(r => r.chr === selectedChromosome);
+
+    return {
+      mirrored: true,
+      data: plotData.data,
+      data2: mirroredPlotData.data,
+      allowZoom: true,
+      onZoom: (e) => {
+        let stack = [...plot.current.config.zoomStack];
+        setZoomStack(stack);
+        onZoom(e);
+      },
+      xAxis: {
+        title: [{ text: title, font: `600 14px ${systemFont}` }],
+        key: columnIndexes.bp,
+        tickFormat: tick => (tick / 1e6).toPrecision(4) + ' MB',
+        extent: [range.bp_min, range.bp_max]
+      },
+      yAxis: {
+        title: [
+          { text: `-log`, font: `600 14px ${systemFont}` },
+          {
+            text: '10',
+            textBaseline: 'middle',
+            font: `600 10px ${systemFont}`
+          },
+          { text: `(p)`, font: `600 14px ${systemFont}` }
+        ],
+        key: columnIndexes.nLogP,
+        tickFormat: tick => tick.toPrecision(3)
+      },
+      point: {
+        size: 2,
+        interactiveSize: 3,
+        opacity: 0.6,
+        color: '#005ea2',
+        tooltip: {
+          trigger: 'hover',
+          class: 'custom-tooltip',
+          style: 'width: 300px;',
+          content: async data => {
+            let point = withKeys(data);
+            const response = await query('variants', {
+              database: selectedPhenotype.value + '.db',
+              id: point.variantId
+            });
+            const record = response.data[0];
+            return h('div', { className: '' }, [
+              h('div', null, [
+                h('b', null, 'position: '),
+                // `${(record.bp / 1e6).toFixed(4)} MB`
+                `${record.chr}:${record.bp}`
+              ]),
+              h('div', null, [h('b', null, 'p-value: '), `${record.p}`]),
+              h('div', null, [h('b', null, 'snp: '), `${record.snp}`]),
+              h('div', null, [
+                h(
+                  'a',
+                  {
+                    className: 'font-weight-bold',
+                    href: '#/gwas/lookup',
+                    onclick: () => onVariantLookup && onVariantLookup(record)
+                  },
+                  'Go to Variant Lookup'
+                )
+              ])
+            ]);
+          }
+        }
+      },
+      point2: {
+      //  color: '#e47833'
+      },
+      lines: [
+        { y: -Math.log10(5e-8), style: 'dashed' },
+        { y: 2 },
+      ],
+      zoomStack: plot.current && plot.current.zoomStack || []
+    }
   }
 
   function getSummaryPlot(plotData) {
