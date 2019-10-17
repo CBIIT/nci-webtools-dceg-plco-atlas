@@ -78,7 +78,6 @@ export function axisLeft(config, ctx) {
       // update maximum tick label width (for determining title offset)
       maxLabelWidth = Math.max(maxLabelWidth, measureWidth(ctx, label));
     }
-
   }
 
 
@@ -136,7 +135,7 @@ export function axisBottom(config, ctx) {
   ctx.fillRect(
     xScale(xMin),
     0,
-    xScale(xMax - xMin) + 3,
+    xScale(xMax) - xScale(xMin) + 3,
     axisWidth
   );
 
