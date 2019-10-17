@@ -1,12 +1,14 @@
 const path = require('path');
 const server = require('fastify');
 const cors = require('fastify-cors');
+const compress = require('fastify-compress');
 const static = require('fastify-static');
 const { port, dbpath } = require('./config.json');
 const { getSummary, getVariants, getMetadata } = require('./query');
 const logger = require('./logger');
 
 const app = server({ignoreTrailingSlash: true});
+app.register(compress);
 app.register(static, {root: path.resolve('www')});
 app.register(static, {root: path.resolve(dbpath), prefix: '/data/', decorateReply: false});
 app.register(cors);
