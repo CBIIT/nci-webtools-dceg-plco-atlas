@@ -51,7 +51,6 @@ export class ManhattanPlot {
       config.zoomStack = config.zoomStack || [];
       drawZoomOverlay(config, this.ctx, this.overlayCtx);
       config.setZoomWindow = ev => {
-        console.log('setting zoom window', ev);
         config.zoomWindow = ev;
         let { xMin, xMax, yMin, yMax } = ev.bounds;
         config.xAxis.extent = [xMin, xMax];
@@ -292,9 +291,14 @@ export class ManhattanPlot {
 
       if (
         (withinMargins && config.xAxis.allowSelection) ||
-        this.getPointFromEvent(ev)
-      )
+        (
+          this.getPointFromEvent(ev) &&
+          config.tooltip &&
+          config.tooltip.trigger === 'click'
+        )
+      ) {
         cursor = 'pointer';
+      }
       else if (withinMargins && config.allowZoom) cursor = 'crosshair';
 
       canvas.style.cursor = cursor;
