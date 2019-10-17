@@ -102,11 +102,13 @@ export function ManhattanPlot({
       point: {
         size: 2,
         opacity: 0.6,
-        color: (d, i) => (d[columnIndexes.chr] % 2 ? '#005ea2' : '#e47833')
+        color: (d, i) => (d[columnIndexes.chr] % 2 ? '#e47618' : '#b55117')
+      },
+      point2: {
+        color: (d, i) => (d[columnIndexes.chr] % 2 ? '#006bb8' : '#002a47')//#e47833')
       },
       lines: [
         { y: -Math.log10(5e-8), style: 'dashed' },
-        { y: 3 },
       ]
     };
   }
@@ -162,7 +164,7 @@ export function ManhattanPlot({
         size: 2,
         interactiveSize: 3,
         opacity: 0.6,
-        color: '#3ea559',
+        color: '#e47618',
         tooltip: {
           trigger: 'hover',
           class: 'custom-tooltip',
@@ -198,11 +200,10 @@ export function ManhattanPlot({
         }
       },
       point2: {
-      //  color: '#e47833'
+       color: '#006bb8'
       },
       lines: [
         { y: -Math.log10(5e-8), style: 'dashed' },
-        { y: 2 },
       ],
       zoomStack: plot.current && plot.current.zoomStack || []
     }
@@ -250,7 +251,7 @@ export function ManhattanPlot({
       point: {
         size: 2,
         opacity: 0.6,
-        color: (d, i) => (d[columnIndexes.chr] % 2 ? '#005ea2' : '#e47833')
+        color: (d, i) => (d[columnIndexes.chr] % 2 ? '#006bb8' : '#002a47')//#e47833')
       },
       lines: [{ y: -Math.log10(5e-8) }]
     };
@@ -340,7 +341,7 @@ export function ManhattanPlot({
           }
         }
       },
-      lines: [{ y: -Math.log10(5e-8) }],
+      lines: [{ y: -Math.log10(5e-8), style: 'dashed' }],
       zoomStack: plot.current && plot.current.zoomStack || []
     };
   }

@@ -61,6 +61,8 @@ export function drawPoints(config, ctx, hiddenCtx) {
       const dx = d[xKey2];
       const dy = d[yKey2];
 
+      if (dx < xMin || dx > xMax || dy < yMin || dy > yMax) continue;
+
       const x = xScale2(dx);
       const y = yScale2(dy);
 

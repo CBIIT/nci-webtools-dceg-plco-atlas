@@ -51,10 +51,15 @@ export class ManhattanPlot {
       config.zoomStack = config.zoomStack || [];
       drawZoomOverlay(config, this.ctx, this.overlayCtx);
       config.setZoomWindow = ev => {
+        console.log('setting zoom window', ev);
         config.zoomWindow = ev;
         let { xMin, xMax, yMin, yMax } = ev.bounds;
         config.xAxis.extent = [xMin, xMax];
         config.yAxis.extent = [yMin, yMax];
+        if (config.mirrored) {
+          config.xAxis2.extent = [xMin, xMax];
+          config.yAxis2.extent = [yMin, yMax];
+        }
         this.draw();
         if (config.onZoom)
           config.onZoom(config.zoomWindow);
@@ -215,6 +220,11 @@ export class ManhattanPlot {
     drawPoints(config, ctx, hiddenCtx);
     axisLeft(config, ctx);
     axisBottom(config, ctx);
+
+    if (config.mirrored) {
+      lines[1] = ({y: config.yAxis.extent[0]})
+    }
+
     for (let line of lines) {
       this.drawLine(line);
     }

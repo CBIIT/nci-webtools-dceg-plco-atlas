@@ -1,4 +1,4 @@
-import { viewportToLocalCoordinates } from './utils.js';
+import { viewportToLocalCoordinates, min, max } from './utils.js';
 import { getScale } from './scale.js';
 
 export function drawSelectionOverlay(config, ctx, overlayCtx) {
@@ -56,27 +56,6 @@ export function drawSelectionOverlay(config, ctx, overlayCtx) {
   }
 }
 
-export function drawMirroredZoomOverlay(config, ctx, overlayCtx) {
-  let canvas = ctx.canvas;
-  let margins = config.margins;
-  let width = canvas.width - margins.left - margins.right;
-  let height = canvas.height - margins.top - margins.bottom;
-  let zoomArea = { x1: 0, x2: 0, y1: 0, y2: 0 };
-  let mouseDown = false;
-
-  function startZoom() {
-
-  }
-
-  function updateZoomWindow() {
-
-  }
-
-  function endZoom() {
-
-  }
-}
-
 export function drawZoomOverlay(config, ctx, overlayCtx) {
   let canvas = ctx.canvas;
   let margins = config.margins;
@@ -120,21 +99,46 @@ export function drawZoomOverlay(config, ctx, overlayCtx) {
     );
     let dx = Math.abs(x - zoomArea.x1);
     let dy = Math.abs(y - zoomArea.y1);
+    let createRect = zoomArea => ({
+      x: Math.min(zoomArea.x1, zoomArea.x2),
+      y: Math.min(zoomArea.y1, zoomArea.y2),
+      width: Math.abs(zoomArea.x2 - zoomArea.x1),
+      height: Math.abs(zoomArea.y2 - zoomArea.y1),
+      direction: zoomArea.y2 > zoomArea.y1 ? -1 : 1,
+      // 1 for drawing upwards, -1 for drawing downwards
+    });
+    let mirrorValue = (val, mid) => {
+      var dist = Math.abs(mid - val);
+      return val < mid ? mid + dist : mid - dist;
+    };
+
     if (!mouseDown || dx * dy < 100)
       return false;
 
     zoomArea.x2 = x;
     zoomArea.y2 = y;
-
+    let rect = createRect(zoomArea);
     overlayCtx.globalAlpha = 0.5;
     overlayCtx.clearRect(margins.left, margins.top, width, height);
     overlayCtx.fillRect(margins.left, margins.top, width, height);
-    overlayCtx.clearRect(
-      Math.min(zoomArea.x1, zoomArea.x2),
-      Math.min(zoomArea.y1, zoomArea.y2),
-      Math.abs(zoomArea.x2 - zoomArea.x1),
-      Math.abs(zoomArea.y2 - zoomArea.y1)
-    );
+
+    if (config.mirrored) {
+      // limit drawable area to midpoint
+      let yMidpoint = margins.top + (height / 2);
+      if (zoomArea.y1 < yMidpoint) {
+        zoomArea.y1 = Math.min(zoomArea.y1, yMidpoint);
+        zoomArea.y2 = Math.min(zoomArea.y2, yMidpoint);
+      } else {
+        zoomArea.y1 = Math.max(zoomArea.y1, yMidpoint);
+        zoomArea.y2 = Math.max(zoomArea.y2, yMidpoint);
+      }
+      let rect = createRect(zoomArea);
+      let yMirrored = mirrorValue(Math.max(zoomArea.y1, zoomArea.y2), yMidpoint);
+      overlayCtx.clearRect(rect.x, rect.y, rect.width, rect.height);
+      overlayCtx.clearRect(rect.x, yMirrored, rect.width, rect.height);
+    } else {
+      overlayCtx.clearRect(rect.x, rect.y, rect.width, rect.height);
+    }
   }
 
   function endZoom(ev) {
@@ -143,16 +147,16 @@ export function drawZoomOverlay(config, ctx, overlayCtx) {
       ev.clientY,
       ev.target
     );
+    let yMidpoint = margins.top + (height / 2);
     overlayCtx.clearRect(margins.left, margins.top, width, height);
     config.zoomOverlayActive = false;
     mouseDown = false;
-    zoomArea.x2 = x;
-    zoomArea.y2 = y;
 
     // order coordinates so that x1 < x2, y2 < y2, and subtract margins
     let x1 = Math.min(zoomArea.x1, zoomArea.x2) - margins.left; // left value (xMin)
-    let y1 = Math.min(zoomArea.y1, zoomArea.y2) - margins.top; // top value (yMax)
     let x2 = Math.max(zoomArea.x1, zoomArea.x2) - margins.left; // right value (xMax)
+
+    let y1 = Math.min(zoomArea.y1, zoomArea.y2) - margins.top; // top value (yMax)
     let y2 = Math.max(zoomArea.y1, zoomArea.y2) - margins.top; // bottom value (yMin)
     if ((x2 - x1) * (y2 - y1) < 100) return false;
 
@@ -165,10 +169,24 @@ export function drawZoomOverlay(config, ctx, overlayCtx) {
     // apply inverse scales to determine original data bounds
     let xInverseScale = getScale([0, width], config.xAxis.extent);
     let yInverseScale = getScale([height, 0], config.yAxis.extent);
+    if (config.mirrored) {
+      yInverseScale = zoomArea.y1 < yMidpoint
+        ? getScale([height/2, 0], config.yAxis.extent)
+        : getScale([height/2, height], config.yAxis.extent)
+    }
+
     let xMin = xInverseScale(x1);
     let xMax = xInverseScale(x2);
-    let yMax = yInverseScale(y1);
-    let yMin = yInverseScale(y2);
+    let yMax, yMin;
+
+    if (config.mirrored) {
+      yMin = zoomArea.y1 > yMidpoint ? yInverseScale(y1) : yInverseScale(y2);
+      yMax = zoomArea.y1 > yMidpoint ? yInverseScale(y2) : yInverseScale(y1);
+    } else {
+      yMin = yInverseScale(y2);
+      yMax = yInverseScale(y1);
+    }
+
 
     const window = {
       coordinates: { x1, x2, y1, y2 },

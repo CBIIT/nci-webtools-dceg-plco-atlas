@@ -234,9 +234,10 @@ export function SummaryResults() {
     const chr = selectedChromosome;
     const page = 1;
     const pageSize = 10;
+
     const table = {
       all: 'variant_all',
-      stacked: 'variant_all',
+      stacked: ['variant_male', 'variant_female'],
       female: 'variant_female',
       male: 'variant_male',
     }[selectedManhattanPlotType];
