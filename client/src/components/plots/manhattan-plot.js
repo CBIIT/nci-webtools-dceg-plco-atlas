@@ -375,7 +375,13 @@ export function ManhattanPlot({
 
         {zoomStack.length > 1 ? <>
           <Icon name="arrow-left" className="mx-2 opacity-50" width="10" />
-          <a className="link" onClick={zoomOut}>Previous Zoom</a>
+          <a className="link" onClick={zoomOut}>
+            Previous Zoom
+            {(() => {
+              let bounds = zoomStack[zoomStack.length - 2].bounds;
+              return ` (${(bounds.xMin / 1e6).toPrecision(4)} MB - ${(bounds.xMax / 1e6).toPrecision(4)} MB)`;
+            })()}
+          </a>
           </> : null}
           <Icon name="arrow-left" className="mx-2 opacity-50" width="10" />
       </div>
