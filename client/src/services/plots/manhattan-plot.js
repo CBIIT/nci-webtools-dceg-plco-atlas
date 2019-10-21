@@ -352,13 +352,28 @@ export class ManhattanPlot {
       ev.clientY,
       ev.target
     );
+    // determine where to place tooltip relative to cursor
+    const targetWidth = ev.target.clientWidth;
+    const targetHeight = ev.target.clientHeight;
+    const quadrant = {
+      left: x <= targetWidth / 2,
+      right: x > targetWidth / 2,
+      top: y <= targetHeight / 2,
+      bottom: y > targetHeight / 2,
+    }
+    console.log('quadrant', quadrant);
+
     this.tooltip.innerHTML = '';
     this.tooltip.style.display = 'inline-block';
-    this.tooltip.style.left = x - 2 + 'px';
-    this.tooltip.style.top = y - 2 + 'px';
     if (html instanceof Element)
       this.tooltip.insertAdjacentElement('beforeend', html);
     else this.tooltip.insertAdjacentHTML('beforeend', html);
+
+    const tooltipHeight = this.tooltip.clientHeight;
+    const tooltipWidth = this.tooltip.clientWidth;
+
+    this.tooltip.style.left = (Math.min(x, targetWidth - tooltipWidth) - 2) + 'px';
+    this.tooltip.style.top = (Math.min(y, targetHeight - tooltipHeight) - 2) + 'px';
   }
 
   hideTooltip() {
