@@ -157,8 +157,12 @@ export function ManhattanPlot({
           },
           { text: `(p)`, font: `600 14px ${systemFont}` }
         ],
+        secondaryTitle: 'Female',
         key: columnIndexes.nLogP,
         tickFormat: tick => tick.toPrecision(3)
+      },
+      yAxis2: {
+        secondaryTitle: 'Male',
       },
       point: {
         size: 2,
