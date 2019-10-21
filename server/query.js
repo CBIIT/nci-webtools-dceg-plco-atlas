@@ -1,4 +1,5 @@
 const Database = require('better-sqlite3');
+const ranges = require('./data/chromosome_ranges.json');
 
 function getRawResults(stmt, params) {
     return {
@@ -55,6 +56,16 @@ function getVariants(filepath, params) {
     const table = validTables.includes(params.table)
         ? params.table
         : validTables[0];
+
+    // validate min/max bp for each chromosome if provided
+    if (params.chr) {
+        let validRange = ranges.find(e => e.chr === +params.chr);
+        if (params.bpMin && +params.bpMin < validRange.bp_min)
+            params.bpMin = validRange.bp_min;
+
+        if (params.bpMax && +params.bpMax > validRange.bp_max)
+            params.bpMax = validRange.bp_max;
+    }
 
     // filter by id, chr, base position, and -log10(p), if provided
     let sql = `
