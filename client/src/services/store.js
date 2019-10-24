@@ -39,6 +39,8 @@ const initialState = {
     snp: '',
     snpResults: null,
     showSnpResults: null,
+    qqplotData: [],
+    qqplotLayout: {},
   },
   variantLookup: {
     selectedListType: 'categorical',

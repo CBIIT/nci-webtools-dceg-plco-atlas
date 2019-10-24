@@ -5,11 +5,21 @@ import { Link } from 'react-router-dom';
 import { Spinner } from 'react-bootstrap';
 import ReactCursorPosition from 'react-cursor-position';
 
+import Plot from 'react-plotly.js';
+
+
 export function QQPlot({ onVariantLookup }) {
   const dispatch = useDispatch();
-  const { loading, qqplotSrc, areaItems, lambdaGC, sampleSize, popupTooltipData } = useSelector(
-    state => state.summaryResults
-  );
+  const { 
+    loading, 
+    qqplotSrc, 
+    areaItems, 
+    lambdaGC, 
+    sampleSize, 
+    popupTooltipData,
+    qqplotData,
+    qqplotLayout
+  } = useSelector(state => state.summaryResults);
 
   // temporary set states
   const [hoverTooltipData, setHoverTooltipData] = useState({});
@@ -97,8 +107,48 @@ export function QQPlot({ onVariantLookup }) {
     setHoverTooltipData({});
   };
 
+  const config = {
+    toImageButtonOptions: {
+      format: 'svg', // one of png, svg, jpeg, webp
+      filename: 'custom_image',
+      // height: 800,
+      // width: 800,
+      scale: 1 // Multiply title/legend/axis/canvas sizes by this factor
+    },
+    displaylogo: false,
+    modeBarButtonsToRemove: ['autoScale2d', 'hoverClosestCartesian', 'hoverCompareCartesian']
+    // responsive: true
+  };
+
   return (
     <>
+      <div className="row mt-3">
+        <div className="col-md-12 text-center">
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center'
+            }}>
+            <Plot
+              data={qqplotData}
+              layout={qqplotLayout}
+              config={config}
+              // onClick={e => popupMarkerClick(e)}
+              // onRelayout={relayout => {
+              //   if (isPopupDisplayed()) {
+              //     popupMarkerClose();
+              //   }
+              // }}
+            />
+          </div>
+        </div>
+      </div>
+
+
+
+
+
       <div className="row mt-3">
         {qqplotSrc && (
           <div className="col-md-12 text-center">
