@@ -1,6 +1,6 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Alert, Nav, Tab, Tabs, Card } from 'react-bootstrap';
+import { Alert, Tab, Tabs } from 'react-bootstrap';
 import { SummaryResultsForm } from '../forms/summary-results-form';
 import { SnpSearchForm } from '../forms/snp-search-form';
 import { ManhattanPlot } from '../plots/manhattan-plot';
