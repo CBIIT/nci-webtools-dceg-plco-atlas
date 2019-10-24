@@ -108,6 +108,103 @@ export function drawQQPlot(phenotype) {
   };
 }
 
+export function drawQQPlotPlotly(phenotype) {
+  return async function(dispatch) {
+    const setLoading = loading => {
+      dispatch(updateSummaryResults({ loading }));
+    };
+    const setQQPlotData = qqplotData => {
+      dispatch(updateSummaryResults({ qqplotData }));
+    };
+    const setQQPlotLayout = qqplotLayout => {
+      dispatch(updateSummaryResults({ qqplotLayout }));
+    }
+    setLoading(true);
+    setQQPlotLayout({});
+    setQQPlotData([]);
+
+    const ppoints = (n, a) => {
+      if (!a) {
+          a = n <= 10 ? 3/8 : 1/2;
+      }
+  
+      var points = new Array(n);
+      for (var i = 1; i <= n; i ++) {
+          var point = (i - a) / (n + (1 - a) - a)
+          points[i - 1] = point;
+      }
+      return points;
+     };
+
+    let x = ppoints(5);
+    let y = ppoints(x.length);
+    // let x = [0.0, 1.1, 2.2, 3.3, 4.4];
+    // let y = [0.0, 1.1, 2.2, 3.3, 4.4];
+
+
+    let data = {
+      x,
+      y,
+      mode: 'markers',
+      type: 'scatter',
+      marker: {
+        size: 8
+      }
+    };
+
+    let layout = {
+      width: 800,
+      height: 800,
+      // margin: {
+      //   t: 120
+      // },
+      title: {
+        text: '<b>\u03BB</b> = n/a' + '    ' + '<b>Sample Size</b> = n/a',
+        font: {
+          family: 'Arial',
+          size: 14,
+          color: 'black'
+        },
+      },
+      xaxis: {
+        automargin: true,
+        title: {
+          text: '<b>Expected -log<sub>10</sub>(p)</b>',
+          font: {
+            family: 'Arial',
+            size: 14,
+            color: 'black'
+          },
+        },
+        tickfont: {
+          family: 'Arial',
+          size: 10,
+          color: 'black'
+        },
+      },
+      yaxis: {
+        automargin: true,
+        title: {
+          text: '<b>Observed -log<sub>10</sub>(p)</b>',
+          font: {
+            family: 'Arial',
+            size: 14,
+            color: 'black'
+          },
+        },
+        tickfont: {
+          family: 'Arial',
+          size: 10,
+          color: 'black'
+        },
+      }
+    };
+    setQQPlotLayout(layout);
+    setQQPlotData([data]);
+    setLoading(false);
+  };
+}
+
 export function drawHeatmap(phenotypes) {
   return async function(dispatch) {
     const getZColor = (phenotype1, phenotype2, correlationData) => {
@@ -257,8 +354,8 @@ export function drawHeatmap(phenotypes) {
     setHeatmapLayout(layout);
     setHeatmapData([sampleData]);
     setLoading(false);
-  }
-};
+  };
+}
 
 export function lookupVariants(phenotypes, variant) {
   return async function(dispatch) {

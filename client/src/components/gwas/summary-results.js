@@ -11,6 +11,7 @@ import {
   updateVariantLookup,
   lookupVariants,
   drawQQPlot,
+  drawQQPlotPlotly,
   drawManhattanPlot,
   updateSummaryResultsTable
 } from '../../services/actions';
@@ -100,6 +101,7 @@ export function SummaryResults() {
     }))
 
     dispatch(drawQQPlot(phenotype));
+    dispatch(drawQQPlotPlotly(phenotype));
     dispatch(
       updateSummaryResults({
         manhattanPlotView: 'summary',
