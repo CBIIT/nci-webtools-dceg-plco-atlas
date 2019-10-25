@@ -138,6 +138,7 @@ export function drawQQPlotPlotly(phenotype) {
     console.log("drawQQPlotPlotly", phenotype);
     const { data } = await query('variants', {
       database: phenotype + '.db',
+      // table: "",
       columns: ['chr', 'bp', 'snp', 'p', 'nlog_p'],
       pMin: 0.0,
       pMax: 1.0,
@@ -154,8 +155,20 @@ export function drawQQPlotPlotly(phenotype) {
     console.log('metadata_count', metadata_count);
     let observed = data.map((row) => row.nlog_p);
     console.log("observed", observed);
-    let expected = ppoints(observed.length);
-    console.log("expected", expected);
+    // let expected = ppoints(observed.length);
+    // console.log("expected", expected);
+    let observedCutOff = observed[observed.length - 1];
+    console.log("observedCutOff", observedCutOff);
+    const summaryData = await query('summary', {
+      database: phenotype + '.db',
+      table: 'aggregate_all',
+      nlogpMin: 3,
+    });
+    console.log("summaryData", summaryData);
+    let expected = ppoints(summaryData.length);
+    console.log("expected", summaryData);
+    let observedSummary = summaryData.map((row) => row.nlog_p2);
+    console.log("observedSummary", observedSummary);
 
     let qqplotData = {
       x: expected,
@@ -165,6 +178,18 @@ export function drawQQPlotPlotly(phenotype) {
       marker: {
         size: 8,
         opacity: 0.65
+      },
+      showlegend: false
+    };
+
+    let qqplotSummaryData = {
+      x: expected,
+      y: observedSummary,
+      mode: 'markers',
+      type: 'scatter',
+      marker: {
+        size: 8,
+        // opacity: 0.65
       },
       showlegend: false
     };
@@ -195,7 +220,7 @@ export function drawQQPlotPlotly(phenotype) {
       },
       xaxis: {
         automargin: true,
-        rangemode: 'nonnegative',
+        rangemode: 'tozero',
         title: {
           text: '<b>Expected -log<sub>10</sub>(p)</b>',
           font: {
@@ -214,7 +239,7 @@ export function drawQQPlotPlotly(phenotype) {
       },
       yaxis: {
         automargin: true,
-        rangemode: 'nonnegative',
+        rangemode: 'tozero',
         title: {
           text: '<b>Observed -log<sub>10</sub>(p)</b>',
           font: {
@@ -233,7 +258,7 @@ export function drawQQPlotPlotly(phenotype) {
       }
     };
     setQQPlotLayout(qqplotLayout);
-    setQQPlotData([qqplotData, qqplotLineData]);
+    setQQPlotData([qqplotData, qqplotSummaryData, qqplotLineData]);
     setLoading(false);
   };
 }
