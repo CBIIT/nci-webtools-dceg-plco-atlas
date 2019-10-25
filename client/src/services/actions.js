@@ -163,11 +163,12 @@ export function drawQQPlotPlotly(phenotype) {
       mode: 'markers',
       type: 'scatter',
       marker: {
-        size: 8
+        size: 8,
+        opacity: 0.65
       },
       showlegend: false
     };
-    console.log("qqplotData.x[qqplotData.x.length - 1]", Math.log10(qqplotData.x[qqplotData.x.length - 1]) * -1.0);
+
     let qqplotLineData = {
       x: [qqplotData.x[qqplotData.x.length - 1], qqplotData.x[0]],
       y: [qqplotData.x[qqplotData.x.length - 1], qqplotData.x[0]],
@@ -184,9 +185,6 @@ export function drawQQPlotPlotly(phenotype) {
     let qqplotLayout = {
       width: 800,
       height: 800,
-      // margin: {
-      //   t: 120
-      // },
       title: {
         text: '<b>\u03BB</b> = n/a        <b>Sample Size</b> = ' + metadata_count,
         font: {
