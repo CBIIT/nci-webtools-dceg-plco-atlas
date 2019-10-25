@@ -52,8 +52,8 @@ query <- function(phenotype) {
   conn <- dbConnect(sqlite.driver, dbname = filename)
   dbListTables(conn)
   
-  # query <- dbGetQuery(conn, "SELECT chr, bp, snp, p FROM variant WHERE nlog_p >= 3 ORDER BY p DESC")
-  query <- dbGetQuery(conn, "SELECT chr, bp, snp, p FROM variant ORDER BY p DESC")
+  query <- dbGetQuery(conn, "SELECT chr, bp, snp, p FROM variant_all WHERE nlog_p >= 3 ORDER BY p DESC")
+  # query <- dbGetQuery(conn, "SELECT chr, bp, snp, p FROM variant ORDER BY p DESC")
   
   chrvector <- query[['chr']]
   bpvector <- query[['bp']]
