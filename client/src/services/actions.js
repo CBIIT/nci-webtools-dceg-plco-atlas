@@ -130,7 +130,7 @@ export function drawQQPlotPlotly(phenotype) {
       var points = new Array(n);
       for (var i = 1; i <= n; i ++) {
           var point = (i - a) / (n + (1 - a) - a)
-          points[i - 1] = point;
+          points[i - 1] = Math.log10(point) * -1.0;
       }
       return points;
     };
@@ -139,8 +139,10 @@ export function drawQQPlotPlotly(phenotype) {
     const { data } = await query('variants', {
       database: phenotype + '.db',
       columns: ['chr', 'bp', 'snp', 'p', 'nlog_p'],
+      pMin: 0.0,
+      pMax: 1.0,
       orderBy: 'p',
-      order: 'desc',
+      order: 'asc',
       limit: 300,
     });
     console.log("data", data);
@@ -162,7 +164,21 @@ export function drawQQPlotPlotly(phenotype) {
       type: 'scatter',
       marker: {
         size: 8
-      }
+      },
+      showlegend: false
+    };
+    console.log("qqplotData.x[qqplotData.x.length - 1]", Math.log10(qqplotData.x[qqplotData.x.length - 1]) * -1.0);
+    let qqplotLineData = {
+      x: [qqplotData.x[qqplotData.x.length - 1], qqplotData.x[0]],
+      y: [qqplotData.x[qqplotData.x.length - 1], qqplotData.x[0]],
+      mode: 'lines',
+      type: 'scatter',
+      line: {
+        color: 'gray',
+        width: 1
+      },
+      opacity: 0.5,
+      showlegend: false
     };
 
     let qqplotLayout = {
@@ -213,7 +229,7 @@ export function drawQQPlotPlotly(phenotype) {
       }
     };
     setQQPlotLayout(qqplotLayout);
-    setQQPlotData([qqplotData]);
+    setQQPlotData([qqplotData, qqplotLineData]);
     setLoading(false);
   };
 }
