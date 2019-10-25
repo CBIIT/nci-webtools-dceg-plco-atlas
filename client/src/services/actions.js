@@ -195,6 +195,7 @@ export function drawQQPlotPlotly(phenotype) {
       },
       xaxis: {
         automargin: true,
+        rangemode: 'nonnegative',
         title: {
           text: '<b>Expected -log<sub>10</sub>(p)</b>',
           font: {
@@ -203,6 +204,8 @@ export function drawQQPlotPlotly(phenotype) {
             color: 'black'
           },
         },
+        tick0: 0,
+        ticklen: 10,
         tickfont: {
           family: 'Arial',
           size: 10,
@@ -211,6 +214,7 @@ export function drawQQPlotPlotly(phenotype) {
       },
       yaxis: {
         automargin: true,
+        rangemode: 'nonnegative',
         title: {
           text: '<b>Observed -log<sub>10</sub>(p)</b>',
           font: {
@@ -219,6 +223,8 @@ export function drawQQPlotPlotly(phenotype) {
             color: 'black'
           },
         },
+        tick0: 0,
+        ticklen: 10,
         tickfont: {
           family: 'Arial',
           size: 10,
