@@ -118,7 +118,7 @@ export function drawQQPlotPlotly(phenotype) {
     };
     const setQQPlotLayout = qqplotLayout => {
       dispatch(updateSummaryResults({ qqplotLayout }));
-    }
+    };
     setLoading(true);
     setQQPlotLayout({});
     setQQPlotData([]);
@@ -127,39 +127,68 @@ export function drawQQPlotPlotly(phenotype) {
       if (!a) {
           a = n <= 10 ? 3/8 : 1/2;
       }
-  
       var points = new Array(n);
       for (var i = 1; i <= n; i ++) {
           var point = (i - a) / (n + (1 - a) - a)
-          points[i - 1] = point;
+          points[i - 1] = Math.log10(point) * -1.0;
       }
       return points;
-     };
+    };
 
-    let x = ppoints(5);
-    let y = ppoints(x.length);
-    // let x = [0.0, 1.1, 2.2, 3.3, 4.4];
-    // let y = [0.0, 1.1, 2.2, 3.3, 4.4];
+    console.log("drawQQPlotPlotly", phenotype);
+    const { data } = await query('variants', {
+      database: phenotype + '.db',
+      columns: ['chr', 'bp', 'snp', 'p', 'nlog_p'],
+      pMin: 0.0,
+      pMax: 1.0,
+      orderBy: 'p',
+      order: 'asc',
+      limit: 300,
+    });
+    console.log("data", data);
+    const metadata = await query('metadata', {
+      database: phenotype + '.db',
+    });
+    console.log("metadata", metadata);
+    const metadata_count = parseInt(metadata['count_all']);
+    console.log('metadata_count', metadata_count);
+    let observed = data.map((row) => row.nlog_p);
+    console.log("observed", observed);
+    let expected = ppoints(observed.length);
+    console.log("expected", expected);
 
-
-    let data = {
-      x,
-      y,
+    let qqplotData = {
+      x: expected,
+      y: observed,
       mode: 'markers',
       type: 'scatter',
       marker: {
         size: 8
-      }
+      },
+      showlegend: false
+    };
+    console.log("qqplotData.x[qqplotData.x.length - 1]", Math.log10(qqplotData.x[qqplotData.x.length - 1]) * -1.0);
+    let qqplotLineData = {
+      x: [qqplotData.x[qqplotData.x.length - 1], qqplotData.x[0]],
+      y: [qqplotData.x[qqplotData.x.length - 1], qqplotData.x[0]],
+      mode: 'lines',
+      type: 'scatter',
+      line: {
+        color: 'gray',
+        width: 1
+      },
+      opacity: 0.5,
+      showlegend: false
     };
 
-    let layout = {
+    let qqplotLayout = {
       width: 800,
       height: 800,
       // margin: {
       //   t: 120
       // },
       title: {
-        text: '<b>\u03BB</b> = n/a' + '    ' + '<b>Sample Size</b> = n/a',
+        text: '<b>\u03BB</b> = n/a        <b>Sample Size</b> = ' + metadata_count,
         font: {
           family: 'Arial',
           size: 14,
@@ -199,8 +228,8 @@ export function drawQQPlotPlotly(phenotype) {
         },
       }
     };
-    setQQPlotLayout(layout);
-    setQQPlotData([data]);
+    setQQPlotLayout(qqplotLayout);
+    setQQPlotData([qqplotData, qqplotLineData]);
     setLoading(false);
   };
 }
@@ -291,7 +320,7 @@ export function drawHeatmap(phenotypes) {
       zText.push(rowText);
     }
 
-    let sampleData = {
+    let heatmapData = {
       x,
       y,
       z: zColor,
@@ -316,7 +345,7 @@ export function drawHeatmap(phenotypes) {
         '<b>Correlation</b>: %{text}' +
         '<extra></extra>'
     };
-    let layout = {
+    let heatmapLayout = {
       width: 1000,
       height: 1000,
       margin: {
@@ -351,8 +380,8 @@ export function drawHeatmap(phenotypes) {
         // dtick: 5
       }
     };
-    setHeatmapLayout(layout);
-    setHeatmapData([sampleData]);
+    setHeatmapLayout(heatmapLayout);
+    setHeatmapData([heatmapData]);
     setLoading(false);
   };
 }

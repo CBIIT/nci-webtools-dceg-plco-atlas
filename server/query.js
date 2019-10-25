@@ -53,6 +53,10 @@ function getVariants(filepath, params) {
         ? params.columns.split(',').filter(c => validColumns.includes(c))
         : validColumns;
 
+    const groupby = params.groupby
+        ? ` GROUP BY "` + params.groupby + `" `
+        : ``;
+
     const table = validTables.includes(params.table)
         ? params.table
         : validTables[0];
@@ -80,7 +84,9 @@ function getVariants(filepath, params) {
             coalesce(params.bpMax, `bp <= :bpMax`),
             coalesce(params.nlogpMin, `nlog_p >= :nlogpMin`),
             coalesce(params.nlogpMax, `nlog_p <= :nlogpMax`),
-        ].filter(Boolean).join(' AND ');
+            coalesce(params.pMin, `p > :pMin`),
+            coalesce(params.pMax, `p < :pMax`),
+        ].filter(Boolean).join(' AND ') + `${groupby}`;
 
     // create count sql based on original query
     let countSql = `SELECT COUNT(1) FROM (${sql})`;
@@ -99,7 +105,7 @@ function getVariants(filepath, params) {
     // adds limit and offset, if provided
     if (params.limit) sql += ' LIMIT :limit ';
     if (params.offset) sql += ' OFFSET :offset ';
-
+    console.log('SQL', sql);
     // query database
     const db = new Database(filepath, {readonly: true});
     const stmt = db.prepare(sql);
