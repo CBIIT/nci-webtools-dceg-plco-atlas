@@ -110,6 +110,8 @@ export function drawQQPlot(phenotype) {
 
 export function drawQQPlotPlotly(phenotype) {
   return async function(dispatch) {
+    console.log("drawQQPlotPlotly", phenotype);
+
     const setLoading = loading => {
       dispatch(updateSummaryResults({ loading }));
     };
@@ -122,59 +124,95 @@ export function drawQQPlotPlotly(phenotype) {
     setLoading(true);
     setQQPlotLayout({});
     setQQPlotData([]);
-
+    
+    // takes a long time need to optimize
     const ppoints = (n, a) => {
       if (!a) {
           a = n <= 10 ? 3/8 : 1/2;
       }
       var points = new Array(n);
       for (var i = 1; i <= n; i ++) {
-          var point = (i - a) / (n + (1 - a) - a)
-          points[i - 1] = Math.log10(point) * -1.0;
+          var point = parseFloat((Math.log10((i - a) / (n + (1 - a) - a)) * - 1.0).toFixed(3));
+          points[i - 1] = point;
+          // points[i - 1] = (Math.log10(point) * -1.0).toFixed(3);
       }
       return points;
     };
 
-    console.log("drawQQPlotPlotly", phenotype);
-    const { data } = await query('variants', {
+    const arrSampler= (arr, delta) => {
+      var newArr = [];
+      for (var i = 0; i < arr.length; i = i + delta) {
+        newArr.push(arr[i]);
+      }
+      return newArr;
+    }
+
+    var topVariantDataCutOff = 10000;
+    const subsetVariantDataMod = 100; // retrieve 1% of the rest of the variants
+
+    const metadata = await query('metadata', {
+      database: phenotype + '.db',
+    });
+    const metadata_count = parseInt(metadata['count_all']);
+    console.log('metadata_count', metadata_count);
+
+    const topVariantData = await query('variants', {
       database: phenotype + '.db',
       // table: "",
-      columns: ['chr', 'bp', 'snp', 'p', 'nlog_p'],
+      // columns: ['chr', 'bp', 'snp', 'p', 'nlog_p'],
+      columns: ['nlog_p'],
       pMin: 0.0,
       pMax: 1.0,
       orderBy: 'p',
       order: 'asc',
-      limit: 300,
+      // nlogpMin: 3,
+      limit: topVariantDataCutOff,
+      raw: true
     });
-    console.log("data", data);
-    const metadata = await query('metadata', {
+    const topObservedVariants = topVariantData.data.flat();
+    console.log("topObservedVariants", topObservedVariants);
+
+    let topVariantDataNLogPCutOff = topObservedVariants[topObservedVariants.length - 1];
+    console.log("topVariantDataNLogPCutOff", topVariantDataNLogPCutOff);
+
+    const topVariantDataExpectedCutOff = topObservedVariants.length;
+    console.log("topVariantDataExpectedCutOff", topVariantDataExpectedCutOff);
+
+    const subsetVariantData = await query('variants', {
       database: phenotype + '.db',
+      // table: "",
+      columns: ['nlog_p'],
+      pMin: 0.0,
+      pMax: 1.0,
+      nlogpMax: topVariantDataNLogPCutOff,
+      mod: subsetVariantDataMod,
+      orderBy: 'p',
+      order: 'asc',
+      raw: true
     });
-    console.log("metadata", metadata);
-    const metadata_count = parseInt(metadata['count_all']);
-    console.log('metadata_count', metadata_count);
-    let observed = data.map((row) => row.nlog_p);
-    console.log("observed", observed);
-    // let expected = ppoints(observed.length);
-    // console.log("expected", expected);
-    let observedCutOff = observed[observed.length - 1];
-    console.log("observedCutOff", observedCutOff);
-    const summaryData = await query('summary', {
-      database: phenotype + '.db',
-      table: 'aggregate_all',
-      nlogpMin: 3,
-    });
-    console.log("summaryData", summaryData);
-    let expected = ppoints(summaryData.length);
-    console.log("expected", summaryData);
-    let observedSummary = summaryData.map((row) => row.nlog_p2);
-    console.log("observedSummary", observedSummary);
+    let subsetObservedVariants = subsetVariantData.data.flat();
+    console.log("subsetObservedVariants", subsetObservedVariants);
+
+
+
+    let expected = ppoints(metadata_count);
+    console.log("expected", expected);
+
+    let topExpectedVariants = expected.slice(0, topVariantDataExpectedCutOff);
+    console.log("topExpectedVariants", topExpectedVariants);
+
+    let expectedVariants2 = expected.slice(topVariantDataExpectedCutOff, expected.length);
+    console.log("expectedVariants2", expectedVariants2);
+
+    let subsetExpectedVariants = arrSampler(expectedVariants2, subsetVariantDataMod);
+    console.log("subsetExpectedVariants", subsetExpectedVariants);
+
 
     let qqplotData = {
-      x: expected,
-      y: observed,
+      x: topExpectedVariants,
+      y: topObservedVariants,
       mode: 'markers',
-      type: 'scatter',
+      type: 'scattergl',
       marker: {
         size: 8,
         opacity: 0.65
@@ -182,23 +220,35 @@ export function drawQQPlotPlotly(phenotype) {
       showlegend: false
     };
 
-    let qqplotSummaryData = {
-      x: expected,
-      y: observedSummary,
+    let qqplotData2 = {
+      x: subsetExpectedVariants,
+      y: subsetObservedVariants,
       mode: 'markers',
-      type: 'scatter',
+      type: 'scattergl',
       marker: {
         size: 8,
-        // opacity: 0.65
+        opacity: 0.65
       },
       showlegend: false
     };
 
+    // let qqplotSummaryData = {
+    //   x: expectedSummarySample,
+    //   y: observedSummary,
+    //   mode: 'markers',
+    //   type: 'scattergl',
+    //   marker: {
+    //     size: 8,
+    //     // opacity: 0.65
+    //   },
+    //   showlegend: false
+    // };
+
     let qqplotLineData = {
-      x: [qqplotData.x[qqplotData.x.length - 1], qqplotData.x[0]],
-      y: [qqplotData.x[qqplotData.x.length - 1], qqplotData.x[0]],
+      x: [0.0, qqplotData.x[0]],
+      y: [0.0, qqplotData.x[0]],
       mode: 'lines',
-      type: 'scatter',
+      type: 'scattergl',
       line: {
         color: 'gray',
         width: 1
@@ -208,6 +258,7 @@ export function drawQQPlotPlotly(phenotype) {
     };
 
     let qqplotLayout = {
+      dragmode: 'pan',
       width: 800,
       height: 800,
       title: {
@@ -220,7 +271,9 @@ export function drawQQPlotPlotly(phenotype) {
       },
       xaxis: {
         automargin: true,
-        rangemode: 'tozero',
+        rangemode: 'tozero', // only show positive 
+        showgrid: false, // disable grid lines
+        fixedrange: true, // disable zoom
         title: {
           text: '<b>Expected -log<sub>10</sub>(p)</b>',
           font: {
@@ -239,7 +292,9 @@ export function drawQQPlotPlotly(phenotype) {
       },
       yaxis: {
         automargin: true,
-        rangemode: 'tozero',
+        rangemode: 'tozero', // only show positive 
+        showgrid: false, // disable grid lines
+        fixedrange: true, // disable zoom
         title: {
           text: '<b>Observed -log<sub>10</sub>(p)</b>',
           font: {
@@ -258,7 +313,8 @@ export function drawQQPlotPlotly(phenotype) {
       }
     };
     setQQPlotLayout(qqplotLayout);
-    setQQPlotData([qqplotData, qqplotSummaryData, qqplotLineData]);
+    // setQQPlotData([qqplotData, qqplotSummaryData, qqplotLineData]);
+    setQQPlotData([qqplotData, qqplotData2, qqplotLineData]);
     setLoading(false);
   };
 }

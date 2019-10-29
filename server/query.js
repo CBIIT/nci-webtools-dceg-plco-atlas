@@ -8,22 +8,63 @@ function getRawResults(stmt, params) {
     };
 }
 
+function wrapColumnName(name){
+    return `"${name}"`;
+}
+
+function isDefined(value) { 
+    return !(/^(null|undefined)$/).test(value);
+}
+function coalesce(condition, value) {
+    return isDefined(condition) ? value : null;
+}
+
 function getSummary(filepath, params) {
+    const validColumns = [
+        'chr', 'bp_abs_1000kb', 'nlog_p2',
+    ];
     const validTables = [
         'aggregate_all',
         'aggregate_female',
         'aggregate_male',
     ];
 
+    const columns = params.columns // given as a comma-separated list
+        ? params.columns.split(',').filter(c => validColumns.includes(c))
+        : validColumns;
+
     const table = validTables.includes(params.table)
         ? params.table
         : validTables[0];
 
-    const stmt = new Database(filepath, {readonly: true}).prepare(`
-        SELECT chr, bp_abs_1000kb, nlog_p2
-            FROM ${table}
-            WHERE nlog_p2 >= :nlogpMin;
-    `);
+    const distinct = params.distinct
+        ? `DISTINCT  `
+        : ``;
+
+    // filter by -log10(p) if provided
+    let sql = `
+        SELECT ${distinct}${columns.map((name => wrapColumnName(name))).join(',')}
+        FROM ${table}
+        WHERE ` + [
+            `nlog_p2 IS NOT NULL`,
+            coalesce(params.nlogpMin, `nlog_p2 >= :nlogpMin`),
+            coalesce(params.nlogpMax, `nlog_p2 <= :nlogpMax`),
+        ].filter(Boolean).join(' AND ');
+
+    // adds "order by" statement, if both order and orderBy are provided
+    let { order, orderBy } = params;
+    if (order && orderBy) {
+        // by default, sort by p-value ascending
+        if (!['asc', 'desc'].includes(order))
+            order = 'asc';
+        if (!validColumns.includes(orderBy))
+            orderBy = 'p';
+        sql += ` ORDER BY "${orderBy}" ${order} `;
+    }
+
+    console.log('SQL', sql);
+
+    const stmt = new Database(filepath, {readonly: true}).prepare(sql);
 
     return params.raw
         ? getRawResults(stmt, params)
@@ -36,9 +77,6 @@ function getSummary(filepath, params) {
  * @param {*} params
  */
 function getVariants(filepath, params) {
-    const isDefined = value => !(/^(null|undefined)$/).test(value);
-    const coalesce = (condition, value) => isDefined(condition) ? value : null;
-    const wrapColumnName = name => `"${name}"`;
     const validColumns = [
         'variant_id', 'chr', 'bp', 'snp','a1','a2', 'n',
         'p','nlog_p', 'p_r', 'or', 'or_r', 'q', 'i',
@@ -73,7 +111,7 @@ function getVariants(filepath, params) {
 
     // filter by id, chr, base position, and -log10(p), if provided
     let sql = `
-        SELECT ${columns.map(wrapColumnName).join(',')}
+        SELECT ${columns.map((name => wrapColumnName(name))).join(',')}
         FROM ${table}
         WHERE ` + [
             `p IS NOT NULL`,
@@ -86,6 +124,7 @@ function getVariants(filepath, params) {
             coalesce(params.nlogpMax, `nlog_p <= :nlogpMax`),
             coalesce(params.pMin, `p > :pMin`),
             coalesce(params.pMax, `p < :pMax`),
+            coalesce(params.mod, `(variant_id % :mod) = 0`),
         ].filter(Boolean).join(' AND ') + `${groupby}`;
 
     // create count sql based on original query
