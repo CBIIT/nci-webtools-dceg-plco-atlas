@@ -91,9 +91,8 @@ reader.on('line', line => {
     // trim, split by spaces, and parse 'NA' as null
     const values = parseLine(line);
     const params = mapToSchema(values);
-    const {chr, strand} = params;
     params.gene_id = null;
-    params.chr = +chr.replace('chr', '');
+    params.chr = +params.chr.replace('chr', '');
 
     // validate line (no alt. genes, only autosomes)
     if (++count === 0 || isNaN(params.chr)) return;
