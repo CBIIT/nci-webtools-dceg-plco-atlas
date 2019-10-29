@@ -3,7 +3,7 @@
 - Navigate to UCSC Genome Table Browser (https://genome.ucsc.edu)
 - Select GRCh38 assembly
 - Select Gencode v32 track
-- Select genome region
+- Select entire genome for region
 - Schema is shown below (required fields in **bold**)
 
 |field          |example           |SQL type         |info   |description
