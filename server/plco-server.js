@@ -4,7 +4,7 @@ const cors = require('fastify-cors');
 const compress = require('fastify-compress');
 const static = require('fastify-static');
 const { port, dbpath } = require('./config.json');
-const { getSummary, getVariants, getMetadata } = require('./query');
+const { getSummary, getVariants, getMetadata, getGenes } = require('./query');
 const logger = require('./logger');
 
 const app = server({ignoreTrailingSlash: true});
@@ -39,6 +39,14 @@ app.get('/metadata', async ({query}, res) => {
     logger.info("Query:", query);
     res.header('Cache-Control', 'max-age=300');
     return getMetadata(dbpath + query.database);
+});
+
+// retrieves genes
+app.get('/genes', async ({query}, res) => {
+    logger.info("Execute genes query.");
+    logger.info("Query:", query);
+    res.header('Cache-Control', 'max-age=300');
+    return getGenes(dbpath + query.database, query);
 });
 
 app.listen(port, '0.0.0.0')

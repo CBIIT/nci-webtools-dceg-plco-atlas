@@ -135,4 +135,33 @@ function getMetadata(filepath) {
     }, {});
 }
 
-module.exports = {getSummary, getVariants, getMetadata};
+
+function getGenes(filepath, params) {
+    const db = new Database(filepath, {readonly: true});
+    const validColumns = [
+        'gene_id',
+        'name',
+        'chr',
+        'strand',
+        'tx_start',
+        'tx_end',
+        'exon_starts',
+        'exon_ends',
+        'protein_id',
+        'align_id',
+    ];
+    const columns = params.columns
+        ? params.columns.split(',').filter(e => validColumns.includes(e))
+        : ['gene_id', 'tx_start', 'tx_end', 'exon_starts', 'exon_ends'];
+
+    return db.prepare(`
+        SELECT ${columns.map(c => `"${c}"`).join(',')}
+        FROM gene
+        WHERE
+            chr = :chr AND
+            tx_start >= :txStart AND
+            tx_end <= :txEnd
+    `).all(params);
+}
+
+module.exports = {getSummary, getVariants, getMetadata, getGenes};
