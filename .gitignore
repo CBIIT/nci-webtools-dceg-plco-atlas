@@ -4,6 +4,8 @@
 *.db-journal
 *.vs
 *.Rhistory
+*.log
+*-audit.json
 config.json
 /server/data/**/*.db
 /server/data/**/*.meta
