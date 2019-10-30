@@ -7,9 +7,10 @@ export function Home({ links }) {
   return (
     <>
       <div className="container video-banner-container text-center d-none d-md-block">
-        <video id="video-banner" autoPlay muted loop>
+        <img src="assets/images/plco-banner.jpg" alt="PLCO banner" style={{width: '100%'}}></img>
+        {/* <video id="video-banner" autoPlay muted loop>
           <source src="assets/images/plco-banner.mp4" type="video/mp4" />
-        </video>
+        </video> */}
         <div className="video-banner-overlay-text row justify-content-center text-center text-light w-75">
           <div className="col-12">
             <h1 className="text-light">

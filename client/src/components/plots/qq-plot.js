@@ -116,7 +116,7 @@ export function QQPlot({ onVariantLookup }) {
       scale: 1 // Multiply title/legend/axis/canvas sizes by this factor
     },
     displaylogo: false,
-    modeBarButtonsToRemove: ['autoScale2d', 'hoverClosestCartesian', 'hoverCompareCartesian']
+    modeBarButtonsToRemove: ['zoom2d', 'zoomIn2d', 'zoomOut2d', 'select2d', 'autoScale2d', 'hoverClosestCartesian', 'hoverCompareCartesian', 'lasso2d']
     // responsive: true
   };
 
