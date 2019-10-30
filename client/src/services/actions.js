@@ -126,23 +126,33 @@ export function drawQQPlotPlotly(phenotype) {
     setQQPlotData([]);
     
     // takes a long time need to optimize
-    const ppoints = (n, a) => {
-      if (!a) {
-          a = n <= 10 ? 3/8 : 1/2;
-      }
-      var points = new Array(n);
-      for (var i = 1; i <= n; i ++) {
-          var point = parseFloat((Math.log10((i - a) / (n + (1 - a) - a)) * - 1.0).toFixed(3));
-          points[i - 1] = point;
-          // points[i - 1] = (Math.log10(point) * -1.0).toFixed(3);
-      }
+    const ppoints = (n, limit, a) => {
+      var size = limit ? Math.min(n, limit) : n;
+      var points = new Array(size);
+      for (var i = 0; i < points.length; i ++)
+        points[i] = ppoint(n, i, a);
+
+      // for (var i = 1; i <= n; i ++) {
+      //     var point = parseFloat((Math.log10((i - a) / (n + (1 - a) - a)) * - 1.0).toFixed(3));
+      //     points[i - 1] = point;
+      //     // points[i - 1] = (Math.log10(point) * -1.0).toFixed(3);
+      // }
       return points;
     };
 
-    const arrSampler= (arr, delta) => {
+    const ppoint = (n, i, a) => {
+      if (!a) {
+          a = n <= 10 ? 3/8 : 1/2;
+      }
+      i ++;
+      return parseFloat((Math.log10((i - a) / (n + (1 - a) - a)) * - 1.0).toFixed(3));
+    };
+
+
+    const arrSampler= (arrLen, delta) => {
       var newArr = [];
-      for (var i = 0; i < arr.length; i = i + delta) {
-        newArr.push(arr[i]);
+      for (var i = 0; i < arrLen; i = i + delta) {
+        newArr.push(i);
       }
       return newArr;
     }
@@ -155,14 +165,15 @@ export function drawQQPlotPlotly(phenotype) {
     });
     const metadata_count = parseInt(metadata['count_all']);
     console.log('metadata_count', metadata_count);
+    const cutoffValue = 0.001;
 
     const topVariantData = await query('variants', {
       database: phenotype + '.db',
       // table: "",
       // columns: ['chr', 'bp', 'snp', 'p', 'nlog_p'],
       columns: ['nlog_p'],
-      pMin: 0.0,
-      pMax: 1.0,
+//      pMin: 0.001,
+      pMax: cutoffValue,
       orderBy: 'p',
       order: 'asc',
       // nlogpMin: 3,
@@ -182,9 +193,9 @@ export function drawQQPlotPlotly(phenotype) {
       database: phenotype + '.db',
       // table: "",
       columns: ['nlog_p'],
-      pMin: 0.0,
-      pMax: 1.0,
-      nlogpMax: topVariantDataNLogPCutOff,
+      pMin: cutoffValue,
+//      pMax: 1.0,
+//      nlogpMax: topVariantDataNLogPCutOff,
       mod: subsetVariantDataMod,
       orderBy: 'p',
       order: 'asc',
@@ -195,16 +206,20 @@ export function drawQQPlotPlotly(phenotype) {
 
 
 
-    let expected = ppoints(metadata_count);
-    console.log("expected", expected);
+    // let expected = ppoints(metadata_count);
+    // console.log("expected", expected);
 
-    let topExpectedVariants = expected.slice(0, topVariantDataExpectedCutOff);
+    let topExpectedVariants = ppoints(metadata_count, topObservedVariants.length);
     console.log("topExpectedVariants", topExpectedVariants);
 
-    let expectedVariants2 = expected.slice(topVariantDataExpectedCutOff, expected.length);
-    console.log("expectedVariants2", expectedVariants2);
+    // let expectedVariants2 = expected.slice(topVariantDataExpectedCutOff, expected.length);
+    // console.log("expectedVariants2", expectedVariants2);
 
-    let subsetExpectedVariants = arrSampler(expectedVariants2, subsetVariantDataMod);
+//    let subsetExpectedVariants = arrSampler(expectedVariants2, subsetVariantDataMod);
+    let subsetExpectedVariants = arrSampler(metadata_count, 100)
+      .map(i => i + topObservedVariants.length)
+      .map(i => ppoint(metadata_count, i));
+
     console.log("subsetExpectedVariants", subsetExpectedVariants);
 
 

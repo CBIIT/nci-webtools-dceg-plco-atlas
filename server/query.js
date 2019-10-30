@@ -122,8 +122,8 @@ function getVariants(filepath, params) {
             coalesce(params.bpMax, `bp <= :bpMax`),
             coalesce(params.nlogpMin, `nlog_p >= :nlogpMin`),
             coalesce(params.nlogpMax, `nlog_p <= :nlogpMax`),
-            coalesce(params.pMin, `p > :pMin`),
-            coalesce(params.pMax, `p < :pMax`),
+            coalesce(params.pMin, `p >= :pMin`),
+            coalesce(params.pMax, `p <= :pMax`),
             coalesce(params.mod, `(variant_id % :mod) = 0`),
         ].filter(Boolean).join(' AND ') + `${groupby}`;
 
