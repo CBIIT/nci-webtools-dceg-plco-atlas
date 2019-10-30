@@ -157,8 +157,8 @@ export function drawQQPlotPlotly(phenotype) {
       return newArr;
     }
 
-    var topVariantDataCutOff = 10000;
-    const subsetVariantDataMod = 100; // retrieve 1% of the rest of the variants
+    // var topVariantDataCutOff = 10000;
+    const subsetVariantDataMod = 1200; // retrieve 1% of the rest of the variants
 
     const metadata = await query('metadata', {
       database: phenotype + '.db',
@@ -177,7 +177,7 @@ export function drawQQPlotPlotly(phenotype) {
       orderBy: 'p',
       order: 'asc',
       // nlogpMin: 3,
-      limit: topVariantDataCutOff,
+      // limit: topVariantDataCutOff,
       raw: true
     });
     const topObservedVariants = topVariantData.data.flat();
@@ -216,7 +216,7 @@ export function drawQQPlotPlotly(phenotype) {
     // console.log("expectedVariants2", expectedVariants2);
 
 //    let subsetExpectedVariants = arrSampler(expectedVariants2, subsetVariantDataMod);
-    let subsetExpectedVariants = arrSampler(metadata_count, 100)
+    let subsetExpectedVariants = arrSampler(metadata_count, subsetVariantDataMod)
       .map(i => i + topObservedVariants.length)
       .map(i => ppoint(metadata_count, i));
 
