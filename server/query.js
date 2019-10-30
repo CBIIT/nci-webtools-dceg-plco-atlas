@@ -1,5 +1,6 @@
 const Database = require('better-sqlite3');
-const ranges = require('./data/chromosome_ranges.json');
+const { port, dbpath } = require('./config.json');
+const ranges = require(dbpath + 'chromosome_ranges.json');
 
 function getRawResults(stmt, params) {
     return {
@@ -12,7 +13,7 @@ function wrapColumnName(name){
     return `"${name}"`;
 }
 
-function isDefined(value) { 
+function isDefined(value) {
     return !(/^(null|undefined)$/).test(value);
 }
 function coalesce(condition, value) {
