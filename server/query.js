@@ -1,6 +1,7 @@
+const path = require('path');
 const Database = require('better-sqlite3');
-const { port, dbpath } = require('./config.json');
-const ranges = require(dbpath + 'chromosome_ranges.json');
+const { dbpath } = require('./config.json');
+const ranges = require(path.resolve(dbpath, 'chromosome_ranges.json'));
 
 function getRawResults(stmt, params) {
     return {
