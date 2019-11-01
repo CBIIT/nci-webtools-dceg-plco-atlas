@@ -181,7 +181,6 @@ function getMetadata(filepath, {key}) {
     }, {});
 }
 
-
 function getGenes(filepath, params) {
     const db = new Database(filepath, {readonly: true});
     const validColumns = [
