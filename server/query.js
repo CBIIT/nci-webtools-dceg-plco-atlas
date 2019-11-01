@@ -167,12 +167,12 @@ function exportVariants(filepath, params) {
     // todo: stream csv contents
 }
 
-function getMetadata(filepath, params) {
+function getMetadata(filepath, {key}) {
     const db = new Database(filepath, {readonly: true});
-    if (params)
+    if (key)
         return db.prepare(`SELECT value FROM variant_metadata WHERE key = :key`)
         .pluck()
-        .get(params);
+        .get({key});
 
     const records = db.prepare(`SELECT * FROM variant_metadata`).all();
     return records.reduce((obj, {key, value}) => {
