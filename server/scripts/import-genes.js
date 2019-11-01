@@ -29,8 +29,8 @@ if (fs.existsSync(databaseFilePath)) {
 
 // maps rows to objects for the gene schema
 const mapToSchema = values => {
-    const [name, chr, strand, tx_start, tx_end, cds_start, cds_end, exon_count, exon_starts, exon_ends, protein_id, align_id] = values;
-    return  {name, chr, strand, tx_start, tx_end, exon_starts, exon_ends, protein_id, align_id};
+    const [bin, ensembl_name, chrom, strand, tx_start, tx_end, cds_start, cds_end, exon_count, exon_starts, exon_ends, score, name, cds_start_stat, cds_end_stat, exon_frames] = values;
+    return  {name, chr, strand, tx_start, tx_end, exon_starts, exon_ends};
 }
 
 // set up utility functions/constants
@@ -45,8 +45,8 @@ const parseLine = line => line.trim().split(/,|\s+/).map(value => {
 });
 
 // gets the first line in a file
-const getFirstLine = filepath => {
-    const size = 4096;
+const getFirstLine = (filepath, size) => {
+    size = size || 4096;
     const buffer = Buffer.alloc(size);
     fs.readSync(fs.openSync(filepath, 'r'), buffer, 0, size);
     const contents = buffer.toString();
@@ -54,7 +54,7 @@ const getFirstLine = filepath => {
 };
 
 // validate headers
-const headers = ['#name', 'chrom', 'strand', 'txStart', 'txEnd', 'cdsStart', 'cdsEnd', 'exonCount', 'exonStarts', 'exonEnds', 'proteinID', 'alignID'];
+const headers = ['#bin', 'name', 'chrom', 'strand', 'txStart', 'txEnd', 'cdsStart', 'cdsEnd', 'exonCount', 'exonStarts', 'exonEnds', 'score', 'name2', 'cdsStartStat', 'cdsEndStat', 'exonFrames'];
 const firstLine = parseLine(getFirstLine(inputFilePath));
 assert.deepStrictEqual(firstLine, headers, `Headers do not match expected values: ${headers} | actual values: ${firstLine}`);
 
@@ -66,17 +66,14 @@ console.log(`[${duration()} s] Creating new database...`);
 db.exec(readFile('gene-schema.sql'));
 
 const insert = db.prepare(`
-    INSERT INTO gene VALUES (
-        :gene_id,
+    INSERT INTO gene_stage VALUES (
         :name,
         :chr,
         :strand,
         :tx_start,
         :tx_end,
         :exon_starts,
-        :exon_ends,
-        :protein_id,
-        :align_id
+        :exon_ends
     )
 `);
 
@@ -106,6 +103,9 @@ reader.on('line', line => {
 
 reader.on('close', () => {
     db.exec('COMMIT');
+
+    // collapse genes in staging table by merging exon starts and ends, and tx_start/tx_end
+
 
     // create indexes
     console.log(`[${duration()} s] Indexing...`);
