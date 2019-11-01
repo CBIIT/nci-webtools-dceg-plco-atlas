@@ -48,7 +48,7 @@ if (cluster.isMaster) {
         logger.info("Execute metadata query.");
         logger.info("Query:", query);
         res.header('Cache-Control', 'max-age=300');
-        return getMetadata(dbpath + query.database);
+        return getMetadata(dbpath + query.database, query);
     });
 
     // retrieves genes
