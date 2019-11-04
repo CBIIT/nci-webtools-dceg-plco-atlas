@@ -150,10 +150,12 @@ export function drawQQPlotPlotly(phenotype) {
     }
 
     // var topVariantDataCutOff = 10000;
-    const subsetVariantDataMod1 = 1000; // retrieve 1% of the rest of the variants
-    const subsetVariantDataMod2 = 10000; // retrieve 1% of the rest of the variants
+    const subsetVariantDataMod1 = 1000; 
+    const subsetVariantDataMod2 = 10000; 
+    const subsetVariantDataMod3 = 100000; 
     const pCutOffValue1 = 0.001;
     const pCutOffValue2 = 0.01;
+    const pCutOffValue3 = 0.1;
 
     const metadata = await query('metadata', {
       database: phenotype + '.db',
@@ -203,8 +205,7 @@ export function drawQQPlotPlotly(phenotype) {
       // table: "",
       columns: ['nlog_p'],
       pMin: pCutOffValue2,
-//      pMax: 1.0,
-//      nlogpMax: topVariantDataNLogPCutOff,
+      pMax: pCutOffValue3,
       mod: subsetVariantDataMod2,
       orderBy: 'p',
       order: 'asc',
@@ -212,6 +213,20 @@ export function drawQQPlotPlotly(phenotype) {
     });
     let subsetObservedVariants2 = subsetVariantData2.data.flat();
     console.log("subsetObservedVariants2", subsetObservedVariants2);
+
+    const subsetVariantData3 = await query('variants', {
+      database: phenotype + '.db',
+      // table: "",
+      columns: ['nlog_p'],
+      pMin: pCutOffValue3,
+//      pMax: 1.0,
+      mod: subsetVariantDataMod3,
+      orderBy: 'p',
+      order: 'asc',
+      raw: true
+    });
+    let subsetObservedVariants3 = subsetVariantData3.data.flat();
+    console.log("subsetObservedVariants2", subsetObservedVariants3);
 
 
 
@@ -224,9 +239,14 @@ export function drawQQPlotPlotly(phenotype) {
     console.log("subsetExpectedVariants1", subsetExpectedVariants1);
 
     let subsetExpectedVariants2 = arrSampler(metadata_count, subsetVariantDataMod2)
-    .map(i => i + topObservedVariants.length + subsetObservedVariants1.length)
-    .map(i => ppoint(metadata_count, i));
+      .map(i => i + topObservedVariants.length + subsetObservedVariants1.length * 1000)
+      .map(i => ppoint(metadata_count, i));
     console.log("subsetExpectedVariants2", subsetExpectedVariants2);
+
+    let subsetExpectedVariants3 = arrSampler(metadata_count, subsetVariantDataMod3)
+      .map(i => i + topObservedVariants.length + subsetObservedVariants1.length * 1000 + subsetObservedVariants2.length * 10000)
+      .map(i => ppoint(metadata_count, i));
+    console.log("subsetExpectedVariants3", subsetExpectedVariants3);
 
 
     let qqplotTopData = {
@@ -248,7 +268,7 @@ export function drawQQPlotPlotly(phenotype) {
       type: 'scattergl',
       marker: {
         size: 8,
-        opacity: 0.65
+        // opacity: 0.65
       },
       showlegend: false
     };
@@ -260,7 +280,19 @@ export function drawQQPlotPlotly(phenotype) {
       type: 'scattergl',
       marker: {
         size: 8,
-        opacity: 0.65
+        // opacity: 0.65
+      },
+      showlegend: false
+    };
+
+    let qqplotSubsetData3 = {
+      x: subsetExpectedVariants3,
+      y: subsetObservedVariants3,
+      mode: 'markers',
+      type: 'scattergl',
+      marker: {
+        size: 8,
+        // opacity: 0.65
       },
       showlegend: false
     };
@@ -335,7 +367,7 @@ export function drawQQPlotPlotly(phenotype) {
     };
     setQQPlotLayout(qqplotLayout);
     // setQQPlotData([qqplotData, qqplotSummaryData, qqplotLineData]);
-    setQQPlotData([qqplotTopData, qqplotSubsetData1, qqplotSubsetData2, qqplotLineData]);
+    setQQPlotData([qqplotTopData, qqplotSubsetData1, qqplotSubsetData2, qqplotSubsetData3, qqplotLineData]);
     setLoading(false);
   };
 }
