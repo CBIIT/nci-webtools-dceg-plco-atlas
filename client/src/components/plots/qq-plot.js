@@ -11,7 +11,8 @@ import Plot from 'react-plotly.js';
 export function QQPlot({ onVariantLookup }) {
   const dispatch = useDispatch();
   const { 
-    loading, 
+    // loading, 
+    loadingQQPlot,
     qqplotSrc, 
     areaItems, 
     lambdaGC, 
@@ -131,6 +132,7 @@ export function QQPlot({ onVariantLookup }) {
               alignItems: 'center'
             }}>
             <Plot
+              style={{ display: !loadingQQPlot ? 'block' : 'none' }}
               data={qqplotData}
               layout={qqplotLayout}
               config={config}
@@ -141,6 +143,13 @@ export function QQPlot({ onVariantLookup }) {
               //   }
               // }}
             />
+          </div>
+          <div
+            className="text-center"
+            style={{ display: loadingQQPlot ? 'block' : 'none' }}>
+            <Spinner animation="border" variant="primary" role="status">
+              <span className="sr-only">Loading...</span>
+            </Spinner>
           </div>
         </div>
       </div>
@@ -158,8 +167,7 @@ export function QQPlot({ onVariantLookup }) {
         )}
         <div className="col-md-12 text-center">
           <div
-            className="qq-plot"
-            style={{ display: loading ? 'none' : 'block' }}>
+            className="qq-plot">
             <ReactCursorPosition
               {...{
                 className: 'qq-plot-mouse-window',
@@ -223,13 +231,13 @@ export function QQPlot({ onVariantLookup }) {
               </map>
             </ReactCursorPosition>
           </div>
-          <div
+          {/* <div
             className="text-center"
             style={{ display: loading ? 'block' : 'none' }}>
             <Spinner animation="border" variant="primary" role="status">
               <span className="sr-only">Loading...</span>
             </Spinner>
-          </div>
+          </div> */}
         </div>
       </div>
 
