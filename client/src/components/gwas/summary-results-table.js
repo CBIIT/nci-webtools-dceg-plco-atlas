@@ -8,7 +8,7 @@ import paginationFactory from 'react-bootstrap-table2-paginator';
 export function SummaryResultsTable() {
   const dispatch = useDispatch();
   const {
-    loading,
+    loadingManhattanTable,
     selectedPhenotype,
     selectedChromosome,
     selectedTable,
@@ -87,7 +87,7 @@ export function SummaryResultsTable() {
     <Table
       remote
       keyField="variant_id"
-      loading={loading}
+      loading={loadingManhattanTable}
       data={results}
       columns={columns}
       onTableChange={handleTableChange}

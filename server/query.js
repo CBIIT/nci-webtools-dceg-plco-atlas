@@ -64,8 +64,6 @@ function getSummary(filepath, params) {
         sql += ` ORDER BY "${orderBy}" ${order} `;
     }
 
-    console.log('SQL', sql);
-
     const stmt = new Database(filepath, {readonly: true}).prepare(sql);
 
     return params.raw
@@ -146,7 +144,7 @@ function getVariants(filepath, params) {
     // adds limit and offset, if provided
     if (params.limit) sql += ' LIMIT :limit ';
     if (params.offset) sql += ' OFFSET :offset ';
-    console.log('SQL', sql);
+
     // query database
     const db = new Database(filepath, {readonly: true});
     const stmt = db.prepare(sql);

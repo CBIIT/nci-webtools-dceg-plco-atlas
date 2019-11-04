@@ -35,7 +35,7 @@ export function fetchRanges() {
 
 export function updateSummaryResultsTable(params, includeCounts) {
   return async function(dispatch) {
-    dispatch(updateSummaryResults({ loading: true }));
+    dispatch(updateSummaryResults({ loadingManhattanTable: true }));
     const response = await query('variants', params);
     const metadata = await query('metadata', params);
     if (!response.error) {
@@ -48,7 +48,7 @@ export function updateSummaryResultsTable(params, includeCounts) {
         data.resultsCount = +metadata[`count_${params.gender}`];
       dispatch(updateSummaryResults(data));
     }
-    dispatch(updateSummaryResults({ loading: false }));
+    dispatch(updateSummaryResults({ loadingManhattanTable: false }));
     return response;
   };
 }
@@ -92,7 +92,7 @@ export function drawManhattanPlot(plotType, params) {
 
 export function drawQQPlot(phenotype) {
   return async function(dispatch) {
-    dispatch(updateSummaryResults({ loading: true }));
+    // dispatch(updateSummaryResults({ loading: true }));
     const imageMapData = await query(
       `data/qq-plots/${phenotype}.imagemap.json`
     );
@@ -101,7 +101,7 @@ export function drawQQPlot(phenotype) {
         updateSummaryResults({
           ...imageMapData, // lambdaGC, sampleSize, areaItems
           qqplotSrc: `data/qq-plots/${phenotype}.png`,
-          loading: false
+          // loading: false
         })
       );
     }
@@ -112,8 +112,8 @@ export function drawQQPlotPlotly(phenotype) {
   return async function(dispatch) {
     console.log("drawQQPlotPlotly", phenotype);
 
-    const setLoading = loading => {
-      dispatch(updateSummaryResults({ loading }));
+    const setQQPlotLoading = loadingQQPlot => {
+      dispatch(updateSummaryResults({ loadingQQPlot }));
     };
     const setQQPlotData = qqplotData => {
       dispatch(updateSummaryResults({ qqplotData }));
@@ -121,7 +121,7 @@ export function drawQQPlotPlotly(phenotype) {
     const setQQPlotLayout = qqplotLayout => {
       dispatch(updateSummaryResults({ qqplotLayout }));
     };
-    setLoading(true);
+    setQQPlotLoading(true);
     setQQPlotLayout({});
     setQQPlotData([]);
     
@@ -138,7 +138,7 @@ export function drawQQPlotPlotly(phenotype) {
           a = n <= 10 ? 3/8 : 1/2;
       }
       i ++;
-      return parseFloat((Math.log10((i - a) / (n + (1 - a) - a)) * - 1.0).toFixed(3));
+      return parseFloat((Math.abs(Math.log10((i - a) / (n + (1 - a) - a)) * - 1.0)).toFixed(3));
     };
 
     const arrSampler= (arrLen, delta) => {
@@ -149,19 +149,18 @@ export function drawQQPlotPlotly(phenotype) {
       return newArr;
     }
 
-    // var topVariantDataCutOff = 10000;
+    const metadata = await query('metadata', {
+      database: phenotype + '.db',
+    });
+    const metadata_count = parseInt(metadata['count_all']);
+    console.log('metadata_count', metadata_count);
+
     const subsetVariantDataMod1 = 1000; 
     const subsetVariantDataMod2 = 10000; 
     const subsetVariantDataMod3 = 100000; 
     const pCutOffValue1 = 0.001;
     const pCutOffValue2 = 0.01;
     const pCutOffValue3 = 0.1;
-
-    const metadata = await query('metadata', {
-      database: phenotype + '.db',
-    });
-    const metadata_count = parseInt(metadata['count_all']);
-    console.log('metadata_count', metadata_count);
 
     const topVariantData = await query('variants', {
       database: phenotype + '.db',
@@ -172,18 +171,10 @@ export function drawQQPlotPlotly(phenotype) {
       pMax: pCutOffValue1,
       orderBy: 'p',
       order: 'asc',
-      // nlogpMin: 3,
-      // limit: topVariantDataCutOff,
       raw: true
     });
     const topObservedVariants = topVariantData.data.flat();
     console.log("topObservedVariants", topObservedVariants);
-
-    // let topVariantDataNLogPCutOff = topObservedVariants[topObservedVariants.length - 1];
-    // console.log("topVariantDataNLogPCutOff", topVariantDataNLogPCutOff);
-
-    // const topVariantDataExpectedCutOff = topObservedVariants.length;
-    // console.log("topVariantDataExpectedCutOff", topVariantDataExpectedCutOff);
 
     const subsetVariantData1 = await query('variants', {
       database: phenotype + '.db',
@@ -191,7 +182,6 @@ export function drawQQPlotPlotly(phenotype) {
       columns: ['nlog_p'],
       pMin: pCutOffValue1,
       pMax: pCutOffValue2,
-//      nlogpMax: topVariantDataNLogPCutOff,
       mod: subsetVariantDataMod1,
       orderBy: 'p',
       order: 'asc',
@@ -226,7 +216,7 @@ export function drawQQPlotPlotly(phenotype) {
       raw: true
     });
     let subsetObservedVariants3 = subsetVariantData3.data.flat();
-    console.log("subsetObservedVariants2", subsetObservedVariants3);
+    console.log("subsetObservedVariants3", subsetObservedVariants3);
 
 
 
@@ -368,7 +358,7 @@ export function drawQQPlotPlotly(phenotype) {
     setQQPlotLayout(qqplotLayout);
     // setQQPlotData([qqplotData, qqplotSummaryData, qqplotLineData]);
     setQQPlotData([qqplotTopData, qqplotSubsetData1, qqplotSubsetData2, qqplotSubsetData3, qqplotLineData]);
-    setLoading(false);
+    setQQPlotLoading(false);
   };
 }
 
