@@ -167,15 +167,19 @@ function exportVariants(filepath, params) {
     // todo: stream csv contents
 }
 
-function getMetadata(filepath) {
+function getMetadata(filepath, {key}) {
     const db = new Database(filepath, {readonly: true});
+    if (key)
+        return db.prepare(`SELECT value FROM variant_metadata WHERE key = :key`)
+        .pluck()
+        .get({key});
+
     const records = db.prepare(`SELECT * FROM variant_metadata`).all();
     return records.reduce((obj, {key, value}) => {
         obj[key] = value;
         return obj;
     }, {});
 }
-
 
 function getGenes(filepath, params) {
     const db = new Database(filepath, {readonly: true});
