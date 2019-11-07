@@ -29,7 +29,7 @@ if (fs.existsSync(databaseFilePath)) {
 
 // maps rows to objects for the gene schema
 const mapToSchema = values => {
-    const [bin, ensembl_name, chrom, strand, tx_start, tx_end, cds_start, cds_end, exon_count, exon_starts, exon_ends, score, name, cds_start_stat, cds_end_stat, exon_frames] = values;
+    const [bin, ensembl_name, chr, strand, tx_start, tx_end, cds_start, cds_end, exon_count, exon_starts, exon_ends, score, name, cds_start_stat, cds_end_stat, exon_frames] = values;
     return  {name, chr, strand, tx_start, tx_end, exon_starts, exon_ends};
 }
 
@@ -39,7 +39,7 @@ const duration = _ => ((new Date() - startTime) / 1000).toPrecision(4);
 const readFile = filepath => fs.readFileSync(path.resolve(__dirname, filepath), 'utf8');
 
 // parses each line in the file
-const parseLine = line => line.trim().split(/,|\s+/).map(value => {
+const parseLine = line => line.trim().split(/\s+/).map(value => {
     if (value === '') return null;
     return value;
 });
@@ -105,7 +105,24 @@ reader.on('close', () => {
     db.exec('COMMIT');
 
     // collapse genes in staging table by merging exon starts and ends, and tx_start/tx_end
+    console.log(`[${duration()} s] Storing genes...`);
+    db.exec(`
+        INSERT INTO gene SELECT
+            null,
+            name,
+            chr,
+            strand,
+            min(tx_start) as tx_start,
+            max(tx_end) as tx_end,
+            group_concat(exon_starts, '') as exon_starts,
+            group_concat(exon_ends, '') as exon_ends
+        FROM gene_stage
+        GROUP BY name
+        ORDER BY chr, tx_start
+    `);
 
+    // drop staging table
+    db.exec(`DROP TABLE gene_stage`);
 
     // create indexes
     console.log(`[${duration()} s] Indexing...`);
