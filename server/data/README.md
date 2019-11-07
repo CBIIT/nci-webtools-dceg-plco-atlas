@@ -32,8 +32,9 @@
 2. Run the `server/scripts/import-genes.js` script:
    ```sh
     cd server
-    node scripts/import-genes.js data/gene.txt data/gene.db
+    node scripts/import-genes.js data/gene.txt data/gene.dd
    ```
+3. Note: exons are collapsed according to gene name
 
 ##### Querying Gene Data
 
