@@ -76,87 +76,35 @@ export function VariantLookupForm({ onChange, onSubmit, onReset }) {
     a.title.localeCompare(b.title)
   );
 
-  const treeData = [
-    {
-      key: 'first-level-node-1',
-      label: 'Node 1 at the first level',
-      nodes: [
-        {
-          key: 'second-level-node-1',
-          label: 'Node 1 at the second level',
-          nodes: [
-            {
-              key: 'third-level-node-1',
-              label: 'Last node of the branch',
-              nodes: [] // you can remove the nodes property or leave it as an empty array
-            },
-          ],
-        },
-      ],
-    },
-    {
-      key: 'first-level-node-2',
-      label: 'Node 2 at the first level',
-    },
-  ];
+  // const treeDataTest = [
+  //   {
+  //     key: 'first-level-node-1',
+  //     label: 'Node 1 at the first level',
+  //     nodes: [
+  //       {
+  //         key: 'second-level-node-1',
+  //         label: 'Node 1 at the second level',
+  //         nodes: [
+  //           {
+  //             key: 'third-level-node-1',
+  //             label: 'Last node of the branch',
+  //             nodes: [] // you can remove the nodes property or leave it as an empty array
+  //           },
+  //         ],
+  //       },
+  //     ],
+  //   },
+  //   {
+  //     key: 'first-level-node-2',
+  //     label: 'Node 2 at the first level',
+  //   },
+  // ];
 
-  const treeSelect = () => {
-    console.log("phenotypesTree", phenotypesTree);
-    phenotypesTree.map((item) => 
-      {
-        console.log(item.title);
-        console.log(
-          <div>
-            {item.title}
-          </div>
-        );
-        // if (item.children && item.children.length > 0) {
-        //   return (
-        //     <ul>
-        //       {
-        //         item.children.map((item) => { 
-        //           if (item.children && item.children.length > 0) {
-        //             return (
-        //               <ul>
-        //                 {
-        //                   item.children.map((item) => { 
-        //                     if (item.children && item.children.length > 0) {
-        //                       return (
-        //                         <ul>
-        //                           level
-        //                         </ul>
-        //                       )
-        //                     } else {
-        //                       return (
-        //                         <li>
-        //                           {item.title}
-        //                         </li>
-        //                       )
-        //                     }
-        //                   }
-        //                 )}
-        //               </ul>
-        //             )
-        //           } else {
-        //             return (
-        //               <li>
-        //                 {item.title}
-        //               </li>
-        //             )
-        //           }
-        //         }
-        //       )}
-        //     </ul>
-        //   )
-        // } else {
-        //   return (
-        //     <li>
-        //       {item.title}
-        //     </li>
-        //   )
-        // }
-      }
-    )
+  const handleChangeCustom = (items) => {
+    setSelectedPhenotypes(items);
+    // console.log("selected", items);
+    // conatselectedPhenotypes
+
   }
 
   return (
@@ -180,12 +128,29 @@ export function VariantLookupForm({ onChange, onSubmit, onReset }) {
       <TreeSelectCustom
         data={phenotypesTree}
         value={selectedPhenotypes}
+        onChange={handleChangeCustom}
       />
 
       {/* <br></br>
 
       <div className="border border-dark">
-        <TreeMenu data={treeData}>
+          SHOW LIST OF SELECTED PHENOTYPES HERE
+          <ul>
+            {
+              selectedPhenotypes.map((item) => 
+                (
+                <li>
+                  {item.title}
+                </li>)
+              )
+            }
+          </ul>
+      </div> */}
+
+      {/* <br></br>
+
+      <div className="border border-dark">
+        <TreeMenu data={treeDataTest}>
           {({ search, items, resetOpenNodes }) => (
             <div>
               {defaultChildren({search, items})}
