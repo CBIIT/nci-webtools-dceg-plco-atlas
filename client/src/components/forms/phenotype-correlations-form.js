@@ -92,7 +92,7 @@ export function PhenotypeCorrelationsForm({ onChange, onSubmit, onReset }) {
       <TreeSelect
         className="form-control h-100 p-0"
         dropdownClassName="phenotype-correlations"
-        style={{ width: '100%', maxHeight: 76, overflow: 'auto' }}
+        style={{ width: '100%', maxHeight: 200, overflow: 'auto' }}
         dropdownStyle={{ maxHeight: 500, overflow: 'auto' }}
         treeData={
           selectedListType === 'alphabetic'
