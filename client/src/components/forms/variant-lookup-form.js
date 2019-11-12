@@ -17,6 +17,7 @@ import {
 import { updateVariantLookup } from '../../services/actions';
 import TreeSelect, { TreeNode } from 'rc-tree-select';
 import 'rc-tree-select/assets/index.css';
+import TreeMenu, { defaultChildren, ItemComponent } from 'react-simple-tree-menu';
 
 export function VariantLookupForm({ onChange, onSubmit, onReset }) {
   const dispatch = useDispatch();
@@ -74,6 +75,30 @@ export function VariantLookupForm({ onChange, onSubmit, onReset }) {
     a.title.localeCompare(b.title)
   );
 
+  const treeData = [
+    {
+      key: 'first-level-node-1',
+      label: 'Node 1 at the first level',
+      nodes: [
+        {
+          key: 'second-level-node-1',
+          label: 'Node 1 at the second level',
+          nodes: [
+            {
+              key: 'third-level-node-1',
+              label: 'Last node of the branch',
+              nodes: [] // you can remove the nodes property or leave it as an empty array
+            },
+          ],
+        },
+      ],
+    },
+    {
+      key: 'first-level-node-2',
+      label: 'Node 2 at the first level',
+    },
+  ];
+
   return (
     <>
       {/* <select
@@ -92,7 +117,75 @@ export function VariantLookupForm({ onChange, onSubmit, onReset }) {
           <label className="ml-1" for="alphabeticRadio">Alphabetic</label>
       </div>
 
-      {/* <br></br> */}
+      <div className="border border-dark">
+        custom
+        <ul>
+          {phenotypesTree.map((item) => 
+            {
+              if (item.children && item.children.length > 0) {
+                return (
+                  <ul>
+                    {
+                      item.children.map((item) => { 
+                        if (item.children && item.children.length > 0) {
+                          return (
+                            <ul>
+                              {
+                                item.children.map((item) => { 
+                                  if (item.children && item.children.length > 0) {
+                                    return (
+                                      <ul>
+                                        level
+                                      </ul>
+                                    )
+                                  } else {
+                                    return (
+                                      <li>
+                                        {item.title}
+                                      </li>
+                                    )
+                                  }
+                                }
+                              )}
+                            </ul>
+                          )
+                        } else {
+                          return (
+                            <li>
+                              {item.title}
+                            </li>
+                          )
+                        }
+                      }
+                    )}
+                  </ul>
+                )
+              } else {
+                return (
+                  <li>
+                    {item.title}
+                  </li>
+                )
+              }
+            }
+          )}
+        </ul>
+      </div>
+
+      <br></br>
+
+      <div className="border border-dark">
+        <TreeMenu data={treeData}>
+          {({ search, items, resetOpenNodes }) => (
+            <div>
+              {defaultChildren({search, items})}
+              <button onClick={resetOpenNodes}>Reset</button>
+            </div>
+          )}
+        </TreeMenu>
+      </div>
+
+      <br></br>
 
       <TreeSelect
         className="form-control h-100 p-0"
