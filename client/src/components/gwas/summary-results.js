@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Alert, Tab, Tabs } from 'react-bootstrap';
+import { Alert, Tab, Tabs, Button } from 'react-bootstrap';
 import { SummaryResultsForm } from '../forms/summary-results-form';
 import { SnpSearchForm } from '../forms/snp-search-form';
 import { ManhattanPlot } from '../plots/manhattan-plot';
@@ -292,51 +292,78 @@ export function SummaryResults() {
     </div>
   );
 
+  const [openSidebar, setOpenSidebar] = useState(true);
+
   return (
     <>
-      <SummaryResultsForm onSubmit={handleSubmit} onChange={handleChange} onReset={handleReset} />
-      {messages &&
-        messages.map(({ type, content }) => (
-          <Alert variant={type} onClose={clearMessages} dismissible>
-            {content}
-          </Alert>
-        ))}
-
-      <Tabs defaultActiveKey={selectedPlot} onSelect={setSelectedPlot}>
-        <Tab
-          eventKey="manhattan-plot"
-          title="Manhattan Plot"
-          className="p-2 bg-white tab-pane-bordered" style={{minHeight: '50vh'}}>
-          <ManhattanPlot
-            onChromosomeSelected={onChromosomeSelected}
-            onAllChromosomeSelected={onAllChromosomeSelected}
-            onVariantLookup={handleVariantLookup}
-            onZoom={handleZoom}
-            loading={loadingManhattanPlot}
-          />
-          <div
-            className="mw-100 my-4 px-5"
-            style={{ display: submitted ? 'block' : 'none' }}>
-            <SnpSearchForm />
-
-            <div style={{ display: showSnpResults ? 'none' : 'block' }}>
-              <SummaryResultsTable />
-            </div>
+      <Button
+        variant="link"
+        style={{position: 'absolute', zIndex: 100}}
+        onClick={() => setOpenSidebar(!openSidebar)}
+        aria-controls="summary-results-collapse-input-panel"
+        aria-expanded={openSidebar}>
+        { openSidebar ? <span>&#171;</span> : <span>&#187;</span>}
+      </Button>
+      
+      <div className={openSidebar ? "row mx-3" : "mx-3"}>
+        {openSidebar && (
+          <div className="col-3">
+            <Tabs defaultActiveKey="summary-results-form">
+              <Tab
+                eventKey="summary-results-form"
+                // title="Table"
+                className="p-2 bg-white tab-pane-bordered rounded-0"
+                style={{minHeight: '100%'}}>
+                <SummaryResultsForm onSubmit={handleSubmit} onChange={handleChange} onReset={handleReset} />
+                {messages &&
+                  messages.map(({ type, content }) => (
+                    <Alert variant={type} onClose={clearMessages} dismissible>
+                      {content}
+                    </Alert>
+                  ))}
+              </Tab>
+            </Tabs>
           </div>
-          {placeholder}
-        </Tab>
-        <Tab
-          eventKey="qq-plot"
-          title="Q-Q Plot"
-          className="p-2 bg-white tab-pane-bordered" style={{minHeight: '50vh'}}>
-          <div
-            className="mw-100 my-4"
-            style={{ display: submitted ? 'block' : 'none' }}>
-            <QQPlot onVariantLookup={handleVariantLookup} />
-          </div>
-          {placeholder}
-        </Tab>
-      </Tabs>
+        )}
+      
+        <div className={openSidebar ? "col-9" : "col-12"}>
+          <Tabs className="" defaultActiveKey={selectedPlot} onSelect={setSelectedPlot}>
+            <Tab
+              eventKey="manhattan-plot"
+              title="Manhattan Plot"
+              className="p-2 bg-white tab-pane-bordered rounded-0" style={{minHeight: '50vh'}}>
+              <ManhattanPlot
+                onChromosomeSelected={onChromosomeSelected}
+                onAllChromosomeSelected={onAllChromosomeSelected}
+                onVariantLookup={handleVariantLookup}
+                onZoom={handleZoom}
+                loading={loadingManhattanPlot}
+              />
+              <div
+                className="mw-100 my-4 px-5"
+                style={{ display: submitted ? 'block' : 'none' }}>
+                <SnpSearchForm />
+
+                <div style={{ display: showSnpResults ? 'none' : 'block' }}>
+                  <SummaryResultsTable />
+                </div>
+              </div>
+              {placeholder}
+            </Tab>
+            <Tab
+              eventKey="qq-plot"
+              title="Q-Q Plot"
+              className="p-2 bg-white tab-pane-bordered" style={{minHeight: '50vh'}}>
+              <div
+                className="mw-100 my-4"
+                style={{ display: submitted ? 'block' : 'none' }}>
+                <QQPlot onVariantLookup={handleVariantLookup} />
+              </div>
+              {placeholder}
+            </Tab>
+          </Tabs>
+        </div>
+      </div>
     </>
   );
 }

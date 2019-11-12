@@ -113,6 +113,8 @@ $enable-shadows: true;
 
 .nav-tabs > .nav-item {
   font-weight: 600;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
 }
 
 .nav-tabs {
@@ -405,4 +407,9 @@ h1 {
 .summary-results
 .rc-tree-select-tree-node-content-wrapper-open span{
   cursor: not-allowed !important;
+}
+
+// custom tree select
+.collapse-button {
+  cursor: pointer !important;
 }

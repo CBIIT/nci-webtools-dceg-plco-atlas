@@ -6,7 +6,7 @@ import { Table, paginationText, paginationSizeSelector, paginationButton } from 
 import paginationFactory from 'react-bootstrap-table2-paginator';
 import filterFactory, { textFilter } from 'react-bootstrap-table2-filter';
 import ToolkitProvider, { CSVExport } from 'react-bootstrap-table2-toolkit';
-import { Alert, Spinner, Card, Tabs, Tab } from 'react-bootstrap';
+import { Alert, Button, Tabs, Tab, Collapse } from 'react-bootstrap';
 
 export function VariantLookup() {
   const dispatch = useDispatch();
@@ -187,68 +187,96 @@ export function VariantLookup() {
     );
   };
 
+  const [openSidebar, setOpenSidebar] = useState(true);
+
   return (
     <>
-      <VariantLookupForm onSubmit={handleSubmit} onChange={handleChange} onReset={handleReset} />
-      {messages &&
-        messages.map(({ type, content }) => (
-          <Alert variant={type} onClose={clearMessages} dismissible>
-            {content}
-          </Alert>
-        ))}
-
-      <Tabs defaultActiveKey="variant-lookup">
-        <Tab
-          eventKey="variant-lookup"
-          // title="Table"
-          className="p-2 bg-white tab-pane-bordered" 
-          style={{minHeight: '50vh'}}>
-          <div
-            className="mw-100 my-2 px-4"
-            style={{ display: submitted ? 'block' : 'none' }}>
-              <ToolkitProvider
-                keyField="variant_id"
-                data={ results }
-                columns={ columns }
-                exportCSV={{
-                  fileName: 'variant_lookup.csv'
-                }}> 
-              {
-                props => (
-                  <div>
-                    <ExportCSVButton 
-                      className="float-right"
-                      style={{all: 'unset', textDecoration: 'underline', cursor: 'pointer', color: '#007bff'}}
-                      { ...props.csvProps }>
-                      Export CSV
-                    </ExportCSVButton>
-                    <br />
-                    <Table
-                      { ...props.baseProps }
-                      bootstrap4
-                      // keyField="variant_id"
-                      // data={results}
-                      // columns={columns}
-                      filter={filterFactory()}
-                      pagination={paginationFactory({
-                        showTotal: results.length > 0,
-                        sizePerPageList: [25, 50, 100],
-                        paginationTotalRenderer: paginationText,
-                        sizePerPageRenderer: paginationSizeSelector,
-                        pageButtonRenderer: paginationButton,
-                      })}
-                      defaultSorted={[
-                        {dataField: 'p', order: 'asc'}
-                      ]}
-                    />
-                  </div>
-                )
-              }
-            </ToolkitProvider>
+      <Button
+        variant="link"
+        style={{position: 'absolute', zIndex: 100}}
+        onClick={() => setOpenSidebar(!openSidebar)}
+        aria-controls="variant-lookup-collapse-input-panel"
+        aria-expanded={openSidebar}>
+        { openSidebar ? <span>&#171;</span> : <span>&#187;</span>}
+      </Button>
+      
+      <div className={openSidebar ? "row mx-3" : "mx-3"}>
+        {openSidebar && (
+          <div className="col-3">
+            <Tabs defaultActiveKey="variant-lookup-form">
+              <Tab
+                eventKey="variant-lookup-form"
+                // title="Table"
+                className="p-2 bg-white tab-pane-bordered rounded-0"
+                style={{minHeight: '100%'}}>
+                <VariantLookupForm onSubmit={handleSubmit} onChange={handleChange} onReset={handleReset} />
+                {messages &&
+                  messages.map(({ type, content }) => (
+                    <Alert variant={type} onClose={clearMessages} dismissible>
+                      {content}
+                    </Alert>
+                  ))
+                }
+              </Tab>
+            </Tabs>
           </div>
-          {placeholder}
-        </Tab>
-      </Tabs>
+        )}
+        
+        <div className={openSidebar ? "col-9" : "col-12"}>
+          <Tabs defaultActiveKey="variant-lookup">
+            <Tab
+              eventKey="variant-lookup"
+              // title="Table"
+              className="p-2 bg-white tab-pane-bordered rounded-0"
+              style={{minHeight: '50vh'}}>
+              <div
+                className="mw-100 my-2 px-4"
+                style={{ display: submitted ? 'block' : 'none' }}>
+                  <ToolkitProvider
+                    keyField="variant_id"
+                    data={ results }
+                    columns={ columns }
+                    exportCSV={{
+                      fileName: 'variant_lookup.csv'
+                    }}> 
+                  {
+                    props => (
+                      <div>
+                        <ExportCSVButton 
+                          className="float-right"
+                          style={{all: 'unset', textDecoration: 'underline', cursor: 'pointer', color: '#007bff'}}
+                          { ...props.csvProps }>
+                          Export CSV
+                        </ExportCSVButton>
+                        <br />
+                        <Table
+                          { ...props.baseProps }
+                          bootstrap4
+                          // keyField="variant_id"
+                          // data={results}
+                          // columns={columns}
+                          filter={filterFactory()}
+                          pagination={paginationFactory({
+                            showTotal: results.length > 0,
+                            sizePerPageList: [25, 50, 100],
+                            paginationTotalRenderer: paginationText,
+                            sizePerPageRenderer: paginationSizeSelector,
+                            pageButtonRenderer: paginationButton,
+                          })}
+                          defaultSorted={[
+                            {dataField: 'p', order: 'asc'}
+                          ]}
+                        />
+                      </div>
+                    )
+                  }
+                </ToolkitProvider>
+              </div>
+              {placeholder}
+            </Tab>
+          </Tabs>
+        </div>
+      </div>
     </>
   );
 }
