@@ -80,18 +80,66 @@ export function axisLeft(config, ctx) {
     }
   }
 
+  if (config.mirrored) {
+    if (config.yAxis.title) {
+      ctx.save();
+      ctx.translate(0, yScale2(yMin) / 2);
+      let titleWidth = measureWidth(ctx, title);
+      let midpoint = (yScale(yMax) - yScale(yMin)) / 2;
+      ctx.rotate(Math.PI / -2);
+      ctx.translate(
+        midpoint - titleWidth / 2,
+        -(tickLength + labelPadding + maxLabelWidth)
+      );
+      ctx.textAlign = 'center';
+      renderText(ctx, config.yAxis.title);
 
+      ctx.restore();
+    }
 
-  // draw axis title (rotated -90 degrees)
-  let titleWidth = measureWidth(ctx, title);
-  let midpoint = (yScale(yMax) - yScale(yMin)) / 2;
-  ctx.rotate(Math.PI / -2);
-  ctx.translate(
-    midpoint - titleWidth / 2,
-    -(tickLength + labelPadding + maxLabelWidth)
-  );
-  ctx.textAlign = 'center';
-  renderText(ctx, title);
+    if (config.yAxis.secondaryTitle) {
+      ctx.save();
+      let titleWidth = measureWidth(ctx, title);
+      let midpoint = (yScale(yMax) - yScale(yMin)) / 2;
+      ctx.rotate(Math.PI / -2);
+      ctx.translate(
+        midpoint - titleWidth / 2,
+        -(tickLength + labelPadding + maxLabelWidth)
+      );
+      ctx.textAlign = 'center';
+      renderText(ctx, config.yAxis.secondaryTitle);
+
+      ctx.restore();
+    }
+
+    if (config.yAxis2.secondaryTitle) {
+      ctx.save();
+      ctx.translate(0, yScale2(yMin));
+      let titleWidth = measureWidth(ctx, title);
+      let midpoint = (yScale(yMax) - yScale(yMin)) / 2;
+      ctx.rotate(Math.PI / -2);
+      ctx.translate(
+        midpoint - titleWidth / 2,
+        -(tickLength + labelPadding + maxLabelWidth)
+      );
+      ctx.textAlign = 'center';
+      renderText(ctx, config.yAxis2.secondaryTitle);
+      ctx.restore();
+    }
+  }
+
+  else {
+    // draw axis title (rotated -90 degrees)
+    let titleWidth = measureWidth(ctx, title);
+    let midpoint = (yScale(yMax) - yScale(yMin)) / 2;
+    ctx.rotate(Math.PI / -2);
+    ctx.translate(
+      midpoint - titleWidth / 2,
+      -(tickLength + labelPadding + maxLabelWidth)
+    );
+    ctx.textAlign = 'center';
+    renderText(ctx, title);
+  }
 
   ctx.restore();
 }
