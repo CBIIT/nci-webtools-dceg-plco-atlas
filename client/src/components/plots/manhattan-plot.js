@@ -168,7 +168,7 @@ export function ManhattanPlot({
         size: 2,
         interactiveSize: 3,
         opacity: 0.6,
-        color: '#e47618',
+        color: selectedChromosome % 2 ? '#e47618' : '#b55117',
         tooltip: {
           trigger: 'hover',
           class: 'custom-tooltip',
@@ -204,7 +204,7 @@ export function ManhattanPlot({
         }
       },
       point2: {
-       color: '#006bb8'
+        color: selectedChromosome % 2 ? '#006bb8' : '#002a47'
       },
       lines: [
         { y: -Math.log10(5e-8), style: 'dashed' },
@@ -310,7 +310,7 @@ export function ManhattanPlot({
         size: 2,
         interactiveSize: 3,
         opacity: 0.6,
-        color: '#3ea559',
+        color: (selectedChromosome % 2 ? '#006bb8' : '#002a47'),
         tooltip: {
           trigger: 'hover',
           class: 'custom-tooltip',
