@@ -18,6 +18,7 @@ import { updateVariantLookup } from '../../services/actions';
 import TreeSelect, { TreeNode } from 'rc-tree-select';
 import 'rc-tree-select/assets/index.css';
 import TreeMenu, { defaultChildren, ItemComponent } from 'react-simple-tree-menu';
+import { TreeSelectCustom } from '../controls/tree-select-custom';
 
 export function VariantLookupForm({ onChange, onSubmit, onReset }) {
   const dispatch = useDispatch();
@@ -99,6 +100,65 @@ export function VariantLookupForm({ onChange, onSubmit, onReset }) {
     },
   ];
 
+  const treeSelect = () => {
+    console.log("phenotypesTree", phenotypesTree);
+    phenotypesTree.map((item) => 
+      {
+        console.log(item.title);
+        console.log(
+          <div>
+            {item.title}
+          </div>
+        );
+        // if (item.children && item.children.length > 0) {
+        //   return (
+        //     <ul>
+        //       {
+        //         item.children.map((item) => { 
+        //           if (item.children && item.children.length > 0) {
+        //             return (
+        //               <ul>
+        //                 {
+        //                   item.children.map((item) => { 
+        //                     if (item.children && item.children.length > 0) {
+        //                       return (
+        //                         <ul>
+        //                           level
+        //                         </ul>
+        //                       )
+        //                     } else {
+        //                       return (
+        //                         <li>
+        //                           {item.title}
+        //                         </li>
+        //                       )
+        //                     }
+        //                   }
+        //                 )}
+        //               </ul>
+        //             )
+        //           } else {
+        //             return (
+        //               <li>
+        //                 {item.title}
+        //               </li>
+        //             )
+        //           }
+        //         }
+        //       )}
+        //     </ul>
+        //   )
+        // } else {
+        //   return (
+        //     <li>
+        //       {item.title}
+        //     </li>
+        //   )
+        // }
+      }
+    )
+  }
+
   return (
     <>
       {/* <select
@@ -117,62 +177,12 @@ export function VariantLookupForm({ onChange, onSubmit, onReset }) {
           <label className="ml-1" for="alphabeticRadio">Alphabetic</label>
       </div>
 
-      <div className="border border-dark">
-        custom
-        <ul>
-          {phenotypesTree.map((item) => 
-            {
-              if (item.children && item.children.length > 0) {
-                return (
-                  <ul>
-                    {
-                      item.children.map((item) => { 
-                        if (item.children && item.children.length > 0) {
-                          return (
-                            <ul>
-                              {
-                                item.children.map((item) => { 
-                                  if (item.children && item.children.length > 0) {
-                                    return (
-                                      <ul>
-                                        level
-                                      </ul>
-                                    )
-                                  } else {
-                                    return (
-                                      <li>
-                                        {item.title}
-                                      </li>
-                                    )
-                                  }
-                                }
-                              )}
-                            </ul>
-                          )
-                        } else {
-                          return (
-                            <li>
-                              {item.title}
-                            </li>
-                          )
-                        }
-                      }
-                    )}
-                  </ul>
-                )
-              } else {
-                return (
-                  <li>
-                    {item.title}
-                  </li>
-                )
-              }
-            }
-          )}
-        </ul>
-      </div>
+      <TreeSelectCustom
+        data={phenotypesTree}
+        value={selectedPhenotypes}
+      />
 
-      <br></br>
+      {/* <br></br>
 
       <div className="border border-dark">
         <TreeMenu data={treeData}>
@@ -183,7 +193,7 @@ export function VariantLookupForm({ onChange, onSubmit, onReset }) {
             </div>
           )}
         </TreeMenu>
-      </div>
+      </div> */}
 
       <br></br>
 
