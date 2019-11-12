@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { PhenotypeCorrelationsForm } from '../forms/phenotype-correlations-form';
 import { Heatmap } from '../plots/heatmap-plot';
-import { Alert, Tabs, Tab } from 'react-bootstrap';
+import { Alert, Tabs, Tab, Button } from 'react-bootstrap';
 import {
   updatePhenotypeCorrelations,
   drawHeatmap
@@ -80,31 +80,59 @@ export function PhenotypeCorrelations() {
     );
   };
 
+  const [openSidebar, setOpenSidebar] = useState(true);
+
   return (
     <>
-      <PhenotypeCorrelationsForm onSubmit={handleSubmit} onChange={handleChange} onReset={handleReset} />
-      {messages &&
-        messages.map(({ type, content }) => (
-          <Alert variant={type} onClose={clearMessages} dismissible>
-            {content}
-          </Alert>
-        ))}
+      <Button
+        variant="link"
+        style={{position: 'absolute', zIndex: 100}}
+        onClick={() => setOpenSidebar(!openSidebar)}
+        aria-controls="phenotype-correlations-collapse-input-panel"
+        aria-expanded={openSidebar}>
+        { openSidebar ? <span>&#171;</span> : <span>&#187;</span>}
+      </Button>
 
-      <Tabs defaultActiveKey="phenotype-correlations">
-        <Tab
-          eventKey="phenotype-correlations"
-          // title="Heatmap"
-          className="p-2 bg-white tab-pane-bordered"
-          style={{minHeight: '50vh'}}>
-          
-          <div
-            className="mw-100 my-4"
-            style={{ display: submitted ? 'block' : 'none' }}>
-            <Heatmap />
+      <div className={openSidebar ? "row mx-3" : "mx-3"}>
+        {openSidebar && (
+          <div className="col-3">
+            <Tabs defaultActiveKey="phenotype-correlations-form">
+              <Tab
+                eventKey="phenotype-correlations-form"
+                // title="Table"
+                className="p-2 bg-white tab-pane-bordered rounded-0"
+                style={{minHeight: '100%'}}>
+                <PhenotypeCorrelationsForm onSubmit={handleSubmit} onChange={handleChange} onReset={handleReset} />
+                {messages &&
+                  messages.map(({ type, content }) => (
+                    <Alert variant={type} onClose={clearMessages} dismissible>
+                      {content}
+                    </Alert>
+                  ))}
+              </Tab>
+             </Tabs>
           </div>
-          {placeholder}
-        </Tab>
-      </Tabs>
+          )}
+        
+      
+        <div className={openSidebar ? "col-9" : "col-12"}>
+          <Tabs defaultActiveKey="phenotype-correlations">
+            <Tab
+              eventKey="phenotype-correlations"
+              // title="Heatmap"
+              className="p-2 bg-white tab-pane-bordered rounded-0"
+              style={{minHeight: '50vh'}}>
+              
+              <div
+                className="mw-100 my-4"
+                style={{ display: submitted ? 'block' : 'none' }}>
+                <Heatmap />
+              </div>
+              {placeholder}
+            </Tab>
+          </Tabs>
+        </div>
+      </div>
     </>
   );
 }
