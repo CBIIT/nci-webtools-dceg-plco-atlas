@@ -202,8 +202,11 @@ function getGenes(filepath, params) {
         FROM gene
         WHERE
             chr = :chr AND
-            tx_start >= :txStart AND
-            tx_end <= :txEnd
+            (
+                (tx_start >= :txStart AND tx_end <= :txEnd) OR
+                (tx_start <= :txStart AND tx_end >= :txEnd)
+            )
+
     `).all(params);
 
     if (columns.includes('exon_starts') || columns.includes('exon_ends')) {
