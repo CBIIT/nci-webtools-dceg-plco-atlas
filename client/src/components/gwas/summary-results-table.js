@@ -19,7 +19,7 @@ export function SummaryResultsTable() {
   const dispatch = useDispatch();
   const summaryTables = useSelector(state => state.summaryTables);
   const {
-    loading,
+    loadingManhattanTable,
     selectedPhenotype,
     selectedChromosome,
     selectedTable,
@@ -102,7 +102,7 @@ export function SummaryResultsTable() {
           <Table
             remote
             keyField="variant_id"
-            loading={loading}
+            loading={loadingManhattanTable}
             data={results}
             columns={columns}
             onTableChange={(type, ev) => handleTableChange(type, ev, index)}
