@@ -202,7 +202,7 @@ export function VariantLookup() {
       
       <div className={openSidebar ? "row mx-3" : "mx-3"}>
         {openSidebar && (
-          <div className="col-3">
+          <div className="col-md-3">
             <Tabs defaultActiveKey="variant-lookup-form">
               <Tab
                 eventKey="variant-lookup-form"
@@ -221,8 +221,10 @@ export function VariantLookup() {
             </Tabs>
           </div>
         )}
+
+        <div class="d-md-none p-2"></div>
         
-        <div className={openSidebar ? "col-9" : "col-12"}>
+        <div className={openSidebar ? "col-md-9" : "col-md-12"}>
           <Tabs defaultActiveKey="variant-lookup">
             <Tab
               eventKey="variant-lookup"
