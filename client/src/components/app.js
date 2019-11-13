@@ -19,19 +19,22 @@ function App() {
     },
     {
       route: '/gwas',
+      action: 'Explore',
       title: 'GWAS',
       image: 'assets/images/gwas.svg',
       navIndex: 0
     },
     {
       route: '/phenotypes',
+      action: 'Browse',
       title: 'Phenotypes',
       image: 'assets/images/phenotypes.svg',
       navIndex: 1
     },
     {
       route: '/downloads',
-      title: 'Downloads',
+      action: 'Download',
+      title: 'Data',
       image: 'assets/images/downloads.svg',
       navIndex: 2
     }
