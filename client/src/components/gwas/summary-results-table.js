@@ -20,7 +20,7 @@ export function SummaryResultsTable() {
   const dispatch = useDispatch();
   const summaryTables = useSelector(state => state.summaryTables);
   const {
-    loading,
+    loadingManhattanTable,
     selectedPhenotype,
     selectedChromosome,
     selectedTable,
