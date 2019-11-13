@@ -69,6 +69,7 @@ export function ManhattanPlot({
       mirrored: true,
       data: plotData.data,
       data2: mirroredPlotData.data,
+      genes: plotData.genes,
       xAxis: {
         title: [
           {
@@ -139,11 +140,26 @@ export function ManhattanPlot({
       mirrored: true,
       data: plotData.data,
       data2: mirroredPlotData.data,
+      genes: plotData.genes,
       allowZoom: true,
-      onZoom: (e) => {
-        let stack = [...plot.current.config.zoomStack];
+      onZoom: async (e) => {
+        let config = plot.current.config;
+        let { xAxis, zoomStack } = config;
+        let stack = [...zoomStack]; // need new reference, since zoomStack updates
+        let zoomRange = Math.abs(xAxis.extent[1] - xAxis.extent[0]);
         setZoomStack(stack);
         onZoom(e);
+
+        // draw genes if zoom is at less than 50 MB
+        if (zoomRange <= 5e7) {
+          let genes = await query('genes', {
+            database: 'gene2.db',
+            chr: selectedChromosome,
+            txStart: xAxis.extent[0],
+            txEnd: xAxis.extent[1],
+          });
+          plot.current.drawGenes(genes.filter(e => e.strand === '+'));
+        }
       },
       xAxis: {
         title: [{ text: title, font: `600 14px ${systemFont}` }],
@@ -226,6 +242,7 @@ export function ManhattanPlot({
 
     return {
       data: plotData.data,
+      genes: plotData.genes,
       xAxis: {
         title: [
           {
@@ -285,11 +302,26 @@ export function ManhattanPlot({
 
     return {
       data: plotData.data,
+      genes: plotData.genes,
       allowZoom: true,
-      onZoom: (e) => {
-        let stack = [...plot.current.config.zoomStack];
+      onZoom: async (e) => {
+        let config = plot.current.config;
+        let { xAxis, zoomStack } = config;
+        let stack = [...zoomStack]; // need new reference, since zoomStack updates
+        let zoomRange = Math.abs(xAxis.extent[1] - xAxis.extent[0]);
         setZoomStack(stack);
         onZoom(e);
+
+        // draw genes if zoom is at less than 50 MB
+        if (zoomRange <= 5e7) {
+          let genes = await query('genes', {
+            database: 'gene2.db',
+            chr: selectedChromosome,
+            txStart: xAxis.extent[0],
+            txEnd: xAxis.extent[1],
+          });
+          plot.current.drawGenes(genes.filter(e => e.strand === '+'));
+        }
       },
       xAxis: {
         title: [{ text: title, font: `600 14px ${systemFont}` }],
@@ -375,7 +407,10 @@ export function ManhattanPlot({
         <a className="link" onClick={e => onAllChromosomeSelected && onAllChromosomeSelected()}>All Chromosomes</a>
 
         {zoomStack.length ? <>
-            <Icon name="arrow-left" className="mx-2 opacity-50" width="10" />
+            <Icon name="arrow-left" className="mx-2 opacit
+
+
+            y-50" width="10" />
             <a className="link" onClick={resetZoom}>
               Chromosome {selectedChromosome}
             </a>
