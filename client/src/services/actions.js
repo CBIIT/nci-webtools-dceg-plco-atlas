@@ -1,6 +1,7 @@
 import { query, rawQuery } from './query';
 
 export const UPDATE_SUMMARY_RESULTS = 'UPDATE_SUMMARY_RESULTS';
+export const UPDATE_SUMMARY_TABLE = 'UPDATE_SUMMARY_TABLE'
 export const UPDATE_VARIANT_LOOKUP = 'UPDATE_VARIANT_LOOKUP';
 export const UPDATE_PHENOTYPE_CORRELATIONS = 'UPDATE_PHENOTYPE_CORRELATIONS';
 export const UPDATE_PHENOTYPES = 'UPDATE_PHENOTYPES';
@@ -18,6 +19,10 @@ export function updateSummaryResults(data) {
   return { type: UPDATE_SUMMARY_RESULTS, data };
 }
 
+export function updateSummaryTable(data, index) {
+  return { type: UPDATE_SUMMARY_TABLE, data, index };
+}
+
 export function updateVariantLookup(data) {
   return { type: UPDATE_VARIANT_LOOKUP, data };
 }
@@ -33,20 +38,21 @@ export function fetchRanges() {
   };
 }
 
-export function updateSummaryResultsTable(params, includeCounts) {
+export function fetchSummaryTable(params, countKey, tableIndex) {
   return async function(dispatch) {
     dispatch(updateSummaryResults({ loadingManhattanTable: true }));
     const response = await query('variants', params);
-    const metadata = await query('metadata', params);
     if (!response.error) {
       let data = {results: response.data};
-      if (response.count) {
+      if (response.count)
         data.resultsCount = response.count;
-      }
-
-      if (includeCounts)
-        data.resultsCount = +metadata[`count_${params.gender}`];
-      dispatch(updateSummaryResults(data));
+      else if (countKey)
+        data.resultsCount = +await query('metadata', {...params, key: countKey});
+      dispatch(updateSummaryTable({
+        ...data,
+        page: params.page,
+        pageSize: params.pageSize
+      }, tableIndex));
     }
     dispatch(updateSummaryResults({ loadingManhattanTable: false }));
     return response;
@@ -90,23 +96,23 @@ export function drawManhattanPlot(plotType, params) {
   };
 }
 
-export function drawQQPlot(phenotype) {
-  return async function(dispatch) {
-    // dispatch(updateSummaryResults({ loading: true }));
-    const imageMapData = await query(
-      `data/qq-plots/${phenotype}.imagemap.json`
-    );
-    if (!imageMapData.error) {
-      dispatch(
-        updateSummaryResults({
-          ...imageMapData, // lambdaGC, sampleSize, areaItems
-          qqplotSrc: `data/qq-plots/${phenotype}.png`,
-          // loading: false
-        })
-      );
-    }
-  };
-}
+// export function drawQQPlot(phenotype) {
+//   return async function(dispatch) {
+//     dispatch(updateSummaryResults({ loading: true }));
+//     const imageMapData = await query(
+//       `data/qq-plots/${phenotype}.imagemap.json`
+//     );
+//     if (!imageMapData.error) {
+//       dispatch(
+//         updateSummaryResults({
+//           ...imageMapData, // lambdaGC, sampleSize, areaItems
+//           qqplotSrc: `data/qq-plots/${phenotype}.png`,
+//           loading: false
+//         })
+//       );
+//     }
+//   };
+// }
 
 export function drawQQPlotPlotly(phenotype) {
   return async function(dispatch) {
@@ -124,7 +130,7 @@ export function drawQQPlotPlotly(phenotype) {
     setQQPlotLoading(true);
     setQQPlotLayout({});
     setQQPlotData([]);
-    
+
     const ppoints = (n, limit, a) => {
       var size = limit ? Math.min(n, limit) : n;
       var points = new Array(size);
@@ -305,7 +311,7 @@ export function drawQQPlotPlotly(phenotype) {
       width: 800,
       height: 800,
       title: {
-        text: '<b>\u03BB</b> = n/a        <b>Sample Size</b> = ' + metadata_count,
+        text: '<b>\u03BB</b> = TBD        <b>Sample Size</b> = ' + metadata_count,
         font: {
           family: 'Arial',
           size: 14,
@@ -314,7 +320,7 @@ export function drawQQPlotPlotly(phenotype) {
       },
       xaxis: {
         automargin: true,
-        rangemode: 'tozero', // only show positive 
+        rangemode: 'tozero', // only show positive
         showgrid: false, // disable grid lines
         fixedrange: true, // disable zoom
         title: {
@@ -335,7 +341,7 @@ export function drawQQPlotPlotly(phenotype) {
       },
       yaxis: {
         automargin: true,
-        rangemode: 'tozero', // only show positive 
+        rangemode: 'tozero', // only show positive
         showgrid: false, // disable grid lines
         fixedrange: true, // disable zoom
         title: {

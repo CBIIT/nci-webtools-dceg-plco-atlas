@@ -76,7 +76,7 @@ export function Home({ links }) {
         className="container align-middle text-center"
         style={{ marginTop: '70px' }}>
         <CardDeck>
-          {links.map(({ exact, route, title, image }, index) => (
+          {links.slice(1,4).map(({ exact, route, action, title, image }, index) => (
             <>
               <Card
                 key={title}
@@ -124,10 +124,11 @@ export function Home({ links }) {
                     }}>
                     <Link
                       className="stretched-link text-light"
+                      style={{textDecoration: 'none'}}
                       exact={exact}
                       key={index}
                       to={route}>
-                      Click
+                      {action}
                     </Link>
                   </Button>
                 </Card.Footer>

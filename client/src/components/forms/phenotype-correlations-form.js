@@ -81,70 +81,72 @@ export function PhenotypeCorrelationsForm({ onChange, onSubmit, onReset }) {
 
   return (
     <>
-      <div className="d-flex mb-2">
-        <select
-          className="form-control flex-shrink-auto"
-          value={selectedListType}
-          onChange={e => setSelectedListType(e.target.value)}>
-          <option value="categorical">Categorical</option>
-          <option value="alphabetic">Alphabetic</option>
-        </select>
+      <select
+        className="form-control"
+        value={selectedListType}
+        onChange={e => setSelectedListType(e.target.value)}>
+        <option value="categorical">Categorical</option>
+        <option value="alphabetic">Alphabetic</option>
+      </select>
 
-        <TreeSelect
-          className="form-control flex-shrink-auto h-100 p-0"
-          dropdownClassName="phenotype-correlations"
-          style={{ width: '100%', maxHeight: 76, overflow: 'auto' }}
-          dropdownStyle={{ maxHeight: 500, overflow: 'auto' }}
-          treeData={
-            selectedListType === 'alphabetic'
-              ? removeFlatDisabled(alphabetizedPhenotypes)
-              : removeTreeDisabled(phenotypesTree)
-          }
-          value={selectedPhenotypes}
-          onChange={handleChange}
-          treeNodeFilterProp="title"
-          dropdownMatchSelectWidth
-          autoClearSearchValue
-          // treeDefaultExpandAll
-          treeLine
-          multiple
-          allowClear
-          labelInValue
-          placeholder="(Select Phenotypes)"
-        />
+      <TreeSelect
+        className="form-control h-100 p-0"
+        dropdownClassName="phenotype-correlations"
+        style={{ width: '100%', maxHeight: 200, overflow: 'auto' }}
+        dropdownStyle={{ maxHeight: 500, overflow: 'auto' }}
+        treeData={
+          selectedListType === 'alphabetic'
+            ? removeFlatDisabled(alphabetizedPhenotypes)
+            : removeTreeDisabled(phenotypesTree)
+        }
+        value={selectedPhenotypes}
+        onChange={handleChange}
+        treeNodeFilterProp="title"
+        dropdownMatchSelectWidth
+        autoClearSearchValue
+        // treeDefaultExpandAll
+        treeLine
+        multiple
+        allowClear
+        labelInValue
+        placeholder="(Select two or more phenotypes)"
+      />
+      
+      <br></br>
 
-        <select
-          className="form-control flex-shrink-auto ml-2"
-          value={selectedGender}
-          onChange={e => setSelectedGender(e.target.value)}>
-          <option value="combined">All</option>
-          <option value="female">Female</option>
-          <option value="male">Male</option>
-        </select>
+      <select
+        className="form-control"
+        value={selectedGender}
+        onChange={e => setSelectedGender(e.target.value)}>
+        <option value="combined">All</option>
+        <option value="female">Female</option>
+        <option value="male">Male</option>
+      </select>
 
-        <Button
-          className="ml-2"
-          style={{ maxHeight: '38px' }}
-          variant="silver"
-          // disabled={!(selectedPhenotypes && selectedPhenotypes.length >= 2)}
-          onClick={e => {
-            e.preventDefault();
-            onSubmit(selectedPhenotypes);
-          }}>
-          Submit
-        </Button>
+      <br></br>
 
-        <Button
-          className="ml-2"
-          style={{ maxHeight: '38px' }}
-          variant="silver"
-          onClick={e => {
-            e.preventDefault();
-            onReset(e);
-          }}>
-          Reset
-        </Button>
-      </div>
+      <Button
+        className=""
+        style={{ maxHeight: '38px' }}
+        variant="silver"
+        // disabled={!(selectedPhenotypes && selectedPhenotypes.length >= 2)}
+        onClick={e => {
+          e.preventDefault();
+          onSubmit(selectedPhenotypes);
+        }}>
+        Submit
+      </Button>
+
+      <Button
+        className="ml-2"
+        style={{ maxHeight: '38px' }}
+        variant="silver"
+        onClick={e => {
+          e.preventDefault();
+          onReset(e);
+        }}>
+        Reset
+      </Button>
       {/* <pre>{JSON.stringify(selectedPhenotypes, null, 2)}</pre> */}
     </>
   );
