@@ -8,7 +8,7 @@ export function Navbar({ links }) {
         {[{ route: '/', title: 'Home', exact: true }]
           .concat(links)
           .sort((a, b) => a.navIndex - b.navIndex)
-          .map(({ route, title, exact }) => (
+          .map(({ route, action, title, exact }) => (
             <>
               <NavLink
                 key={title}
@@ -17,7 +17,7 @@ export function Navbar({ links }) {
                 activeClassName="active-navlinks"
                 exact={exact}
                 to={route}>
-                {title}
+                {action} {title}
               </NavLink>
               <div className="d-md-none w-100"></div>
             </>
