@@ -107,7 +107,7 @@ export class ManhattanPlot {
     const margins = (config.margins = {
       top: 60,
       right: 60,
-      bottom: 60,
+      bottom: 100,
       left: 80,
       ...config.margins
     });
@@ -228,6 +228,52 @@ export class ManhattanPlot {
       this.drawLine(line);
     }
     console.log(config);
+  }
+
+  drawGenes(genes) {
+    let ctx = this.ctx;
+    let canvas = this.canvas;
+    let config = this.config;
+    let { margins } = config;
+    let leadingStrand = genes.filter(g => g.strand === '+');
+    let laggingStrand = genes.filter(g => g.strand === '-');
+
+    let genePlotHeight = 40;
+    let genePlotWidth = canvas.width - margins.left - margins.right;
+
+    let xOffset = margins.left;
+    let yOffset = canvas.height - genePlotHeight;
+
+    ctx.clearRect(xOffset, yOffset, genePlotWidth, genePlotHeight);
+
+    ctx.save();
+    ctx.translate(xOffset, yOffset);
+
+    leadingStrand.forEach(gene => {
+      let start = Math.max(config.xAxis.scale(gene.tx_start), xOffset);
+      let end = Math.min(config.xAxis.scale(gene.tx_end), xOffset + genePlotWidth);
+
+      let width = Math.abs(end - start);
+      let exons = gene.exon_starts.map((e, i) => [
+        gene.exon_starts[i],
+        gene.exon_ends[i],
+      ]);
+
+      ctx.globalAlpha = 0.25;
+      ctx.fillStyle = '#006bb8'
+      ctx.fillRect(start, 8, width, 4);
+
+      exons.forEach(exon => {
+        ctx.fillStyle = '#002a47'
+        let start = Math.max(config.xAxis.scale(exon[0]), xOffset);
+        let end = Math.min(config.xAxis.scale(exon[1]), xOffset + genePlotWidth);
+        let width = Math.abs(end - start);
+        ctx.fillRect(start, 0, width, 20);
+      });
+
+    });
+
+    ctx.restore();
   }
 
   drawLine(line) {
