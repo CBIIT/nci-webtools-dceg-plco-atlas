@@ -307,7 +307,7 @@ export function SummaryResults() {
       
       <div className={openSidebar ? "row mx-3" : "mx-3"}>
         {openSidebar && (
-          <div className="col-3">
+          <div className="col-md-3">
             <Tabs defaultActiveKey="summary-results-form">
               <Tab
                 eventKey="summary-results-form"
@@ -325,8 +325,10 @@ export function SummaryResults() {
             </Tabs>
           </div>
         )}
+
+        <div class="d-md-none p-2"></div>
       
-        <div className={openSidebar ? "col-9" : "col-12"}>
+        <div className={openSidebar ? "col-md-9" : "col-md-12"}>
           <Tabs className="" defaultActiveKey={selectedPlot} onSelect={setSelectedPlot}>
             <Tab
               eventKey="manhattan-plot"

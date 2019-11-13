@@ -111,7 +111,15 @@ export function TreeSelectCustom({onChange, data, value}) {
             return(
                 <>
                     <li className="my-1">
-                        <span className="text-info"><i>(<u>parent</u>)</i></span> 
+                        <input
+                            name="isGoing"
+                            type="checkbox"
+                            checked={true}
+                            // onChange={this.handleInputChange} 
+                        />
+
+                        <span className="text-info ml-1"><i>(<u>parent</u>)</i></span> 
+
                         <button 
                             className="ml-1"
                             style={{all: 'unset', cursor: 'pointer'}}
@@ -135,7 +143,15 @@ export function TreeSelectCustom({onChange, data, value}) {
         } else {
             return(
                 <li>
-                    <span className="text-danger"><i>(<u>leaf</u>)</i></span> 
+                    <input
+                        name="isGoing"
+                        type="checkbox"
+                        // checked={this.state.isGoing}
+                        // onChange={this.handleInputChange} 
+                    />
+
+                    <span className="text-danger ml-1"><i>(<u>leaf</u>)</i></span> 
+
                     <button 
                         className="ml-1"
                         style={{all: 'unset', cursor: 'pointer'}}
