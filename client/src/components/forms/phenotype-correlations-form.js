@@ -109,7 +109,7 @@ export function PhenotypeCorrelationsForm({ onChange, onSubmit, onReset }) {
         multiple
         allowClear
         labelInValue
-        placeholder="(Select Phenotypes)"
+        placeholder="(Select two or more phenotypes)"
       />
       
       <br></br>

@@ -10,7 +10,7 @@ import {
   updateSummaryResults,
   updateVariantLookup,
   lookupVariants,
-  drawQQPlot,
+  // drawQQPlot,
   drawQQPlotPlotly,
   drawManhattanPlot,
   fetchSummaryTable,
@@ -89,7 +89,7 @@ export function SummaryResults() {
     const variantTable = getVariantTable(manhattanPlotType);
 
     setPopupTooltipData(null);
-    dispatch(drawQQPlot(phenotype));
+    // dispatch(drawQQPlot(phenotype));
     dispatch(drawQQPlotPlotly(phenotype));
 
     // update summary results filters
