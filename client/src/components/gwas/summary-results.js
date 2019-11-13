@@ -350,7 +350,7 @@ export function SummaryResults() {
           </div>
         )}
 
-        <div class="d-md-none p-2"></div>
+        <div className="d-md-none p-2"></div>
       
         <div className={openSidebar ? "col-md-9" : "col-md-12"}>
           <Tabs className="" defaultActiveKey={selectedPlot} onSelect={setSelectedPlot}>
