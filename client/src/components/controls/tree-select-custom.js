@@ -152,20 +152,20 @@ export function TreeSelectCustom({onChange, data, value}) {
                             onChange={e => handleSelect(item)} 
                         />
 
-                        <span className="text-info ml-1"><i>(<u>parent</u>)</i></span> 
+                        {/* <span className="text-info ml-1"><i>(<u>parent</u>)</i></span>  */}
 
                         <button 
-                            className="ml-1"
+                            className="ml-2"
                             style={{all: 'unset', cursor: 'pointer'}}
                             onClick={e => handleSelect(item)}>
-                            {item.title} 
+                            <b>{item.title}</b> 
                         </button>
 
                         <button 
                             style={{all: 'unset'}}
-                            className="collapse-button text-secondary ml-1" 
+                            className="collapse-button text-secondary ml-2" 
                             onClick={e => toggleHideChildren(item.value)}>
-                            <i>(<span className={"collapse-button-text-" + item.value}>show</span>)</i>
+                            <span className={"collapse-button-text-" + item.value}>show</span>
                         </button>
 
                         <ul className={"pl-3 children-of-" + item.value} style={{listStyleType: 'none', display: 'none'}}>
@@ -185,10 +185,10 @@ export function TreeSelectCustom({onChange, data, value}) {
                         onChange={e => handleSelect(item)} 
                     />
 
-                    <span className="text-danger ml-1"><i>(<u>leaf</u>)</i></span> 
+                    {/* <span className="text-danger ml-1"><i>(<u>leaf</u>)</i></span>  */}
 
                     <button 
-                        className="ml-1"
+                        className="ml-2"
                         style={{all: 'unset', cursor: 'pointer'}}
                         onClick={e => handleSelect(item)}>
                         {item.title} 
@@ -215,7 +215,7 @@ export function TreeSelectCustom({onChange, data, value}) {
     return(
         <>
             <div 
-                className="border border-dark" 
+                className="border border-secondary" 
                 style={{
                     overflow: 'auto', 
                     whiteSpace: 'nowrap',

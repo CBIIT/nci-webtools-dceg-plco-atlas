@@ -96,23 +96,23 @@ export function drawManhattanPlot(plotType, params) {
   };
 }
 
-export function drawQQPlot(phenotype) {
-  return async function(dispatch) {
-    dispatch(updateSummaryResults({ loading: true }));
-    const imageMapData = await query(
-      `data/qq-plots/${phenotype}.imagemap.json`
-    );
-    if (!imageMapData.error) {
-      dispatch(
-        updateSummaryResults({
-          ...imageMapData, // lambdaGC, sampleSize, areaItems
-          qqplotSrc: `data/qq-plots/${phenotype}.png`,
-          loading: false
-        })
-      );
-    }
-  };
-}
+// export function drawQQPlot(phenotype) {
+//   return async function(dispatch) {
+//     dispatch(updateSummaryResults({ loading: true }));
+//     const imageMapData = await query(
+//       `data/qq-plots/${phenotype}.imagemap.json`
+//     );
+//     if (!imageMapData.error) {
+//       dispatch(
+//         updateSummaryResults({
+//           ...imageMapData, // lambdaGC, sampleSize, areaItems
+//           qqplotSrc: `data/qq-plots/${phenotype}.png`,
+//           loading: false
+//         })
+//       );
+//     }
+//   };
+// }
 
 export function drawQQPlotPlotly(phenotype) {
   return async function(dispatch) {
@@ -321,7 +321,7 @@ export function drawQQPlotPlotly(phenotype) {
       width: 800,
       height: 800,
       title: {
-        text: '<b>\u03BB</b> = n/a        <b>Sample Size</b> = ' + metadata_count,
+        text: '<b>\u03BB</b> = TBD        <b>Sample Size</b> = ' + metadata_count,
         font: {
           family: 'Arial',
           size: 14,
