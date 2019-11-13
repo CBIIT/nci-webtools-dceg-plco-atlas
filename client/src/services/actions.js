@@ -40,7 +40,7 @@ export function fetchRanges() {
 
 export function fetchSummaryTable(params, countKey, tableIndex) {
   return async function(dispatch) {
-    dispatch(updateSummaryResults({ loading: true }));
+    dispatch(updateSummaryResults({ loadingManhattanTable: true }));
     const response = await query('variants', params);
     if (!response.error) {
       let data = {results: response.data};
@@ -54,7 +54,7 @@ export function fetchSummaryTable(params, countKey, tableIndex) {
         pageSize: params.pageSize
       }, tableIndex));
     }
-    dispatch(updateSummaryResults({ loading: false }));
+    dispatch(updateSummaryResults({ loadingManhattanTable: false }));
     return response;
   };
 }
@@ -118,8 +118,8 @@ export function drawQQPlotPlotly(phenotype) {
   return async function(dispatch) {
     console.log("drawQQPlotPlotly", phenotype);
 
-    const setLoading = loading => {
-      dispatch(updateSummaryResults({ loading }));
+    const setQQPlotLoading = loadingQQPlot => {
+      dispatch(updateSummaryResults({ loadingQQPlot }));
     };
     const setQQPlotData = qqplotData => {
       dispatch(updateSummaryResults({ qqplotData }));
@@ -127,7 +127,7 @@ export function drawQQPlotPlotly(phenotype) {
     const setQQPlotLayout = qqplotLayout => {
       dispatch(updateSummaryResults({ qqplotLayout }));
     };
-    setLoading(true);
+    setQQPlotLoading(true);
     setQQPlotLayout({});
     setQQPlotData([]);
 
@@ -144,7 +144,7 @@ export function drawQQPlotPlotly(phenotype) {
           a = n <= 10 ? 3/8 : 1/2;
       }
       i ++;
-      return parseFloat((Math.log10((i - a) / (n + (1 - a) - a)) * - 1.0).toFixed(3));
+      return parseFloat((Math.abs(Math.log10((i - a) / (n + (1 - a) - a)) * - 1.0)).toFixed(3));
     };
 
     const arrSampler= (arrLen, delta) => {
@@ -155,19 +155,18 @@ export function drawQQPlotPlotly(phenotype) {
       return newArr;
     }
 
-    // var topVariantDataCutOff = 10000;
-    const subsetVariantDataMod1 = 1000;
-    const subsetVariantDataMod2 = 10000;
-    const subsetVariantDataMod3 = 100000;
-    const pCutOffValue1 = 0.001;
-    const pCutOffValue2 = 0.01;
-    const pCutOffValue3 = 0.1;
-
     const metadata = await query('metadata', {
       database: phenotype + '.db',
     });
     const metadata_count = parseInt(metadata['count_all']);
     console.log('metadata_count', metadata_count);
+
+    const subsetVariantDataMod1 = 1000; 
+    const subsetVariantDataMod2 = 10000; 
+    const subsetVariantDataMod3 = 100000; 
+    const pCutOffValue1 = 0.001;
+    const pCutOffValue2 = 0.01;
+    const pCutOffValue3 = 0.1;
 
     const topVariantData = await query('variants', {
       database: phenotype + '.db',
@@ -178,18 +177,10 @@ export function drawQQPlotPlotly(phenotype) {
       pMax: pCutOffValue1,
       orderBy: 'p',
       order: 'asc',
-      // nlogpMin: 3,
-      // limit: topVariantDataCutOff,
       raw: true
     });
     const topObservedVariants = topVariantData.data.flat();
     console.log("topObservedVariants", topObservedVariants);
-
-    // let topVariantDataNLogPCutOff = topObservedVariants[topObservedVariants.length - 1];
-    // console.log("topVariantDataNLogPCutOff", topVariantDataNLogPCutOff);
-
-    // const topVariantDataExpectedCutOff = topObservedVariants.length;
-    // console.log("topVariantDataExpectedCutOff", topVariantDataExpectedCutOff);
 
     const subsetVariantData1 = await query('variants', {
       database: phenotype + '.db',
@@ -197,7 +188,6 @@ export function drawQQPlotPlotly(phenotype) {
       columns: ['nlog_p'],
       pMin: pCutOffValue1,
       pMax: pCutOffValue2,
-//      nlogpMax: topVariantDataNLogPCutOff,
       mod: subsetVariantDataMod1,
       orderBy: 'p',
       order: 'asc',
@@ -232,7 +222,7 @@ export function drawQQPlotPlotly(phenotype) {
       raw: true
     });
     let subsetObservedVariants3 = subsetVariantData3.data.flat();
-    console.log("subsetObservedVariants2", subsetObservedVariants3);
+    console.log("subsetObservedVariants3", subsetObservedVariants3);
 
 
 
@@ -254,13 +244,18 @@ export function drawQQPlotPlotly(phenotype) {
       .map(i => ppoint(metadata_count, i));
     console.log("subsetExpectedVariants3", subsetExpectedVariants3);
 
+    let aggregateMarkerColor = '#002a47';
+    let topMarkerColor = '#006bb8';
 
     let qqplotTopData = {
       x: topExpectedVariants,
       y: topObservedVariants,
+      hovertext: Array(topObservedVariants.length).fill("TBD"),
+      hoverinfo: 'text',
       mode: 'markers',
       type: 'scattergl',
       marker: {
+        color: topMarkerColor,
         size: 8,
         opacity: 0.65
       },
@@ -270,9 +265,11 @@ export function drawQQPlotPlotly(phenotype) {
     let qqplotSubsetData1 = {
       x: subsetExpectedVariants1,
       y: subsetObservedVariants1,
+      hoverinfo: 'none',
       mode: 'markers',
       type: 'scattergl',
       marker: {
+        color: aggregateMarkerColor,
         size: 8,
         // opacity: 0.65
       },
@@ -282,9 +279,11 @@ export function drawQQPlotPlotly(phenotype) {
     let qqplotSubsetData2 = {
       x: subsetExpectedVariants2,
       y: subsetObservedVariants2,
+      hoverinfo: 'none',
       mode: 'markers',
       type: 'scattergl',
       marker: {
+        color: aggregateMarkerColor,
         size: 8,
         // opacity: 0.65
       },
@@ -294,9 +293,11 @@ export function drawQQPlotPlotly(phenotype) {
     let qqplotSubsetData3 = {
       x: subsetExpectedVariants3,
       y: subsetObservedVariants3,
+      hoverinfo: 'none',
       mode: 'markers',
       type: 'scattergl',
       marker: {
+        color: aggregateMarkerColor,
         size: 8,
         // opacity: 0.65
       },
@@ -306,6 +307,7 @@ export function drawQQPlotPlotly(phenotype) {
     let qqplotLineData = {
       x: [0.0, qqplotTopData.x[0]],
       y: [0.0, qqplotTopData.x[0]],
+      hoverinfo: 'none',
       mode: 'lines',
       type: 'scattergl',
       line: {
@@ -374,7 +376,7 @@ export function drawQQPlotPlotly(phenotype) {
     setQQPlotLayout(qqplotLayout);
     // setQQPlotData([qqplotData, qqplotSummaryData, qqplotLineData]);
     setQQPlotData([qqplotTopData, qqplotSubsetData1, qqplotSubsetData2, qqplotSubsetData3, qqplotLineData]);
-    setLoading(false);
+    setQQPlotLoading(false);
   };
 }
 

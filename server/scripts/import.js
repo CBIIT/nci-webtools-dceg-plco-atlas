@@ -184,7 +184,8 @@ reader.on('close', () => {
     db.exec(`
         INSERT INTO variant_${tableSuffix} SELECT
             null, "chr", "bp", "snp", "a1", "a2", "n", "p", "nlog_p", "p_r", "or", "or_r", "q", "i"
-        FROM variant_stage;
+        FROM variant_stage
+        ORDER BY p DESC;
     `);
 
     // store aggregate table for variants
