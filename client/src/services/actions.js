@@ -250,7 +250,7 @@ export function drawQQPlotPlotly(phenotype) {
     let qqplotTopData = {
       x: topExpectedVariants,
       y: topObservedVariants,
-      hovertext: ['TBD'],
+      hovertext: Array(topObservedVariants.length).fill("TBD"),
       hoverinfo: 'text',
       mode: 'markers',
       type: 'scattergl',
