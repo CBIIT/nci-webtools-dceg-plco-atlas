@@ -16,11 +16,6 @@ const initialState = {
     manhattanPlotData: {},
     manhattanMirroredData: {},
     manhattanPlotView: '',
-    ranges: [],
-    results: [],
-    resultsCount: 0,
-    page: 1,
-    pageSize: 10,
     nlogpMin: null,
     nlogpMax: null,
     bpMin: null,
@@ -42,6 +37,20 @@ const initialState = {
     qqplotData: [],
     qqplotLayout: {},
   },
+  summaryTables: [
+    {
+      results: [],
+      resultsCount: 0,
+      page: 1,
+      pageSize: 10,
+    },
+    {
+      results: [],
+      resultsCount: 0,
+      page: 1,
+      pageSize: 10,
+    },
+  ],
   variantLookup: {
     selectedListType: 'categorical',
     selectedPhenotype: null,
