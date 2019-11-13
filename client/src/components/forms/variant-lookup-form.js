@@ -17,6 +17,8 @@ import {
 import { updateVariantLookup } from '../../services/actions';
 import TreeSelect, { TreeNode } from 'rc-tree-select';
 import 'rc-tree-select/assets/index.css';
+import TreeMenu, { defaultChildren, ItemComponent } from 'react-simple-tree-menu';
+import { TreeSelectCustom } from '../controls/tree-select-custom';
 
 export function VariantLookupForm({ onChange, onSubmit, onReset }) {
   const dispatch = useDispatch();
@@ -74,18 +76,94 @@ export function VariantLookupForm({ onChange, onSubmit, onReset }) {
     a.title.localeCompare(b.title)
   );
 
+  // const treeDataTest = [
+  //   {
+  //     key: 'first-level-node-1',
+  //     label: 'Node 1 at the first level',
+  //     nodes: [
+  //       {
+  //         key: 'second-level-node-1',
+  //         label: 'Node 1 at the second level',
+  //         nodes: [
+  //           {
+  //             key: 'third-level-node-1',
+  //             label: 'Last node of the branch',
+  //             nodes: [] // you can remove the nodes property or leave it as an empty array
+  //           },
+  //         ],
+  //       },
+  //     ],
+  //   },
+  //   {
+  //     key: 'first-level-node-2',
+  //     label: 'Node 2 at the first level',
+  //   },
+  // ];
+
+  const handleChangeCustom = (items) => {
+    setSelectedPhenotypes(items);
+    // console.log("selected", items);
+    // conatselectedPhenotypes
+
+  }
+
   return (
-    <div className="d-flex mb-2">
-      <select
-        className="form-control flex-shrink-auto"
+    <>
+      {/* <select
+        className="form-control"
         value={selectedListType}
         onChange={e => setSelectedListType(e.target.value)}>
         <option value="categorical">Categorical</option>
         <option value="alphabetic">Alphabetic</option>
-      </select>
+      </select> */}
+
+      <div className="sortByToggle">
+          <b>Sort by</b>
+          <input className="ml-3"type="radio" id="categoricalRadio" name="sortByRadios" value="categorical" checked />
+          <label className="ml-1" for="categoricalRadio">Categorical</label>
+          <input className="ml-2" type="radio" id="alphabeticRadio" name="sortByRadios" value="alphabetic" />
+          <label className="ml-1" for="alphabeticRadio">Alphabetic</label>
+      </div>
+
+      <TreeSelectCustom
+        data={phenotypesTree}
+        value={selectedPhenotypes}
+        onChange={handleChangeCustom}
+      />
+
+      {/* <br></br>
+
+      <div className="border border-dark">
+          SHOW LIST OF SELECTED PHENOTYPES HERE
+          <ul>
+            {
+              selectedPhenotypes.map((item) => 
+                (
+                <li>
+                  {item.title}
+                </li>)
+              )
+            }
+          </ul>
+      </div> */}
+
+      {/* <br></br>
+
+      <div className="border border-dark">
+        <TreeMenu data={treeDataTest}>
+          {({ search, items, resetOpenNodes }) => (
+            <div>
+              {defaultChildren({search, items})}
+              <button onClick={resetOpenNodes}>Reset</button>
+            </div>
+          )}
+        </TreeMenu>
+      </div> */}
+
+      <br></br>
 
       <TreeSelect
-        className="form-control flex-shrink-auto h-100 p-0"
+        className="form-control h-100 p-0"
         dropdownClassName="variant-lookup"
         style={{ width: '100%', maxHeight: 76, overflow: 'auto' }}
         dropdownStyle={{ maxHeight: 500, overflow: 'auto' }}
@@ -107,9 +185,11 @@ export function VariantLookupForm({ onChange, onSubmit, onReset }) {
         placeholder="(Select Phenotypes)"
       />
 
+      <br></br>
+
       <FormControl
-        className="form-control flex-shrink-auto ml-2"
-        style={{ width: '470px' }}
+        className="form-control"
+        // style={{ width: '470px' }}
         placeholder="(Variant rsid or coordinate)"
         aria-label="Variant (required)"
         value={selectedVariant}
@@ -121,8 +201,10 @@ export function VariantLookupForm({ onChange, onSubmit, onReset }) {
         required
       />
 
+      <br></br>
+
       <select
-        className="form-control flex-shrink-auto ml-2"
+        className="form-control"
         value={selectedGender}
         onChange={e => setSelectedGender(e.target.value)}>
         <option value="combined">All</option>
@@ -130,8 +212,10 @@ export function VariantLookupForm({ onChange, onSubmit, onReset }) {
         <option value="male">Male</option>
       </select>
 
+      <br></br>
+
       <Button
-        className="ml-2 flex-shrink-auto"
+        className=""
         style={{ maxHeight: '38px' }}
         variant="silver"
         // disabled={!canSubmit}
@@ -143,7 +227,7 @@ export function VariantLookupForm({ onChange, onSubmit, onReset }) {
       </Button>
 
       <Button
-        className="ml-2 flex-shrink-auto"
+        className="ml-2"
         style={{ maxHeight: '38px' }}
         variant="silver"
         onClick={e => {
@@ -152,6 +236,6 @@ export function VariantLookupForm({ onChange, onSubmit, onReset }) {
         }}>
         Reset
       </Button>
-    </div>
+    </>
   );
 }
