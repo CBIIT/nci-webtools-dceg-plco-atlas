@@ -244,13 +244,18 @@ export function drawQQPlotPlotly(phenotype) {
       .map(i => ppoint(metadata_count, i));
     console.log("subsetExpectedVariants3", subsetExpectedVariants3);
 
+    let aggregateMarkerColor = '#002a47';
+    let topMarkerColor = '#006bb8';
 
     let qqplotTopData = {
       x: topExpectedVariants,
       y: topObservedVariants,
+      hovertext: ['TBD'],
+      hoverinfo: 'text',
       mode: 'markers',
       type: 'scattergl',
       marker: {
+        color: topMarkerColor,
         size: 8,
         opacity: 0.65
       },
@@ -260,9 +265,11 @@ export function drawQQPlotPlotly(phenotype) {
     let qqplotSubsetData1 = {
       x: subsetExpectedVariants1,
       y: subsetObservedVariants1,
+      hoverinfo: 'none',
       mode: 'markers',
       type: 'scattergl',
       marker: {
+        color: aggregateMarkerColor,
         size: 8,
         // opacity: 0.65
       },
@@ -272,9 +279,11 @@ export function drawQQPlotPlotly(phenotype) {
     let qqplotSubsetData2 = {
       x: subsetExpectedVariants2,
       y: subsetObservedVariants2,
+      hoverinfo: 'none',
       mode: 'markers',
       type: 'scattergl',
       marker: {
+        color: aggregateMarkerColor,
         size: 8,
         // opacity: 0.65
       },
@@ -284,9 +293,11 @@ export function drawQQPlotPlotly(phenotype) {
     let qqplotSubsetData3 = {
       x: subsetExpectedVariants3,
       y: subsetObservedVariants3,
+      hoverinfo: 'none',
       mode: 'markers',
       type: 'scattergl',
       marker: {
+        color: aggregateMarkerColor,
         size: 8,
         // opacity: 0.65
       },
@@ -296,6 +307,7 @@ export function drawQQPlotPlotly(phenotype) {
     let qqplotLineData = {
       x: [0.0, qqplotTopData.x[0]],
       y: [0.0, qqplotTopData.x[0]],
+      hoverinfo: 'none',
       mode: 'lines',
       type: 'scattergl',
       line: {
