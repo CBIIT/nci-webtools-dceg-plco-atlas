@@ -78,7 +78,7 @@ export function SummaryResultsForm({ onChange, onSubmit, onReset }) {
         allowClear
         labelInValue
         multiple
-        placeholder="(Select Phenotype)"
+        placeholder="(Select one phenotype)"
       />
 
       <br></br>

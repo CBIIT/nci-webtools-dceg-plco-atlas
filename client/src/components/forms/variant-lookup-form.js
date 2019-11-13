@@ -182,7 +182,7 @@ export function VariantLookupForm({ onChange, onSubmit, onReset }) {
         multiple
         allowClear
         labelInValue
-        placeholder="(Select Phenotypes)"
+        placeholder="(Select one or more phenotypes)"
       />
 
       <br></br>
