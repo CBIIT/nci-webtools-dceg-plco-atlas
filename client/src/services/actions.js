@@ -1,6 +1,7 @@
 import { query, rawQuery } from './query';
 
 export const UPDATE_SUMMARY_RESULTS = 'UPDATE_SUMMARY_RESULTS';
+export const UPDATE_SUMMARY_TABLE = 'UPDATE_SUMMARY_TABLE'
 export const UPDATE_VARIANT_LOOKUP = 'UPDATE_VARIANT_LOOKUP';
 export const UPDATE_PHENOTYPE_CORRELATIONS = 'UPDATE_PHENOTYPE_CORRELATIONS';
 export const UPDATE_PHENOTYPES = 'UPDATE_PHENOTYPES';
@@ -18,6 +19,10 @@ export function updateSummaryResults(data) {
   return { type: UPDATE_SUMMARY_RESULTS, data };
 }
 
+export function updateSummaryTable(data, index) {
+  return { type: UPDATE_SUMMARY_TABLE, data, index };
+}
+
 export function updateVariantLookup(data) {
   return { type: UPDATE_VARIANT_LOOKUP, data };
 }
@@ -33,20 +38,21 @@ export function fetchRanges() {
   };
 }
 
-export function updateSummaryResultsTable(params, includeCounts) {
+export function fetchSummaryTable(params, countKey, tableIndex) {
   return async function(dispatch) {
     dispatch(updateSummaryResults({ loading: true }));
     const response = await query('variants', params);
-    const metadata = await query('metadata', params);
     if (!response.error) {
       let data = {results: response.data};
-      if (response.count) {
+      if (response.count)
         data.resultsCount = response.count;
-      }
-
-      if (includeCounts)
-        data.resultsCount = +metadata[`count_${params.gender}`];
-      dispatch(updateSummaryResults(data));
+      else if (countKey)
+        data.resultsCount = +await query('metadata', {...params, key: countKey});
+      dispatch(updateSummaryTable({
+        ...data,
+        page: params.page,
+        pageSize: params.pageSize
+      }, tableIndex));
     }
     dispatch(updateSummaryResults({ loading: false }));
     return response;
@@ -124,7 +130,7 @@ export function drawQQPlotPlotly(phenotype) {
     setLoading(true);
     setQQPlotLayout({});
     setQQPlotData([]);
-    
+
     const ppoints = (n, limit, a) => {
       var size = limit ? Math.min(n, limit) : n;
       var points = new Array(size);
@@ -150,9 +156,9 @@ export function drawQQPlotPlotly(phenotype) {
     }
 
     // var topVariantDataCutOff = 10000;
-    const subsetVariantDataMod1 = 1000; 
-    const subsetVariantDataMod2 = 10000; 
-    const subsetVariantDataMod3 = 100000; 
+    const subsetVariantDataMod1 = 1000;
+    const subsetVariantDataMod2 = 10000;
+    const subsetVariantDataMod3 = 100000;
     const pCutOffValue1 = 0.001;
     const pCutOffValue2 = 0.01;
     const pCutOffValue3 = 0.1;
@@ -324,7 +330,7 @@ export function drawQQPlotPlotly(phenotype) {
       },
       xaxis: {
         automargin: true,
-        rangemode: 'tozero', // only show positive 
+        rangemode: 'tozero', // only show positive
         showgrid: false, // disable grid lines
         fixedrange: true, // disable zoom
         title: {
@@ -345,7 +351,7 @@ export function drawQQPlotPlotly(phenotype) {
       },
       yaxis: {
         automargin: true,
-        rangemode: 'tozero', // only show positive 
+        rangemode: 'tozero', // only show positive
         showgrid: false, // disable grid lines
         fixedrange: true, // disable zoom
         title: {
