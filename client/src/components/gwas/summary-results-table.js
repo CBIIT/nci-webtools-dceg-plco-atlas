@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { Tabs, Tab } from "react-bootstrap";
 import {
   updateSummaryResults,
   updateSummaryTable,
@@ -91,36 +92,66 @@ export function SummaryResultsTable() {
         bpMax
       }, null, index)
     );
-
   };
 
+  let showTabs = selectedManhattanPlotType === 'stacked';
+  let tabs = showTabs ? [
+    {title: 'Female', key: 'female', index: 0},
+    {title: 'Male', key: 'male', index: 1},
+  ] : [];
+
   return (
-    <div>
-      {summaryTables.map(({ results, resultsCount, page, pageSize }, index) => {
-        if (index > 0 && selectedManhattanPlotType != 'stacked') return null;
-        return (
-          <Table
-            remote
-            keyField="variant_id"
-            loading={loading}
-            data={results}
-            columns={columns}
-            onTableChange={(type, ev) => handleTableChange(type, ev, index)}
-            overlay={loadingOverlay}
-            pagination={paginationFactory({
-              page,
-              sizePerPage: pageSize,
-              totalSize: resultsCount,
-              showTotal: results.length > 0,
-              sizePerPageList: [10, 25, 50, 100],
-              paginationTotalRenderer: paginationText,
-              sizePerPageRenderer: paginationSizeSelector,
-              pageButtonRenderer: paginationButton
-            })}
-            defaultSorted={[{ dataField: "p", order: "asc" }]}
-          />
-        );
-      })}
+    <div className="mt-3">
+      {showTabs &&
+        <Tabs defaultActiveKey="female">
+          {tabs.map(({title, key, index}) => (
+            <Tab eventKey={key} title={title}>
+              <Table
+                remote
+                keyField="variant_id"
+                loading={loading}
+                data={summaryTables[index].results}
+                columns={columns}
+                onTableChange={(type, ev) => handleTableChange(type, ev, index)}
+                overlay={loadingOverlay}
+                pagination={paginationFactory({
+                  page: summaryTables[index].page,
+                  sizePerPage: summaryTables[index].pageSize,
+                  totalSize: summaryTables[index].resultsCount,
+                  showTotal: summaryTables[index].results.length > 0,
+                  sizePerPageList: [10, 25, 50, 100],
+                  paginationTotalRenderer: paginationText,
+                  sizePerPageRenderer: paginationSizeSelector,
+                  pageButtonRenderer: paginationButton
+                })}
+                defaultSorted={[{ dataField: "p", order: "asc" }]}
+              />
+            </Tab>
+          ))}
+        </Tabs>
+      }
+
+      {!showTabs &&
+        <Table
+          remote
+          keyField="variant_id"
+          loading={loading}
+          data={summaryTables[0].results}
+          columns={columns}
+          onTableChange={(type, ev) => handleTableChange(type, ev, 0)}
+          overlay={loadingOverlay}
+          pagination={paginationFactory({
+            page: summaryTables[0].page,
+            sizePerPage: summaryTables[0].pageSize,
+            totalSize: summaryTables[0].resultsCount,
+            showTotal: summaryTables[0].results.length > 0,
+            sizePerPageList: [10, 25, 50, 100],
+            paginationTotalRenderer: paginationText,
+            sizePerPageRenderer: paginationSizeSelector,
+            pageButtonRenderer: paginationButton
+          })}
+          defaultSorted={[{ dataField: "p", order: "asc" }]}
+        />}
     </div>
   );
 }
