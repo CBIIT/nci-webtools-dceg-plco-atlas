@@ -48,9 +48,9 @@ export function SummaryResultsForm({ onChange, onSubmit, onReset }) {
   );
 
   return (
-    <div className="d-flex mb-2">
+    <>
       <select
-        className="form-control flex-shrink-auto"
+        className="form-control"
         value={selectedListType}
         onChange={e => setSelectedListType(e.target.value)}>
         <option value="categorical">Categorical</option>
@@ -58,7 +58,7 @@ export function SummaryResultsForm({ onChange, onSubmit, onReset }) {
       </select>
 
       <TreeSelect
-        className="form-control flex-shrink-auto h-100 p-0 mr-2"
+        className="form-control h-100 p-0"
         dropdownClassName="summary-results"
         style={{ width: '100%' }}
         dropdownStyle={{ maxHeight: 500, overflow: 'auto' }}
@@ -78,11 +78,13 @@ export function SummaryResultsForm({ onChange, onSubmit, onReset }) {
         allowClear
         labelInValue
         multiple
-        placeholder="(Select Phenotype)"
+        placeholder="(Select one phenotype)"
       />
 
+      <br></br>
+
       <select
-        className="form-control flex-shrink-auto mr-2"
+        className="form-control"
         value={selectedManhattanPlotType}
         onChange={e => setSelectedManhattanPlotType(e.target.value)}
         aria-label="Select the type of data you wish to plot">
@@ -92,8 +94,10 @@ export function SummaryResultsForm({ onChange, onSubmit, onReset }) {
         <option value="male">Male</option>
       </select>
 
+      <br></br>
+
       <Button
-        className="mr-2"
+        className=""
         variant="silver"
         onClick={e => {
           e.preventDefault();
@@ -103,7 +107,7 @@ export function SummaryResultsForm({ onChange, onSubmit, onReset }) {
       </Button>
 
       <Button
-        className=""
+        className="ml-2"
         variant="silver"
         onClick={e => {
           e.preventDefault();
@@ -111,6 +115,6 @@ export function SummaryResultsForm({ onChange, onSubmit, onReset }) {
         }}>
         Reset
       </Button>
-    </div>
+    </>
   );
 }

@@ -1,5 +1,6 @@
 import {
   UPDATE_SUMMARY_RESULTS,
+  UPDATE_SUMMARY_TABLE,
   UPDATE_VARIANT_LOOKUP,
   UPDATE_PHENOTYPE_CORRELATIONS,
   UPDATE_PHENOTYPES,
@@ -17,6 +18,13 @@ export const rootReducer = (state, action) => {
           ...action.data
         }
       };
+      case UPDATE_SUMMARY_TABLE:
+        let summaryTables = state.summaryTables;
+        summaryTables[action.index] = action.data;
+        return {
+          ...state,
+          summaryTables
+        };
     case UPDATE_VARIANT_LOOKUP:
       return {
         ...state,

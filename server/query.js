@@ -190,14 +190,12 @@ function getGenes(filepath, params) {
         'tx_end',
         'exon_starts',
         'exon_ends',
-        'protein_id',
-        'align_id',
     ];
     const columns = params.columns
         ? params.columns.split(',').filter(e => validColumns.includes(e))
-        : ['gene_id', 'tx_start', 'tx_end', 'exon_starts', 'exon_ends'];
+        : ['gene_id', 'name', 'strand', 'tx_start', 'tx_end', 'exon_starts', 'exon_ends'];
 
-    return db.prepare(`
+    let records = db.prepare(`
         SELECT ${columns.map(c => `"${c}"`).join(',')}
         FROM gene
         WHERE
@@ -205,6 +203,17 @@ function getGenes(filepath, params) {
             tx_start >= :txStart AND
             tx_end <= :txEnd
     `).all(params);
+
+    if (columns.includes('exon_starts') || columns.includes('exon_ends')) {
+        const split = e => (e || '').split(',').filter(e => e !== '').map(e => +e);
+        records = records.map(e => {
+            e.exon_starts = split(e.exon_starts);
+            e.exon_ends = split(e.exon_ends);
+            return e;
+        });
+    }
+
+    return records;
 }
 
 module.exports = {getSummary, getVariants, getMetadata, getGenes};
