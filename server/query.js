@@ -1,3 +1,4 @@
+const fs = require('fs');
 const path = require('path');
 const Database = require('better-sqlite3');
 const { dbpath } = require('./config.json');
@@ -63,6 +64,8 @@ function getSummary(filepath, params) {
             orderBy = 'p';
         sql += ` ORDER BY "${orderBy}" ${order} `;
     }
+
+    console.log('SQL', sql);
 
     const stmt = new Database(filepath, {readonly: true}).prepare(sql);
 
@@ -144,7 +147,7 @@ function getVariants(filepath, params) {
     // adds limit and offset, if provided
     if (params.limit) sql += ' LIMIT :limit ';
     if (params.offset) sql += ' OFFSET :offset ';
-
+    console.log('SQL', sql);
     // query database
     const db = new Database(filepath, {readonly: true});
     const stmt = db.prepare(sql);
@@ -180,6 +183,8 @@ function getMetadata(filepath, {key}) {
 }
 
 function getGenes(filepath, params) {
+    if (!fs.existsSync(filepath)) return [];
+
     const db = new Database(filepath, {readonly: true});
     const validColumns = [
         'gene_id',
@@ -204,7 +209,6 @@ function getGenes(filepath, params) {
                 (tx_start >= :txStart AND tx_end <= :txEnd) OR
                 (tx_start <= :txStart AND tx_end >= :txEnd)
             )
-
     `).all(params);
 
     if (columns.includes('exon_starts') || columns.includes('exon_ends')) {
