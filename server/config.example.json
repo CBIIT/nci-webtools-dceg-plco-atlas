@@ -1,5 +1,6 @@
 {
     "port": 9000,
     "dbpath": "server/data/",
-    "logpath": "server/logs/"
+    "logpath": "server/logs/",
+    "loglevel": "info"
 }
