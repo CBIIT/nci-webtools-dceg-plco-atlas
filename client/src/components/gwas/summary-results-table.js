@@ -109,7 +109,7 @@ export function SummaryResultsTable() {
               <Table
                 remote
                 keyField="variant_id"
-                loading={loading}
+                loading={loadingManhattanTable}
                 data={summaryTables[index].results}
                 columns={columns}
                 onTableChange={(type, ev) => handleTableChange(type, ev, index)}
@@ -135,7 +135,7 @@ export function SummaryResultsTable() {
         <Table
           remote
           keyField="variant_id"
-          loading={loading}
+          loading={loadingManhattanTable}
           data={summaryTables[0].results}
           columns={columns}
           onTableChange={(type, ev) => handleTableChange(type, ev, 0)}
