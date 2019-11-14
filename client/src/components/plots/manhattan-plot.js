@@ -315,7 +315,7 @@ export function ManhattanPlot({
         // draw genes if zoom is at less than 50 MB
         if (zoomRange <= 5e7) {
           let genes = await query('genes', {
-            database: 'gene2.db',
+            database: 'gene.db',
             chr: selectedChromosome,
             txStart: xAxis.extent[0],
             txEnd: xAxis.extent[1],
