@@ -320,6 +320,8 @@ export function drawQQPlotPlotly(phenotype) {
 
     let qqplotLayout = {
       dragmode: 'pan',
+      clickmode: 'event',
+      hovermode: 'closest',
       width: 800,
       height: 800,
       title: {

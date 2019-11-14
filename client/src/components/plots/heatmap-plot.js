@@ -1,8 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { query } from '../../services/query';
 import { updatePhenotypeCorrelations } from '../../services/actions';
-import { Spinner, Button, ButtonGroup, ToggleButton } from 'react-bootstrap';
+import { Spinner } from 'react-bootstrap';
 import Plot from 'react-plotly.js';
 // import ReactCursorPosition from 'react-cursor-position';
 
@@ -96,14 +95,14 @@ export function Heatmap() {
                 // onPositionChanged: newPos => setPos(newPos)
               }}> */}
             {/* {popupTooltipData && ( */}
-              <div style={popupTooltipStyle} className="popup-tooltip shadow" id="heatmap-tooltip">
-                <a href="/">{popupTooltipData ? popupTooltipData.phenotypeX : ''}</a>
-                <br />
-                <a href="/">{popupTooltipData ? popupTooltipData.phenotypeY : ''}</a>
-                <br />
-                <b>Correlation:</b> {popupTooltipData ? popupTooltipData.r2 : ''}
-                <br />
-              </div>
+            <div style={popupTooltipStyle} className="popup-tooltip shadow" id="heatmap-tooltip">
+              <a href="/">{popupTooltipData ? popupTooltipData.phenotypeX : ''}</a>
+              <br />
+              <a href="/">{popupTooltipData ? popupTooltipData.phenotypeY : ''}</a>
+              <br />
+              <b>Correlation:</b> {popupTooltipData ? popupTooltipData.r2 : ''}
+              <br />
+            </div>
             {/* )} */}
             <div
               style={{
