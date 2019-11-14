@@ -6,11 +6,12 @@
 
 const winston = require('winston');
 const { createLogger, format, transports } = winston;
-const { logpath } = require('./config.json');
+const { logpath, loglevel } = require('./config.json');
 require('winston-daily-rotate-file');
 // winston.emitErrs = true;
 
 var logger = new createLogger({
+  level: loglevel || 'info',
   format: format.combine(
     format.label({ label: '[PLCO-SERVER]' }),
     format.timestamp({
