@@ -87,7 +87,7 @@ export function TreeSelectCustom({onChange, data, value}) {
     };
 
     const checkParents = () => {
-       console.log(data);
+    //    console.log(data);
        // 1 uncheck all sub parents and children when touched parent is unchecked
        // 2 check parent when all sibling leafs are also checked
        // 3 uncheck parent when if any of children are unchecked
@@ -102,7 +102,7 @@ export function TreeSelectCustom({onChange, data, value}) {
             // remove all leafs if parent is clicked and all leafs were already selected
             values = removeAllVals(values, newValues);
             if (document.getElementsByClassName(parentCheckboxClassName)[0]) {
-                console.log(document.getElementsByClassName(parentCheckboxClassName));
+                // console.log(document.getElementsByClassName(parentCheckboxClassName));
                 document.getElementsByClassName(parentCheckboxClassName)[0].checked = false;
             }
             for (var i = 0; i < newValues.length; i++) {
@@ -116,7 +116,7 @@ export function TreeSelectCustom({onChange, data, value}) {
                     // only add if value did not exist before
                     values.push(newValues[i]);
                     if (document.getElementsByClassName(parentCheckboxClassName)[0]) {
-                        console.log(document.getElementsByClassName(parentCheckboxClassName));
+                        // console.log(document.getElementsByClassName(parentCheckboxClassName));
                         document.getElementsByClassName(parentCheckboxClassName)[0].checked = true;
                     }
                     if (document.getElementsByClassName("leaf-checkbox-" + newValues[i].value)[0]) {
