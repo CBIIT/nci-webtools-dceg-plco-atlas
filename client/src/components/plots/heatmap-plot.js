@@ -3,7 +3,10 @@ import { useDispatch, useSelector } from 'react-redux';
 import { updatePhenotypeCorrelations } from '../../services/actions';
 import { Spinner } from 'react-bootstrap';
 import Plot from 'react-plotly.js';
-// import ReactCursorPosition from 'react-cursor-position';
+import {
+  viewportToLocalCoordinates,
+  createElement as h 
+} from '../../services/plots/utils';
 
 export function Heatmap() {
   const dispatch = useDispatch();
@@ -11,56 +14,101 @@ export function Heatmap() {
   const {
     heatmapData,
     heatmapLayout,
+    // tooltipData,
     loading,
-    popupTooltipData,
-    popupTooltipStyle
   } = useSelector(state => state.phenotypeCorrelations);
 
-  const setPopupTooltipData = popupTooltipData => {
-    dispatch(updatePhenotypeCorrelations({ popupTooltipData }));
-  };
-
-  const setPopupTooltipStyle = popupTooltipStyle => {
-    dispatch(updatePhenotypeCorrelations({ popupTooltipStyle }));
+  const createTooltip = () => {
+    const tooltip = document.createElement('div');
+    tooltip.classList.add('heatmap-tooltip');
+    tooltip.style.display = 'none';
+    tooltip.style.position = 'absolute';
+    return tooltip;
   }
 
-  const popupMarkerClose = e => {
-    setPopupTooltipStyle({
-      top: 0, // computed based on child and parent's height
-      left: 0, // computed based on child and parent's width
-      display: 'none'
-    });
-    setPopupTooltipData(null);
-  };
+  const showTooltip = (ev, tooltip, html) => {
+    let { x, y } = viewportToLocalCoordinates(
+      ev.clientX,
+      ev.clientY,
+      ev.target
+    );
 
-  const isPopupDisplayed = () => {
-    var ele = document.getElementById("heatmap-tooltip");
-    return ele.offsetWidth > 0 && ele.offsetHeight > 0;
+    tooltip.innerHTML = '';
+    tooltip.style.display = 'inline-block';
+    if (html instanceof Element) {
+      console.log("ELEMENT");
+      tooltip.insertAdjacentElement('beforeend', html);
+    } else  {
+      console.log("HTML");
+      tooltip.insertAdjacentHTML('beforeend', html);
+    }
+
+    const tooltipLeft = (x + 130) + 'px';
+    const tooltipTop = (y + 120) + 'px';
+
+    tooltip.style.left = tooltipLeft;
+    tooltip.style.top = tooltipTop;
+  }
+
+  const hideTooltip = () => {
+    // if tooltip already exists, destroy
+    const elem = document.getElementsByClassName("heatmap-tooltip");
+    if (elem && elem.length > 0) {
+      elem[0].remove();
+    }
+    // tooltip.style.display = 'none';
   }
 
   const popupMarkerClick = e => {
-    if (isPopupDisplayed()) {
-      popupMarkerClose();
-    } else {
-      if (e && e.points && e.points[0]) {
-        setPopupTooltipData({
-          phenotypeX: e.points[0].x,
-          phenotypeY: e.points[0].y,
-          r2: e.points[0].text
-        });
-        // console.log(e.event);
-        let x = e.event.offsetX;
-        let y = e.event.offsetY;
-        console.log(x, y);
-        // console.log(pos.position);
-        setPopupTooltipStyle({
-          left: x + 65, // computed based on child and parent's width
-          top: y, // computed based on child and parent's height
-          display: 'block'
-        });
-      } else {
-        popupMarkerClose();
+    console.log("E", e);
+    const ev = e.event;
+    console.log("EVENT", ev);
+    const points = e.points;
+    console.log("POINTS", points)
+    if (e  && ev && points && points[0]) {
+      hideTooltip();
+      const tooltip = createTooltip();
+      // add tooltip to heatmap container
+      const heatmapContainer = document.getElementsByClassName("heatmap")[0];
+      const containerStyle = getComputedStyle(heatmapContainer);
+      if (containerStyle.position === 'static') {
+        heatmapContainer.style.position = 'relative';
       }
+      heatmapContainer.appendChild(tooltip);
+      // show tooltip
+      const tooltipX = points[0].x;
+      const tooltipY = points[0].y;
+      const tooltipCorrelation = points[0].text;
+      const html =
+        h('div', { className: '' }, [
+          h('div', null, [
+            h(
+              'a', 
+              {
+                className: '',
+                href: 'javascript:void(0)',
+                onclick: () => console.log(tooltipX)
+              }, 
+              `${tooltipX}`
+            )
+          ]),
+          h('div', null, [
+            h(
+              'a', 
+              {
+                className: '',
+                href: 'javascript:void(0)',
+                onclick: () => console.log(tooltipY)
+              }, 
+              `${tooltipY}`
+            )
+          ]),
+          h('div', null, [
+            h('b', null, 'Correlation: '), 
+            `${tooltipCorrelation}`
+          ])
+        ]);
+      showTooltip(ev, tooltip, html);
     }
   };
 
@@ -86,43 +134,47 @@ export function Heatmap() {
             display: heatmapData.length > 0 && !loading ? 'block' : 'none'
           }}>
           <div
-            className="heatmap"
             style={{ display: loading ? 'none' : 'block' }}>
-            {/* <ReactCursorPosition
-              {...{
-                className: 'heatmap-mouse-window',
-                onPositionChanged: newPos => console.log(newPos.position)
-                // onPositionChanged: newPos => setPos(newPos)
-              }}> */}
             {/* {popupTooltipData && ( */}
-            <div style={popupTooltipStyle} className="popup-tooltip shadow" id="heatmap-tooltip">
+            {/* <div style={popupTooltipStyle} className="popup-tooltip shadow" id="heatmap-tooltip">
               <a href="/">{popupTooltipData ? popupTooltipData.phenotypeX : ''}</a>
               <br />
               <a href="/">{popupTooltipData ? popupTooltipData.phenotypeY : ''}</a>
               <br />
               <b>Correlation:</b> {popupTooltipData ? popupTooltipData.r2 : ''}
               <br />
-            </div>
+            </div> */}
             {/* )} */}
             <div
               style={{
                 display: 'flex',
                 justifyContent: 'center',
-                alignItems: 'center'
+                alignItems: 'center',
+                textAlign: 'left'
               }}>
               <Plot
+                className="heatmap"
+                style={{position: 'relative'}}
                 data={heatmapData}
                 layout={heatmapLayout}
                 config={config}
                 onClick={e => popupMarkerClick(e)}
                 onRelayout={relayout => {
-                  if (isPopupDisplayed()) {
-                    popupMarkerClose();
-                  }
+                  console.log("RELAYOUT");
+                  hideTooltip();
                 }}
               />
+              {/* { tooltipData && (
+                <div className="heatmap-tooltip" style={{display: 'none', position: 'absolute'}}>
+                  <a href="/">{tooltipData ? tooltipData.phenotypeX : ''}</a>
+                  <br />
+                  <a href="/">{tooltipData ? tooltipData.phenotypeY : ''}</a>
+                  <br />
+                  <b>Correlation:</b> {tooltipData ? tooltipData.r2 : ''}
+                  <br />
+                </div>
+              )} */}
             </div>
-            {/* </ReactCursorPosition> */}
           </div>
         </div>
         <div className="col-md-12">
@@ -135,9 +187,6 @@ export function Heatmap() {
           </div>
         </div>
       </div>
-      {/* <script>
-        window.ReactCursorPosition = window.ReactCursorPosition.default;
-      </script> */}
     </>
   );
 }
