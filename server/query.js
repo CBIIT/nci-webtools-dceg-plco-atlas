@@ -2,6 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const Database = require('better-sqlite3');
 const { dbpath } = require('./config.json');
+const logger = require("./logger");
 const ranges = require(path.resolve(dbpath, 'chromosome_ranges.json'));
 
 function getRawResults(stmt, params) {
@@ -65,7 +66,7 @@ function getSummary(filepath, params) {
         sql += ` ORDER BY "${orderBy}" ${order} `;
     }
 
-    console.log('SQL', sql);
+    logger.debug(`SQL: ${sql}`);
 
     const stmt = new Database(filepath, {readonly: true}).prepare(sql);
 
@@ -75,7 +76,22 @@ function getSummary(filepath, params) {
 }
 
 /**
- * Params ar
+ * Params are as follows:
+ *   - id (variant id)
+ *   - snp
+ *   - chr
+ *   - bpMin
+ *   - bpMax
+ *   - nlogpMin
+ *   - nlogpMax
+ *   - pMin
+ *   - pMax
+ *   - mod
+ *   - order
+ *   - orderBy
+ *   - limit
+ *   - offset
+ *   - count
  * @param {*} filepath
  * @param {*} params
  */
@@ -147,7 +163,7 @@ function getVariants(filepath, params) {
     // adds limit and offset, if provided
     if (params.limit) sql += ' LIMIT :limit ';
     if (params.offset) sql += ' OFFSET :offset ';
-    console.log('SQL', sql);
+    logger.debug(`SQL: ${sql}`);
     // query database
     const db = new Database(filepath, {readonly: true});
     const stmt = db.prepare(sql);

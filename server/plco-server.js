@@ -9,7 +9,7 @@ const { getSummary, getVariants, getMetadata, getGenes } = require("./query");
 const logger = require("./logger");
 
 if (cluster.isMaster) {
-  logger.info(`Started master process: ${process.pid}`);
+  logger.info(`[${process.pid}] Started master process`);
   const numProcesses = require("os").cpus().length * 2; // two processes per cpu
   for (let i = 0; i < numProcesses; i++) cluster.fork();
   cluster.on("exit", worker => {
@@ -18,7 +18,7 @@ if (cluster.isMaster) {
   return;
 }
 
-logger.info(`Started worker process: ${process.pid}`);
+logger.info(`[${process.pid}] Started worker process`);
 
 const app = server({ ignoreTrailingSlash: true });
 app.register(compress);
@@ -29,18 +29,32 @@ app.register(static, {
   decorateReply: false
 });
 app.register(cors);
+
+
+// execute code before handling request
 app.addHook("onRequest", (req, res, done) => {
+  res.header("Timestamp", new Date().getTime());
+  done();
+});
+
+// execute code before sending response
+app.addHook("onSend", (req, res, payload, done) => {
+
   let pathname = req.raw.url.replace(/\?.*$/, "");
-  if (/summary|variants|metadata|genes/.test(pathname)) {
+  let timestamp = res.getHeader("Timestamp");
+
+  if (timestamp && /summary|variants|metadata|genes/.test(pathname)) {
+    let duration = new Date().getTime() - timestamp;
+    logger.info(`[${process.pid}] ${pathname}: ${duration/1000}s`, req.query);
+
     res.header("Cache-Control", "max-age=300");
-    logger.info(pathname, req.query);
+    res.header("Response-Time", duration);
   }
+
   done();
 });
 
 app.get("/ping", (req, res) => res.send(true));
-
-app
 
 // retrieves all variant groups for all chroms. at the lowest granularity (in MBases)
 app.get("/summary", async ({ query }, res) => {
@@ -65,7 +79,7 @@ app.get("/genes", async ({ query }, res) => {
 app
   .listen(port, "0.0.0.0")
   .then(addr =>
-    console.log(`[${process.pid}] Application is running on: ${addr}`)
+    logger.info(`[${process.pid}] Application is running on: ${addr}`)
   )
   .catch(error => {
     logger.error(error);
