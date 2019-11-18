@@ -299,8 +299,6 @@ export function SummaryResults() {
   };
 
   const handleVariantLookup = ({ snp }) => {
-    console.log("SNP", snp);
-    console.log("selectedPhenotype", selectedPhenotype);
     dispatch(
       updateVariantLookup({
         selectedPhenotypes: [selectedPhenotype],
@@ -308,7 +306,6 @@ export function SummaryResults() {
         selectedGender: selectedManhattanPlotType === 'male' || selectedManhattanPlotType === 'female' ? selectedManhattanPlotType : 'combined'
       })
     );
-    console.log("[selectedPhenotype]", [selectedPhenotype]);
     dispatch(lookupVariants([selectedPhenotype], snp));
   };
   
