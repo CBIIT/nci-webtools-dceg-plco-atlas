@@ -559,15 +559,12 @@ export function lookupVariants(phenotypes, variant) {
       })
     );
 
-    console.log("phenotypes", phenotypes);
-
     var tableList = [];
     for (let i = 0; i < phenotypes.length; i++) {
       const { data } = await query('variants', {
         database: phenotypes[i].value + '.db',
         snp: variant,
       });
-      console.log("data", data);
       if (!data || data.length === 0) {
         tableList.push({
           phenotype: phenotypes[i].title ? phenotypes[i].title : phenotypes[i].label,
@@ -581,7 +578,6 @@ export function lookupVariants(phenotypes, variant) {
         });
       } else {
         for (let j = 0; j < data.length; j++) {
-          console.log(data[j]);
           data[j]['phenotype'] = phenotypes[i].title ? phenotypes[i].title : phenotypes[i].label;
           tableList.push(data[j]);
         }
