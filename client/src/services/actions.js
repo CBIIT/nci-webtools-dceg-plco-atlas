@@ -559,6 +559,8 @@ export function lookupVariants(phenotypes, variant) {
       })
     );
 
+    console.log("phenotypes", phenotypes);
+
     var tableList = [];
     for (let i = 0; i < phenotypes.length; i++) {
       const { data } = await query('variants', {

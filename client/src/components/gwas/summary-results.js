@@ -33,7 +33,6 @@ export function SummaryResults() {
     selectedManhattanPlotType,
     loadingManhattanPlot,
     showSnpResults,
-
   } = useSelector(state => state.summaryResults);
 
   const setPopupTooltipData = popupTooltipData => {
@@ -312,6 +311,7 @@ export function SummaryResults() {
     console.log("[selectedPhenotype]", [selectedPhenotype]);
     dispatch(lookupVariants([selectedPhenotype], snp));
   };
+  
   const placeholder = (
     <div style={{ display: submitted ? 'none' : 'block' }}>
       <p className="h4 text-center my-5">
