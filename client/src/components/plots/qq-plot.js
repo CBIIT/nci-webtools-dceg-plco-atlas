@@ -25,6 +25,7 @@ export function QQPlot({ onVariantLookup }) {
     popupTooltipData,
     qqplotData,
     qqplotLayout,
+    selectedPhenotypes
   } = useSelector(state => state.summaryResults);
 
   // temporary set states
@@ -169,7 +170,32 @@ export function QQPlot({ onVariantLookup }) {
     // tooltip.style.display = 'none';
   }
 
-  const popupMarkerClick = e => {
+  async function getHTML(tooltipData) {
+    console.log("selectedPhenotypes", selectedPhenotypes);
+    return(
+        h('div', { className: '' }, [
+          h('div', null, [
+            h('b', null, 'position: '),
+            `${tooltipData.chr}:${tooltipData.bp}`
+          ]),
+          h('div', null, [h('b', null, 'p-value: '), `${tooltipData.p}`]),
+          h('div', null, [h('b', null, 'snp: '), `${tooltipData.snp}`]),
+          h('div', null, [
+            h(
+              'a',
+              {
+                className: 'font-weight-bold',
+                href: '#/gwas/lookup',
+                onclick: () => onVariantLookup && onVariantLookup(tooltipData)
+              },
+              'Go to Variant Lookup'
+            )
+          ])
+        ])
+    );
+  }
+
+  async function popupMarkerClick(e) {
     console.log("E", e);
     const ev = e.event;
     console.log("EVENT", ev);
@@ -189,26 +215,7 @@ export function QQPlot({ onVariantLookup }) {
       qqPlotContainer.appendChild(tooltip);
       // show tooltip
       const tooltipData = points[0].text;
-      const html =
-        h('div', { className: '' }, [
-          h('div', null, [
-            h('b', null, 'position: '),
-            `${tooltipData.chr}:${tooltipData.bp}`
-          ]),
-          h('div', null, [h('b', null, 'p-value: '), `${tooltipData.p}`]),
-          h('div', null, [h('b', null, 'snp: '), `${tooltipData.snp}`]),
-          h('div', null, [
-            h(
-              'a',
-              {
-                className: 'font-weight-bold',
-                href: '#/gwas/lookup',
-                onclick: () => onVariantLookup && onVariantLookup(tooltipData)
-              },
-              'Go to Variant Lookup'
-            )
-          ])
-        ]);
+      const html = await getHTML(tooltipData);
       showTooltip(ev, tooltip, html);
     }
   };
