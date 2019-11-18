@@ -31,7 +31,8 @@ const initialState = {
     loadingQQPlot: false,
     drawManhattanPlot: null,
     updateResultsTable: null,
-    popupTooltipData: null,
+    // popupTooltipData: null,
+    // tooltipData: null,
     snp: '',
     snpResults: null,
     showSnpResults: null,
@@ -73,8 +74,7 @@ const initialState = {
     loading: false,
     submitted: null,
     messages: [],
-    popupTooltipStyle: {display: 'none'},
-    popupTooltipData: null
+    // tooltipData: null
   }
 };
 

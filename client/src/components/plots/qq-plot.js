@@ -1,8 +1,13 @@
 import React, { useState } from 'react';
+// import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { updateSummaryResults } from '../../services/actions';
 import { Link } from 'react-router-dom';
 import { Spinner } from 'react-bootstrap';
+import {
+  viewportToLocalCoordinates,
+  createElement as h 
+} from '../../services/plots/utils';
 import ReactCursorPosition from 'react-cursor-position';
 
 import Plot from 'react-plotly.js';
@@ -19,7 +24,8 @@ export function QQPlot({ onVariantLookup }) {
     sampleSize, 
     popupTooltipData,
     qqplotData,
-    qqplotLayout
+    qqplotLayout,
+    selectedPhenotypes
   } = useSelector(state => state.summaryResults);
 
   // temporary set states
@@ -35,18 +41,20 @@ export function QQPlot({ onVariantLookup }) {
       y: 0
     }
   });
+
   const [hoverTooltipStyle, setHoverTooltipStyle] = useState({
     top: 0, // computed based on child and parent's height
     left: 0, // computed based on child and parent's width
     display: 'none'
   });
+
   const [popupTooltipStyle, setPopupTooltipStyle] = useState({
     top: 0, // computed based on child and parent's height
     left: 0, // computed based on child and parent's width
     display: 'none'
   });
 
-  const popupMarkerClick = e => {
+  const popupMarkerClickOld = e => {
     // make sure action occurs on imagemap coord only
     if (e.target && e.target.coords) {
       var variant = e.target.alt.split(',');
@@ -121,6 +129,143 @@ export function QQPlot({ onVariantLookup }) {
     // responsive: true
   };
 
+  const createTooltip = () => {
+    const tooltip = document.createElement('div');
+    tooltip.classList.add('qq-plot-tooltip');
+    tooltip.style.display = 'none';
+    tooltip.style.position = 'absolute';
+    return tooltip;
+  }
+
+  const showTooltip = (ev, tooltip, html) => {
+    let { x, y } = viewportToLocalCoordinates(
+      ev.clientX,
+      ev.clientY,
+      ev.target
+    );
+
+    tooltip.innerHTML = '';
+    tooltip.style.display = 'inline-block';
+    if (html instanceof Element) {
+      console.log("ELEMENT");
+      tooltip.insertAdjacentElement('beforeend', html);
+    } else  {
+      console.log("HTML");
+      tooltip.insertAdjacentHTML('beforeend', html);
+    }
+
+    const tooltipLeft = (x + 85) + 'px';
+    const tooltipTop = (y + 105) + 'px';
+
+    tooltip.style.left = tooltipLeft;
+    tooltip.style.top = tooltipTop;
+  }
+
+  const hideTooltip = () => {
+    // if tooltip already exists, destroy
+    const elem = document.getElementsByClassName("qq-plot-tooltip");
+    if (elem && elem.length > 0) {
+      elem[0].remove();
+    }
+    // tooltip.style.display = 'none';
+  }
+
+  async function getHTML(tooltipData) {
+    console.log("selectedPhenotypes", selectedPhenotypes);
+    return(
+        h('div', { className: '' }, [
+          h('div', null, [
+            h('b', null, 'position: '),
+            `${tooltipData.chr}:${tooltipData.bp}`
+          ]),
+          h('div', null, [h('b', null, 'p-value: '), `${tooltipData.p}`]),
+          h('div', null, [h('b', null, 'snp: '), `${tooltipData.snp}`]),
+          h('div', null, [
+            h(
+              'a',
+              {
+                className: 'font-weight-bold',
+                href: '#/gwas/lookup',
+                onclick: () => onVariantLookup && onVariantLookup(tooltipData)
+              },
+              'Go to Variant Lookup'
+            )
+          ])
+        ])
+    );
+  }
+
+  async function popupMarkerClick(e) {
+    console.log("E", e);
+    const ev = e.event;
+    console.log("EVENT", ev);
+    const points = e.points;
+    console.log("POINTS", points)
+    if (e  && ev && points && points[0]) {
+      hideTooltip();
+      const tooltip = createTooltip();
+      // add tooltip to qq-plot container
+      const qqPlotContainer = document.getElementsByClassName("qq-plot")[0];
+      // console.log(qqPlotContainer.style);
+      const containerStyle = getComputedStyle(qqPlotContainer);
+      // console.log(containerStyle);
+      if (containerStyle.position === 'static') {
+        qqPlotContainer.style.position = 'relative';
+      }
+      qqPlotContainer.appendChild(tooltip);
+      // show tooltip
+      const tooltipData = points[0].text;
+      const html = await getHTML(tooltipData);
+      showTooltip(ev, tooltip, html);
+    }
+  };
+
+  // const showTooltip = (ev, data) => {
+  //   setTooltipData(data);
+  //   let { x, y } = viewportToLocalCoordinates(
+  //     ev.clientX,
+  //     ev.clientY,
+  //     ev.target
+  //   );
+  //   const elem = document.getElementsByClassName("qq-plot-tooltip");
+  //   if (elem && elem.length > 0) {
+  //     const tooltip = elem[0];
+  //     const tooltipLeft = (x + 260) + 'px';
+  //     const tooltipTop = (y + 105) + 'px';
+  //     tooltip.style.display = 'inline-block';
+  //     tooltip.style.left = tooltipLeft;
+  //     tooltip.style.top = tooltipTop;
+  //   }
+  // }
+
+  // const hideTooltip = () => {
+  //   // if tooltip already exists, hide
+  //   const elem = document.getElementsByClassName("qq-plot-tooltip");
+  //   if (elem && elem.length > 0) {
+  //     setTooltipData(null);
+  //   }
+  // }
+
+  // const popupMarkerClick = e => {
+  //   console.log("E", e);
+  //   const ev = e.event;
+  //   console.log("EVENT", ev);
+  //   const points = e.points;
+  //   console.log("POINTS", points)
+  //   if (e  && ev && points && points[0]) {
+  //     hideTooltip();
+  //     // add tooltip to qq-plot container
+  //     const qqPlotContainer = document.getElementsByClassName("qq-plot")[0];
+  //     const containerStyle = getComputedStyle(qqPlotContainer);
+  //     if (containerStyle.position === 'static') {
+  //       qqPlotContainer.style.position = 'relative';
+  //     }
+  //     // show tooltip
+  //     const data = points[0].text;
+  //     showTooltip(ev, data);
+  //   }
+  // };
+
   return (
     <>
       <div className="row mt-3">
@@ -129,19 +274,20 @@ export function QQPlot({ onVariantLookup }) {
             style={{
               display: 'flex',
               justifyContent: 'center',
-              alignItems: 'center'
+              alignItems: 'center',
+              textAlign: 'left',
             }}>
             <Plot
-              style={{ display: !loadingQQPlot ? 'block' : 'none' }}
+              className="qq-plot"
+              style={{ display: !loadingQQPlot ? 'block' : 'none', position: 'relative' }}
               data={qqplotData}
               layout={qqplotLayout}
               config={config}
-              // onClick={e => popupMarkerClick(e)}
-              // onRelayout={relayout => {
-              //   if (isPopupDisplayed()) {
-              //     popupMarkerClose();
-              //   }
-              // }}
+              onClick={e => popupMarkerClick(e)}
+              onRelayout={relayout => {
+                console.log("RELAYOUT");
+                hideTooltip();
+              }}
             />
           </div>
           <div
@@ -175,14 +321,6 @@ export function QQPlot({ onVariantLookup }) {
               }}>
               {popupTooltipData && (
                 <div style={popupTooltipStyle} className="popup-tooltip shadow">
-                  {/* <button
-                    type="button"
-                    className="close popup-tooltip-close"
-                    aria-label="Close"
-                    onClick={popupMarkerClose}>
-                    <span aria-hidden="true">&times;</span>
-                  </button> */}
-                  {/* <b>id:</b> {popupTooltipData['point_#']} */}
                   <b>position:</b> {popupTooltipData.position}
                   <br />
                   <b>p-value:</b> {popupTooltipData['p-value']}
@@ -191,7 +329,7 @@ export function QQPlot({ onVariantLookup }) {
                   <br />
                   <Link
                     to="/gwas/lookup"
-                    onClick={_ => onVariantLookup(popupTooltipData)}>
+                    onClick={_ => {console.log("popupTooltipData", popupTooltipData);onVariantLookup(popupTooltipData)}}>
                     <b>Go to Variant Lookup</b>
                   </Link>
                 </div>
@@ -209,7 +347,7 @@ export function QQPlot({ onVariantLookup }) {
                   draggable={false}
                   alt="QQ Plot"
                   useMap="#image-map"
-                  onClick={e => popupMarkerClick(e)}
+                  onClick={e => popupMarkerClickOld(e)}
                 />
               )}
 
@@ -222,7 +360,7 @@ export function QQPlot({ onVariantLookup }) {
                       coords={area.coords}
                       alt={area.alt}
                       // href="javascript:void(0);"
-                      onClick={e => popupMarkerClick(e)}
+                      onClick={e => popupMarkerClickOld(e)}
                       onMouseEnter={e => hoverMarkerEnter(e)}
                       onMouseLeave={e => hoverMarkerLeave(e)}
                     />
@@ -231,13 +369,6 @@ export function QQPlot({ onVariantLookup }) {
               </map>
             </ReactCursorPosition>
           </div>
-          {/* <div
-            className="text-center"
-            style={{ display: loading ? 'block' : 'none' }}>
-            <Spinner animation="border" variant="primary" role="status">
-              <span className="sr-only">Loading...</span>
-            </Spinner>
-          </div> */}
         </div>
       </div>
 
