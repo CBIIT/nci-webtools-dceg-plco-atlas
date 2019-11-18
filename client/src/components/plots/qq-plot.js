@@ -38,20 +38,20 @@ export function QQPlot({ onVariantLookup }) {
     return tooltip;
   }
 
-  const showTooltip = (ev, tooltip, html) => {
+  const showTooltip = (ev, tooltip, html, containerWidth) => {
     let { x, y } = viewportToLocalCoordinates(
       ev.clientX,
       ev.clientY,
       ev.target
     );
     
-    console.log("ev target", ev.target);
+    // console.log("ev target", ev.target);
 
     // determine where to place tooltip relative to cursor
     const targetWidth = ev.target.width.baseVal.value;
-    const targetHeight = ev.target.height.baseVal.value;
-    console.log("targetWidth", targetWidth);
-    console.log("targetHeight", targetHeight);
+    // const targetHeight = ev.target.height.baseVal.value;
+    // console.log("targetWidth", targetWidth);
+    // console.log("targetHeight", targetHeight);
 
     tooltip.innerHTML = '';
     tooltip.style.display = 'inline-block';
@@ -61,22 +61,20 @@ export function QQPlot({ onVariantLookup }) {
     } else  {
       tooltip.insertAdjacentHTML('beforeend', html);
     }
-
     const tooltipWidth = tooltip.clientWidth;
-    const tooltipHeight = tooltip.clientHeight;
-    console.log("tooltipWidth", tooltipWidth);
-    console.log("tooltipHeight", tooltipHeight);
-
+    // const tooltipHeight = tooltip.clientHeight;
+    // console.log("tooltipWidth", tooltipWidth);
+    // console.log("tooltipHeight", tooltipHeight);
     let tooltipLeft = (x + 85);
     let tooltipTop = (y + 105);
-
-    if (tooltipLeft + tooltipWidth > 800) {
-      tooltipLeft = (targetWidth - (800 - tooltipLeft));
+    if (containerWidth.includes('px')) {
+      containerWidth = containerWidth.replace(/px/, "");
     }
-
-    console.log("tooltipLeft", tooltipLeft);
-    console.log("tooltipTop", tooltipTop);
-
+    if (tooltipLeft + tooltipWidth > containerWidth) {
+      tooltipLeft = (targetWidth - (containerWidth - tooltipLeft));
+    }
+    // console.log("tooltipLeft", tooltipLeft);
+    // console.log("tooltipTop", tooltipTop);
     tooltip.style.left = tooltipLeft + 'px';
     tooltip.style.top = tooltipTop + 'px';
   }
@@ -134,9 +132,10 @@ export function QQPlot({ onVariantLookup }) {
       qqPlotContainer.appendChild(tooltip);
       // show tooltip
       const tooltipData = points[0].text;
+      let containerWidth = containerStyle.width;
       if (tooltipData) {
         const html = getHTML(tooltipData);
-        showTooltip(ev, tooltip, html);
+        showTooltip(ev, tooltip, html, containerWidth);
       }
     }
   };
