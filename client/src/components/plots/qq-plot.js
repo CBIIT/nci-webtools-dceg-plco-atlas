@@ -12,8 +12,7 @@ export function QQPlot({ onVariantLookup }) {
   const { 
     loadingQQPlot,
     qqplotData,
-    qqplotLayout,
-    selectedPhenotype,
+    qqplotLayout
   } = useSelector(state => state.summaryResults);
 
   const [selectedVariant, setSelectedVariant] = useState(null);
@@ -39,12 +38,20 @@ export function QQPlot({ onVariantLookup }) {
     return tooltip;
   }
 
-  const showTooltip = (ev, tooltip, html) => {
+  const showTooltip = (ev, tooltip, html, containerWidth) => {
     let { x, y } = viewportToLocalCoordinates(
       ev.clientX,
       ev.clientY,
       ev.target
     );
+    
+    // console.log("ev target", ev.target);
+
+    // determine where to place tooltip relative to cursor
+    const targetWidth = ev.target.width.baseVal.value;
+    // const targetHeight = ev.target.height.baseVal.value;
+    // console.log("targetWidth", targetWidth);
+    // console.log("targetHeight", targetHeight);
 
     tooltip.innerHTML = '';
     tooltip.style.display = 'inline-block';
@@ -54,12 +61,22 @@ export function QQPlot({ onVariantLookup }) {
     } else  {
       tooltip.insertAdjacentHTML('beforeend', html);
     }
-
-    const tooltipLeft = (x + 85) + 'px';
-    const tooltipTop = (y + 105) + 'px';
-
-    tooltip.style.left = tooltipLeft;
-    tooltip.style.top = tooltipTop;
+    const tooltipWidth = tooltip.clientWidth;
+    // const tooltipHeight = tooltip.clientHeight;
+    // console.log("tooltipWidth", tooltipWidth);
+    // console.log("tooltipHeight", tooltipHeight);
+    let tooltipLeft = (x + 85);
+    let tooltipTop = (y + 105);
+    if (containerWidth.includes('px')) {
+      containerWidth = containerWidth.replace(/px/, "");
+    }
+    if (tooltipLeft + tooltipWidth > containerWidth) {
+      tooltipLeft = (targetWidth - (containerWidth - tooltipLeft));
+    }
+    // console.log("tooltipLeft", tooltipLeft);
+    // console.log("tooltipTop", tooltipTop);
+    tooltip.style.left = tooltipLeft + 'px';
+    tooltip.style.top = tooltipTop + 'px';
   }
 
   const hideTooltip = () => {
@@ -77,10 +94,10 @@ export function QQPlot({ onVariantLookup }) {
         h('div', { className: '' }, [
           h('div', null, [
             h('b', null, 'position: '),
-            `${tooltipData.chr}:${tooltipData.bp}`
+            `${tooltipData.chr ? tooltipData.chr : ''}:${tooltipData.bp ? tooltipData.bp : ''}`
           ]),
-          h('div', null, [h('b', null, 'p-value: '), `${tooltipData.p}`]),
-          h('div', null, [h('b', null, 'snp: '), `${tooltipData.snp}`]),
+          h('div', null, [h('b', null, 'p-value: '), `${tooltipData.p ? tooltipData.p : ''}`]),
+          h('div', null, [h('b', null, 'snp: '), `${tooltipData.snp ? tooltipData.snp : ''}`]),
           h('div', null, [
             h(
               'a',
@@ -115,8 +132,11 @@ export function QQPlot({ onVariantLookup }) {
       qqPlotContainer.appendChild(tooltip);
       // show tooltip
       const tooltipData = points[0].text;
-      const html = getHTML(tooltipData);
-      showTooltip(ev, tooltip, html);
+      let containerWidth = containerStyle.width;
+      if (tooltipData) {
+        const html = getHTML(tooltipData);
+        showTooltip(ev, tooltip, html, containerWidth);
+      }
     }
   };
 
