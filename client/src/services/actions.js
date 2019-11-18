@@ -159,7 +159,7 @@ export function drawQQPlotPlotly(phenotype) {
       database: phenotype + '.db',
     });
     const metadata_count = parseInt(metadata['count_all']);
-    console.log('metadata_count', metadata_count);
+    // console.log('metadata_count', metadata_count);
 
     const subsetVariantDataMod1 = 1000; 
     const subsetVariantDataMod2 = 10000; 
@@ -171,16 +171,26 @@ export function drawQQPlotPlotly(phenotype) {
     const topVariantData = await query('variants', {
       database: phenotype + '.db',
       // table: "",
-      // columns: ['chr', 'bp', 'snp', 'p', 'nlog_p'],
-      columns: ['nlog_p'],
+      columns: ['chr', 'bp', 'snp', 'p', 'nlog_p'],
+      // columns: ['nlog_p'],
 //      pMin: 0.001,
       pMax: pCutOffValue1,
       orderBy: 'p',
       order: 'asc',
       raw: true
     });
-    const topObservedVariants = topVariantData.data.flat();
-    console.log("topObservedVariants", topObservedVariants);
+    // const topObservedVariants = topVariantData.data.flat();
+    const topObservedVariants = topVariantData.data.map(row => row[4]);
+    const topObservedVariantsText = [];
+    topVariantData.data.map(row => 
+      topObservedVariantsText.push({
+        chr: row[0],
+        bp: row[1],
+        snp: row[2],
+        p: row[3]
+    }))
+    // console.log("topObservedVariants", topObservedVariants);
+    // console.log("topObservedVariantsText", topObservedVariantsText);
 
     const subsetVariantData1 = await query('variants', {
       database: phenotype + '.db',
@@ -194,7 +204,7 @@ export function drawQQPlotPlotly(phenotype) {
       raw: true
     });
     let subsetObservedVariants1 = subsetVariantData1.data.flat();
-    console.log("subsetObservedVariants1", subsetObservedVariants1);
+    // console.log("subsetObservedVariants1", subsetObservedVariants1);
 
     const subsetVariantData2 = await query('variants', {
       database: phenotype + '.db',
@@ -208,7 +218,7 @@ export function drawQQPlotPlotly(phenotype) {
       raw: true
     });
     let subsetObservedVariants2 = subsetVariantData2.data.flat();
-    console.log("subsetObservedVariants2", subsetObservedVariants2);
+    // console.log("subsetObservedVariants2", subsetObservedVariants2);
 
     const subsetVariantData3 = await query('variants', {
       database: phenotype + '.db',
@@ -222,27 +232,27 @@ export function drawQQPlotPlotly(phenotype) {
       raw: true
     });
     let subsetObservedVariants3 = subsetVariantData3.data.flat();
-    console.log("subsetObservedVariants3", subsetObservedVariants3);
+    // console.log("subsetObservedVariants3", subsetObservedVariants3);
 
 
 
     let topExpectedVariants = ppoints(metadata_count, topObservedVariants.length);
-    console.log("topExpectedVariants", topExpectedVariants);
+    // console.log("topExpectedVariants", topExpectedVariants);
 
     let subsetExpectedVariants1 = arrSampler(metadata_count, subsetVariantDataMod1)
       .map(i => i + topObservedVariants.length)
       .map(i => ppoint(metadata_count, i));
-    console.log("subsetExpectedVariants1", subsetExpectedVariants1);
+    // console.log("subsetExpectedVariants1", subsetExpectedVariants1);
 
     let subsetExpectedVariants2 = arrSampler(metadata_count, subsetVariantDataMod2)
       .map(i => i + topObservedVariants.length + subsetObservedVariants1.length * 1000)
       .map(i => ppoint(metadata_count, i));
-    console.log("subsetExpectedVariants2", subsetExpectedVariants2);
+    // console.log("subsetExpectedVariants2", subsetExpectedVariants2);
 
     let subsetExpectedVariants3 = arrSampler(metadata_count, subsetVariantDataMod3)
       .map(i => i + topObservedVariants.length + subsetObservedVariants1.length * 1000 + subsetObservedVariants2.length * 10000)
       .map(i => ppoint(metadata_count, i));
-    console.log("subsetExpectedVariants3", subsetExpectedVariants3);
+    // console.log("subsetExpectedVariants3", subsetExpectedVariants3);
 
     let aggregateMarkerColor = '#002a47';
     let topMarkerColor = '#006bb8';
@@ -250,7 +260,12 @@ export function drawQQPlotPlotly(phenotype) {
     let qqplotTopData = {
       x: topExpectedVariants,
       y: topObservedVariants,
-      hovertext: Array(topObservedVariants.length).fill("TBD"),
+      text: topObservedVariantsText,
+      hovertemplate: 
+        '<b>position:</b> %{text.chr}:%{text.bp}<br>' +
+        '<b>p-value:</b> %{text.p}<br>' +
+        '<b>snp:</b> %{text.snp}' +
+        '<extra></extra>',
       hoverinfo: 'text',
       mode: 'markers',
       type: 'scattergl',
@@ -320,6 +335,8 @@ export function drawQQPlotPlotly(phenotype) {
 
     let qqplotLayout = {
       dragmode: 'pan',
+      clickmode: 'event',
+      hovermode: 'closest',
       width: 800,
       height: 800,
       title: {
@@ -484,11 +501,11 @@ export function drawHeatmap(phenotypes) {
         ['1.0', 'rgb(255,0,0)']
       ],
       showscale: false,
-      hoverinfo: 'x+y',
+      hoverinfo: 'text',
       hovertemplate:
         '%{x}<br>' +
         '%{y}<br>' +
-        '<b>Correlation</b>: %{text}' +
+        '<b>Correlation:</b> %{text}' +
         '<extra></extra>'
     };
     let heatmapLayout = {
@@ -541,6 +558,8 @@ export function lookupVariants(phenotypes, variant) {
         submitted: new Date()
       })
     );
+
+    console.log("phenotypes", phenotypes);
 
     var tableList = [];
     for (let i = 0; i < phenotypes.length; i++) {

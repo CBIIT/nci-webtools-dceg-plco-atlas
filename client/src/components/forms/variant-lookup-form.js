@@ -119,10 +119,10 @@ export function VariantLookupForm({ onChange, onSubmit, onReset }) {
 
       <div className="sortByToggle">
           <b>Sort by</b>
-          <input className="ml-3"type="radio" id="categoricalRadio" name="sortByRadios" value="categorical" checked />
-          <label className="ml-1" for="categoricalRadio">Categorical</label>
+          <input className="ml-3" type="radio" id="categoricalRadio" name="sortByRadios" value="categorical" defaultChecked />
+          <label className="ml-1" htmlFor="categoricalRadio">Categorical</label>
           <input className="ml-2" type="radio" id="alphabeticRadio" name="sortByRadios" value="alphabetic" />
-          <label className="ml-1" for="alphabeticRadio">Alphabetic</label>
+          <label className="ml-1" htmlFor="alphabeticRadio">Alphabetic</label>
       </div>
 
       <TreeSelectCustom

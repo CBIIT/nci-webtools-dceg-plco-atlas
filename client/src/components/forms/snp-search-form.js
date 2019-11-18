@@ -101,7 +101,7 @@ export const SnpSearchForm = () => {
           onClick={handleSnpReset}
         >
           <Icon className="opacity-50" name="times" width="12" />
-          <span class="sr-only">Clear</span>
+          <span className="sr-only">Clear</span>
         </button>
         <button
           className="btn btn-silver flex-shrink-auto mx-2"

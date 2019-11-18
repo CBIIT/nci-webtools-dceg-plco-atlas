@@ -10,7 +10,7 @@ import {
   updateSummaryResults,
   updateVariantLookup,
   lookupVariants,
-  // drawQQPlot,
+  drawQQPlot,
   drawQQPlotPlotly,
   drawManhattanPlot,
   fetchSummaryTable,
@@ -33,7 +33,6 @@ export function SummaryResults() {
     selectedManhattanPlotType,
     loadingManhattanPlot,
     showSnpResults,
-
   } = useSelector(state => state.summaryResults);
 
   const setPopupTooltipData = popupTooltipData => {
@@ -300,6 +299,8 @@ export function SummaryResults() {
   };
 
   const handleVariantLookup = ({ snp }) => {
+    console.log("SNP", snp);
+    console.log("selectedPhenotype", selectedPhenotype);
     dispatch(
       updateVariantLookup({
         selectedPhenotypes: [selectedPhenotype],
@@ -307,8 +308,10 @@ export function SummaryResults() {
         selectedGender: selectedManhattanPlotType === 'male' || selectedManhattanPlotType === 'female' ? selectedManhattanPlotType : 'combined'
       })
     );
+    console.log("[selectedPhenotype]", [selectedPhenotype]);
     dispatch(lookupVariants([selectedPhenotype], snp));
   };
+  
   const placeholder = (
     <div style={{ display: submitted ? 'none' : 'block' }}>
       <p className="h4 text-center my-5">
