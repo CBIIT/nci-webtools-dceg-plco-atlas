@@ -1,4 +1,10 @@
 import { query, rawQuery } from './query';
+const libR = require('lib-r-math.js');
+const { ChiSquared, R: { numberPrecision } } = libR;
+//uses as default: "Inversion" and "Mersenne-Twister"
+const precision4 = numberPrecision(4)
+const { qchisq } = ChiSquared();
+
 
 export const UPDATE_SUMMARY_RESULTS = 'UPDATE_SUMMARY_RESULTS';
 export const UPDATE_SUMMARY_TABLE = 'UPDATE_SUMMARY_TABLE'
@@ -216,8 +222,6 @@ export function drawQQPlot(phenotype) {
     let subsetObservedVariants3 = subsetVariantData3.data.flat();
     // console.log("subsetObservedVariants3", subsetObservedVariants3);
 
-
-
     let topExpectedVariants = ppoints(metadata_count, topObservedVariants.length);
     // console.log("topExpectedVariants", topExpectedVariants);
 
@@ -315,6 +319,17 @@ export function drawQQPlot(phenotype) {
       showlegend: false
     };
 
+    // get median
+    const medianData = await query('variants', {
+      database: phenotype + '.db',
+      // table: "",
+      median: 'p'
+    });
+    const median = medianData.data[0].median;
+    // console.log('median', median);
+    const lambdaGC = precision4((qchisq(1 - median, 1) / qchisq(0.5, 1)));
+    // console.log("lambdaGC", lambdaGC);
+
     let qqplotLayout = {
       dragmode: 'pan',
       clickmode: 'event',
@@ -322,7 +337,7 @@ export function drawQQPlot(phenotype) {
       width: 800,
       height: 800,
       title: {
-        text: '<b>\u03BB</b> = TBD        <b>Sample Size</b> = ' + metadata_count,
+        text: '<b>\u03BB</b> = ' + lambdaGC + '        <b>Sample Size</b> = ' + metadata_count,
         font: {
           family: 'Arial',
           size: 14,
