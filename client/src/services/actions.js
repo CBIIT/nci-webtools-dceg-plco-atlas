@@ -326,9 +326,9 @@ export function drawQQPlot(phenotype) {
       median: 'p'
     });
     const median = medianData.data[0].median;
-    console.log('median', median);
+    // console.log('median', median);
     const lambdaGC = precision4((qchisq(1 - median, 1) / qchisq(0.5, 1)));
-    console.log("lambdaGC", lambdaGC);
+    // console.log("lambdaGC", lambdaGC);
 
     let qqplotLayout = {
       dragmode: 'pan',
