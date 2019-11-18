@@ -96,27 +96,9 @@ export function drawManhattanPlot(plotType, params) {
   };
 }
 
-// export function drawQQPlot(phenotype) {
-//   return async function(dispatch) {
-//     dispatch(updateSummaryResults({ loading: true }));
-//     const imageMapData = await query(
-//       `data/qq-plots/${phenotype}.imagemap.json`
-//     );
-//     if (!imageMapData.error) {
-//       dispatch(
-//         updateSummaryResults({
-//           ...imageMapData, // lambdaGC, sampleSize, areaItems
-//           qqplotSrc: `data/qq-plots/${phenotype}.png`,
-//           loading: false
-//         })
-//       );
-//     }
-//   };
-// }
-
-export function drawQQPlotPlotly(phenotype) {
+export function drawQQPlot(phenotype) {
   return async function(dispatch) {
-    console.log("drawQQPlotPlotly", phenotype);
+    console.log("drawQQPlot", phenotype);
 
     const setQQPlotLoading = loadingQQPlot => {
       dispatch(updateSummaryResults({ loadingQQPlot }));
