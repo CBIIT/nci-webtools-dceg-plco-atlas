@@ -115,7 +115,7 @@ function getVariants(filepath, params) {
         : validTables[0];
 
     let sql = ``;
-    // get median
+    // get variants median query
     if (params.median) {
         sql = `
             SELECT AVG(${params.median}) AS "median" 
@@ -130,10 +130,11 @@ function getVariants(filepath, params) {
                 )
             )`;
     } else {
-        // get query
+        // get variants query
+
         const groupby = params.groupby
-        ? ` GROUP BY "` + params.groupby + `" `
-        : ``;
+            ? ` GROUP BY "` + params.groupby + `" `
+            : ``;
 
         // validate min/max bp for each chromosome if provided
         if (params.chr) {
@@ -163,9 +164,6 @@ function getVariants(filepath, params) {
                 coalesce(params.mod, `(variant_id % :mod) = 0`),
             ].filter(Boolean).join(' AND ') + `${groupby}`;
 
-        // create count sql based on original query
-        let countSql = `SELECT COUNT(1) FROM (${sql})`;
-
         // adds "order by" statement, if both order and orderBy are provided
         let { order, orderBy } = params;
         if (order && orderBy) {
@@ -182,6 +180,8 @@ function getVariants(filepath, params) {
         if (params.offset) sql += ' OFFSET :offset ';
     }
 
+    // create count sql based on original query
+    let countSql = `SELECT COUNT(1) FROM (${sql})`;
     
     logger.debug(`SQL: ${sql}`);
     // query database
