@@ -1,4 +1,10 @@
 import { query, rawQuery } from './query';
+const libR = require('lib-r-math.js');
+const { ChiSquared, R: { numberPrecision } } = libR;
+//uses as default: "Inversion" and "Mersenne-Twister"
+const precision4 = numberPrecision(4)
+const { qchisq } = ChiSquared();
+
 
 export const UPDATE_SUMMARY_RESULTS = 'UPDATE_SUMMARY_RESULTS';
 export const UPDATE_SUMMARY_TABLE = 'UPDATE_SUMMARY_TABLE'
@@ -96,27 +102,9 @@ export function drawManhattanPlot(plotType, params) {
   };
 }
 
-// export function drawQQPlot(phenotype) {
-//   return async function(dispatch) {
-//     dispatch(updateSummaryResults({ loading: true }));
-//     const imageMapData = await query(
-//       `data/qq-plots/${phenotype}.imagemap.json`
-//     );
-//     if (!imageMapData.error) {
-//       dispatch(
-//         updateSummaryResults({
-//           ...imageMapData, // lambdaGC, sampleSize, areaItems
-//           qqplotSrc: `data/qq-plots/${phenotype}.png`,
-//           loading: false
-//         })
-//       );
-//     }
-//   };
-// }
-
-export function drawQQPlotPlotly(phenotype) {
+export function drawQQPlot(phenotype) {
   return async function(dispatch) {
-    console.log("drawQQPlotPlotly", phenotype);
+    console.log("drawQQPlot", phenotype);
 
     const setQQPlotLoading = loadingQQPlot => {
       dispatch(updateSummaryResults({ loadingQQPlot }));
@@ -234,8 +222,6 @@ export function drawQQPlotPlotly(phenotype) {
     let subsetObservedVariants3 = subsetVariantData3.data.flat();
     // console.log("subsetObservedVariants3", subsetObservedVariants3);
 
-
-
     let topExpectedVariants = ppoints(metadata_count, topObservedVariants.length);
     // console.log("topExpectedVariants", topExpectedVariants);
 
@@ -333,6 +319,17 @@ export function drawQQPlotPlotly(phenotype) {
       showlegend: false
     };
 
+    // get median
+    const medianData = await query('variants', {
+      database: phenotype + '.db',
+      // table: "",
+      median: 'p'
+    });
+    const median = medianData.data[0].median;
+    // console.log('median', median);
+    const lambdaGC = precision4((qchisq(1 - median, 1) / qchisq(0.5, 1)));
+    // console.log("lambdaGC", lambdaGC);
+
     let qqplotLayout = {
       dragmode: 'pan',
       clickmode: 'event',
@@ -340,7 +337,7 @@ export function drawQQPlotPlotly(phenotype) {
       width: 800,
       height: 800,
       title: {
-        text: '<b>\u03BB</b> = TBD        <b>Sample Size</b> = ' + metadata_count,
+        text: '<b>\u03BB</b> = ' + lambdaGC + '        <b>Sample Size</b> = ' + metadata_count,
         font: {
           family: 'Arial',
           size: 14,
