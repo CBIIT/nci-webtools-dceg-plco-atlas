@@ -11,7 +11,6 @@ import {
   updateVariantLookup,
   lookupVariants,
   drawQQPlot,
-  drawQQPlotPlotly,
   drawManhattanPlot,
   fetchSummaryTable,
   updateSummaryTable,
@@ -88,8 +87,7 @@ export function SummaryResults() {
     const variantTable = getVariantTable(manhattanPlotType);
 
     setPopupTooltipData(null);
-    // dispatch(drawQQPlot(phenotype));
-    dispatch(drawQQPlotPlotly(phenotype));
+    dispatch(drawQQPlot(phenotype));
 
     // update summary results filters
     dispatch(
