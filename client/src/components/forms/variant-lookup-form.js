@@ -17,7 +17,6 @@ import {
 import { updateVariantLookup } from '../../services/actions';
 import TreeSelect, { TreeNode } from 'rc-tree-select';
 import 'rc-tree-select/assets/index.css';
-import TreeMenu, { defaultChildren, ItemComponent } from 'react-simple-tree-menu';
 import { TreeSelectCustom } from '../controls/tree-select-custom';
 
 export function VariantLookupForm({ onChange, onSubmit, onReset }) {
@@ -145,19 +144,6 @@ export function VariantLookupForm({ onChange, onSubmit, onReset }) {
               )
             }
           </ul>
-      </div> */}
-
-      {/* <br></br>
-
-      <div className="border border-dark">
-        <TreeMenu data={treeDataTest}>
-          {({ search, items, resetOpenNodes }) => (
-            <div>
-              {defaultChildren({search, items})}
-              <button onClick={resetOpenNodes}>Reset</button>
-            </div>
-          )}
-        </TreeMenu>
       </div> */}
 
       <br></br>
