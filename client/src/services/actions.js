@@ -159,10 +159,10 @@ export function drawQQPlot(phenotype) {
     // }
 
     const metadata = await query('metadata', {
-      database: 'meta_fixed_assoc_new' + '.db',
+      database: phenotype + '.db',
     });
     const metadata_count = parseInt(metadata['count_all']);
-    const lambdaGC = metadata['lambdagc_all'];
+    const lambdaGC = metadata['lambdagc_all'] ? metadata['lambdagc_all'] : 'TBD';
 
     const subsetVariantDataMod1 = 1000; 
     const subsetVariantDataMod2 = 10000; 
@@ -172,7 +172,7 @@ export function drawQQPlot(phenotype) {
     const pCutOffValue3 = 0.1;
 
     const topVariantData = await query('variants', {
-      database: 'meta_fixed_assoc_new' + '.db',
+      database: phenotype + '.db',
       table: "variant_all",
       columns: ['chr', 'bp', 'snp', 'p', 'nlog_p'],
       // columns: ['nlog_p'],
