@@ -75,6 +75,45 @@ export function colorToIndex(r, g, b, multiplier) {
   return multiplier * (r * 65536 + g * 256 + b);
 }
 
+export function packRanges(ranges) {
+  let rows = [];
+  let MIN_INDEX = 0;
+  let MAX_INDEX = 1;
+
+  // determine highest filled value in row
+  let highestIndex = row => (
+    row.length > 0 ? row[row.length - 1][MAX_INDEX] : -1
+  );
+
+  // sort rows by min, then max
+  let sortedRanges = [...ranges].sort((a, b) =>
+    a[MIN_INDEX] - b[MIN_INDEX] ||
+    a[MAX_INDEX] - b[MAX_INDEX]
+  );
+
+  for (let range of sortedRanges) {
+
+    // determines if the range was inserted into an existing row
+    let insertedRange = false;
+
+    // look for a row where the highest range is below the current range
+    // because ranges are sorted, they will be inserted top-down
+    for (let row of rows) {
+      if (!insertedRange && highestIndex(row) < range[MIN_INDEX]) {
+        row.push(range);
+        insertedRange = true;
+      }
+    }
+
+    // if no valid rows could be found, insert the range into a new row
+    if (!insertedRange)
+      rows.push([range]);
+  }
+
+  return rows;
+}
+
+
 /**
  * Translates coordinates from the current viewport (eg: MouseEvent's clientX/Y)
  * to local coordinates within an element
