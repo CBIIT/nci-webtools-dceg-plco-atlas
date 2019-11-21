@@ -5,6 +5,7 @@ DROP INDEX IF EXISTS idx_variant_all_snp;
 DROP INDEX IF EXISTS idx_variant_all_p;
 DROP INDEX IF EXISTS idx_variant_all_nlog_p;
 DROP INDEX IF EXISTS idx_variant_all_query;
+DROP INDEX IF EXISTS idx_variant_all_plot_qq;
 
 DROP INDEX IF EXISTS idx_variant_female_id;
 DROP INDEX IF EXISTS idx_variant_female_chr;
@@ -13,6 +14,7 @@ DROP INDEX IF EXISTS idx_variant_female_snp;
 DROP INDEX IF EXISTS idx_variant_female_p;
 DROP INDEX IF EXISTS idx_variant_female_nlog_p;
 DROP INDEX IF EXISTS idx_variant_female_query;
+DROP INDEX IF EXISTS idx_variant_female_plot_qq;
 
 DROP INDEX IF EXISTS idx_variant_male_id;
 DROP INDEX IF EXISTS idx_variant_male_chr;
@@ -21,7 +23,7 @@ DROP INDEX IF EXISTS idx_variant_male_snp;
 DROP INDEX IF EXISTS idx_variant_male_p;
 DROP INDEX IF EXISTS idx_variant_male_nlog_p;
 DROP INDEX IF EXISTS idx_variant_male_query;
-
+DROP INDEX IF EXISTS idx_variant_male_plot_qq;
 
 DROP INDEX IF EXISTS idx_aggregate_all_chr;
 DROP INDEX IF EXISTS idx_aggregate_all_bp_abs_1000kb;
