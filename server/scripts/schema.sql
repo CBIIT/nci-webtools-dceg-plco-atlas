@@ -16,7 +16,9 @@ CREATE TABLE variant_stage
     "or"            REAL,
     "or_r"          REAL,
     "q"             REAL,
-    "i"             REAL
+    "i"             REAL,
+    "expected_p"    REAL,
+    "plot_qq"       BOOLEAN
 );
 
 CREATE TABLE variant_all
@@ -34,7 +36,9 @@ CREATE TABLE variant_all
     "or"            REAL,
     "or_r"          REAL,
     "q"             REAL,
-    "i"             REAL
+    "i"             REAL,
+    "expected_p"    REAL,
+    "plot_qq"       BOOLEAN
 );
 
 CREATE TABLE variant_female
@@ -52,7 +56,9 @@ CREATE TABLE variant_female
     "or"            REAL,
     "or_r"          REAL,
     "q"             REAL,
-    "i"             REAL
+    "i"             REAL,
+    "expected_p"    REAL,
+    "plot_qq"       BOOLEAN
 );
 
 CREATE TABLE variant_male
@@ -70,7 +76,9 @@ CREATE TABLE variant_male
     "or"            REAL,
     "or_r"          REAL,
     "q"             REAL,
-    "i"             REAL
+    "i"             REAL,
+    "expected_p"    REAL,
+    "plot_qq"       BOOLEAN
 );
 
 CREATE TABLE aggregate_all
