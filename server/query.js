@@ -118,14 +118,14 @@ function getVariants(filepath, params) {
     // get variants median query
     if (params.median) {
         sql = `
-            SELECT AVG(${params.median}) AS "median" 
+            SELECT AVG(${params.median}) AS "median"
             FROM (
-                SELECT ${params.median} 
-                FROM ${table} 
-                ORDER BY ${params.median} 
-                LIMIT 2 - (SELECT COUNT(*) FROM ${table}) % 2 
+                SELECT ${params.median}
+                FROM ${table}
+                ORDER BY ${params.median}
+                LIMIT 2 - (SELECT COUNT(*) FROM ${table}) % 2
                 OFFSET (
-                    SELECT (COUNT(*) - 1) / 2 
+                    SELECT (COUNT(*) - 1) / 2
                     FROM ${table}
                 )
             )`;
@@ -182,7 +182,7 @@ function getVariants(filepath, params) {
 
     // create count sql based on original query
     let countSql = `SELECT COUNT(1) FROM (${sql})`;
-    
+
     logger.debug(`SQL: ${sql}`);
     // query database
     const db = new Database(filepath, {readonly: true});
@@ -242,11 +242,12 @@ function getGenes(filepath, params) {
         WHERE
             chr = :chr AND
             (
-                (tx_start >= :txStart AND tx_end <= :txEnd) OR
-                (tx_start <= :txStart AND tx_end >= :txEnd)
+                (tx_start BETWEEN :txStart AND :txEnd) OR
+                (tx_end BETWEEN :txStart AND :txEnd)
             )
     `).all(params);
 
+    // since exon_starts/ends are comma-delimited strings, we should parse them as arrays
     if (columns.includes('exon_starts') || columns.includes('exon_ends')) {
         const split = e => (e || '').split(',').filter(e => e !== '').map(e => +e);
         records = records.map(e => {
