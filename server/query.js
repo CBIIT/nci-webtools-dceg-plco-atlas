@@ -98,7 +98,7 @@ function getSummary(filepath, params) {
 function getVariants(filepath, params) {
     const validColumns = [
         'variant_id', 'chr', 'bp', 'snp','a1','a2', 'n',
-        'p','nlog_p', 'p_r', 'or', 'or_r', 'q', 'i',
+        'p','nlog_p', 'p_r', 'or', 'or_r', 'q', 'i', 'expected_p', 'plot_qq',
     ];
     const validTables = [
         'variant_all',

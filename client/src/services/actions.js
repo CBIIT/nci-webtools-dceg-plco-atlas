@@ -133,57 +133,36 @@ export function drawQQPlot(phenotype) {
       return intervals;
     }
 
-    const ppoints = (n, limit, a) => {
-      var size = limit ? Math.min(n, limit) : n;
-      var points = new Array(size);
-      for (var i = 0; i < points.length; i ++)
-        points[i] = ppoint(n, i, a);
-      return points;
-    };
-
-    const ppoint = (n, i, a) => {
-      if (!a) {
-          a = n <= 10 ? 3/8 : 1/2;
-      }
-      i ++;
-      return parseFloat((Math.abs(Math.log10((i - a) / (n + (1 - a) - a)) * - 1.0)).toFixed(3));
-    };
-
-    // const arrSampler= (arrLen, delta) => {
-    //   // var newArr = [];
-    //   // for (var i = 0; i < arrLen; i = i + delta) {
-    //   //   newArr.push(i);
-    //   // }
-    //   // return newArr;
-    //   return getIntervals(arrL)
-    // }
-
     const metadata = await query('metadata', {
-      database: phenotype + '.db',
+      database: 'meta_fixed_assoc_new_keep' + '.db',
     });
     const metadata_count = parseInt(metadata['count_all']);
     const lambdaGC = metadata['lambdagc_all'] ? metadata['lambdagc_all'] : 'TBD';
 
-    const subsetVariantDataMod1 = 1000; 
-    const subsetVariantDataMod2 = 10000; 
-    const subsetVariantDataMod3 = 100000; 
-    const pCutOffValue1 = 0.001;
-    const pCutOffValue2 = 0.01;
-    const pCutOffValue3 = 0.1;
+    // const subsetVariantDataMod1 = 1000; 
+    // const subsetVariantDataMod2 = 10000; 
+    // const subsetVariantDataMod3 = 100000; 
+    const pCutOffValue = 0.001;
+    // const pCutOffValue2 = 0.01;
+    // const pCutOffValue3 = 0.1;
 
     const topVariantData = await query('variants', {
-      database: phenotype + '.db',
+      database: 'meta_fixed_assoc_new' + '.db',
       table: "variant_all",
-      columns: ['chr', 'bp', 'snp', 'p', 'nlog_p'],
+      columns: ['chr', 'bp', 'snp', 'p', 'nlog_p', 'expected_p'],
       // columns: ['nlog_p'],
 //      pMin: 0.001,
-      pMax: pCutOffValue1,
+      pMax: pCutOffValue,
       orderBy: 'p',
       order: 'asc',
       raw: true
     });
-    // const topObservedVariants = topVariantData.data.flat();
-    const topObservedVariants = topVariantData.data.map(row => row[4]);
+    let topObservedVariants = [];
+    let topExpectedVariants = [];
+    topVariantData.data.map((row) => {
+      topObservedVariants.push(row[4]);
+      topExpectedVariants.push(row[5]);
+    });
     const topObservedVariantsText = [];
     topVariantData.data.map(row => 
       topObservedVariantsText.push({
@@ -193,96 +172,7 @@ export function drawQQPlot(phenotype) {
         p: row[3]
     }))
     console.log("topObservedVariants.length", topObservedVariants.length);
-    // console.log("topObservedVariantsText", topObservedVariantsText);
-
-    // const subsetVariantData1 = await query('variants', {
-    //   database: phenotype + '.db',
-    //   // table: "",
-    //   columns: ['nlog_p'],
-    //   pMin: pCutOffValue1,
-    //   pMax: pCutOffValue2,
-    //   mod: subsetVariantDataMod1,
-    //   orderBy: 'p',
-    //   order: 'asc',
-    //   raw: true
-    // });
-    // let subsetObservedVariants1 = subsetVariantData1.data.flat();
-    // console.log("subsetObservedVariants1", subsetObservedVariants1);
-
-    // const subsetVariantData2 = await query('variants', {
-    //   database: phenotype + '.db',
-    //   // table: "",
-    //   columns: ['nlog_p'],
-    //   pMin: pCutOffValue2,
-    //   pMax: pCutOffValue3,
-    //   mod: subsetVariantDataMod2,
-    //   orderBy: 'p',
-    //   order: 'asc',
-    //   raw: true
-    // });
-    // let subsetObservedVariants2 = subsetVariantData2.data.flat();
-    // console.log("subsetObservedVariants2", subsetObservedVariants2);
-
-//     const subsetVariantData3 = await query('variants', {
-//       database: phenotype + '.db',
-//       // table: "",
-//       columns: ['nlog_p'],
-//       pMin: pCutOffValue3,
-// //      pMax: 1.0,
-//       mod: subsetVariantDataMod3,
-//       orderBy: 'p',
-//       order: 'asc',
-//       raw: true
-//     });
-//     let subsetObservedVariants3 = subsetVariantData3.data.flat();
-//     console.log("subsetObservedVariants3", subsetObservedVariants3);
-
-
-
-    // const subsetVariantDataTest = await query('variants', {
-    //   database: 'meta_fixed_assoc_new.db',
-    //   table: 'variant_all',
-    //   columns: ['nlog_p', 'p'],
-    //   pMin: .001,
-    //   limit: 10000,
-    //   orderBy: 'p',
-    //   order: 'asc',
-    //   raw: true
-    // });
-    // let subsetObservedVariantsTest = subsetVariantDataTest.data.map((row) => row[0]);
-    // console.log("subsetVariantDataTest", subsetVariantDataTest);
-
-
-
-
-    let topExpectedVariants = ppoints(metadata_count, topObservedVariants.length);
-    // console.log("topExpectedVariants", topExpectedVariants);
-
-    // let subsetExpectedVariants1 = arrSampler(metadata_count, subsetVariantDataMod1)
-    //   .map(i => i + topObservedVariants.length)
-    //   .map(i => ppoint(metadata_count, i));
-    // // console.log("subsetExpectedVariants1", subsetExpectedVariants1);
-
-    // let subsetExpectedVariants2 = arrSampler(metadata_count, subsetVariantDataMod2)
-    //   .map(i => i + topObservedVariants.length + subsetObservedVariants1.length * 1000)
-    //   .map(i => ppoint(metadata_count, i));
-    // // console.log("subsetExpectedVariants2", subsetExpectedVariants2);
-
-    // let subsetExpectedVariants3 = arrSampler(metadata_count, subsetVariantDataMod3)
-    //   .map(i => i + topObservedVariants.length + subsetObservedVariants1.length * 1000 + subsetObservedVariants2.length * 10000)
-    //   .map(i => ppoint(metadata_count, i));
-    // console.log("subsetExpectedVariants3", subsetExpectedVariants3);
-
-
-
-    // let subsetExpectedVariantsTest = arrSampler(metadata_count, 10000)
-    //   .map(i => i + topObservedVariants.length)
-    //   .map(i => ppoint(metadata_count, i));
-    // console.log("subsetExpectedVariantsTest", subsetExpectedVariantsTest);
-
-
-
-
+    
     let subsetMarkerColor = '#002a47';
     let topMarkerColor = '#006bb8';
 
@@ -309,48 +199,6 @@ export function drawQQPlot(phenotype) {
     // let qqplotSubsetData1 = {
     //   x: subsetExpectedVariants1,
     //   y: subsetObservedVariants1,
-    //   hoverinfo: 'none',
-    //   mode: 'markers',
-    //   type: 'scattergl',
-    //   marker: {
-    //     color: subsetMarkerColor,
-    //     size: 8,
-    //     // opacity: 0.65
-    //   },
-    //   showlegend: false
-    // };
-
-    // let qqplotSubsetData2 = {
-    //   x: subsetExpectedVariants2,
-    //   y: subsetObservedVariants2,
-    //   hoverinfo: 'none',
-    //   mode: 'markers',
-    //   type: 'scattergl',
-    //   marker: {
-    //     color: subsetMarkerColor,
-    //     size: 8,
-    //     // opacity: 0.65
-    //   },
-    //   showlegend: false
-    // };
-
-    // let qqplotSubsetData3 = {
-    //   x: subsetExpectedVariants3,
-    //   y: subsetObservedVariants3,
-    //   hoverinfo: 'none',
-    //   mode: 'markers',
-    //   type: 'scattergl',
-    //   marker: {
-    //     color: subsetMarkerColor,
-    //     size: 8,
-    //     // opacity: 0.65
-    //   },
-    //   showlegend: false
-    // };
-
-    // let qqplotSubsetDataTest = {
-    //   x: subsetExpectedVariantsTest,
-    //   y: subsetObservedVariantsTest,
     //   hoverinfo: 'none',
     //   mode: 'markers',
     //   type: 'scattergl',
