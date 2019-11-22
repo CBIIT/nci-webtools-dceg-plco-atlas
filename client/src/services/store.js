@@ -38,6 +38,7 @@ const initialState = {
     showSnpResults: null,
     qqplotData: [],
     qqplotLayout: {},
+    qqplotStacked: false,
   },
   summaryTables: [
     {

@@ -68,7 +68,16 @@ export function SummaryResults() {
     stacked: ['variant_male', 'variant_female'],
     female: ['variant_female'],
     male: ['variant_male'],
-  }[plotType])
+  }[plotType]);
+
+  const hideQQTooltips = () => {
+    // if tooltip already exists, destroy
+    const elem = document.getElementsByClassName("qq-plot-tooltip");
+    if (elem && elem.length > 0) {
+      elem[0].remove();
+    }
+    // tooltip.style.display = 'none';
+  }
 
   const handleSubmit = (phenotype, manhattanPlotType) => {
     phenotype = phenotype ? phenotype.value : null;
@@ -87,7 +96,7 @@ export function SummaryResults() {
     const variantTable = getVariantTable(manhattanPlotType);
 
     setPopupTooltipData(null);
-    dispatch(drawQQPlot(phenotype));
+    dispatch(drawQQPlot(phenotype, variantTable));
 
     // update summary results filters
     dispatch(
@@ -139,6 +148,8 @@ export function SummaryResults() {
         }, countKey, tableIndex)
       );
     });
+    // if any Q-Q plot tooltips exist, destory
+    hideQQTooltips();
   };
 
   const handleReset = params => {
@@ -181,6 +192,9 @@ export function SummaryResults() {
         }, i)
       );
     }
+
+    // if any Q-Q plot tooltips exist, destory
+    hideQQTooltips();
   };
 
   // resubmit summary results
