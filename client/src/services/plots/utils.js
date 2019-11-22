@@ -142,6 +142,43 @@ export function viewportToLocalCoordinates(x, y, element) {
   };
 }
 
+/**
+ *
+ * @param {HTMLElement} element
+ * @param {any} styles
+ */
+export function setStyles(element, styles) {
+  for (let key in styles) {
+    let suffix = '';
+
+    // allow us to pass in numbers for styles which accept -px values
+    if (/px$/i.test(key)) {
+      key = key.replace(/px$/i, '');
+      suffix = 'px';
+    }
+
+    element.style[key] = styles[key] + suffix;
+  }
+  return element;
+}
+
+/**
+ *
+ * @param {HTMLElement} element
+ */
+export function ensureNonStaticPositioning(element) {
+  const style = getComputedStyle(element);
+  if (style.position === 'static')
+    element.style.position = 'relative';
+}
+
+export function getCanvasAndContext() {
+  let canvas = document.createElement('canvas');
+  let context = canvas.getContext('2d');
+  return [canvas, context];
+}
+
+
 export function createElement(tagName, props, children) {
   let el = document.createElement(tagName);
   for (let key in props || {}) el[key] = props[key];
@@ -154,4 +191,28 @@ export function createElement(tagName, props, children) {
   }
 
   return el;
+}
+
+/**
+ *
+ * @param {Element} element
+ * @param {string} location
+ * @param {string|Element} html
+ */
+export function insertAdjacentNode(element, position, html) {
+  if (html instanceof Element) {
+    element.insertAdjacentElement(position, html);
+  } else {
+    element.insertAdjacentHTML(position, html);
+  }
+}
+
+/**
+ * Removes all immediate children from a node
+ * @param {Element} element
+ */
+export function removeChildren(element) {
+  for (let child of element.children) {
+    element.removeChild(child);
+  }
 }

@@ -1,128 +1,97 @@
 import {
   debounce,
   extent,
+  getCanvasAndContext,
   rgbToColor,
-  viewportToLocalCoordinates
+  setStyles,
+  viewportToLocalCoordinates,
+  ensureNonStaticPositioning
 } from './utils.js';
 import { getScale, getTicks } from './scale.js';
 import { axisLeft, axisBottom } from './axis.js';
 import { drawPoints } from './points.js';
 import { drawSelectionOverlay, drawZoomOverlay } from './overlays.js';
+import { createTooltip, showTooltip, hideTooltip } from './tooltip.js';
 
 export class ManhattanPlot {
-  constructor(container, config) {
-    const containerStyle = getComputedStyle(container);
-    if (containerStyle.position === 'static')
-      container.style.position = 'relative';
-    this.container = container;
-
-    this.canvas = document.createElement('canvas');
-    this.ctx = this.canvas.getContext('2d');
-
-    // create an overlay canvas to be used for selecting areas (zooming)
-    this.overlayCanvas = document.createElement('canvas');
-    this.overlayCtx = this.overlayCanvas.getContext('2d');
-    this.overlayCanvas.style.position = 'absolute';
-    this.overlayCanvas.style.pointerEvents = 'none';
-    this.overlayCanvas.style.top = '0';
-    this.overlayCanvas.style.left = '0';
-
-    // create a hidden canvas to be used for selecting points
-    this.hiddenCanvas = document.createElement('canvas');
-    this.hiddenCtx = this.hiddenCanvas.getContext('2d');
-
-    this.config = config;
-    if (this.config.xAxis.extent)
-      this.config.xAxis.defaultExtent = this.config.xAxis.extent;
-    if (this.config.yAxis.extent)
-      this.config.yAxis.defaultExtent = this.config.yAxis.extent;
-    this.tooltip = this.createTooltip();
-    this.container.appendChild(this.canvas);
-    this.container.appendChild(this.overlayCanvas);
-    this.container.appendChild(this.tooltip);
-    this.draw();
-
-    this.attachEventHandlers(this.canvas);
-
-    // allow either selection or zoom, but not both
-    if (config.xAxis.allowSelection) {
-      drawSelectionOverlay(config, this.ctx, this.overlayCtx);
-    } else if (config.allowZoom) {
-      config.zoomStack = config.zoomStack || [];
-      drawZoomOverlay(config, this.ctx, this.overlayCtx);
-      config.setZoomWindow = ev => {
-        config.zoomWindow = ev;
-        let { xMin, xMax, yMin, yMax } = ev.bounds;
-        config.xAxis.extent = [xMin, xMax];
-        config.yAxis.extent = [yMin, yMax];
-        if (config.mirrored) {
-          config.xAxis2.extent = [xMin, xMax];
-          config.yAxis2.extent = [yMin, yMax];
-        }
-        this.draw();
-        if (config.onZoom)
-          config.onZoom(config.zoomWindow);
-      };
-      config.zoomOut = ev => {
-        let stack = config.zoomStack;
-        if (stack.length < 2) {
-          config.resetZoom();
-        } else {
-          // stack has the current zoom level, we need the previous level
-          stack.pop();
-          let window = stack[stack.length - 1];
-          config.setZoomWindow(window);
-        }
-      };
-      config.resetZoom = window => {
-        const xData = config.data.map(d => d[config.xAxis.key]);
-        const yData = config.data.map(d => d[config.yAxis.key]);
-        config.xAxis.extent = config.xAxis.defaultExtent || extent(xData);
-        config.yAxis.extent = config.yAxis.defaultExtent || extent(yData);
-        config.zoomStack = [];
-        this.draw();
-        if (config.onZoom) {
-          const [xMin, xMax] = config.xAxis.extent;
-          const [yMin, yMax] = config.yAxis.extent;
-          config.onZoom({
-            bounds: {xMin, xMax, yMin, yMax}
-          });
-        }
-      };
-    }
-  }
-
-  draw() {
-    const config = this.config;
-    const canvas = this.canvas;
-    const hiddenCanvas = this.hiddenCanvas;
-    const overlayCanvas = this.overlayCanvas;
-    const ctx = this.ctx;
-    const hiddenCtx = this.hiddenCtx;
-    const overlayCtx = this.overlayCtx;
-    const {data, data2} = this.config;
-    const {mirrored} = this.config;
-    const canvasWidth = this.container.clientWidth;
-    const canvasHeight = this.container.clientHeight;
-    const margins = (config.margins = {
+  defaultConfig = {
+    margins: {
       top: 60,
       right: 60,
       bottom: 100,
       left: 80,
-      ...config.margins
+    }
+  }
+
+  constructor(config) {
+    this.config = config;
+    this.container = this.config.container;
+
+    // create a canvas to be used for drawing main plot elements
+    [this.canvas, this.ctx] = getCanvasAndContext();
+    this.container.appendChild(this.canvas);
+
+    // create an overlay canvas to be used for selecting areas (zooming)
+    [this.overlayCanvas, this.overlayCtx] = getCanvasAndContext();
+    this.container.appendChild(this.overlayCanvas);
+
+    // create a hidden canvas to be used for selecting points
+    [this.hiddenCanvas, this.hiddenCtx] = getCanvasAndContext();
+
+    // ensure the plot container is not positioned statically
+    ensureNonStaticPositioning(this.container);
+
+    // ensure the overlay canvas is positioned above the canvas, and is not interactive
+    setStyles(this.overlayCanvas, {
+      position: 'absolute',
+      pointerEvents: 'none',
+      top: '0',
+      left: '0',
     });
+
+    // create a tooltip container
+    this.tooltip = createTooltip();
+    this.container.appendChild(this.tooltip);
+
+    // save default extents, if they are provided
+    if (this.config.xAxis.extent)
+      this.config.xAxis.defaultExtent = this.config.xAxis.extent;
+    if (this.config.yAxis.extent)
+      this.config.yAxis.defaultExtent = this.config.yAxis.extent;
+
+    // draw plot and attach handlers for interactive events
+    this.draw();
+    this.attachEventHandlers(this.canvas);
+  }
+
+  defaultConfig() {
+    return {
+
+    }
+  }
+
+  draw() {
+    const {
+      config,
+      canvas, ctx,
+      hiddenCanvas, hiddenCtx,
+      overlayCanvas, overlayCtx,
+      data, data2, mirrored,
+      container: {clientWidth: canvasWidth},
+      container: {clientWidth: canvasHeight},
+    } = this;
+
+    // determine default top, right, bottom, and left margins
+    const margins = {
+      ...this.defaultConfig.margins,
+      ...config.margins
+    };
+
+    // Determine drawable area for manhattan plot
     const width = canvasWidth - margins.left - margins.right;
     const height = canvasHeight - margins.top - margins.bottom;
-    const lines = this.config.lines || [];
-    config.pointMap = {}; // maps colors to data indexes
 
-    if (mirrored) {
-      // copy axis configs if mirrored
-      config.xAxis2 = {...config.xAxis, ...config.xAxis2}
-      config.yAxis2 = {...config.yAxis, ...config.yAxis2}
-      config.point2 = {...config.point, ...config.point2}
-    }
-
+    // Set sizes of each canvas
     canvas.width = canvasWidth;
     canvas.height = canvasHeight;
 
@@ -131,6 +100,17 @@ export class ManhattanPlot {
 
     overlayCanvas.width = canvasWidth;
     overlayCanvas.height = canvasHeight;
+
+    const lines = this.config.lines || [];
+    config.pointMap = {}; // maps colors to data indexes
+
+    // copy axis configs if mirrored
+    if (mirrored) {
+      config.xAxis2 = {...config.xAxis, ...config.xAxis2}
+      config.yAxis2 = {...config.yAxis, ...config.yAxis2}
+      config.point2 = {...config.point, ...config.point2}
+    }
+
 
     let xData, xData2, yData, yData2;
 
@@ -237,8 +217,6 @@ export class ManhattanPlot {
     let canvas = this.canvas;
     let config = this.config;
     let { margins } = config;
-    let leadingStrand = genes.filter(g => g.strand === '+');
-    let laggingStrand = genes.filter(g => g.strand === '-');
     let txColor = '#002a47';
     let exonColor = '#002a47';
 
@@ -254,7 +232,7 @@ export class ManhattanPlot {
     ctx.save();
     ctx.translate(xOffset, yOffset);
 
-    leadingStrand.forEach(gene => {
+    genes.forEach(gene => {
       let start = Math.max(config.xAxis.scale(gene.tx_start), xOffset);
       let end = Math.min(config.xAxis.scale(gene.tx_end), xOffset + genePlotWidth);
 
@@ -394,48 +372,54 @@ export class ManhattanPlot {
         if (content && trigger === 'click')
           this.showTooltip(ev, await content(point, this.tooltip));
       });
-  }
 
-  createTooltip() {
-    const tooltip = document.createElement('div');
-    tooltip.classList.add('manhattan-plot-tooltip');
-    tooltip.style.display = 'none';
-    tooltip.style.position = 'absolute';
-    return tooltip;
-  }
-
-  showTooltip(ev, html) {
-    let { x, y } = viewportToLocalCoordinates(
-      ev.clientX,
-      ev.clientY,
-      ev.target
-    );
-    // determine where to place tooltip relative to cursor
-    const targetWidth = ev.target.clientWidth;
-    const targetHeight = ev.target.clientHeight;
-    const quadrant = {
-      left: x <= targetWidth / 2,
-      right: x > targetWidth / 2,
-      top: y <= targetHeight / 2,
-      bottom: y > targetHeight / 2,
+    // allow either selection or zoom, but not both
+    if (config.xAxis.allowSelection) {
+      drawSelectionOverlay(config, this.ctx, this.overlayCtx);
+    } else if (config.allowZoom) {
+      config.zoomStack = config.zoomStack || [];
+      drawZoomOverlay(config, this.ctx, this.overlayCtx);
+      config.setZoomWindow = ev => {
+        config.zoomWindow = ev;
+        let { xMin, xMax, yMin, yMax } = ev.bounds;
+        config.xAxis.extent = [xMin, xMax];
+        config.yAxis.extent = [yMin, yMax];
+        if (config.mirrored) {
+          config.xAxis2.extent = [xMin, xMax];
+          config.yAxis2.extent = [yMin, yMax];
+        }
+        this.draw();
+        if (config.onZoom)
+          config.onZoom(config.zoomWindow);
+      };
+      config.zoomOut = ev => {
+        let stack = config.zoomStack;
+        if (stack.length < 2) {
+          config.resetZoom();
+        } else {
+          // stack has the current zoom level, we need the previous level
+          stack.pop();
+          let window = stack[stack.length - 1];
+          config.setZoomWindow(window);
+        }
+      };
+      config.resetZoom = window => {
+        const xData = config.data.map(d => d[config.xAxis.key]);
+        const yData = config.data.map(d => d[config.yAxis.key]);
+        config.xAxis.extent = config.xAxis.defaultExtent || extent(xData);
+        config.yAxis.extent = config.yAxis.defaultExtent || extent(yData);
+        config.zoomStack = [];
+        this.draw();
+        if (config.onZoom) {
+          const [xMin, xMax] = config.xAxis.extent;
+          const [yMin, yMax] = config.yAxis.extent;
+          config.onZoom({
+            bounds: {xMin, xMax, yMin, yMax}
+          });
+        }
+      };
     }
-    console.log('quadrant', quadrant);
 
-    this.tooltip.innerHTML = '';
-    this.tooltip.style.display = 'inline-block';
-    if (html instanceof Element)
-      this.tooltip.insertAdjacentElement('beforeend', html);
-    else this.tooltip.insertAdjacentHTML('beforeend', html);
-
-    const tooltipHeight = this.tooltip.clientHeight;
-    const tooltipWidth = this.tooltip.clientWidth;
-
-    this.tooltip.style.left = (Math.min(x, targetWidth - tooltipWidth) - 2) + 'px';
-    this.tooltip.style.top = (Math.min(y, targetHeight - tooltipHeight) - 2) + 'px';
-  }
-
-  hideTooltip() {
-    this.tooltip.style.display = 'none';
   }
 
   getPointFromEvent({ clientX, clientY, target }) {
