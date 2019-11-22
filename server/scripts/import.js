@@ -130,6 +130,25 @@ const ppoint = (n, i, a) => {
     return parseFloat((Math.abs(Math.log10((i - a) / (n + (1 - a) - a)) * - 1.0)).toFixed(3));
 };
 
+const getIntervals = (maxValue, length) => {
+    var sqMax = Math.sqrt(maxValue);
+
+    const fx = (x) => {
+        return Math.round(maxValue - Math.pow(x - sqMax, 2));
+    }
+
+    var intervals = [];
+    for (var i = 1; i <= length; i ++) {
+        var x = (i / length) * sqMax;
+        var interval = fx(x);
+        if (interval > 0 && !intervals.includes(interval)) {
+            intervals.push(interval);
+        } 
+    }
+
+    return intervals;
+}
+
 const insert = db.prepare(`
     INSERT INTO variant_stage VALUES (
         :chr,
@@ -279,16 +298,14 @@ reader.on('close', () => {
         value: lambdaGC
     });
 
+    // updating variants table with expected nlog_p values
+    console.log(`[${duration()} s] Updating expected p-values...`);
     const updateExpectedP = db.prepare(`
         UPDATE variant_${tableSuffix} 
         SET expected_p = :expected_p
         WHERE variant_id = :id
     `);
-
     const expected_p = ppoints(totalCount);
-
-    // updating variants table with expected nlog_p values
-    console.log(`[${duration()} s] Updating expected p-values...`);
     for (let id = 0; id < totalCount; id++) {
         updateExpectedP.run({
             id: id + 1, 
@@ -298,13 +315,15 @@ reader.on('close', () => {
 
     // updating variants table with Q-Q plot flag
     console.log(`[${duration()} s] Updating plot_qq values...`);
-    // for (let id of [1,2,3]) {
-    //     db.prepare(`
-    //         UPDATE variant_${tableSuffix} 
-    //         SET plot = 1 
-    //         WHERE variant_id = :id
-    //     `).exec({id});
-    // }
+    const updatePlotQQ = db.prepare(`
+        UPDATE variant_${tableSuffix} 
+        SET plot_qq = 1 
+        WHERE variant_id = :id
+    `);
+    const plotQQIntervals = getIntervals(totalCount, Math.round(totalCount * 0.01));
+    for (let id of plotQQIntervals) {
+        updatePlotQQ.run({id});
+    }
 
     db.exec('COMMIT');
 

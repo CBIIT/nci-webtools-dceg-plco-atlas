@@ -134,7 +134,7 @@ export function drawQQPlot(phenotype) {
     }
 
     const metadata = await query('metadata', {
-      database: 'meta_fixed_assoc_new_keep' + '.db',
+      database: phenotype + '.db',
     });
     const metadata_count = parseInt(metadata['count_all']);
     const lambdaGC = metadata['lambdagc_all'] ? metadata['lambdagc_all'] : 'TBD';
@@ -147,10 +147,9 @@ export function drawQQPlot(phenotype) {
     // const pCutOffValue3 = 0.1;
 
     const topVariantData = await query('variants', {
-      database: 'meta_fixed_assoc_new' + '.db',
+      database: phenotype + '.db',
       table: "variant_all",
       columns: ['chr', 'bp', 'snp', 'p', 'nlog_p', 'expected_p'],
-      // columns: ['nlog_p'],
 //      pMin: 0.001,
       pMax: pCutOffValue,
       orderBy: 'p',
@@ -170,8 +169,26 @@ export function drawQQPlot(phenotype) {
         bp: row[1],
         snp: row[2],
         p: row[3]
-    }))
+    }));
     console.log("topObservedVariants.length", topObservedVariants.length);
+
+    const subsetVariantData = await query('variants', {
+      database: phenotype + '.db',
+      table: "variant_all",
+      columns: ['nlog_p', 'expected_p'],
+      pMin: pCutOffValue,
+      orderBy: 'p',
+      order: 'asc',
+      plot_qq: true,
+      raw: true
+    });
+    let subsetObservedVariants = [];
+    let subsetExpectedVariants = [];
+    subsetVariantData.data.map((row) => {
+      subsetObservedVariants.push(row[0]);
+      subsetExpectedVariants.push(row[1]);
+    });
+    console.log("subsetObservedVariants.length", subsetObservedVariants.length);
     
     let subsetMarkerColor = '#002a47';
     let topMarkerColor = '#006bb8';
@@ -196,19 +213,19 @@ export function drawQQPlot(phenotype) {
       showlegend: false
     };
 
-    // let qqplotSubsetData1 = {
-    //   x: subsetExpectedVariants1,
-    //   y: subsetObservedVariants1,
-    //   hoverinfo: 'none',
-    //   mode: 'markers',
-    //   type: 'scattergl',
-    //   marker: {
-    //     color: subsetMarkerColor,
-    //     size: 8,
-    //     // opacity: 0.65
-    //   },
-    //   showlegend: false
-    // };
+    let qqplotSubsetData = {
+      x: subsetExpectedVariants,
+      y: subsetObservedVariants,
+      hoverinfo: 'none',
+      mode: 'markers',
+      type: 'scattergl',
+      marker: {
+        color: subsetMarkerColor,
+        size: 8,
+        // opacity: 0.65
+      },
+      showlegend: false
+    };
 
     let qqplotLineData = {
       x: [0.0, qqplotTopData.x[0]],
@@ -282,9 +299,7 @@ export function drawQQPlot(phenotype) {
       }
     };
     setQQPlotLayout(qqplotLayout);
-    // setQQPlotData([qqplotTopData, qqplotSubsetData1, qqplotSubsetData2, qqplotSubsetData3, qqplotLineData]);
-    // setQQPlotData([qqplotTopData, qqplotSubsetDataTest, qqplotLineData]);
-    setQQPlotData([qqplotTopData, qqplotLineData]);
+    setQQPlotData([qqplotTopData, qqplotSubsetData, qqplotLineData]);
     setQQPlotLoading(false);
   };
 }

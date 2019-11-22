@@ -144,6 +144,7 @@ function getVariants(filepath, params) {
             coalesce(params.pMin, `p >= :pMin`),
             coalesce(params.pMax, `p <= :pMax`),
             coalesce(params.mod, `(variant_id % :mod) = 0`),
+            coalesce(params.plot_qq, `plot_qq = 1`)
         ].filter(Boolean).join(' AND ') + `${groupby}`;
 
     // adds "order by" statement, if both order and orderBy are provided
