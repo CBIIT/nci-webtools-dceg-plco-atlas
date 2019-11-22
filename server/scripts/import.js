@@ -114,13 +114,40 @@ else {
     db.exec(readFile('drop-indexes.sql'));
 }
 
+const ppoints = (n, limit, a) => {
+    var size = limit ? Math.min(n, limit) : n;
+    var points = new Array(size);
+    for (var i = 0; i < points.length; i ++)
+        points[i] = ppoint(n, i, a);
+    return points;
+};
+
 const ppoint = (n, i, a) => {
     if (!a) {
         a = n <= 10 ? 3/8 : 1/2;
     }
     i ++;
     return parseFloat((Math.abs(Math.log10((i - a) / (n + (1 - a) - a)) * - 1.0)).toFixed(3));
-  };
+};
+
+const getIntervals = (maxValue, length) => {
+    var sqMax = Math.sqrt(maxValue);
+
+    const fx = (x) => {
+        return Math.round(maxValue - Math.pow(x - sqMax, 2));
+    }
+
+    var intervals = [];
+    for (var i = 1; i <= length; i ++) {
+        var x = (i / length) * sqMax;
+        var interval = fx(x);
+        if (interval > 0 && !intervals.includes(interval)) {
+            intervals.push(interval);
+        } 
+    }
+
+    return intervals;
+}
 
 const insert = db.prepare(`
     INSERT INTO variant_stage VALUES (
@@ -199,7 +226,7 @@ reader.on('line', line => {
 });
 
 reader.on('close', () => {
-    db.exec('COMMIT');
+    // db.exec('COMMIT');
 
     // store variant table (variant_stage should not be used beyond this point)
     console.log(`[${duration()} s] Storing variants...`);
@@ -238,14 +265,6 @@ reader.on('close', () => {
         value: count
     }));
 
-    // for (let id of [1,2,3]) {
-    //     db.prepare(`
-    //         UPDATE variant_${tableSuffix} 
-    //         SET plot = 1 
-    //         WHERE variant_id = :id
-    //     `).exec({id});
-    // }
-
     // insert total count (eg: count_male)
     const totalCount = db.prepare(`
         SELECT count(*)
@@ -256,7 +275,8 @@ reader.on('close', () => {
         value: totalCount
     });
 
-    // insert lambdagc (eg: lambdagc_male)
+    // calculating lambdaGC (eg: lambdagc_male)
+    console.log(`[${duration()} s] Calculating lambdaGC value...`);
     const pMedian = db.prepare(`
         SELECT AVG(p) AS "median" 
         FROM (
@@ -270,30 +290,42 @@ reader.on('close', () => {
             )
         )
     `).pluck().get();
-    console.log("pMedian", pMedian);
+    // console.log("pMedian", pMedian);
     const lambdaGC = precision4((qchisq(1 - pMedian, 1) / qchisq(0.5, 1)));
-    console.log("lambdaGC", lambdaGC);
+    // console.log("lambdaGC", lambdaGC);
     insertMetadata.run({
         key: `lambdagc_${tableSuffix}`,
         value: lambdaGC
     });
 
+    // updating variants table with expected nlog_p values
+    console.log(`[${duration()} s] Updating expected p-values...`);
     const updateExpectedP = db.prepare(`
         UPDATE variant_${tableSuffix} 
         SET expected_p = :expected_p
         WHERE variant_id = :id
     `);
-
-    // insert expected nlog_p
-    for (let id = 1; id <= totalCount; id++) {
-        const expected_p = ppoint(totalCount, id);
-        updateExpectedP.run({id, expected_p});
-        // db.exec(`
-        //     UPDATE variant_${tableSuffix} 
-        //     SET expected_p = ${expected_p}
-        //     WHERE variant_id = ${id}
-        // `);
+    const expected_p = ppoints(totalCount);
+    for (let id = 0; id < totalCount; id++) {
+        updateExpectedP.run({
+            id: id + 1, 
+            expected_p: expected_p[totalCount - id - 1]
+        });
     }
+
+    // updating variants table with Q-Q plot flag
+    console.log(`[${duration()} s] Updating plot_qq values...`);
+    const updatePlotQQ = db.prepare(`
+        UPDATE variant_${tableSuffix} 
+        SET plot_qq = 1 
+        WHERE variant_id = :id
+    `);
+    const plotQQIntervals = getIntervals(totalCount, Math.round(totalCount * 0.01));
+    for (let id of plotQQIntervals) {
+        updatePlotQQ.run({id});
+    }
+
+    db.exec('COMMIT');
 
     // drop staging table
     db.exec(`DELETE FROM variant_stage`);
