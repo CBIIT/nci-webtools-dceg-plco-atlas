@@ -97,9 +97,10 @@ export function drawManhattanPlot(plotType, params) {
   };
 }
 
-export function drawQQPlot(phenotype) {
+export function drawQQPlot(phenotype, variantTable) {
   return async function(dispatch) {
     console.log("drawQQPlot", phenotype);
+    console.log("variantTable", variantTable);
 
     const setQQPlotLoading = loadingQQPlot => {
       dispatch(updateSummaryResults({ loadingQQPlot }));
@@ -110,196 +111,516 @@ export function drawQQPlot(phenotype) {
     const setQQPlotLayout = qqplotLayout => {
       dispatch(updateSummaryResults({ qqplotLayout }));
     };
+    const setQQPlotStacked = qqplotStacked => {
+      dispatch(updateSummaryResults({ qqplotStacked }));
+    };
     setQQPlotLoading(true);
     setQQPlotLayout({});
     setQQPlotData([]);
+    setQQPlotStacked(false);
 
-    const getIntervals = (maxValue, length) => {
-      var sqMax = Math.sqrt(maxValue);
+    const table = variantTable.length === 1 ? 
+      variantTable[0] : 'stacked';
 
-      const fx = (x) => {
-        return Math.round(maxValue - Math.pow(x - sqMax, 2));
-      }
-     
-      var intervals = [];
-      for (var i = 1; i <= length; i ++) {
-        var x = (i / length) * sqMax;
-        var interval = fx(x);
-        if (interval > 0 && !intervals.includes(interval)) {
-            intervals.push(interval);
-        } 
-      }
-    
-      return intervals;
+    if (table === 'stacked') {
+      setQQPlotStacked(true);
     }
 
     const metadata = await query('metadata', {
       database: phenotype + '.db',
     });
-    const metadata_count = parseInt(metadata['count_all']);
-    const lambdaGC = metadata['lambdagc_all'] ? metadata['lambdagc_all'] : 'TBD';
 
-    // const subsetVariantDataMod1 = 1000; 
-    // const subsetVariantDataMod2 = 10000; 
-    // const subsetVariantDataMod3 = 100000; 
-    const pCutOffValue = 0.001;
-    // const pCutOffValue2 = 0.01;
-    // const pCutOffValue3 = 0.1;
+    const countKey = plotType => ({
+      variant_all: 'count_all',
+      stacked: ['count_female', 'count_male'],
+      variant_female: 'count_female',
+      variant_male: 'count_male',
+    }[plotType])
+    const lambdaGCKey = plotType => ({
+      variant_all: 'lambdagc_all',
+      stacked: ['lambdagc_female', 'lambdagc_male'],
+      variant_female: 'lambdagc_female',
+      variant_male: 'lambdagc_male',
+    }[plotType])
 
-    const topVariantData = await query('variants', {
-      database: phenotype + '.db',
-      table: "variant_all",
-      columns: ['chr', 'bp', 'snp', 'p', 'nlog_p', 'expected_p'],
-//      pMin: 0.001,
-      pMax: pCutOffValue,
-      orderBy: 'p',
-      order: 'asc',
-      raw: true
-    });
-    let topObservedVariants = [];
-    let topExpectedVariants = [];
-    topVariantData.data.map((row) => {
-      topObservedVariants.push(row[4]);
-      topExpectedVariants.push(row[5]);
-    });
-    const topObservedVariantsText = [];
-    topVariantData.data.map(row => 
-      topObservedVariantsText.push({
-        chr: row[0],
-        bp: row[1],
-        snp: row[2],
-        p: row[3]
-    }));
-    console.log("topObservedVariants.length", topObservedVariants.length);
+    if (table !== 'stacked') {
+      const metadata_count = parseInt(metadata[countKey(table)]);
+      const metadata_lambdaGC = metadata[lambdaGCKey(table)] ? metadata[lambdaGCKey(table)] : 'TBD';
 
-    const subsetVariantData = await query('variants', {
-      database: phenotype + '.db',
-      table: "variant_all",
-      columns: ['nlog_p', 'expected_p'],
-      pMin: pCutOffValue,
-      orderBy: 'p',
-      order: 'asc',
-      plot_qq: true,
-      raw: true
-    });
-    let subsetObservedVariants = [];
-    let subsetExpectedVariants = [];
-    subsetVariantData.data.map((row) => {
-      subsetObservedVariants.push(row[0]);
-      subsetExpectedVariants.push(row[1]);
-    });
-    console.log("subsetObservedVariants.length", subsetObservedVariants.length);
+      // const subsetVariantDataMod1 = 1000; 
+      // const subsetVariantDataMod2 = 10000; 
+      // const subsetVariantDataMod3 = 100000; 
+      const pCutOffValue = 0.001;
+      // const pCutOffValue2 = 0.01;
+      // const pCutOffValue3 = 0.1;
+
+      const topVariantData = await query('variants', {
+        database: phenotype + '.db',
+        table,
+        columns: ['chr', 'bp', 'snp', 'p', 'nlog_p', 'expected_p'],
+  //      pMin: 0.001,
+        pMax: pCutOffValue,
+        orderBy: 'p',
+        order: 'asc',
+        raw: true
+      });
+      let topObservedVariants = [];
+      let topExpectedVariants = [];
+      topVariantData.data.map((row) => {
+        topObservedVariants.push(row[4]);
+        topExpectedVariants.push(row[5]);
+      });
+      const topObservedVariantsText = [];
+      topVariantData.data.map(row => 
+        topObservedVariantsText.push({
+          chr: row[0],
+          bp: row[1],
+          snp: row[2],
+          p: row[3]
+      }));
+      console.log("topObservedVariants.length", topObservedVariants.length);
+
+      const subsetVariantData = await query('variants', {
+        database: phenotype + '.db',
+        table,
+        columns: ['nlog_p', 'expected_p'],
+        pMin: pCutOffValue,
+        orderBy: 'p',
+        order: 'asc',
+        plot_qq: true,
+        raw: true
+      });
+      let subsetObservedVariants = [];
+      let subsetExpectedVariants = [];
+      subsetVariantData.data.map((row) => {
+        subsetObservedVariants.push(row[0]);
+        subsetExpectedVariants.push(row[1]);
+      });
+      console.log("subsetObservedVariants.length", subsetObservedVariants.length);
+      
+      const subsetMarkerColor = '#002a47';
+      const topMarkerColor = '#006bb8';
+
+      let qqplotTopData = {
+        x: topExpectedVariants,
+        y: topObservedVariants,
+        text: topObservedVariantsText,
+        hovertemplate: 
+          '<b>position:</b> %{text.chr}:%{text.bp}<br>' +
+          '<b>p-value:</b> %{text.p}<br>' +
+          '<b>snp:</b> %{text.snp}' +
+          '<extra></extra>',
+        hoverinfo: 'text',
+        mode: 'markers',
+        type: 'scattergl',
+        marker: {
+          color: topMarkerColor,
+          size: 8,
+          opacity: 0.65
+        },
+        showlegend: false
+      };
+
+      let qqplotSubsetData = {
+        x: subsetExpectedVariants,
+        y: subsetObservedVariants,
+        hoverinfo: 'none',
+        mode: 'markers',
+        type: 'scattergl',
+        marker: {
+          color: subsetMarkerColor,
+          size: 8,
+          // opacity: 0.65
+        },
+        showlegend: false
+      };
+
+      let qqplotLineData = {
+        x: [0.0, qqplotTopData.x[0]],
+        y: [0.0, qqplotTopData.x[0]],
+        hoverinfo: 'none',
+        mode: 'lines',
+        type: 'scattergl',
+        line: {
+          color: 'gray',
+          width: 1
+        },
+        opacity: 0.5,
+        showlegend: false
+      };
+
+      let qqplotLayout = {
+        dragmode: 'pan',
+        clickmode: 'event',
+        hovermode: 'closest',
+        width: 800,
+        height: 800,
+        title: {
+          text: '<b>\u03BB</b> = ' + metadata_lambdaGC + '        <b>Sample Size</b> = ' + metadata_count,
+          font: {
+            family: 'Arial',
+            size: 14,
+            color: 'black'
+          },
+        },
+        xaxis: {
+          automargin: true,
+          rangemode: 'tozero', // only show positive
+          showgrid: false, // disable grid lines
+          fixedrange: true, // disable zoom
+          title: {
+            text: '<b>Expected -log<sub>10</sub>(p)</b>',
+            font: {
+              family: 'Arial',
+              size: 14,
+              color: 'black'
+            },
+          },
+          tick0: 0,
+          ticklen: 10,
+          tickfont: {
+            family: 'Arial',
+            size: 10,
+            color: 'black'
+          },
+        },
+        yaxis: {
+          automargin: true,
+          rangemode: 'tozero', // only show positive
+          showgrid: false, // disable grid lines
+          fixedrange: true, // disable zoom
+          title: {
+            text: '<b>Observed -log<sub>10</sub>(p)</b>',
+            font: {
+              family: 'Arial',
+              size: 14,
+              color: 'black'
+            },
+          },
+          tick0: 0,
+          ticklen: 10,
+          tickfont: {
+            family: 'Arial',
+            size: 10,
+            color: 'black'
+          },
+        }
+      };
+      setQQPlotLayout(qqplotLayout);
+      setQQPlotData([qqplotTopData, qqplotSubsetData, qqplotLineData]);
+    } else {
+      const metadata_count_female = parseInt(metadata[countKey(table)[0]]);
+      const metadata_count_male = parseInt(metadata[countKey(table)[1]]);
+      const metadata_lambdaGC_female = metadata[lambdaGCKey(table)[0]] ? metadata[lambdaGCKey(table)[0]] : 'TBD';
+      const metadata_lambdaGC_male = metadata[lambdaGCKey(table)[1]] ? metadata[lambdaGCKey(table)[1]] : 'TBD';
+
+      const pCutOffValue = 0.001;
+
+      const topVariantDataFemale = await query('variants', {
+        database: phenotype + '.db',
+        table: 'variant_female',
+        columns: ['chr', 'bp', 'snp', 'p', 'nlog_p', 'expected_p'],
+        pMax: pCutOffValue,
+        orderBy: 'p',
+        order: 'asc',
+        raw: true
+      });
+      let topObservedVariantsFemale = [];
+      let topExpectedVariantsFemale = [];
+      topVariantDataFemale.data.map((row) => {
+        topObservedVariantsFemale.push(row[4]);
+        topExpectedVariantsFemale.push(row[5]);
+      });
+      const topObservedVariantsTextFemale = [];
+      topVariantDataFemale.data.map(row => 
+        topObservedVariantsTextFemale.push({
+          chr: row[0],
+          bp: row[1],
+          snp: row[2],
+          p: row[3]
+      }));
+      console.log("topObservedVariantsFemale.length", topObservedVariantsFemale.length);
+
+      const subsetVariantDataFemale = await query('variants', {
+        database: phenotype + '.db',
+        table: 'variant_female',
+        columns: ['nlog_p', 'expected_p'],
+        pMin: pCutOffValue,
+        orderBy: 'p',
+        order: 'asc',
+        plot_qq: true,
+        raw: true
+      });
+      let subsetObservedVariantsFemale = [];
+      let subsetExpectedVariantsFemale = [];
+      subsetVariantDataFemale.data.map((row) => {
+        subsetObservedVariantsFemale.push(row[0]);
+        subsetExpectedVariantsFemale.push(row[1]);
+      });
+      console.log("subsetObservedVariantsFemale.length", subsetObservedVariantsFemale.length);
+
+      const topVariantDataMale = await query('variants', {
+        database: phenotype + '.db',
+        table: 'variant_male',
+        columns: ['chr', 'bp', 'snp', 'p', 'nlog_p', 'expected_p'],
+        pMax: pCutOffValue,
+        orderBy: 'p',
+        order: 'asc',
+        raw: true
+      });
+      let topObservedVariantsMale = [];
+      let topExpectedVariantsMale = [];
+      topVariantDataMale.data.map((row) => {
+        topObservedVariantsMale.push(row[4]);
+        topExpectedVariantsMale.push(row[5]);
+      });
+      const topObservedVariantsTextMale = [];
+      topVariantDataMale.data.map(row => 
+        topObservedVariantsTextMale.push({
+          chr: row[0],
+          bp: row[1],
+          snp: row[2],
+          p: row[3]
+      }));
+      console.log("topObservedVariantsMale.length", topObservedVariantsMale.length);
+
+      const subsetVariantDataMale = await query('variants', {
+        database: phenotype + '.db',
+        table: 'variant_male',
+        columns: ['nlog_p', 'expected_p'],
+        pMin: pCutOffValue,
+        orderBy: 'p',
+        order: 'asc',
+        plot_qq: true,
+        raw: true
+      });
+      let subsetObservedVariantsMale = [];
+      let subsetExpectedVariantsMale = [];
+      subsetVariantDataMale.data.map((row) => {
+        subsetObservedVariantsMale.push(row[0]);
+        subsetExpectedVariantsMale.push(row[1]);
+      });
+      console.log("subsetObservedVariantsMale.length", subsetObservedVariantsMale.length);
+      
+      const subsetMarkerColorFemale = '#b55117';
+      const topMarkerColorFemale = '#e47618';
+      const subsetMarkerColorMale = '#002a47';
+      const topMarkerColorMale = '#006bb8';
+
+      let qqplotTopDataFemale = {
+        x: topExpectedVariantsFemale,
+        y: topObservedVariantsFemale,
+        text: topObservedVariantsTextFemale,
+        hovertemplate: 
+          '<b>position:</b> %{text.chr}:%{text.bp}<br>' +
+          '<b>p-value:</b> %{text.p}<br>' +
+          '<b>snp:</b> %{text.snp}' +
+          '<extra></extra>',
+        hoverinfo: 'text',
+        mode: 'markers',
+        type: 'scattergl',
+        marker: {
+          color: topMarkerColorFemale,
+          size: 8,
+          opacity: 0.65
+        },
+        showlegend: false
+      };
+
+      let qqplotSubsetDataFemale = {
+        x: subsetExpectedVariantsFemale,
+        y: subsetObservedVariantsFemale,
+        hoverinfo: 'none',
+        mode: 'markers',
+        type: 'scattergl',
+        marker: {
+          color: subsetMarkerColorFemale,
+          size: 8,
+          // opacity: 0.65
+        },
+        showlegend: false
+      };
+
+      let qqplotLineDataFemale = {
+        x: [0.0, qqplotTopDataFemale.x[0]],
+        y: [0.0, qqplotTopDataFemale.x[0]],
+        hoverinfo: 'none',
+        mode: 'lines',
+        type: 'scattergl',
+        line: {
+          color: 'gray',
+          width: 1
+        },
+        opacity: 0.5,
+        showlegend: false
+      };
+
+      let qqplotTopDataMale = {
+        x: topExpectedVariantsMale,
+        y: topObservedVariantsMale,
+        text: topObservedVariantsTextMale,
+        hovertemplate: 
+          '<b>position:</b> %{text.chr}:%{text.bp}<br>' +
+          '<b>p-value:</b> %{text.p}<br>' +
+          '<b>snp:</b> %{text.snp}' +
+          '<extra></extra>',
+        hoverinfo: 'text',
+        mode: 'markers',
+        type: 'scattergl',
+        marker: {
+          color: topMarkerColorMale,
+          size: 8,
+          opacity: 0.65
+        },
+        showlegend: false
+      };
+
+      let qqplotSubsetDataMale = {
+        x: subsetExpectedVariantsMale,
+        y: subsetObservedVariantsMale,
+        hoverinfo: 'none',
+        mode: 'markers',
+        type: 'scattergl',
+        marker: {
+          color: subsetMarkerColorMale,
+          size: 8,
+          // opacity: 0.65
+        },
+        showlegend: false
+      };
+
+      let qqplotLineDataMale = {
+        x: [0.0, qqplotTopDataMale.x[0]],
+        y: [0.0, qqplotTopDataMale.x[0]],
+        hoverinfo: 'none',
+        mode: 'lines',
+        type: 'scattergl',
+        line: {
+          color: 'gray',
+          width: 1
+        },
+        opacity: 0.5,
+        showlegend: false
+      };
+
+      let qqplotLayoutFemale = {
+        dragmode: 'pan',
+        clickmode: 'event',
+        hovermode: 'closest',
+        width: 800,
+        height: 800,
+        title: {
+          text: '<b>Female \u03BB</b> = ' + metadata_lambdaGC_female + '        <b>Female Sample Size</b> = ' + metadata_count_female,
+          font: {
+            family: 'Arial',
+            size: 14,
+            color: 'black'
+          },
+        },
+        xaxis: {
+          automargin: true,
+          rangemode: 'tozero', // only show positive
+          showgrid: false, // disable grid lines
+          fixedrange: true, // disable zoom
+          title: {
+            text: '<b>Expected -log<sub>10</sub>(p)</b>',
+            font: {
+              family: 'Arial',
+              size: 14,
+              color: 'black'
+            },
+          },
+          tick0: 0,
+          ticklen: 10,
+          tickfont: {
+            family: 'Arial',
+            size: 10,
+            color: 'black'
+          },
+        },
+        yaxis: {
+          automargin: true,
+          rangemode: 'tozero', // only show positive
+          showgrid: false, // disable grid lines
+          fixedrange: true, // disable zoom
+          title: {
+            text: '<b>Observed -log<sub>10</sub>(p)</b>',
+            font: {
+              family: 'Arial',
+              size: 14,
+              color: 'black'
+            },
+          },
+          tick0: 0,
+          ticklen: 10,
+          tickfont: {
+            family: 'Arial',
+            size: 10,
+            color: 'black'
+          },
+        }
+      };
+      let qqplotLayoutMale = {
+        dragmode: 'pan',
+        clickmode: 'event',
+        hovermode: 'closest',
+        width: 800,
+        height: 800,
+        title: {
+          text: '<b>Male \u03BB</b> = ' + metadata_lambdaGC_male + '        <b>Male Sample Size</b> = ' + metadata_count_male,
+          font: {
+            family: 'Arial',
+            size: 14,
+            color: 'black'
+          },
+        },
+        xaxis: {
+          automargin: true,
+          rangemode: 'tozero', // only show positive
+          showgrid: false, // disable grid lines
+          fixedrange: true, // disable zoom
+          title: {
+            text: '<b>Expected -log<sub>10</sub>(p)</b>',
+            font: {
+              family: 'Arial',
+              size: 14,
+              color: 'black'
+            },
+          },
+          tick0: 0,
+          ticklen: 10,
+          tickfont: {
+            family: 'Arial',
+            size: 10,
+            color: 'black'
+          },
+        },
+        yaxis: {
+          automargin: true,
+          rangemode: 'tozero', // only show positive
+          showgrid: false, // disable grid lines
+          fixedrange: true, // disable zoom
+          title: {
+            text: '<b>Observed -log<sub>10</sub>(p)</b>',
+            font: {
+              family: 'Arial',
+              size: 14,
+              color: 'black'
+            },
+          },
+          tick0: 0,
+          ticklen: 10,
+          tickfont: {
+            family: 'Arial',
+            size: 10,
+            color: 'black'
+          },
+        }
+      };
+      setQQPlotLayout([qqplotLayoutFemale, qqplotLayoutMale]);
+      setQQPlotData([[qqplotTopDataFemale, qqplotSubsetDataFemale, qqplotLineDataFemale], [qqplotTopDataMale, qqplotSubsetDataMale, qqplotLineDataMale]]);
+    }
     
-    let subsetMarkerColor = '#002a47';
-    let topMarkerColor = '#006bb8';
-
-    let qqplotTopData = {
-      x: topExpectedVariants,
-      y: topObservedVariants,
-      text: topObservedVariantsText,
-      hovertemplate: 
-        '<b>position:</b> %{text.chr}:%{text.bp}<br>' +
-        '<b>p-value:</b> %{text.p}<br>' +
-        '<b>snp:</b> %{text.snp}' +
-        '<extra></extra>',
-      hoverinfo: 'text',
-      mode: 'markers',
-      type: 'scattergl',
-      marker: {
-        color: topMarkerColor,
-        size: 8,
-        opacity: 0.65
-      },
-      showlegend: false
-    };
-
-    let qqplotSubsetData = {
-      x: subsetExpectedVariants,
-      y: subsetObservedVariants,
-      hoverinfo: 'none',
-      mode: 'markers',
-      type: 'scattergl',
-      marker: {
-        color: subsetMarkerColor,
-        size: 8,
-        // opacity: 0.65
-      },
-      showlegend: false
-    };
-
-    let qqplotLineData = {
-      x: [0.0, qqplotTopData.x[0]],
-      y: [0.0, qqplotTopData.x[0]],
-      hoverinfo: 'none',
-      mode: 'lines',
-      type: 'scattergl',
-      line: {
-        color: 'gray',
-        width: 1
-      },
-      opacity: 0.5,
-      showlegend: false
-    };
-
-    let qqplotLayout = {
-      dragmode: 'pan',
-      clickmode: 'event',
-      hovermode: 'closest',
-      width: 800,
-      height: 800,
-      title: {
-        text: '<b>\u03BB</b> = ' + lambdaGC + '        <b>Sample Size</b> = ' + metadata_count,
-        font: {
-          family: 'Arial',
-          size: 14,
-          color: 'black'
-        },
-      },
-      xaxis: {
-        automargin: true,
-        rangemode: 'tozero', // only show positive
-        showgrid: false, // disable grid lines
-        fixedrange: true, // disable zoom
-        title: {
-          text: '<b>Expected -log<sub>10</sub>(p)</b>',
-          font: {
-            family: 'Arial',
-            size: 14,
-            color: 'black'
-          },
-        },
-        tick0: 0,
-        ticklen: 10,
-        tickfont: {
-          family: 'Arial',
-          size: 10,
-          color: 'black'
-        },
-      },
-      yaxis: {
-        automargin: true,
-        rangemode: 'tozero', // only show positive
-        showgrid: false, // disable grid lines
-        fixedrange: true, // disable zoom
-        title: {
-          text: '<b>Observed -log<sub>10</sub>(p)</b>',
-          font: {
-            family: 'Arial',
-            size: 14,
-            color: 'black'
-          },
-        },
-        tick0: 0,
-        ticklen: 10,
-        tickfont: {
-          family: 'Arial',
-          size: 10,
-          color: 'black'
-        },
-      }
-    };
-    setQQPlotLayout(qqplotLayout);
-    setQQPlotData([qqplotTopData, qqplotSubsetData, qqplotLineData]);
     setQQPlotLoading(false);
   };
 }

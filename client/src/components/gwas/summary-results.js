@@ -87,7 +87,7 @@ export function SummaryResults() {
     const variantTable = getVariantTable(manhattanPlotType);
 
     setPopupTooltipData(null);
-    dispatch(drawQQPlot(phenotype));
+    dispatch(drawQQPlot(phenotype, variantTable));
 
     // update summary results filters
     dispatch(
