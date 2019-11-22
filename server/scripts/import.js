@@ -320,7 +320,7 @@ reader.on('close', () => {
         SET plot_qq = 1 
         WHERE variant_id = :id
     `);
-    const plotQQIntervals = getIntervals(totalCount, Math.round(totalCount * 0.01));
+    const plotQQIntervals = getIntervals(totalCount, 10000);
     for (let id of plotQQIntervals) {
         updatePlotQQ.run({id});
     }
