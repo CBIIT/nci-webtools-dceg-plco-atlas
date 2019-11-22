@@ -98,7 +98,7 @@ function getSummary(filepath, params) {
 function getVariants(filepath, params) {
     const validColumns = [
         'variant_id', 'chr', 'bp', 'snp','a1','a2', 'n',
-        'p','nlog_p', 'p_r', 'or', 'or_r', 'q', 'i',
+        'p','nlog_p', 'p_r', 'or', 'or_r', 'q', 'i', 'expected_p', 'plot_qq',
     ];
     const validTables = [
         'variant_all',
@@ -114,6 +114,7 @@ function getVariants(filepath, params) {
         ? params.table
         : validTables[0];
 
+<<<<<<< HEAD
     let sql = ``;
     // get variants median query
     if (params.median) {
@@ -178,7 +179,56 @@ function getVariants(filepath, params) {
         // adds limit and offset, if provided
         if (params.limit) sql += ' LIMIT :limit ';
         if (params.offset) sql += ' OFFSET :offset ';
+=======
+    const groupby = params.groupby
+        ? ` GROUP BY "` + params.groupby + `" `
+        : ``;
+
+    // validate min/max bp for each chromosome if provided
+    if (params.chr) {
+        let validRange = ranges.find(e => e.chr === +params.chr);
+        if (params.bpMin && +params.bpMin < validRange.bp_min)
+            params.bpMin = validRange.bp_min;
+
+        if (params.bpMax && +params.bpMax > validRange.bp_max)
+            params.bpMax = validRange.bp_max;
     }
+
+    // filter by id, chr, base position, and -log10(p), if provided
+    let sql = `
+        SELECT ${columns.map((name => wrapColumnName(name))).join(',')}
+        FROM ${table}
+        WHERE ` + [
+            `p IS NOT NULL`,
+            coalesce(params.id, `variant_id = :id`),
+            coalesce(params.snp, `snp = :snp`),
+            coalesce(params.chr, `chr = :chr`),
+            coalesce(params.bpMin, `bp >= :bpMin`),
+            coalesce(params.bpMax, `bp <= :bpMax`),
+            coalesce(params.nlogpMin, `nlog_p >= :nlogpMin`),
+            coalesce(params.nlogpMax, `nlog_p <= :nlogpMax`),
+            coalesce(params.pMin, `p >= :pMin`),
+            coalesce(params.pMax, `p <= :pMax`),
+            coalesce(params.mod, `(variant_id % :mod) = 0`),
+            coalesce(params.plot_qq, `plot_qq = 1`)
+        ].filter(Boolean).join(' AND ') + `${groupby}`;
+
+    // adds "order by" statement, if both order and orderBy are provided
+    let { order, orderBy } = params;
+    if (order && orderBy) {
+        // by default, sort by p-value ascending
+        if (!['asc', 'desc'].includes(order))
+            order = 'asc';
+        if (!validColumns.includes(orderBy))
+            orderBy = 'p';
+        sql += ` ORDER BY "${orderBy}" ${order} `;
+>>>>>>> master
+    }
+
+    // adds limit and offset, if provided
+    if (params.limit) sql += ' LIMIT :limit ';
+    if (params.offset) sql += ' OFFSET :offset ';
+
 
     // create count sql based on original query
     let countSql = `SELECT COUNT(1) FROM (${sql})`;

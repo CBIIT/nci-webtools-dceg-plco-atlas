@@ -4,6 +4,11 @@ const path = require('path');
 const readline = require('readline');
 const sqlite = require('better-sqlite3');
 const ranges = require('../data/chromosome_ranges.json');
+const libR = require('lib-r-math.js');
+const { ChiSquared, R: { numberPrecision } } = libR;
+//uses as default: "Inversion" and "Mersenne-Twister"
+const precision4 = numberPrecision(4)
+const { qchisq } = ChiSquared();
 
 // retrieve arguments
 const argv = process.argv.slice(2);
@@ -31,6 +36,7 @@ const mapToSchema = {
     mel: values => {
         const [chr, bp, snp, a1, a2, n, p, p_r, or, or_r, q, i, case_n, control_n, sample_n, se_fixed, z_fixed, rsid] = values;
         return {chr, bp, snp, a1, a2, n, p, p_r, or, or_r, q, i};
+        // return {chr: +chr.replace('chr', ''), r, bp, snp, a1, a2, n, p, p_r, or, or_r, q, i};
     },
     rcc: values => {
         // use this map once we have the original rcc.txt
@@ -108,6 +114,41 @@ else {
     db.exec(readFile('drop-indexes.sql'));
 }
 
+const ppoints = (n, limit, a) => {
+    var size = limit ? Math.min(n, limit) : n;
+    var points = new Array(size);
+    for (var i = 0; i < points.length; i ++)
+        points[i] = ppoint(n, i, a);
+    return points;
+};
+
+const ppoint = (n, i, a) => {
+    if (!a) {
+        a = n <= 10 ? 3/8 : 1/2;
+    }
+    i ++;
+    return parseFloat((Math.abs(Math.log10((i - a) / (n + (1 - a) - a)) * - 1.0)).toFixed(3));
+};
+
+const getIntervals = (maxValue, length) => {
+    var sqMax = Math.sqrt(maxValue);
+
+    const fx = (x) => {
+        return Math.round(maxValue - Math.pow(x - sqMax, 2));
+    }
+
+    var intervals = [];
+    for (var i = 1; i <= length; i ++) {
+        var x = (i / length) * sqMax;
+        var interval = fx(x);
+        if (interval > 0 && !intervals.includes(interval)) {
+            intervals.push(interval);
+        } 
+    }
+
+    return intervals;
+}
+
 const insert = db.prepare(`
     INSERT INTO variant_stage VALUES (
         :chr,
@@ -126,7 +167,9 @@ const insert = db.prepare(`
         :or,
         :or_r,
         :q,
-        :i
+        :i,
+        :expected_p,
+        :plot_qq
     )
 `);
 
@@ -148,7 +191,7 @@ reader.on('line', line => {
     const {chr, bp, p} = params;
 
     // validate line (not first line, p value not null or non-numeric, bp within grch38)
-    if (++count === 0 || p === null || isNaN(p) || bp > ranges[chr - 1].bp_max) {
+    if (++count === 0 || p === null || isNaN(p)) {
         return;
     }
 
@@ -169,6 +212,12 @@ reader.on('line', line => {
     params.bp_abs = bpOffset + bp;
     params.bp_abs_1000kb = group(params.bp_abs, 10**6);
 
+    // initialize plot_qq to (0) false
+    params.plot_qq = 0;
+
+    // initiaize expected_p to 0
+    params.expected_p = 0
+
     insert.run(params);
 
     // show progress message every 10000 rows
@@ -177,13 +226,13 @@ reader.on('line', line => {
 });
 
 reader.on('close', () => {
-    db.exec('COMMIT');
+    // db.exec('COMMIT');
 
     // store variant table (variant_stage should not be used beyond this point)
     console.log(`[${duration()} s] Storing variants...`);
     db.exec(`
         INSERT INTO variant_${tableSuffix} SELECT
-            null, "chr", "bp", "snp", "a1", "a2", "n", "p", "nlog_p", "p_r", "or", "or_r", "q", "i"
+            null, "chr", "bp", "snp", "a1", "a2", "n", "p", "nlog_p", "p_r", "or", "or_r", "q", "i", "expected_p", "plot_qq"
         FROM variant_stage
         ORDER BY p DESC;
     `);
@@ -225,6 +274,58 @@ reader.on('close', () => {
         key: `count_${tableSuffix}`,
         value: totalCount
     });
+
+    // calculating lambdaGC (eg: lambdagc_male)
+    console.log(`[${duration()} s] Calculating lambdaGC value...`);
+    const pMedian = db.prepare(`
+        SELECT AVG(p) AS "median" 
+        FROM (
+            SELECT "p"
+            FROM variant_${tableSuffix} 
+            ORDER BY "p"
+            LIMIT 2 - (SELECT COUNT(*) FROM variant_${tableSuffix}) % 2 
+            OFFSET (
+                SELECT (COUNT(*) - 1) / 2 
+                FROM variant_${tableSuffix} 
+            )
+        )
+    `).pluck().get();
+    // console.log("pMedian", pMedian);
+    const lambdaGC = precision4((qchisq(1 - pMedian, 1) / qchisq(0.5, 1)));
+    // console.log("lambdaGC", lambdaGC);
+    insertMetadata.run({
+        key: `lambdagc_${tableSuffix}`,
+        value: lambdaGC
+    });
+
+    // updating variants table with expected nlog_p values
+    console.log(`[${duration()} s] Updating expected p-values...`);
+    const updateExpectedP = db.prepare(`
+        UPDATE variant_${tableSuffix} 
+        SET expected_p = :expected_p
+        WHERE variant_id = :id
+    `);
+    const expected_p = ppoints(totalCount);
+    for (let id = 0; id < totalCount; id++) {
+        updateExpectedP.run({
+            id: id + 1, 
+            expected_p: expected_p[totalCount - id - 1]
+        });
+    }
+
+    // updating variants table with Q-Q plot flag
+    console.log(`[${duration()} s] Updating plot_qq values...`);
+    const updatePlotQQ = db.prepare(`
+        UPDATE variant_${tableSuffix} 
+        SET plot_qq = 1 
+        WHERE variant_id = :id
+    `);
+    const plotQQIntervals = getIntervals(totalCount, Math.round(totalCount * 0.01));
+    for (let id of plotQQIntervals) {
+        updatePlotQQ.run({id});
+    }
+
+    db.exec('COMMIT');
 
     // drop staging table
     db.exec(`DELETE FROM variant_stage`);
