@@ -2,11 +2,13 @@ import {
   debounce,
   extent,
   getCanvasAndContext,
+  packRanges,
   rgbToColor,
   setStyles,
   viewportToLocalCoordinates,
   ensureNonStaticPositioning
 } from './utils.js';
+import { measureWidth, renderText } from './text.js'
 import { getScale, getTicks } from './scale.js';
 import { axisLeft, axisBottom } from './axis.js';
 import { drawPoints } from './points.js';
@@ -15,6 +17,7 @@ import { createTooltip, showTooltip, hideTooltip } from './tooltip.js';
 
 export class ManhattanPlot {
   defaultConfig = {
+    manhattanPlotHeight: 600,
     margins: {
       top: 60,
       right: 60,
@@ -23,24 +26,21 @@ export class ManhattanPlot {
     }
   }
 
-  constructor(config) {
+  constructor(container, config) {
+    this.container = container;
     this.config = config;
-    this.container = this.config.container;
+
+    // ensure the plot container is not positioned statically
+    ensureNonStaticPositioning(this.container);
 
     // create a canvas to be used for drawing main plot elements
     [this.canvas, this.ctx] = getCanvasAndContext();
+    setStyles(this.canvas, { display: 'block' });
     this.container.appendChild(this.canvas);
 
     // create an overlay canvas to be used for selecting areas (zooming)
     [this.overlayCanvas, this.overlayCtx] = getCanvasAndContext();
     this.container.appendChild(this.overlayCanvas);
-
-    // create a hidden canvas to be used for selecting points
-    [this.hiddenCanvas, this.hiddenCtx] = getCanvasAndContext();
-
-    // ensure the plot container is not positioned statically
-    ensureNonStaticPositioning(this.container);
-
     // ensure the overlay canvas is positioned above the canvas, and is not interactive
     setStyles(this.overlayCanvas, {
       position: 'absolute',
@@ -49,8 +49,19 @@ export class ManhattanPlot {
       left: '0',
     });
 
+    // create a hidden canvas to be used for selecting points
+    [this.hiddenCanvas, this.hiddenCtx] = getCanvasAndContext();
+
+    // create a canvas for drawing the gene plot
+    [this.geneCanvas, this.geneCtx] = getCanvasAndContext();
+    setStyles(this.geneCanvas, { display: 'block' });
+    this.geneCanvas.height = 0;
+    this.container.appendChild(this.geneCanvas);
+
     // create a tooltip container
-    this.tooltip = createTooltip();
+    this.tooltip = createTooltip({
+      className: 'manhattan-plot-tooltip'
+    });
     this.container.appendChild(this.tooltip);
 
     // save default extents, if they are provided
@@ -64,25 +75,22 @@ export class ManhattanPlot {
     this.attachEventHandlers(this.canvas);
   }
 
-  defaultConfig() {
-    return {
-
-    }
-  }
-
   draw() {
-    const {
+    let {
       config,
       canvas, ctx,
       hiddenCanvas, hiddenCtx,
       overlayCanvas, overlayCtx,
-      data, data2, mirrored,
       container: {clientWidth: canvasWidth},
-      container: {clientWidth: canvasHeight},
+      container: {clientHeight: canvasHeight},
     } = this;
+    const {
+      data, data2, mirrored,
+    } =  config;
+    canvasHeight = Math.min(this.defaultConfig.manhattanPlotHeight, 600);
 
     // determine default top, right, bottom, and left margins
-    const margins = {
+    const margins = config.margins = {
       ...this.defaultConfig.margins,
       ...config.margins
     };
@@ -110,7 +118,6 @@ export class ManhattanPlot {
       config.yAxis2 = {...config.yAxis, ...config.yAxis2}
       config.point2 = {...config.point, ...config.point2}
     }
-
 
     let xData, xData2, yData, yData2;
 
@@ -168,7 +175,7 @@ export class ManhattanPlot {
         config.yAxis2.ticks = getTicks(...config.yAxis2.extent, numTicks);
     }
 
-    // generate scales
+    // generate scales for regular, non-mirrored plots
     if (!config.mirrored) {
       // if not mirrored, we only generate scales for the first dataset
       config.xAxis.scale = getScale(config.xAxis.extent, [0, width]);
@@ -210,9 +217,118 @@ export class ManhattanPlot {
     console.log(config);
   }
 
-  drawGenes(genes) {
-    console.log('drawing genes', genes);
+  clearGenes() {
+    let { config, geneCanvas, geneCtx } = this;
+    geneCanvas.height = 0;
+  }
 
+  drawGenes(genes) {
+    let { config, geneCanvas, geneCtx } = this;
+    let { margins, xAxis } = config;
+    let rowHeight = 40;
+
+    geneCtx.textAlign = 'left';
+    geneCtx.textBaseline = 'middle';
+
+    let genePositions = genes.map(gene => {
+      let name = gene.name;
+      if (gene.strand === '-')
+        name = '← ' + name;
+      else if (gene.strand === '+')
+        name = name + ' →';
+
+      let padding = 5; // horiz. padding between name and gene
+      let geneStart = xAxis.scale(gene.tx_start);
+      let geneEnd = xAxis.scale(gene.tx_end);
+      let labelWidth = measureWidth(geneCtx, name)
+      let range = Math.abs(geneEnd - geneStart);
+      let width = labelWidth + padding + range;
+
+      let pxStart = geneStart - padding - labelWidth;
+      let pxEnd = geneEnd + padding * 4;
+
+      return {
+        ...gene,
+        name,
+        width,
+        pxStart,
+        pxEnd,
+      };
+    });
+
+    let geneRanges = genePositions.map(gene => {
+      return [gene.pxStart, gene.pxEnd];
+    });
+
+    let packedGeneRanges = packRanges(geneRanges)
+
+    let numRows = packedGeneRanges.length;
+    let txColor = '#049372';
+    let exonColor = '#002a47';
+    let genePlotWidth = geneCanvas.clientWidth;
+
+    geneCanvas.height = rowHeight * numRows;
+    geneCanvas.width = this.canvas.width
+    this.container.style.height = (geneCanvas.height + this.canvas.height) + 'px';
+
+    packedGeneRanges.forEach((geneRow, rowIndex) => {
+      let yOffset = rowHeight * rowIndex;
+      let xOffset = margins.left;
+
+      geneCtx.save();
+      geneCtx.translate(xOffset, yOffset);
+
+      for (let geneRange of geneRow) {
+        let geneIndex = geneRanges.indexOf(geneRange);
+        let gene = genePositions[geneIndex];
+        let geneLabel = genePositions[geneIndex];
+
+        let start = Math.floor(xAxis.scale(gene.tx_start));
+        let end = Math.ceil(xAxis.scale(gene.tx_end));
+
+        // let start = Math.max(xAxis.scale(gene.tx_start), xOffset);
+        // let end = Math.min(xAxis.scale(gene.tx_end), genePlotWidth - margins.right);
+
+        geneCtx.save();
+        geneCtx.translate(geneLabel.pxStart, 17);
+        renderText(geneCtx, geneLabel.name);
+        geneCtx.restore();
+
+        let width = Math.abs(end - start);
+        let exons = gene.exon_starts.map((e, i) => [
+          gene.exon_starts[i],
+          gene.exon_ends[i],
+        ]);
+
+        //ctx.globalAlpha = 0.25;
+        geneCtx.fillStyle = txColor;
+        geneCtx.strokeStyle = txColor;
+        geneCtx.strokeWidth = 1;
+        geneCtx.beginPath();
+        let lineY = 14.5;
+        geneCtx.moveTo(start, lineY);
+        geneCtx.lineTo(start + width, lineY)
+        geneCtx.stroke();
+
+        // ctx.fillRect(start, 14.5, width, 1);
+
+        exons.forEach(exon => {
+  //        ctx.fillStyle = '#006bb8'
+          let start = config.xAxis.scale(exon[0])
+          let end = config.xAxis.scale(exon[1]);
+          let width = Math.ceil(Math.abs(end - start));
+         geneCtx.fillRect(start, 0, width, 30);
+        });
+      }
+
+      geneCtx.restore();
+
+    });
+
+
+    return;
+
+    /*
     let ctx = this.ctx;
     let canvas = this.canvas;
     let config = this.config;
@@ -264,6 +380,7 @@ export class ManhattanPlot {
     });
 
     ctx.restore();
+    */
   }
 
   drawLine(line) {
@@ -353,7 +470,7 @@ export class ManhattanPlot {
           if (onhover) onhover(point);
 
           if (content && trigger === 'hover' && !config.zoomOverlayActive)
-            this.showTooltip(ev, await content(point, this.tooltip));
+            showTooltip(this.tooltip, ev, await content(point, this.tooltip));
         }, config.point.tooltipDelay || 100)
       );
     }
@@ -361,7 +478,7 @@ export class ManhattanPlot {
     // call click event callbacks
     if (config.point.onclick || config.point.tooltip)
       canvas.addEventListener('click', async ev => {
-        this.hideTooltip();
+        hideTooltip(this.tooltip);
         const { tooltip, onclick } = config.point;
         const { trigger, content } = tooltip;
         const point = this.getPointFromEvent(ev);
@@ -370,7 +487,7 @@ export class ManhattanPlot {
         if (onclick) onclick(point);
 
         if (content && trigger === 'click')
-          this.showTooltip(ev, await content(point, this.tooltip));
+          showTooltip(this.tooltip, ev, await content(point, this.tooltip));
       });
 
     // allow either selection or zoom, but not both

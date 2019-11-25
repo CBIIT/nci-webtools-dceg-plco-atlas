@@ -158,7 +158,7 @@ export function ManhattanPlot({
             txStart: xAxis.extent[0],
             txEnd: xAxis.extent[1],
           });
-          plot.current.drawGenes(genes.filter(e => e.strand === '+'));
+          plot.current.drawGenes(genes);
         }
       },
       xAxis: {
@@ -187,7 +187,7 @@ export function ManhattanPlot({
       point: {
         size: 2,
         interactiveSize: 3,
-        opacity: 0.6,
+        opacity: 1,
         color: selectedChromosome % 2 ? '#e47618' : '#b55117',
         tooltip: {
           trigger: 'hover',
@@ -320,7 +320,7 @@ export function ManhattanPlot({
             txStart: xAxis.extent[0],
             txEnd: xAxis.extent[1],
           });
-          plot.current.drawGenes(genes.filter(e => e.strand === '+'));
+          plot.current.drawGenes(genes);
         }
       },
       xAxis: {
@@ -430,9 +430,9 @@ export function ManhattanPlot({
       </div>
       <div
         style={{
-          overflowX: 'auto',
-          overflowY: 'hidden',
-          height: '600px',
+          overflowX: 'visible',
+          // overflowY: 'auto',
+          // height: '600px',
         }}>
         <div ref={plotContainer} className="manhattan-plot" />
       </div>

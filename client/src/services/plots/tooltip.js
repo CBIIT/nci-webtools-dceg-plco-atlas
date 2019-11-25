@@ -59,7 +59,7 @@ export function showTooltip(tooltip, ev, html) {
     Math.min(localY, targetHeight - tooltipHeight) - tooltipOffset;
 
   setStyles(tooltip, {
-    leftPx: leftOffset,
-    topPx: topOffset
+    left: leftOffset + 'px',
+    top: topOffset + 'px',
   });
 }
