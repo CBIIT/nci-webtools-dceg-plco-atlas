@@ -6,7 +6,7 @@ import { CardDeck, Button } from 'react-bootstrap';
 export function Home({ links }) {
   return (
     <>
-      <div className="container video-banner-container text-center d-none d-md-block">
+      <div className="video-banner-container text-center d-none d-md-block">
         <img src="assets/images/plco-banner.jpg" alt="PLCO banner" style={{width: '100%'}}></img>
         {/* <video id="video-banner" autoPlay muted loop>
           <source src="assets/images/plco-banner.mp4" type="video/mp4" />
@@ -19,19 +19,18 @@ export function Home({ links }) {
           </div>
           <div
             className="col-6 w-50 my-3 align-self-center"
-            style={{ borderTop: '2px solid orange' }}></div>
+            style={{ borderTop: '3px solid white' }}></div>
           <div
-            className="col-12 text-center mt-2"
-            style={{ width: '100%', fontSize: '14pt' }}>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-            eiusmod tempor incididunt ut labore et dolore magna aliqua. Quam
-            lacus suspendisse faucibus interdum posuere lorem ipsum. Integer
-            malesuada nunc vel risus commodo viverra maecenas accumsan lacus.
+            className="col-12 text-center mt-2 font-weight-bold"
+            style={{ width: '100%', fontSize: '18pt' }}>
+            Simplifying GWAS for the Prostate, Lung, Colorectal and Ovarian
+            <br />
+            Cancer Screening Trial
           </div>
           <div
             className="col-12 text-center mt-5"
             style={{ width: '100%', fontSize: '14pt' }}>
-            <Button
+            {/* <Button
               className="mr-5 px-4"
               style={{ backgroundColor: '#F2711D', border: 'none' }}>
               Link
@@ -40,7 +39,7 @@ export function Home({ links }) {
               className="px-4"
               style={{ backgroundColor: '#01BDD4', border: 'none' }}>
               Link
-            </Button>
+            </Button> */}
           </div>
         </div>
       </div>
@@ -116,14 +115,14 @@ export function Home({ links }) {
                 </Card.Body>
                 <Card.Footer className="bg-egg" style={{ width: '100%' }}>
                   <Button
-                    className="my-2"
+                    className="my-2 border border-0"
                     style={{
-                      backgroundColor: '#545871',
+                      backgroundColor: '#2CC799',
                       borderRadius: '10px',
                       width: '90%'
                     }}>
                     <Link
-                      className="stretched-link text-light"
+                      className="stretched-link text-dark"
                       style={{textDecoration: 'none'}}
                       exact={exact}
                       key={index}
@@ -149,9 +148,10 @@ export function Home({ links }) {
           <h3 style={{ color: '#545871' }}>
             <b>OUR FOCUS</b>
           </h3>
-          <h4 className="text-secondary mt-3 text-orange">
-            Simplifying GWAS for the Prostate, Lung, Colorectal and Ovarian
-            Cancer Screening Trial
+          <h4 className="container text-secondary mt-3 text-dark">
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
+            eiusmod tempor incididunt ut labore et dolore magna aliqua. Quam
+            lacus suspendisse faucibus interdum posuere lorem ipsum.
           </h4>
         </div>
       </div>

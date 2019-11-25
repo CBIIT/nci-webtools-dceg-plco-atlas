@@ -62,7 +62,7 @@ export function Gwas() {
                   <NavLink
                     key={pathId}
                     className="text-secondary px-3 py-1 d-inline-block"
-                    activeClassName="active-secondary-navlinks border-primary border-bottom text-secondary"
+                    activeClassName="active-secondary-navlinks border-bottom text-secondary"
                     style={{
                       textDecoration: 'none',
                       fontSize: '11pt',
