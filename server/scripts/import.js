@@ -330,9 +330,11 @@ reader.on('close', () => {
     // drop staging table
     db.exec(`DELETE FROM variant_stage`);
 
-    // create indexes
-    console.log(`[${duration()} s] Indexing...`);
-    db.exec(readFile('indexes.sql'));
+    // create indexes only if tableSuffix === 'male' (last data inserted)
+    if (tableSuffix === 'male') {
+        console.log(`[${duration()} s] Indexing...`);
+        db.exec(readFile('indexes.sql'));
+    }
 
     // close database
     console.log(`[${duration()} s] Finalizing database...`);
