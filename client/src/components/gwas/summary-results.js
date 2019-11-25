@@ -366,6 +366,25 @@ export function SummaryResults() {
         <div className="d-md-none p-2"></div>
       
         <div className={openSidebar ? "col-md-9" : "col-md-12"}>
+         {/* <Tabs className="" defaultActiveKey="summary-results-criteria">
+            <Tab
+              eventKey="summary-results-criteria"
+              className="d-flex justify-content-between p-2 bg-white tab-pane-bordered rounded-0">
+                <div className="">
+                    <span>
+                      <b>Phenotype</b>: <span>TBD</span>
+                    </span>
+                    <span className="mx-3">|</span>
+                    <span>
+                      <b>Gender</b>: <span>TBD</span>
+                    </span>
+                </div>
+                <div className="">
+                    Total Variants: <span>TBD</span>
+                </div>
+            </Tab>
+          </Tabs> */}
+
           <Tabs className="" defaultActiveKey={selectedPlot} onSelect={setSelectedPlot}>
             <Tab
               eventKey="manhattan-plot"
@@ -392,7 +411,7 @@ export function SummaryResults() {
             <Tab
               eventKey="qq-plot"
               title="Q-Q Plot"
-              className="p-2 bg-white tab-pane-bordered" style={{minHeight: '50vh'}}>
+              className="p-2 bg-white tab-pane-bordered rounded-0" style={{minHeight: '50vh'}}>
               <div
                 className="mw-100 my-4"
                 style={{ display: submitted ? 'block' : 'none' }}>

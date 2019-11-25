@@ -136,6 +136,7 @@ export function drawQQPlot(phenotype, variantTable) {
       variant_female: 'count_female',
       variant_male: 'count_male',
     }[plotType])
+    
     const lambdaGCKey = plotType => ({
       variant_all: 'lambdagc_all',
       stacked: ['lambdagc_female', 'lambdagc_male'],

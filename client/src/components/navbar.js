@@ -4,7 +4,7 @@ import { NavLink } from 'react-router-dom';
 export function Navbar({ links }) {
   return (
     <div className="bg-primary text-white shadow-sm">
-      <div className="container">
+      <div className="ml-3">
         {[{ route: '/', title: 'Home', exact: true }]
           .concat(links)
           .sort((a, b) => a.navIndex - b.navIndex)
