@@ -197,7 +197,7 @@ select.form-control-sm {
 }
 
 h1 {
-  color: #ff8c00;
+  color: #2CC799;
 }
 
 /** home.js video banner*/
@@ -232,8 +232,8 @@ h1 {
 }
 
 .active-navlinks {
-  background-color: rgb(242, 113, 29) !important;
-  color: white !important;
+  background-color: #2CC799 !important;
+  color: #333c4e !important;
   font-weight: bold !important;
 
   button {
@@ -248,6 +248,7 @@ h1 {
 }
 
 .active-secondary-navlinks {
+  border-color: #2CC799 !important;
   border-width: 2px !important;
 }
 
