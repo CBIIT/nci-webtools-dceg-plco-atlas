@@ -50,7 +50,7 @@ $enable-shadows: true;
 }
 
 .btn-silver:hover {
-  background-image: 
+  background-image:
     linear-gradient(
       #ffffff, #dfdfdf
     );
@@ -59,7 +59,7 @@ $enable-shadows: true;
 }
 
 .btn-silver:active {
-  background-image: 
+  background-image:
     linear-gradient(
       #dfdfdf, #e5e5e5
     ) !important;
@@ -252,6 +252,10 @@ h1 {
   border-width: 2px !important;
 }
 
+._loading_overlay_wrapper {
+  pointer-events: none;
+}
+
 // .navlinks-card {
 //   font-size: 10pt;
 // }
@@ -303,6 +307,12 @@ h1 {
     border-radius: 0.25rem;
     padding: 0.5rem 1rem;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  }
+
+  &.gene-plot-collapsed {
+    [data-type="gene-plot"] {
+      display: none;
+    }
   }
 }
 
