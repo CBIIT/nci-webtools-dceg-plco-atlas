@@ -15,8 +15,6 @@ import {
   removeAllVals,
   getAllLeafs } from '../controls/tree-select';
 import { updateVariantLookup } from '../../services/actions';
-import TreeSelect, { TreeNode } from 'rc-tree-select';
-import 'rc-tree-select/assets/index.css';
 import { TreeSelectCustom } from '../controls/tree-select-custom';
 
 export function VariantLookupForm({ onChange, onSubmit, onReset }) {
@@ -75,30 +73,6 @@ export function VariantLookupForm({ onChange, onSubmit, onReset }) {
     a.title.localeCompare(b.title)
   );
 
-  // const treeDataTest = [
-  //   {
-  //     key: 'first-level-node-1',
-  //     label: 'Node 1 at the first level',
-  //     nodes: [
-  //       {
-  //         key: 'second-level-node-1',
-  //         label: 'Node 1 at the second level',
-  //         nodes: [
-  //           {
-  //             key: 'third-level-node-1',
-  //             label: 'Last node of the branch',
-  //             nodes: [] // you can remove the nodes property or leave it as an empty array
-  //           },
-  //         ],
-  //       },
-  //     ],
-  //   },
-  //   {
-  //     key: 'first-level-node-2',
-  //     label: 'Node 2 at the first level',
-  //   },
-  // ];
-
   const handleChangeCustom = (items) => {
     setSelectedPhenotypes(items);
     // console.log("selected", items);
@@ -128,47 +102,6 @@ export function VariantLookupForm({ onChange, onSubmit, onReset }) {
         data={phenotypesTree}
         value={selectedPhenotypes}
         onChange={handleChangeCustom}
-      />
-
-      {/* <br></br>
-
-      <div className="border border-dark">
-          SHOW LIST OF SELECTED PHENOTYPES HERE
-          <ul>
-            {
-              selectedPhenotypes.map((item) => 
-                (
-                <li>
-                  {item.title}
-                </li>)
-              )
-            }
-          </ul>
-      </div> */}
-
-      <br></br>
-
-      <TreeSelect
-        className="form-control h-100 p-0"
-        dropdownClassName="variant-lookup"
-        style={{ width: '100%', maxHeight: 76, overflow: 'auto' }}
-        dropdownStyle={{ maxHeight: 500, overflow: 'auto' }}
-        treeData={
-          selectedListType === 'alphabetic'
-            ? alphabetizedPhenotypes
-            : phenotypesTree
-        }
-        value={selectedPhenotypes}
-        onChange={handleChange}
-        treeNodeFilterProp="title"
-        dropdownMatchSelectWidth
-        autoClearSearchValue
-        // treeDefaultExpandAll
-        treeLine
-        multiple
-        allowClear
-        labelInValue
-        placeholder="(Select one or more phenotypes)"
       />
 
       <br></br>
