@@ -53,10 +53,20 @@ export class ManhattanPlot {
     [this.hiddenCanvas, this.hiddenCtx] = getCanvasAndContext();
 
     // create a canvas for drawing the gene plot
+    this.geneCanvasContainer = document.createElement('div');
+    this.geneCanvasContainer.setAttribute('data-type', 'gene-plot');
+    setStyles(this.geneCanvasContainer, {
+      maxHeight: '300px',
+      overflowY: 'auto',
+      overflowX: 'hidden'
+    });
+
     [this.geneCanvas, this.geneCtx] = getCanvasAndContext();
-    setStyles(this.geneCanvas, { display: 'block' });
+    // setStyles(this.geneCanvas, { display: 'block' });
     this.geneCanvas.height = 0;
-    this.container.appendChild(this.geneCanvas);
+    this.geneCanvasContainer.appendChild(this.geneCanvas);
+    this.container.append(this.geneCanvasContainer);
+    this.geneCanvasContainer.append(this.geneCanvas);
 
     // create a tooltip container
     this.tooltip = createTooltip({
@@ -269,7 +279,7 @@ export class ManhattanPlot {
 
     geneCanvas.height = rowHeight * numRows;
     geneCanvas.width = this.canvas.width
-    this.container.style.height = (geneCanvas.height + this.canvas.height) + 'px';
+    // this.container.style.height = (geneCanvas.height + this.canvas.height) + 'px';
 
     packedGeneRanges.forEach((geneRow, rowIndex) => {
       let yOffset = rowHeight * rowIndex;
@@ -552,6 +562,8 @@ export class ManhattanPlot {
     this.canvas.remove();
     this.overlayCanvas.remove();
     this.tooltip.remove();
+    this.geneCanvasContainer.remove();
+    this.geneCanvas.remove();
 
     this.canvas.onclick = null;
     this.hiddenCanvas = null;
