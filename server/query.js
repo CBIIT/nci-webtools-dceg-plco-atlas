@@ -165,7 +165,7 @@ function getVariants(filepath, params) {
 
     // create count sql based on original query
     let countSql = `SELECT COUNT(1) FROM (${sql})`;
-    
+
     logger.debug(`SQL: ${sql}`);
     // query database
     const db = new Database(filepath, {readonly: true});
@@ -225,11 +225,12 @@ function getGenes(filepath, params) {
         WHERE
             chr = :chr AND
             (
-                (tx_start >= :txStart AND tx_end <= :txEnd) OR
-                (tx_start <= :txStart AND tx_end >= :txEnd)
+                (tx_start BETWEEN :txStart AND :txEnd) OR
+                (tx_end BETWEEN :txStart AND :txEnd)
             )
     `).all(params);
 
+    // since exon_starts/ends are comma-delimited strings, we should parse them as arrays
     if (columns.includes('exon_starts') || columns.includes('exon_ends')) {
         const split = e => (e || '').split(',').filter(e => e !== '').map(e => +e);
         records = records.map(e => {

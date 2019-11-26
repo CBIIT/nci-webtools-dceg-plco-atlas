@@ -151,14 +151,15 @@ export function ManhattanPlot({
         onZoom(e);
 
         // draw genes if zoom is at less than 50 MB
-        if (zoomRange <= 5e7) {
+        plot.current.drawGenes([]);
+        if (zoomRange <= 1e6) {
           let genes = await query('genes', {
             database: 'gene.db',
             chr: selectedChromosome,
             txStart: xAxis.extent[0],
             txEnd: xAxis.extent[1],
           });
-          plot.current.drawGenes(genes.filter(e => e.strand === '+'));
+          plot.current.drawGenes(genes);
         }
       },
       xAxis: {
@@ -187,7 +188,7 @@ export function ManhattanPlot({
       point: {
         size: 2,
         interactiveSize: 3,
-        opacity: 0.6,
+        opacity: 1,
         color: selectedChromosome % 2 ? '#e47618' : '#b55117',
         tooltip: {
           trigger: 'hover',
@@ -313,14 +314,15 @@ export function ManhattanPlot({
         onZoom(e);
 
         // draw genes if zoom is at less than 50 MB
-        if (zoomRange <= 5e7) {
+        plot.current.drawGenes([]);
+        if (zoomRange <= 1e6) {
           let genes = await query('genes', {
             database: 'gene.db',
             chr: selectedChromosome,
             txStart: xAxis.extent[0],
             txEnd: xAxis.extent[1],
           });
-          plot.current.drawGenes(genes.filter(e => e.strand === '+'));
+          plot.current.drawGenes(genes);
         }
       },
       xAxis: {
@@ -430,11 +432,19 @@ export function ManhattanPlot({
       </div>
       <div
         style={{
-          overflowX: 'auto',
-          overflowY: 'hidden',
-          height: '600px',
+          overflowX: 'visible',
+          // overflowY: 'auto',
+          // height: '600px',
         }}>
         <div ref={plotContainer} className="manhattan-plot" />
+        {(() => {
+              if (manhattanPlotView === 'summary') return null;
+              let zoomMessage = <p class="h4 mt-0 mb-5 text-center">Please zoom in to see genes.</p>
+              if (!zoomStack || !zoomStack.length) return zoomMessage;
+              let { xMax, xMin } = zoomStack[zoomStack.length - 1].bounds;
+              let xRange = xMax - xMin;
+              if (xRange > 1e6) return zoomMessage;
+            })()}
       </div>
     </div>
   );
