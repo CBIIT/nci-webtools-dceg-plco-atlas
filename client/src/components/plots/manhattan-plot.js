@@ -151,7 +151,8 @@ export function ManhattanPlot({
         onZoom(e);
 
         // draw genes if zoom is at less than 50 MB
-        if (zoomRange <= 5e7) {
+        plot.current.drawGenes([]);
+        if (zoomRange <= 1e6) {
           let genes = await query('genes', {
             database: 'gene.db',
             chr: selectedChromosome,
@@ -313,7 +314,8 @@ export function ManhattanPlot({
         onZoom(e);
 
         // draw genes if zoom is at less than 50 MB
-        if (zoomRange <= 5e7) {
+        plot.current.drawGenes([]);
+        if (zoomRange <= 1e6) {
           let genes = await query('genes', {
             database: 'gene.db',
             chr: selectedChromosome,
@@ -435,6 +437,14 @@ export function ManhattanPlot({
           // height: '600px',
         }}>
         <div ref={plotContainer} className="manhattan-plot" />
+        {(() => {
+              if (manhattanPlotView === 'summary') return null;
+              let zoomMessage = <p class="h4 mt-0 mb-5 text-center">Please zoom in to see genes.</p>
+              if (!zoomStack || !zoomStack.length) return zoomMessage;
+              let { xMax, xMin } = zoomStack[zoomStack.length - 1].bounds;
+              let xRange = xMax - xMin;
+              if (xRange > 1e6) return zoomMessage;
+            })()}
       </div>
     </div>
   );
