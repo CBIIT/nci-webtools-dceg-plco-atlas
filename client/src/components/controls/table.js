@@ -81,16 +81,20 @@ export const overlayConfig = {
     spinner: true,
     styles: {
         spinner: base => ({
-        ...base,
-        marginTop: '10px',
-        width: '40px',
-        '& svg circle': {
-            stroke: '#888'
-        }
+            ...base,
+            marginTop: '10px',
+            width: '40px',
+            '& svg circle': {
+                stroke: '#888'
+            }
+        }),
+        wrapper: base => ({
+            ...base,
+            'pointer-events': 'none',
         }),
         overlay: base => ({
-        ...base,
-        background: 'rgba(255, 255, 255, 0.4)'
+            ...base,
+            background: 'rgba(255, 255, 255, 0.4)',
         }),
     }
 }
