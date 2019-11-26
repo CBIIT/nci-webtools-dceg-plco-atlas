@@ -7,6 +7,10 @@ import paginationFactory from 'react-bootstrap-table2-paginator';
 import filterFactory, { textFilter } from 'react-bootstrap-table2-filter';
 import ToolkitProvider, { CSVExport } from 'react-bootstrap-table2-toolkit';
 import { Alert, Button, Tabs, Tab, Collapse } from 'react-bootstrap';
+import { VariantLookupSearchCriteria } from '../controls/variant-lookup-search-criteria';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faCaretRight, faCaretLeft } from '@fortawesome/free-solid-svg-icons'
+
 
 export function VariantLookup() {
   const dispatch = useDispatch();
@@ -14,6 +18,7 @@ export function VariantLookup() {
   const {
     selectedPhenotypes,
     selectedVariant,
+    selectedGender,
     results,
     messages,
     loading,
@@ -103,6 +108,10 @@ export function VariantLookup() {
     dispatch(updateVariantLookup({ submitted }));
   };
 
+  const setSearchCriteriaVariantLookup = searchCriteriaVariantLookup => {
+    dispatch(updateVariantLookup({ searchCriteriaVariantLookup }));
+  }
+
   const validateVariantInput = (variant) => {
     if (
       variant.match(/^[r|R][s|S][0-9]+$/) != null 
@@ -167,6 +176,12 @@ export function VariantLookup() {
       ]);
       return;
     }
+    setSearchCriteriaVariantLookup({
+      phenotypes: selectedPhenotypes.map((item) => item.title),
+      variant: selectedVariant,
+      gender: selectedGender,
+      totalPhenotypes: selectedPhenotypes.length
+    });
     setSubmitted(new Date());
     dispatch(lookupVariants(selectedPhenotypes, selectedVariant));
   }
@@ -182,7 +197,8 @@ export function VariantLookup() {
         results: [],
         messages: [],
         loading: false,
-        submitted: null
+        submitted: null,
+        searchCriteriaVariantLookup: {}
       })
     );
   };
@@ -192,12 +208,13 @@ export function VariantLookup() {
   return (
     <>
       <Button
+        title="Show/hide search panel"
         variant="link"
         style={{position: 'absolute', zIndex: 100}}
         onClick={() => setOpenSidebar(!openSidebar)}
         aria-controls="variant-lookup-collapse-input-panel"
         aria-expanded={openSidebar}>
-        { openSidebar ? <span>&#171;</span> : <span>&#187;</span>}
+        { openSidebar ? <FontAwesomeIcon icon={faCaretLeft} size="lg"/> : <FontAwesomeIcon icon={faCaretRight} size="lg"/>}
       </Button>
       
       <div className={openSidebar ? "row mx-3" : "mx-3"}>
@@ -225,6 +242,8 @@ export function VariantLookup() {
         <div className="d-md-none p-2"></div>
         
         <div className={openSidebar ? "col-md-9" : "col-md-12"}>
+          <VariantLookupSearchCriteria />
+          
           <Tabs defaultActiveKey="variant-lookup">
             <Tab
               eventKey="variant-lookup"
