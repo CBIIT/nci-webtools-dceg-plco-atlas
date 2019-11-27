@@ -347,24 +347,13 @@ export function SummaryResults() {
   const [openSidebar, setOpenSidebar] = useState(true);
 
   return (
-    <>
-      <Button
-        title="Show/hide search panel"
-        variant="link"
-        style={{position: 'absolute', zIndex: 100}}
-        onClick={() => setOpenSidebar(!openSidebar)}
-        aria-controls="summary-results-collapse-input-panel"
-        aria-expanded={openSidebar}>
-        { openSidebar ? <FontAwesomeIcon icon={faCaretLeft} size="lg"/> : <FontAwesomeIcon icon={faCaretRight} size="lg"/>}
-      </Button>
-      
+    <div style={{position: 'relative'}}>
       <div className={openSidebar ? "row mx-3" : "mx-3"}>
-        {openSidebar && (
-          <div className="col-md-3">
+        <div className="col-md-3">
+          {openSidebar && (
             <Tabs defaultActiveKey="summary-results-form">
               <Tab
                 eventKey="summary-results-form"
-                // title="Table"
                 className="p-2 bg-white tab-pane-bordered rounded-0"
                 style={{minHeight: '100%'}}>
                 <SummaryResultsForm onSubmit={handleSubmit} onChange={handleChange} onReset={handleReset} />
@@ -376,8 +365,17 @@ export function SummaryResults() {
                   ))}
               </Tab>
             </Tabs>
-          </div>
-        )}
+          )}
+          <Button
+            title="Show/hide search panel"
+            variant="link"
+            style={{position: 'absolute', zIndex: 100, top: '7px', [openSidebar ? 'right' : 'left']: '-15px'}}
+            onClick={() => setOpenSidebar(!openSidebar)}
+            aria-controls="summary-results-collapse-input-panel"
+            aria-expanded={openSidebar}>
+            { openSidebar ? <FontAwesomeIcon icon={faCaretLeft} size="lg"/> : <FontAwesomeIcon icon={faCaretRight} size="lg"/>}
+          </Button>
+        </div>
 
         <div className="d-md-none p-2"></div>
       
@@ -421,6 +419,6 @@ export function SummaryResults() {
           </Tabs>
         </div>
       </div>
-    </>
+    </div>
   );
 }
