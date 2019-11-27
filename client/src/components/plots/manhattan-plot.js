@@ -471,15 +471,27 @@ export function ManhattanPlot({
         {manhattanPlotView !== 'summary' && (
           <div className="text-center px-5">
             {(() => {
-                  if (genePlotCollapsed) return null;
-                  let zoomMessage = <div className="p-4 mb-0 text-muted small" style={{border: '1px solid #eee'}}>Gene plot is not available at the current zoom level. To show genes, please zoom in to a 1MB viewport.</div>
-                  if (!zoomStack || !zoomStack.length) return zoomMessage;
-                  let { xMax, xMin } = zoomStack[zoomStack.length - 1].bounds;
-                  let xRange = xMax - xMin;
-                  if (xRange > 1e6) return zoomMessage;
+              if (genePlotCollapsed) return null;
+              let zoomMessage = (
+                <div
+                  className="p-4 mb-0 text-muted small"
+                  style={{ border: '1px solid #eee' }}>
+                  Gene plot is not available at the current zoom level. To show
+                  genes, please zoom in to a 1MB viewport.
+                </div>
+              );
+              if (!zoomStack || !zoomStack.length) return zoomMessage;
+              let { xMax, xMin } = zoomStack[zoomStack.length - 1].bounds;
+              let xRange = xMax - xMin;
+              if (xRange > 1e6) return zoomMessage;
             })()}
-            <button className="btn-collapse" onClick={e => setGenePlotCollapsed(!genePlotCollapsed)}>
-              <Icon name={genePlotCollapsed ? 'angle-down' : 'angle-up'} width="10"/>
+            <button
+              className="btn-collapse"
+              onClick={e => setGenePlotCollapsed(!genePlotCollapsed)}>
+              <Icon
+                name={genePlotCollapsed ? 'angle-down' : 'angle-up'}
+                width="10"
+              />
             </button>
           </div>
         )}
