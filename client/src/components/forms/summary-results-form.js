@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { FormControl, InputGroup, Button, Row, Col } from 'react-bootstrap';
 import { updateSummaryResults } from '../../services/actions';
-import TreeSelect, { TreeNode } from 'rc-tree-select';
-import 'rc-tree-select/assets/index.css';
+import { TreeSelectCustom } from '../controls/tree-select-custom';
+
 
 export function SummaryResultsForm({ onChange, onSubmit, onReset }) {
   const dispatch = useDispatch();
@@ -28,57 +28,57 @@ export function SummaryResultsForm({ onChange, onSubmit, onReset }) {
     dispatch(updateSummaryResults({ selectedManhattanPlotType }));
   };
 
-  const handleChange = params => {
-    // only clear selection
-    if (params.length === 0) {
-      setSelectedPhenotype(params);
+  const handleChangeCustom = (item) => {
+    if (item && item[0]) {
+      setSelectedPhenotype(item[0]);
     }
-  };
-
-  const handleSelect = (value, node, extra) => {
-    // can only select leaf nodes
-    if (node.props.children.length === 0 && !node.props.parent) {
-      setSelectedPhenotype({value: value.value, title: value.label});
-      onChange({value: value.value, title: value.label});
-    }
-  };
+  }
 
   const alphabetizedPhenotypes = [...phenotypes].sort((a, b) =>
     a.title.localeCompare(b.title)
   );
 
+  const handleListTypeChange = (value) => {
+    setSelectedListType(value);
+  };
+
   return (
     <>
-      <select
-        className="form-control"
-        value={selectedListType}
-        onChange={e => setSelectedListType(e.target.value)}>
-        <option value="categorical">Categorical</option>
-        <option value="alphabetic">Alphabetic</option>
-      </select>
+      <form className="sortByToggle">
+        <div className="row">
+          <div className="col-md-auto pr-0">
+            <b>Phenotypes</b>
+          </div>
+          <div className="col-md-auto radio pr-0">
+            <label>
+              <input 
+                className="mr-1" 
+                type="radio" 
+                value="categorical" 
+                checked={selectedListType === "categorical" ? true : false} 
+                onChange={e => handleListTypeChange(e.target.value)}/>
+              By Category
+            </label>
+          </div>
+          <div className="col-md-auto radio pr-0">
+            <label>
+              <input 
+                className="mr-1" 
+                type="radio" 
+                value="alphabetic" 
+                checked={selectedListType === "alphabetic" ? true : false} 
+                onChange={e => handleListTypeChange(e.target.value)}/>
+              By Name
+            </label>
+          </div>
+        </div>
+      </form>
 
-      <TreeSelect
-        className="form-control h-100 p-0"
-        dropdownClassName="summary-results"
-        style={{ width: '100%' }}
-        dropdownStyle={{ maxHeight: 500, overflow: 'auto' }}
-        treeData={
-          selectedListType === 'alphabetic'
-            ? alphabetizedPhenotypes
-            : phenotypesTree
-        }
+      <TreeSelectCustom
+        data={phenotypesTree}
         value={selectedPhenotype}
-        onChange={handleChange}
-        onSelect={handleSelect}
-        treeNodeFilterProp="title"
-        dropdownMatchSelectWidth
-        autoClearSearchValue
-        // treeDefaultExpandAll
-        treeLine
-        allowClear
-        labelInValue
-        multiple
-        placeholder="(Select one phenotype)"
+        onChange={handleChangeCustom}
+        singleSelect={true}
       />
 
       <br></br>
