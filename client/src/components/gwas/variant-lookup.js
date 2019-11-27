@@ -225,7 +225,8 @@ export function VariantLookup() {
                 eventKey="variant-lookup-form"
                 // title="Table"
                 className="p-2 bg-white tab-pane-bordered rounded-0"
-                style={{minHeight: '100%'}}>
+                // style={{minHeight: '550px'}}
+                >
                 <VariantLookupForm onSubmit={handleSubmit} onChange={handleChange} onReset={handleReset} />
                 {messages &&
                   messages.map(({ type, content }) => (
