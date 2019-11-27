@@ -3,26 +3,16 @@ import { useSelector, useDispatch } from 'react-redux';
 import { PhenotypeCorrelationsForm } from '../forms/phenotype-correlations-form';
 import { Heatmap } from '../plots/heatmap-plot';
 import { Alert, Tabs, Tab, Button } from 'react-bootstrap';
-import { PhenotypeCorrelationsSearchCriteria } from '../controls/phenotype-correlations-search-criteria';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faCaretRight, faCaretLeft } from '@fortawesome/free-solid-svg-icons'
 import {
   updatePhenotypeCorrelations,
   drawHeatmap
 } from '../../services/actions';
-
-
 
 export function PhenotypeCorrelations() {
   const dispatch = useDispatch();
   const phenotypeCorrelations = useSelector(
     state => state.phenotypeCorrelations
   );
-  const {
-    selectedPhenotypes,
-    selectedGender,
-  } = phenotypeCorrelations;
-
   const { submitted, messages } = phenotypeCorrelations;
 
   const setSubmitted = submitted => {
@@ -40,10 +30,6 @@ export function PhenotypeCorrelations() {
   const clearMessages = e => {
     setMessages([]);
   };
-
-  const setSearchCriteriaPhenotypeCorrelations = searchCriteriaPhenotypeCorrelations => {
-    dispatch(updatePhenotypeCorrelations({ searchCriteriaPhenotypeCorrelations }));
-  }
 
   const placeholder = (
     <div style={{ display: submitted ? 'none' : 'block' }}>
@@ -69,12 +55,6 @@ export function PhenotypeCorrelations() {
       return;
     }
 
-    setSearchCriteriaPhenotypeCorrelations({
-      phenotypes: selectedPhenotypes.map((item) => item.title ? item.title : item.label),
-      gender: selectedGender,
-      totalPhenotypes: selectedPhenotypes.length
-    });
-
     setSubmitted(new Date());
     setPopupTooltipData(null);
     console.log('submit');
@@ -95,8 +75,7 @@ export function PhenotypeCorrelations() {
         submitted: null,
         messages: [],
         popupTooltipStyle: {display: 'none'},
-        popupTooltipData: null,
-        searchCriteriaPhenotypeCorrelations: {}
+        popupTooltipData: null
       })
     );
   };
@@ -106,13 +85,12 @@ export function PhenotypeCorrelations() {
   return (
     <>
       <Button
-        title="Show/hide search panel"
         variant="link"
         style={{position: 'absolute', zIndex: 100}}
         onClick={() => setOpenSidebar(!openSidebar)}
         aria-controls="phenotype-correlations-collapse-input-panel"
         aria-expanded={openSidebar}>
-        { openSidebar ? <FontAwesomeIcon icon={faCaretLeft} size="lg"/> : <FontAwesomeIcon icon={faCaretRight} size="lg"/>}
+        { openSidebar ? <span>&#171;</span> : <span>&#187;</span>}
       </Button>
 
       <div className={openSidebar ? "row mx-3" : "mx-3"}>
@@ -139,8 +117,6 @@ export function PhenotypeCorrelations() {
         <div className="d-md-none p-2"></div>
       
         <div className={openSidebar ? "col-md-9" : "col-md-12"}>
-          <PhenotypeCorrelationsSearchCriteria />
-
           <Tabs defaultActiveKey="phenotype-correlations">
             <Tab
               eventKey="phenotype-correlations"
