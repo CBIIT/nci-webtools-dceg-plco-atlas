@@ -24,6 +24,7 @@ const initialState = {
     qqplotSrc: '',
     areaItems: [],
     lambdaGC: '',
+    sampleSize: '',
     submitted: null,
     loadingManhattanTable: false,
     loadingManhattanPlot: false,
@@ -38,8 +39,6 @@ const initialState = {
     qqplotData: [],
     qqplotLayout: {},
     qqplotStacked: false,
-    searchCriteriaSummaryResults: {},
-    sampleSize: null
   },
   summaryTables: [
     {
@@ -64,8 +63,7 @@ const initialState = {
     results: [],
     messages: [],
     loading: false,
-    submitted: null,
-    searchCriteriaVariantLookup: {}
+    submitted: null
   },
   phenotypeCorrelations: {
     selectedListType: 'categorical',
@@ -77,7 +75,6 @@ const initialState = {
     loading: false,
     submitted: null,
     messages: [],
-    searchCriteriaPhenotypeCorrelations: {}
     // tooltipData: null
   }
 };
