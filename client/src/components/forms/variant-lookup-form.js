@@ -2,7 +2,6 @@ import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   Form,
-  FormControl,
   InputGroup,
   Row,
   Col,
@@ -123,7 +122,8 @@ export function VariantLookupForm({ onChange, onSubmit, onReset }) {
 
       <br></br>
 
-      <FormControl
+      <b>Variant</b>
+      <input
         className="form-control"
         // style={{ width: '470px' }}
         placeholder="(Variant rsid or coordinate)"
@@ -139,6 +139,7 @@ export function VariantLookupForm({ onChange, onSubmit, onReset }) {
 
       <br></br>
 
+      <b>Gender</b>
       <select
         className="form-control"
         value={selectedGender}

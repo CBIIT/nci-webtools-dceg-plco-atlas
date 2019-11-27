@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { FormControl, InputGroup, Button, Row, Col } from 'react-bootstrap';
+import { Button } from 'react-bootstrap';
 import { updateSummaryResults } from '../../services/actions';
 import { TreeSelectCustom } from '../controls/tree-select-custom';
 
@@ -83,6 +83,7 @@ export function SummaryResultsForm({ onChange, onSubmit, onReset }) {
 
       <br></br>
 
+      <b>Gender</b>
       <select
         className="form-control"
         value={selectedManhattanPlotType}
