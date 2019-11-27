@@ -369,7 +369,7 @@ export function SummaryResults() {
           <Button
             title="Show/hide search panel"
             variant="link"
-            style={{position: 'absolute', zIndex: 100, top: '7px', [openSidebar ? 'right' : 'left']: '-15px'}}
+            style={{color: '#008CBA', position: 'absolute', zIndex: 100, top: '7px', [openSidebar ? 'right' : 'left']: '-15px'}}
             onClick={() => setOpenSidebar(!openSidebar)}
             aria-controls="summary-results-collapse-input-panel"
             aria-expanded={openSidebar}>

@@ -51,6 +51,7 @@ export const PhenotypeCorrelationsSearchCriteria = (props) => {
                             <span className="mr-1">
                                 <Button 
                                     className="p-0"
+                                    style={{color: searchCriteriaPhenotypeCorrelations.phenotypes ? '#008CBA' : ''}}
                                     title="Expand/collapse search criteria panel"
                                     variant="link"
                                     onClick={e => toggleCollapseCriteria()}
@@ -74,7 +75,7 @@ export const PhenotypeCorrelationsSearchCriteria = (props) => {
                                         }
                                         <button 
                                             className="ml-1 p-0 text-primary"
-                                            style={{all: 'unset', textDecoration: 'underline', cursor: 'pointer'}}
+                                            style={{all: 'unset', textDecoration: 'underline', cursor: 'pointer', color: '#008CBA'}}
                                             title="Expand/collapse search criteria panel"
                                             onClick={e => toggleCollapseCriteria()}
                                             aria-controls="search-criteria-collapse-panel"
