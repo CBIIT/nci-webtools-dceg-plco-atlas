@@ -73,13 +73,14 @@ export function ManhattanPlot({
       data: plotData.data,
       data2: mirroredPlotData.data,
       genes: plotData.genes,
+      title: [
+        {
+          text: selectedPhenotype.title,
+          font: `600 14px ${systemFont}`
+        }
+      ],
       xAxis: {
-        title: [
-          {
-            text: selectedPhenotype.title,
-            font: `600 14px ${systemFont}`
-          }
-        ],
+        title: null,
         key: columnIndexes.bp,
         tickFormat: tick => (tick / 1e6).toPrecision(3) + ' MB',
         ticks: ranges.filter(r => r.chr <= 22).map(r => r.max_bp_abs),
@@ -163,8 +164,9 @@ export function ManhattanPlot({
           plot.current.drawGenes(genes);
         }
       },
+      title: [{ text: title, font: `600 14px ${systemFont}` }],
       xAxis: {
-        title: [{ text: title, font: `600 14px ${systemFont}` }],
+        title: null,
         key: columnIndexes.bp,
         tickFormat: tick => (tick / 1e6).toPrecision(4) + ' MB',
         extent: [range.bp_min, range.bp_max]
@@ -243,13 +245,14 @@ export function ManhattanPlot({
     return {
       data: plotData.data,
       genes: plotData.genes,
+      title: [
+        {
+          text: selectedPhenotype.title,
+          font: `600 14px ${systemFont}`
+        }
+      ],
       xAxis: {
-        title: [
-          {
-            text: selectedPhenotype.title,
-            font: `600 14px ${systemFont}`
-          }
-        ],
+        title: null,
         key: columnIndexes.bp,
         tickFormat: tick => (tick / 1e6).toPrecision(3) + ' MB',
         ticks: ranges.filter(r => r.chr <= 22).map(r => r.max_bp_abs),
@@ -324,8 +327,9 @@ export function ManhattanPlot({
           plot.current.drawGenes(genes);
         }
       },
+      title: [{ text: title, font: `600 14px ${systemFont}` }],
       xAxis: {
-        title: [{ text: title, font: `600 14px ${systemFont}` }],
+        title: null,
         key: columnIndexes.bp,
         tickFormat: tick => (tick / 1e6).toPrecision(4) + ' MB',
         extent: [range.bp_min, range.bp_max]
@@ -467,25 +471,15 @@ export function ManhattanPlot({
         {manhattanPlotView !== 'summary' && (
           <div className="text-center px-5">
             {(() => {
-              if (genePlotCollapsed) return null;
-              let zoomMessage = (
-                <p className="p-4 mb-0" style={{ border: '1px solid #ccc' }}>
-                  Gene plot is not available at the current zoom level. To show
-                  genes, please zoom in to a 1MB viewport.
-                </p>
-              );
-              if (!zoomStack || !zoomStack.length) return zoomMessage;
-              let { xMax, xMin } = zoomStack[zoomStack.length - 1].bounds;
-              let xRange = xMax - xMin;
-              if (xRange > 1e6) return zoomMessage;
+                  if (genePlotCollapsed) return null;
+                  let zoomMessage = <div className="p-4 mb-0 text-muted small" style={{border: '1px solid #eee'}}>Gene plot is not available at the current zoom level. To show genes, please zoom in to a 1MB viewport.</div>
+                  if (!zoomStack || !zoomStack.length) return zoomMessage;
+                  let { xMax, xMin } = zoomStack[zoomStack.length - 1].bounds;
+                  let xRange = xMax - xMin;
+                  if (xRange > 1e6) return zoomMessage;
             })()}
-            <button
-              className="btn btn-collapse"
-              onClick={e => setGenePlotCollapsed(!genePlotCollapsed)}>
-              <Icon
-                name={genePlotCollapsed ? 'angle-down' : 'angle-up'}
-                width="10"
-              />
+            <button className="btn-collapse" onClick={e => setGenePlotCollapsed(!genePlotCollapsed)}>
+              <Icon name={genePlotCollapsed ? 'angle-down' : 'angle-up'} width="10"/>
             </button>
           </div>
         )}
