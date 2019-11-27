@@ -4,24 +4,19 @@ import { PhenotypeCorrelationsForm } from '../forms/phenotype-correlations-form'
 import { Heatmap } from '../plots/heatmap-plot';
 import { Alert, Tabs, Tab, Button } from 'react-bootstrap';
 import { PhenotypeCorrelationsSearchCriteria } from '../controls/phenotype-correlations-search-criteria';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faCaretRight, faCaretLeft } from '@fortawesome/free-solid-svg-icons'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCaretRight, faCaretLeft } from '@fortawesome/free-solid-svg-icons';
 import {
   updatePhenotypeCorrelations,
   drawHeatmap
 } from '../../services/actions';
-
-
 
 export function PhenotypeCorrelations() {
   const dispatch = useDispatch();
   const phenotypeCorrelations = useSelector(
     state => state.phenotypeCorrelations
   );
-  const {
-    selectedPhenotypes,
-    selectedGender,
-  } = phenotypeCorrelations;
+  const { selectedPhenotypes, selectedGender } = phenotypeCorrelations;
 
   const { submitted, messages } = phenotypeCorrelations;
 
@@ -42,8 +37,10 @@ export function PhenotypeCorrelations() {
   };
 
   const setSearchCriteriaPhenotypeCorrelations = searchCriteriaPhenotypeCorrelations => {
-    dispatch(updatePhenotypeCorrelations({ searchCriteriaPhenotypeCorrelations }));
-  }
+    dispatch(
+      updatePhenotypeCorrelations({ searchCriteriaPhenotypeCorrelations })
+    );
+  };
 
   const placeholder = (
     <div style={{ display: submitted ? 'none' : 'block' }}>
@@ -70,7 +67,9 @@ export function PhenotypeCorrelations() {
     }
 
     setSearchCriteriaPhenotypeCorrelations({
-      phenotypes: selectedPhenotypes.map((item) => item.title ? item.title : item.label),
+      phenotypes: selectedPhenotypes.map(item =>
+        item.title ? item.title : item.label
+      ),
       gender: selectedGender,
       totalPhenotypes: selectedPhenotypes.length
     });
@@ -94,7 +93,7 @@ export function PhenotypeCorrelations() {
         loading: false,
         submitted: null,
         messages: [],
-        popupTooltipStyle: {display: 'none'},
+        popupTooltipStyle: { display: 'none' },
         popupTooltipData: null,
         searchCriteriaPhenotypeCorrelations: {}
       })
@@ -104,8 +103,8 @@ export function PhenotypeCorrelations() {
   const [openSidebar, setOpenSidebar] = useState(true);
 
   return (
-    <div style={{position: 'relative'}}>
-      <div className={openSidebar ? "row mx-3" : "mx-3"}>
+    <div style={{ position: 'relative' }}>
+      <div className={openSidebar ? 'row mx-3' : 'mx-3'}>
         <div className="col-md-3">
           {openSidebar && (
             <Tabs defaultActiveKey="phenotype-correlations-form">
@@ -113,8 +112,12 @@ export function PhenotypeCorrelations() {
                 eventKey="phenotype-correlations-form"
                 // title="Table"
                 className="p-2 bg-white tab-pane-bordered rounded-0"
-                style={{minHeight: '100%'}}>
-                <PhenotypeCorrelationsForm onSubmit={handleSubmit} onChange={handleChange} onReset={handleReset} />
+                style={{ minHeight: '100%' }}>
+                <PhenotypeCorrelationsForm
+                  onSubmit={handleSubmit}
+                  onChange={handleChange}
+                  onReset={handleReset}
+                />
                 {messages &&
                   messages.map(({ type, content }) => (
                     <Alert variant={type} onClose={clearMessages} dismissible>
@@ -122,22 +125,32 @@ export function PhenotypeCorrelations() {
                     </Alert>
                   ))}
               </Tab>
-             </Tabs>
+            </Tabs>
+          )}
+          <Button
+            title="Show/hide search panel"
+            variant="link"
+            style={{
+              color: '#008CBA',
+              position: 'absolute',
+              zIndex: 100,
+              top: '7px',
+              [openSidebar ? 'right' : 'left']: '-15px'
+            }}
+            onClick={() => setOpenSidebar(!openSidebar)}
+            aria-controls="phenotype-correlations-collapse-input-panel"
+            aria-expanded={openSidebar}>
+            {openSidebar ? (
+              <FontAwesomeIcon icon={faCaretLeft} size="lg" />
+            ) : (
+              <FontAwesomeIcon icon={faCaretRight} size="lg" />
             )}
-            <Button
-              title="Show/hide search panel"
-              variant="link"
-              style={{color: '#008CBA', position: 'absolute', zIndex: 100, top: '7px', [openSidebar ? 'right' : 'left']: '-15px'}}
-              onClick={() => setOpenSidebar(!openSidebar)}
-              aria-controls="phenotype-correlations-collapse-input-panel"
-              aria-expanded={openSidebar}>
-              { openSidebar ? <FontAwesomeIcon icon={faCaretLeft} size="lg"/> : <FontAwesomeIcon icon={faCaretRight} size="lg"/>}
-            </Button>
+          </Button>
         </div>
 
         <div className="d-md-none p-2"></div>
-      
-        <div className={openSidebar ? "col-md-9" : "col-md-12"}>
+
+        <div className={openSidebar ? 'col-md-9' : 'col-md-12'}>
           <PhenotypeCorrelationsSearchCriteria />
 
           <Tabs defaultActiveKey="phenotype-correlations">
@@ -145,8 +158,7 @@ export function PhenotypeCorrelations() {
               eventKey="phenotype-correlations"
               // title="Heatmap"
               className="p-2 bg-white tab-pane-bordered rounded-0"
-              style={{minHeight: '50vh'}}>
-              
+              style={{ minHeight: '50vh' }}>
               <div
                 className="mw-100 my-4"
                 style={{ display: submitted ? 'block' : 'none' }}>

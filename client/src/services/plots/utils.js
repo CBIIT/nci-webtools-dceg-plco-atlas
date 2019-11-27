@@ -45,7 +45,6 @@ export function debounce(callback, interval) {
   };
 }
 
-
 /**
  * Generates a color based on a number, useful for assigning
  * elements in a canvas a unique color, so they can be selected
@@ -89,9 +88,8 @@ export function packRanges(ranges) {
   let MAX_INDEX = 1;
 
   // sort rows by min, then max range value
-  let sortedRanges = [...ranges].sort((a, b) =>
-    a[MIN_INDEX] - b[MIN_INDEX] ||
-    a[MAX_INDEX] - b[MAX_INDEX]
+  let sortedRanges = [...ranges].sort(
+    (a, b) => a[MIN_INDEX] - b[MIN_INDEX] || a[MAX_INDEX] - b[MAX_INDEX]
   );
 
   for (let range of sortedRanges) {
@@ -110,8 +108,7 @@ export function packRanges(ranges) {
     }
 
     // if no valid rows could be found, insert the range into a new row
-    if (!insertedRange)
-      rows.push([range]);
+    if (!insertedRange) rows.push([range]);
   }
 
   return rows;
@@ -168,8 +165,7 @@ export function setStyles(element, styles) {
  */
 export function ensureNonStaticPositioning(element) {
   const style = getComputedStyle(element);
-  if (style.position === 'static')
-    element.style.position = 'relative';
+  if (style.position === 'static') element.style.position = 'relative';
 }
 
 export function getCanvasAndContext() {
@@ -177,7 +173,6 @@ export function getCanvasAndContext() {
   let context = canvas.getContext('2d');
   return [canvas, context];
 }
-
 
 export function createElement(tagName, props, children) {
   let el = document.createElement(tagName);

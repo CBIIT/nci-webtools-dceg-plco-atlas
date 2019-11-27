@@ -7,7 +7,10 @@ export function Home({ links }) {
   return (
     <>
       <div className="video-banner-container text-center d-none d-md-block">
-        <img src="assets/images/plco-banner.jpg" alt="PLCO banner" style={{width: '100%'}}></img>
+        <img
+          src="assets/images/plco-banner.jpg"
+          alt="PLCO banner"
+          style={{ width: '100%' }}></img>
         {/* <video id="video-banner" autoPlay muted loop>
           <source src="assets/images/plco-banner.mp4" type="video/mp4" />
         </video> */}
@@ -75,66 +78,68 @@ export function Home({ links }) {
         className="container align-middle text-center"
         style={{ marginTop: '70px' }}>
         <CardDeck>
-          {links.slice(1,4).map(({ exact, route, action, title, image }, index) => (
-            <>
-              <Card
-                key={title}
-                className="mb-5 align-self-center"
-                style={{
-                  width: '18rem',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  border: '1px solid #DADBE6',
-                  borderRadius: '10px'
-                }}>
-                <Link
-                  className="stretched-link"
-                  exact={exact}
-                  key={index}
-                  to={route}>
-                  <div
-                    className="bg-primary rounded-circle"
-                    style={{ marginTop: '-40px', padding: '10px' }}>
-                    <img alt="icon" src={image} height="55" width="55" />
-                  </div>
-                </Link>
-                <Card.Body>
-                  <Card.Title style={{ color: '#545871' }}>
-                    <h3>
-                      <b>{title}</b>
-                    </h3>
-                  </Card.Title>
-                  <Card.Text className="text-secondary">
-                    <small>
-                      Lorem ipsum dolor sit amet, consectetur adipiscing elit,
-                      sed do eiusmod tempor incididunt ut labore et dolore magna
-                      aliqua. Id velit ut tortor pretium viverra suspendisse
-                      potenti.
-                    </small>
-                  </Card.Text>
-                </Card.Body>
-                <Card.Footer className="bg-egg" style={{ width: '100%' }}>
-                  <Button
-                    className="my-2 border border-0"
-                    style={{
-                      backgroundColor: '#2CC799',
-                      borderRadius: '10px',
-                      width: '90%'
-                    }}>
-                    <Link
-                      className="stretched-link text-dark"
-                      style={{textDecoration: 'none'}}
-                      exact={exact}
-                      key={index}
-                      to={route}>
-                      {action}
-                    </Link>
-                  </Button>
-                </Card.Footer>
-              </Card>
-              <div className="d-lg-none w-100"></div>
-            </>
-          ))}
+          {links
+            .slice(1, 4)
+            .map(({ exact, route, action, title, image }, index) => (
+              <>
+                <Card
+                  key={title}
+                  className="mb-5 align-self-center"
+                  style={{
+                    width: '18rem',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    border: '1px solid #DADBE6',
+                    borderRadius: '10px'
+                  }}>
+                  <Link
+                    className="stretched-link"
+                    exact={exact}
+                    key={index}
+                    to={route}>
+                    <div
+                      className="bg-primary rounded-circle"
+                      style={{ marginTop: '-40px', padding: '10px' }}>
+                      <img alt="icon" src={image} height="55" width="55" />
+                    </div>
+                  </Link>
+                  <Card.Body>
+                    <Card.Title style={{ color: '#545871' }}>
+                      <h3>
+                        <b>{title}</b>
+                      </h3>
+                    </Card.Title>
+                    <Card.Text className="text-secondary">
+                      <small>
+                        Lorem ipsum dolor sit amet, consectetur adipiscing elit,
+                        sed do eiusmod tempor incididunt ut labore et dolore
+                        magna aliqua. Id velit ut tortor pretium viverra
+                        suspendisse potenti.
+                      </small>
+                    </Card.Text>
+                  </Card.Body>
+                  <Card.Footer className="bg-egg" style={{ width: '100%' }}>
+                    <Button
+                      className="my-2 border border-0"
+                      style={{
+                        backgroundColor: '#2CC799',
+                        borderRadius: '10px',
+                        width: '90%'
+                      }}>
+                      <Link
+                        className="stretched-link text-dark"
+                        style={{ textDecoration: 'none' }}
+                        exact={exact}
+                        key={index}
+                        to={route}>
+                        {action}
+                      </Link>
+                    </Button>
+                  </Card.Footer>
+                </Card>
+                <div className="d-lg-none w-100"></div>
+              </>
+            ))}
         </CardDeck>
       </div>
       <div className="bg-white text-center">

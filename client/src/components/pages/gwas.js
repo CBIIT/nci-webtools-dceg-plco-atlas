@@ -53,7 +53,7 @@ export function Gwas() {
         <div
           className="mx-3 bg-white border border-top-0"
           // style={{ borderRadius: '0 0 0 0' }}
-          >
+        >
           <div className="">
             <Nav defaultActiveKey="summary">
               {gwasLinks.map(({ name, pathId }) => (
@@ -65,7 +65,7 @@ export function Gwas() {
                     activeClassName="active-secondary-navlinks border-bottom text-secondary"
                     style={{
                       textDecoration: 'none',
-                      fontSize: '11pt',
+                      fontSize: '11pt'
                       // fontWeight: '300'
                     }}
                     exact={true}
