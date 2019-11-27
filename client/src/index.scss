@@ -112,9 +112,14 @@ $enable-shadows: true;
 }
 
 .nav-tabs > .nav-item {
-  font-weight: 600;
+  // font-weight: 600;
+  color: black;
   border-top-left-radius: 0;
   border-top-right-radius: 0;
+}
+
+.nav-tabs .nav-link.active {
+  color: black !important;
 }
 
 .nav-tabs {

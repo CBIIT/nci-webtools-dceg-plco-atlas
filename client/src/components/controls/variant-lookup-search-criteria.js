@@ -53,6 +53,7 @@ export const VariantLookupSearchCriteria = (props) => {
                                 <Button 
                                     className="p-0"
                                     title="Expand/collapse search criteria panel"
+                                    style={{color: searchCriteriaVariantLookup.phenotypes ? '#008CBA' : ''}}
                                     variant="link"
                                     onClick={e => toggleCollapseCriteria()}
                                     aria-controls="search-criteria-collapse-panel"
@@ -75,7 +76,7 @@ export const VariantLookupSearchCriteria = (props) => {
                                         }
                                         <button 
                                             className="ml-1 p-0 text-primary"
-                                            style={{all: 'unset', textDecoration: 'underline', cursor: 'pointer'}}
+                                            style={{all: 'unset', textDecoration: 'underline', cursor: 'pointer', color: '#008CBA'}}
                                             title="Expand/collapse search criteria panel"
                                             onClick={e => toggleCollapseCriteria()}
                                             aria-controls="search-criteria-collapse-panel"

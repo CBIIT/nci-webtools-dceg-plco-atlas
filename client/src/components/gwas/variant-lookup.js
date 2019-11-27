@@ -231,7 +231,7 @@ export function VariantLookup() {
             <Button
               title="Show/hide search panel"
               variant="link"
-              style={{position: 'absolute', zIndex: 100, top: '7px', [openSidebar ? 'right' : 'left']: '-15px'}}
+              style={{color: '#008CBA', position: 'absolute', zIndex: 100, top: '7px', [openSidebar ? 'right' : 'left']: '-15px'}}
               onClick={() => setOpenSidebar(!openSidebar)}
               aria-controls="variant-lookup-collapse-input-panel"
               aria-expanded={openSidebar}>
@@ -265,7 +265,7 @@ export function VariantLookup() {
                       <div>
                         <ExportCSVButton 
                           className="float-right"
-                          style={{all: 'unset', textDecoration: 'underline', cursor: 'pointer', color: '#007bff'}}
+                          style={{all: 'unset', textDecoration: 'underline', cursor: 'pointer', color: '#008CBA'}}
                           { ...props.csvProps }>
                           Export CSV
                         </ExportCSVButton>
