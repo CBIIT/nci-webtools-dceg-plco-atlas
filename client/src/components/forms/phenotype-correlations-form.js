@@ -7,9 +7,9 @@ import {
   containsAllVals,
   removeVal,
   removeAllVals,
-  getAllLeafs } from '../controls/tree-select';
+  getAllLeafs
+} from '../controls/tree-select';
 import { TreeSelectCustom } from '../controls/tree-select-custom';
-
 
 export function PhenotypeCorrelationsForm({ onChange, onSubmit, onReset }) {
   const dispatch = useDispatch();
@@ -40,7 +40,10 @@ export function PhenotypeCorrelationsForm({ onChange, onSubmit, onReset }) {
   const handleChange = (value, label, extra) => {
     let values = extra.preValue;
     let newValues = getAllLeafs(extra);
-    if (containsAllVals(values, newValues) && values.length >= newValues.length) {
+    if (
+      containsAllVals(values, newValues) &&
+      values.length >= newValues.length
+    ) {
       // remove all leafs if parent is clicked and all leafs were already selected
       values = removeAllVals(values, newValues);
     } else {
@@ -60,33 +63,36 @@ export function PhenotypeCorrelationsForm({ onChange, onSubmit, onReset }) {
     onChange(values);
   };
 
-  const handleChangeCustom = (items) => {
+  const handleChangeCustom = items => {
     setSelectedPhenotypes(items);
     // console.log("selected", items);
     // conatselectedPhenotypes
+  };
 
-  }
-
-  const removeTreeDisabled = (phenoTree) => {
+  const removeTreeDisabled = phenoTree => {
     let phenoTreeAllEnabled = [...phenoTree];
-    let phenoTreeAllEnabledString = JSON.stringify(phenoTreeAllEnabled)
-    phenoTreeAllEnabledString = phenoTreeAllEnabledString.replace(/\"disabled\":true/g, `\"disabled\":false`);
+    let phenoTreeAllEnabledString = JSON.stringify(phenoTreeAllEnabled);
+    phenoTreeAllEnabledString = phenoTreeAllEnabledString.replace(
+      /\"disabled\":true/g,
+      `\"disabled\":false`
+    );
     phenoTreeAllEnabled = JSON.parse(phenoTreeAllEnabledString);
     return phenoTreeAllEnabled;
-  }
+  };
 
-  const removeFlatDisabled = (phenoList) => phenoList.map(node => {
-    return {
-      value: node.value,
-      title: node.title
-    };
-  });
+  const removeFlatDisabled = phenoList =>
+    phenoList.map(node => {
+      return {
+        value: node.value,
+        title: node.title
+      };
+    });
 
   const alphabetizedPhenotypes = [...phenotypes].sort((a, b) =>
     a.title.localeCompare(b.title)
   );
 
-  const handleListTypeChange = (value) => {
+  const handleListTypeChange = value => {
     setSelectedListType(value);
   };
 
@@ -99,23 +105,25 @@ export function PhenotypeCorrelationsForm({ onChange, onSubmit, onReset }) {
           </div>
           <div className="col-md-auto radio pr-0">
             <label>
-              <input 
-                className="mr-1" 
-                type="radio" 
-                value="categorical" 
-                checked={selectedListType === "categorical" ? true : false} 
-                onChange={e => handleListTypeChange(e.target.value)}/>
+              <input
+                className="mr-1"
+                type="radio"
+                value="categorical"
+                checked={selectedListType === 'categorical' ? true : false}
+                onChange={e => handleListTypeChange(e.target.value)}
+              />
               By Category
             </label>
           </div>
           <div className="col-md-auto radio pr-0">
             <label>
-              <input 
-                className="mr-1" 
-                type="radio" 
-                value="alphabetic" 
-                checked={selectedListType === "alphabetic" ? true : false} 
-                onChange={e => handleListTypeChange(e.target.value)}/>
+              <input
+                className="mr-1"
+                type="radio"
+                value="alphabetic"
+                checked={selectedListType === 'alphabetic' ? true : false}
+                onChange={e => handleListTypeChange(e.target.value)}
+              />
               By Name
             </label>
           </div>
@@ -127,7 +135,7 @@ export function PhenotypeCorrelationsForm({ onChange, onSubmit, onReset }) {
         value={selectedPhenotypes}
         onChange={handleChangeCustom}
       />
-      
+
       <br></br>
 
       <b>Gender</b>

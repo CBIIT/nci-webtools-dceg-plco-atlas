@@ -8,7 +8,7 @@ import {
   viewportToLocalCoordinates,
   ensureNonStaticPositioning
 } from './utils.js';
-import { measureWidth, renderText, systemFont } from './text.js'
+import { measureWidth, renderText, systemFont } from './text.js';
 import { getScale, getTicks } from './scale.js';
 import { axisLeft, axisBottom } from './axis.js';
 import { drawPoints } from './points.js';
@@ -24,7 +24,7 @@ export class ManhattanPlot {
       bottom: 30,
       left: 80,
     }
-  }
+  };
 
   constructor(container, config) {
     this.container = container;
@@ -46,7 +46,7 @@ export class ManhattanPlot {
       position: 'absolute',
       pointerEvents: 'none',
       top: '0',
-      left: '0',
+      left: '0'
     });
 
     // create a hidden canvas to be used for selecting points
@@ -90,22 +90,23 @@ export class ManhattanPlot {
   draw() {
     let {
       config,
-      canvas, ctx,
-      hiddenCanvas, hiddenCtx,
-      overlayCanvas, overlayCtx,
-      container: {clientWidth: canvasWidth},
-      container: {clientHeight: canvasHeight},
+      canvas,
+      ctx,
+      hiddenCanvas,
+      hiddenCtx,
+      overlayCanvas,
+      overlayCtx,
+      container: { clientWidth: canvasWidth },
+      container: { clientHeight: canvasHeight }
     } = this;
-    const {
-      data, data2, mirrored,
-    } =  config;
+    const { data, data2, mirrored } = config;
     canvasHeight = Math.min(this.defaultConfig.manhattanPlotHeight, 600);
 
     // determine default top, right, bottom, and left margins
-    const margins = config.margins = {
+    const margins = (config.margins = {
       ...this.defaultConfig.margins,
       ...config.margins
-    };
+    });
 
     // Determine drawable area for manhattan plot
     const width = canvasWidth - margins.left - margins.right;
@@ -126,9 +127,9 @@ export class ManhattanPlot {
 
     // copy axis configs if mirrored
     if (mirrored) {
-      config.xAxis2 = {...config.xAxis, ...config.xAxis2}
-      config.yAxis2 = {...config.yAxis, ...config.yAxis2}
-      config.point2 = {...config.point, ...config.point2}
+      config.xAxis2 = { ...config.xAxis, ...config.xAxis2 };
+      config.yAxis2 = { ...config.yAxis, ...config.yAxis2 };
+      config.point2 = { ...config.point, ...config.point2 };
     }
 
     let xData, xData2, yData, yData2;
@@ -138,33 +139,29 @@ export class ManhattanPlot {
       xData = data.map(d => d[config.xAxis.key]);
       yData = data.map(d => d[config.yAxis.key]);
 
-      if (!config.xAxis.extent)
-        config.xAxis.extent = extent(xData);
+      if (!config.xAxis.extent) config.xAxis.extent = extent(xData);
 
-      if (!config.yAxis.extent)
-        config.yAxis.extent = extent(yData);
+      if (!config.yAxis.extent) config.yAxis.extent = extent(yData);
     }
 
     if (data2) {
       xData2 = data2.map(d => d[config.xAxis2.key]);
       yData2 = data2.map(d => d[config.yAxis2.key]);
 
-      if (!config.xAxis2.extent)
-        config.xAxis2.extent = extent(xData2);
+      if (!config.xAxis2.extent) config.xAxis2.extent = extent(xData2);
 
-      if (!config.yAxis2.extent)
-        config.yAxis2.extent = extent(yData2);
+      if (!config.yAxis2.extent) config.yAxis2.extent = extent(yData2);
 
       // extend extents if 2 datasets are provided
       config.xAxis.extent = [
         Math.min(config.xAxis.extent[0], config.xAxis2.extent[0]),
-        Math.max(config.xAxis.extent[1], config.xAxis2.extent[1]),
+        Math.max(config.xAxis.extent[1], config.xAxis2.extent[1])
       ];
       config.xAxis2.extent = [...config.xAxis.extent];
 
       config.yAxis.extent = [
         Math.min(config.yAxis.extent[0], config.yAxis2.extent[0]),
-        Math.max(config.yAxis.extent[1], config.yAxis2.extent[1]),
+        Math.max(config.yAxis.extent[1], config.yAxis2.extent[1])
       ];
       config.yAxis2.extent = [...config.yAxis.extent];
     }
@@ -181,7 +178,7 @@ export class ManhattanPlot {
 
     if (data2) {
       if (!config.xAxis2.ticks || config.allowZoom)
-      config.xAxis2.ticks = getTicks(...config.xAxis2.extent, numTicks);
+        config.xAxis2.ticks = getTicks(...config.xAxis2.extent, numTicks);
 
       if (!config.yAxis2.ticks || config.allowZoom)
         config.yAxis2.ticks = getTicks(...config.yAxis2.extent, numTicks);
@@ -206,12 +203,21 @@ export class ManhattanPlot {
       config.xAxis2.inverseScale = getScale([0, width], config.xAxis2.extent);
 
       // top half covers height -> height/2
-      config.yAxis.scale = getScale(config.yAxis.extent, [height/2, 0]);
-      config.yAxis.inverseScale = getScale([height/2, 0], config.yAxis.extent);
+      config.yAxis.scale = getScale(config.yAxis.extent, [height / 2, 0]);
+      config.yAxis.inverseScale = getScale(
+        [height / 2, 0],
+        config.yAxis.extent
+      );
 
       // bottom half covers height/2 -> 0, inverted
-      config.yAxis2.scale = getScale(config.yAxis2.extent, [height/2, height]);
-      config.yAxis.inverseScale = getScale([height/2, height], config.yAxis.extent);
+      config.yAxis2.scale = getScale(config.yAxis2.extent, [
+        height / 2,
+        height
+      ]);
+      config.yAxis.inverseScale = getScale(
+        [height / 2, height],
+        config.yAxis.extent
+      );
     }
 
     ctx.clearRect(0, 0, width, height);
@@ -220,7 +226,7 @@ export class ManhattanPlot {
     axisBottom(config, ctx);
 
     if (config.mirrored) {
-      lines[1] = ({y: config.yAxis.extent[0]})
+      lines[1] = { y: config.yAxis.extent[0] };
     }
 
     for (let line of lines) {
@@ -254,13 +260,11 @@ export class ManhattanPlot {
       left: margins.left + 'px',
       width: this.canvas.width - margins.left - margins.right + 'px',
       overflowX: 'hidden',
-      overflowY: 'auto',
+      overflowY: 'auto'
     });
 
     let getName = gene =>
-      gene.strand === '+'
-        ? `${gene.name} →`
-        : `← ${gene.name}`;
+      gene.strand === '+' ? `${gene.name} →` : `← ${gene.name}`;
 
     let labelPadding = 5;
     let labelHeight = 10;
@@ -268,7 +272,7 @@ export class ManhattanPlot {
       font: `${labelHeight}px ${systemFont}`,
       textAlign: 'center',
       textBaseline: 'middle',
-      fillStyle: 'black',
+      fillStyle: 'black'
     };
 
     let rowHeight = 40 + labelHeight + labelPadding;
@@ -303,7 +307,7 @@ export class ManhattanPlot {
         width,
         pxCenter,
         pxStart,
-        pxEnd,
+        pxEnd
       };
     });
 
@@ -312,7 +316,7 @@ export class ManhattanPlot {
       return [gene.pxStart - horizPadding, gene.pxEnd + horizPadding];
     });
 
-    let packedGeneRanges = packRanges(geneRanges)
+    let packedGeneRanges = packRanges(geneRanges);
 
     let numRows = packedGeneRanges.length;
     let txColor = '#ddd';
@@ -320,7 +324,7 @@ export class ManhattanPlot {
     let genePlotWidth = geneCanvas.clientWidth;
 
     geneCanvas.height = rowHeight * numRows;
-    geneCanvas.width = this.canvas.width
+    geneCanvas.width = this.canvas.width;
     // this.container.style.height = (geneCanvas.height + this.canvas.height) + 'px';
 
     packedGeneRanges.forEach((geneRow, rowIndex) => {
@@ -343,18 +347,14 @@ export class ManhattanPlot {
 
         geneCtx.save();
         geneCtx.translate(geneLabel.pxCenter, labelHeight);
-        renderText(
-          geneCtx,
-          geneLabel.name,
-          labelConfig,
-        );
+        renderText(geneCtx, geneLabel.name, labelConfig);
         geneCtx.restore();
 
         let exonOffsetY = labelHeight + labelPadding;
         let width = Math.abs(end - start);
         let exons = gene.exon_starts.map((e, i) => [
           gene.exon_starts[i],
-          gene.exon_ends[i],
+          gene.exon_ends[i]
         ]);
 
         //ctx.globalAlpha = 0.25;
@@ -364,7 +364,7 @@ export class ManhattanPlot {
         geneCtx.beginPath();
         let lineY = 14.5;
         geneCtx.moveTo(start, lineY + exonOffsetY);
-        geneCtx.lineTo(start + width, lineY + exonOffsetY)
+        geneCtx.lineTo(start + width, lineY + exonOffsetY);
         geneCtx.stroke();
 
         // ctx.fillRect(start, 14.5, width, 1);
@@ -372,16 +372,14 @@ export class ManhattanPlot {
         exons.forEach(exon => {
           geneCtx.fillStyle = exonColor;
           geneCtx.strokeStyle = exonColor;
-          let start = config.xAxis.scale(exon[0])
+          let start = config.xAxis.scale(exon[0]);
           let end = config.xAxis.scale(exon[1]);
           let width = Math.ceil(Math.abs(end - start));
-         geneCtx.fillRect(start, exonOffsetY, width, 30);
+          geneCtx.fillRect(start, exonOffsetY, width, 30);
         });
-
       }
 
       geneCtx.restore();
-
     });
 
     /*
@@ -395,11 +393,9 @@ export class ManhattanPlot {
       geneCanvas.height,
     )
     */
-
   }
 
   drawLine(line) {
-
     const draw = (x1, y1, x2, y2, style) => {
       this.ctx.save();
       this.ctx.beginPath();
@@ -407,21 +403,19 @@ export class ManhattanPlot {
       this.ctx.strokeStyle = '#444';
       this.ctx.lineWidth = 0.5;
 
-      if (style === 'dashed')
-        this.ctx.setLineDash([6, 4]);
+      if (style === 'dashed') this.ctx.setLineDash([6, 4]);
 
-        this.ctx.moveTo(x1, y1);
+      this.ctx.moveTo(x1, y1);
       this.ctx.lineTo(x2, y2);
       this.ctx.stroke();
       this.ctx.restore();
-    }
+    };
 
     // draw a horizontal line
     if (line.y) {
       let margins = this.config.margins;
       let y = this.config.yAxis.scale(line.y) + margins.top;
-      if (y > this.canvas.height - margins.bottom || y < margins.top)
-        return;
+      if (y > this.canvas.height - margins.bottom || y < margins.top) return;
 
       draw(margins.left, y, this.canvas.width - margins.right, y, line.style);
 
@@ -429,7 +423,13 @@ export class ManhattanPlot {
         let y2 = this.config.yAxis2.scale(line.y) + margins.top;
         if (y2 > this.canvas.height - margins.bottom || y2 < margins.top)
           return;
-          draw(margins.left, y2, this.canvas.width - margins.right, y2, line.style);
+        draw(
+          margins.left,
+          y2,
+          this.canvas.width - margins.right,
+          y2,
+          line.style
+        );
       }
     }
   }
@@ -459,15 +459,12 @@ export class ManhattanPlot {
 
       if (
         (withinMargins && config.xAxis.allowSelection) ||
-        (
-          this.getPointFromEvent(ev) &&
+        (this.getPointFromEvent(ev) &&
           config.tooltip &&
-          config.tooltip.trigger === 'click'
-        )
+          config.tooltip.trigger === 'click')
       ) {
         cursor = 'pointer';
-      }
-      else if (withinMargins && config.allowZoom) cursor = 'crosshair';
+      } else if (withinMargins && config.allowZoom) cursor = 'crosshair';
 
       canvas.style.cursor = cursor;
     };
@@ -521,8 +518,7 @@ export class ManhattanPlot {
           config.yAxis2.extent = [yMin, yMax];
         }
         this.draw();
-        if (config.onZoom)
-          config.onZoom(config.zoomWindow);
+        if (config.onZoom) config.onZoom(config.zoomWindow);
       };
       config.zoomOut = ev => {
         let stack = config.zoomStack;
@@ -546,12 +542,11 @@ export class ManhattanPlot {
           const [xMin, xMax] = config.xAxis.extent;
           const [yMin, yMax] = config.yAxis.extent;
           config.onZoom({
-            bounds: {xMin, xMax, yMin, yMax}
+            bounds: { xMin, xMax, yMin, yMax }
           });
         }
       };
     }
-
   }
 
   getPointFromEvent({ clientX, clientY, target }) {

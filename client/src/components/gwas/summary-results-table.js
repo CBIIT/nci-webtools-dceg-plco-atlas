@@ -1,20 +1,20 @@
-import React, { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { Tabs, Tab } from "react-bootstrap";
+import React, { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { Tabs, Tab } from 'react-bootstrap';
 import {
   updateSummaryResults,
   updateSummaryTable,
   fetchSummaryTable
-} from "../../services/actions";
-import { query } from "../../services/query";
+} from '../../services/actions';
+import { query } from '../../services/query';
 import {
   Table,
   paginationText,
   paginationSizeSelector,
   paginationButton,
   loadingOverlay
-} from "../controls/table";
-import paginationFactory from "react-bootstrap-table2-paginator";
+} from '../controls/table';
+import paginationFactory from 'react-bootstrap-table2-paginator';
 
 export function SummaryResultsTable() {
   const dispatch = useDispatch();
@@ -33,35 +33,35 @@ export function SummaryResultsTable() {
 
   const columns = [
     {
-      dataField: "chr",
-      text: "Chromosome",
+      dataField: 'chr',
+      text: 'Chromosome',
       sort: true
     },
     {
-      dataField: "bp",
-      text: "Position",
+      dataField: 'bp',
+      text: 'Position',
       sort: true
     },
     {
-      dataField: "snp",
-      text: "SNP",
+      dataField: 'snp',
+      text: 'SNP',
       sort: true
     },
     {
-      dataField: "a1",
-      text: "Reference Allele"
+      dataField: 'a1',
+      text: 'Reference Allele'
     },
     {
-      dataField: "a2",
-      text: "Alternate Allele"
+      dataField: 'a2',
+      text: 'Alternate Allele'
     },
     {
-      dataField: "or",
-      text: "Odds Ratio"
+      dataField: 'or',
+      text: 'Odds Ratio'
     },
     {
-      dataField: "p",
-      text: "P-Value",
+      dataField: 'p',
+      text: 'P-Value',
       sort: true
     }
   ];
@@ -75,36 +75,41 @@ export function SummaryResultsTable() {
 
     console.log({ order, orderBy, limit, page, bpMin, bpMax });
 
-
     dispatch(
-      fetchSummaryTable({
-        database: selectedPhenotype.value + ".db",
-        offset: limit * (page - 1),
-        table: selectedTable,
-        chr: selectedChromosome,
-        count: true,
-        limit,
-        orderBy,
-        order,
-        nlogpMin,
-        nlogpMax,
-        bpMin,
-        bpMax
-      }, null, index)
+      fetchSummaryTable(
+        {
+          database: selectedPhenotype.value + '.db',
+          offset: limit * (page - 1),
+          table: selectedTable,
+          chr: selectedChromosome,
+          count: true,
+          limit,
+          orderBy,
+          order,
+          nlogpMin,
+          nlogpMax,
+          bpMin,
+          bpMax
+        },
+        null,
+        index
+      )
     );
   };
 
   let showTabs = selectedManhattanPlotType === 'stacked';
-  let tabs = showTabs ? [
-    {title: 'Female', key: 'female', index: 0},
-    {title: 'Male', key: 'male', index: 1},
-  ] : [];
+  let tabs = showTabs
+    ? [
+        { title: 'Female', key: 'female', index: 0 },
+        { title: 'Male', key: 'male', index: 1 }
+      ]
+    : [];
 
   return (
     <div className="mt-3">
-      {showTabs &&
+      {showTabs && (
         <Tabs defaultActiveKey="female">
-          {tabs.map(({title, key, index}) => (
+          {tabs.map(({ title, key, index }) => (
             <Tab eventKey={key} title={title}>
               <Table
                 remote
@@ -124,14 +129,14 @@ export function SummaryResultsTable() {
                   sizePerPageRenderer: paginationSizeSelector,
                   pageButtonRenderer: paginationButton
                 })}
-                defaultSorted={[{ dataField: "p", order: "asc" }]}
+                defaultSorted={[{ dataField: 'p', order: 'asc' }]}
               />
             </Tab>
           ))}
         </Tabs>
-      }
+      )}
 
-      {!showTabs &&
+      {!showTabs && (
         <Table
           remote
           keyField="variant_id"
@@ -150,8 +155,9 @@ export function SummaryResultsTable() {
             sizePerPageRenderer: paginationSizeSelector,
             pageButtonRenderer: paginationButton
           })}
-          defaultSorted={[{ dataField: "p", order: "asc" }]}
-        />}
+          defaultSorted={[{ dataField: 'p', order: 'asc' }]}
+        />
+      )}
     </div>
   );
 }

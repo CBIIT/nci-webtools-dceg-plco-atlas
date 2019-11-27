@@ -4,7 +4,6 @@ import { Button } from 'react-bootstrap';
 import { updateSummaryResults } from '../../services/actions';
 import { TreeSelectCustom } from '../controls/tree-select-custom';
 
-
 export function SummaryResultsForm({ onChange, onSubmit, onReset }) {
   const dispatch = useDispatch();
   const phenotypes = useSelector(state => state.phenotypes);
@@ -28,17 +27,17 @@ export function SummaryResultsForm({ onChange, onSubmit, onReset }) {
     dispatch(updateSummaryResults({ selectedManhattanPlotType }));
   };
 
-  const handleChangeCustom = (item) => {
+  const handleChangeCustom = item => {
     if (item && item[0]) {
       setSelectedPhenotype(item[0]);
     }
-  }
+  };
 
   const alphabetizedPhenotypes = [...phenotypes].sort((a, b) =>
     a.title.localeCompare(b.title)
   );
 
-  const handleListTypeChange = (value) => {
+  const handleListTypeChange = value => {
     setSelectedListType(value);
   };
 
@@ -51,23 +50,25 @@ export function SummaryResultsForm({ onChange, onSubmit, onReset }) {
           </div>
           <div className="col-md-auto radio pr-0">
             <label>
-              <input 
-                className="mr-1" 
-                type="radio" 
-                value="categorical" 
-                checked={selectedListType === "categorical" ? true : false} 
-                onChange={e => handleListTypeChange(e.target.value)}/>
+              <input
+                className="mr-1"
+                type="radio"
+                value="categorical"
+                checked={selectedListType === 'categorical' ? true : false}
+                onChange={e => handleListTypeChange(e.target.value)}
+              />
               By Category
             </label>
           </div>
           <div className="col-md-auto radio pr-0">
             <label>
-              <input 
-                className="mr-1" 
-                type="radio" 
-                value="alphabetic" 
-                checked={selectedListType === "alphabetic" ? true : false} 
-                onChange={e => handleListTypeChange(e.target.value)}/>
+              <input
+                className="mr-1"
+                type="radio"
+                value="alphabetic"
+                checked={selectedListType === 'alphabetic' ? true : false}
+                onChange={e => handleListTypeChange(e.target.value)}
+              />
               By Name
             </label>
           </div>

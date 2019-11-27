@@ -40,7 +40,7 @@ export function containsAllVals(arr, vals) {
   for (var i = 0; i < vals.length; i++) {
     if (!containsVal(arr, vals[i].value)) {
       result = false;
-    } 
+    }
   }
   return result;
 }
@@ -62,11 +62,11 @@ export function removeAllVals(arr, vals) {
 }
 
 export function getLeafs(extra, node, allLeafs = []) {
-  if(node.children.length === 0) {
+  if (node.children.length === 0) {
     if (!node.disabled) {
       allLeafs.push(node);
     }
-  }else{
+  } else {
     for (var i = 0; i < node.children.length; i++) {
       allLeafs = getLeafs(extra, node.children[i].props, allLeafs);
     }

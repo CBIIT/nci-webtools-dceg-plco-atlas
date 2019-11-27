@@ -1,8 +1,7 @@
 import { query, rawQuery } from './query';
 
-
 export const UPDATE_SUMMARY_RESULTS = 'UPDATE_SUMMARY_RESULTS';
-export const UPDATE_SUMMARY_TABLE = 'UPDATE_SUMMARY_TABLE'
+export const UPDATE_SUMMARY_TABLE = 'UPDATE_SUMMARY_TABLE';
 export const UPDATE_VARIANT_LOOKUP = 'UPDATE_VARIANT_LOOKUP';
 export const UPDATE_PHENOTYPE_CORRELATIONS = 'UPDATE_PHENOTYPE_CORRELATIONS';
 export const UPDATE_PHENOTYPES = 'UPDATE_PHENOTYPES';
@@ -44,16 +43,23 @@ export function fetchSummaryTable(params, countKey, tableIndex) {
     dispatch(updateSummaryResults({ loadingManhattanTable: true }));
     const response = await query('variants', params);
     if (!response.error) {
-      let data = {results: response.data};
-      if (response.count)
-        data.resultsCount = response.count;
+      let data = { results: response.data };
+      if (response.count) data.resultsCount = response.count;
       else if (countKey)
-        data.resultsCount = +await query('metadata', {...params, key: countKey});
-      dispatch(updateSummaryTable({
-        ...data,
-        page: params.page,
-        pageSize: params.pageSize
-      }, tableIndex));
+        data.resultsCount = +(await query('metadata', {
+          ...params,
+          key: countKey
+        }));
+      dispatch(
+        updateSummaryTable(
+          {
+            ...data,
+            page: params.page,
+            pageSize: params.pageSize
+          },
+          tableIndex
+        )
+      );
     }
     dispatch(updateSummaryResults({ loadingManhattanTable: false }));
     return response;
@@ -81,16 +87,20 @@ export function drawManhattanPlot(plotType, params) {
         table: params.table[1]
       });
 
-      dispatch(updateSummaryResults({
-        manhattanPlotData,
-        manhattanPlotMirroredData,
-      }));
+      dispatch(
+        updateSummaryResults({
+          manhattanPlotData,
+          manhattanPlotMirroredData
+        })
+      );
     } else {
       const manhattanPlotData = await rawQuery(plotType, params);
-      dispatch(updateSummaryResults({
-        manhattanPlotData,
-        manhattanPlotMirroredData: {}
-      }));
+      dispatch(
+        updateSummaryResults({
+          manhattanPlotData,
+          manhattanPlotMirroredData: {}
+        })
+      );
     }
 
     dispatch(updateSummaryResults({ loadingManhattanPlot: false }));
@@ -99,8 +109,8 @@ export function drawManhattanPlot(plotType, params) {
 
 export function drawQQPlot(phenotype, variantTable) {
   return async function(dispatch) {
-    console.log("drawQQPlot", phenotype);
-    console.log("variantTable", variantTable);
+    console.log('drawQQPlot', phenotype);
+    console.log('variantTable', variantTable);
 
     const setQQPlotLoading = loadingQQPlot => {
       dispatch(updateSummaryResults({ loadingQQPlot }));
@@ -123,35 +133,38 @@ export function drawQQPlot(phenotype, variantTable) {
     setQQPlotStacked(false);
     setSampleSize(null);
 
-    const table = variantTable.length === 1 ? 
-      variantTable[0] : 'stacked';
+    const table = variantTable.length === 1 ? variantTable[0] : 'stacked';
 
     if (table === 'stacked') {
       setQQPlotStacked(true);
     }
 
     const metadata = await query('metadata', {
-      database: phenotype + '.db',
+      database: phenotype + '.db'
     });
 
-    const countKey = plotType => ({
-      variant_all: 'count_all',
-      stacked: ['count_female', 'count_male'],
-      variant_female: 'count_female',
-      variant_male: 'count_male',
-    }[plotType])
-    
-    const lambdaGCKey = plotType => ({
-      variant_all: 'lambdagc_all',
-      stacked: ['lambdagc_female', 'lambdagc_male'],
-      variant_female: 'lambdagc_female',
-      variant_male: 'lambdagc_male',
-    }[plotType])
+    const countKey = plotType =>
+      ({
+        variant_all: 'count_all',
+        stacked: ['count_female', 'count_male'],
+        variant_female: 'count_female',
+        variant_male: 'count_male'
+      }[plotType]);
+
+    const lambdaGCKey = plotType =>
+      ({
+        variant_all: 'lambdagc_all',
+        stacked: ['lambdagc_female', 'lambdagc_male'],
+        variant_female: 'lambdagc_female',
+        variant_male: 'lambdagc_male'
+      }[plotType]);
 
     if (table !== 'stacked') {
       const metadata_count = parseInt(metadata[countKey(table)]);
       setSampleSize(metadata_count);
-      const metadata_lambdaGC = metadata[lambdaGCKey(table)] ? metadata[lambdaGCKey(table)] : 'TBD';
+      const metadata_lambdaGC = metadata[lambdaGCKey(table)]
+        ? metadata[lambdaGCKey(table)]
+        : 'TBD';
 
       const pCutOffValue = 0.001;
 
@@ -166,19 +179,20 @@ export function drawQQPlot(phenotype, variantTable) {
       });
       let topObservedVariants = [];
       let topExpectedVariants = [];
-      topVariantData.data.map((row) => {
+      topVariantData.data.map(row => {
         topObservedVariants.push(row[4]);
         topExpectedVariants.push(row[5]);
       });
       const topObservedVariantsText = [];
-      topVariantData.data.map(row => 
+      topVariantData.data.map(row =>
         topObservedVariantsText.push({
           chr: row[0],
           bp: row[1],
           snp: row[2],
           p: row[3]
-      }));
-      console.log("topObservedVariants.length", topObservedVariants.length);
+        })
+      );
+      console.log('topObservedVariants.length', topObservedVariants.length);
 
       const subsetVariantData = await query('variants', {
         database: phenotype + '.db',
@@ -192,12 +206,15 @@ export function drawQQPlot(phenotype, variantTable) {
       });
       let subsetObservedVariants = [];
       let subsetExpectedVariants = [];
-      subsetVariantData.data.map((row) => {
+      subsetVariantData.data.map(row => {
         subsetObservedVariants.push(row[0]);
         subsetExpectedVariants.push(row[1]);
       });
-      console.log("subsetObservedVariants.length", subsetObservedVariants.length);
-      
+      console.log(
+        'subsetObservedVariants.length',
+        subsetObservedVariants.length
+      );
+
       const subsetMarkerColor = '#002a47';
       const topMarkerColor = '#006bb8';
 
@@ -205,7 +222,7 @@ export function drawQQPlot(phenotype, variantTable) {
         x: topExpectedVariants,
         y: topObservedVariants,
         text: topObservedVariantsText,
-        hovertemplate: 
+        hovertemplate:
           '<b>position:</b> %{text.chr}:%{text.bp}<br>' +
           '<b>p-value:</b> %{text.p}<br>' +
           '<b>snp:</b> %{text.snp}' +
@@ -229,7 +246,7 @@ export function drawQQPlot(phenotype, variantTable) {
         type: 'scattergl',
         marker: {
           color: subsetMarkerColor,
-          size: 8,
+          size: 8
           // opacity: 0.65
         },
         showlegend: false
@@ -256,12 +273,16 @@ export function drawQQPlot(phenotype, variantTable) {
         width: 800,
         height: 800,
         title: {
-          text: '<b>\u03BB</b> = ' + metadata_lambdaGC + '        <b>Sample Size</b> = ' + metadata_count.toLocaleString(),
+          text:
+            '<b>\u03BB</b> = ' +
+            metadata_lambdaGC +
+            '        <b>Sample Size</b> = ' +
+            metadata_count.toLocaleString(),
           font: {
             family: 'Arial',
             size: 14,
             color: 'black'
-          },
+          }
         },
         xaxis: {
           automargin: true,
@@ -274,7 +295,7 @@ export function drawQQPlot(phenotype, variantTable) {
               family: 'Arial',
               size: 14,
               color: 'black'
-            },
+            }
           },
           tick0: 0,
           ticklen: 10,
@@ -282,7 +303,7 @@ export function drawQQPlot(phenotype, variantTable) {
             family: 'Arial',
             size: 10,
             color: 'black'
-          },
+          }
         },
         yaxis: {
           automargin: true,
@@ -295,7 +316,7 @@ export function drawQQPlot(phenotype, variantTable) {
               family: 'Arial',
               size: 14,
               color: 'black'
-            },
+            }
           },
           tick0: 0,
           ticklen: 10,
@@ -303,7 +324,7 @@ export function drawQQPlot(phenotype, variantTable) {
             family: 'Arial',
             size: 10,
             color: 'black'
-          },
+          }
         }
       };
       setQQPlotLayout(qqplotLayout);
@@ -312,8 +333,12 @@ export function drawQQPlot(phenotype, variantTable) {
       const metadata_count_female = parseInt(metadata[countKey(table)[0]]);
       const metadata_count_male = parseInt(metadata[countKey(table)[1]]);
       setSampleSize(metadata_count_female + metadata_count_male);
-      const metadata_lambdaGC_female = metadata[lambdaGCKey(table)[0]] ? metadata[lambdaGCKey(table)[0]] : 'TBD';
-      const metadata_lambdaGC_male = metadata[lambdaGCKey(table)[1]] ? metadata[lambdaGCKey(table)[1]] : 'TBD';
+      const metadata_lambdaGC_female = metadata[lambdaGCKey(table)[0]]
+        ? metadata[lambdaGCKey(table)[0]]
+        : 'TBD';
+      const metadata_lambdaGC_male = metadata[lambdaGCKey(table)[1]]
+        ? metadata[lambdaGCKey(table)[1]]
+        : 'TBD';
 
       const pCutOffValue = 0.001;
 
@@ -328,19 +353,23 @@ export function drawQQPlot(phenotype, variantTable) {
       });
       let topObservedVariantsFemale = [];
       let topExpectedVariantsFemale = [];
-      topVariantDataFemale.data.map((row) => {
+      topVariantDataFemale.data.map(row => {
         topObservedVariantsFemale.push(row[4]);
         topExpectedVariantsFemale.push(row[5]);
       });
       const topObservedVariantsTextFemale = [];
-      topVariantDataFemale.data.map(row => 
+      topVariantDataFemale.data.map(row =>
         topObservedVariantsTextFemale.push({
           chr: row[0],
           bp: row[1],
           snp: row[2],
           p: row[3]
-      }));
-      console.log("topObservedVariantsFemale.length", topObservedVariantsFemale.length);
+        })
+      );
+      console.log(
+        'topObservedVariantsFemale.length',
+        topObservedVariantsFemale.length
+      );
 
       const subsetVariantDataFemale = await query('variants', {
         database: phenotype + '.db',
@@ -354,11 +383,14 @@ export function drawQQPlot(phenotype, variantTable) {
       });
       let subsetObservedVariantsFemale = [];
       let subsetExpectedVariantsFemale = [];
-      subsetVariantDataFemale.data.map((row) => {
+      subsetVariantDataFemale.data.map(row => {
         subsetObservedVariantsFemale.push(row[0]);
         subsetExpectedVariantsFemale.push(row[1]);
       });
-      console.log("subsetObservedVariantsFemale.length", subsetObservedVariantsFemale.length);
+      console.log(
+        'subsetObservedVariantsFemale.length',
+        subsetObservedVariantsFemale.length
+      );
 
       const topVariantDataMale = await query('variants', {
         database: phenotype + '.db',
@@ -371,19 +403,23 @@ export function drawQQPlot(phenotype, variantTable) {
       });
       let topObservedVariantsMale = [];
       let topExpectedVariantsMale = [];
-      topVariantDataMale.data.map((row) => {
+      topVariantDataMale.data.map(row => {
         topObservedVariantsMale.push(row[4]);
         topExpectedVariantsMale.push(row[5]);
       });
       const topObservedVariantsTextMale = [];
-      topVariantDataMale.data.map(row => 
+      topVariantDataMale.data.map(row =>
         topObservedVariantsTextMale.push({
           chr: row[0],
           bp: row[1],
           snp: row[2],
           p: row[3]
-      }));
-      console.log("topObservedVariantsMale.length", topObservedVariantsMale.length);
+        })
+      );
+      console.log(
+        'topObservedVariantsMale.length',
+        topObservedVariantsMale.length
+      );
 
       const subsetVariantDataMale = await query('variants', {
         database: phenotype + '.db',
@@ -397,12 +433,15 @@ export function drawQQPlot(phenotype, variantTable) {
       });
       let subsetObservedVariantsMale = [];
       let subsetExpectedVariantsMale = [];
-      subsetVariantDataMale.data.map((row) => {
+      subsetVariantDataMale.data.map(row => {
         subsetObservedVariantsMale.push(row[0]);
         subsetExpectedVariantsMale.push(row[1]);
       });
-      console.log("subsetObservedVariantsMale.length", subsetObservedVariantsMale.length);
-      
+      console.log(
+        'subsetObservedVariantsMale.length',
+        subsetObservedVariantsMale.length
+      );
+
       const subsetMarkerColorFemale = '#b55117';
       const topMarkerColorFemale = '#e47618';
       const subsetMarkerColorMale = '#002a47';
@@ -412,7 +451,7 @@ export function drawQQPlot(phenotype, variantTable) {
         x: topExpectedVariantsFemale,
         y: topObservedVariantsFemale,
         text: topObservedVariantsTextFemale,
-        hovertemplate: 
+        hovertemplate:
           '<b>position:</b> %{text.chr}:%{text.bp}<br>' +
           '<b>p-value:</b> %{text.p}<br>' +
           '<b>snp:</b> %{text.snp}' +
@@ -436,7 +475,7 @@ export function drawQQPlot(phenotype, variantTable) {
         type: 'scattergl',
         marker: {
           color: subsetMarkerColorFemale,
-          size: 8,
+          size: 8
           // opacity: 0.65
         },
         showlegend: false
@@ -460,7 +499,7 @@ export function drawQQPlot(phenotype, variantTable) {
         x: topExpectedVariantsMale,
         y: topObservedVariantsMale,
         text: topObservedVariantsTextMale,
-        hovertemplate: 
+        hovertemplate:
           '<b>position:</b> %{text.chr}:%{text.bp}<br>' +
           '<b>p-value:</b> %{text.p}<br>' +
           '<b>snp:</b> %{text.snp}' +
@@ -484,7 +523,7 @@ export function drawQQPlot(phenotype, variantTable) {
         type: 'scattergl',
         marker: {
           color: subsetMarkerColorMale,
-          size: 8,
+          size: 8
           // opacity: 0.65
         },
         showlegend: false
@@ -511,12 +550,16 @@ export function drawQQPlot(phenotype, variantTable) {
         width: 800,
         height: 800,
         title: {
-          text: '<b>Female \u03BB</b> = ' + metadata_lambdaGC_female + '        <b>Female Sample Size</b> = ' + metadata_count_female.toLocaleString(),
+          text:
+            '<b>Female \u03BB</b> = ' +
+            metadata_lambdaGC_female +
+            '        <b>Female Sample Size</b> = ' +
+            metadata_count_female.toLocaleString(),
           font: {
             family: 'Arial',
             size: 14,
             color: 'black'
-          },
+          }
         },
         xaxis: {
           automargin: true,
@@ -529,7 +572,7 @@ export function drawQQPlot(phenotype, variantTable) {
               family: 'Arial',
               size: 14,
               color: 'black'
-            },
+            }
           },
           tick0: 0,
           ticklen: 10,
@@ -537,7 +580,7 @@ export function drawQQPlot(phenotype, variantTable) {
             family: 'Arial',
             size: 10,
             color: 'black'
-          },
+          }
         },
         yaxis: {
           automargin: true,
@@ -550,7 +593,7 @@ export function drawQQPlot(phenotype, variantTable) {
               family: 'Arial',
               size: 14,
               color: 'black'
-            },
+            }
           },
           tick0: 0,
           ticklen: 10,
@@ -558,7 +601,7 @@ export function drawQQPlot(phenotype, variantTable) {
             family: 'Arial',
             size: 10,
             color: 'black'
-          },
+          }
         }
       };
       let qqplotLayoutMale = {
@@ -568,12 +611,16 @@ export function drawQQPlot(phenotype, variantTable) {
         width: 800,
         height: 800,
         title: {
-          text: '<b>Male \u03BB</b> = ' + metadata_lambdaGC_male + '        <b>Male Sample Size</b> = ' + metadata_count_male.toLocaleString(),
+          text:
+            '<b>Male \u03BB</b> = ' +
+            metadata_lambdaGC_male +
+            '        <b>Male Sample Size</b> = ' +
+            metadata_count_male.toLocaleString(),
           font: {
             family: 'Arial',
             size: 14,
             color: 'black'
-          },
+          }
         },
         xaxis: {
           automargin: true,
@@ -586,7 +633,7 @@ export function drawQQPlot(phenotype, variantTable) {
               family: 'Arial',
               size: 14,
               color: 'black'
-            },
+            }
           },
           tick0: 0,
           ticklen: 10,
@@ -594,7 +641,7 @@ export function drawQQPlot(phenotype, variantTable) {
             family: 'Arial',
             size: 10,
             color: 'black'
-          },
+          }
         },
         yaxis: {
           automargin: true,
@@ -607,7 +654,7 @@ export function drawQQPlot(phenotype, variantTable) {
               family: 'Arial',
               size: 14,
               color: 'black'
-            },
+            }
           },
           tick0: 0,
           ticklen: 10,
@@ -615,13 +662,16 @@ export function drawQQPlot(phenotype, variantTable) {
             family: 'Arial',
             size: 10,
             color: 'black'
-          },
+          }
         }
       };
       setQQPlotLayout([qqplotLayoutFemale, qqplotLayoutMale]);
-      setQQPlotData([[qqplotTopDataFemale, qqplotSubsetDataFemale, qqplotLineDataFemale], [qqplotTopDataMale, qqplotSubsetDataMale, qqplotLineDataMale]]);
+      setQQPlotData([
+        [qqplotTopDataFemale, qqplotSubsetDataFemale, qqplotLineDataFemale],
+        [qqplotTopDataMale, qqplotSubsetDataMale, qqplotLineDataMale]
+      ]);
     }
-    
+
     setQQPlotLoading(false);
   };
 }
@@ -631,7 +681,10 @@ export function drawHeatmap(phenotypes) {
     const getZColor = (phenotype1, phenotype2, correlationData) => {
       var r2 = 0.0;
       if (phenotype1 in correlationData && phenotype2 in correlationData) {
-        if (phenotype2 in correlationData[phenotype1] || phenotype1 in correlationData[phenotype2]) {
+        if (
+          phenotype2 in correlationData[phenotype1] ||
+          phenotype1 in correlationData[phenotype2]
+        ) {
           if (phenotype2 in correlationData[phenotype1]) {
             r2 = correlationData[phenotype1][phenotype2];
           } else {
@@ -644,7 +697,6 @@ export function drawHeatmap(phenotypes) {
         r2 = 0.0;
       }
 
-
       if (r2 === -1.0 || r2 === 1.0) {
         r2 = 0.0;
       }
@@ -654,7 +706,10 @@ export function drawHeatmap(phenotypes) {
     const getZText = (phenotype1, phenotype2, correlationData) => {
       var r2 = 0.0;
       if (phenotype1 in correlationData && phenotype2 in correlationData) {
-        if (phenotype2 in correlationData[phenotype1] || phenotype1 in correlationData[phenotype2]) {
+        if (
+          phenotype2 in correlationData[phenotype1] ||
+          phenotype1 in correlationData[phenotype2]
+        ) {
           if (phenotype2 in correlationData[phenotype1]) {
             r2 = correlationData[phenotype1][phenotype2];
           } else {
@@ -677,7 +732,7 @@ export function drawHeatmap(phenotypes) {
     };
     const setHeatmapLayout = heatmapLayout => {
       dispatch(updatePhenotypeCorrelations({ heatmapLayout }));
-    }
+    };
     const setPopupTooltipStyle = popupTooltipStyle => {
       dispatch(updatePhenotypeCorrelations({ popupTooltipStyle }));
     };
@@ -686,15 +741,19 @@ export function drawHeatmap(phenotypes) {
     };
 
     setLoading(true);
-    setPopupTooltipStyle({display: 'none'});
+    setPopupTooltipStyle({ display: 'none' });
     setPopupTooltipData(null);
 
     setHeatmapLayout({});
     setHeatmapData([]);
 
-    const correlationData = await query(`data/sample_correlations_sanitized.json`);
+    const correlationData = await query(
+      `data/sample_correlations_sanitized.json`
+    );
 
-    var uniquePhenotypes = phenotypes.map(phenotype => phenotype.title ? phenotype.title : phenotype.label);
+    var uniquePhenotypes = phenotypes.map(phenotype =>
+      phenotype.title ? phenotype.title : phenotype.label
+    );
     let n = uniquePhenotypes.length;
     let x = uniquePhenotypes;
     let y = uniquePhenotypes;
@@ -755,7 +814,9 @@ export function drawHeatmap(phenotypes) {
           color: 'black'
         },
         tickvals: uniquePhenotypes,
-        ticktext: uniquePhenotypes.map(phenotype => phenotype.length > 20 ? phenotype.substring(0, 20) + "..." : phenotype),
+        ticktext: uniquePhenotypes.map(phenotype =>
+          phenotype.length > 20 ? phenotype.substring(0, 20) + '...' : phenotype
+        )
         // dtick: 5,
       },
       yaxis: {
@@ -768,7 +829,9 @@ export function drawHeatmap(phenotypes) {
           color: 'black'
         },
         tickvals: uniquePhenotypes,
-        ticktext: uniquePhenotypes.map(phenotype => phenotype.length > 20 ? phenotype.substring(0, 20) + "..." : phenotype),
+        ticktext: uniquePhenotypes.map(phenotype =>
+          phenotype.length > 20 ? phenotype.substring(0, 20) + '...' : phenotype
+        )
         // dtick: 5
       }
     };
@@ -792,11 +855,13 @@ export function lookupVariants(phenotypes, variant) {
     for (let i = 0; i < phenotypes.length; i++) {
       const { data } = await query('variants', {
         database: phenotypes[i].value + '.db',
-        snp: variant,
+        snp: variant
       });
       if (!data || data.length === 0) {
         tableList.push({
-          phenotype: phenotypes[i].title ? phenotypes[i].title : phenotypes[i].label,
+          phenotype: phenotypes[i].title
+            ? phenotypes[i].title
+            : phenotypes[i].label,
           a1: '-',
           a2: '-',
           bp: '-',
@@ -807,7 +872,9 @@ export function lookupVariants(phenotypes, variant) {
         });
       } else {
         for (let j = 0; j < data.length; j++) {
-          data[j]['phenotype'] = phenotypes[i].title ? phenotypes[i].title : phenotypes[i].label;
+          data[j]['phenotype'] = phenotypes[i].title
+            ? phenotypes[i].title
+            : phenotypes[i].label;
           tableList.push(data[j]);
         }
       }
