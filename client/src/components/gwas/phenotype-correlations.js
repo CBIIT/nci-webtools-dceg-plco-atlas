@@ -104,20 +104,10 @@ export function PhenotypeCorrelations() {
   const [openSidebar, setOpenSidebar] = useState(true);
 
   return (
-    <>
-      <Button
-        title="Show/hide search panel"
-        variant="link"
-        style={{position: 'absolute', zIndex: 100}}
-        onClick={() => setOpenSidebar(!openSidebar)}
-        aria-controls="phenotype-correlations-collapse-input-panel"
-        aria-expanded={openSidebar}>
-        { openSidebar ? <FontAwesomeIcon icon={faCaretLeft} size="lg"/> : <FontAwesomeIcon icon={faCaretRight} size="lg"/>}
-      </Button>
-
+    <div style={{position: 'relative'}}>
       <div className={openSidebar ? "row mx-3" : "mx-3"}>
-        {openSidebar && (
-          <div className="col-md-3">
+        <div className="col-md-3">
+          {openSidebar && (
             <Tabs defaultActiveKey="phenotype-correlations-form">
               <Tab
                 eventKey="phenotype-correlations-form"
@@ -133,8 +123,17 @@ export function PhenotypeCorrelations() {
                   ))}
               </Tab>
              </Tabs>
-          </div>
-          )}
+            )}
+            <Button
+              title="Show/hide search panel"
+              variant="link"
+              style={{position: 'absolute', zIndex: 100, top: '7px', [openSidebar ? 'right' : 'left']: '-15px'}}
+              onClick={() => setOpenSidebar(!openSidebar)}
+              aria-controls="phenotype-correlations-collapse-input-panel"
+              aria-expanded={openSidebar}>
+              { openSidebar ? <FontAwesomeIcon icon={faCaretLeft} size="lg"/> : <FontAwesomeIcon icon={faCaretRight} size="lg"/>}
+            </Button>
+        </div>
 
         <div className="d-md-none p-2"></div>
       
@@ -158,6 +157,6 @@ export function PhenotypeCorrelations() {
           </Tabs>
         </div>
       </div>
-    </>
+    </div>
   );
 }
