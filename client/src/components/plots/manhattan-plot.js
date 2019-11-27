@@ -76,7 +76,7 @@ export function ManhattanPlot({
       title: [
         {
           text: selectedPhenotype.title,
-          font: `600 14px ${systemFont}`
+          font: `600 16px ${systemFont}`
         }
       ],
       xAxis: {
@@ -164,7 +164,7 @@ export function ManhattanPlot({
           plot.current.drawGenes(genes);
         }
       },
-      title: [{ text: title, font: `600 14px ${systemFont}` }],
+      title: [{ text: title, font: `600 16px ${systemFont}` }],
       xAxis: {
         title: null,
         key: columnIndexes.bp,
@@ -248,7 +248,7 @@ export function ManhattanPlot({
       title: [
         {
           text: selectedPhenotype.title,
-          font: `600 14px ${systemFont}`
+          font: `600 16px ${systemFont}`
         }
       ],
       xAxis: {
@@ -327,7 +327,7 @@ export function ManhattanPlot({
           plot.current.drawGenes(genes);
         }
       },
-      title: [{ text: title, font: `600 14px ${systemFont}` }],
+      title: [{ text: title, font: `600 16px ${systemFont}` }],
       xAxis: {
         title: null,
         key: columnIndexes.bp,

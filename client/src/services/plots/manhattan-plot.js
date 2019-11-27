@@ -19,10 +19,10 @@ export class ManhattanPlot {
   defaultConfig = {
     manhattanPlotHeight: 600,
     margins: {
-      top: 60,
+      top: 30,
       right: 60,
-      bottom: 30,
-      left: 80
+      bottom: 40,
+      left: 80,
     }
   };
 
@@ -236,7 +236,7 @@ export class ManhattanPlot {
     if (config.title) {
       let midpoint = margins.left + width / 2;
       ctx.save();
-      ctx.translate(midpoint, 30);
+      ctx.translate(midpoint, 10);
       renderText(ctx, config.title, {
         textAlign: 'center',
         textBaseline: 'top',
