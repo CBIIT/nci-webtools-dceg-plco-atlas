@@ -8,7 +8,9 @@ import {
   faTimes
 } from '@fortawesome/free-solid-svg-icons';
 
-export function TreeSelectCustom({ onChange, data, value, singleSelect }) {
+export function TreeSelectCustom({ onChange, data, dataAlphabetical, value, singleSelect }) {
+  const [searchInput, setSearchInput] = useState('');
+  const [listType, setListType] = useState('categorical');
   const containsVal = (arr, val) => {
     let result = false;
     for (var i = 0; i < arr.length; i++) {
@@ -16,7 +18,6 @@ export function TreeSelectCustom({ onChange, data, value, singleSelect }) {
         result = true;
       }
     }
-
     return result;
   };
 
@@ -134,7 +135,7 @@ export function TreeSelectCustom({ onChange, data, value, singleSelect }) {
             parentCheckboxClassName
           )[0].checked = false;
         }
-        for (var i = 0; i < newValues.length; i++) {
+        for (let i = 0; i < newValues.length; i++) {
           if (
             document.getElementsByClassName(
               'leaf-checkbox-' + newValues[i].value
@@ -146,7 +147,7 @@ export function TreeSelectCustom({ onChange, data, value, singleSelect }) {
           }
         }
       } else {
-        for (var i = 0; i < newValues.length; i++) {
+        for (let i = 0; i < newValues.length; i++) {
           if (!containsVal(values, newValues[i].value)) {
             // only add if value did not exist before
             values.push(newValues[i]);
@@ -183,7 +184,7 @@ export function TreeSelectCustom({ onChange, data, value, singleSelect }) {
   //     console.log("isChecked", e);
   // };
 
-  const selectTree = data =>
+  const selectTreeCategorical = data =>
     data.map(item => {
       if (item.children && item.children.length > 0) {
         return (
@@ -214,13 +215,12 @@ export function TreeSelectCustom({ onChange, data, value, singleSelect }) {
                   }}
                   className={'ml-2 parent-checkbox-' + item.value}
                   name={'parent-checkbox-' + item.value}
-                  type={singleSelect ? 'radio' : 'checkbox'}
+                  type="checkbox"
+                  // type={singleSelect ? "radio" : "checkbox"}
                   // checked={true}
                   onChange={e => handleSelect(item)}
                   disabled={singleSelect ? true : false}
                 />
-
-                {/* <span className="text-info ml-1"><i>(<u>parent</u>)</i></span>  */}
 
                 <button
                   title={item.title}
@@ -240,7 +240,7 @@ export function TreeSelectCustom({ onChange, data, value, singleSelect }) {
               <ul
                 className={'pl-4 children-of-' + item.value}
                 style={{ listStyleType: 'none', display: 'none' }}>
-                {selectTree(item.children)}
+                {selectTreeCategorical(item.children)}
               </ul>
             </li>
           </>
@@ -259,8 +259,12 @@ export function TreeSelectCustom({ onChange, data, value, singleSelect }) {
               style={{ cursor: 'pointer' }}
               className={'ml-4 leaf-checkbox-' + item.value}
               name={'leaf-checkbox-' + item.value}
-              type={singleSelect ? 'radio' : 'checkbox'}
-              // checked={e => isChecked(e)}
+              type="checkbox"
+              // type={singleSelect ? 'radio' : 'checkbox'}
+              checked={
+                (singleSelect && value && value.value === item.value) ||
+                (!singleSelect && value.map((item) => item.value).includes(item.value))
+              }
               onChange={e => handleSelect(item)}
             />
 
@@ -281,9 +285,19 @@ export function TreeSelectCustom({ onChange, data, value, singleSelect }) {
           </li>
         );
       }
-    });
+  });
 
-  const [searchInput, setSearchInput] = useState('');
+  const selectTreeAlphabetical = dataAlphabetical => {
+    const stringMatch = (item) => {
+      let re = new RegExp(searchInput, 'gi');
+      return item.title.match(re);
+    };
+    const dataAlphabeticalFiltered = dataAlphabetical.filter(stringMatch);
+    return dataAlphabeticalFiltered.map((item) => (
+        <div>{item.title}</div>
+      ));
+
+  };
 
   return (
     <>
@@ -322,7 +336,8 @@ export function TreeSelectCustom({ onChange, data, value, singleSelect }) {
             style={{ cursor: singleSelect ? 'not-allowed' : 'pointer' }}
             className=""
             name=""
-            type={singleSelect ? 'radio' : 'checkbox'}
+            type="checkbox"
+            // type={singleSelect ? 'radio' : 'checkbox'}
             disabled={singleSelect ? true : false}
             // checked={e => isChecked(e)}
             // onChange={e => handleSelect(item)}
@@ -346,14 +361,22 @@ export function TreeSelectCustom({ onChange, data, value, singleSelect }) {
               value={searchInput}
               onChange={e => {
                 setSearchInput(e.target.value);
-                // console.log(searchInput);
-                // console.log(e.target.value);
+                if (e.target.value && e.target.value.length > 0) {
+                  setListType('alphabetical');
+                } else {
+                  setListType('categorical');
+                }
               }}
               type="text"
             />
             <div className="input-group-append">
               {searchInput.length > 0 ? (
-                <button className="input-group-text bg-white">
+                <button 
+                  className="input-group-text bg-white" 
+                  onClick={e => {
+                    setSearchInput("");
+                    setListType('categorical');
+                  }}>
                   <FontAwesomeIcon icon={faTimes} size="xs" />
                 </button>
               ) : (
@@ -376,18 +399,11 @@ export function TreeSelectCustom({ onChange, data, value, singleSelect }) {
             maxHeight: '450px',
             fontSize: '10pt'
           }}>
-          {selectTree(data)}
+          {
+            listType === 'categorical' ? selectTreeCategorical(data) : selectTreeAlphabetical(dataAlphabetical)
+          }
         </ul>
       </div>
-      {/* <br></br>
-            <div className="border border-dark">
-                SHOW LIST OF SELECTED PHENOTYPES HERE
-                <ul className="pl-0" style={{listStyleType: 'none'}}>
-                    {
-                        selectedTree(props.value)
-                    }  
-                </ul>
-            </div> */}
     </>
   );
 }

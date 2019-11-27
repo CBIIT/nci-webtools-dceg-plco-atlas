@@ -144,7 +144,7 @@ export const VariantLookupSearchCriteria = props => {
           </div>
 
           <div className="right py-1">
-            <span>Total Phenotypes: </span>
+            <span>Total Results: </span>
             {searchCriteriaVariantLookup &&
             searchCriteriaVariantLookup.totalPhenotypes
               ? searchCriteriaVariantLookup.totalPhenotypes
