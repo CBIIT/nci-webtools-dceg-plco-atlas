@@ -21,13 +21,13 @@ export const VariantLookupSearchCriteria = (props) => {
     };
 
     const CollapseCaret = () => {
-        if (collapseCriteria) {
+        if (!collapseCriteria && searchCriteriaVariantLookup.phenotypes) {
             return (
-                <FontAwesomeIcon icon={faCaretRight} size="lg"/>
+                <FontAwesomeIcon icon={faCaretDown} size="lg"/>
             );
         } else {
             return (
-                <FontAwesomeIcon icon={faCaretDown} size="lg"/>
+                <FontAwesomeIcon icon={faCaretRight} size="lg"/>
             );
         }
     }
@@ -40,7 +40,7 @@ export const VariantLookupSearchCriteria = (props) => {
     }[gender]);
 
     return (
-        <div className="mb-3">
+        <div className="mb-2">
             <Tabs className="" defaultActiveKey="variant-lookup-search-criteria">
                 <Tab
                     eventKey="variant-lookup-search-criteria"
@@ -56,13 +56,14 @@ export const VariantLookupSearchCriteria = (props) => {
                                     variant="link"
                                     onClick={e => toggleCollapseCriteria()}
                                     aria-controls="search-criteria-collapse-panel"
-                                    aria-expanded={!collapseCriteria}>
+                                    aria-expanded={!collapseCriteria}
+                                    disabled={!searchCriteriaVariantLookup.phenotypes}>
                                     <CollapseCaret />
                                 </Button>
                             </span>  
                             <span><b>Phenotype(s)</b>:</span>  
                         </div>
-                        <div className="col-md-auto ml-1 px-0">
+                        <div className="col-md-auto ml-1 px-0" style={{maxHeight: '300px', overflow: 'auto'}}>
                             { collapseCriteria && (
                                 <>
                                     <span>
