@@ -41,30 +41,21 @@ $enable-shadows: true;
 
 .btn-silver {
   // background-color:#D3D3D3;
-  background-image:
-    linear-gradient(
-      #ffffff, #dfdfdf
-    );
+  background-image: linear-gradient(#ffffff, #dfdfdf);
   color: black;
-  border-color:#dee2e6;
+  border-color: #dee2e6;
 }
 
 .btn-silver:hover {
-  background-image:
-    linear-gradient(
-      #ffffff, #dfdfdf
-    );
+  background-image: linear-gradient(#ffffff, #dfdfdf);
   color: black;
-  border-color:#dee2e6;
+  border-color: #dee2e6;
 }
 
 .btn-silver:active {
-  background-image:
-    linear-gradient(
-      #dfdfdf, #e5e5e5
-    ) !important;
+  background-image: linear-gradient(#dfdfdf, #e5e5e5) !important;
   color: black !important;
-  border-color:#dee2e6 !important;
+  border-color: #dee2e6 !important;
 }
 
 .btn-collapse {
@@ -121,9 +112,14 @@ $enable-shadows: true;
 }
 
 .nav-tabs > .nav-item {
-  font-weight: 600;
+  // font-weight: 600;
+  color: black;
   border-top-left-radius: 0;
   border-top-right-radius: 0;
+}
+
+.nav-tabs .nav-link.active {
+  color: black !important;
 }
 
 .nav-tabs {
@@ -143,7 +139,6 @@ $enable-shadows: true;
   border-radius: 0.25em;
 }
 
-
 .table {
   thead th {
     border-bottom: 1px solid #ddd;
@@ -153,7 +148,8 @@ $enable-shadows: true;
     word-wrap: break-word;
   }
 }
-.table.table-striped th, .table.table-striped td {
+.table.table-striped th,
+.table.table-striped td {
   border-top: none;
 }
 
@@ -182,11 +178,21 @@ select.form-control-sm {
   box-shadow: none;
 }
 
-.form-control::-webkit-input-placeholder { color: #aaa; }  /* WebKit, Blink, Edge */
-.form-control:-moz-placeholder { color: #aaa; }  /* Mozilla Firefox 4 to 18 */
-.form-control::-moz-placeholder { color: #aaa; }  /* Mozilla Firefox 19+ */
-.form-control:-ms-input-placeholder { color: #aaa; }  /* Internet Explorer 10-11 */
-.form-control::-ms-input-placeholder { color: #aaa; }  /* Microsoft Edge */
+.form-control::-webkit-input-placeholder {
+  color: #aaa;
+} /* WebKit, Blink, Edge */
+.form-control:-moz-placeholder {
+  color: #aaa;
+} /* Mozilla Firefox 4 to 18 */
+.form-control::-moz-placeholder {
+  color: #aaa;
+} /* Mozilla Firefox 19+ */
+.form-control:-ms-input-placeholder {
+  color: #aaa;
+} /* Internet Explorer 10-11 */
+.form-control::-ms-input-placeholder {
+  color: #aaa;
+} /* Microsoft Edge */
 
 .pagination {
   .page-item .page-link {
@@ -206,7 +212,7 @@ select.form-control-sm {
 }
 
 h1 {
-  color: #2CC799;
+  color: #2cc799;
 }
 
 /** home.js video banner*/
@@ -241,7 +247,7 @@ h1 {
 }
 
 .active-navlinks {
-  background-color: #2CC799 !important;
+  background-color: #2cc799 !important;
   color: #333c4e !important;
   font-weight: bold !important;
 
@@ -257,7 +263,7 @@ h1 {
 }
 
 .active-secondary-navlinks {
-  border-color: #2CC799 !important;
+  border-color: #2cc799 !important;
   border-width: 2px !important;
 }
 
@@ -319,12 +325,11 @@ h1 {
   }
 
   &.gene-plot-collapsed {
-    [data-type="gene-plot"] {
+    [data-type='gene-plot'] {
       display: none;
     }
   }
 }
-
 
 .qq-plot-tooltip {
   background-color: white;
@@ -382,7 +387,7 @@ h1 {
 // .rc-tree-select-tree-treenode-disabled > span,
 // .rc-tree-select-tree-treenode-disabled > a,
 // .rc-tree-select-tree-treenode-disabled > a span {
-  // color: black !important;
+// color: black !important;
 // }
 
 // all rc-tree-select options
@@ -391,8 +396,7 @@ h1 {
 }
 
 // leaf options
-.rc-tree-select-tree-node-content-wrapper-normal
-.rc-tree-select-tree-title {
+.rc-tree-select-tree-node-content-wrapper-normal .rc-tree-select-tree-title {
   cursor: pointer !important;
 }
 
@@ -418,25 +422,19 @@ h1 {
 // }
 
 // show click cursor just for variamt lookup and phenotype correlations tree select
-.variant-lookup
-.rc-tree-select-tree-node-content-wrapper-close,
-.variant-lookup
-.rc-tree-select-tree-node-content-wrapper-open {
+.variant-lookup .rc-tree-select-tree-node-content-wrapper-close,
+.variant-lookup .rc-tree-select-tree-node-content-wrapper-open {
   cursor: pointer !important;
 }
 
-.phenotype-correlations
-.rc-tree-select-tree-node-content-wrapper-close,
-.phenotype-correlations
-.rc-tree-select-tree-node-content-wrapper-open {
+.phenotype-correlations .rc-tree-select-tree-node-content-wrapper-close,
+.phenotype-correlations .rc-tree-select-tree-node-content-wrapper-open {
   cursor: pointer !important;
 }
 
 // show disabled cursor just for summary results tree select
-.summary-results
-.rc-tree-select-tree-node-content-wrapper-close span,
-.summary-results
-.rc-tree-select-tree-node-content-wrapper-open span{
+.summary-results .rc-tree-select-tree-node-content-wrapper-close span,
+.summary-results .rc-tree-select-tree-node-content-wrapper-open span {
   cursor: not-allowed !important;
 }
 

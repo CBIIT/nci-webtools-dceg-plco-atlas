@@ -15,7 +15,7 @@ export function ManhattanPlot({
   onChromosomeSelected,
   onVariantLookup,
   onZoom,
-  loading,
+  loading
 }) {
   const [zoomStack, setZoomStack] = useState([]);
   const [genePlotCollapsed, setGenePlotCollapsed] = useState(false);
@@ -29,7 +29,7 @@ export function ManhattanPlot({
     selectedManhattanPlotType,
     selectedPhenotype,
     selectedChromosome,
-    ranges,
+    ranges
   } = useSelector(state => state.summaryResults);
   const hasData = () =>
     manhattanPlotData &&
@@ -44,20 +44,22 @@ export function ManhattanPlot({
       params =
         manhattanPlotView === 'summary'
           ? getMirroredSummaryPlot(manhattanPlotData, manhattanPlotMirroredData)
-          : getMirroredChromosomePlot(manhattanPlotData, manhattanPlotMirroredData)
+          : getMirroredChromosomePlot(
+              manhattanPlotData,
+              manhattanPlotMirroredData
+            );
     } else {
       params =
         manhattanPlotView === 'summary'
           ? getSummaryPlot(manhattanPlotData)
-          : getChromosomePlot(manhattanPlotData)
+          : getChromosomePlot(manhattanPlotData);
     }
     plot.current = new Plot(plotContainer.current, params);
-    setZoomStack([])
+    setZoomStack([]);
     return () => {
       plot.current.destroy();
     };
   }, [manhattanPlotData, manhattanPlotMirroredData, selectedPlot]);
-
 
   function getMirroredSummaryPlot(plotData, mirroredPlotData) {
     let columnIndexes = {
@@ -104,7 +106,7 @@ export function ManhattanPlot({
         tickFormat: tick => tick.toPrecision(3)
       },
       yAxis2: {
-        secondaryTitle: [{ text: `Male`, font: `600 11px ${systemFont}` }],
+        secondaryTitle: [{ text: `Male`, font: `600 11px ${systemFont}` }]
       },
       point: {
         size: 2,
@@ -112,11 +114,9 @@ export function ManhattanPlot({
         color: (d, i) => (d[columnIndexes.chr] % 2 ? '#e47618' : '#b55117')
       },
       point2: {
-        color: (d, i) => (d[columnIndexes.chr] % 2 ? '#006bb8' : '#002a47')//#e47833')
+        color: (d, i) => (d[columnIndexes.chr] % 2 ? '#006bb8' : '#002a47') //#e47833')
       },
-      lines: [
-        { y: -Math.log10(5e-8), style: 'dashed' },
-      ]
+      lines: [{ y: -Math.log10(5e-8), style: 'dashed' }]
     };
   }
 
@@ -144,7 +144,7 @@ export function ManhattanPlot({
       data2: mirroredPlotData.data,
       genes: plotData.genes,
       allowZoom: true,
-      onZoom: async (e) => {
+      onZoom: async e => {
         let config = plot.current.config;
         let { xAxis, zoomStack } = config;
         let stack = [...zoomStack]; // need new reference, since zoomStack updates
@@ -159,7 +159,7 @@ export function ManhattanPlot({
             database: 'gene.db',
             chr: selectedChromosome,
             txStart: xAxis.extent[0],
-            txEnd: xAxis.extent[1],
+            txEnd: xAxis.extent[1]
           });
           plot.current.drawGenes(genes);
         }
@@ -230,11 +230,9 @@ export function ManhattanPlot({
       point2: {
         color: selectedChromosome % 2 ? '#006bb8' : '#002a47'
       },
-      lines: [
-        { y: -Math.log10(5e-8), style: 'dashed' },
-      ],
-      zoomStack: plot.current && plot.current.zoomStack || []
-    }
+      lines: [{ y: -Math.log10(5e-8), style: 'dashed' }],
+      zoomStack: (plot.current && plot.current.zoomStack) || []
+    };
   }
 
   function getSummaryPlot(plotData) {
@@ -281,7 +279,7 @@ export function ManhattanPlot({
       point: {
         size: 2,
         opacity: 0.6,
-        color: (d, i) => (d[columnIndexes.chr] % 2 ? '#006bb8' : '#002a47')//#e47833')
+        color: (d, i) => (d[columnIndexes.chr] % 2 ? '#006bb8' : '#002a47') //#e47833')
       },
       lines: [{ y: -Math.log10(5e-8) }]
     };
@@ -309,7 +307,7 @@ export function ManhattanPlot({
       data: plotData.data,
       genes: plotData.genes,
       allowZoom: true,
-      onZoom: async (e) => {
+      onZoom: async e => {
         let config = plot.current.config;
         let { xAxis, zoomStack } = config;
         let stack = [...zoomStack]; // need new reference, since zoomStack updates
@@ -324,7 +322,7 @@ export function ManhattanPlot({
             database: 'gene.db',
             chr: selectedChromosome,
             txStart: xAxis.extent[0],
-            txEnd: xAxis.extent[1],
+            txEnd: xAxis.extent[1]
           });
           plot.current.drawGenes(genes);
         }
@@ -353,7 +351,7 @@ export function ManhattanPlot({
         size: 2,
         interactiveSize: 3,
         opacity: 0.6,
-        color: (selectedChromosome % 2 ? '#006bb8' : '#002a47'),
+        color: selectedChromosome % 2 ? '#006bb8' : '#002a47',
         tooltip: {
           trigger: 'hover',
           class: 'custom-tooltip',
@@ -389,7 +387,7 @@ export function ManhattanPlot({
         }
       },
       lines: [{ y: -Math.log10(5e-8), style: 'dashed' }],
-      zoomStack: plot.current && plot.current.zoomStack || []
+      zoomStack: (plot.current && plot.current.zoomStack) || []
     };
   }
 
@@ -409,51 +407,68 @@ export function ManhattanPlot({
     if (!zoomStack || !zoomStack.length) return Number.MAX_VALUE;
     let { xMax, xMin } = zoomStack[zoomStack.length - 1].bounds;
     return xMax - xMin;
-  }
-
-
+  };
 
   return (
-    <div style={{display: hasData() ? 'block' : 'none', position: 'relative'}}>
+    <div
+      style={{ display: hasData() ? 'block' : 'none', position: 'relative' }}>
       <LoadingOverlay active={loading} {...plotOverlayConfig} />
       <div
         className="mx-2 mt-3 small d-flex align-items-center"
-        style={{visibility: selectedChromosome ? 'visible' : 'hidden'}}>
-        <a className="link" onClick={e => onAllChromosomeSelected && onAllChromosomeSelected()}>All Chromosomes</a>
+        style={{ visibility: selectedChromosome ? 'visible' : 'hidden' }}>
+        <a
+          className="link"
+          onClick={e => onAllChromosomeSelected && onAllChromosomeSelected()}>
+          All Chromosomes
+        </a>
 
-        {zoomStack.length ? <>
-            <Icon name="arrow-left" className="mx-2 opacit
+        {zoomStack.length ? (
+          <>
+            <Icon
+              name="arrow-left"
+              className="mx-2 opacit
 
 
-            y-50" width="10" />
+            y-50"
+              width="10"
+            />
             <a className="link" onClick={resetZoom}>
               Chromosome {selectedChromosome}
             </a>
-          </> : null}
+          </>
+        ) : null}
 
-        {zoomStack.length > 1 ? <>
-          <Icon name="arrow-left" className="mx-2 opacity-50" width="10" />
-          <a className="link" onClick={zoomOut}>
-            Previous Zoom
-            {(() => {
-              let bounds = zoomStack[zoomStack.length - 2].bounds;
-              return ` (${(bounds.xMin / 1e6).toPrecision(4)} MB - ${(bounds.xMax / 1e6).toPrecision(4)} MB)`;
-            })()}
-          </a>
-          </> : null}
-          <Icon name="arrow-left" className="mx-2 opacity-50" width="10" />
+        {zoomStack.length > 1 ? (
+          <>
+            <Icon name="arrow-left" className="mx-2 opacity-50" width="10" />
+            <a className="link" onClick={zoomOut}>
+              Previous Zoom
+              {(() => {
+                let bounds = zoomStack[zoomStack.length - 2].bounds;
+                return ` (${(bounds.xMin / 1e6).toPrecision(4)} MB - ${(
+                  bounds.xMax / 1e6
+                ).toPrecision(4)} MB)`;
+              })()}
+            </a>
+          </>
+        ) : null}
+        <Icon name="arrow-left" className="mx-2 opacity-50" width="10" />
       </div>
       <div
         style={{
-          overflowX: 'visible',
+          overflowX: 'visible'
           // overflowY: 'auto',
           // height: '600px',
         }}>
         <div
           ref={plotContainer}
-          className={[`manhattan-plot`, (genePlotCollapsed || getXRange() > 1e6) && 'gene-plot-collapsed'].join(' ')} />
+          className={[
+            `manhattan-plot`,
+            (genePlotCollapsed || getXRange() > 1e6) && 'gene-plot-collapsed'
+          ].join(' ')}
+        />
 
-        {manhattanPlotView !== 'summary' &&
+        {manhattanPlotView !== 'summary' && (
           <div className="text-center px-5">
             {(() => {
                   if (genePlotCollapsed) return null;
@@ -467,8 +482,7 @@ export function ManhattanPlot({
               <Icon name={genePlotCollapsed ? 'angle-down' : 'angle-up'} width="10"/>
             </button>
           </div>
-        }
-
+        )}
       </div>
     </div>
   );

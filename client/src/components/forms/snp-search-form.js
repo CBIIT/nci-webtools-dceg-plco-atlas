@@ -1,8 +1,8 @@
-import React from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { updateSummaryResults } from "../../services/actions";
-import { query } from "../../services/query";
-import { Table } from "../controls/table";
+import React from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { updateSummaryResults } from '../../services/actions';
+import { query } from '../../services/query';
+import { Table } from '../controls/table';
 import { Icon } from '../controls/icon';
 
 export const SnpSearchForm = () => {
@@ -14,38 +14,36 @@ export const SnpSearchForm = () => {
     selectedPhenotype,
     selectedChromosome,
     selectedManhattanPlotType
-  } = useSelector(
-    state => state.summaryResults
-  );
+  } = useSelector(state => state.summaryResults);
 
   const columns = [
     {
-      dataField: "chr",
-      text: "Chromosome"
+      dataField: 'chr',
+      text: 'Chromosome'
     },
     {
-      dataField: "bp",
-      text: "Position"
+      dataField: 'bp',
+      text: 'Position'
     },
     {
-      dataField: "snp",
-      text: "SNP"
+      dataField: 'snp',
+      text: 'SNP'
     },
     {
-      dataField: "a1",
-      text: "Reference Allele"
+      dataField: 'a1',
+      text: 'Reference Allele'
     },
     {
-      dataField: "a2",
-      text: "Alternate Allele"
+      dataField: 'a2',
+      text: 'Alternate Allele'
     },
     {
-      dataField: "or",
-      text: "Odds Ratio"
+      dataField: 'or',
+      text: 'Odds Ratio'
     },
     {
-      dataField: "p",
-      text: "P-Value"
+      dataField: 'p',
+      text: 'P-Value'
     }
   ];
 
@@ -59,14 +57,14 @@ export const SnpSearchForm = () => {
       all: 'variant_all',
       stacked: 'variant_all',
       female: 'variant_female',
-      male: 'variant_male',
+      male: 'variant_male'
     }[selectedManhattanPlotType];
 
     const { data } = await query('variants', {
       database: selectedPhenotype.value + '.db',
       table: table,
-      snp: snp,
-    })
+      snp: snp
+    });
     dispatch(
       updateSummaryResults({
         snpResults: data,
@@ -90,7 +88,7 @@ export const SnpSearchForm = () => {
       <div className="d-flex mb-2">
         <input
           type="text"
-          style={{maxWidth: '400px'}}
+          style={{ maxWidth: '400px' }}
           className="form-control"
           placeholder="Search for a SNP"
           value={snp}
@@ -98,15 +96,13 @@ export const SnpSearchForm = () => {
         />
         <button
           className="btn btn-silver flex-shrink-auto d-flex"
-          onClick={handleSnpReset}
-        >
+          onClick={handleSnpReset}>
           <Icon className="opacity-50" name="times" width="12" />
           <span className="sr-only">Clear</span>
         </button>
         <button
           className="btn btn-silver flex-shrink-auto mx-2"
-          onClick={handleSnpLookup}
-        >
+          onClick={handleSnpLookup}>
           Search
         </button>
       </div>

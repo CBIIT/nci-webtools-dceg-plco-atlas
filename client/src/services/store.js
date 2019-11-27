@@ -46,14 +46,14 @@ const initialState = {
       results: [],
       resultsCount: 0,
       page: 1,
-      pageSize: 10,
+      pageSize: 10
     },
     {
       results: [],
       resultsCount: 0,
       page: 1,
-      pageSize: 10,
-    },
+      pageSize: 10
+    }
   ],
   variantLookup: {
     selectedListType: 'categorical',

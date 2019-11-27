@@ -85,10 +85,9 @@ export function drawPoints(config, ctx, hiddenCtx) {
   hiddenCtx.restore();
 }
 
-
 export function drawMirroredPoints(config, ctx, hiddenCtx) {
   console.log('mirrored points', config);
-  const {data, data2, margins} = config;
+  const { data, data2, margins } = config;
   const xKey = config.xAxis.key;
   const yKey = config.yAxis.key;
   const xScale = config.xAxis.scale;
@@ -136,7 +135,7 @@ export function drawMirroredPoints(config, ctx, hiddenCtx) {
       if (dx < xMin || dx > xMax || dy < yMin || dy > yMax) continue;
 
       let x = xScale2(dx);
-      let  y = yScale2(dy);
+      let y = yScale2(dy);
 
       ctx.beginPath();
       ctx.arc(x, y, pointSize, 0, 2 * Math.PI, true);
@@ -145,7 +144,6 @@ export function drawMirroredPoints(config, ctx, hiddenCtx) {
       ctx.fill();
     }
   }
-
 
   ctx.restore();
   hiddenCtx.restore();
