@@ -22,7 +22,7 @@ export class ManhattanPlot {
       top: 60,
       right: 60,
       bottom: 30,
-      left: 80,
+      left: 80
     }
   };
 
@@ -60,7 +60,7 @@ export class ManhattanPlot {
       overflowY: 'auto',
       overflowX: 'hidden',
       position: 'relative',
-      border: '1px solid #eee',
+      border: '1px solid #eee'
     });
 
     [this.geneCanvas, this.geneCtx] = getCanvasAndContext();

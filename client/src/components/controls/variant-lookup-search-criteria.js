@@ -88,26 +88,27 @@ export const VariantLookupSearchCriteria = props => {
                       style={{
                         all: 'unset',
                         textDecoration: 'underline',
-                        cursor: 'pointer',
-                        color: '#008CBA'
+                        cursor: 'pointer'
                       }}
                       title="Expand/collapse search criteria panel"
                       onClick={e => toggleCollapseCriteria()}
                       aria-controls="search-criteria-collapse-panel"
                       aria-expanded={!collapseCriteria}>
-                      {searchCriteriaVariantLookup &&
-                      searchCriteriaVariantLookup.phenotypes &&
-                      searchCriteriaVariantLookup.phenotypes.length > 1
-                        ? searchCriteriaVariantLookup.phenotypes.length -
-                          1 +
-                          ` other${
-                            searchCriteriaVariantLookup.phenotypes.length -
-                              1 ===
-                            1
-                              ? ''
-                              : 's'
-                          }`
-                        : ''}
+                      <span style={{ color: '#008CBA' }}>
+                        {searchCriteriaVariantLookup &&
+                        searchCriteriaVariantLookup.phenotypes &&
+                        searchCriteriaVariantLookup.phenotypes.length > 1
+                          ? searchCriteriaVariantLookup.phenotypes.length -
+                            1 +
+                            ` other${
+                              searchCriteriaVariantLookup.phenotypes.length -
+                                1 ===
+                              1
+                                ? ''
+                                : 's'
+                            }`
+                          : ''}
+                      </span>
                     </button>
                   </span>
                 </>
