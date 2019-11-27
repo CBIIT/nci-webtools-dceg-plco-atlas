@@ -17,7 +17,7 @@ export const SummaryResultsSearchCriteria = () => {
     }[gender]);
 
     return (
-        <div className="mb-3">
+        <div className="mb-2">
             <Tabs className="" defaultActiveKey="summary-results-search-criteria">
                 <Tab
                     eventKey="summary-results-search-criteria"

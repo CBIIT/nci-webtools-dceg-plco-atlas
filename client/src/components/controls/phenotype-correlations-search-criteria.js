@@ -21,13 +21,13 @@ export const PhenotypeCorrelationsSearchCriteria = (props) => {
     };
 
     const CollapseCaret = () => {
-        if (collapseCriteria) {
+        if (!collapseCriteria && searchCriteriaPhenotypeCorrelations.phenotypes) {
             return (
-                <FontAwesomeIcon icon={faCaretRight} size="lg"/>
+                <FontAwesomeIcon icon={faCaretDown} size="lg"/>
             );
         } else {
             return (
-                <FontAwesomeIcon icon={faCaretDown} size="lg"/>
+                <FontAwesomeIcon icon={faCaretRight} size="lg"/>
             );
         }
     }
@@ -40,7 +40,7 @@ export const PhenotypeCorrelationsSearchCriteria = (props) => {
     }[gender]);
 
     return (
-        <div className="mb-3">
+        <div className="mb-2">
             <Tabs className="" defaultActiveKey="search-criteria">
                 <Tab
                     eventKey="search-criteria"
@@ -55,14 +55,15 @@ export const PhenotypeCorrelationsSearchCriteria = (props) => {
                                     variant="link"
                                     onClick={e => toggleCollapseCriteria()}
                                     aria-controls="search-criteria-collapse-panel"
-                                    aria-expanded={!collapseCriteria}>
+                                    aria-expanded={!collapseCriteria}
+                                    disabled={!searchCriteriaPhenotypeCorrelations.phenotypes}>
                                     <CollapseCaret />
                                 </Button>
                             </span>   
-                            <span><b>Phenotypes</b>: </span>
+                            <span><b>Phenotypes</b>:</span>
                         </div>         
-                        <div className="col-md-auto ml-1 px-0">
-                            { collapseCriteria && (
+                        <div className="col-md-auto ml-1 px-0" style={{maxHeight: '300px', overflow: 'auto'}}>
+                            { collapseCriteria && searchCriteriaPhenotypeCorrelations.phenotypes && searchCriteriaPhenotypeCorrelations.phenotypes.length > 0 && (
                                 <>  
                                     <span>
                                         {searchCriteriaPhenotypeCorrelations && searchCriteriaPhenotypeCorrelations.phenotypes ? searchCriteriaPhenotypeCorrelations.phenotypes[0] : 'None'}
@@ -87,9 +88,11 @@ export const PhenotypeCorrelationsSearchCriteria = (props) => {
                             )}
                             { !collapseCriteria && searchCriteriaPhenotypeCorrelations && searchCriteriaPhenotypeCorrelations.phenotypes &&
                                 searchCriteriaPhenotypeCorrelations.phenotypes.map((phenotype) =>
-                                    (<div>
-                                        {phenotype}
-                                    </div>)
+                                    (
+                                        <div>
+                                            {phenotype}
+                                        </div>
+                                    )
                                 )    
                             }
                         </div>
