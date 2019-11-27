@@ -18,6 +18,7 @@ export function ManhattanPlot({
   loading,
 }) {
   const [zoomStack, setZoomStack] = useState([]);
+  const [genePlotCollapsed, setGenePlotCollapsed] = useState(false);
   const plotContainer = useRef(null);
   const plot = useRef(null);
   const {
@@ -400,6 +401,14 @@ export function ManhattanPlot({
     }
   }
 
+  let getXRange = () => {
+    if (!zoomStack || !zoomStack.length) return Number.MAX_VALUE;
+    let { xMax, xMin } = zoomStack[zoomStack.length - 1].bounds;
+    return xMax - xMin;
+  }
+
+
+
   return (
     <div style={{display: hasData() ? 'block' : 'none', position: 'relative'}}>
       <LoadingOverlay active={loading} {...plotOverlayConfig} />
@@ -436,15 +445,26 @@ export function ManhattanPlot({
           // overflowY: 'auto',
           // height: '600px',
         }}>
-        <div ref={plotContainer} className="manhattan-plot" />
-        {(() => {
-              if (manhattanPlotView === 'summary') return null;
-              let zoomMessage = <p class="h4 mt-0 mb-5 text-center">Please zoom in to see genes.</p>
-              if (!zoomStack || !zoomStack.length) return zoomMessage;
-              let { xMax, xMin } = zoomStack[zoomStack.length - 1].bounds;
-              let xRange = xMax - xMin;
-              if (xRange > 1e6) return zoomMessage;
+        <div
+          ref={plotContainer}
+          className={[`manhattan-plot`, (genePlotCollapsed || getXRange() > 1e6) && 'gene-plot-collapsed'].join(' ')} />
+
+        {manhattanPlotView !== 'summary' &&
+          <div className="text-center px-5">
+            {(() => {
+                  if (genePlotCollapsed) return null;
+                  let zoomMessage = <p className="p-4 mb-0" style={{border: '1px solid #ccc'}}>Gene plot is not available at the current zoom level. To show genes, please zoom in to a 1MB viewport.</p>
+                  if (!zoomStack || !zoomStack.length) return zoomMessage;
+                  let { xMax, xMin } = zoomStack[zoomStack.length - 1].bounds;
+                  let xRange = xMax - xMin;
+                  if (xRange > 1e6) return zoomMessage;
             })()}
+            <button className="btn btn-collapse" onClick={e => setGenePlotCollapsed(!genePlotCollapsed)}>
+              <Icon name={genePlotCollapsed ? 'angle-down' : 'angle-up'} width="10"/>
+            </button>
+          </div>
+        }
+
       </div>
     </div>
   );
