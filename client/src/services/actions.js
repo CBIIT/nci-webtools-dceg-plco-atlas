@@ -114,14 +114,10 @@ export function drawQQPlot(phenotype, variantTable) {
     const setQQPlotStacked = qqplotStacked => {
       dispatch(updateSummaryResults({ qqplotStacked }));
     };
-    const setSampleSize = sampleSize => {
-      dispatch(updateSummaryResults({ sampleSize }));
-    };
     setQQPlotLoading(true);
     setQQPlotLayout({});
     setQQPlotData([]);
     setQQPlotStacked(false);
-    setSampleSize(null);
 
     const table = variantTable.length === 1 ? 
       variantTable[0] : 'stacked';
@@ -150,15 +146,20 @@ export function drawQQPlot(phenotype, variantTable) {
 
     if (table !== 'stacked') {
       const metadata_count = parseInt(metadata[countKey(table)]);
-      setSampleSize(metadata_count);
       const metadata_lambdaGC = metadata[lambdaGCKey(table)] ? metadata[lambdaGCKey(table)] : 'TBD';
 
+      // const subsetVariantDataMod1 = 1000; 
+      // const subsetVariantDataMod2 = 10000; 
+      // const subsetVariantDataMod3 = 100000; 
       const pCutOffValue = 0.001;
+      // const pCutOffValue2 = 0.01;
+      // const pCutOffValue3 = 0.1;
 
       const topVariantData = await query('variants', {
         database: phenotype + '.db',
         table,
         columns: ['chr', 'bp', 'snp', 'p', 'nlog_p', 'expected_p'],
+  //      pMin: 0.001,
         pMax: pCutOffValue,
         orderBy: 'p',
         order: 'asc',
@@ -256,7 +257,7 @@ export function drawQQPlot(phenotype, variantTable) {
         width: 800,
         height: 800,
         title: {
-          text: '<b>\u03BB</b> = ' + metadata_lambdaGC + '        <b>Sample Size</b> = ' + metadata_count.toLocaleString(),
+          text: '<b>\u03BB</b> = ' + metadata_lambdaGC + '        <b>Sample Size</b> = ' + metadata_count,
           font: {
             family: 'Arial',
             size: 14,
@@ -311,7 +312,6 @@ export function drawQQPlot(phenotype, variantTable) {
     } else {
       const metadata_count_female = parseInt(metadata[countKey(table)[0]]);
       const metadata_count_male = parseInt(metadata[countKey(table)[1]]);
-      setSampleSize(metadata_count_female + metadata_count_male);
       const metadata_lambdaGC_female = metadata[lambdaGCKey(table)[0]] ? metadata[lambdaGCKey(table)[0]] : 'TBD';
       const metadata_lambdaGC_male = metadata[lambdaGCKey(table)[1]] ? metadata[lambdaGCKey(table)[1]] : 'TBD';
 
@@ -511,7 +511,7 @@ export function drawQQPlot(phenotype, variantTable) {
         width: 800,
         height: 800,
         title: {
-          text: '<b>Female \u03BB</b> = ' + metadata_lambdaGC_female + '        <b>Female Sample Size</b> = ' + metadata_count_female.toLocaleString(),
+          text: '<b>Female \u03BB</b> = ' + metadata_lambdaGC_female + '        <b>Female Sample Size</b> = ' + metadata_count_female,
           font: {
             family: 'Arial',
             size: 14,
@@ -568,7 +568,7 @@ export function drawQQPlot(phenotype, variantTable) {
         width: 800,
         height: 800,
         title: {
-          text: '<b>Male \u03BB</b> = ' + metadata_lambdaGC_male + '        <b>Male Sample Size</b> = ' + metadata_count_male.toLocaleString(),
+          text: '<b>Male \u03BB</b> = ' + metadata_lambdaGC_male + '        <b>Male Sample Size</b> = ' + metadata_count_male,
           font: {
             family: 'Arial',
             size: 14,
