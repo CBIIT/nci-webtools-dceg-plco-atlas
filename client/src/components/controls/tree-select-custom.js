@@ -5,7 +5,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faPlusSquare, faMinusSquare, faSearch } from '@fortawesome/free-solid-svg-icons'
 
 
-export function TreeSelectCustom({onChange, data, value}) {
+export function TreeSelectCustom({onChange, data, value, singleSelect}) {
 
     const containsVal = (arr, val) => {
         let result = false;
@@ -84,7 +84,7 @@ export function TreeSelectCustom({onChange, data, value}) {
             document.getElementsByClassName(className)[0].style.display = "block";
             const collapseButton = document.getElementsByClassName("collapse-button-text-" + name)[0];
             ReactDOM.render(
-                <FontAwesomeIcon icon={faMinusSquare} size="md"/>,
+                <FontAwesomeIcon icon={faMinusSquare} size="1x"/>,
                 collapseButton);
             // textContent = <FontAwesomeIcon icon={faMinusSquare} size="lg"/>;
         } else {
@@ -92,7 +92,7 @@ export function TreeSelectCustom({onChange, data, value}) {
             const collapseButton = document.getElementsByClassName("collapse-button-text-" + name)[0];
             // .textContent = <FontAwesomeIcon icon={faPlusSquare} size="lg"/>;
             ReactDOM.render(
-                <FontAwesomeIcon icon={faPlusSquare} size="md"/>,
+                <FontAwesomeIcon icon={faPlusSquare} size="1x"/>,
                 collapseButton);
         }
     };
@@ -105,45 +105,50 @@ export function TreeSelectCustom({onChange, data, value}) {
     };
 
     const handleSelect = item => {
-        const parentCheckboxClassName = "parent-checkbox-" + item.value;
-        // const leafCheckboxClassName = "leaf-checkbox-" + item.value;
-        let values = [...value];
-        let newValues = getAllLeafs(item);
-        if (containsAllVals(values, newValues)) {
-            // remove all leafs if parent is clicked and all leafs were already selected
-            values = removeAllVals(values, newValues);
-            if (document.getElementsByClassName(parentCheckboxClassName)[0]) {
-                // console.log(document.getElementsByClassName(parentCheckboxClassName));
-                document.getElementsByClassName(parentCheckboxClassName)[0].checked = false;
-            }
-            for (var i = 0; i < newValues.length; i++) {
-                if (document.getElementsByClassName("leaf-checkbox-" + newValues[i].value)[0]) {
-                    document.getElementsByClassName("leaf-checkbox-" + newValues[i].value)[0].checked = false;
-                }
-            }
+        if (singleSelect) {
+            console.log("SINGLE SELECT ITEM", item);
+            onChange([item]);
         } else {
-            for (var i = 0; i < newValues.length; i++) {
-                if (!containsVal(values, newValues[i].value)) {
-                    // only add if value did not exist before
-                    values.push(newValues[i]);
-                    if (document.getElementsByClassName(parentCheckboxClassName)[0]) {
-                        // console.log(document.getElementsByClassName(parentCheckboxClassName));
-                        document.getElementsByClassName(parentCheckboxClassName)[0].checked = true;
-                    }
+            const parentCheckboxClassName = "parent-checkbox-" + item.value;
+            // const leafCheckboxClassName = "leaf-checkbox-" + item.value;
+            let values = [...value];
+            let newValues = getAllLeafs(item);
+            if (containsAllVals(values, newValues)) {
+                // remove all leafs if parent is clicked and all leafs were already selected
+                values = removeAllVals(values, newValues);
+                if (document.getElementsByClassName(parentCheckboxClassName)[0]) {
+                    // console.log(document.getElementsByClassName(parentCheckboxClassName));
+                    document.getElementsByClassName(parentCheckboxClassName)[0].checked = false;
+                }
+                for (var i = 0; i < newValues.length; i++) {
                     if (document.getElementsByClassName("leaf-checkbox-" + newValues[i].value)[0]) {
-                        document.getElementsByClassName("leaf-checkbox-" + newValues[i].value)[0].checked = true;
+                        document.getElementsByClassName("leaf-checkbox-" + newValues[i].value)[0].checked = false;
                     }
-                } else {
-                    // remove if new selected leaf was already selected
-                    if (newValues.length === 1) {
-                        values = removeVal(values, newValues[i].value);
+                }
+            } else {
+                for (var i = 0; i < newValues.length; i++) {
+                    if (!containsVal(values, newValues[i].value)) {
+                        // only add if value did not exist before
+                        values.push(newValues[i]);
+                        if (document.getElementsByClassName(parentCheckboxClassName)[0]) {
+                            // console.log(document.getElementsByClassName(parentCheckboxClassName));
+                            document.getElementsByClassName(parentCheckboxClassName)[0].checked = true;
+                        }
+                        if (document.getElementsByClassName("leaf-checkbox-" + newValues[i].value)[0]) {
+                            document.getElementsByClassName("leaf-checkbox-" + newValues[i].value)[0].checked = true;
+                        }
+                    } else {
+                        // remove if new selected leaf was already selected
+                        if (newValues.length === 1) {
+                            values = removeVal(values, newValues[i].value);
+                        }
                     }
                 }
             }
-        }
-        checkParents();
+            checkParents();
 
-        onChange(values);
+            onChange(values);
+        }
     };
 
     // const isChecked = (e) => {
@@ -162,7 +167,7 @@ export function TreeSelectCustom({onChange, data, value}) {
                                 className="collapse-button text-secondary" 
                                 onClick={e => toggleHideChildren(item.value)}>
                                 <span className={"collapse-button-text-" + item.value}>
-                                    <FontAwesomeIcon icon={faPlusSquare} size="md"/>
+                                    <FontAwesomeIcon icon={faPlusSquare} size="1x"/>
                                 </span>
                             </button>
                             
@@ -170,9 +175,10 @@ export function TreeSelectCustom({onChange, data, value}) {
                                 style={{verticalAlign: 'middle', alignSelf: 'center'}}
                                 className={"ml-2 parent-checkbox-" + item.value}
                                 name={"parent-checkbox-" + item.value}
-                                type="checkbox"
+                                type={singleSelect ? "radio" : "checkbox"}
                                 // checked={true}
                                 onChange={e => handleSelect(item)} 
+                                disabled={singleSelect ? true : false}
                             />
 
                             {/* <span className="text-info ml-1"><i>(<u>parent</u>)</i></span>  */}
@@ -209,7 +215,7 @@ export function TreeSelectCustom({onChange, data, value}) {
                     <input
                         className={"ml-4 leaf-checkbox-" + item.value}
                         name={"leaf-checkbox-" + item.value}
-                        type="checkbox"
+                        type={singleSelect ? "radio" : "checkbox"}
                         // checked={e => isChecked(e)}
                         onChange={e => handleSelect(item)} 
                     />
@@ -255,7 +261,7 @@ export function TreeSelectCustom({onChange, data, value}) {
                         className="ml-1 collapse-button text-secondary" 
                         // onClick={e => toggleHideChildren(item.value)}
                         >
-                        <FontAwesomeIcon icon={faPlusSquare} size="md"/>
+                        <FontAwesomeIcon icon={faPlusSquare} size="1x"/>
                     </button>
 
                     <div 
@@ -270,7 +276,8 @@ export function TreeSelectCustom({onChange, data, value}) {
                     <input
                         className=""
                         name=""
-                        type="checkbox"
+                        type={singleSelect ? "radio" : "checkbox"}
+                        disabled={singleSelect ? true : false}
                         // checked={e => isChecked(e)}
                         // onChange={e => handleSelect(item)} 
                     />
@@ -296,10 +303,10 @@ export function TreeSelectCustom({onChange, data, value}) {
                             }}
                             type="text"
                         />
-                        <div class="input-group-append">
+                        <div className="input-group-append">
                             <button 
-                                class="input-group-text">
-                                <FontAwesomeIcon icon={faSearch} size="sm"/>
+                                className="input-group-text">
+                                <FontAwesomeIcon icon={faSearch} size="xs"/>
                             </button>
                         </div>
                     </div>
