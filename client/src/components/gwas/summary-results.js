@@ -6,9 +6,6 @@ import { SnpSearchForm } from '../forms/snp-search-form';
 import { ManhattanPlot } from '../plots/manhattan-plot';
 import { QQPlot } from '../plots/qq-plot';
 import { SummaryResultsTable } from './summary-results-table';
-import { SummaryResultsSearchCriteria } from '../controls/summary-results-search-criteria';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faCaretRight, faCaretLeft } from '@fortawesome/free-solid-svg-icons'
 import {
   updateSummaryResults,
   updateVariantLookup,
@@ -18,8 +15,6 @@ import {
   fetchSummaryTable,
   updateSummaryTable,
 } from '../../services/actions';
-import { query } from '../../services/query';
-
 
 export function SummaryResults() {
   const dispatch = useDispatch();
@@ -50,10 +45,6 @@ export function SummaryResults() {
   const setMessages = messages => {
     dispatch(updateSummaryResults({ messages }));
   };
-
-  const setSearchCriteriaSummaryResults = searchCriteriaSummaryResults => {
-    dispatch(updateSummaryResults({ searchCriteriaSummaryResults }));
-  }
 
   const clearMessages = e => {
     setMessages([]);
@@ -157,11 +148,6 @@ export function SummaryResults() {
         }, countKey, tableIndex)
       );
     });
-
-    setSearchCriteriaSummaryResults({
-      phenotype: [...selectedPhenotype.title],
-      gender: selectedManhattanPlotType,
-    });
     // if any Q-Q plot tooltips exist, destory
     hideQQTooltips();
   };
@@ -182,6 +168,7 @@ export function SummaryResults() {
         qqplotSrc: '',
         areaItems: [],
         lambdaGC: '',
+        sampleSize: '',
         submitted: null,
         loadingManhattanTable: false,
         loadingManhattanPlot: false,
@@ -191,8 +178,6 @@ export function SummaryResults() {
         popupTooltipData: null,
         showSnpResults: false,
         snp: '',
-        searchCriteriaSummaryResults: {},
-        sampleSize: null
       })
     );
 
@@ -349,13 +334,12 @@ export function SummaryResults() {
   return (
     <>
       <Button
-        title="Show/hide search panel"
         variant="link"
         style={{position: 'absolute', zIndex: 100}}
         onClick={() => setOpenSidebar(!openSidebar)}
         aria-controls="summary-results-collapse-input-panel"
         aria-expanded={openSidebar}>
-        { openSidebar ? <FontAwesomeIcon icon={faCaretLeft} size="lg"/> : <FontAwesomeIcon icon={faCaretRight} size="lg"/>}
+        { openSidebar ? <span>&#171;</span> : <span>&#187;</span>}
       </Button>
       
       <div className={openSidebar ? "row mx-3" : "mx-3"}>
@@ -382,9 +366,26 @@ export function SummaryResults() {
         <div className="d-md-none p-2"></div>
       
         <div className={openSidebar ? "col-md-9" : "col-md-12"}>
-          <SummaryResultsSearchCriteria />
+         {/* <Tabs className="" defaultActiveKey="summary-results-criteria">
+            <Tab
+              eventKey="summary-results-criteria"
+              className="d-flex justify-content-between p-2 bg-white tab-pane-bordered rounded-0">
+                <div className="">
+                    <span>
+                      <b>Phenotype</b>: <span>TBD</span>
+                    </span>
+                    <span className="mx-3">|</span>
+                    <span>
+                      <b>Gender</b>: <span>TBD</span>
+                    </span>
+                </div>
+                <div className="">
+                    Total Variants: <span>TBD</span>
+                </div>
+            </Tab>
+          </Tabs> */}
 
-          <Tabs className="mt-2" defaultActiveKey={selectedPlot} onSelect={setSelectedPlot}>
+          <Tabs className="" defaultActiveKey={selectedPlot} onSelect={setSelectedPlot}>
             <Tab
               eventKey="manhattan-plot"
               title="Manhattan Plot"

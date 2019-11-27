@@ -8,8 +8,8 @@ import {
   removeVal,
   removeAllVals,
   getAllLeafs } from '../controls/tree-select';
-import { TreeSelectCustom } from '../controls/tree-select-custom';
-
+import TreeSelect, { TreeNode } from 'rc-tree-select';
+import 'rc-tree-select/assets/index.css';
 
 export function PhenotypeCorrelationsForm({ onChange, onSubmit, onReset }) {
   const dispatch = useDispatch();
@@ -60,13 +60,6 @@ export function PhenotypeCorrelationsForm({ onChange, onSubmit, onReset }) {
     onChange(values);
   };
 
-  const handleChangeCustom = (items) => {
-    setSelectedPhenotypes(items);
-    // console.log("selected", items);
-    // conatselectedPhenotypes
-
-  }
-
   const removeTreeDisabled = (phenoTree) => {
     let phenoTreeAllEnabled = [...phenoTree];
     let phenoTreeAllEnabledString = JSON.stringify(phenoTreeAllEnabled)
@@ -96,10 +89,27 @@ export function PhenotypeCorrelationsForm({ onChange, onSubmit, onReset }) {
         <option value="alphabetic">Alphabetic</option>
       </select>
 
-      <TreeSelectCustom
-        data={phenotypesTree}
+      <TreeSelect
+        className="form-control h-100 p-0"
+        dropdownClassName="phenotype-correlations"
+        style={{ width: '100%', maxHeight: 200, overflow: 'auto' }}
+        dropdownStyle={{ maxHeight: 500, overflow: 'auto' }}
+        treeData={
+          selectedListType === 'alphabetic'
+            ? removeFlatDisabled(alphabetizedPhenotypes)
+            : removeTreeDisabled(phenotypesTree)
+        }
         value={selectedPhenotypes}
-        onChange={handleChangeCustom}
+        onChange={handleChange}
+        treeNodeFilterProp="title"
+        dropdownMatchSelectWidth
+        autoClearSearchValue
+        // treeDefaultExpandAll
+        treeLine
+        multiple
+        allowClear
+        labelInValue
+        placeholder="(Select two or more phenotypes)"
       />
       
       <br></br>
