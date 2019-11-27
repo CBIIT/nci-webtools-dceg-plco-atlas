@@ -58,6 +58,15 @@ $enable-shadows: true;
   border-color: #dee2e6 !important;
 }
 
+.btn-collapse {
+  background-color: white;
+  border: none;
+}
+
+.btn-collapse:focus {
+  outline: none;
+}
+
 .text-orange {
   color: orange !important;
 }

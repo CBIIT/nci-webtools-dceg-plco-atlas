@@ -157,7 +157,7 @@ export function axisBottom(config, ctx) {
   }
 
   let axisWidth = config.yAxis.width || 1;
-  let title = config.xAxis.title || 'X Axis';
+  let title = config.xAxis.title;
   let ticks = config.xAxis.ticks;
   let interpolatedTicks = interpolateTicks(ticks);
   let labelsBetweenTicks = config.xAxis.labelsBetweenTicks;
@@ -194,14 +194,16 @@ export function axisBottom(config, ctx) {
   }
 
   // draw axis title
-  let titleWidth = measureWidth(ctx, title);
-  let midpoint = (xScale(xMax) - xScale(xMin)) / 2;
-  ctx.translate(
-    midpoint - titleWidth / 2,
-    tickLength + tickPadding + labelPadding
-  );
-  ctx.textAlign = 'center';
-  renderText(ctx, title);
+  if (title) {
+    let titleWidth = measureWidth(ctx, title);
+    let midpoint = (xScale(xMax) - xScale(xMin)) / 2;
+    ctx.translate(
+      midpoint - titleWidth / 2,
+      tickLength + tickPadding + labelPadding
+    );
+    ctx.textAlign = 'center';
+    renderText(ctx, title);
+  }
 
   ctx.restore();
 }

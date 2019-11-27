@@ -21,8 +21,8 @@ export class ManhattanPlot {
     margins: {
       top: 60,
       right: 60,
-      bottom: 60,
-      left: 80
+      bottom: 30,
+      left: 80,
     }
   };
 
@@ -60,7 +60,7 @@ export class ManhattanPlot {
       overflowY: 'auto',
       overflowX: 'hidden',
       position: 'relative',
-      border: '1px solid #ddd'
+      border: '1px solid #eee',
     });
 
     [this.geneCanvas, this.geneCtx] = getCanvasAndContext();
@@ -232,6 +232,18 @@ export class ManhattanPlot {
     for (let line of lines) {
       this.drawLine(line);
     }
+
+    if (config.title) {
+      let midpoint = margins.left + width / 2;
+      ctx.save();
+      ctx.translate(midpoint, 30);
+      renderText(ctx, config.title, {
+        textAlign: 'center',
+        textBaseline: 'top',
+        fillStyle: 'black'
+      });
+      ctx.restore();
+    }
     console.log(config);
   }
 
@@ -255,7 +267,7 @@ export class ManhattanPlot {
       gene.strand === '+' ? `${gene.name} →` : `← ${gene.name}`;
 
     let labelPadding = 5;
-    let labelHeight = 12;
+    let labelHeight = 10;
     let labelConfig = {
       font: `${labelHeight}px ${systemFont}`,
       textAlign: 'center',
