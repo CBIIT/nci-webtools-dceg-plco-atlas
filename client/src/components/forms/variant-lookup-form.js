@@ -77,26 +77,43 @@ export function VariantLookupForm({ onChange, onSubmit, onReset }) {
     setSelectedPhenotypes(items);
     // console.log("selected", items);
     // conatselectedPhenotypes
+  };
 
-  }
+  const handleListTypeChange = (value) => {
+    setSelectedListType(value);
+  };
 
   return (
     <>
-      {/* <select
-        className="form-control"
-        value={selectedListType}
-        onChange={e => setSelectedListType(e.target.value)}>
-        <option value="categorical">Categorical</option>
-        <option value="alphabetic">Alphabetic</option>
-      </select> */}
-
-      <div className="sortByToggle">
-          <b>Phenotypes</b>
-          <input className="ml-2" type="radio" id="categoricalRadio" name="sortByRadios" value="categorical" defaultChecked />
-          <label className="ml-1" htmlFor="categoricalRadio">By Category</label>
-          <input className="ml-2" type="radio" id="alphabeticRadio" name="sortByRadios" value="alphabetic" />
-          <label className="ml-1" htmlFor="alphabeticRadio">By Name</label>
-      </div>
+      <form className="sortByToggle">
+          <div className="row">
+            <div className="col-md-auto pr-0">
+              <b>Phenotypes</b>
+            </div>
+            <div className="col-md-auto radio pr-0">
+              <label>
+                <input 
+                  className="mr-1" 
+                  type="radio" 
+                  value="categorical" 
+                  checked={selectedListType === "categorical" ? true : false} 
+                  onChange={e => handleListTypeChange(e.target.value)}/>
+                By Category
+              </label>
+            </div>
+            <div className="col-md-auto radio pr-0">
+              <label>
+                <input 
+                  className="mr-1" 
+                  type="radio" 
+                  value="alphabetic" 
+                  checked={selectedListType === "alphabetic" ? true : false} 
+                  onChange={e => handleListTypeChange(e.target.value)}/>
+                By Name
+              </label>
+            </div>
+          </div>
+      </form>
 
       <TreeSelectCustom
         data={phenotypesTree}

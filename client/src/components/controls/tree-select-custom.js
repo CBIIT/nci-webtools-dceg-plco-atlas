@@ -163,6 +163,7 @@ export function TreeSelectCustom({onChange, data, value, singleSelect}) {
                     <li className="my-1" style={{display: 'block'}}>
                         <div className="d-flex align-items-center">
                             <button 
+                                title="Show/hide children"
                                 style={{all: 'unset'}}
                                 className="collapse-button text-secondary" 
                                 onClick={e => toggleHideChildren(item.value)}>
@@ -172,7 +173,8 @@ export function TreeSelectCustom({onChange, data, value, singleSelect}) {
                             </button>
                             
                             <input
-                                style={{verticalAlign: 'middle', alignSelf: 'center'}}
+                                title={singleSelect ? 'Cannot select all children' : 'Select all children'}
+                                style={{verticalAlign: 'middle', alignSelf: 'center', cursor: singleSelect ? 'not-allowed' : 'pointer'}}
                                 className={"ml-2 parent-checkbox-" + item.value}
                                 name={"parent-checkbox-" + item.value}
                                 type={singleSelect ? "radio" : "checkbox"}
@@ -213,6 +215,8 @@ export function TreeSelectCustom({onChange, data, value, singleSelect}) {
                 whiteSpace: 'nowrap',
                 overflow: 'hidden'}}>
                     <input
+                        title="Select phenotype"
+                        style={{cursor: 'pointer'}}
                         className={"ml-4 leaf-checkbox-" + item.value}
                         name={"leaf-checkbox-" + item.value}
                         type={singleSelect ? "radio" : "checkbox"}
@@ -257,6 +261,7 @@ export function TreeSelectCustom({onChange, data, value, singleSelect}) {
                 <div className="bg-secondary border-bottom d-flex align-items-center py-1">
                     
                     <button 
+                        title="Show/hide all children"
                         style={{all: 'unset'}}
                         className="ml-1 collapse-button text-secondary" 
                         // onClick={e => toggleHideChildren(item.value)}
@@ -274,6 +279,8 @@ export function TreeSelectCustom({onChange, data, value, singleSelect}) {
                     />
 
                     <input
+                        title={singleSelect ? 'Cannot select all phenotypes' : 'Select all'}
+                        style={{cursor: singleSelect ? 'not-allowed' : 'pointer'}}
                         className=""
                         name=""
                         type={singleSelect ? "radio" : "checkbox"}
