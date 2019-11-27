@@ -130,6 +130,7 @@ export function PhenotypeCorrelationsForm({ onChange, onSubmit, onReset }) {
       
       <br></br>
 
+      <b>Gender</b>
       <select
         className="form-control"
         value={selectedGender}
