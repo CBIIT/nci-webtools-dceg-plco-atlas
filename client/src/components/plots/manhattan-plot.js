@@ -401,6 +401,14 @@ export function ManhattanPlot({
     }
   }
 
+  let getXRange = () => {
+    if (!zoomStack || !zoomStack.length) return Number.MAX_VALUE;
+    let { xMax, xMin } = zoomStack[zoomStack.length - 1].bounds;
+    return xMax - xMin;
+  }
+
+
+
   return (
     <div style={{display: hasData() ? 'block' : 'none', position: 'relative'}}>
       <LoadingOverlay active={loading} {...plotOverlayConfig} />
@@ -439,13 +447,13 @@ export function ManhattanPlot({
         }}>
         <div
           ref={plotContainer}
-          className={[`manhattan-plot`, genePlotCollapsed && 'gene-plot-collapsed'].join(' ')} />
+          className={[`manhattan-plot`, (genePlotCollapsed || getXRange() > 1e6) && 'gene-plot-collapsed'].join(' ')} />
 
         {manhattanPlotView !== 'summary' &&
-          <div className="text-center">
+          <div className="text-center px-5">
             {(() => {
                   if (genePlotCollapsed) return null;
-                  let zoomMessage = <p>Gene plot is not available at the current zoom level. To show genes, please zoom in to a 1MB viewport.</p>
+                  let zoomMessage = <p className="p-4 mb-0" style={{border: '1px solid #ccc'}}>Gene plot is not available at the current zoom level. To show genes, please zoom in to a 1MB viewport.</p>
                   if (!zoomStack || !zoomStack.length) return zoomMessage;
                   let { xMax, xMin } = zoomStack[zoomStack.length - 1].bounds;
                   let xRange = xMax - xMin;
