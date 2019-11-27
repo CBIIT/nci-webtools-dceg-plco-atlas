@@ -24,4 +24,4 @@ export const query = (resource, params) =>
   fetch(`${root}/${resource}${asQueryString(params)}`).then(r => r.json());
 
 export const rawQuery = (resource, params) =>
-  query(resource, {...params, raw: true})
+  query(resource, { ...params, raw: true });

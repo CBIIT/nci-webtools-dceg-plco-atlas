@@ -8,8 +8,7 @@ export function axisLeft(config, ctx) {
   const xScale = config.xAxis.scale;
   const yScale = config.yAxis.scale;
   let yScale2;
-  if (config.yAxis2)
-    yScale2 = config.yAxis2.scale;
+  if (config.yAxis2) yScale2 = config.yAxis2.scale;
 
   let axisWidth = config.xAxis.width || 1;
   let title = config.yAxis.title || 'Y Axis';
@@ -126,9 +125,7 @@ export function axisLeft(config, ctx) {
       renderText(ctx, config.yAxis2.secondaryTitle);
       ctx.restore();
     }
-  }
-
-  else {
+  } else {
     // draw axis title (rotated -90 degrees)
     let titleWidth = measureWidth(ctx, title);
     let midpoint = (yScale(yMax) - yScale(yMin)) / 2;
@@ -174,18 +171,11 @@ export function axisBottom(config, ctx) {
 
   ctx.translate(
     margins.left,
-    margins.top + (config.yAxis2
-      ? yScale(yMax)
-      : yScale(yMin))
+    margins.top + (config.yAxis2 ? yScale(yMax) : yScale(yMin))
   );
 
   // draw axis line
-  ctx.fillRect(
-    xScale(xMin),
-    0,
-    xScale(xMax) - xScale(xMin) + 3,
-    axisWidth
-  );
+  ctx.fillRect(xScale(xMin), 0, xScale(xMax) - xScale(xMin) + 3, axisWidth);
 
   // draw each tick (do not use forEach to avoid creating new scopes)
   for (let i = 0; i < ticks.length; i++) {
