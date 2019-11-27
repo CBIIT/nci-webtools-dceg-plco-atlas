@@ -86,15 +86,41 @@ export function PhenotypeCorrelationsForm({ onChange, onSubmit, onReset }) {
     a.title.localeCompare(b.title)
   );
 
+  const handleListTypeChange = (value) => {
+    setSelectedListType(value);
+  };
+
   return (
     <>
-      <select
-        className="form-control"
-        value={selectedListType}
-        onChange={e => setSelectedListType(e.target.value)}>
-        <option value="categorical">Categorical</option>
-        <option value="alphabetic">Alphabetic</option>
-      </select>
+      <form className="sortByToggle">
+        <div className="row">
+          <div className="col-md-auto pr-0">
+            <b>Phenotypes</b>
+          </div>
+          <div className="col-md-auto radio pr-0">
+            <label>
+              <input 
+                className="mr-1" 
+                type="radio" 
+                value="categorical" 
+                checked={selectedListType === "categorical" ? true : false} 
+                onChange={e => handleListTypeChange(e.target.value)}/>
+              By Category
+            </label>
+          </div>
+          <div className="col-md-auto radio pr-0">
+            <label>
+              <input 
+                className="mr-1" 
+                type="radio" 
+                value="alphabetic" 
+                checked={selectedListType === "alphabetic" ? true : false} 
+                onChange={e => handleListTypeChange(e.target.value)}/>
+              By Name
+            </label>
+          </div>
+        </div>
+      </form>
 
       <TreeSelectCustom
         data={phenotypesTree}
