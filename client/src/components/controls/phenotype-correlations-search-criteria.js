@@ -91,27 +91,28 @@ export const PhenotypeCorrelationsSearchCriteria = props => {
                         style={{
                           all: 'unset',
                           textDecoration: 'underline',
-                          cursor: 'pointer',
-                          color: '#008CBA'
+                          cursor: 'pointer'
                         }}
                         title="Expand/collapse search criteria panel"
                         onClick={e => toggleCollapseCriteria()}
                         aria-controls="search-criteria-collapse-panel"
                         aria-expanded={!collapseCriteria}>
-                        {searchCriteriaPhenotypeCorrelations &&
-                        searchCriteriaPhenotypeCorrelations.phenotypes
-                          ? searchCriteriaPhenotypeCorrelations.phenotypes
-                              .length -
-                            1 +
-                            ` other${
-                              searchCriteriaPhenotypeCorrelations.phenotypes
+                        <span style={{ color: '#008CBA' }}>
+                          {searchCriteriaPhenotypeCorrelations &&
+                          searchCriteriaPhenotypeCorrelations.phenotypes
+                            ? searchCriteriaPhenotypeCorrelations.phenotypes
                                 .length -
-                                1 ===
-                              1
-                                ? ''
-                                : 's'
-                            }`
-                          : ''}
+                              1 +
+                              ` other${
+                                searchCriteriaPhenotypeCorrelations.phenotypes
+                                  .length -
+                                  1 ===
+                                1
+                                  ? ''
+                                  : 's'
+                              }`
+                            : ''}
+                        </span>
                       </button>
                     </span>
                   </>
