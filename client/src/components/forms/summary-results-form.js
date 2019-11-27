@@ -28,6 +28,7 @@ export function SummaryResultsForm({ onChange, onSubmit, onReset }) {
   };
 
   const handleChangeCustom = item => {
+    console.log("handleChangeCustom", item)
     if (item && item[0]) {
       setSelectedPhenotype(item[0]);
     }
@@ -37,13 +38,13 @@ export function SummaryResultsForm({ onChange, onSubmit, onReset }) {
     a.title.localeCompare(b.title)
   );
 
-  const handleListTypeChange = value => {
-    setSelectedListType(value);
-  };
+  // const handleListTypeChange = value => {
+  //   setSelectedListType(value);
+  // };
 
   return (
     <>
-      <form className="sortByToggle">
+      {/* <form className="sortByToggle">
         <div className="row">
           <div className="col-md-auto pr-0">
             <b>Phenotypes</b>
@@ -73,10 +74,11 @@ export function SummaryResultsForm({ onChange, onSubmit, onReset }) {
             </label>
           </div>
         </div>
-      </form>
+      </form> */}
 
       <TreeSelectCustom
         data={phenotypesTree}
+        dataAlphabetical={alphabetizedPhenotypes}
         value={selectedPhenotype}
         onChange={handleChangeCustom}
         singleSelect={true}
