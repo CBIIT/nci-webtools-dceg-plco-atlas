@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import ReactDOM from 'react-dom';
-// import { FormControl } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faPlusSquare, faMinusSquare, faSearch } from '@fortawesome/free-solid-svg-icons'
+import { faPlusSquare, faMinusSquare, faSearch, faTimes } from '@fortawesome/free-solid-svg-icons'
 
 
 export function TreeSelectCustom({onChange, data, value, singleSelect}) {
@@ -244,6 +243,8 @@ export function TreeSelectCustom({onChange, data, value, singleSelect}) {
         
     });
 
+    const [searchInput, setSearchInput] = useState("");
+
     return(
         <>
             <div 
@@ -300,21 +301,34 @@ export function TreeSelectCustom({onChange, data, value, singleSelect}) {
 
                     <div className="px-2 input-group" style={{ width: '100%' }}>
                         <input
-                            className="form-control py-1 h-100"
+                            className="form-control py-1 h-100 border-right-0"
                             style={{ display: 'block' }}
                             placeholder="Search Phenotype"
                             aria-label="Search Phenotype"
-                            // value={selectedVariant}
+                            value={searchInput}
                             onChange={e => {
-                                console.log(e.target.value);
+                                setSearchInput(e.target.value);
+                                // console.log(searchInput);
+                                // console.log(e.target.value);
                             }}
                             type="text"
                         />
                         <div className="input-group-append">
-                            <button 
-                                className="input-group-text">
-                                <FontAwesomeIcon icon={faSearch} size="xs"/>
-                            </button>
+                            {
+                                searchInput.length > 0 ? (
+                                    <button 
+                                        className="input-group-text bg-white">
+                                        <FontAwesomeIcon icon={faTimes} size="xs"/>
+                                    </button>
+                                ) :
+                                (
+                                    <button 
+                                        className="input-group-text bg-white"
+                                        disabled>
+                                        <FontAwesomeIcon icon={faSearch} size="xs"/>
+                                    </button>
+                                )
+                            }                
                         </div>
                     </div>
 

@@ -179,7 +179,7 @@ select.form-control-sm {
 }
 
 .form-control {
-  border-color: #dee2e6;
+  box-shadow: none;
 }
 
 .form-control::-webkit-input-placeholder { color: #aaa; }  /* WebKit, Blink, Edge */
