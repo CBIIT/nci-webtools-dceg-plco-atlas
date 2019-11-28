@@ -128,7 +128,7 @@ export function VariantLookupForm({ onChange, onSubmit, onReset }) {
       <input
         className="form-control"
         // style={{ width: '470px' }}
-        placeholder="(Variant rsid or coordinate)"
+        placeholder="Enter RS Number"
         aria-label="Variant (required)"
         value={selectedVariant}
         onChange={e => {

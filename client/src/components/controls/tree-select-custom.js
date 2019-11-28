@@ -293,10 +293,50 @@ export function TreeSelectCustom({ onChange, data, dataAlphabetical, value, sing
       return item.title.match(re);
     };
     const dataAlphabeticalFiltered = dataAlphabetical.filter(stringMatch);
-    return dataAlphabeticalFiltered.map((item) => (
-        <div>{item.title}</div>
-      ));
+    if (dataAlphabeticalFiltered && dataAlphabeticalFiltered.length > 0) {
+      return dataAlphabeticalFiltered.map((item) => (
+        <div
+          className="my-1"
+          style={{
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
+            overflow: 'hidden'
+          }}>
+          <input
+            title="Select phenotype"
+            style={{ cursor: 'pointer' }}
+            className={'ml-0 leaf-checkbox-' + item.value}
+            name={'leaf-checkbox-' + item.value}
+            type="checkbox"
+            checked={
+              (singleSelect && value && value.value === item.value) ||
+              (!singleSelect && value.map((item) => item.value).includes(item.value))
+            }
+            onChange={e => handleSelect(item)}
+          />
 
+          <button
+            title={item.title}
+            className="ml-2"
+            style={{
+              all: 'unset',
+              cursor: 'pointer',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
+              overflow: 'hidden'
+            }}
+            onClick={e => handleSelect(item)}>
+            {item.title}
+          </button>
+        </div>
+      ));
+    } else {
+      return(
+        <div className="p-2">
+          No phenotypes found.
+        </div>
+      );
+    }
   };
 
   return (
@@ -313,28 +353,33 @@ export function TreeSelectCustom({ onChange, data, dataAlphabetical, value, sing
           fontSize: '10pt'
         }}>
         <div className="bg-secondary border-bottom d-flex align-items-center py-1">
-          <button
-            title="Show/hide all children"
-            style={{ all: 'unset' }}
-            className="ml-1 collapse-button text-secondary"
-            // onClick={e => toggleHideChildren(item.value)}
-          >
-            <FontAwesomeIcon icon={faPlusSquare} size="1x" />
-          </button>
 
-          <div
-            className="mx-1"
-            style={{
-              display: 'inline-block',
-              borderLeft: '1px solid #c7cbcf',
-              height: '25px'
-            }}
-          />
+          {
+              listType === 'categorical' && (
+              <>
+                <button
+                  title="Show/hide all children"
+                  style={{ all: 'unset' }}
+                  className="ml-1 collapse-button text-secondary">
+                  <FontAwesomeIcon icon={faPlusSquare} size="1x" />
+                </button>
+
+                <div
+                  className="mx-1"
+                  style={{
+                    display: 'inline-block',
+                    borderLeft: '1px solid #c7cbcf',
+                    height: '25px'
+                  }}
+                />
+              </>
+            )
+          }
 
           <input
             title={singleSelect ? 'Cannot select all phenotypes' : 'Select all'}
             style={{ cursor: singleSelect ? 'not-allowed' : 'pointer' }}
-            className=""
+            className={listType === 'alphabetical' ? "ml-1" : ""}
             name=""
             type="checkbox"
             // type={singleSelect ? 'radio' : 'checkbox'}
