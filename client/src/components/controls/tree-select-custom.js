@@ -386,8 +386,8 @@ export function TreeSelectCustom({ onChange, data, dataAlphabetical, value, sing
   const selectTreeAlphabetical = dataAlphabetical => {
     const stringMatch = (item) => {
       // console.log("searchInput", searchInput);
-      let re1 = new RegExp(/[a-zA-Z]+/, 'gi');
-      if (re1.test(searchInput)) {
+      let re1 = new RegExp(/[~`!#$%\^&*+=\-\[\]\\;,/{}|\\":<>\?]/, 'gi');
+      if (!re1.test(searchInput)) {
         let re2 = new RegExp(searchInput, 'gi');
         return item.title.match(re2);
       }
