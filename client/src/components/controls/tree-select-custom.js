@@ -109,9 +109,9 @@ export function TreeSelectCustom({ onChange, data, dataAlphabetical, value, sing
     }
   };
 
-  function arrayContainsAnotherArray(needle, haystack){
-    for(var i = 0; i < needle.length; i++){
-      if(haystack.indexOf(needle[i]) === -1)
+  function checkAllLeafsSelected(allLeafs, selectedValues){
+    for(var i = 0; i < allLeafs.length; i++){
+      if(selectedValues.indexOf(allLeafs[i]) === -1)
          return false;
     }
     return true;
@@ -120,10 +120,11 @@ export function TreeSelectCustom({ onChange, data, dataAlphabetical, value, sing
   const checkParents = (item) => {
     console.log("checkParents item", item);
     if (!singleSelect) {
+      // multi-select
       const itemAllLeafs = getAllLeafs(item);
       console.log("checkParents item's CHILDREN:", itemAllLeafs, "selected VALUE:", value);
-      console.log("contains all?", arrayContainsAnotherArray(itemAllLeafs.map((obj) => obj.value), value.map((obj) => obj.value)));
-      return arrayContainsAnotherArray(itemAllLeafs.map((obj) => obj.value), value.map((obj) => obj.value));
+      console.log("contains all?", checkAllLeafsSelected(itemAllLeafs.map((obj) => obj.value), value.map((obj) => obj.value)));
+      return checkAllLeafsSelected(itemAllLeafs.map((obj) => obj.value), value.map((obj) => obj.value));
       // let checkbox = document.getElementsByClassName('parent-checkbox-' + item.value)[0];
       // if (checkbox) {
       //   checkbox.indeterminate = true;
@@ -132,6 +133,7 @@ export function TreeSelectCustom({ onChange, data, dataAlphabetical, value, sing
       // }
     } 
     else {
+      // single-select
 
     }
     //    console.log(data);
