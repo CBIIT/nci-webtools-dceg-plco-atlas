@@ -11,6 +11,7 @@ import {
 export function TreeSelectCustom({ onChange, data, dataAlphabetical, value, singleSelect }) {
   const [searchInput, setSearchInput] = useState('');
   const [listType, setListType] = useState('categorical');
+  // const [selectAll, setSelectAll] = useState(false);
   const containsVal = (arr, val) => {
     let result = false;
     for (var i = 0; i < arr.length; i++) {
@@ -109,25 +110,23 @@ export function TreeSelectCustom({ onChange, data, dataAlphabetical, value, sing
     }
   };
 
-  const checkAllLeafsSelected = (allLeafs, selectedValues) => {
-    for(var i = 0; i < allLeafs.length; i++){
-      if(selectedValues.indexOf(allLeafs[i]) === -1)
+  const checkAllChildrenLeafsSelected = (leafs, selectedValues) => {
+    for(var i = 0; i < leafs.length; i++){
+      if(selectedValues.indexOf(leafs[i]) === -1)
          return false;
     }
     return true;
   }
 
-  const checkSomeLeafsSelected = (allLeafs, selectedValues) => {
-    return allLeafs.some(r => selectedValues.indexOf(r) >= 0)
+  const checkSomeChildrenLeafsSelected = (leafs, selectedValues) => {
+    return leafs.some(r => selectedValues.indexOf(r) >= 0)
   }
 
   const checkParents = (item) => {
-    console.log("checkParents ITEM", item);
     const itemAllLeafs = getAllLeafs(item);
-    console.log("itemAllLeafs", itemAllLeafs);
     if (!singleSelect && itemAllLeafs && value) {
       // multi-select
-      const checkAllLeafsSelectedResult = checkAllLeafsSelected(itemAllLeafs.map((obj) => obj.value), value.map((obj) => obj.value));
+      const checkAllLeafsSelectedResult = checkAllChildrenLeafsSelected(itemAllLeafs.map((obj) => obj.value), value.map((obj) => obj.value));
       if (checkAllLeafsSelectedResult) {
         let checkbox = document.getElementsByClassName('parent-checkbox-' + item.value)[0];
           if (checkbox) {
@@ -135,7 +134,7 @@ export function TreeSelectCustom({ onChange, data, dataAlphabetical, value, sing
           } 
         return true;
       } else {
-        const checkSomeLeafsSelectedResult = checkSomeLeafsSelected(itemAllLeafs.map((obj) => obj.value), value.map((obj) => obj.value));
+        const checkSomeLeafsSelectedResult = checkSomeChildrenLeafsSelected(itemAllLeafs.map((obj) => obj.value), value.map((obj) => obj.value));
         if (checkSomeLeafsSelectedResult) {
           // show indeterminate checkbox if some (at least one) leaf is selected
           let checkbox = document.getElementsByClassName('parent-checkbox-' + item.value)[0];
@@ -155,8 +154,7 @@ export function TreeSelectCustom({ onChange, data, dataAlphabetical, value, sing
     else {
       // single-select
       if (itemAllLeafs && value) {
-        console.log("VALUE", value);
-        const checkSomeLeafsSelectedResult = checkSomeLeafsSelected(itemAllLeafs.map((obj) => obj.value), [value].map((obj) => obj.value));
+        const checkSomeLeafsSelectedResult = checkSomeChildrenLeafsSelected(itemAllLeafs.map((obj) => obj.value), [value].map((obj) => obj.value));
         if (checkSomeLeafsSelectedResult) {
           // show indeterminate checkbox if some (at least one) leaf is selected
           let checkbox = document.getElementsByClassName('parent-checkbox-' + item.value)[0];
@@ -183,7 +181,6 @@ export function TreeSelectCustom({ onChange, data, dataAlphabetical, value, sing
 
   const handleSelect = item => {
     if (singleSelect) {
-      console.log('SINGLE SELECT ITEM', item);
       onChange([item]);
     } else {
       const parentCheckboxClassName = 'parent-checkbox-' + item.value;
@@ -238,15 +235,10 @@ export function TreeSelectCustom({ onChange, data, dataAlphabetical, value, sing
           }
         }
       }
-      // checkParents();
 
       onChange(values);
     }
   };
-
-  // const isChecked = (e) => {
-  //     console.log("isChecked", e);
-  // };
 
   const selectTreeCategorical = data =>
     data.map(item => {
@@ -404,6 +396,27 @@ export function TreeSelectCustom({ onChange, data, dataAlphabetical, value, sing
     }
   };
 
+  const selectAll = () => {
+    if (checkAllLeafsSelected()) {
+      onChange([]);
+    } else {
+      const allLeafs = [];
+      data.map((item) => allLeafs.push(getAllLeafs(item)));
+      onChange(allLeafs.flat());
+    }
+  };
+
+  const checkAllLeafsSelected = () => {
+    let allLeafs = [];
+    data.map((item) => allLeafs.push(getAllLeafs(item)));
+    allLeafs = allLeafs.flat().map((item) => item.value);
+    for(var i = 0; i < allLeafs.length; i++){
+      if(value.map((item) => item.value).indexOf(allLeafs[i]) === -1)
+         return false;
+    }
+    return true;
+  }
+
   return (
     <>
       <div
@@ -447,10 +460,9 @@ export function TreeSelectCustom({ onChange, data, dataAlphabetical, value, sing
             className={listType === 'alphabetical' ? "ml-1" : ""}
             name=""
             type="checkbox"
-            // type={singleSelect ? 'radio' : 'checkbox'}
             disabled={singleSelect ? true : false}
-            // checked={e => isChecked(e)}
-            // onChange={e => handleSelect(item)}
+            checked={!singleSelect && checkAllLeafsSelected()}
+            onChange={e => !singleSelect && selectAll()}
           />
 
           <div
