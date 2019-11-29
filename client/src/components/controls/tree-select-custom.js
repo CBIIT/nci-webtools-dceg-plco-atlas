@@ -259,6 +259,15 @@ export function TreeSelectCustom({ onChange, data, dataAlphabetical, value, sing
                   </span>
                 </button>
 
+                <div
+                  className="mx-1"
+                  style={{
+                    display: 'inline-block',
+                    borderLeft: '1px solid white',
+                    height: '25px'
+                  }}
+                />
+
                 <input
                   title={
                     singleSelect
@@ -270,7 +279,7 @@ export function TreeSelectCustom({ onChange, data, dataAlphabetical, value, sing
                     alignSelf: 'center',
                     cursor: singleSelect ? 'not-allowed' : 'pointer'
                   }}
-                  className={'ml-2 parent-checkbox-' + item.value}
+                  className={'parent-checkbox-' + item.value}
                   name={'parent-checkbox-' + item.value}
                   type="checkbox"
                   // indeterminate={true}
@@ -280,9 +289,18 @@ export function TreeSelectCustom({ onChange, data, dataAlphabetical, value, sing
                   disabled={singleSelect ? true : false}
                 />
 
+                <div
+                  className="ml-1"
+                  style={{
+                    display: 'inline-block',
+                    borderLeft: '1px solid white',
+                    height: '25px'
+                  }}
+                />
+
                 <button
                   title={item.title}
-                  className="ml-2"
+                  className=""
                   style={{
                     all: 'unset',
                     cursor: 'pointer',
@@ -296,7 +314,7 @@ export function TreeSelectCustom({ onChange, data, dataAlphabetical, value, sing
               </div>
 
               <ul
-                className={'pl-4 children-of-' + item.value}
+                className={'ml-3 pl-1 children-of-' + item.value}
                 style={{ listStyleType: 'none', display: 'none' }}>
                 {selectTreeCategorical(item.children)}
               </ul>
@@ -312,10 +330,18 @@ export function TreeSelectCustom({ onChange, data, dataAlphabetical, value, sing
               whiteSpace: 'nowrap',
               overflow: 'hidden'
             }}>
+            <div
+              className="ml-3"
+              style={{
+                display: 'inline-block',
+                borderLeft: '1px solid white',
+                height: '10px'
+              }}
+            />
             <input
               title="Select phenotype"
               style={{ cursor: 'pointer' }}
-              className={'ml-4 leaf-checkbox-' + item.value}
+              className={'ml-1 leaf-checkbox-' + item.value}
               name={'leaf-checkbox-' + item.value}
               type="checkbox"
               // type={singleSelect ? 'radio' : 'checkbox'}
@@ -329,9 +355,18 @@ export function TreeSelectCustom({ onChange, data, dataAlphabetical, value, sing
               }}
             />
 
+            <div
+              className="ml-1"
+              style={{
+                display: 'inline-block',
+                borderLeft: '1px solid white',
+                height: '10px'
+              }}
+            />
+
             <button
               title={item.title}
-              className="ml-2"
+              className=""
               style={{
                 all: 'unset',
                 cursor: 'pointer',
