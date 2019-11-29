@@ -122,9 +122,11 @@ export function TreeSelectCustom({ onChange, data, dataAlphabetical, value, sing
   }
 
   const checkParents = (item) => {
-    if (!singleSelect) {
+    console.log("checkParents ITEM", item);
+    const itemAllLeafs = getAllLeafs(item);
+    console.log("itemAllLeafs", itemAllLeafs);
+    if (!singleSelect && itemAllLeafs && value) {
       // multi-select
-      const itemAllLeafs = getAllLeafs(item);
       const checkAllLeafsSelectedResult = checkAllLeafsSelected(itemAllLeafs.map((obj) => obj.value), value.map((obj) => obj.value));
       if (checkAllLeafsSelectedResult) {
         let checkbox = document.getElementsByClassName('parent-checkbox-' + item.value)[0];
@@ -152,7 +154,30 @@ export function TreeSelectCustom({ onChange, data, dataAlphabetical, value, sing
     } 
     else {
       // single-select
-
+      if (itemAllLeafs && value) {
+        console.log("VALUE", value);
+        const checkSomeLeafsSelectedResult = checkSomeLeafsSelected(itemAllLeafs.map((obj) => obj.value), [value].map((obj) => obj.value));
+        if (checkSomeLeafsSelectedResult) {
+          // show indeterminate checkbox if some (at least one) leaf is selected
+          let checkbox = document.getElementsByClassName('parent-checkbox-' + item.value)[0];
+          if (checkbox) {
+            checkbox.indeterminate = true;
+          } 
+          return false;
+        } else {
+          let checkbox = document.getElementsByClassName('parent-checkbox-' + item.value)[0];
+          if (checkbox) {
+            checkbox.indeterminate = false;
+          } 
+          return false;
+        }
+      } else {
+        let checkbox = document.getElementsByClassName('parent-checkbox-' + item.value)[0];
+        if (checkbox) {
+          checkbox.indeterminate = false;
+        } 
+        return false;
+      }
     }
   };
 
