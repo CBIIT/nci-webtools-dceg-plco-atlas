@@ -124,7 +124,8 @@ export function TreeSelectCustom({ onChange, data, dataAlphabetical, value, sing
 
   const checkParents = (item) => {
     const itemAllLeafs = getAllLeafs(item);
-    if (!singleSelect && itemAllLeafs && value) {
+    if (!singleSelect) {
+      console.log("reached");
       // multi-select
       const checkAllLeafsSelectedResult = checkAllChildrenLeafsSelected(itemAllLeafs.map((obj) => obj.value), value.map((obj) => obj.value));
       if (checkAllLeafsSelectedResult) {
@@ -322,7 +323,10 @@ export function TreeSelectCustom({ onChange, data, dataAlphabetical, value, sing
                 (singleSelect && value && value.value === item.value) ||
                 (!singleSelect && value.map((item) => item.value).includes(item.value))
               }
-              onChange={e => handleSelect(item)}
+              onChange={e => {
+                handleSelect(item);
+                // checkParents(item);
+              }}
             />
 
             <button
@@ -521,9 +525,12 @@ export function TreeSelectCustom({ onChange, data, dataAlphabetical, value, sing
             maxHeight: '450px',
             fontSize: '10pt'
           }}>
-          {
-            listType === 'categorical' ? selectTreeCategorical(data) : selectTreeAlphabetical(dataAlphabetical)
-          }
+          <span style={{display: listType === 'categorical' ? 'block' : 'none'}}>
+            {selectTreeCategorical(data)}
+          </span>
+          <span style={{display: listType === 'categorical' ? 'none' : 'block'}}>
+            {selectTreeAlphabetical(dataAlphabetical)}
+          </span>
         </ul>
       </div>
     </>
