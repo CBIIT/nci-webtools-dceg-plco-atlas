@@ -71,18 +71,19 @@ export function VariantLookupForm({ onChange, onSubmit, onReset }) {
   );
 
   const handleChangeCustom = items => {
+    console.log("handleChangeCustom", items)
     setSelectedPhenotypes(items);
     // console.log("selected", items);
     // conatselectedPhenotypes
   };
 
-  const handleListTypeChange = value => {
-    setSelectedListType(value);
-  };
+  // const handleListTypeChange = value => {
+  //   setSelectedListType(value);
+  // };
 
   return (
     <>
-      <form className="sortByToggle">
+      {/* <form className="sortByToggle">
         <div className="row">
           <div className="col-md-auto pr-0">
             <b>Phenotypes</b>
@@ -112,10 +113,11 @@ export function VariantLookupForm({ onChange, onSubmit, onReset }) {
             </label>
           </div>
         </div>
-      </form>
+      </form> */}
 
       <TreeSelectCustom
         data={phenotypesTree}
+        dataAlphabetical={alphabetizedPhenotypes}
         value={selectedPhenotypes}
         onChange={handleChangeCustom}
       />
@@ -126,7 +128,7 @@ export function VariantLookupForm({ onChange, onSubmit, onReset }) {
       <input
         className="form-control"
         // style={{ width: '470px' }}
-        placeholder="(Variant rsid or coordinate)"
+        placeholder="Enter RS Number"
         aria-label="Variant (required)"
         value={selectedVariant}
         onChange={e => {

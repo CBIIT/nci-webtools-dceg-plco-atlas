@@ -174,6 +174,10 @@ select.form-control-sm {
   padding-right: 0;
 }
 
+.input-group > .form-control::placeholder {
+  font-size: 10pt !important;
+}
+
 .form-control {
   box-shadow: none;
 }
