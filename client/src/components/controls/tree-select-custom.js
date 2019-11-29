@@ -264,7 +264,7 @@ export function TreeSelectCustom({ onChange, data, dataAlphabetical, value, sing
                   style={{
                     display: 'inline-block',
                     borderLeft: '1px solid white',
-                    height: '25px'
+                    height: '10px'
                   }}
                 />
 
@@ -294,13 +294,13 @@ export function TreeSelectCustom({ onChange, data, dataAlphabetical, value, sing
                   style={{
                     display: 'inline-block',
                     borderLeft: '1px solid white',
-                    height: '25px'
+                    height: '10px'
                   }}
                 />
 
                 <button
                   title={item.title}
-                  className=""
+                  className="ml-1"
                   style={{
                     all: 'unset',
                     cursor: 'pointer',
@@ -366,7 +366,7 @@ export function TreeSelectCustom({ onChange, data, dataAlphabetical, value, sing
 
             <button
               title={item.title}
-              className=""
+              className="ml-1"
               style={{
                 all: 'unset',
                 cursor: 'pointer',
