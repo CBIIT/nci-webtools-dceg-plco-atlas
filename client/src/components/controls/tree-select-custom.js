@@ -109,7 +109,7 @@ export function TreeSelectCustom({ onChange, data, dataAlphabetical, value, sing
     }
   };
 
-  function checkAllLeafsSelected(allLeafs, selectedValues){
+  const checkAllLeafsSelected = (allLeafs, selectedValues) => {
     for(var i = 0; i < allLeafs.length; i++){
       if(selectedValues.indexOf(allLeafs[i]) === -1)
          return false;
@@ -117,29 +117,43 @@ export function TreeSelectCustom({ onChange, data, dataAlphabetical, value, sing
     return true;
   }
 
+  const checkSomeLeafsSelected = (allLeafs, selectedValues) => {
+    return allLeafs.some(r => selectedValues.indexOf(r) >= 0)
+  }
+
   const checkParents = (item) => {
-    console.log("checkParents item", item);
     if (!singleSelect) {
       // multi-select
       const itemAllLeafs = getAllLeafs(item);
-      console.log("checkParents item's CHILDREN:", itemAllLeafs, "selected VALUE:", value);
-      console.log("contains all?", checkAllLeafsSelected(itemAllLeafs.map((obj) => obj.value), value.map((obj) => obj.value)));
-      return checkAllLeafsSelected(itemAllLeafs.map((obj) => obj.value), value.map((obj) => obj.value));
-      // let checkbox = document.getElementsByClassName('parent-checkbox-' + item.value)[0];
-      // if (checkbox) {
-      //   checkbox.indeterminate = true;
-      // } else {
-      //   // null checkbox
-      // }
+      const checkAllLeafsSelectedResult = checkAllLeafsSelected(itemAllLeafs.map((obj) => obj.value), value.map((obj) => obj.value));
+      if (checkAllLeafsSelectedResult) {
+        let checkbox = document.getElementsByClassName('parent-checkbox-' + item.value)[0];
+          if (checkbox) {
+            checkbox.indeterminate = false;
+          } 
+        return true;
+      } else {
+        const checkSomeLeafsSelectedResult = checkSomeLeafsSelected(itemAllLeafs.map((obj) => obj.value), value.map((obj) => obj.value));
+        if (checkSomeLeafsSelectedResult) {
+          // show indeterminate checkbox if some (at least one) leaf is selected
+          let checkbox = document.getElementsByClassName('parent-checkbox-' + item.value)[0];
+          if (checkbox) {
+            checkbox.indeterminate = true;
+          } 
+          return true;
+        } else {
+          let checkbox = document.getElementsByClassName('parent-checkbox-' + item.value)[0];
+          if (checkbox) {
+            checkbox.indeterminate = false;
+          } 
+          return false;
+        }
+      }
     } 
     else {
       // single-select
 
     }
-    //    console.log(data);
-    // 1 uncheck all sub parents and children when touched parent is unchecked
-    // 2 check parent when all sibling leafs are also checked
-    // 3 uncheck parent when if any of children are unchecked
   };
 
   const handleSelect = item => {
