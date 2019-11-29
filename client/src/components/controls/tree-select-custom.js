@@ -78,7 +78,6 @@ export function TreeSelectCustom({ onChange, data, dataAlphabetical, value, sing
         allLeafs.push(item);
       }
     }
-
     return allLeafs;
   };
 
@@ -110,7 +109,31 @@ export function TreeSelectCustom({ onChange, data, dataAlphabetical, value, sing
     }
   };
 
-  const checkParents = () => {
+  function arrayContainsAnotherArray(needle, haystack){
+    for(var i = 0; i < needle.length; i++){
+      if(haystack.indexOf(needle[i]) === -1)
+         return false;
+    }
+    return true;
+  }
+
+  const checkParents = (item) => {
+    console.log("checkParents item", item);
+    if (!singleSelect) {
+      const itemAllLeafs = getAllLeafs(item);
+      console.log("checkParents item's CHILDREN:", itemAllLeafs, "selected VALUE:", value);
+      console.log("contains all?", arrayContainsAnotherArray(itemAllLeafs.map((obj) => obj.value), value.map((obj) => obj.value)));
+      return arrayContainsAnotherArray(itemAllLeafs.map((obj) => obj.value), value.map((obj) => obj.value));
+      // let checkbox = document.getElementsByClassName('parent-checkbox-' + item.value)[0];
+      // if (checkbox) {
+      //   checkbox.indeterminate = true;
+      // } else {
+      //   // null checkbox
+      // }
+    } 
+    else {
+
+    }
     //    console.log(data);
     // 1 uncheck all sub parents and children when touched parent is unchecked
     // 2 check parent when all sibling leafs are also checked
@@ -174,7 +197,7 @@ export function TreeSelectCustom({ onChange, data, dataAlphabetical, value, sing
           }
         }
       }
-      checkParents();
+      // checkParents();
 
       onChange(values);
     }
@@ -216,8 +239,9 @@ export function TreeSelectCustom({ onChange, data, dataAlphabetical, value, sing
                   className={'ml-2 parent-checkbox-' + item.value}
                   name={'parent-checkbox-' + item.value}
                   type="checkbox"
-                  // type={singleSelect ? "radio" : "checkbox"}
-                  // checked={true}
+                  // indeterminate={true}
+                  // checked={ !singleSelect && value && value.length > 0 && containsAllVals(getAllLeafs(item), value)}
+                  checked={checkParents(item)}
                   onChange={e => handleSelect(item)}
                   disabled={singleSelect ? true : false}
                 />
