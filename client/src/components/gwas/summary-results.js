@@ -351,7 +351,16 @@ export function SummaryResults() {
           selectedManhattanPlotType === 'male' ||
           selectedManhattanPlotType === 'female'
             ? selectedManhattanPlotType
-            : 'combined'
+            : 'combined',
+        searchCriteriaVariantLookup: {
+          phenotypes: [selectedPhenotype].map(item => item.title),
+          variant: snp,
+          gender: 
+            selectedManhattanPlotType === 'male' ||
+            selectedManhattanPlotType === 'female'
+              ? selectedManhattanPlotType
+              : 'combined',
+        }
       })
     );
     dispatch(lookupVariants([selectedPhenotype], snp));

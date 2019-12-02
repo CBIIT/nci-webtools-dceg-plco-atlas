@@ -30,6 +30,7 @@ export const PhenotypeCorrelationsSearchCriteria = props => {
   const displayGender = gender =>
     ({
       all: 'All',
+      combined: 'All',
       stacked: 'Female/Male (Stacked)',
       female: 'Female',
       male: 'Male'
@@ -61,7 +62,7 @@ export const PhenotypeCorrelationsSearchCriteria = props => {
                 </Button>
               </span>
               <span>
-                <b>Phenotypes</b>:
+              <b>Phenotypes(</b>{searchCriteriaPhenotypeCorrelations.phenotypes ? searchCriteriaPhenotypeCorrelations.phenotypes.length : 0}<b>)</b>:
               </span>
             </div>
             <div
@@ -69,7 +70,7 @@ export const PhenotypeCorrelationsSearchCriteria = props => {
               style={{ maxHeight: '300px', overflow: 'auto' }}>
               {collapseCriteria &&
                 searchCriteriaPhenotypeCorrelations.phenotypes &&
-                searchCriteriaPhenotypeCorrelations.phenotypes.length > 0 && (
+                searchCriteriaPhenotypeCorrelations.phenotypes.length > 0 ? (
                   <>
                     <span>
                       {searchCriteriaPhenotypeCorrelations &&
@@ -116,7 +117,7 @@ export const PhenotypeCorrelationsSearchCriteria = props => {
                       </button>
                     </span>
                   </>
-                )}
+                ) : (<>None</>)}
               {!collapseCriteria &&
                 searchCriteriaPhenotypeCorrelations &&
                 searchCriteriaPhenotypeCorrelations.phenotypes &&
