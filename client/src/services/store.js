@@ -66,7 +66,8 @@ const initialState = {
     messages: [],
     loading: false,
     submitted: null,
-    searchCriteriaVariantLookup: {}
+    searchCriteriaVariantLookup: {},
+    numResults: null
   },
   phenotypeCorrelations: {
     selectedListType: 'categorical',
