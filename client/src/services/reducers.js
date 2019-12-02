@@ -5,7 +5,7 @@ import {
   UPDATE_PHENOTYPE_CORRELATIONS,
   UPDATE_PHENOTYPES,
   UPDATE_PHENOTYPE_CATEGORIES,
-  UPDATE_PHENOTYPES_TREE,
+  UPDATE_PHENOTYPES_TREE
 } from './actions';
 
 export const rootReducer = (state, action) => {

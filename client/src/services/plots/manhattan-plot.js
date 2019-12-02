@@ -22,7 +22,7 @@ export class ManhattanPlot {
       top: 30,
       right: 60,
       bottom: 40,
-      left: 80,
+      left: 80
     }
   };
 

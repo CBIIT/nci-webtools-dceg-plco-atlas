@@ -13,10 +13,7 @@ export function PhenotypeCorrelationsForm({ onChange, onSubmit, onReset }) {
   const phenotypeCorrelations = useSelector(
     state => state.phenotypeCorrelations
   );
-  const {
-    selectedPhenotypes,
-    selectedGender
-  } = phenotypeCorrelations;
+  const { selectedPhenotypes, selectedGender } = phenotypeCorrelations;
 
   const setSelectedPhenotypes = selectedPhenotypes => {
     dispatch(updatePhenotypeCorrelations({ selectedPhenotypes }));
@@ -55,7 +52,8 @@ export function PhenotypeCorrelationsForm({ onChange, onSubmit, onReset }) {
 
   return (
     <>
-      <b>Phenotypes</b><span style={{color: 'red'}}>*</span>
+      <b>Phenotypes</b>
+      <span style={{ color: 'red' }}>*</span>
       <TreeSelectCustom
         data={phenotypesTree}
         dataAlphabetical={alphabetizedPhenotypes}

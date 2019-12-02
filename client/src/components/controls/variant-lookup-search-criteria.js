@@ -5,10 +5,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCaretRight, faCaretDown } from '@fortawesome/free-solid-svg-icons';
 
 export const VariantLookupSearchCriteria = props => {
-  const { 
-    searchCriteriaVariantLookup,
-    numResults
-   } = useSelector(
+  const { searchCriteriaVariantLookup, numResults } = useSelector(
     state => state.variantLookup
   );
 
@@ -65,15 +62,19 @@ export const VariantLookupSearchCriteria = props => {
                 </Button>
               </span>
               <span>
-                <b>Phenotypes(</b>{searchCriteriaVariantLookup.phenotypes ? searchCriteriaVariantLookup.phenotypes.length : 0}<b>)</b>:
+                <b>Phenotypes(</b>
+                {searchCriteriaVariantLookup.phenotypes
+                  ? searchCriteriaVariantLookup.phenotypes.length
+                  : 0}
+                <b>)</b>:
               </span>
             </div>
             <div
               className="col-md-auto ml-1 px-0"
               style={{ maxHeight: '300px', overflow: 'auto' }}>
-              {collapseCriteria && 
-                searchCriteriaVariantLookup.phenotypes &&
-                searchCriteriaVariantLookup.phenotypes.length > 0 ? (
+              {collapseCriteria &&
+              searchCriteriaVariantLookup.phenotypes &&
+              searchCriteriaVariantLookup.phenotypes.length > 0 ? (
                 <>
                   <span>
                     {searchCriteriaVariantLookup &&
@@ -118,7 +119,9 @@ export const VariantLookupSearchCriteria = props => {
                     </button>
                   </span>
                 </>
-              ) : (<>None</>)}
+              ) : (
+                <>None</>
+              )}
               {!collapseCriteria &&
                 searchCriteriaVariantLookup &&
                 searchCriteriaVariantLookup.phenotypes &&
@@ -151,10 +154,7 @@ export const VariantLookupSearchCriteria = props => {
 
           <div className="right py-1">
             <span>Total Results: </span>
-            {searchCriteriaVariantLookup &&
-            numResults
-              ? numResults
-              : 'None'}
+            {searchCriteriaVariantLookup && numResults ? numResults : 'None'}
           </div>
         </Tab>
       </Tabs>
