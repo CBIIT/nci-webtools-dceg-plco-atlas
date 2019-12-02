@@ -5,7 +5,10 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCaretRight, faCaretDown } from '@fortawesome/free-solid-svg-icons';
 
 export const VariantLookupSearchCriteria = props => {
-  const { searchCriteriaVariantLookup } = useSelector(
+  const { 
+    searchCriteriaVariantLookup,
+    numResults
+   } = useSelector(
     state => state.variantLookup
   );
 
@@ -30,6 +33,7 @@ export const VariantLookupSearchCriteria = props => {
   const displayGender = gender =>
     ({
       all: 'All',
+      combined: 'All',
       stacked: 'Female/Male (Stacked)',
       female: 'Female',
       male: 'Male'
@@ -61,13 +65,15 @@ export const VariantLookupSearchCriteria = props => {
                 </Button>
               </span>
               <span>
-                <b>Phenotype(s)</b>:
+                <b>Phenotypes(</b>{searchCriteriaVariantLookup.phenotypes ? searchCriteriaVariantLookup.phenotypes.length : 0}<b>)</b>:
               </span>
             </div>
             <div
               className="col-md-auto ml-1 px-0"
               style={{ maxHeight: '300px', overflow: 'auto' }}>
-              {collapseCriteria && (
+              {collapseCriteria && 
+                searchCriteriaVariantLookup.phenotypes &&
+                searchCriteriaVariantLookup.phenotypes.length > 0 ? (
                 <>
                   <span>
                     {searchCriteriaVariantLookup &&
@@ -112,7 +118,7 @@ export const VariantLookupSearchCriteria = props => {
                     </button>
                   </span>
                 </>
-              )}
+              ) : (<>None</>)}
               {!collapseCriteria &&
                 searchCriteriaVariantLookup &&
                 searchCriteriaVariantLookup.phenotypes &&
@@ -146,8 +152,8 @@ export const VariantLookupSearchCriteria = props => {
           <div className="right py-1">
             <span>Total Results: </span>
             {searchCriteriaVariantLookup &&
-            searchCriteriaVariantLookup.totalPhenotypes
-              ? searchCriteriaVariantLookup.totalPhenotypes
+            numResults
+              ? numResults
               : 'None'}
           </div>
         </Tab>
