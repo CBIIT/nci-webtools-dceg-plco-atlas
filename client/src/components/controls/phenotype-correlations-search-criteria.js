@@ -62,62 +62,68 @@ export const PhenotypeCorrelationsSearchCriteria = props => {
                 </Button>
               </span>
               <span>
-              <b>Phenotypes(</b>{searchCriteriaPhenotypeCorrelations.phenotypes ? searchCriteriaPhenotypeCorrelations.phenotypes.length : 0}<b>)</b>:
+                <b>Phenotypes(</b>
+                {searchCriteriaPhenotypeCorrelations.phenotypes
+                  ? searchCriteriaPhenotypeCorrelations.phenotypes.length
+                  : 0}
+                <b>)</b>:
               </span>
             </div>
             <div
               className="col-md-auto ml-1 px-0"
               style={{ maxHeight: '300px', overflow: 'auto' }}>
               {collapseCriteria &&
-                searchCriteriaPhenotypeCorrelations.phenotypes &&
-                searchCriteriaPhenotypeCorrelations.phenotypes.length > 0 ? (
-                  <>
-                    <span>
-                      {searchCriteriaPhenotypeCorrelations &&
-                      searchCriteriaPhenotypeCorrelations.phenotypes
-                        ? searchCriteriaPhenotypeCorrelations.phenotypes[0]
-                        : 'None'}
-                    </span>
-                    <span className="ml-1">
-                      {searchCriteriaPhenotypeCorrelations &&
-                      searchCriteriaPhenotypeCorrelations.phenotypes &&
-                      searchCriteriaPhenotypeCorrelations.phenotypes.length >
-                        1 ? (
-                        <span>and</span>
-                      ) : (
-                        <></>
-                      )}
-                      <button
-                        className="ml-1 p-0 text-primary"
-                        style={{
-                          all: 'unset',
-                          textDecoration: 'underline',
-                          cursor: 'pointer'
-                        }}
-                        title="Expand/collapse search criteria panel"
-                        onClick={e => toggleCollapseCriteria()}
-                        aria-controls="search-criteria-collapse-panel"
-                        aria-expanded={!collapseCriteria}>
-                        <span style={{ color: '#008CBA' }}>
-                          {searchCriteriaPhenotypeCorrelations &&
-                          searchCriteriaPhenotypeCorrelations.phenotypes
-                            ? searchCriteriaPhenotypeCorrelations.phenotypes
+              searchCriteriaPhenotypeCorrelations.phenotypes &&
+              searchCriteriaPhenotypeCorrelations.phenotypes.length > 0 ? (
+                <>
+                  <span>
+                    {searchCriteriaPhenotypeCorrelations &&
+                    searchCriteriaPhenotypeCorrelations.phenotypes
+                      ? searchCriteriaPhenotypeCorrelations.phenotypes[0]
+                      : 'None'}
+                  </span>
+                  <span className="ml-1">
+                    {searchCriteriaPhenotypeCorrelations &&
+                    searchCriteriaPhenotypeCorrelations.phenotypes &&
+                    searchCriteriaPhenotypeCorrelations.phenotypes.length >
+                      1 ? (
+                      <span>and</span>
+                    ) : (
+                      <></>
+                    )}
+                    <button
+                      className="ml-1 p-0 text-primary"
+                      style={{
+                        all: 'unset',
+                        textDecoration: 'underline',
+                        cursor: 'pointer'
+                      }}
+                      title="Expand/collapse search criteria panel"
+                      onClick={e => toggleCollapseCriteria()}
+                      aria-controls="search-criteria-collapse-panel"
+                      aria-expanded={!collapseCriteria}>
+                      <span style={{ color: '#008CBA' }}>
+                        {searchCriteriaPhenotypeCorrelations &&
+                        searchCriteriaPhenotypeCorrelations.phenotypes
+                          ? searchCriteriaPhenotypeCorrelations.phenotypes
+                              .length -
+                            1 +
+                            ` other${
+                              searchCriteriaPhenotypeCorrelations.phenotypes
                                 .length -
-                              1 +
-                              ` other${
-                                searchCriteriaPhenotypeCorrelations.phenotypes
-                                  .length -
-                                  1 ===
-                                1
-                                  ? ''
-                                  : 's'
-                              }`
-                            : ''}
-                        </span>
-                      </button>
-                    </span>
-                  </>
-                ) : (<>None</>)}
+                                1 ===
+                              1
+                                ? ''
+                                : 's'
+                            }`
+                          : ''}
+                      </span>
+                    </button>
+                  </span>
+                </>
+              ) : (
+                <>None</>
+              )}
               {!collapseCriteria &&
                 searchCriteriaPhenotypeCorrelations &&
                 searchCriteriaPhenotypeCorrelations.phenotypes &&

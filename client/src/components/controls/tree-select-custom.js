@@ -8,7 +8,14 @@ import {
   faTimes
 } from '@fortawesome/free-solid-svg-icons';
 
-export function TreeSelectCustom({ onChange, data, dataAlphabetical, dataCategories, value, singleSelect }) {
+export function TreeSelectCustom({
+  onChange,
+  data,
+  dataAlphabetical,
+  dataCategories,
+  value,
+  singleSelect
+}) {
   const [searchInput, setSearchInput] = useState('');
   const [listType, setListType] = useState('categorical');
   const [expandAll, setExpandAll] = useState(false);
@@ -106,7 +113,8 @@ export function TreeSelectCustom({ onChange, data, dataAlphabetical, dataCategor
         const className = 'children-of-' + dataCategories[i].value;
         if (
           document.getElementsByClassName(className)[0].style.display &&
-          document.getElementsByClassName(className)[0].style.display === 'block'
+          document.getElementsByClassName(className)[0].style.display ===
+            'block'
         ) {
           document.getElementsByClassName(className)[0].style.display = 'none';
           const collapseButton = document.getElementsByClassName(
@@ -122,7 +130,7 @@ export function TreeSelectCustom({ onChange, data, dataAlphabetical, dataCategor
     }
   };
 
-  const toggleHideChildren = (name) => {
+  const toggleHideChildren = name => {
     const className = 'children-of-' + name;
     if (
       document.getElementsByClassName(className)[0].style.display &&
@@ -149,69 +157,88 @@ export function TreeSelectCustom({ onChange, data, dataAlphabetical, dataCategor
   };
 
   const checkAllChildrenLeafsSelected = (leafs, selectedValues) => {
-    for(var i = 0; i < leafs.length; i++){
-      if(selectedValues.indexOf(leafs[i]) === -1)
-         return false;
+    for (var i = 0; i < leafs.length; i++) {
+      if (selectedValues.indexOf(leafs[i]) === -1) return false;
     }
     return true;
-  }
+  };
 
   const checkSomeChildrenLeafsSelected = (leafs, selectedValues) => {
-    return leafs.some(r => selectedValues.indexOf(r) >= 0)
-  }
+    return leafs.some(r => selectedValues.indexOf(r) >= 0);
+  };
 
-  const checkParents = (item) => {
+  const checkParents = item => {
     const itemAllLeafs = getAllLeafs(item);
     if (!singleSelect) {
       // multi-select
-      const checkAllLeafsSelectedResult = checkAllChildrenLeafsSelected(itemAllLeafs.map((obj) => obj.value), value.map((obj) => obj.value));
+      const checkAllLeafsSelectedResult = checkAllChildrenLeafsSelected(
+        itemAllLeafs.map(obj => obj.value),
+        value.map(obj => obj.value)
+      );
       if (checkAllLeafsSelectedResult) {
-        let checkbox = document.getElementsByClassName('parent-checkbox-' + item.value)[0];
-          if (checkbox) {
-            checkbox.indeterminate = false;
-          } 
+        let checkbox = document.getElementsByClassName(
+          'parent-checkbox-' + item.value
+        )[0];
+        if (checkbox) {
+          checkbox.indeterminate = false;
+        }
         return true;
       } else {
-        const checkSomeLeafsSelectedResult = checkSomeChildrenLeafsSelected(itemAllLeafs.map((obj) => obj.value), value.map((obj) => obj.value));
+        const checkSomeLeafsSelectedResult = checkSomeChildrenLeafsSelected(
+          itemAllLeafs.map(obj => obj.value),
+          value.map(obj => obj.value)
+        );
         if (checkSomeLeafsSelectedResult) {
           // show indeterminate checkbox if some (at least one) leaf is selected
-          let checkbox = document.getElementsByClassName('parent-checkbox-' + item.value)[0];
+          let checkbox = document.getElementsByClassName(
+            'parent-checkbox-' + item.value
+          )[0];
           if (checkbox) {
             checkbox.indeterminate = true;
-          } 
+          }
           return true;
         } else {
-          let checkbox = document.getElementsByClassName('parent-checkbox-' + item.value)[0];
+          let checkbox = document.getElementsByClassName(
+            'parent-checkbox-' + item.value
+          )[0];
           if (checkbox) {
             checkbox.indeterminate = false;
-          } 
+          }
           return false;
         }
       }
-    } 
-    else {
+    } else {
       // single-select
       if (itemAllLeafs && value) {
-        const checkSomeLeafsSelectedResult = checkSomeChildrenLeafsSelected(itemAllLeafs.map((obj) => obj.value), [value].map((obj) => obj.value));
+        const checkSomeLeafsSelectedResult = checkSomeChildrenLeafsSelected(
+          itemAllLeafs.map(obj => obj.value),
+          [value].map(obj => obj.value)
+        );
         if (checkSomeLeafsSelectedResult) {
           // show indeterminate checkbox if some (at least one) leaf is selected
-          let checkbox = document.getElementsByClassName('parent-checkbox-' + item.value)[0];
+          let checkbox = document.getElementsByClassName(
+            'parent-checkbox-' + item.value
+          )[0];
           if (checkbox) {
             checkbox.indeterminate = true;
-          } 
+          }
           return false;
         } else {
-          let checkbox = document.getElementsByClassName('parent-checkbox-' + item.value)[0];
+          let checkbox = document.getElementsByClassName(
+            'parent-checkbox-' + item.value
+          )[0];
           if (checkbox) {
             checkbox.indeterminate = false;
-          } 
+          }
           return false;
         }
       } else {
-        let checkbox = document.getElementsByClassName('parent-checkbox-' + item.value)[0];
+        let checkbox = document.getElementsByClassName(
+          'parent-checkbox-' + item.value
+        )[0];
         if (checkbox) {
           checkbox.indeterminate = false;
-        } 
+        }
         return false;
       }
     }
@@ -361,7 +388,7 @@ export function TreeSelectCustom({ onChange, data, dataAlphabetical, dataCategor
         return (
           // LEAF
           <li
-            key={"categorical-" + item.value}
+            key={'categorical-' + item.value}
             style={{
               textOverflow: 'ellipsis',
               whiteSpace: 'nowrap',
@@ -384,7 +411,8 @@ export function TreeSelectCustom({ onChange, data, dataAlphabetical, dataCategor
               // type={singleSelect ? 'radio' : 'checkbox'}
               checked={
                 (singleSelect && value && value.value === item.value) ||
-                (!singleSelect && value.map((item) => item.value).includes(item.value))
+                (!singleSelect &&
+                  value.map(item => item.value).includes(item.value))
               }
               onChange={e => handleSelect(item)}
             />
@@ -415,10 +443,10 @@ export function TreeSelectCustom({ onChange, data, dataAlphabetical, dataCategor
           </li>
         );
       }
-  });
+    });
 
   const selectTreeAlphabetical = dataAlphabetical => {
-    const stringMatch = (item) => {
+    const stringMatch = item => {
       // console.log("searchInput", searchInput);
       let re1 = new RegExp(/[()~`!#$%\^&*+=\[\]\\;,/{}|\\":<>\?]/, 'gi');
       if (!re1.test(searchInput)) {
@@ -428,9 +456,9 @@ export function TreeSelectCustom({ onChange, data, dataAlphabetical, dataCategor
     };
     const dataAlphabeticalFiltered = dataAlphabetical.filter(stringMatch);
     if (dataAlphabeticalFiltered && dataAlphabeticalFiltered.length > 0) {
-      return dataAlphabeticalFiltered.map((item) => (
+      return dataAlphabeticalFiltered.map(item => (
         <div
-          key={"alpha-" + item.value}
+          key={'alpha-' + item.value}
           className="my-1"
           style={{
             textOverflow: 'ellipsis',
@@ -445,7 +473,8 @@ export function TreeSelectCustom({ onChange, data, dataAlphabetical, dataCategor
             type="checkbox"
             checked={
               (singleSelect && value && value.value === item.value) ||
-              (!singleSelect && value.map((item) => item.value).includes(item.value))
+              (!singleSelect &&
+                value.map(item => item.value).includes(item.value))
             }
             onChange={e => handleSelect(item)}
           />
@@ -462,20 +491,27 @@ export function TreeSelectCustom({ onChange, data, dataAlphabetical, dataCategor
             }}
             onClick={e => handleSelect(item)}>
             {/* {item.title.replace(searchInput, '[' + searchInput + ']')} */}
-            {item.title.slice(0, item.title.toLowerCase().indexOf(searchInput.toLowerCase()))}
+            {item.title.slice(
+              0,
+              item.title.toLowerCase().indexOf(searchInput.toLowerCase())
+            )}
             <b>
-              {item.title.slice(item.title.toLowerCase().indexOf(searchInput.toLowerCase()), item.title.toLowerCase().indexOf(searchInput.toLowerCase()) + searchInput.length)}
+              {item.title.slice(
+                item.title.toLowerCase().indexOf(searchInput.toLowerCase()),
+                item.title.toLowerCase().indexOf(searchInput.toLowerCase()) +
+                  searchInput.length
+              )}
             </b>
-            {item.title.slice(item.title.toLowerCase().indexOf(searchInput.toLowerCase()) + searchInput.length, item.title.length)}
+            {item.title.slice(
+              item.title.toLowerCase().indexOf(searchInput.toLowerCase()) +
+                searchInput.length,
+              item.title.length
+            )}
           </button>
         </div>
       ));
     } else {
-      return(
-        <div className="p-2">
-          No phenotypes found.
-        </div>
-      );
+      return <div className="p-2">No phenotypes found.</div>;
     }
   };
 
@@ -484,21 +520,21 @@ export function TreeSelectCustom({ onChange, data, dataAlphabetical, dataCategor
       onChange([]);
     } else {
       const allLeafs = [];
-      data.map((item) => allLeafs.push(getAllLeafs(item)));
+      data.map(item => allLeafs.push(getAllLeafs(item)));
       onChange(allLeafs.flat());
     }
   };
 
   const checkAllLeafsSelected = () => {
     let allLeafs = [];
-    data.map((item) => allLeafs.push(getAllLeafs(item)));
-    allLeafs = allLeafs.flat().map((item) => item.value);
-    for(var i = 0; i < allLeafs.length; i++){
-      if(value.map((item) => item.value).indexOf(allLeafs[i]) === -1)
-         return false;
+    data.map(item => allLeafs.push(getAllLeafs(item)));
+    allLeafs = allLeafs.flat().map(item => item.value);
+    for (var i = 0; i < allLeafs.length; i++) {
+      if (value.map(item => item.value).indexOf(allLeafs[i]) === -1)
+        return false;
     }
     return true;
-  }
+  };
 
   return (
     <>
@@ -514,43 +550,36 @@ export function TreeSelectCustom({ onChange, data, dataAlphabetical, dataCategor
           fontSize: '10pt'
         }}>
         <div className="bg-secondary border-bottom d-flex align-items-center py-1">
+          {listType === 'categorical' && (
+            <>
+              <button
+                title="Show/hide all children"
+                style={{ all: 'unset' }}
+                className="ml-1 collapse-button-all text-secondary"
+                onClick={e => toggleExpandAllParents()}>
+                {expandAll && (
+                  <FontAwesomeIcon icon={faMinusSquare} size="1x" />
+                )}
+                {!expandAll && (
+                  <FontAwesomeIcon icon={faPlusSquare} size="1x" />
+                )}
+              </button>
 
-          {
-              listType === 'categorical' && (
-              <>
-                <button
-                  title="Show/hide all children"
-                  style={{ all: 'unset' }}
-                  className="ml-1 collapse-button-all text-secondary"
-                  onClick={e => toggleExpandAllParents()}>
-                    {
-                      expandAll && (
-                        <FontAwesomeIcon icon={faMinusSquare} size="1x" />
-                      )
-                    }
-                    {
-                      !expandAll && (
-                        <FontAwesomeIcon icon={faPlusSquare} size="1x" />
-                      )
-                    }
-                </button>
-
-                <div
-                  className="mx-1"
-                  style={{
-                    display: 'inline-block',
-                    borderLeft: '1px solid #c7cbcf',
-                    height: '25px'
-                  }}
-                />
-              </>
-            )
-          }
+              <div
+                className="mx-1"
+                style={{
+                  display: 'inline-block',
+                  borderLeft: '1px solid #c7cbcf',
+                  height: '25px'
+                }}
+              />
+            </>
+          )}
 
           <input
             title={singleSelect ? 'Cannot select all phenotypes' : 'Select all'}
             style={{ cursor: singleSelect ? 'not-allowed' : 'pointer' }}
-            className={listType === 'alphabetical' ? "ml-1" : ""}
+            className={listType === 'alphabetical' ? 'ml-1' : ''}
             name=""
             type="checkbox"
             disabled={singleSelect ? true : false}
@@ -586,10 +615,10 @@ export function TreeSelectCustom({ onChange, data, dataAlphabetical, dataCategor
             />
             <div className="input-group-append">
               {searchInput.length > 0 ? (
-                <button 
-                  className="input-group-text bg-white" 
+                <button
+                  className="input-group-text bg-white"
                   onClick={e => {
-                    setSearchInput("");
+                    setSearchInput('');
                     setListType('categorical');
                   }}>
                   <FontAwesomeIcon icon={faTimes} size="xs" />
@@ -614,10 +643,12 @@ export function TreeSelectCustom({ onChange, data, dataAlphabetical, dataCategor
             maxHeight: '450px',
             fontSize: '10pt'
           }}>
-          <span style={{display: listType === 'categorical' ? 'block' : 'none'}}>
+          <span
+            style={{ display: listType === 'categorical' ? 'block' : 'none' }}>
             {selectTreeCategorical(data)}
           </span>
-          <span style={{display: listType === 'categorical' ? 'none' : 'block'}}>
+          <span
+            style={{ display: listType === 'categorical' ? 'none' : 'block' }}>
             {selectTreeAlphabetical(dataAlphabetical)}
           </span>
         </ul>

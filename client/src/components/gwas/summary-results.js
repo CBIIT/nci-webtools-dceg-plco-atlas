@@ -355,11 +355,11 @@ export function SummaryResults() {
         searchCriteriaVariantLookup: {
           phenotypes: [selectedPhenotype].map(item => item.title),
           variant: snp,
-          gender: 
+          gender:
             selectedManhattanPlotType === 'male' ||
             selectedManhattanPlotType === 'female'
               ? selectedManhattanPlotType
-              : 'combined',
+              : 'combined'
         }
       })
     );

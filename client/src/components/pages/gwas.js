@@ -5,7 +5,11 @@ import { ButtonGroup, Button, Card, Nav, NavItem } from 'react-bootstrap';
 import { SummaryResults } from '../gwas/summary-results';
 import { VariantLookup } from '../gwas/variant-lookup';
 import { PhenotypeCorrelations } from '../gwas/phenotype-correlations';
-import { updatePhenotypes, updatePhenotypeCategories, updatePhenotypesTree } from '../../services/actions';
+import {
+  updatePhenotypes,
+  updatePhenotypeCategories,
+  updatePhenotypesTree
+} from '../../services/actions';
 import { query } from '../../services/query';
 
 export function Gwas() {
@@ -26,7 +30,7 @@ export function Gwas() {
         categories.push({
           title: node.title,
           value: node.value
-        })
+        });
       }
       if (node.children) node.children.forEach(populateRecords);
     };

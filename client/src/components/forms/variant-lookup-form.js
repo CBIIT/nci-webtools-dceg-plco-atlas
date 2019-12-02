@@ -10,11 +10,7 @@ export function VariantLookupForm({ onChange, onSubmit, onReset }) {
   const phenotypeCategories = useSelector(state => state.phenotypeCategories);
   const phenotypesTree = useSelector(state => state.phenotypesTree);
   const variantLookup = useSelector(state => state.variantLookup);
-  const {
-    selectedPhenotypes,
-    selectedVariant,
-    selectedGender
-  } = variantLookup;
+  const { selectedPhenotypes, selectedVariant, selectedGender } = variantLookup;
 
   const setSelectedPhenotypes = selectedPhenotypes => {
     dispatch(updateVariantLookup({ selectedPhenotypes }));
@@ -38,7 +34,8 @@ export function VariantLookupForm({ onChange, onSubmit, onReset }) {
 
   return (
     <>
-      <b>Phenotypes</b><span style={{color: 'red'}}>*</span>
+      <b>Phenotypes</b>
+      <span style={{ color: 'red' }}>*</span>
       <TreeSelectCustom
         data={phenotypesTree}
         dataAlphabetical={alphabetizedPhenotypes}
@@ -49,7 +46,8 @@ export function VariantLookupForm({ onChange, onSubmit, onReset }) {
 
       <br></br>
 
-      <b>Variant</b><span style={{color: 'red'}}>*</span>
+      <b>Variant</b>
+      <span style={{ color: 'red' }}>*</span>
       <input
         className="form-control"
         // style={{ width: '470px' }}

@@ -10,10 +10,9 @@ export function SummaryResultsForm({ onChange, onSubmit, onReset }) {
   const phenotypeCategories = useSelector(state => state.phenotypeCategories);
   const phenotypesTree = useSelector(state => state.phenotypesTree);
 
-  const {
-    selectedPhenotype,
-    selectedManhattanPlotType
-  } = useSelector(state => state.summaryResults);
+  const { selectedPhenotype, selectedManhattanPlotType } = useSelector(
+    state => state.summaryResults
+  );
 
   const setSelectedPhenotype = selectedPhenotype => {
     dispatch(updateSummaryResults({ selectedPhenotype }));
@@ -35,7 +34,8 @@ export function SummaryResultsForm({ onChange, onSubmit, onReset }) {
 
   return (
     <>
-      <b>Phenotypes</b><span style={{color: 'red'}}>*</span>
+      <b>Phenotypes</b>
+      <span style={{ color: 'red' }}>*</span>
       <TreeSelectCustom
         data={phenotypesTree}
         dataAlphabetical={alphabetizedPhenotypes}
