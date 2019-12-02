@@ -27,7 +27,6 @@ export function VariantLookup() {
     messages,
     loading,
     submitted,
-    numResults
   } = variantLookup;
 
   const { ExportCSVButton } = CSVExport;
@@ -207,7 +206,8 @@ export function VariantLookup() {
         loading: false,
         submitted: null,
         searchCriteriaVariantLookup: {},
-        numResults: null
+        numResults: null,
+        collapseCriteria: true
       })
     );
   };

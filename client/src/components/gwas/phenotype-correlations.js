@@ -95,7 +95,8 @@ export function PhenotypeCorrelations() {
         messages: [],
         popupTooltipStyle: { display: 'none' },
         popupTooltipData: null,
-        searchCriteriaPhenotypeCorrelations: {}
+        searchCriteriaPhenotypeCorrelations: {},
+        collapseCriteria: true
       })
     );
   };
