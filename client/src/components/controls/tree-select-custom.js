@@ -319,7 +319,6 @@ export function TreeSelectCustom({ onChange, data, dataAlphabetical, dataCategor
                   className={'parent-checkbox-' + item.value}
                   name={'parent-checkbox-' + item.value}
                   type="checkbox"
-                  // indeterminate={true}
                   // checked={ !singleSelect && value && value.length > 0 && containsAllVals(getAllLeafs(item), value)}
                   checked={checkParents(item)}
                   onChange={e => handleSelect(item)}
@@ -387,10 +386,7 @@ export function TreeSelectCustom({ onChange, data, dataAlphabetical, dataCategor
                 (singleSelect && value && value.value === item.value) ||
                 (!singleSelect && value.map((item) => item.value).includes(item.value))
               }
-              onChange={e => {
-                handleSelect(item);
-                // checkParents(item);
-              }}
+              onChange={e => handleSelect(item)}
             />
 
             <div

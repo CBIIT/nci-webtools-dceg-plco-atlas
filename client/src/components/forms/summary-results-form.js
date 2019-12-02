@@ -35,6 +35,7 @@ export function SummaryResultsForm({ onChange, onSubmit, onReset }) {
 
   return (
     <>
+      <b>Phenotypes</b><span style={{color: 'red'}}>*</span>
       <TreeSelectCustom
         data={phenotypesTree}
         dataAlphabetical={alphabetizedPhenotypes}
