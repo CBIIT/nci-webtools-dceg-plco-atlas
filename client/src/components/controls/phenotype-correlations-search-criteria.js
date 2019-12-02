@@ -72,13 +72,11 @@ export const PhenotypeCorrelationsSearchCriteria = props => {
             <div
               className="col-md-auto ml-1 px-0"
               style={{ maxHeight: '300px', overflow: 'auto' }}>
-              {collapseCriteria &&
-              searchCriteriaPhenotypeCorrelations.phenotypes &&
-              searchCriteriaPhenotypeCorrelations.phenotypes.length > 0 ? (
+              {collapseCriteria && (
                 <>
                   <span>
                     {searchCriteriaPhenotypeCorrelations &&
-                    searchCriteriaPhenotypeCorrelations.phenotypes
+                    searchCriteriaPhenotypeCorrelations.phenotypes && searchCriteriaPhenotypeCorrelations.phenotypes.length >= 1
                       ? searchCriteriaPhenotypeCorrelations.phenotypes[0]
                       : 'None'}
                   </span>
@@ -121,8 +119,6 @@ export const PhenotypeCorrelationsSearchCriteria = props => {
                     </button>
                   </span>
                 </>
-              ) : (
-                <>None</>
               )}
               {!collapseCriteria &&
                 searchCriteriaPhenotypeCorrelations &&
