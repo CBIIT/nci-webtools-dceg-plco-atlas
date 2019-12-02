@@ -38,6 +38,7 @@ export function VariantLookupForm({ onChange, onSubmit, onReset }) {
 
   return (
     <>
+      <b>Phenotypes</b><span style={{color: 'red'}}>*</span>
       <TreeSelectCustom
         data={phenotypesTree}
         dataAlphabetical={alphabetizedPhenotypes}
@@ -48,11 +49,11 @@ export function VariantLookupForm({ onChange, onSubmit, onReset }) {
 
       <br></br>
 
-      <b>Variant</b>
+      <b>Variant</b><span style={{color: 'red'}}>*</span>
       <input
         className="form-control"
         // style={{ width: '470px' }}
-        placeholder="Enter RS Number"
+        placeholder="Enter RS Number or Coordinate"
         aria-label="Variant (required)"
         value={selectedVariant}
         onChange={e => {
