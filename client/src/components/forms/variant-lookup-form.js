@@ -14,6 +14,7 @@ import { TreeSelectCustom } from '../controls/tree-select-custom';
 export function VariantLookupForm({ onChange, onSubmit, onReset }) {
   const dispatch = useDispatch();
   const phenotypes = useSelector(state => state.phenotypes);
+  const phenotypeCategories = useSelector(state => state.phenotypeCategories);
   const phenotypesTree = useSelector(state => state.phenotypesTree);
   const variantLookup = useSelector(state => state.variantLookup);
   const {
@@ -71,7 +72,6 @@ export function VariantLookupForm({ onChange, onSubmit, onReset }) {
   );
 
   const handleChangeCustom = items => {
-    console.log("handleChangeCustom", items)
     setSelectedPhenotypes(items);
     // console.log("selected", items);
     // conatselectedPhenotypes
@@ -118,6 +118,7 @@ export function VariantLookupForm({ onChange, onSubmit, onReset }) {
       <TreeSelectCustom
         data={phenotypesTree}
         dataAlphabetical={alphabetizedPhenotypes}
+        dataCategories={phenotypeCategories}
         value={selectedPhenotypes}
         onChange={handleChangeCustom}
       />

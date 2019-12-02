@@ -5,6 +5,7 @@ import ReduxThunk from 'redux-thunk';
 
 const initialState = {
   phenotypes: [],
+  phenotypeCategories: [],
   phenotypesTree: [],
   summaryResults: {
     selectedListType: 'categorical',

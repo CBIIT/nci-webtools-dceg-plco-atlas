@@ -8,10 +8,10 @@ import {
   faTimes
 } from '@fortawesome/free-solid-svg-icons';
 
-export function TreeSelectCustom({ onChange, data, dataAlphabetical, value, singleSelect }) {
+export function TreeSelectCustom({ onChange, data, dataAlphabetical, dataCategories, value, singleSelect }) {
   const [searchInput, setSearchInput] = useState('');
   const [listType, setListType] = useState('categorical');
-  // const [selectAll, setSelectAll] = useState(false);
+  const [expandAll, setExpandAll] = useState(false);
   const containsVal = (arr, val) => {
     let result = false;
     for (var i = 0; i < arr.length; i++) {
@@ -82,7 +82,47 @@ export function TreeSelectCustom({ onChange, data, dataAlphabetical, value, sing
     return allLeafs;
   };
 
-  const toggleHideChildren = name => {
+  const toggleExpandAllParents = () => {
+    if (!expandAll) {
+      for (var i = 0; i < dataCategories.length; i++) {
+        const className = 'children-of-' + dataCategories[i].value;
+        if (
+          document.getElementsByClassName(className)[0].style.display &&
+          document.getElementsByClassName(className)[0].style.display === 'none'
+        ) {
+          document.getElementsByClassName(className)[0].style.display = 'block';
+          const collapseButton = document.getElementsByClassName(
+            'collapse-button-text-' + dataCategories[i].value
+          )[0];
+          ReactDOM.render(
+            <FontAwesomeIcon icon={faMinusSquare} size="1x" />,
+            collapseButton
+          );
+        }
+      }
+      setExpandAll(true);
+    } else {
+      for (var i = 0; i < dataCategories.length; i++) {
+        const className = 'children-of-' + dataCategories[i].value;
+        if (
+          document.getElementsByClassName(className)[0].style.display &&
+          document.getElementsByClassName(className)[0].style.display === 'block'
+        ) {
+          document.getElementsByClassName(className)[0].style.display = 'none';
+          const collapseButton = document.getElementsByClassName(
+            'collapse-button-text-' + dataCategories[i].value
+          )[0];
+          ReactDOM.render(
+            <FontAwesomeIcon icon={faPlusSquare} size="1x" />,
+            collapseButton
+          );
+        }
+      }
+      setExpandAll(false);
+    }
+  };
+
+  const toggleHideChildren = (name) => {
     const className = 'children-of-' + name;
     if (
       document.getElementsByClassName(className)[0].style.display &&
@@ -96,13 +136,11 @@ export function TreeSelectCustom({ onChange, data, dataAlphabetical, value, sing
         <FontAwesomeIcon icon={faMinusSquare} size="1x" />,
         collapseButton
       );
-      // textContent = <FontAwesomeIcon icon={faMinusSquare} size="lg"/>;
     } else {
       document.getElementsByClassName(className)[0].style.display = 'none';
       const collapseButton = document.getElementsByClassName(
         'collapse-button-text-' + name
       )[0];
-      // .textContent = <FontAwesomeIcon icon={faPlusSquare} size="lg"/>;
       ReactDOM.render(
         <FontAwesomeIcon icon={faPlusSquare} size="1x" />,
         collapseButton
@@ -125,7 +163,6 @@ export function TreeSelectCustom({ onChange, data, dataAlphabetical, value, sing
   const checkParents = (item) => {
     const itemAllLeafs = getAllLeafs(item);
     if (!singleSelect) {
-      console.log("reached");
       // multi-select
       const checkAllLeafsSelectedResult = checkAllChildrenLeafsSelected(itemAllLeafs.map((obj) => obj.value), value.map((obj) => obj.value));
       if (checkAllLeafsSelectedResult) {
@@ -325,6 +362,7 @@ export function TreeSelectCustom({ onChange, data, dataAlphabetical, value, sing
         return (
           // LEAF
           <li
+            key={"categorical-" + item.value}
             style={{
               textOverflow: 'ellipsis',
               whiteSpace: 'nowrap',
@@ -396,6 +434,7 @@ export function TreeSelectCustom({ onChange, data, dataAlphabetical, value, sing
     if (dataAlphabeticalFiltered && dataAlphabeticalFiltered.length > 0) {
       return dataAlphabeticalFiltered.map((item) => (
         <div
+          key={"alpha-" + item.value}
           className="my-1"
           style={{
             textOverflow: 'ellipsis',
@@ -481,8 +520,18 @@ export function TreeSelectCustom({ onChange, data, dataAlphabetical, value, sing
                 <button
                   title="Show/hide all children"
                   style={{ all: 'unset' }}
-                  className="ml-1 collapse-button text-secondary">
-                  <FontAwesomeIcon icon={faPlusSquare} size="1x" />
+                  className="ml-1 collapse-button-all text-secondary"
+                  onClick={e => toggleExpandAllParents()}>
+                    {
+                      expandAll && (
+                        <FontAwesomeIcon icon={faMinusSquare} size="1x" />
+                      )
+                    }
+                    {
+                      !expandAll && (
+                        <FontAwesomeIcon icon={faPlusSquare} size="1x" />
+                      )
+                    }
                 </button>
 
                 <div
