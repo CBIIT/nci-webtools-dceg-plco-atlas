@@ -84,7 +84,13 @@ export function VariantLookup() {
     {
       dataField: 'p',
       text: 'P-value',
-      sort: true
+      sort: true,
+      // sortFunc: (a, b, order, dataField, rowA, rowB) => {
+      //   if (order === 'asc') {
+      //     return a - b;
+      //   }
+      //   return b - a; // desc
+      // }
     }
   ];
   // add filter to column headers
