@@ -14,6 +14,7 @@ import { TreeSelectCustom } from '../controls/tree-select-custom';
 export function PhenotypeCorrelationsForm({ onChange, onSubmit, onReset }) {
   const dispatch = useDispatch();
   const phenotypes = useSelector(state => state.phenotypes);
+  const phenotypeCategories = useSelector(state => state.phenotypeCategories);
   const phenotypesTree = useSelector(state => state.phenotypesTree);
 
   const phenotypeCorrelations = useSelector(
@@ -133,6 +134,7 @@ export function PhenotypeCorrelationsForm({ onChange, onSubmit, onReset }) {
       <TreeSelectCustom
         data={phenotypesTree}
         dataAlphabetical={alphabetizedPhenotypes}
+        dataCategories={phenotypeCategories}
         value={selectedPhenotypes}
         onChange={handleChangeCustom}
       />
