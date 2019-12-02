@@ -5,6 +5,7 @@ import ReduxThunk from 'redux-thunk';
 
 const initialState = {
   phenotypes: [],
+  phenotypeCategories: [],
   phenotypesTree: [],
   summaryResults: {
     selectedListType: 'categorical',
@@ -24,7 +25,6 @@ const initialState = {
     qqplotSrc: '',
     areaItems: [],
     lambdaGC: '',
-    sampleSize: '',
     submitted: null,
     loadingManhattanTable: false,
     loadingManhattanPlot: false,
@@ -39,20 +39,22 @@ const initialState = {
     qqplotData: [],
     qqplotLayout: {},
     qqplotStacked: false,
+    searchCriteriaSummaryResults: {},
+    sampleSize: null
   },
   summaryTables: [
     {
       results: [],
       resultsCount: 0,
       page: 1,
-      pageSize: 10,
+      pageSize: 10
     },
     {
       results: [],
       resultsCount: 0,
       page: 1,
-      pageSize: 10,
-    },
+      pageSize: 10
+    }
   ],
   variantLookup: {
     selectedListType: 'categorical',
@@ -63,7 +65,9 @@ const initialState = {
     results: [],
     messages: [],
     loading: false,
-    submitted: null
+    submitted: null,
+    searchCriteriaVariantLookup: {},
+    numResults: null
   },
   phenotypeCorrelations: {
     selectedListType: 'categorical',
@@ -75,6 +79,7 @@ const initialState = {
     loading: false,
     submitted: null,
     messages: [],
+    searchCriteriaPhenotypeCorrelations: {}
     // tooltipData: null
   }
 };

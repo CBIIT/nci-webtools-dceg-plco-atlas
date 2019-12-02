@@ -41,30 +41,30 @@ $enable-shadows: true;
 
 .btn-silver {
   // background-color:#D3D3D3;
-  background-image:
-    linear-gradient(
-      #ffffff, #dfdfdf
-    );
+  background-image: linear-gradient(#ffffff, #dfdfdf);
   color: black;
-  border-color:#dee2e6;
+  border-color: #dee2e6;
 }
 
 .btn-silver:hover {
-  background-image: 
-    linear-gradient(
-      #ffffff, #dfdfdf
-    );
+  background-image: linear-gradient(#ffffff, #dfdfdf);
   color: black;
-  border-color:#dee2e6;
+  border-color: #dee2e6;
 }
 
 .btn-silver:active {
-  background-image: 
-    linear-gradient(
-      #dfdfdf, #e5e5e5
-    ) !important;
+  background-image: linear-gradient(#dfdfdf, #e5e5e5) !important;
   color: black !important;
-  border-color:#dee2e6 !important;
+  border-color: #dee2e6 !important;
+}
+
+.btn-collapse {
+  background-color: white;
+  border: none;
+}
+
+.btn-collapse:focus {
+  outline: none;
 }
 
 .text-orange {
@@ -112,9 +112,14 @@ $enable-shadows: true;
 }
 
 .nav-tabs > .nav-item {
-  font-weight: 600;
+  // font-weight: 600;
+  color: black;
   border-top-left-radius: 0;
   border-top-right-radius: 0;
+}
+
+.nav-tabs .nav-link.active {
+  color: black !important;
 }
 
 .nav-tabs {
@@ -134,7 +139,6 @@ $enable-shadows: true;
   border-radius: 0.25em;
 }
 
-
 .table {
   thead th {
     border-bottom: 1px solid #ddd;
@@ -144,7 +148,8 @@ $enable-shadows: true;
     word-wrap: break-word;
   }
 }
-.table.table-striped th, .table.table-striped td {
+.table.table-striped th,
+.table.table-striped td {
   border-top: none;
 }
 
@@ -169,15 +174,29 @@ select.form-control-sm {
   padding-right: 0;
 }
 
-.form-control {
-  border-color: #dee2e6;
+.input-group > .form-control::placeholder {
+  font-size: 10pt !important;
 }
 
-.form-control::-webkit-input-placeholder { color: #aaa; }  /* WebKit, Blink, Edge */
-.form-control:-moz-placeholder { color: #aaa; }  /* Mozilla Firefox 4 to 18 */
-.form-control::-moz-placeholder { color: #aaa; }  /* Mozilla Firefox 19+ */
-.form-control:-ms-input-placeholder { color: #aaa; }  /* Internet Explorer 10-11 */
-.form-control::-ms-input-placeholder { color: #aaa; }  /* Microsoft Edge */
+.form-control {
+  box-shadow: none;
+}
+
+.form-control::-webkit-input-placeholder {
+  color: #aaa;
+} /* WebKit, Blink, Edge */
+.form-control:-moz-placeholder {
+  color: #aaa;
+} /* Mozilla Firefox 4 to 18 */
+.form-control::-moz-placeholder {
+  color: #aaa;
+} /* Mozilla Firefox 19+ */
+.form-control:-ms-input-placeholder {
+  color: #aaa;
+} /* Internet Explorer 10-11 */
+.form-control::-ms-input-placeholder {
+  color: #aaa;
+} /* Microsoft Edge */
 
 .pagination {
   .page-item .page-link {
@@ -197,7 +216,7 @@ select.form-control-sm {
 }
 
 h1 {
-  color: #2CC799;
+  color: #2cc799;
 }
 
 /** home.js video banner*/
@@ -232,7 +251,7 @@ h1 {
 }
 
 .active-navlinks {
-  background-color: #2CC799 !important;
+  background-color: #2cc799 !important;
   color: #333c4e !important;
   font-weight: bold !important;
 
@@ -248,8 +267,12 @@ h1 {
 }
 
 .active-secondary-navlinks {
-  border-color: #2CC799 !important;
+  border-color: #2cc799 !important;
   border-width: 2px !important;
+}
+
+._loading_overlay_wrapper {
+  pointer-events: none;
 }
 
 // .navlinks-card {
@@ -304,8 +327,13 @@ h1 {
     padding: 0.5rem 1rem;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
   }
-}
 
+  &.gene-plot-collapsed {
+    [data-type='gene-plot'] {
+      display: none;
+    }
+  }
+}
 
 .qq-plot-tooltip {
   background-color: white;
@@ -321,108 +349,16 @@ h1 {
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
 }
 
-// .hover-tooltip {
-//   position: absolute;
-//   // border: 1px solid #bbb;
-//   // border-radius: 4px;
-//   border-radius: 0.25rem;
-//   text-align: left;
-//   // padding: 5px;
-//   padding: 0.5rem 1rem;
-//   // background-color: #ffa503;
-//   background-color: white;
-//   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-//   z-index: 2 !important;
-// }
-
-// .popup-tooltip {
-//   position: absolute;
-//   background-color: white;
-//   // border: 1px solid #bbb;
-//   // border-radius: 4px;
-//   border-radius: 0.25rem;
-//   // padding: 10px;
-//   padding: 0.5rem 1rem;
-//   text-align: left;
-//   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-//   z-index: 1 !important;
-// }
-
-// .popup-tooltip-close {
-//   margin-top: -10px;
-//   margin-right: -5px;
-// }
-
-/** overwrite rc-tree-select styles*/
-.rc-tree-select-selection--multiple .rc-tree-select-selection__rendered {
-  padding-top: 4px !important;
-  padding-bottom: 8px !important;
-}
-
-// rc-tree-select disabled options
-// .rc-tree-select-tree-treenode-disabled > span,
-// .rc-tree-select-tree-treenode-disabled > a,
-// .rc-tree-select-tree-treenode-disabled > a span {
-  // color: black !important;
-// }
-
-// all rc-tree-select options
-.rc-tree-select-tree li {
-  color: black !important;
-}
-
-// leaf options
-.rc-tree-select-tree-node-content-wrapper-normal
-.rc-tree-select-tree-title {
+// custom tree select
+.collapse-button {
   cursor: pointer !important;
-}
-
-// rc-tree-select container
-.rc-tree-select-selection {
-  border: none !important;
-  box-shadow: none !important;
-}
-
-// rc-tree-select filtered options
-.rc-tree-select-tree
-  li.filter-node
-  > .rc-tree-select-tree-node-content-wrapper {
-  color: black !important;
-  font-weight: normal !important;
-}
-
-// rc-tree-select all option parents
-// .rc-tree-select-tree-node-content-wrapper-close,
-// .rc-tree-select-tree-node-content-wrapper-open {
-//   // font-weight: bold !important;
-//   // text-decoration: underline !important;
-// }
-
-// show click cursor just for variamt lookup and phenotype correlations tree select
-.variant-lookup
-.rc-tree-select-tree-node-content-wrapper-close,
-.variant-lookup
-.rc-tree-select-tree-node-content-wrapper-open {
-  cursor: pointer !important;
-}
-
-.phenotype-correlations
-.rc-tree-select-tree-node-content-wrapper-close,
-.phenotype-correlations
-.rc-tree-select-tree-node-content-wrapper-open {
-  cursor: pointer !important;
-}
-
-// show disabled cursor just for summary results tree select
-.summary-results
-.rc-tree-select-tree-node-content-wrapper-close span,
-.summary-results
-.rc-tree-select-tree-node-content-wrapper-open span{
-  cursor: not-allowed !important;
+  :hover {
+    text-decoration: underline;
+  }
 }
 
 // custom tree select
-.collapse-button {
+.collapse-button-all {
   cursor: pointer !important;
   :hover {
     text-decoration: underline;

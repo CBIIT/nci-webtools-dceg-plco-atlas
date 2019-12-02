@@ -5,7 +5,11 @@ import { ButtonGroup, Button, Card, Nav, NavItem } from 'react-bootstrap';
 import { SummaryResults } from '../gwas/summary-results';
 import { VariantLookup } from '../gwas/variant-lookup';
 import { PhenotypeCorrelations } from '../gwas/phenotype-correlations';
-import { updatePhenotypes, updatePhenotypesTree } from '../../services/actions';
+import {
+  updatePhenotypes,
+  updatePhenotypeCategories,
+  updatePhenotypesTree
+} from '../../services/actions';
 import { query } from '../../services/query';
 
 export function Gwas() {
@@ -13,6 +17,7 @@ export function Gwas() {
 
   useEffect(() => {
     const records = [];
+    const categories = [];
     const populateRecords = node => {
       // only populate alphabetic phenotype list with leaf nodes
       if (node.children === undefined) {
@@ -21,6 +26,11 @@ export function Gwas() {
           value: node.value,
           disabled: node.disabled
         });
+      } else {
+        categories.push({
+          title: node.title,
+          value: node.value
+        });
       }
       if (node.children) node.children.forEach(populateRecords);
     };
@@ -28,6 +38,7 @@ export function Gwas() {
     query('data/phenotypes.json').then(data => {
       data.forEach(populateRecords, 0);
       dispatch(updatePhenotypes(records));
+      dispatch(updatePhenotypeCategories(categories));
       dispatch(updatePhenotypesTree(data));
     });
   }, []);
@@ -53,7 +64,7 @@ export function Gwas() {
         <div
           className="mx-3 bg-white border border-top-0"
           // style={{ borderRadius: '0 0 0 0' }}
-          >
+        >
           <div className="">
             <Nav defaultActiveKey="summary">
               {gwasLinks.map(({ name, pathId }) => (
@@ -65,7 +76,7 @@ export function Gwas() {
                     activeClassName="active-secondary-navlinks border-bottom text-secondary"
                     style={{
                       textDecoration: 'none',
-                      fontSize: '11pt',
+                      fontSize: '11pt'
                       // fontWeight: '300'
                     }}
                     exact={true}

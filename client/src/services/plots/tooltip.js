@@ -3,19 +3,18 @@ import {
   removeChildren,
   setStyles,
   viewportToLocalCoordinates
-} from "./utils";
+} from './utils';
 
- /**
-  *
-  * @param {object} props
-  */
+/**
+ *
+ * @param {object} props
+ */
 export function createTooltip(props) {
-  const tooltip = document.createElement("div");
-  for (let key in props)
-      tooltip[key] = props[key];
+  const tooltip = document.createElement('div');
+  for (let key in props) tooltip[key] = props[key];
   return setStyles(tooltip, {
-    display: "none",
-    position: "absolute"
+    display: 'none',
+    position: 'absolute'
   });
 }
 
@@ -24,7 +23,7 @@ export function createTooltip(props) {
  * @param {Element} tooltip
  */
 export function hideTooltip(tooltip) {
-  setStyles(tooltip, { display: "none" });
+  setStyles(tooltip, { display: 'none' });
 }
 
 /**
@@ -43,8 +42,8 @@ export function showTooltip(tooltip, ev, html) {
 
   // set tooltip contents and make tooltip visible
   removeChildren(tooltip);
-  insertAdjacentNode(tooltip, "beforeend", html);
-  setStyles(tooltip, { display: "inline-block" });
+  insertAdjacentNode(tooltip, 'beforeend', html);
+  setStyles(tooltip, { display: 'inline-block' });
 
   // determine where to place tooltip relative to event source
   // ensure tooltip is not drawn outside event target's boundaries
@@ -60,6 +59,6 @@ export function showTooltip(tooltip, ev, html) {
 
   setStyles(tooltip, {
     left: leftOffset + 'px',
-    top: topOffset + 'px',
+    top: topOffset + 'px'
   });
 }
