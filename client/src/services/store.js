@@ -67,7 +67,8 @@ const initialState = {
     loading: false,
     submitted: null,
     searchCriteriaVariantLookup: {},
-    numResults: null
+    numResults: null,
+    collapseCriteria: true
   },
   phenotypeCorrelations: {
     selectedListType: 'categorical',
@@ -79,7 +80,8 @@ const initialState = {
     loading: false,
     submitted: null,
     messages: [],
-    searchCriteriaPhenotypeCorrelations: {}
+    searchCriteriaPhenotypeCorrelations: {},
+    collapseCriteria: true
     // tooltipData: null
   }
 };
