@@ -72,13 +72,11 @@ export const VariantLookupSearchCriteria = props => {
             <div
               className="col-md-auto ml-1 px-0"
               style={{ maxHeight: '300px', overflow: 'auto' }}>
-              {collapseCriteria &&
-              searchCriteriaVariantLookup.phenotypes &&
-              searchCriteriaVariantLookup.phenotypes.length > 0 ? (
+              {collapseCriteria && (
                 <>
                   <span>
                     {searchCriteriaVariantLookup &&
-                    searchCriteriaVariantLookup.phenotypes
+                    searchCriteriaVariantLookup.phenotypes && searchCriteriaVariantLookup.phenotypes.length >= 1
                       ? searchCriteriaVariantLookup.phenotypes[0]
                       : 'None'}
                   </span>
@@ -119,8 +117,6 @@ export const VariantLookupSearchCriteria = props => {
                     </button>
                   </span>
                 </>
-              ) : (
-                <>None</>
               )}
               {!collapseCriteria &&
                 searchCriteriaVariantLookup &&
