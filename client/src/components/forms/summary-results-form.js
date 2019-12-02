@@ -7,6 +7,7 @@ import { TreeSelectCustom } from '../controls/tree-select-custom';
 export function SummaryResultsForm({ onChange, onSubmit, onReset }) {
   const dispatch = useDispatch();
   const phenotypes = useSelector(state => state.phenotypes);
+  const phenotypeCategories = useSelector(state => state.phenotypeCategories);
   const phenotypesTree = useSelector(state => state.phenotypesTree);
 
   const {
@@ -28,7 +29,6 @@ export function SummaryResultsForm({ onChange, onSubmit, onReset }) {
   };
 
   const handleChangeCustom = item => {
-    console.log("handleChangeCustom", item)
     if (item && item[0]) {
       setSelectedPhenotype(item[0]);
     }
@@ -79,6 +79,7 @@ export function SummaryResultsForm({ onChange, onSubmit, onReset }) {
       <TreeSelectCustom
         data={phenotypesTree}
         dataAlphabetical={alphabetizedPhenotypes}
+        dataCategories={phenotypeCategories}
         value={selectedPhenotype}
         onChange={handleChangeCustom}
         singleSelect={true}

@@ -5,10 +5,15 @@ export const UPDATE_SUMMARY_TABLE = 'UPDATE_SUMMARY_TABLE';
 export const UPDATE_VARIANT_LOOKUP = 'UPDATE_VARIANT_LOOKUP';
 export const UPDATE_PHENOTYPE_CORRELATIONS = 'UPDATE_PHENOTYPE_CORRELATIONS';
 export const UPDATE_PHENOTYPES = 'UPDATE_PHENOTYPES';
+export const UPDATE_PHENOTYPE_CATEGORIES = 'UPDATE_PHENOTYPE_CATEGORIES'
 export const UPDATE_PHENOTYPES_TREE = 'UPDATE_PHENOTYPES_TREE';
 
 export function updatePhenotypes(data) {
   return { type: UPDATE_PHENOTYPES, data };
+}
+
+export function updatePhenotypeCategories(data) {
+  return { type: UPDATE_PHENOTYPE_CATEGORIES, data }
 }
 
 export function updatePhenotypesTree(data) {
