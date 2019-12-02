@@ -26,7 +26,8 @@ export function VariantLookup() {
     results,
     messages,
     loading,
-    submitted
+    submitted,
+    numResults
   } = variantLookup;
 
   const { ExportCSVButton } = CSVExport;
@@ -181,8 +182,7 @@ export function VariantLookup() {
     setSearchCriteriaVariantLookup({
       phenotypes: selectedPhenotypes.map(item => item.title),
       variant: selectedVariant,
-      gender: selectedGender,
-      totalPhenotypes: selectedPhenotypes.length
+      gender: selectedGender
     });
     setSubmitted(new Date());
     dispatch(lookupVariants(selectedPhenotypes, selectedVariant));
@@ -200,7 +200,8 @@ export function VariantLookup() {
         messages: [],
         loading: false,
         submitted: null,
-        searchCriteriaVariantLookup: {}
+        searchCriteriaVariantLookup: {},
+        numResults: null
       })
     );
   };
