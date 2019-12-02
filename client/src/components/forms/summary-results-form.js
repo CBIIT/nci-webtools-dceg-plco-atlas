@@ -1,45 +1,30 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { FormControl, InputGroup, Button, Row, Col } from 'react-bootstrap';
+import { Button } from 'react-bootstrap';
 import { updateSummaryResults } from '../../services/actions';
-import TreeSelect, { TreeNode } from 'rc-tree-select';
-import 'rc-tree-select/assets/index.css';
+import { TreeSelectCustom } from '../controls/tree-select-custom';
 
 export function SummaryResultsForm({ onChange, onSubmit, onReset }) {
   const dispatch = useDispatch();
   const phenotypes = useSelector(state => state.phenotypes);
+  const phenotypeCategories = useSelector(state => state.phenotypeCategories);
   const phenotypesTree = useSelector(state => state.phenotypesTree);
 
-  const {
-    selectedListType,
-    selectedPhenotype,
-    selectedManhattanPlotType
-  } = useSelector(state => state.summaryResults);
+  const { selectedPhenotype, selectedManhattanPlotType } = useSelector(
+    state => state.summaryResults
+  );
 
   const setSelectedPhenotype = selectedPhenotype => {
     dispatch(updateSummaryResults({ selectedPhenotype }));
-  };
-
-  const setSelectedListType = selectedListType => {
-    dispatch(updateSummaryResults({ selectedListType }));
   };
 
   const setSelectedManhattanPlotType = selectedManhattanPlotType => {
     dispatch(updateSummaryResults({ selectedManhattanPlotType }));
   };
 
-  const handleChange = params => {
-    // only clear selection
-    if (params.length === 0) {
-      setSelectedPhenotype(params);
-    }
-  };
-
-  const handleSelect = (value, node, extra) => {
-    // can only select leaf nodes
-    if (node.props.children.length === 0 && !node.props.parent) {
-      setSelectedPhenotype({value: value.value, title: value.label});
-      onChange({value: value.value, title: value.label});
+  const handleChangeCustom = item => {
+    if (item && item[0]) {
+      setSelectedPhenotype(item[0]);
     }
   };
 
@@ -49,40 +34,20 @@ export function SummaryResultsForm({ onChange, onSubmit, onReset }) {
 
   return (
     <>
-      <select
-        className="form-control"
-        value={selectedListType}
-        onChange={e => setSelectedListType(e.target.value)}>
-        <option value="categorical">Categorical</option>
-        <option value="alphabetic">Alphabetic</option>
-      </select>
-
-      <TreeSelect
-        className="form-control h-100 p-0"
-        dropdownClassName="summary-results"
-        style={{ width: '100%' }}
-        dropdownStyle={{ maxHeight: 500, overflow: 'auto' }}
-        treeData={
-          selectedListType === 'alphabetic'
-            ? alphabetizedPhenotypes
-            : phenotypesTree
-        }
+      <b>Phenotypes</b>
+      <span style={{ color: 'red' }}>*</span>
+      <TreeSelectCustom
+        data={phenotypesTree}
+        dataAlphabetical={alphabetizedPhenotypes}
+        dataCategories={phenotypeCategories}
         value={selectedPhenotype}
-        onChange={handleChange}
-        onSelect={handleSelect}
-        treeNodeFilterProp="title"
-        dropdownMatchSelectWidth
-        autoClearSearchValue
-        // treeDefaultExpandAll
-        treeLine
-        allowClear
-        labelInValue
-        multiple
-        placeholder="(Select one phenotype)"
+        onChange={handleChangeCustom}
+        singleSelect={true}
       />
 
       <br></br>
 
+      <b>Gender</b>
       <select
         className="form-control"
         value={selectedManhattanPlotType}

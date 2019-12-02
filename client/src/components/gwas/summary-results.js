@@ -6,6 +6,9 @@ import { SnpSearchForm } from '../forms/snp-search-form';
 import { ManhattanPlot } from '../plots/manhattan-plot';
 import { QQPlot } from '../plots/qq-plot';
 import { SummaryResultsTable } from './summary-results-table';
+import { SummaryResultsSearchCriteria } from '../controls/summary-results-search-criteria';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCaretRight, faCaretLeft } from '@fortawesome/free-solid-svg-icons';
 import {
   updateSummaryResults,
   updateVariantLookup,
@@ -13,8 +16,9 @@ import {
   drawQQPlot,
   drawManhattanPlot,
   fetchSummaryTable,
-  updateSummaryTable,
+  updateSummaryTable
 } from '../../services/actions';
+import { query } from '../../services/query';
 
 export function SummaryResults() {
   const dispatch = useDispatch();
@@ -31,7 +35,7 @@ export function SummaryResults() {
     selectedGender,
     selectedManhattanPlotType,
     loadingManhattanPlot,
-    showSnpResults,
+    showSnpResults
   } = useSelector(state => state.summaryResults);
 
   const setPopupTooltipData = popupTooltipData => {
@@ -46,6 +50,10 @@ export function SummaryResults() {
     dispatch(updateSummaryResults({ messages }));
   };
 
+  const setSearchCriteriaSummaryResults = searchCriteriaSummaryResults => {
+    dispatch(updateSummaryResults({ searchCriteriaSummaryResults }));
+  };
+
   const clearMessages = e => {
     setMessages([]);
   };
@@ -55,38 +63,42 @@ export function SummaryResults() {
   };
 
   // determine which aggregate tables correspond to the selected plot type
-  const getAggregateTable = plotType => ({
-    all: ['aggregate_all'],
-    stacked: ['aggregate_male', 'aggregate_female'],
-    female: ['aggregate_female'],
-    male: ['aggregate_male'],
-  }[plotType]);
+  const getAggregateTable = plotType =>
+    ({
+      all: ['aggregate_all'],
+      stacked: ['aggregate_male', 'aggregate_female'],
+      female: ['aggregate_female'],
+      male: ['aggregate_male']
+    }[plotType]);
 
   // determine which variant tables correspond to the selected plot type
-  const getVariantTable = plotType => ({
-    all: ['variant_all'],
-    stacked: ['variant_male', 'variant_female'],
-    female: ['variant_female'],
-    male: ['variant_male'],
-  }[plotType]);
+  const getVariantTable = plotType =>
+    ({
+      all: ['variant_all'],
+      stacked: ['variant_male', 'variant_female'],
+      female: ['variant_female'],
+      male: ['variant_male']
+    }[plotType]);
 
   const hideQQTooltips = () => {
     // if tooltip already exists, destroy
-    const elem = document.getElementsByClassName("qq-plot-tooltip");
+    const elem = document.getElementsByClassName('qq-plot-tooltip');
     if (elem && elem.length > 0) {
       elem[0].remove();
     }
     // tooltip.style.display = 'none';
-  }
+  };
 
   const handleSubmit = (phenotype, manhattanPlotType) => {
     phenotype = phenotype ? phenotype.value : null;
 
     if (!phenotype) {
-      return setMessages([{
-        type: 'danger',
-        content: 'Please select a phenotype.'
-      }]);
+      return setMessages([
+        {
+          type: 'danger',
+          content: 'Please select a phenotype.'
+        }
+      ]);
     }
 
     // determine which tables to use for manhattan plot
@@ -109,7 +121,7 @@ export function SummaryResults() {
         nlogpMax: null,
         bpMin: null,
         bpMax: null,
-        submitted: true,
+        submitted: true
       })
     );
 
@@ -118,13 +130,12 @@ export function SummaryResults() {
       drawManhattanPlot('summary', {
         database: phenotype + '.db',
         table: aggregateTable,
-        nlogpMin: 3,
+        nlogpMin: 3
       })
     );
 
     // fetch variant results tables
     variantTable.forEach((table, tableIndex) => {
-
       // gender is specified by manhattan plot type (all, stacked, male, female)
       let gender = manhattanPlotType;
 
@@ -136,17 +147,26 @@ export function SummaryResults() {
       let countKey = `count_${gender}`;
 
       dispatch(
-        fetchSummaryTable({
-          database: phenotype + '.db',
-          table: table,
-          gender: gender,
-          offset: 0,
-          limit: 10,
-          columns: ['chr', 'bp', 'snp', 'a1', 'a2', 'or', 'p'],
-          orderBy: 'p',
-          order: 'asc',
-        }, countKey, tableIndex)
+        fetchSummaryTable(
+          {
+            database: phenotype + '.db',
+            table: table,
+            gender: gender,
+            offset: 0,
+            limit: 10,
+            columns: ['chr', 'bp', 'snp', 'a1', 'a2', 'or', 'p'],
+            orderBy: 'p',
+            order: 'asc'
+          },
+          countKey,
+          tableIndex
+        )
       );
+    });
+
+    setSearchCriteriaSummaryResults({
+      phenotype: [...selectedPhenotype.title],
+      gender: selectedManhattanPlotType
     });
     // if any Q-Q plot tooltips exist, destory
     hideQQTooltips();
@@ -168,7 +188,6 @@ export function SummaryResults() {
         qqplotSrc: '',
         areaItems: [],
         lambdaGC: '',
-        sampleSize: '',
         submitted: null,
         loadingManhattanTable: false,
         loadingManhattanPlot: false,
@@ -178,18 +197,23 @@ export function SummaryResults() {
         popupTooltipData: null,
         showSnpResults: false,
         snp: '',
+        searchCriteriaSummaryResults: {},
+        sampleSize: null
       })
     );
 
     // reset summary results tables
-    for (let i = 0; i < 2; i ++) {
+    for (let i = 0; i < 2; i++) {
       dispatch(
-        updateSummaryTable({
-          results: [],
-          resultsCount: 0,
-          page: 1,
-          pageSize: 10,
-        }, i)
+        updateSummaryTable(
+          {
+            results: [],
+            resultsCount: 0,
+            page: 1,
+            pageSize: 10
+          },
+          i
+        )
       );
     }
 
@@ -199,8 +223,8 @@ export function SummaryResults() {
 
   // resubmit summary results
   const onAllChromosomeSelected = () => {
-    handleSubmit(selectedPhenotype, selectedManhattanPlotType)
-  }
+    handleSubmit(selectedPhenotype, selectedManhattanPlotType);
+  };
 
   // redraw plot and update table(s) for single chromosome selection
   const onChromosomeSelected = chr => {
@@ -218,7 +242,7 @@ export function SummaryResults() {
         bpMin: range.bp_min,
         bpMax: range.bp_max,
         nlogpMin: 2,
-        nlogpMax: null,
+        nlogpMax: null
       })
     );
 
@@ -245,17 +269,21 @@ export function SummaryResults() {
         gender = [`female`, `male`][tableIndex];
 
       dispatch(
-        fetchSummaryTable({
-          database,
-          table,
-          chr,
-          gender,
-          offset: 0,
-          limit: 10,
-          columns: ['chr', 'bp', 'snp', 'a1', 'a2', 'or', 'p'],
-          orderBy: 'p',
-          order: 'asc',
-        }, `count_${gender}_${chr}`, tableIndex)
+        fetchSummaryTable(
+          {
+            database,
+            table,
+            chr,
+            gender,
+            offset: 0,
+            limit: 10,
+            columns: ['chr', 'bp', 'snp', 'a1', 'a2', 'or', 'p'],
+            orderBy: 'p',
+            order: 'asc'
+          },
+          `count_${gender}_${chr}`,
+          tableIndex
+        )
       );
     });
   };
@@ -271,7 +299,7 @@ export function SummaryResults() {
       bpMin: bounds.xMin,
       bpMax: bounds.xMax,
       nlogpMin: bounds.yMin,
-      nlogpMax: bounds.yMax,
+      nlogpMax: bounds.yMax
     };
 
     // reset page/pageSize, and update zoom params
@@ -279,7 +307,7 @@ export function SummaryResults() {
       updateSummaryResults({
         page,
         pageSize,
-        ...zoomParams,
+        ...zoomParams
       })
     );
 
@@ -293,19 +321,23 @@ export function SummaryResults() {
         gender = [`female`, `male`][tableIndex];
 
       dispatch(
-        fetchSummaryTable({
-          database,
-          table,
-          chr,
-          gender,
-          offset: (page - 1) * pageSize,
-          limit: pageSize,
-          columns: ['chr', 'bp', 'snp', 'a1', 'a2', 'or', 'p'],
-          orderBy: 'p',
-          order: 'asc',
-          count: true,
-          ...zoomParams,
-        }, null, tableIndex)
+        fetchSummaryTable(
+          {
+            database,
+            table,
+            chr,
+            gender,
+            offset: (page - 1) * pageSize,
+            limit: pageSize,
+            columns: ['chr', 'bp', 'snp', 'a1', 'a2', 'or', 'p'],
+            orderBy: 'p',
+            order: 'asc',
+            count: true,
+            ...zoomParams
+          },
+          null,
+          tableIndex
+        )
       );
     });
   };
@@ -315,12 +347,25 @@ export function SummaryResults() {
       updateVariantLookup({
         selectedPhenotypes: [selectedPhenotype],
         selectedVariant: snp,
-        selectedGender: selectedManhattanPlotType === 'male' || selectedManhattanPlotType === 'female' ? selectedManhattanPlotType : 'combined'
+        selectedGender:
+          selectedManhattanPlotType === 'male' ||
+          selectedManhattanPlotType === 'female'
+            ? selectedManhattanPlotType
+            : 'combined',
+        searchCriteriaVariantLookup: {
+          phenotypes: [selectedPhenotype].map(item => item.title),
+          variant: snp,
+          gender:
+            selectedManhattanPlotType === 'male' ||
+            selectedManhattanPlotType === 'female'
+              ? selectedManhattanPlotType
+              : 'combined'
+        }
       })
     );
     dispatch(lookupVariants([selectedPhenotype], snp));
   };
-  
+
   const placeholder = (
     <div style={{ display: submitted ? 'none' : 'block' }}>
       <p className="h4 text-center my-5">
@@ -332,26 +377,20 @@ export function SummaryResults() {
   const [openSidebar, setOpenSidebar] = useState(true);
 
   return (
-    <>
-      <Button
-        variant="link"
-        style={{position: 'absolute', zIndex: 100}}
-        onClick={() => setOpenSidebar(!openSidebar)}
-        aria-controls="summary-results-collapse-input-panel"
-        aria-expanded={openSidebar}>
-        { openSidebar ? <span>&#171;</span> : <span>&#187;</span>}
-      </Button>
-      
-      <div className={openSidebar ? "row mx-3" : "mx-3"}>
-        {openSidebar && (
-          <div className="col-md-3">
+    <div style={{ position: 'relative' }}>
+      <div className={openSidebar ? 'row mx-3' : 'mx-3'}>
+        <div className="col-md-3">
+          {openSidebar && (
             <Tabs defaultActiveKey="summary-results-form">
               <Tab
                 eventKey="summary-results-form"
-                // title="Table"
                 className="p-2 bg-white tab-pane-bordered rounded-0"
-                style={{minHeight: '100%'}}>
-                <SummaryResultsForm onSubmit={handleSubmit} onChange={handleChange} onReset={handleReset} />
+                style={{ minHeight: '100%' }}>
+                <SummaryResultsForm
+                  onSubmit={handleSubmit}
+                  onChange={handleChange}
+                  onReset={handleReset}
+                />
                 {messages &&
                   messages.map(({ type, content }) => (
                     <Alert variant={type} onClose={clearMessages} dismissible>
@@ -360,36 +399,42 @@ export function SummaryResults() {
                   ))}
               </Tab>
             </Tabs>
-          </div>
-        )}
+          )}
+          <Button
+            title="Show/hide search panel"
+            variant="link"
+            style={{
+              color: '#008CBA',
+              position: 'absolute',
+              zIndex: 100,
+              top: '7px',
+              [openSidebar ? 'right' : 'left']: '-15px'
+            }}
+            onClick={() => setOpenSidebar(!openSidebar)}
+            aria-controls="summary-results-collapse-input-panel"
+            aria-expanded={openSidebar}>
+            {openSidebar ? (
+              <FontAwesomeIcon icon={faCaretLeft} size="lg" />
+            ) : (
+              <FontAwesomeIcon icon={faCaretRight} size="lg" />
+            )}
+          </Button>
+        </div>
 
         <div className="d-md-none p-2"></div>
-      
-        <div className={openSidebar ? "col-md-9" : "col-md-12"}>
-         {/* <Tabs className="" defaultActiveKey="summary-results-criteria">
-            <Tab
-              eventKey="summary-results-criteria"
-              className="d-flex justify-content-between p-2 bg-white tab-pane-bordered rounded-0">
-                <div className="">
-                    <span>
-                      <b>Phenotype</b>: <span>TBD</span>
-                    </span>
-                    <span className="mx-3">|</span>
-                    <span>
-                      <b>Gender</b>: <span>TBD</span>
-                    </span>
-                </div>
-                <div className="">
-                    Total Variants: <span>TBD</span>
-                </div>
-            </Tab>
-          </Tabs> */}
 
-          <Tabs className="" defaultActiveKey={selectedPlot} onSelect={setSelectedPlot}>
+        <div className={openSidebar ? 'col-md-9' : 'col-md-12'}>
+          <SummaryResultsSearchCriteria />
+
+          <Tabs
+            className="mt-2"
+            defaultActiveKey={selectedPlot}
+            onSelect={setSelectedPlot}>
             <Tab
               eventKey="manhattan-plot"
               title="Manhattan Plot"
-              className="p-2 bg-white tab-pane-bordered rounded-0" style={{minHeight: '50vh'}}>
+              className="p-2 bg-white tab-pane-bordered rounded-0"
+              style={{ minHeight: '50vh' }}>
               <ManhattanPlot
                 onChromosomeSelected={onChromosomeSelected}
                 onAllChromosomeSelected={onAllChromosomeSelected}
@@ -411,7 +456,8 @@ export function SummaryResults() {
             <Tab
               eventKey="qq-plot"
               title="Q-Q Plot"
-              className="p-2 bg-white tab-pane-bordered rounded-0" style={{minHeight: '50vh'}}>
+              className="p-2 bg-white tab-pane-bordered rounded-0"
+              style={{ minHeight: '50vh' }}>
               <div
                 className="mw-100 my-4"
                 style={{ display: submitted ? 'block' : 'none' }}>
@@ -422,6 +468,6 @@ export function SummaryResults() {
           </Tabs>
         </div>
       </div>
-    </>
+    </div>
   );
 }

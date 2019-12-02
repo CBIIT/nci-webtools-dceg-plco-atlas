@@ -7,9 +7,5 @@ import { ManhattanPlot } from 'manhattan-plot';
  */
 
 function drawGenePlot(manhattanPlot, config) {
-    const { genes, ctx, overlayCtx, hiddenCtx } = config;
-
-
-
-
+  const { genes, ctx, overlayCtx, hiddenCtx } = config;
 }
