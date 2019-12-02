@@ -84,7 +84,7 @@ export function TreeSelectCustom({ onChange, data, dataAlphabetical, dataCategor
 
   const toggleExpandAllParents = () => {
     if (!expandAll) {
-      for (var i = 0; i < dataCategories.length; i++) {
+      for (let i = 0; i < dataCategories.length; i++) {
         const className = 'children-of-' + dataCategories[i].value;
         if (
           document.getElementsByClassName(className)[0].style.display &&
@@ -102,7 +102,7 @@ export function TreeSelectCustom({ onChange, data, dataAlphabetical, dataCategor
       }
       setExpandAll(true);
     } else {
-      for (var i = 0; i < dataCategories.length; i++) {
+      for (let i = 0; i < dataCategories.length; i++) {
         const className = 'children-of-' + dataCategories[i].value;
         if (
           document.getElementsByClassName(className)[0].style.display &&
@@ -424,7 +424,7 @@ export function TreeSelectCustom({ onChange, data, dataAlphabetical, dataCategor
   const selectTreeAlphabetical = dataAlphabetical => {
     const stringMatch = (item) => {
       // console.log("searchInput", searchInput);
-      let re1 = new RegExp(/[~`!#$%\^&*+=\-\[\]\\;,/{}|\\":<>\?]/, 'gi');
+      let re1 = new RegExp(/[()~`!#$%\^&*+=\[\]\\;,/{}|\\":<>\?]/, 'gi');
       if (!re1.test(searchInput)) {
         let re2 = new RegExp(searchInput, 'gi');
         return item.title.match(re2);
@@ -465,7 +465,12 @@ export function TreeSelectCustom({ onChange, data, dataAlphabetical, dataCategor
               overflow: 'hidden'
             }}
             onClick={e => handleSelect(item)}>
-            {item.title}
+            {/* {item.title.replace(searchInput, '[' + searchInput + ']')} */}
+            {item.title.slice(0, item.title.toLowerCase().indexOf(searchInput.toLowerCase()))}
+            <b>
+              {item.title.slice(item.title.toLowerCase().indexOf(searchInput.toLowerCase()), item.title.toLowerCase().indexOf(searchInput.toLowerCase()) + searchInput.length)}
+            </b>
+            {item.title.slice(item.title.toLowerCase().indexOf(searchInput.toLowerCase()) + searchInput.length, item.title.length)}
           </button>
         </div>
       ));
