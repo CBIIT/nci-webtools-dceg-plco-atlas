@@ -52,54 +52,53 @@ export function PhenotypeCorrelationsForm({ onChange, onSubmit, onReset }) {
 
   return (
     <>
-      <div className="mb-2">
-        <b>Phenotypes</b>
-        <span style={{ color: 'red' }}>*</span>
-        <TreeSelectCustom
-          data={phenotypesTree}
-          dataAlphabetical={alphabetizedPhenotypes}
-          dataCategories={phenotypeCategories}
-          value={selectedPhenotypes}
-          onChange={handleChangeCustom}
-        />
-      </div>
-      
-      <div className="mb-3">
-        <b>Gender</b>
-        <select
-          className="form-control"
-          value={selectedGender}
-          onChange={e => setSelectedGender(e.target.value)}>
-          <option value="combined">All</option>
-          <option value="female">Female</option>
-          <option value="male">Male</option>
-        </select>
-      </div>
-      
-      <div>
-        <Button
-          className=""
-          style={{ maxHeight: '38px' }}
-          variant="silver"
-          // disabled={!(selectedPhenotypes && selectedPhenotypes.length >= 2)}
-          onClick={e => {
-            e.preventDefault();
-            onSubmit(selectedPhenotypes);
-          }}>
-          Submit
-        </Button>
+      <b>Phenotypes</b>
+      <span style={{ color: 'red' }}>*</span>
+      <TreeSelectCustom
+        data={phenotypesTree}
+        dataAlphabetical={alphabetizedPhenotypes}
+        dataCategories={phenotypeCategories}
+        value={selectedPhenotypes}
+        onChange={handleChangeCustom}
+      />
 
-        <Button
-          className="ml-2"
-          style={{ maxHeight: '38px' }}
-          variant="silver"
-          onClick={e => {
-            e.preventDefault();
-            onReset(e);
-          }}>
-          Reset
-        </Button>
-      </div>
+      <br></br>
+
+      <b>Gender</b>
+      <select
+        className="form-control"
+        value={selectedGender}
+        onChange={e => setSelectedGender(e.target.value)}>
+        <option value="combined">All</option>
+        <option value="female">Female</option>
+        <option value="male">Male</option>
+      </select>
+
+      <br></br>
+
+      <Button
+        className=""
+        style={{ maxHeight: '38px' }}
+        variant="silver"
+        // disabled={!(selectedPhenotypes && selectedPhenotypes.length >= 2)}
+        onClick={e => {
+          e.preventDefault();
+          onSubmit(selectedPhenotypes);
+        }}>
+        Submit
+      </Button>
+
+      <Button
+        className="ml-2"
+        style={{ maxHeight: '38px' }}
+        variant="silver"
+        onClick={e => {
+          e.preventDefault();
+          onReset(e);
+        }}>
+        Reset
+      </Button>
+      {/* <pre>{JSON.stringify(selectedPhenotypes, null, 2)}</pre> */}
     </>
   );
 }

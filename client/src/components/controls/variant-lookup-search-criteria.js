@@ -1,21 +1,15 @@
 import React, { useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { updateVariantLookup } from '../../services/actions';
+import { useSelector } from 'react-redux';
 import { Tab, Tabs, Button } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCaretRight, faCaretDown } from '@fortawesome/free-solid-svg-icons';
 
 export const VariantLookupSearchCriteria = props => {
-  const dispatch = useDispatch();
-  const { 
-    searchCriteriaVariantLookup, 
-    numResults,
-    collapseCriteria
-  } = useSelector(state => state.variantLookup);
+  const { searchCriteriaVariantLookup, numResults } = useSelector(
+    state => state.variantLookup
+  );
 
-  const setCollapseCriteria = collapseCriteria => {
-    dispatch(updateVariantLookup({ collapseCriteria }));
-  };
+  const [collapseCriteria, setCollapseCriteria] = useState(true);
 
   const toggleCollapseCriteria = () => {
     if (collapseCriteria) {
