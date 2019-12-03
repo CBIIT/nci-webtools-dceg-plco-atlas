@@ -90,7 +90,7 @@ export function Home({ links }) {
                     justifyContent: 'center',
                     alignItems: 'center',
                     border: '1px solid #DADBE6',
-                    borderRadius: '10px'
+                    // borderRadius: '10px'
                   }}>
                   <Link
                     className="stretched-link"
