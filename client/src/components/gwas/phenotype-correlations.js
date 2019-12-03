@@ -44,8 +44,8 @@ export function PhenotypeCorrelations() {
 
   const placeholder = (
     <div style={{ display: submitted ? 'none' : 'block' }}>
-      <p className="h4 text-center text-secondary my-5">
-        Please select phenotypes to view this plot
+      <p className="h4 text-center my-5">
+        Please select phenotypes to view this plot.
       </p>
     </div>
   );
@@ -95,8 +95,7 @@ export function PhenotypeCorrelations() {
         messages: [],
         popupTooltipStyle: { display: 'none' },
         popupTooltipData: null,
-        searchCriteriaPhenotypeCorrelations: {},
-        collapseCriteria: true
+        searchCriteriaPhenotypeCorrelations: {}
       })
     );
   };
@@ -129,14 +128,13 @@ export function PhenotypeCorrelations() {
             </Tabs>
           )}
           <Button
-            className="pt-0 border-0"
-            title={openSidebar ? "Hide search panel" : "Show search panel"}
+            title="Show/hide search panel"
             variant="link"
             style={{
               color: '#008CBA',
               position: 'absolute',
               zIndex: 100,
-              top: '0px',
+              top: '7px',
               [openSidebar ? 'right' : 'left']: '-15px'
             }}
             onClick={() => setOpenSidebar(!openSidebar)}

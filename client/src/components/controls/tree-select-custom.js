@@ -314,7 +314,7 @@ export function TreeSelectCustom({
             <li className="my-1" style={{ display: 'block' }}>
               <div className="d-flex align-items-center">
                 <button
-                  title={"Show/hide " + item.title + " phenotypes"}
+                  title="Show/hide children"
                   style={{ all: 'unset' }}
                   className="collapse-button text-secondary"
                   onClick={e => toggleHideChildren(item.value)}>
@@ -335,8 +335,8 @@ export function TreeSelectCustom({
                 <input
                   title={
                     singleSelect
-                      ? 'Only one phenotype can be selected'
-                      : 'Select/deselect all ' + item.title + ' phenotypes'
+                      ? 'Cannot select all children'
+                      : 'Select all children'
                   }
                   style={{
                     verticalAlign: 'middle',
@@ -403,7 +403,7 @@ export function TreeSelectCustom({
               }}
             />
             <input
-              title={singleSelect ? "Select phenotype" : "Select/deselect phenotype"}
+              title="Select phenotype"
               style={{ cursor: 'pointer' }}
               className={'ml-1 leaf-checkbox-' + item.value}
               name={'leaf-checkbox-' + item.value}
@@ -553,7 +553,7 @@ export function TreeSelectCustom({
           {listType === 'categorical' && (
             <>
               <button
-                title={expandAll ? "Hide all phenotypes" : "Show all phenotypes"}
+                title="Show/hide all children"
                 style={{ all: 'unset' }}
                 className="ml-1 collapse-button-all text-secondary"
                 onClick={e => toggleExpandAllParents()}>
@@ -577,7 +577,7 @@ export function TreeSelectCustom({
           )}
 
           <input
-            title={singleSelect ? 'Only one phenotype can be selected' : 'Select/deselect all'}
+            title={singleSelect ? 'Cannot select all phenotypes' : 'Select all'}
             style={{ cursor: singleSelect ? 'not-allowed' : 'pointer' }}
             className={listType === 'alphabetical' ? 'ml-1' : ''}
             name=""

@@ -1,20 +1,15 @@
 import React, { useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { updatePhenotypeCorrelations } from '../../services/actions';
+import { useSelector } from 'react-redux';
 import { Tab, Tabs, Button } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCaretRight, faCaretDown } from '@fortawesome/free-solid-svg-icons';
 
 export const PhenotypeCorrelationsSearchCriteria = props => {
-  const dispatch = useDispatch();
-  const { 
-    searchCriteriaPhenotypeCorrelations,
-    collapseCriteria
-  } = useSelector(state => state.phenotypeCorrelations);
+  const { searchCriteriaPhenotypeCorrelations } = useSelector(
+    state => state.phenotypeCorrelations
+  );
 
-  const setCollapseCriteria = collapseCriteria => {
-    dispatch(updatePhenotypeCorrelations({ collapseCriteria }));
-  };
+  const [collapseCriteria, setCollapseCriteria] = useState(true);
 
   const toggleCollapseCriteria = () => {
     if (collapseCriteria) {
