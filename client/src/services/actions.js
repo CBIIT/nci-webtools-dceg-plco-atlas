@@ -858,23 +858,21 @@ export function lookupVariants(phenotypes, variant) {
 
     var tableList = [];
     var tableListNull = [];
+    var chr = null;
+    var bp = null;
+    if (variant.substring(0,3).toLowerCase() === "chr") {
+      variant = variant.toLowerCase().replace("chr", "");
+      var coord = variant.split(":");
+      chr = coord[0];
+      bp = coord[1];
+    }
     for (let i = 0; i < phenotypes.length; i++) {
-      if (variant.substring(0,2).toLowerCase() === "rs") {
-        var { data } = await query('variants', {
-          database: phenotypes[i].value + '.db',
-          snp: variant
-        });
-      } else {
-        variant = variant.toLowerCase().replace("chr", "");
-        let [chr, bp] = variant.split(":");
-        console.log("chr", chr, "bp", bp);
-        var { data2 } = await query('variants', {
-          database: phenotypes[i].value + '.db',
-          chr,
-          bp
-        });
-        console.log("data2", data2);
-      }
+      var { data } = await query('variants', {
+        database: phenotypes[i].value + '.db',
+        snp: chr && bp ? null : variant,
+        chr: chr ? chr : null,
+        bp: bp ? bp : null
+      });
       if (!data || data.length === 0) {
         tableListNull.push({
           phenotype: phenotypes[i].title
@@ -899,7 +897,6 @@ export function lookupVariants(phenotypes, variant) {
     }
     const numResults = tableList.length;
     tableList = tableList.concat(tableListNull);
-    console.log('tableList', tableList);
     dispatch(
       updateVariantLookup({
         loading: false,
