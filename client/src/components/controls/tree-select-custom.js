@@ -8,7 +8,17 @@ import {
   faTimes
 } from '@fortawesome/free-solid-svg-icons';
 
-export function TreeSelectCustom({ onChange, data, value, singleSelect }) {
+export function TreeSelectCustom({
+  onChange,
+  data,
+  dataAlphabetical,
+  dataCategories,
+  value,
+  singleSelect
+}) {
+  const [searchInput, setSearchInput] = useState('');
+  const [listType, setListType] = useState('categorical');
+  const [expandAll, setExpandAll] = useState(false);
   const containsVal = (arr, val) => {
     let result = false;
     for (var i = 0; i < arr.length; i++) {
@@ -16,7 +26,6 @@ export function TreeSelectCustom({ onChange, data, value, singleSelect }) {
         result = true;
       }
     }
-
     return result;
   };
 
@@ -77,8 +86,48 @@ export function TreeSelectCustom({ onChange, data, value, singleSelect }) {
         allLeafs.push(item);
       }
     }
-
     return allLeafs;
+  };
+
+  const toggleExpandAllParents = () => {
+    if (!expandAll) {
+      for (let i = 0; i < dataCategories.length; i++) {
+        const className = 'children-of-' + dataCategories[i].value;
+        if (
+          document.getElementsByClassName(className)[0].style.display &&
+          document.getElementsByClassName(className)[0].style.display === 'none'
+        ) {
+          document.getElementsByClassName(className)[0].style.display = 'block';
+          const collapseButton = document.getElementsByClassName(
+            'collapse-button-text-' + dataCategories[i].value
+          )[0];
+          ReactDOM.render(
+            <FontAwesomeIcon icon={faMinusSquare} size="1x" />,
+            collapseButton
+          );
+        }
+      }
+      setExpandAll(true);
+    } else {
+      for (let i = 0; i < dataCategories.length; i++) {
+        const className = 'children-of-' + dataCategories[i].value;
+        if (
+          document.getElementsByClassName(className)[0].style.display &&
+          document.getElementsByClassName(className)[0].style.display ===
+            'block'
+        ) {
+          document.getElementsByClassName(className)[0].style.display = 'none';
+          const collapseButton = document.getElementsByClassName(
+            'collapse-button-text-' + dataCategories[i].value
+          )[0];
+          ReactDOM.render(
+            <FontAwesomeIcon icon={faPlusSquare} size="1x" />,
+            collapseButton
+          );
+        }
+      }
+      setExpandAll(false);
+    }
   };
 
   const toggleHideChildren = name => {
@@ -95,13 +144,11 @@ export function TreeSelectCustom({ onChange, data, value, singleSelect }) {
         <FontAwesomeIcon icon={faMinusSquare} size="1x" />,
         collapseButton
       );
-      // textContent = <FontAwesomeIcon icon={faMinusSquare} size="lg"/>;
     } else {
       document.getElementsByClassName(className)[0].style.display = 'none';
       const collapseButton = document.getElementsByClassName(
         'collapse-button-text-' + name
       )[0];
-      // .textContent = <FontAwesomeIcon icon={faPlusSquare} size="lg"/>;
       ReactDOM.render(
         <FontAwesomeIcon icon={faPlusSquare} size="1x" />,
         collapseButton
@@ -109,16 +156,96 @@ export function TreeSelectCustom({ onChange, data, value, singleSelect }) {
     }
   };
 
-  const checkParents = () => {
-    //    console.log(data);
-    // 1 uncheck all sub parents and children when touched parent is unchecked
-    // 2 check parent when all sibling leafs are also checked
-    // 3 uncheck parent when if any of children are unchecked
+  const checkAllChildrenLeafsSelected = (leafs, selectedValues) => {
+    for (var i = 0; i < leafs.length; i++) {
+      if (selectedValues.indexOf(leafs[i]) === -1) return false;
+    }
+    return true;
+  };
+
+  const checkSomeChildrenLeafsSelected = (leafs, selectedValues) => {
+    return leafs.some(r => selectedValues.indexOf(r) >= 0);
+  };
+
+  const checkParents = item => {
+    const itemAllLeafs = getAllLeafs(item);
+    if (!singleSelect) {
+      // multi-select
+      const checkAllLeafsSelectedResult = checkAllChildrenLeafsSelected(
+        itemAllLeafs.map(obj => obj.value),
+        value.map(obj => obj.value)
+      );
+      if (checkAllLeafsSelectedResult) {
+        let checkbox = document.getElementsByClassName(
+          'parent-checkbox-' + item.value
+        )[0];
+        if (checkbox) {
+          checkbox.indeterminate = false;
+        }
+        return true;
+      } else {
+        const checkSomeLeafsSelectedResult = checkSomeChildrenLeafsSelected(
+          itemAllLeafs.map(obj => obj.value),
+          value.map(obj => obj.value)
+        );
+        if (checkSomeLeafsSelectedResult) {
+          // show indeterminate checkbox if some (at least one) leaf is selected
+          let checkbox = document.getElementsByClassName(
+            'parent-checkbox-' + item.value
+          )[0];
+          if (checkbox) {
+            checkbox.indeterminate = true;
+          }
+          return true;
+        } else {
+          let checkbox = document.getElementsByClassName(
+            'parent-checkbox-' + item.value
+          )[0];
+          if (checkbox) {
+            checkbox.indeterminate = false;
+          }
+          return false;
+        }
+      }
+    } else {
+      // single-select
+      if (itemAllLeafs && value) {
+        const checkSomeLeafsSelectedResult = checkSomeChildrenLeafsSelected(
+          itemAllLeafs.map(obj => obj.value),
+          [value].map(obj => obj.value)
+        );
+        if (checkSomeLeafsSelectedResult) {
+          // show indeterminate checkbox if some (at least one) leaf is selected
+          let checkbox = document.getElementsByClassName(
+            'parent-checkbox-' + item.value
+          )[0];
+          if (checkbox) {
+            checkbox.indeterminate = true;
+          }
+          return false;
+        } else {
+          let checkbox = document.getElementsByClassName(
+            'parent-checkbox-' + item.value
+          )[0];
+          if (checkbox) {
+            checkbox.indeterminate = false;
+          }
+          return false;
+        }
+      } else {
+        let checkbox = document.getElementsByClassName(
+          'parent-checkbox-' + item.value
+        )[0];
+        if (checkbox) {
+          checkbox.indeterminate = false;
+        }
+        return false;
+      }
+    }
   };
 
   const handleSelect = item => {
     if (singleSelect) {
-      console.log('SINGLE SELECT ITEM', item);
       onChange([item]);
     } else {
       const parentCheckboxClassName = 'parent-checkbox-' + item.value;
@@ -134,7 +261,7 @@ export function TreeSelectCustom({ onChange, data, value, singleSelect }) {
             parentCheckboxClassName
           )[0].checked = false;
         }
-        for (var i = 0; i < newValues.length; i++) {
+        for (let i = 0; i < newValues.length; i++) {
           if (
             document.getElementsByClassName(
               'leaf-checkbox-' + newValues[i].value
@@ -146,7 +273,7 @@ export function TreeSelectCustom({ onChange, data, value, singleSelect }) {
           }
         }
       } else {
-        for (var i = 0; i < newValues.length; i++) {
+        for (let i = 0; i < newValues.length; i++) {
           if (!containsVal(values, newValues[i].value)) {
             // only add if value did not exist before
             values.push(newValues[i]);
@@ -173,17 +300,12 @@ export function TreeSelectCustom({ onChange, data, value, singleSelect }) {
           }
         }
       }
-      checkParents();
 
       onChange(values);
     }
   };
 
-  // const isChecked = (e) => {
-  //     console.log("isChecked", e);
-  // };
-
-  const selectTree = data =>
+  const selectTreeCategorical = data =>
     data.map(item => {
       if (item.children && item.children.length > 0) {
         return (
@@ -192,7 +314,7 @@ export function TreeSelectCustom({ onChange, data, value, singleSelect }) {
             <li className="my-1" style={{ display: 'block' }}>
               <div className="d-flex align-items-center">
                 <button
-                  title="Show/hide children"
+                  title={"Show/hide " + item.title + " phenotypes"}
                   style={{ all: 'unset' }}
                   className="collapse-button text-secondary"
                   onClick={e => toggleHideChildren(item.value)}>
@@ -201,30 +323,47 @@ export function TreeSelectCustom({ onChange, data, value, singleSelect }) {
                   </span>
                 </button>
 
+                <div
+                  className="mx-1"
+                  style={{
+                    display: 'inline-block',
+                    borderLeft: '1px solid white',
+                    height: '10px'
+                  }}
+                />
+
                 <input
                   title={
                     singleSelect
-                      ? 'Cannot select all children'
-                      : 'Select all children'
+                      ? 'Only one phenotype can be selected'
+                      : 'Select/deselect all ' + item.title + ' phenotypes'
                   }
                   style={{
                     verticalAlign: 'middle',
                     alignSelf: 'center',
                     cursor: singleSelect ? 'not-allowed' : 'pointer'
                   }}
-                  className={'ml-2 parent-checkbox-' + item.value}
+                  className={'parent-checkbox-' + item.value}
                   name={'parent-checkbox-' + item.value}
-                  type={singleSelect ? 'radio' : 'checkbox'}
-                  // checked={true}
+                  type="checkbox"
+                  // checked={ !singleSelect && value && value.length > 0 && containsAllVals(getAllLeafs(item), value)}
+                  checked={checkParents(item)}
                   onChange={e => handleSelect(item)}
                   disabled={singleSelect ? true : false}
                 />
 
-                {/* <span className="text-info ml-1"><i>(<u>parent</u>)</i></span>  */}
+                <div
+                  className="ml-1"
+                  style={{
+                    display: 'inline-block',
+                    borderLeft: '1px solid white',
+                    height: '10px'
+                  }}
+                />
 
                 <button
                   title={item.title}
-                  className="ml-2"
+                  className="ml-1"
                   style={{
                     all: 'unset',
                     cursor: 'pointer',
@@ -238,9 +377,9 @@ export function TreeSelectCustom({ onChange, data, value, singleSelect }) {
               </div>
 
               <ul
-                className={'pl-4 children-of-' + item.value}
+                className={'ml-3 pl-1 children-of-' + item.value}
                 style={{ listStyleType: 'none', display: 'none' }}>
-                {selectTree(item.children)}
+                {selectTreeCategorical(item.children)}
               </ul>
             </li>
           </>
@@ -249,24 +388,47 @@ export function TreeSelectCustom({ onChange, data, value, singleSelect }) {
         return (
           // LEAF
           <li
+            key={'categorical-' + item.value}
             style={{
               textOverflow: 'ellipsis',
               whiteSpace: 'nowrap',
               overflow: 'hidden'
             }}>
+            <div
+              className="ml-3"
+              style={{
+                display: 'inline-block',
+                borderLeft: '1px solid white',
+                height: '10px'
+              }}
+            />
             <input
-              title="Select phenotype"
+              title={singleSelect ? "Select phenotype" : "Select/deselect phenotype"}
               style={{ cursor: 'pointer' }}
-              className={'ml-4 leaf-checkbox-' + item.value}
+              className={'ml-1 leaf-checkbox-' + item.value}
               name={'leaf-checkbox-' + item.value}
-              type={singleSelect ? 'radio' : 'checkbox'}
-              // checked={e => isChecked(e)}
+              type="checkbox"
+              // type={singleSelect ? 'radio' : 'checkbox'}
+              checked={
+                (singleSelect && value && value.value === item.value) ||
+                (!singleSelect &&
+                  value.map(item => item.value).includes(item.value))
+              }
               onChange={e => handleSelect(item)}
+            />
+
+            <div
+              className="ml-1"
+              style={{
+                display: 'inline-block',
+                borderLeft: '1px solid white',
+                height: '10px'
+              }}
             />
 
             <button
               title={item.title}
-              className="ml-2"
+              className="ml-1"
               style={{
                 all: 'unset',
                 cursor: 'pointer',
@@ -283,7 +445,96 @@ export function TreeSelectCustom({ onChange, data, value, singleSelect }) {
       }
     });
 
-  const [searchInput, setSearchInput] = useState('');
+  const selectTreeAlphabetical = dataAlphabetical => {
+    const stringMatch = item => {
+      // console.log("searchInput", searchInput);
+      let re1 = new RegExp(/[()~`!#$%\^&*+=\[\]\\;,/{}|\\":<>\?]/, 'gi');
+      if (!re1.test(searchInput)) {
+        let re2 = new RegExp(searchInput, 'gi');
+        return item.title.match(re2);
+      }
+    };
+    const dataAlphabeticalFiltered = dataAlphabetical.filter(stringMatch);
+    if (dataAlphabeticalFiltered && dataAlphabeticalFiltered.length > 0) {
+      return dataAlphabeticalFiltered.map(item => (
+        <div
+          key={'alpha-' + item.value}
+          className="my-1"
+          style={{
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
+            overflow: 'hidden'
+          }}>
+          <input
+            title="Select phenotype"
+            style={{ cursor: 'pointer' }}
+            className={'ml-0 leaf-checkbox-' + item.value}
+            name={'leaf-checkbox-' + item.value}
+            type="checkbox"
+            checked={
+              (singleSelect && value && value.value === item.value) ||
+              (!singleSelect &&
+                value.map(item => item.value).includes(item.value))
+            }
+            onChange={e => handleSelect(item)}
+          />
+
+          <button
+            title={item.title}
+            className="ml-2"
+            style={{
+              all: 'unset',
+              cursor: 'pointer',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
+              overflow: 'hidden'
+            }}
+            onClick={e => handleSelect(item)}>
+            {/* {item.title.replace(searchInput, '[' + searchInput + ']')} */}
+            {item.title.slice(
+              0,
+              item.title.toLowerCase().indexOf(searchInput.toLowerCase())
+            )}
+            <b>
+              {item.title.slice(
+                item.title.toLowerCase().indexOf(searchInput.toLowerCase()),
+                item.title.toLowerCase().indexOf(searchInput.toLowerCase()) +
+                  searchInput.length
+              )}
+            </b>
+            {item.title.slice(
+              item.title.toLowerCase().indexOf(searchInput.toLowerCase()) +
+                searchInput.length,
+              item.title.length
+            )}
+          </button>
+        </div>
+      ));
+    } else {
+      return <div className="p-2">No phenotypes found.</div>;
+    }
+  };
+
+  const selectAll = () => {
+    if (checkAllLeafsSelected()) {
+      onChange([]);
+    } else {
+      const allLeafs = [];
+      data.map(item => allLeafs.push(getAllLeafs(item)));
+      onChange(allLeafs.flat());
+    }
+  };
+
+  const checkAllLeafsSelected = () => {
+    let allLeafs = [];
+    data.map(item => allLeafs.push(getAllLeafs(item)));
+    allLeafs = allLeafs.flat().map(item => item.value);
+    for (var i = 0; i < allLeafs.length; i++) {
+      if (value.map(item => item.value).indexOf(allLeafs[i]) === -1)
+        return false;
+    }
+    return true;
+  };
 
   return (
     <>
@@ -299,33 +550,41 @@ export function TreeSelectCustom({ onChange, data, value, singleSelect }) {
           fontSize: '10pt'
         }}>
         <div className="bg-secondary border-bottom d-flex align-items-center py-1">
-          <button
-            title="Show/hide all children"
-            style={{ all: 'unset' }}
-            className="ml-1 collapse-button text-secondary"
-            // onClick={e => toggleHideChildren(item.value)}
-          >
-            <FontAwesomeIcon icon={faPlusSquare} size="1x" />
-          </button>
+          {listType === 'categorical' && (
+            <>
+              <button
+                title={expandAll ? "Hide all phenotypes" : "Show all phenotypes"}
+                style={{ all: 'unset' }}
+                className="ml-1 collapse-button-all text-secondary"
+                onClick={e => toggleExpandAllParents()}>
+                {expandAll && (
+                  <FontAwesomeIcon icon={faMinusSquare} size="1x" />
+                )}
+                {!expandAll && (
+                  <FontAwesomeIcon icon={faPlusSquare} size="1x" />
+                )}
+              </button>
 
-          <div
-            className="mx-1"
-            style={{
-              display: 'inline-block',
-              borderLeft: '1px solid #c7cbcf',
-              height: '25px'
-            }}
-          />
+              <div
+                className="mx-1"
+                style={{
+                  display: 'inline-block',
+                  borderLeft: '1px solid #c7cbcf',
+                  height: '25px'
+                }}
+              />
+            </>
+          )}
 
           <input
-            title={singleSelect ? 'Cannot select all phenotypes' : 'Select all'}
+            title={singleSelect ? 'Only one phenotype can be selected' : 'Select/deselect all'}
             style={{ cursor: singleSelect ? 'not-allowed' : 'pointer' }}
-            className=""
+            className={listType === 'alphabetical' ? 'ml-1' : ''}
             name=""
-            type={singleSelect ? 'radio' : 'checkbox'}
+            type="checkbox"
             disabled={singleSelect ? true : false}
-            // checked={e => isChecked(e)}
-            // onChange={e => handleSelect(item)}
+            checked={!singleSelect && checkAllLeafsSelected()}
+            onChange={e => !singleSelect && selectAll()}
           />
 
           <div
@@ -346,14 +605,22 @@ export function TreeSelectCustom({ onChange, data, value, singleSelect }) {
               value={searchInput}
               onChange={e => {
                 setSearchInput(e.target.value);
-                // console.log(searchInput);
-                // console.log(e.target.value);
+                if (e.target.value && e.target.value.length > 0) {
+                  setListType('alphabetical');
+                } else {
+                  setListType('categorical');
+                }
               }}
               type="text"
             />
             <div className="input-group-append">
               {searchInput.length > 0 ? (
-                <button className="input-group-text bg-white">
+                <button
+                  className="input-group-text bg-white"
+                  onClick={e => {
+                    setSearchInput('');
+                    setListType('categorical');
+                  }}>
                   <FontAwesomeIcon icon={faTimes} size="xs" />
                 </button>
               ) : (
@@ -376,18 +643,16 @@ export function TreeSelectCustom({ onChange, data, value, singleSelect }) {
             maxHeight: '450px',
             fontSize: '10pt'
           }}>
-          {selectTree(data)}
+          <span
+            style={{ display: listType === 'categorical' ? 'block' : 'none' }}>
+            {selectTreeCategorical(data)}
+          </span>
+          <span
+            style={{ display: listType === 'categorical' ? 'none' : 'block' }}>
+            {selectTreeAlphabetical(dataAlphabetical)}
+          </span>
         </ul>
       </div>
-      {/* <br></br>
-            <div className="border border-dark">
-                SHOW LIST OF SELECTED PHENOTYPES HERE
-                <ul className="pl-0" style={{listStyleType: 'none'}}>
-                    {
-                        selectedTree(props.value)
-                    }  
-                </ul>
-            </div> */}
     </>
   );
 }

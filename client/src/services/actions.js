@@ -5,10 +5,15 @@ export const UPDATE_SUMMARY_TABLE = 'UPDATE_SUMMARY_TABLE';
 export const UPDATE_VARIANT_LOOKUP = 'UPDATE_VARIANT_LOOKUP';
 export const UPDATE_PHENOTYPE_CORRELATIONS = 'UPDATE_PHENOTYPE_CORRELATIONS';
 export const UPDATE_PHENOTYPES = 'UPDATE_PHENOTYPES';
+export const UPDATE_PHENOTYPE_CATEGORIES = 'UPDATE_PHENOTYPE_CATEGORIES';
 export const UPDATE_PHENOTYPES_TREE = 'UPDATE_PHENOTYPES_TREE';
 
 export function updatePhenotypes(data) {
   return { type: UPDATE_PHENOTYPES, data };
+}
+
+export function updatePhenotypeCategories(data) {
+  return { type: UPDATE_PHENOTYPE_CATEGORIES, data };
 }
 
 export function updatePhenotypesTree(data) {
@@ -852,13 +857,26 @@ export function lookupVariants(phenotypes, variant) {
     );
 
     var tableList = [];
+    var tableListNull = [];
     for (let i = 0; i < phenotypes.length; i++) {
-      const { data } = await query('variants', {
-        database: phenotypes[i].value + '.db',
-        snp: variant
-      });
+      if (variant.substring(0,2).toLowerCase() === "rs") {
+        var { data } = await query('variants', {
+          database: phenotypes[i].value + '.db',
+          snp: variant
+        });
+      } else {
+        variant = variant.toLowerCase().replace("chr", "");
+        let [chr, bp] = variant.split(":");
+        console.log("chr", chr, "bp", bp);
+        var { data2 } = await query('variants', {
+          database: phenotypes[i].value + '.db',
+          chr,
+          bp
+        });
+        console.log("data2", data2);
+      }
       if (!data || data.length === 0) {
-        tableList.push({
+        tableListNull.push({
           phenotype: phenotypes[i].title
             ? phenotypes[i].title
             : phenotypes[i].label,
@@ -879,10 +897,14 @@ export function lookupVariants(phenotypes, variant) {
         }
       }
     }
+    const numResults = tableList.length;
+    tableList = tableList.concat(tableListNull);
+    console.log('tableList', tableList);
     dispatch(
       updateVariantLookup({
         loading: false,
-        results: tableList
+        results: tableList,
+        numResults
       })
     );
   };
