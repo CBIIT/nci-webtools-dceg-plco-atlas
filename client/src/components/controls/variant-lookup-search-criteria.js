@@ -1,15 +1,21 @@
 import React, { useState } from 'react';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { updateVariantLookup } from '../../services/actions';
 import { Tab, Tabs, Button } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCaretRight, faCaretDown } from '@fortawesome/free-solid-svg-icons';
 
 export const VariantLookupSearchCriteria = props => {
-  const { searchCriteriaVariantLookup } = useSelector(
-    state => state.variantLookup
-  );
+  const dispatch = useDispatch();
+  const { 
+    searchCriteriaVariantLookup, 
+    numResults,
+    collapseCriteria
+  } = useSelector(state => state.variantLookup);
 
-  const [collapseCriteria, setCollapseCriteria] = useState(true);
+  const setCollapseCriteria = collapseCriteria => {
+    dispatch(updateVariantLookup({ collapseCriteria }));
+  };
 
   const toggleCollapseCriteria = () => {
     if (collapseCriteria) {
@@ -30,6 +36,7 @@ export const VariantLookupSearchCriteria = props => {
   const displayGender = gender =>
     ({
       all: 'All',
+      combined: 'All',
       stacked: 'Female/Male (Stacked)',
       female: 'Female',
       male: 'Male'
@@ -61,7 +68,11 @@ export const VariantLookupSearchCriteria = props => {
                 </Button>
               </span>
               <span>
-                <b>Phenotype(s)</b>:
+                <b>Phenotypes(</b>
+                {searchCriteriaVariantLookup.phenotypes
+                  ? searchCriteriaVariantLookup.phenotypes.length
+                  : 0}
+                <b>)</b>:
               </span>
             </div>
             <div
@@ -71,7 +82,7 @@ export const VariantLookupSearchCriteria = props => {
                 <>
                   <span>
                     {searchCriteriaVariantLookup &&
-                    searchCriteriaVariantLookup.phenotypes
+                    searchCriteriaVariantLookup.phenotypes && searchCriteriaVariantLookup.phenotypes.length >= 1
                       ? searchCriteriaVariantLookup.phenotypes[0]
                       : 'None'}
                   </span>
@@ -88,26 +99,27 @@ export const VariantLookupSearchCriteria = props => {
                       style={{
                         all: 'unset',
                         textDecoration: 'underline',
-                        cursor: 'pointer',
-                        color: '#008CBA'
+                        cursor: 'pointer'
                       }}
                       title="Expand/collapse search criteria panel"
                       onClick={e => toggleCollapseCriteria()}
                       aria-controls="search-criteria-collapse-panel"
                       aria-expanded={!collapseCriteria}>
-                      {searchCriteriaVariantLookup &&
-                      searchCriteriaVariantLookup.phenotypes &&
-                      searchCriteriaVariantLookup.phenotypes.length > 1
-                        ? searchCriteriaVariantLookup.phenotypes.length -
-                          1 +
-                          ` other${
-                            searchCriteriaVariantLookup.phenotypes.length -
-                              1 ===
-                            1
-                              ? ''
-                              : 's'
-                          }`
-                        : ''}
+                      <span style={{ color: '#008CBA' }}>
+                        {searchCriteriaVariantLookup &&
+                        searchCriteriaVariantLookup.phenotypes &&
+                        searchCriteriaVariantLookup.phenotypes.length > 1
+                          ? searchCriteriaVariantLookup.phenotypes.length -
+                            1 +
+                            ` other${
+                              searchCriteriaVariantLookup.phenotypes.length -
+                                1 ===
+                              1
+                                ? ''
+                                : 's'
+                            }`
+                          : ''}
+                      </span>
                     </button>
                   </span>
                 </>
@@ -143,11 +155,8 @@ export const VariantLookupSearchCriteria = props => {
           </div>
 
           <div className="right py-1">
-            <span>Total Phenotypes: </span>
-            {searchCriteriaVariantLookup &&
-            searchCriteriaVariantLookup.totalPhenotypes
-              ? searchCriteriaVariantLookup.totalPhenotypes
-              : 'None'}
+            <span>Total Results: </span>
+            {searchCriteriaVariantLookup && numResults ? numResults : 'None'}
           </div>
         </Tab>
       </Tabs>

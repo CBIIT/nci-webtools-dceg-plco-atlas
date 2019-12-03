@@ -5,6 +5,7 @@ import ReduxThunk from 'redux-thunk';
 
 const initialState = {
   phenotypes: [],
+  phenotypeCategories: [],
   phenotypesTree: [],
   summaryResults: {
     selectedListType: 'categorical',
@@ -65,7 +66,9 @@ const initialState = {
     messages: [],
     loading: false,
     submitted: null,
-    searchCriteriaVariantLookup: {}
+    searchCriteriaVariantLookup: {},
+    numResults: null,
+    collapseCriteria: true
   },
   phenotypeCorrelations: {
     selectedListType: 'categorical',
@@ -77,7 +80,8 @@ const initialState = {
     loading: false,
     submitted: null,
     messages: [],
-    searchCriteriaPhenotypeCorrelations: {}
+    searchCriteriaPhenotypeCorrelations: {},
+    collapseCriteria: true
     // tooltipData: null
   }
 };
