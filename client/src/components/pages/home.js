@@ -123,7 +123,7 @@ export function Home({ links }) {
                       className="my-2 border border-0"
                       style={{
                         backgroundColor: '#2CC799',
-                        borderRadius: '10px',
+                        // borderRadius: '10px',
                         width: '90%'
                       }}>
                       <Link
