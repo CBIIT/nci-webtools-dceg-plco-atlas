@@ -27,7 +27,6 @@ export function VariantLookup() {
     messages,
     loading,
     submitted,
-    numResults
   } = variantLookup;
 
   const { ExportCSVButton } = CSVExport;
@@ -84,7 +83,13 @@ export function VariantLookup() {
     {
       dataField: 'p',
       text: 'P-value',
-      sort: true
+      sort: true,
+      // sortFunc: (a, b, order, dataField, rowA, rowB) => {
+      //   if (order === 'asc') {
+      //     return a - b;
+      //   }
+      //   return b - a; // desc
+      // }
     }
   ];
   // add filter to column headers
@@ -95,8 +100,8 @@ export function VariantLookup() {
 
   const placeholder = (
     <div style={{ display: submitted ? 'none' : 'block' }}>
-      <p className="h4 text-center my-5">
-        Please select phenotype(s) and input variant to view this table.
+      <p className="h4 text-center text-secondary my-5">
+        Please select phenotype(s) and input variant to view this table
       </p>
     </div>
   );
@@ -201,7 +206,8 @@ export function VariantLookup() {
         loading: false,
         submitted: null,
         searchCriteriaVariantLookup: {},
-        numResults: null
+        numResults: null,
+        collapseCriteria: true
       })
     );
   };
@@ -239,13 +245,14 @@ export function VariantLookup() {
             </Tabs>
           )}
           <Button
-            title="Show/hide search panel"
+            className="pt-0 border-0"
+            title={openSidebar ? "Hide search panel" : "Show search panel"}
             variant="link"
             style={{
               color: '#008CBA',
               position: 'absolute',
               zIndex: 100,
-              top: '7px',
+              top: '0px',
               [openSidebar ? 'right' : 'left']: '-15px'
             }}
             onClick={() => setOpenSidebar(!openSidebar)}

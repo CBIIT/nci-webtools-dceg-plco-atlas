@@ -72,12 +72,13 @@ export function Gwas() {
                   {/* <NavItem className="mr-2"> */}
                   <NavLink
                     key={pathId}
-                    className="text-secondary px-3 py-1 d-inline-block"
-                    activeClassName="active-secondary-navlinks border-bottom text-secondary"
+                    className="secondary-navlinks px-3 py-1 d-inline-block"
+                    activeClassName="active-secondary-navlinks"
                     style={{
                       textDecoration: 'none',
-                      fontSize: '11pt'
-                      // fontWeight: '300'
+                      fontSize: '11pt',
+                      color: 'black',
+                      fontWeight: '500'
                     }}
                     exact={true}
                     to={`/gwas/${pathId}`}>
