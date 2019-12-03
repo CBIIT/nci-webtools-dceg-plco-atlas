@@ -211,3 +211,15 @@ export function removeChildren(element) {
     element.removeChild(child);
   }
 }
+
+/**
+ * Promisifies the canvasToBlob method
+ * @param {*} canvas
+ * @param {*} mimeType
+ * @param {*} qualityArgument
+ */
+export function canvasToBlob(canvas, mimeType, qualityArgument) {
+  return new Promise((resolve, reject) => {
+    canvas.toBlob(resolve, mimeType, qualityArgument);
+  })
+}
