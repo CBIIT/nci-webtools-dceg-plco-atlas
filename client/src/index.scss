@@ -122,6 +122,15 @@ $enable-shadows: true;
   color: black !important;
 }
 
+.nav-tabs .nav-link.active:after {
+  content: "";
+  display: block;
+  padding-top: 2px;
+  width: 50%;
+  border-bottom: 2px solid #2cc799;
+  margin-bottom: -4px;
+}
+
 .nav-tabs {
   margin-bottom: -1px;
   border: 0;
@@ -269,6 +278,7 @@ h1 {
 .active-secondary-navlinks {
   border-color: #2cc799 !important;
   border-width: 2px !important;
+  color: 'black';
 }
 
 ._loading_overlay_wrapper {
