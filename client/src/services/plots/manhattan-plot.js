@@ -1,4 +1,7 @@
+import * as saveAs from 'file-saver';
+import * as clone from 'lodash.clonedeep';
 import {
+  canvasToBlob,
   debounce,
   extent,
   getCanvasAndContext,
@@ -6,7 +9,8 @@ import {
   rgbToColor,
   setStyles,
   viewportToLocalCoordinates,
-  ensureNonStaticPositioning
+  ensureNonStaticPositioning,
+  min, max
 } from './utils.js';
 import { measureWidth, renderText, systemFont } from './text.js';
 import { getScale, getTicks } from './scale.js';
@@ -17,7 +21,7 @@ import { createTooltip, showTooltip, hideTooltip } from './tooltip.js';
 
 export class ManhattanPlot {
   defaultConfig = {
-    manhattanPlotHeight: 600,
+    manhattanPlotMaxHeight: 600,
     margins: {
       top: 30,
       right: 60,
@@ -100,7 +104,13 @@ export class ManhattanPlot {
       container: { clientHeight: canvasHeight }
     } = this;
     const { data, data2, mirrored } = config;
-    canvasHeight = Math.min(this.defaultConfig.manhattanPlotHeight, 600);
+    canvasHeight = config.export ? max([
+      canvasHeight,
+      this.defaultConfig.manhattanPlotMaxHeight
+    ]) : min([
+      canvasHeight,
+      this.defaultConfig.manhattanPlotMaxHeight
+    ]);
 
     // determine default top, right, bottom, and left margins
     const margins = (config.margins = {
@@ -250,11 +260,62 @@ export class ManhattanPlot {
   clearGenes() {
     let { config, geneCanvas, geneCtx } = this;
     geneCanvas.height = 0;
+    this.genes = null;
+  }
+
+  async exportPng(height, width) {
+    let container = document.createElement('div');
+    let config = clone(this.config);
+    config.manhattanPlotMaxHeight = height;
+    config.height = height;
+    config.point.size = Math.floor(Math.log10(width * height) - 2);
+    config.export = true;
+
+    setStyles(container, {
+      width: `${width}px`,
+      height: `${height}px`,
+      position: 'fixed',
+      left: 0,
+      bottom: 0,
+      cursorEvents: 'none',
+      visibility: 'hidden',
+    });
+    window.document.body.appendChild(container);
+
+    let plot = new ManhattanPlot(container, config);
+    plot.drawGenes();
+    window.document.body.removeChild(container);
+
+    let exportCanvas = document.createElement('canvas');
+    let exportCtx = exportCanvas.getContext('2d');
+
+    exportCanvas.width = plot.canvas.width;
+    exportCanvas.height = plot.canvas.height + plot.geneCanvas.height;
+
+    exportCtx.drawImage(plot.canvas, 0, 0);
+    if (plot.geneCanvas.height) {
+      exportCtx.drawImage(plot.geneCanvas, config.margins.left, plot.canvas.height);
+    }
+
+    let canvasData = await canvasToBlob(exportCanvas, 'image/png');
+    saveAs(canvasData, 'export.png');
+    // window.document.body.appendChild(container);
+    console.log(plot);
   }
 
   drawGenes(genes) {
     let { config, geneCanvas, geneCtx } = this;
     let { margins, xAxis } = config;
+
+    if (genes) {
+      config.genes = genes
+    }
+
+    else if (config.genes) {
+      genes = config.genes;
+    }
+
+    if (!genes) return;
 
     setStyles(this.geneCanvasContainer, {
       left: margins.left + 'px',
@@ -264,7 +325,7 @@ export class ManhattanPlot {
     });
 
     let getName = gene =>
-      gene.strand === '+' ? `${gene.name} →` : `← ${gene.name}`;
+      gene.strand === '+' ? `${gene.name} 🡪` : `🡨 ${gene.name}`;
 
     let labelPadding = 5;
     let labelHeight = 10;
@@ -381,18 +442,6 @@ export class ManhattanPlot {
 
       geneCtx.restore();
     });
-
-    /*
-    geneCtx.strokeStyle = '#ccc';
-    geneCtx.clearRect(0, 0, margins.left, geneCanvas.height);
-    geneCtx.clearRect(geneCanvas.width - margins.right, 0, margins.right, geneCanvas.height);
-    geneCtx.strokeRect(
-      margins.left,
-      0,
-      geneCanvas.width - margins.right - margins.left,
-      geneCanvas.height,
-    )
-    */
   }
 
   drawLine(line) {
