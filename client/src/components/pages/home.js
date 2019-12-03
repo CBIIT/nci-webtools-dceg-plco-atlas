@@ -90,7 +90,7 @@ export function Home({ links }) {
                     justifyContent: 'center',
                     alignItems: 'center',
                     border: '1px solid #DADBE6',
-                    borderRadius: '10px'
+                    // borderRadius: '10px'
                   }}>
                   <Link
                     className="stretched-link"
@@ -118,7 +118,7 @@ export function Home({ links }) {
                       </small>
                     </Card.Text>
                   </Card.Body>
-                  <Card.Footer className="bg-egg" style={{ width: '100%' }}>
+                  <Card.Footer className="bg-white border-top-0" style={{ width: '100%' }}>
                     <Button
                       className="my-2 border border-0"
                       style={{
