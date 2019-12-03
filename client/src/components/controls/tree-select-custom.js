@@ -577,7 +577,7 @@ export function TreeSelectCustom({
           )}
 
           <input
-            title={singleSelect ? 'Cannot select all phenotypes' : 'Select all'}
+            title={singleSelect ? 'Only one phenotype can be selected' : 'Select all'}
             style={{ cursor: singleSelect ? 'not-allowed' : 'pointer' }}
             className={listType === 'alphabetical' ? 'ml-1' : ''}
             name=""
