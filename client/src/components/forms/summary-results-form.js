@@ -33,56 +33,53 @@ export function SummaryResultsForm({ onChange, onSubmit, onReset }) {
   );
 
   return (
-    <> 
-      <div className="mb-2">
-        <b>Phenotypes</b>
-        <span style={{ color: 'red' }}>*</span>
-        <TreeSelectCustom
-          data={phenotypesTree}
-          dataAlphabetical={alphabetizedPhenotypes}
-          dataCategories={phenotypeCategories}
-          value={selectedPhenotype}
-          onChange={handleChangeCustom}
-          singleSelect={true}
-        />
-      </div>
-      
+    <>
+      <b>Phenotypes</b>
+      <span style={{ color: 'red' }}>*</span>
+      <TreeSelectCustom
+        data={phenotypesTree}
+        dataAlphabetical={alphabetizedPhenotypes}
+        dataCategories={phenotypeCategories}
+        value={selectedPhenotype}
+        onChange={handleChangeCustom}
+        singleSelect={true}
+      />
 
-      <div className="mb-3">
-        <b>Gender</b>
-        <select
-          className="form-control"
-          value={selectedManhattanPlotType}
-          onChange={e => setSelectedManhattanPlotType(e.target.value)}
-          aria-label="Select the type of data you wish to plot">
-          <option value="all">All</option>
-          <option value="stacked">Female/Male (Stacked)</option>
-          <option value="female">Female</option>
-          <option value="male">Male</option>
-        </select>
-      </div>
+      <br></br>
 
-      <div>
-        <Button
-          className=""
-          variant="silver"
-          onClick={e => {
-            e.preventDefault();
-            onSubmit(selectedPhenotype, selectedManhattanPlotType);
-          }}>
-          Submit
-        </Button>
+      <b>Gender</b>
+      <select
+        className="form-control"
+        value={selectedManhattanPlotType}
+        onChange={e => setSelectedManhattanPlotType(e.target.value)}
+        aria-label="Select the type of data you wish to plot">
+        <option value="all">All</option>
+        <option value="stacked">Female/Male (Stacked)</option>
+        <option value="female">Female</option>
+        <option value="male">Male</option>
+      </select>
 
-        <Button
-          className="ml-2"
-          variant="silver"
-          onClick={e => {
-            e.preventDefault();
-            onReset(e);
-          }}>
-          Reset
-        </Button>
-      </div>
+      <br></br>
+
+      <Button
+        className=""
+        variant="silver"
+        onClick={e => {
+          e.preventDefault();
+          onSubmit(selectedPhenotype, selectedManhattanPlotType);
+        }}>
+        Submit
+      </Button>
+
+      <Button
+        className="ml-2"
+        variant="silver"
+        onClick={e => {
+          e.preventDefault();
+          onReset(e);
+        }}>
+        Reset
+      </Button>
     </>
   );
 }

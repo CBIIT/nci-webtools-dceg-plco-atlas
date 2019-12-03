@@ -33,73 +33,71 @@ export function VariantLookupForm({ onChange, onSubmit, onReset }) {
   };
 
   return (
-    <> 
-      <div className="mb-2">
-        <b>Phenotypes</b>
-        <span style={{ color: 'red' }}>*</span>
-        <TreeSelectCustom
-          data={phenotypesTree}
-          dataAlphabetical={alphabetizedPhenotypes}
-          dataCategories={phenotypeCategories}
-          value={selectedPhenotypes}
-          onChange={handleChangeCustom}
-        />
-      </div>
+    <>
+      <b>Phenotypes</b>
+      <span style={{ color: 'red' }}>*</span>
+      <TreeSelectCustom
+        data={phenotypesTree}
+        dataAlphabetical={alphabetizedPhenotypes}
+        dataCategories={phenotypeCategories}
+        value={selectedPhenotypes}
+        onChange={handleChangeCustom}
+      />
 
-      <div className="mb-2">
-        <b>Variant</b>
-        <span style={{ color: 'red' }}>*</span>
-        <input
-          className="form-control"
-          // style={{ width: '470px' }}
-          placeholder="Enter RS Number or Coordinate"
-          aria-label="Variant (required)"
-          value={selectedVariant}
-          onChange={e => {
-            setSelectedVariant(e.target.value);
-            onChange(e.target.value);
-          }}
-          type="text"
-          required
-        />
-      </div>
+      <br></br>
 
-      <div className="mb-3">
-        <b>Gender</b>
-        <select
-          className="form-control"
-          value={selectedGender}
-          onChange={e => setSelectedGender(e.target.value)}>
-          <option value="combined">All</option>
-          <option value="female">Female</option>
-          <option value="male">Male</option>
-        </select>
-      </div>
+      <b>Variant</b>
+      <span style={{ color: 'red' }}>*</span>
+      <input
+        className="form-control"
+        // style={{ width: '470px' }}
+        placeholder="Enter RS Number or Coordinate"
+        aria-label="Variant (required)"
+        value={selectedVariant}
+        onChange={e => {
+          setSelectedVariant(e.target.value);
+          onChange(e.target.value);
+        }}
+        type="text"
+        required
+      />
 
-      <div>
-        <Button
-          className=""
-          style={{ maxHeight: '38px' }}
-          variant="silver"
-          // disabled={!canSubmit}
-          onClick={e => {
-            e.preventDefault();
-            onSubmit({ selectedPhenotypes, selectedVariant });
-          }}>
-          Submit
-        </Button>
+      <br></br>
 
-        <Button
-          className="ml-2"
-          style={{ maxHeight: '38px' }}
-          variant="silver"
-          onClick={e => {
-            e.preventDefault();
-            onReset(e);
-          }}>
-          Reset
-        </Button>
-      </div>
+      <b>Gender</b>
+      <select
+        className="form-control"
+        value={selectedGender}
+        onChange={e => setSelectedGender(e.target.value)}>
+        <option value="combined">All</option>
+        <option value="female">Female</option>
+        <option value="male">Male</option>
+      </select>
+
+      <br></br>
+
+      <Button
+        className=""
+        style={{ maxHeight: '38px' }}
+        variant="silver"
+        // disabled={!canSubmit}
+        onClick={e => {
+          e.preventDefault();
+          onSubmit({ selectedPhenotypes, selectedVariant });
+        }}>
+        Submit
+      </Button>
+
+      <Button
+        className="ml-2"
+        style={{ maxHeight: '38px' }}
+        variant="silver"
+        onClick={e => {
+          e.preventDefault();
+          onReset(e);
+        }}>
+        Reset
+      </Button>
     </>
   );
 }
