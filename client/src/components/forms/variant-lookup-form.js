@@ -32,6 +32,12 @@ export function VariantLookupForm({ onChange, onSubmit, onReset }) {
     setSelectedPhenotypes(items);
   };
 
+  const handleKeyPress = e => {
+    if(e.key ==='Enter') {
+      onSubmit({ selectedPhenotypes, selectedVariant });
+    }
+  };
+
   return (
     <> 
       <div className="mb-2">
@@ -51,7 +57,6 @@ export function VariantLookupForm({ onChange, onSubmit, onReset }) {
         <span style={{ color: 'red' }}>*</span>
         <input
           className="form-control"
-          // style={{ width: '470px' }}
           placeholder="Enter RS Number or Coordinate"
           aria-label="Variant (required)"
           value={selectedVariant}
@@ -59,6 +64,7 @@ export function VariantLookupForm({ onChange, onSubmit, onReset }) {
             setSelectedVariant(e.target.value);
             onChange(e.target.value);
           }}
+          onKeyPress={e => handleKeyPress(e)}
           type="text"
           required
         />
