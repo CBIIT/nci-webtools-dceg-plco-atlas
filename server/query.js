@@ -80,18 +80,22 @@ function getSummary(filepath, params) {
  *   - id (variant id)
  *   - snp
  *   - chr
+ *   - bp
  *   - bpMin
  *   - bpMax
+ *   - nlog_p
  *   - nlogpMin
  *   - nlogpMax
  *   - pMin
  *   - pMax
+ *   - p
  *   - mod
  *   - order
  *   - orderBy
  *   - limit
  *   - offset
  *   - count
+ *   - plot_qq
  * @param {*} filepath
  * @param {*} params
  */
@@ -137,6 +141,7 @@ function getVariants(filepath, params) {
             coalesce(params.id, `variant_id = :id`),
             coalesce(params.snp, `snp = :snp`),
             coalesce(params.chr, `chr = :chr`),
+            coalesce(params.bp, `bp = :bp`),
             coalesce(params.bpMin, `bp >= :bpMin`),
             coalesce(params.bpMax, `bp <= :bpMax`),
             coalesce(params.nlogpMin, `nlog_p >= :nlogpMin`),
