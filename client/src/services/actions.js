@@ -126,23 +126,15 @@ export function drawQQPlot(phenotype, variantTable) {
     const setQQPlotLayout = qqplotLayout => {
       dispatch(updateSummaryResults({ qqplotLayout }));
     };
-    const setQQPlotStacked = qqplotStacked => {
-      dispatch(updateSummaryResults({ qqplotStacked }));
-    };
     const setSampleSize = sampleSize => {
       dispatch(updateSummaryResults({ sampleSize }));
     };
     setQQPlotLoading(true);
     setQQPlotLayout({});
     setQQPlotData([]);
-    setQQPlotStacked(false);
     setSampleSize(null);
 
     const table = variantTable.length === 1 ? variantTable[0] : 'stacked';
-
-    if (table === 'stacked') {
-      setQQPlotStacked(true);
-    }
 
     const metadata = await query('metadata', {
       database: phenotype + '.db'
@@ -219,9 +211,8 @@ export function drawQQPlot(phenotype, variantTable) {
         'subsetObservedVariants.length',
         subsetObservedVariants.length
       );
-
-      const subsetMarkerColor = '#002a47';
-      const topMarkerColor = '#006bb8';
+      
+      const markerColor = table !== 'variant_female' ? '#006bb8' : '#e47618';
 
       let qqplotTopData = {
         x: topExpectedVariants,
@@ -236,11 +227,11 @@ export function drawQQPlot(phenotype, variantTable) {
         mode: 'markers',
         type: 'scattergl',
         marker: {
-          color: topMarkerColor,
+          color: markerColor,
           size: 8,
           opacity: 0.65
         },
-        showlegend: false
+        // showlegend: false
       };
 
       let qqplotSubsetData = {
@@ -250,11 +241,11 @@ export function drawQQPlot(phenotype, variantTable) {
         mode: 'markers',
         type: 'scattergl',
         marker: {
-          color: subsetMarkerColor,
+          color: markerColor,
           size: 8
           // opacity: 0.65
         },
-        showlegend: false
+        // showlegend: false
       };
 
       let qqplotLineData = {
@@ -268,7 +259,7 @@ export function drawQQPlot(phenotype, variantTable) {
           width: 1
         },
         opacity: 0.5,
-        showlegend: false
+        // showlegend: false
       };
 
       let qqplotLayout = {
@@ -330,14 +321,16 @@ export function drawQQPlot(phenotype, variantTable) {
             size: 10,
             color: 'black'
           }
-        }
+        },
+        showlegend: false
       };
       setQQPlotLayout(qqplotLayout);
       setQQPlotData([qqplotTopData, qqplotSubsetData, qqplotLineData]);
     } else {
       const metadata_count_female = parseInt(metadata[countKey(table)[0]]);
       const metadata_count_male = parseInt(metadata[countKey(table)[1]]);
-      setSampleSize(metadata_count_female + metadata_count_male);
+      // set sampleSize to whichever gender has more variants
+      setSampleSize(Math.max(metadata_count_female, metadata_count_male));
       const metadata_lambdaGC_female = metadata[lambdaGCKey(table)[0]]
         ? metadata[lambdaGCKey(table)[0]]
         : 'TBD';
@@ -447,14 +440,15 @@ export function drawQQPlot(phenotype, variantTable) {
         subsetObservedVariantsMale.length
       );
 
-      const subsetMarkerColorFemale = '#b55117';
-      const topMarkerColorFemale = '#e47618';
-      const subsetMarkerColorMale = '#002a47';
-      const topMarkerColorMale = '#006bb8';
+      // const subsetMarkerColorFemale = '#b55117';
+      const markerColorFemale = '#e47618';
+      // const subsetMarkerColorMale = '#002a47';
+      const markerColorMale = '#006bb8';
 
       let qqplotTopDataFemale = {
         x: topExpectedVariantsFemale,
         y: topObservedVariantsFemale,
+        name: 'Female',
         text: topObservedVariantsTextFemale,
         hovertemplate:
           '<b>position:</b> %{text.chr}:%{text.bp}<br>' +
@@ -465,7 +459,7 @@ export function drawQQPlot(phenotype, variantTable) {
         mode: 'markers',
         type: 'scattergl',
         marker: {
-          color: topMarkerColorFemale,
+          color: markerColorFemale,
           size: 8,
           opacity: 0.65
         },
@@ -475,15 +469,16 @@ export function drawQQPlot(phenotype, variantTable) {
       let qqplotSubsetDataFemale = {
         x: subsetExpectedVariantsFemale,
         y: subsetObservedVariantsFemale,
+        name: 'Female',
         hoverinfo: 'none',
         mode: 'markers',
         type: 'scattergl',
         marker: {
-          color: subsetMarkerColorFemale,
+          color: markerColorFemale,
           size: 8
           // opacity: 0.65
         },
-        showlegend: false
+        // showlegend: false
       };
 
       let qqplotLineDataFemale = {
@@ -503,6 +498,7 @@ export function drawQQPlot(phenotype, variantTable) {
       let qqplotTopDataMale = {
         x: topExpectedVariantsMale,
         y: topObservedVariantsMale,
+        name: 'Male',
         text: topObservedVariantsTextMale,
         hovertemplate:
           '<b>position:</b> %{text.chr}:%{text.bp}<br>' +
@@ -513,7 +509,7 @@ export function drawQQPlot(phenotype, variantTable) {
         mode: 'markers',
         type: 'scattergl',
         marker: {
-          color: topMarkerColorMale,
+          color: markerColorMale,
           size: 8,
           opacity: 0.65
         },
@@ -523,15 +519,16 @@ export function drawQQPlot(phenotype, variantTable) {
       let qqplotSubsetDataMale = {
         x: subsetExpectedVariantsMale,
         y: subsetObservedVariantsMale,
+        name: 'Male',
         hoverinfo: 'none',
         mode: 'markers',
         type: 'scattergl',
         marker: {
-          color: subsetMarkerColorMale,
+          color: markerColorMale,
           size: 8
           // opacity: 0.65
         },
-        showlegend: false
+        // showlegend: false
       };
 
       let qqplotLineDataMale = {
@@ -548,7 +545,7 @@ export function drawQQPlot(phenotype, variantTable) {
         showlegend: false
       };
 
-      let qqplotLayoutFemale = {
+      let qqplotLayout = {
         dragmode: 'pan',
         clickmode: 'event',
         hovermode: 'closest',
@@ -559,65 +556,8 @@ export function drawQQPlot(phenotype, variantTable) {
             '<b>Female \u03BB</b> = ' +
             metadata_lambdaGC_female +
             '        <b>Female Sample Size</b> = ' +
-            metadata_count_female.toLocaleString(),
-          font: {
-            family: 'Arial',
-            size: 14,
-            color: 'black'
-          }
-        },
-        xaxis: {
-          automargin: true,
-          rangemode: 'tozero', // only show positive
-          showgrid: false, // disable grid lines
-          fixedrange: true, // disable zoom
-          title: {
-            text: '<b>Expected -log<sub>10</sub>(p)</b>',
-            font: {
-              family: 'Arial',
-              size: 14,
-              color: 'black'
-            }
-          },
-          tick0: 0,
-          ticklen: 10,
-          tickfont: {
-            family: 'Arial',
-            size: 10,
-            color: 'black'
-          }
-        },
-        yaxis: {
-          automargin: true,
-          rangemode: 'tozero', // only show positive
-          showgrid: false, // disable grid lines
-          fixedrange: true, // disable zoom
-          title: {
-            text: '<b>Observed -log<sub>10</sub>(p)</b>',
-            font: {
-              family: 'Arial',
-              size: 14,
-              color: 'black'
-            }
-          },
-          tick0: 0,
-          ticklen: 10,
-          tickfont: {
-            family: 'Arial',
-            size: 10,
-            color: 'black'
-          }
-        }
-      };
-      let qqplotLayoutMale = {
-        dragmode: 'pan',
-        clickmode: 'event',
-        hovermode: 'closest',
-        width: 800,
-        height: 800,
-        title: {
-          text:
-            '<b>Male \u03BB</b> = ' +
+            metadata_count_female.toLocaleString() + 
+            '        <b>Male \u03BB</b> = ' +
             metadata_lambdaGC_male +
             '        <b>Male Sample Size</b> = ' +
             metadata_count_male.toLocaleString(),
@@ -668,12 +608,23 @@ export function drawQQPlot(phenotype, variantTable) {
             size: 10,
             color: 'black'
           }
+        },
+        showlegend: true,
+        legend: {
+          orientation: 'h',
+          itemclick: false,
+          itemdoubleclick: false
         }
       };
-      setQQPlotLayout([qqplotLayoutFemale, qqplotLayoutMale]);
+      
+      setQQPlotLayout(qqplotLayout);
       setQQPlotData([
-        [qqplotTopDataFemale, qqplotSubsetDataFemale, qqplotLineDataFemale],
-        [qqplotTopDataMale, qqplotSubsetDataMale, qqplotLineDataMale]
+        qqplotTopDataFemale, 
+        qqplotSubsetDataFemale, 
+        qqplotLineDataFemale, 
+        qqplotTopDataMale, 
+        qqplotSubsetDataMale, 
+        qqplotLineDataMale
       ]);
     }
 

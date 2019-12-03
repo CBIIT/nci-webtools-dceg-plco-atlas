@@ -342,12 +342,14 @@ export function SummaryResults() {
     });
   };
 
-  const handleVariantLookup = ({ snp }) => {
+  const handleVariantLookup = ({ snp }, gender) => {
+    console.log("gender", gender);
     dispatch(
       updateVariantLookup({
         selectedPhenotypes: [selectedPhenotype],
         selectedVariant: snp,
         selectedGender:
+          gender ? (gender === 'Male' ? 'male' : 'female') :
           selectedManhattanPlotType === 'male' ||
           selectedManhattanPlotType === 'female'
             ? selectedManhattanPlotType
@@ -356,6 +358,7 @@ export function SummaryResults() {
           phenotypes: [selectedPhenotype].map(item => item.title),
           variant: snp,
           gender:
+            gender ? (gender === 'Male' ? 'male' : 'female') :
             selectedManhattanPlotType === 'male' ||
             selectedManhattanPlotType === 'female'
               ? selectedManhattanPlotType
