@@ -1,6 +1,6 @@
 import React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { Button } from 'react-bootstrap';
+import { Button, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import { updateSummaryResults } from '../../services/actions';
 import { TreeSelectCustom } from '../controls/tree-select-custom';
 
@@ -63,19 +63,36 @@ export function SummaryResultsForm({ onChange, onSubmit, onReset }) {
       </div>
 
       <div>
-        <Button
-          className=""
-          variant="silver"
-          onClick={e => {
-            e.preventDefault();
-            onSubmit(selectedPhenotype, selectedManhattanPlotType);
-          }}>
-          Submit
-        </Button>
+        <OverlayTrigger overlay={
+            <Tooltip id="tooltip-disabled" 
+              style={{
+                display: 
+                  (!selectedPhenotype || selectedPhenotype.length < 1) 
+                  ? 'block' 
+                  : 'none'
+                }}>
+              Please select a phenotype.
+            </Tooltip>
+          }>
+          <span className="d-inline-block">
+            <Button
+              className=""
+              variant="silver"
+              style={{ maxHeight: '38px', pointerEvents: (!selectedPhenotype || selectedPhenotype.length < 2) ? 'none' : 'auto' }}
+              onClick={e => {
+                e.preventDefault();
+                onSubmit(selectedPhenotype, selectedManhattanPlotType);
+              }}
+              disabled={!selectedPhenotype || selectedPhenotype.length < 1}>
+              Submit
+            </Button>
+          </span>
+        </OverlayTrigger>
 
         <Button
           className="ml-2"
           variant="silver"
+          style={{ maxHeight: '38px' }}
           onClick={e => {
             e.preventDefault();
             onReset(e);

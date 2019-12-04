@@ -179,7 +179,7 @@ export function VariantLookup() {
       setMessages([
         {
           type: 'danger',
-          content: 'Please input a valid variant rsid or coordinate.'
+          content: "Please input a valid variant rsid or coordinate. (Ex. 'rs1234' or 'chr22:25855459')"
         }
       ]);
       return;
@@ -234,6 +234,7 @@ export function VariantLookup() {
                 {messages &&
                   messages.map(({ type, content }) => (
                     <Alert
+                      className="mt-3"
                       key={content}
                       variant={type}
                       onClose={clearMessages}

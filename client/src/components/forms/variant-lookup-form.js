@@ -1,6 +1,6 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Button } from 'react-bootstrap';
+import { Button, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import { updateVariantLookup } from '../../services/actions';
 import { TreeSelectCustom } from '../controls/tree-select-custom';
 
@@ -83,17 +83,60 @@ export function VariantLookupForm({ onChange, onSubmit, onReset }) {
       </div>
 
       <div>
-        <Button
-          className=""
-          style={{ maxHeight: '38px' }}
-          variant="silver"
-          // disabled={!canSubmit}
-          onClick={e => {
-            e.preventDefault();
-            onSubmit({ selectedPhenotypes, selectedVariant });
-          }}>
-          Submit
-        </Button>
+        <OverlayTrigger overlay={
+            <Tooltip id="tooltip-disabled" 
+              style={{
+                display: 
+                  (!selectedPhenotypes || selectedPhenotypes.length < 1) ||
+                  (!selectedVariant || selectedVariant.length < 1) 
+                  ? 'block' 
+                  : 'none'
+                }}>
+              {
+                (!selectedPhenotypes || selectedPhenotypes.length < 1) &&
+                (!selectedVariant || selectedVariant.length < 1) && (
+                  <>Please select one or more phenotypes and input a search variant.</>
+                )
+              }
+              {
+                (!selectedPhenotypes || selectedPhenotypes.length < 1) &&
+                (selectedVariant && selectedVariant.length > 0) && (
+                  <>Please select one or more phenotypes.</>
+                )
+              }
+              {
+                (selectedPhenotypes && selectedPhenotypes.length > 1) &&
+                (!selectedVariant || selectedVariant.length < 1) && (
+                  <>Please input a search variant.</>
+                )
+              }
+            </Tooltip>
+          }>
+          <span className="d-inline-block">
+            <Button
+              className=""
+              style={{ 
+                maxHeight: '38px', 
+                pointerEvents: 
+                  (!selectedPhenotypes || selectedPhenotypes.length < 1) ||
+                  (!selectedVariant || selectedVariant.length < 1)
+                  ? 'none' 
+                  : 'auto' 
+                }}
+              variant="silver"
+              // disabled={!canSubmit}
+              onClick={e => {
+                e.preventDefault();
+                onSubmit({ selectedPhenotypes, selectedVariant });
+              }}
+              disabled={
+                (!selectedPhenotypes || selectedPhenotypes.length < 1) ||
+                (!selectedVariant || selectedVariant.length < 1)
+              }>
+              Submit
+            </Button>
+          </span>
+        </OverlayTrigger>
 
         <Button
           className="ml-2"
