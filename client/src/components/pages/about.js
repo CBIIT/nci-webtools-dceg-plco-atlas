@@ -3,7 +3,7 @@ import React from 'react';
 export function About() {
   return (
     <div className="px-5 my-4">
-      <h1 className="font-weight-light">About PLCO Atlas</h1>
+      <h1 className="font-weight-light text-green">About PLCO Atlas</h1>
       <hr />
 
       <p>
