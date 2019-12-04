@@ -62,14 +62,11 @@ export function Gwas() {
     <>
       <div className="mx-3">
         <div
-          className="mx-3 bg-white border border-top-0"
-          // style={{ borderRadius: '0 0 0 0' }}
-        >
+          className="mx-3 bg-white border border-top-0">
           <div className="">
             <Nav defaultActiveKey="summary">
               {gwasLinks.map(({ name, pathId }) => (
                 <>
-                  {/* <NavItem className="mr-2"> */}
                   <NavLink
                     key={pathId}
                     className="secondary-navlinks px-3 py-1 d-inline-block"
@@ -91,7 +88,9 @@ export function Gwas() {
           </div>
         </div>
       </div>
-      {/* <div className="container mt-2 mb-4"> */}
+
+      <h1 className="d-none">Explore GWAS data</h1>
+
       <div className="my-3">
         <Route
           exact

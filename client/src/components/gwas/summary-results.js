@@ -381,6 +381,7 @@ export function SummaryResults() {
 
   return (
     <div style={{ position: 'relative' }}>
+      <h1 className="d-none">Explore GWAS data - Visualize summary results</h1>
       <div className={openSidebar ? 'row mx-3' : 'mx-3'}>
         <div className="col-md-3">
           {openSidebar && (
