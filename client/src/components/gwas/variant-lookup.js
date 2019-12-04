@@ -216,6 +216,7 @@ export function VariantLookup() {
 
   return (
     <div style={{ position: 'relative' }}>
+      <h1 className="d-none">Explore GWAS data - Search for variant across phenotypes</h1>
       <div className={openSidebar ? 'row mx-3' : 'mx-3'}>
         <div className="col-md-3">
           {openSidebar && (
