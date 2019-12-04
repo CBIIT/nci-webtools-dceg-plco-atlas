@@ -396,7 +396,7 @@ export function SummaryResults() {
                 />
                 {messages &&
                   messages.map(({ type, content }) => (
-                    <Alert variant={type} onClose={clearMessages} dismissible>
+                    <Alert className="mt-3" variant={type} onClose={clearMessages} dismissible>
                       {content}
                     </Alert>
                   ))}
