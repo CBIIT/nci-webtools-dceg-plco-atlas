@@ -1,6 +1,6 @@
 import React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { Button } from 'react-bootstrap';
+import { Button, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import { updatePhenotypeCorrelations } from '../../services/actions';
 import { TreeSelectCustom } from '../controls/tree-select-custom';
 
@@ -77,17 +77,27 @@ export function PhenotypeCorrelationsForm({ onChange, onSubmit, onReset }) {
       </div>
       
       <div>
-        <Button
-          className=""
-          style={{ maxHeight: '38px' }}
-          variant="silver"
-          // disabled={!(selectedPhenotypes && selectedPhenotypes.length >= 2)}
-          onClick={e => {
-            e.preventDefault();
-            onSubmit(selectedPhenotypes);
-          }}>
-          Submit
-        </Button>
+        <OverlayTrigger overlay={
+            <Tooltip id="tooltip-disabled" style={{display: (!selectedPhenotypes || selectedPhenotypes.length < 2) ? 'block' : 'none'}}>
+              Please select two or more phenotypes.
+            </Tooltip>
+          }>
+          <span className="d-inline-block">
+            <Button
+              // ref={target}
+              className=""
+              style={{ maxHeight: '38px', pointerEvents: (!selectedPhenotypes || selectedPhenotypes.length < 2) ? 'none' : 'auto' }}
+              variant="silver"
+              onClick={e => {
+                e.preventDefault();
+                onSubmit(selectedPhenotypes);
+              }}
+              disabled={(!selectedPhenotypes || selectedPhenotypes.length < 2)}
+              >
+              Submit
+            </Button>
+          </span>
+        </OverlayTrigger>
 
         <Button
           className="ml-2"
