@@ -494,10 +494,10 @@ export function ManhattanPlot({
             <button
               className="btn-collapse"
               onClick={e => setGenePlotCollapsed(!genePlotCollapsed)}>
-              <Icon
-                name={genePlotCollapsed ? 'angle-down' : 'angle-up'}
-                width="10"
-              />
+              {genePlotCollapsed
+                ? <small className="link">Show Gene Plot</small>
+                : <Icon name="angle-up" width="10" />
+              }
             </button>
           </div>
         )}
