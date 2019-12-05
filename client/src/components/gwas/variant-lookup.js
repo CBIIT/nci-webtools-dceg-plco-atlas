@@ -78,18 +78,24 @@ export function VariantLookup() {
     {
       dataField: 'or',
       text: 'Odds Ratio',
-      sort: true
+      sort: true,
+      sortFunc: (a, b, order, dataField, rowA, rowB) => {
+        if (order === 'asc') {
+          return a - b;
+        }
+        return b - a; // desc
+      }
     },
     {
       dataField: 'p',
       text: 'P-value',
       sort: true,
-      // sortFunc: (a, b, order, dataField, rowA, rowB) => {
-      //   if (order === 'asc') {
-      //     return a - b;
-      //   }
-      //   return b - a; // desc
-      // }
+      sortFunc: (a, b, order, dataField, rowA, rowB) => {
+        if (order === 'asc') {
+          return a - b;
+        }
+        return b - a; // desc
+      }
     }
   ];
   // add filter to column headers
