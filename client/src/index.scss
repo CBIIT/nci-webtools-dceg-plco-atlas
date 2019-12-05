@@ -237,23 +237,23 @@ select.form-control-sm {
   }
 }
 
-/** home.js video banner*/
-.video-banner-container {
+/** home.js banner*/
+.banner-container {
   z-index: 0;
   overflow: hidden;
   display: block;
-  height: 420px;
+  height: 233px;
   position: relative;
 
-  #video-banner {
+  #banner {
     width: 100%;
     position: relative;
     display: block;
   }
 
-  .video-banner-overlay-text {
+  .banner-overlay-text {
     position: absolute;
-    top: 50%;
+    top: 60%;
     left: 50%;
     transform: translate(-50%, -50%);
   }
