@@ -111,7 +111,7 @@ export function ManhattanPlot({
       point: {
         size: 2,
         opacity: 1,
-        color: (d, i) => (d[columnIndexes.chr] % 2 ? '#e47618' : '#b55117')
+        color: (d, i) => (d[columnIndexes.chr] % 2 ? '#e4a918' : '#b53717')
       },
       point2: {
         color: (d, i) => (d[columnIndexes.chr] % 2 ? '#006bb8' : '#002a47') //#e47833')
@@ -192,7 +192,7 @@ export function ManhattanPlot({
         size: 2,
         interactiveSize: 3,
         opacity: 1,
-        color: selectedChromosome % 2 ? '#e47618' : '#b55117',
+        color: selectedChromosome % 2 ? '#e4a918' : '#b53717',
         tooltip: {
           trigger: 'hover',
           class: 'custom-tooltip',
@@ -455,7 +455,7 @@ export function ManhattanPlot({
       <div className="text-right">
         <a
           rel="tooltip"
-          className="d-flex-inline align-items-center link small muted"
+          className="d-flex-inline align-items-center link small muted mr-5"
           onClick={e => plot.current.exportPng(4000, 6000)}>
             Export
         </a>
@@ -494,10 +494,10 @@ export function ManhattanPlot({
             <button
               className="btn-collapse"
               onClick={e => setGenePlotCollapsed(!genePlotCollapsed)}>
-              <Icon
-                name={genePlotCollapsed ? 'angle-down' : 'angle-up'}
-                width="10"
-              />
+              {genePlotCollapsed
+                ? <small className="link">Show Gene Plot</small>
+                : <Icon name="angle-up" width="10" />
+              }
             </button>
           </div>
         )}
