@@ -835,7 +835,7 @@ export function lookupVariants(phenotypes, variant) {
           chr: '-',
           or: '-',
           p: '-',
-          variant_id: '-'
+          variant_id: 'not-found-' + phenotypes[i].title ? phenotypes[i].title : phenotypes[i].label,
         });
       } else {
         for (let j = 0; j < data.length; j++) {
