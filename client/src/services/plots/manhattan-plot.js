@@ -336,7 +336,7 @@ export class ManhattanPlot {
 
     setStyles(this.geneCanvasContainer, {
       left: margins.left + 'px',
-      maxHeight: ((rowHeight * 5) + 5) + 'px',
+      maxHeight: ((rowHeight * 5) + 10) + 'px',
       width: this.canvas.width - margins.left - margins.right + 'px',
       overflowX: 'hidden',
       overflowY: 'auto'
