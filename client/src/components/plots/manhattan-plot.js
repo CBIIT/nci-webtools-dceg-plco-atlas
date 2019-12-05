@@ -455,7 +455,7 @@ export function ManhattanPlot({
       <div className="text-right">
         <a
           rel="tooltip"
-          className="d-flex-inline align-items-center link small muted"
+          className="d-flex-inline align-items-center link small muted mr-5"
           onClick={e => plot.current.exportPng(4000, 6000)}>
             Export
         </a>
