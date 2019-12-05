@@ -60,7 +60,7 @@ export class ManhattanPlot {
     this.geneCanvasContainer = document.createElement('div');
     this.geneCanvasContainer.setAttribute('data-type', 'gene-plot');
     setStyles(this.geneCanvasContainer, {
-      maxHeight: '200px',
+      //maxHeight: '200px',
       overflowY: 'auto',
       overflowX: 'hidden',
       position: 'relative',
@@ -317,13 +317,6 @@ export class ManhattanPlot {
 
     if (!genes) return;
 
-    setStyles(this.geneCanvasContainer, {
-      left: margins.left + 'px',
-      width: this.canvas.width - margins.left - margins.right + 'px',
-      overflowX: 'hidden',
-      overflowY: 'auto'
-    });
-
     let getName = gene =>
       gene.strand === '+' ? `${gene.name} 🡪` : `🡨 ${gene.name}`;
 
@@ -340,6 +333,14 @@ export class ManhattanPlot {
 
     geneCtx.textAlign = 'center';
     geneCtx.textBaseline = 'top';
+
+    setStyles(this.geneCanvasContainer, {
+      left: margins.left + 'px',
+      maxHeight: (rowHeight * 5) + 'px',
+      width: this.canvas.width - margins.left - margins.right + 'px',
+      overflowX: 'hidden',
+      overflowY: 'auto'
+    });
 
     let genePositions = genes.map(gene => {
       let name = getName(gene);
