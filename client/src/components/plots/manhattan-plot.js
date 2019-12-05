@@ -36,6 +36,17 @@ export function ManhattanPlot({
     manhattanPlotData.data &&
     manhattanPlotData.data.length;
 
+  const colors = {
+    primary: {
+      light: '#006bb8',
+      dark: '#002a47'
+    },
+    secondary: {
+      light: '#F2990D',
+      dark: '#A76909'
+    }
+  }
+
   useEffect(() => {
     if (selectedPlot != 'manhattan-plot' || !hasData()) return;
 
@@ -111,10 +122,10 @@ export function ManhattanPlot({
       point: {
         size: 2,
         opacity: 1,
-        color: (d, i) => (d[columnIndexes.chr] % 2 ? '#e4a918' : '#b53717')
+        color: (d, i) => (d[columnIndexes.chr] % 2 ? colors.primary.light : colors.primary.dark)
       },
       point2: {
-        color: (d, i) => (d[columnIndexes.chr] % 2 ? '#006bb8' : '#002a47') //#e47833')
+        color: (d, i) => (d[columnIndexes.chr] % 2 ? colors.secondary.light : colors.secondary.dark) //#e47833')
       },
       lines: [{ y: -Math.log10(5e-8), style: 'dashed' }]
     };
@@ -192,7 +203,7 @@ export function ManhattanPlot({
         size: 2,
         interactiveSize: 3,
         opacity: 1,
-        color: selectedChromosome % 2 ? '#e4a918' : '#b53717',
+        color: selectedChromosome % 2 ? colors.primary.light : colors.primary.dark,
         tooltip: {
           trigger: 'hover',
           class: 'custom-tooltip',
@@ -228,7 +239,7 @@ export function ManhattanPlot({
         }
       },
       point2: {
-        color: selectedChromosome % 2 ? '#006bb8' : '#002a47'
+        color: selectedChromosome % 2 ? colors.secondary.light : colors.secondary.dark
       },
       lines: [{ y: -Math.log10(5e-8), style: 'dashed' }],
       zoomStack: (plot.current && plot.current.zoomStack) || []
@@ -279,7 +290,7 @@ export function ManhattanPlot({
       point: {
         size: 2,
         opacity: 1,
-        color: (d, i) => (d[columnIndexes.chr] % 2 ? '#006bb8' : '#002a47') //#e47833')
+        color: (d, i) => (d[columnIndexes.chr] % 2 ? colors.primary.light : colors.primary.dark) //#e47833')
       },
       lines: [{ y: -Math.log10(5e-8) }]
     };
@@ -351,7 +362,7 @@ export function ManhattanPlot({
         size: 2,
         interactiveSize: 3,
         opacity: 1,
-        color: selectedChromosome % 2 ? '#006bb8' : '#002a47',
+        color: selectedChromosome % 2 ? colors.primary.light : colors.primary.dark,
         tooltip: {
           trigger: 'hover',
           class: 'custom-tooltip',
