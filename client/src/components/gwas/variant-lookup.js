@@ -78,18 +78,24 @@ export function VariantLookup() {
     {
       dataField: 'or',
       text: 'Odds Ratio',
-      sort: true
+      sort: true,
+      sortFunc: (a, b, order, dataField, rowA, rowB) => {
+        if (order === 'asc') {
+          return a - b;
+        }
+        return b - a; // desc
+      }
     },
     {
       dataField: 'p',
       text: 'P-value',
       sort: true,
-      // sortFunc: (a, b, order, dataField, rowA, rowB) => {
-      //   if (order === 'asc') {
-      //     return a - b;
-      //   }
-      //   return b - a; // desc
-      // }
+      sortFunc: (a, b, order, dataField, rowA, rowB) => {
+        if (order === 'asc') {
+          return a - b;
+        }
+        return b - a; // desc
+      }
     }
   ];
   // add filter to column headers
@@ -179,7 +185,7 @@ export function VariantLookup() {
       setMessages([
         {
           type: 'danger',
-          content: 'Please input a valid variant rsid or coordinate.'
+          content: "Please input a valid variant rsid or coordinate. (Ex. 'rs1234' or 'chr22:25855459')"
         }
       ]);
       return;
@@ -216,6 +222,7 @@ export function VariantLookup() {
 
   return (
     <div style={{ position: 'relative' }}>
+      <h1 className="d-none">Explore GWAS data - Search for variant across phenotypes</h1>
       <div className={openSidebar ? 'row mx-3' : 'mx-3'}>
         <div className="col-md-3">
           {openSidebar && (
@@ -234,6 +241,7 @@ export function VariantLookup() {
                 {messages &&
                   messages.map(({ type, content }) => (
                     <Alert
+                      className="mt-3"
                       key={content}
                       variant={type}
                       onClose={clearMessages}
