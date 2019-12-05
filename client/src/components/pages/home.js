@@ -6,15 +6,15 @@ import { CardDeck, Button } from 'react-bootstrap';
 export function Home({ links }) {
   return (
     <>
-      <div className="video-banner-container text-center d-none d-md-block">
+      <div className="banner-container text-center d-none d-md-block">
         <img
           src="assets/images/plco-banner.jpg"
           alt="PLCO banner"
           style={{ width: '100%' }}></img>
-        {/* <video id="video-banner" autoPlay muted loop>
+        {/* <video id="banner" autoPlay muted loop>
           <source src="assets/images/plco-banner.mp4" type="video/mp4" />
         </video> */}
-        <div className="video-banner-overlay-text row justify-content-center text-center text-light w-75">
+        <div className="banner-overlay-text row justify-content-center text-center text-light w-75">
           <div className="col-12">
             <h1 className="text-light">
               <b>PLCO ATLAS</b>
