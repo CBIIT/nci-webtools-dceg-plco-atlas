@@ -342,12 +342,14 @@ export function SummaryResults() {
     });
   };
 
-  const handleVariantLookup = ({ snp }) => {
+  const handleVariantLookup = ({ snp }, gender) => {
+    console.log("gender", gender);
     dispatch(
       updateVariantLookup({
         selectedPhenotypes: [selectedPhenotype],
         selectedVariant: snp,
         selectedGender:
+          gender ? (gender === 'Male' ? 'male' : 'female') :
           selectedManhattanPlotType === 'male' ||
           selectedManhattanPlotType === 'female'
             ? selectedManhattanPlotType
@@ -356,6 +358,7 @@ export function SummaryResults() {
           phenotypes: [selectedPhenotype].map(item => item.title),
           variant: snp,
           gender:
+            gender ? (gender === 'Male' ? 'male' : 'female') :
             selectedManhattanPlotType === 'male' ||
             selectedManhattanPlotType === 'female'
               ? selectedManhattanPlotType
@@ -378,6 +381,7 @@ export function SummaryResults() {
 
   return (
     <div style={{ position: 'relative' }}>
+      <h1 className="d-none">Explore GWAS data - Visualize summary results</h1>
       <div className={openSidebar ? 'row mx-3' : 'mx-3'}>
         <div className="col-md-3">
           {openSidebar && (
@@ -393,7 +397,7 @@ export function SummaryResults() {
                 />
                 {messages &&
                   messages.map(({ type, content }) => (
-                    <Alert variant={type} onClose={clearMessages} dismissible>
+                    <Alert className="mt-3" variant={type} onClose={clearMessages} dismissible>
                       {content}
                     </Alert>
                   ))}
