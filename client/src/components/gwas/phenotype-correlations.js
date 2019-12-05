@@ -105,6 +105,7 @@ export function PhenotypeCorrelations() {
 
   return (
     <div style={{ position: 'relative' }}>
+      <h1 className="d-none">Explore GWAS data - Visualize phenotype correlations</h1>
       <div className={openSidebar ? 'row mx-3' : 'mx-3'}>
         <div className="col-md-3">
           {openSidebar && (
@@ -121,7 +122,7 @@ export function PhenotypeCorrelations() {
                 />
                 {messages &&
                   messages.map(({ type, content }) => (
-                    <Alert variant={type} onClose={clearMessages} dismissible>
+                    <Alert className="mt-3" variant={type} onClose={clearMessages} dismissible>
                       {content}
                     </Alert>
                   ))}

@@ -110,8 +110,8 @@ export function ManhattanPlot({
       },
       point: {
         size: 2,
-        opacity: 0.6,
-        color: (d, i) => (d[columnIndexes.chr] % 2 ? '#e47618' : '#b55117')
+        opacity: 1,
+        color: (d, i) => (d[columnIndexes.chr] % 2 ? '#e4a918' : '#b53717')
       },
       point2: {
         color: (d, i) => (d[columnIndexes.chr] % 2 ? '#006bb8' : '#002a47') //#e47833')
@@ -192,7 +192,7 @@ export function ManhattanPlot({
         size: 2,
         interactiveSize: 3,
         opacity: 1,
-        color: selectedChromosome % 2 ? '#e47618' : '#b55117',
+        color: selectedChromosome % 2 ? '#e4a918' : '#b53717',
         tooltip: {
           trigger: 'hover',
           class: 'custom-tooltip',
@@ -278,7 +278,7 @@ export function ManhattanPlot({
       },
       point: {
         size: 2,
-        opacity: 0.6,
+        opacity: 1,
         color: (d, i) => (d[columnIndexes.chr] % 2 ? '#006bb8' : '#002a47') //#e47833')
       },
       lines: [{ y: -Math.log10(5e-8) }]
@@ -350,7 +350,7 @@ export function ManhattanPlot({
       point: {
         size: 2,
         interactiveSize: 3,
-        opacity: 0.6,
+        opacity: 1,
         color: selectedChromosome % 2 ? '#006bb8' : '#002a47',
         tooltip: {
           trigger: 'hover',
@@ -426,10 +426,7 @@ export function ManhattanPlot({
           <>
             <Icon
               name="arrow-left"
-              className="mx-2 opacit
-
-
-            y-50"
+              className="mx-2 opacity-50"
               width="10"
             />
             <a className="link" onClick={resetZoom}>
@@ -453,6 +450,15 @@ export function ManhattanPlot({
           </>
         ) : null}
         <Icon name="arrow-left" className="mx-2 opacity-50" width="10" />
+      </div>
+
+      <div className="text-right">
+        <a
+          rel="tooltip"
+          className="d-flex-inline align-items-center link small muted mr-5"
+          onClick={e => plot.current.exportPng(4000, 6000)}>
+            Export
+        </a>
       </div>
       <div
         style={{
@@ -488,10 +494,10 @@ export function ManhattanPlot({
             <button
               className="btn-collapse"
               onClick={e => setGenePlotCollapsed(!genePlotCollapsed)}>
-              <Icon
-                name={genePlotCollapsed ? 'angle-down' : 'angle-up'}
-                width="10"
-              />
+              {genePlotCollapsed
+                ? <small className="link">Show Gene Plot</small>
+                : <Icon name="angle-up" width="10" />
+              }
             </button>
           </div>
         )}

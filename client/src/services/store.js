@@ -38,7 +38,6 @@ const initialState = {
     showSnpResults: null,
     qqplotData: [],
     qqplotLayout: {},
-    qqplotStacked: false,
     searchCriteriaSummaryResults: {},
     sampleSize: null
   },
