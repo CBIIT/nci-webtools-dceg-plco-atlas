@@ -192,6 +192,18 @@ $enable-shadows: true;
   text-decoration: underline !important;
 }
 
+.small-link {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #007bff !important;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.small-link:hover {
+  text-decoration: underline !important;
+}
+
 select.form-control-sm {
   padding-right: 0;
 }

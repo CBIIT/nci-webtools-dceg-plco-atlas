@@ -18,6 +18,7 @@ export function ManhattanPlot({
   loading
 }) {
   const [zoomStack, setZoomStack] = useState([]);
+  const [genes, setGenes] = useState([]);
   const [genePlotCollapsed, setGenePlotCollapsed] = useState(false);
   const plotContainer = useRef(null);
   const plot = useRef(null);
@@ -147,6 +148,7 @@ export function ManhattanPlot({
     });
 
     let title = `${selectedPhenotype.title} - Chromosome ${selectedChromosome}`;
+
     let range = ranges.find(r => r.chr === selectedChromosome);
 
     return {
@@ -163,7 +165,27 @@ export function ManhattanPlot({
         setZoomStack(stack);
         onZoom(e);
 
+        let title = '';
+        if (zoomStack.length > 0) {
+          let bounds = zoomStack[zoomStack.length - 1].bounds;
+          let boundsText = `(${(bounds.xMin / 1e6).toPrecision(4)} MB - ${(
+            bounds.xMax / 1e6
+          ).toPrecision(4)} MB)`;
+          title = `${selectedPhenotype.title} - Chromosome ${selectedChromosome} ${boundsText}`;
+        } else {
+          title = `${selectedPhenotype.title} - Chromosome ${selectedChromosome}`;
+        }
+
+        plot.current.setTitle([
+          {
+            text: title,
+            font: `600 16px ${systemFont}`
+          }
+        ]);
+
+
         // draw genes if zoom is at less than 50 MB
+        setGenes([]);
         plot.current.drawGenes([]);
         if (zoomRange <= 1e6) {
           let genes = await query('genes', {
@@ -173,6 +195,7 @@ export function ManhattanPlot({
             txEnd: xAxis.extent[1]
           });
           plot.current.drawGenes(genes);
+          setGenes(genes);
         }
       },
       title: [{ text: title, font: `600 16px ${systemFont}` }],
@@ -326,7 +349,26 @@ export function ManhattanPlot({
         setZoomStack(stack);
         onZoom(e);
 
+        let title = '';
+        if (zoomStack.length > 0) {
+          let bounds = zoomStack[zoomStack.length - 1].bounds;
+          let boundsText = `(${(bounds.xMin / 1e6).toPrecision(4)} MB - ${(
+            bounds.xMax / 1e6
+          ).toPrecision(4)} MB)`;
+          title = `${selectedPhenotype.title} - Chromosome ${selectedChromosome} ${boundsText}`;
+        } else {
+          title = `${selectedPhenotype.title} - Chromosome ${selectedChromosome}`;
+        }
+
+        plot.current.setTitle([
+          {
+            text: title,
+            font: `600 16px ${systemFont}`
+          }
+        ]);
+
         // draw genes if zoom is at less than 50 MB
+        setGenes([]);
         plot.current.drawGenes([]);
         if (zoomRange <= 1e6) {
           let genes = await query('genes', {
@@ -335,6 +377,7 @@ export function ManhattanPlot({
             txStart: xAxis.extent[0],
             txEnd: xAxis.extent[1]
           });
+          setGenes(genes);
           plot.current.drawGenes(genes);
         }
       },
@@ -414,11 +457,11 @@ export function ManhattanPlot({
     }
   }
 
-  let getXRange = () => {
+  function getXRange() {
     if (!zoomStack || !zoomStack.length) return Number.MAX_VALUE;
     let { xMax, xMin } = zoomStack[zoomStack.length - 1].bounds;
     return xMax - xMin;
-  };
+  }
 
   return (
     <div
@@ -466,7 +509,7 @@ export function ManhattanPlot({
       <div className="text-right">
         <a
           rel="tooltip"
-          className="d-flex-inline align-items-center link small muted mr-5"
+          className="d-flex-inline align-items-center small-link mr-5"
           onClick={e => plot.current.exportPng(4000, 6000)}>
             Export
         </a>
@@ -481,7 +524,7 @@ export function ManhattanPlot({
           ref={plotContainer}
           className={[
             `manhattan-plot`,
-            (genePlotCollapsed || getXRange() > 1e6) && 'gene-plot-collapsed'
+            (genePlotCollapsed || getXRange() > 1e6 || !genes.length) && 'gene-plot-collapsed'
           ].join(' ')}
         />
 
@@ -500,13 +543,26 @@ export function ManhattanPlot({
               if (!zoomStack || !zoomStack.length) return zoomMessage;
               let { xMax, xMin } = zoomStack[zoomStack.length - 1].bounds;
               let xRange = xMax - xMin;
-              if (xRange > 1e6) return zoomMessage;
+              if (xRange > 1e6) {
+                return zoomMessage;
+              } else if (!genes.length) {
+                return (
+                  <div
+                    className="p-4 mb-0 text-muted small"
+                    style={{ border: '1px solid #eee' }}>
+                    No genes are available at the current zoom level.
+                  </div>
+                )
+              }
+
+
+
             })()}
             <button
               className="btn-collapse"
               onClick={e => setGenePlotCollapsed(!genePlotCollapsed)}>
               {genePlotCollapsed
-                ? <small className="link">Show Gene Plot</small>
+                ? <div className="small-link">Show Gene Plot</div>
                 : <Icon name="angle-up" width="10" />
               }
             </button>
