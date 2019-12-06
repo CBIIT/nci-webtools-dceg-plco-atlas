@@ -71,6 +71,18 @@ export class ManhattanPlot {
     // setStyles(this.geneCanvas, { display: 'block' });
     this.geneCanvas.height = 0;
     this.geneCanvasContainer.appendChild(this.geneCanvas);
+
+    // create overlay canvas for making gene plot interactive
+    [this.geneOverlayCanvas, this.geneOverlayCtx] = getCanvasAndContext();
+    this.geneOverlayCanvas.height = 0;
+    setStyles(this.geneOverlayCanvas, {
+      position: 'absolute',
+      pointerEvents: 'none',
+      top: '0',
+      left: '0'
+    });
+    this.geneCanvasContainer.appendChild(this.geneOverlayCanvas);
+
     this.container.append(this.geneCanvasContainer);
     this.geneCanvasContainer.append(this.geneCanvas);
 
@@ -314,7 +326,7 @@ export class ManhattanPlot {
   }
 
   drawGenes(genes) {
-    let { config, geneCanvas, geneCtx } = this;
+    let { config, geneCanvas, geneCtx, geneOverlayCanvas, geneOverlayCtx } = this;
     let { margins, xAxis } = config;
 
     if (genes) {
@@ -393,10 +405,41 @@ export class ManhattanPlot {
     let numRows = packedGeneRanges.length;
     let txColor = '#ddd';
     let exonColor = '#049372';
-    let genePlotWidth = geneCanvas.clientWidth;
+    let geneOverlayPositions = [];
 
     geneCanvas.height = rowHeight * numRows;
     geneCanvas.width = this.canvas.width;
+
+    geneOverlayCanvas.height = geneCanvas.height;
+    geneOverlayCanvas.width = geneCanvas.width;
+
+    const getGeneAtPosition = (x, y) => {
+      return geneOverlayPositions.find(pos => {
+        return x > pos.x1 && x < pos.x2
+          && y > pos.y1 && y < pos.y2;
+      })
+    }
+    geneCanvas.onmousemove = async function(ev) {
+      let { x, y } = viewportToLocalCoordinates(
+        ev.clientX,
+        ev.clientY,
+        ev.target
+      );
+      let gene = getGeneAtPosition(x, y);
+      if (gene && !config.tooltipOpen && config.geneTooltipContent) {
+        console.log('tooltip', this.tooltip);
+        config.tooltipOpen = true;
+        showTooltip(this.tooltip, ev, await config.geneTooltipContent(gene, this.tooltip));
+      }
+
+      console.log('found gene', gene);
+    }
+
+    geneCanvas.onclick = function(ev) {
+      config.tooltipOpen = false;
+      hideTooltip(this.tooltip);
+    }
+
     // this.container.style.height = (geneCanvas.height + this.canvas.height) + 'px';
 
     packedGeneRanges.forEach((geneRow, rowIndex) => {
@@ -435,6 +478,14 @@ export class ManhattanPlot {
         geneCtx.strokeWidth = 2;
         geneCtx.beginPath();
         let lineY = 14.5;
+        geneOverlayPositions.push({
+          x1: Math.min(geneLabel.pxStart, start),
+          x2: Math.max(geneLabel.pxEnd, start + width),
+          y1: yOffset + exonOffsetY,
+          y2: yOffset + exonOffsetY + 30,
+          gene: gene
+        });
+
         geneCtx.moveTo(start, lineY + exonOffsetY);
         geneCtx.lineTo(start + width, lineY + exonOffsetY);
         geneCtx.stroke();
@@ -453,6 +504,7 @@ export class ManhattanPlot {
 
       geneCtx.restore();
     });
+    console.log(geneOverlayPositions);
   }
 
   drawLine(line) {
