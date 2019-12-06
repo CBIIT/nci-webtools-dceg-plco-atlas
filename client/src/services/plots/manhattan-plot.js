@@ -243,18 +243,28 @@ export class ManhattanPlot {
       this.drawLine(line);
     }
 
-    if (config.title) {
-      let midpoint = margins.left + width / 2;
-      ctx.save();
-      ctx.translate(midpoint, 10);
-      renderText(ctx, config.title, {
-        textAlign: 'center',
-        textBaseline: 'top',
-        fillStyle: 'black'
-      });
-      ctx.restore();
-    }
+    this.setTitle(config.title);
     console.log(config);
+  }
+
+  setTitle(title) {
+    if (!title) return;
+
+    let config = this.config;
+    let margins = config.margins;
+    let width = this.canvas.width - margins.left - margins.right;
+    let ctx = this.ctx;
+
+    ctx.clearRect(0, 0, this.canvas.width, margins.top);
+    let midpoint = margins.left + width / 2;
+    ctx.save();
+    ctx.translate(midpoint, 10);
+    renderText(ctx, title, {
+      textAlign: 'center',
+      textBaseline: 'top',
+      fillStyle: 'black'
+    });
+    ctx.restore();
   }
 
   clearGenes() {
