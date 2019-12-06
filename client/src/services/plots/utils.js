@@ -207,6 +207,7 @@ export function insertAdjacentNode(element, position, html) {
  * @param {Element} element
  */
 export function removeChildren(element) {
+  if (!element || !element.children) return;
   for (let child of element.children) {
     element.removeChild(child);
   }

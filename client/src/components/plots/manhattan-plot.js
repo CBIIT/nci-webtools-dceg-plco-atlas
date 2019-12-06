@@ -440,6 +440,15 @@ export function ManhattanPlot({
           }
         }
       },
+      geneTooltipContent: gene => {
+        return h('div', { className: '' }, [
+          h('div', null, [
+            h('b', null, 'gene: '),
+            // `${(record.bp / 1e6).toFixed(4)} MB`
+            `${gene.name}`
+          ])
+        ]);
+      },
       lines: [{ y: -Math.log10(5e-8), style: 'dashed' }],
       zoomStack: (plot.current && plot.current.zoomStack) || []
     };
