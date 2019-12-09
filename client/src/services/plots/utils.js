@@ -224,3 +224,9 @@ export function canvasToBlob(canvas, mimeType, qualityArgument) {
     canvas.toBlob(resolve, mimeType, qualityArgument);
   })
 }
+
+export function withSavedContext(context, callback) {
+  context.save();
+  callback(context);
+  context.restore();
+}
