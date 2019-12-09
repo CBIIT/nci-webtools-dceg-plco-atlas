@@ -530,7 +530,7 @@ export function ManhattanPlot({
         <a
           rel="tooltip"
           className="d-flex-inline align-items-center small-link mr-5"
-          onClick={e => plot.current.exportPng(4000, 6000)}>
+          onClick={e => plot.current.exportPng(2000, 3000)}>
             Export
         </a>
       </div>
