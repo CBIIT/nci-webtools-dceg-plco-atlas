@@ -58,7 +58,7 @@ export function Home({ links }) {
           suspendisse faucibus interdum posuere lorem ipsum. Integer malesuada
           nunc vel risus commodo viverra maecenas accumsan lacus.
         </div>
-        <div
+        {/* <div
           className="text-center mt-4"
           style={{ width: '100%', fontSize: '14pt' }}>
           <Button
@@ -71,7 +71,7 @@ export function Home({ links }) {
             style={{ backgroundColor: '#01BDD4', border: 'none' }}>
             Link
           </Button>
-        </div>
+        </div> */}
       </div>
 
       <div
