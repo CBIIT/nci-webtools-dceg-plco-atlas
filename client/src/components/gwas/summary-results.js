@@ -106,7 +106,7 @@ export function SummaryResults() {
 
     // determine which tables to use for summary results
     const variantTable = getVariantTable(manhattanPlotType);
-
+    setOpenSidebar(false);
     setPopupTooltipData(null);
     dispatch(drawQQPlot(phenotype, variantTable));
 
