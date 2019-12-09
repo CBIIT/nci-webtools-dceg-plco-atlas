@@ -444,9 +444,20 @@ export function ManhattanPlot({
         return h('div', { className: '' }, [
           h('div', null, [
             h('b', null, 'gene: '),
-            // `${(record.bp / 1e6).toFixed(4)} MB`
-            `${gene.name}`
-          ])
+            `${gene.originalName}`
+          ]),
+          h('div', null, [
+            h('b', null, 'position: '),
+            `chr${selectedChromosome}:${gene.tx_start}-${gene.tx_end}`
+          ]),
+          h('div', null, [
+            h('a', {
+              className: 'font-weight-bold',
+              href: `https://www.ncbi.nlm.nih.gov/gene/?term=${gene.originalName}`,
+              target: '_blank'
+            }, 'Go to RefSeq'),
+          ]),
+
         ]);
       },
       lines: [{ y: -Math.log10(5e-8), style: 'dashed' }],

@@ -60,7 +60,7 @@ export function showTooltip(tooltip, ev, html) {
   const targetHeight = ev.target.clientHeight;
   const tooltipHeight = tooltip.clientHeight;
   const tooltipWidth = tooltip.clientWidth;
-  const tooltipOffset = -2;
+  const tooltipOffset = 5;
   const leftOffset =
     Math.min(localX, targetWidth - tooltipWidth) - tooltipOffset;
   const topOffset =

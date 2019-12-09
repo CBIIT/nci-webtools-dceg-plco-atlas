@@ -92,6 +92,13 @@ export class ManhattanPlot {
     });
     this.container.appendChild(this.tooltip);
 
+
+    // create a tooltip container for the gene plot
+    this.geneTooltip = createTooltip({
+      className: 'manhattan-plot-tooltip'
+    });
+    this.geneCanvasContainer.appendChild(this.geneTooltip);
+
     // save default extents, if they are provided
     if (this.config.xAxis.extent)
       this.config.xAxis.defaultExtent = this.config.xAxis.extent;
@@ -365,6 +372,7 @@ export class ManhattanPlot {
     });
 
     let genePositions = genes.map(gene => {
+      let originalName = gene.name;
       let name = getName(gene);
       let padding = 5; // horiz. padding between name and gene
 
@@ -388,6 +396,7 @@ export class ManhattanPlot {
       return {
         ...gene,
         name,
+        originalName,
         width,
         pxCenter,
         pxStart,
@@ -408,7 +417,7 @@ export class ManhattanPlot {
     let geneOverlayPositions = [];
 
     geneCanvas.height = rowHeight * numRows;
-    geneCanvas.width = this.canvas.width;
+    geneCanvas.width = this.canvas.width - config.margins.left - config.margins.right;
 
     geneOverlayCanvas.height = geneCanvas.height;
     geneOverlayCanvas.width = geneCanvas.width;
@@ -419,7 +428,7 @@ export class ManhattanPlot {
           && y > pos.y1 && y < pos.y2;
       })
     }
-    geneCanvas.onmousemove = async function(ev) {
+    geneCanvas.onmousemove = async (ev) => {
       let { x, y } = viewportToLocalCoordinates(
         ev.clientX,
         ev.clientY,
@@ -427,17 +436,21 @@ export class ManhattanPlot {
       );
       let gene = getGeneAtPosition(x, y);
       if (gene && !config.tooltipOpen && config.geneTooltipContent) {
-        console.log('tooltip', this.tooltip);
         config.tooltipOpen = true;
-        showTooltip(this.tooltip, ev, await config.geneTooltipContent(gene, this.tooltip));
+        let content = await config.geneTooltipContent(gene.gene, this.tooltip);
+        console.log('showing tooltip', gene, content, this.geneTooltip)
+        showTooltip(this.geneTooltip, ev, content);
+      } else if (!gene) {
+        config.tooltipOpen = false;
+        hideTooltip(this.geneTooltip);
       }
 
-      console.log('found gene', gene);
+     // console.log('found gene', gene);
     }
 
-    geneCanvas.onclick = function(ev) {
+    geneCanvas.onclick = (ev) => {
       config.tooltipOpen = false;
-      hideTooltip(this.tooltip);
+      hideTooltip(this.geneTooltip);
     }
 
     // this.container.style.height = (geneCanvas.height + this.canvas.height) + 'px';
