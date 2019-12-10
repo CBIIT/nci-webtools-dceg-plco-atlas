@@ -260,6 +260,14 @@ export function TreeSelectCustom({
           }
         }
       } else {
+        if (
+          document.getElementsByClassName('children-of-' + item.value) &&
+          document.getElementsByClassName('children-of-' + item.value)[0] &&
+          document.getElementsByClassName('children-of-' + item.value)[0].style.display &&
+          document.getElementsByClassName('children-of-' + item.value)[0].style.display === 'none'
+        ) {
+          toggleHideChildren(item.value);
+        }
         for (let i = 0; i < newValues.length; i++) {
           if (!containsVal(values, newValues[i].value)) {
             // only add if value did not exist before
