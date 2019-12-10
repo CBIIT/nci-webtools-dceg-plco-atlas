@@ -10,7 +10,8 @@ import {
   setStyles,
   viewportToLocalCoordinates,
   ensureNonStaticPositioning,
-  min, max
+  min, max,
+  withSavedContext,
 } from './utils.js';
 import { measureWidth, renderText, systemFont } from './text.js';
 import { getScale, getTicks } from './scale.js';
@@ -27,7 +28,8 @@ export class ManhattanPlot {
       right: 60,
       bottom: 40,
       left: 80
-    }
+    },
+    backgroundColor: '#ffffff',
   };
 
   constructor(container, config) {
@@ -249,7 +251,12 @@ export class ManhattanPlot {
       );
     }
 
-    ctx.clearRect(0, 0, width, height);
+//    ctx.clearRect(0, 0, width, height);
+    withSavedContext(ctx, ctx => {
+      ctx.fillStyle = this.defaultConfig.backgroundColor;
+      ctx.fillRect(0, 0, width, height);
+    })
+
     drawPoints(config, ctx, hiddenCtx);
     axisLeft(config, ctx);
     axisBottom(config, ctx);
@@ -274,7 +281,13 @@ export class ManhattanPlot {
     let width = this.canvas.width - margins.left - margins.right;
     let ctx = this.ctx;
 
-    ctx.clearRect(0, 0, this.canvas.width, margins.top);
+//    ctx.clearRect(0, 0, this.canvas.width, margins.top);
+    withSavedContext(ctx, ctx => {
+      ctx.fillStyle = this.defaultConfig.backgroundColor;
+      ctx.fillRect(0, 0, this.canvas.width, margins.top);
+    })
+
+
     let midpoint = margins.left + width / 2;
     ctx.save();
     ctx.translate(midpoint, 10);
@@ -320,6 +333,12 @@ export class ManhattanPlot {
 
     exportCanvas.width = plot.canvas.width;
     exportCanvas.height = plot.canvas.height + plot.geneCanvas.height;
+
+
+    withSavedContext(exportCtx, ctx => {
+      ctx.fillStyle = this.defaultConfig.backgroundColor;
+      ctx.fillRect(0, 0, exportCanvas.width, exportCanvas.height);
+    })
 
     exportCtx.drawImage(plot.canvas, 0, 0);
     if (plot.geneCanvas.height) {
