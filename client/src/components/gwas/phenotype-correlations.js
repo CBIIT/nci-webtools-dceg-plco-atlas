@@ -4,12 +4,11 @@ import { PhenotypeCorrelationsForm } from '../forms/phenotype-correlations-form'
 import { Heatmap } from '../plots/heatmap-plot';
 import { Alert, Tabs, Tab, Button } from 'react-bootstrap';
 import { PhenotypeCorrelationsSearchCriteria } from '../controls/phenotype-correlations-search-criteria';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCaretRight, faCaretLeft } from '@fortawesome/free-solid-svg-icons';
 import {
   updatePhenotypeCorrelations,
   drawHeatmap
 } from '../../services/actions';
+
 
 export function PhenotypeCorrelations() {
   const dispatch = useDispatch();
@@ -65,7 +64,7 @@ export function PhenotypeCorrelations() {
       ]);
       return;
     }
-
+    setOpenSidebar(false);
     setSearchCriteriaPhenotypeCorrelations({
       phenotypes: selectedPhenotypes.map(item =>
         item.title ? item.title : item.label
@@ -107,28 +106,29 @@ export function PhenotypeCorrelations() {
     <div style={{ position: 'relative' }}>
       <h1 className="d-none">Explore GWAS data - Visualize phenotype correlations</h1>
       <div className={openSidebar ? 'row mx-3' : 'mx-3'}>
-        <div className="col-md-3">
-          {openSidebar && (
-            <Tabs defaultActiveKey="phenotype-correlations-form">
-              <Tab
-                eventKey="phenotype-correlations-form"
-                // title="Table"
-                className="p-2 bg-white tab-pane-bordered rounded-0"
-                style={{ minHeight: '100%' }}>
-                <PhenotypeCorrelationsForm
-                  onSubmit={handleSubmit}
-                  onChange={handleChange}
-                  onReset={handleReset}
-                />
-                {messages &&
-                  messages.map(({ type, content }) => (
-                    <Alert className="mt-3" variant={type} onClose={clearMessages} dismissible>
-                      {content}
-                    </Alert>
-                  ))}
-              </Tab>
-            </Tabs>
-          )}
+        <div className="col-lg-3">
+        {/* {openSidebar && ( */}
+          <Tabs defaultActiveKey="phenotype-correlations-form"
+            style={{display: openSidebar ? 'block' : 'none'}}>
+            <Tab
+              eventKey="phenotype-correlations-form"
+              className="p-2 bg-white tab-pane-bordered rounded-0"
+              style={{ minHeight: '100%', display: openSidebar ? 'block' : 'none' }}>
+              <PhenotypeCorrelationsForm
+                onSubmit={handleSubmit}
+                onChange={handleChange}
+                onReset={handleReset}
+                style={{display: openSidebar ? 'block' : 'none'}}
+              />
+              {messages &&
+                messages.map(({ type, content }) => (
+                  <Alert className="mt-3" variant={type} onClose={clearMessages} dismissible>
+                    {content}
+                  </Alert>
+                ))}
+            </Tab>
+          </Tabs>
+          {/* )} */}
           <Button
             className="pt-0 border-0"
             title={openSidebar ? "Hide search panel" : "Show search panel"}
@@ -144,16 +144,16 @@ export function PhenotypeCorrelations() {
             aria-controls="phenotype-correlations-collapse-input-panel"
             aria-expanded={openSidebar}>
             {openSidebar ? (
-              <FontAwesomeIcon icon={faCaretLeft} size="lg" />
+              <i className="fas fa-caret-left fa-lg"></i>
             ) : (
-              <FontAwesomeIcon icon={faCaretRight} size="lg" />
+              <i className="fas fa-caret-right fa-lg"></i>
             )}
           </Button>
         </div>
 
-        <div className="d-md-none p-2"></div>
+        <div className="d-lg-none p-2"></div>
 
-        <div className={openSidebar ? 'col-md-9' : 'col-md-12'}>
+        <div className={openSidebar ? 'col-lg-9' : 'col-lg-12'}>
           <PhenotypeCorrelationsSearchCriteria />
 
           <Tabs defaultActiveKey="phenotype-correlations">

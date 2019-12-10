@@ -7,8 +7,6 @@ import { ManhattanPlot } from '../plots/manhattan-plot';
 import { QQPlot } from '../plots/qq-plot';
 import { SummaryResultsTable } from './summary-results-table';
 import { SummaryResultsSearchCriteria } from '../controls/summary-results-search-criteria';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCaretRight, faCaretLeft } from '@fortawesome/free-solid-svg-icons';
 import {
   updateSummaryResults,
   updateVariantLookup,
@@ -19,6 +17,7 @@ import {
   updateSummaryTable
 } from '../../services/actions';
 import { query } from '../../services/query';
+
 
 export function SummaryResults() {
   const dispatch = useDispatch();
@@ -106,7 +105,7 @@ export function SummaryResults() {
 
     // determine which tables to use for summary results
     const variantTable = getVariantTable(manhattanPlotType);
-
+    setOpenSidebar(false);
     setPopupTooltipData(null);
     dispatch(drawQQPlot(phenotype, variantTable));
 
@@ -383,27 +382,29 @@ export function SummaryResults() {
     <div style={{ position: 'relative' }}>
       <h1 className="d-none">Explore GWAS data - Visualize summary results</h1>
       <div className={openSidebar ? 'row mx-3' : 'mx-3'}>
-        <div className="col-md-3">
-          {openSidebar && (
-            <Tabs defaultActiveKey="summary-results-form">
-              <Tab
-                eventKey="summary-results-form"
-                className="p-2 bg-white tab-pane-bordered rounded-0"
-                style={{ minHeight: '100%' }}>
-                <SummaryResultsForm
-                  onSubmit={handleSubmit}
-                  onChange={handleChange}
-                  onReset={handleReset}
-                />
-                {messages &&
-                  messages.map(({ type, content }) => (
-                    <Alert className="mt-3" variant={type} onClose={clearMessages} dismissible>
-                      {content}
-                    </Alert>
-                  ))}
-              </Tab>
-            </Tabs>
-          )}
+        <div className="col-lg-3">
+          {/* {openSidebar && ( */}
+          <Tabs defaultActiveKey="summary-results-form"
+            style={{display: openSidebar ? 'block' : 'none'}}>
+            <Tab
+              eventKey="summary-results-form"
+              className="p-2 bg-white tab-pane-bordered rounded-0"
+              style={{ minHeight: '100%', display: openSidebar ? 'block' : 'none' }}>
+              <SummaryResultsForm
+                onSubmit={handleSubmit}
+                onChange={handleChange}
+                onReset={handleReset}
+                style={{display: openSidebar ? 'block' : 'none'}}
+              />
+              {messages &&
+                messages.map(({ type, content }) => (
+                  <Alert className="mt-3" variant={type} onClose={clearMessages} dismissible>
+                    {content}
+                  </Alert>
+                ))}
+            </Tab>
+          </Tabs>
+          {/* )} */}
           <Button
             className="pt-0 border-0"
             title={openSidebar ? "Hide search panel" : "Show search panel"}
@@ -419,16 +420,16 @@ export function SummaryResults() {
             aria-controls="summary-results-collapse-input-panel"
             aria-expanded={openSidebar}>
             {openSidebar ? (
-              <FontAwesomeIcon icon={faCaretLeft} size="lg" />
+              <i className="fas fa-caret-left fa-lg"></i>
             ) : (
-              <FontAwesomeIcon icon={faCaretRight} size="lg" />
+              <i className="fas fa-caret-right fa-lg"></i>
             )}
           </Button>
         </div>
 
-        <div className="d-md-none p-2"></div>
+        <div className="d-lg-none p-2"></div>
 
-        <div className={openSidebar ? 'col-md-9' : 'col-md-12'}>
+        <div className={openSidebar ? 'col-lg-9' : 'col-lg-12'}>
           <SummaryResultsSearchCriteria />
 
           <Tabs
