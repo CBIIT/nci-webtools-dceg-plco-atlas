@@ -7,8 +7,6 @@ import { ManhattanPlot } from '../plots/manhattan-plot';
 import { QQPlot } from '../plots/qq-plot';
 import { SummaryResultsTable } from './summary-results-table';
 import { SummaryResultsSearchCriteria } from '../controls/summary-results-search-criteria';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCaretRight, faCaretLeft } from '@fortawesome/free-solid-svg-icons';
 import {
   updateSummaryResults,
   updateVariantLookup,
@@ -19,6 +17,7 @@ import {
   updateSummaryTable
 } from '../../services/actions';
 import { query } from '../../services/query';
+
 
 export function SummaryResults() {
   const dispatch = useDispatch();
@@ -421,9 +420,9 @@ export function SummaryResults() {
             aria-controls="summary-results-collapse-input-panel"
             aria-expanded={openSidebar}>
             {openSidebar ? (
-              <FontAwesomeIcon icon={faCaretLeft} size="lg" />
+              <i className="fas fa-caret-left fa-lg"></i>
             ) : (
-              <FontAwesomeIcon icon={faCaretRight} size="lg" />
+              <i className="fas fa-caret-right fa-lg"></i>
             )}
           </Button>
         </div>

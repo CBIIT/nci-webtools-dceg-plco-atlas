@@ -4,12 +4,11 @@ import { PhenotypeCorrelationsForm } from '../forms/phenotype-correlations-form'
 import { Heatmap } from '../plots/heatmap-plot';
 import { Alert, Tabs, Tab, Button } from 'react-bootstrap';
 import { PhenotypeCorrelationsSearchCriteria } from '../controls/phenotype-correlations-search-criteria';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCaretRight, faCaretLeft } from '@fortawesome/free-solid-svg-icons';
 import {
   updatePhenotypeCorrelations,
   drawHeatmap
 } from '../../services/actions';
+
 
 export function PhenotypeCorrelations() {
   const dispatch = useDispatch();
@@ -145,9 +144,9 @@ export function PhenotypeCorrelations() {
             aria-controls="phenotype-correlations-collapse-input-panel"
             aria-expanded={openSidebar}>
             {openSidebar ? (
-              <FontAwesomeIcon icon={faCaretLeft} size="lg" />
+              <i className="fas fa-caret-left fa-lg"></i>
             ) : (
-              <FontAwesomeIcon icon={faCaretRight} size="lg" />
+              <i className="fas fa-caret-right fa-lg"></i>
             )}
           </Button>
         </div>

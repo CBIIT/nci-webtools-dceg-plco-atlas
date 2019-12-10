@@ -13,8 +13,7 @@ import filterFactory, { textFilter } from 'react-bootstrap-table2-filter';
 import ToolkitProvider, { CSVExport } from 'react-bootstrap-table2-toolkit';
 import { Alert, Button, Tabs, Tab, Collapse } from 'react-bootstrap';
 import { VariantLookupSearchCriteria } from '../controls/variant-lookup-search-criteria';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCaretRight, faCaretLeft } from '@fortawesome/free-solid-svg-icons';
+
 
 export function VariantLookup() {
   const dispatch = useDispatch();
@@ -270,9 +269,9 @@ export function VariantLookup() {
             aria-controls="variant-lookup-collapse-input-panel"
             aria-expanded={openSidebar}>
             {openSidebar ? (
-              <FontAwesomeIcon icon={faCaretLeft} size="lg" />
+              <i className="fas fa-caret-left fa-lg"></i>
             ) : (
-              <FontAwesomeIcon icon={faCaretRight} size="lg" />
+              <i className="fas fa-caret-right fa-lg"></i>
             )}
           </Button>
         </div>

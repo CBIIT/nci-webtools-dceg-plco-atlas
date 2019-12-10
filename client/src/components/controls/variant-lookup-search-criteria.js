@@ -2,8 +2,7 @@ import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { updateVariantLookup } from '../../services/actions';
 import { Tab, Tabs, Button } from 'react-bootstrap';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCaretRight, faCaretDown } from '@fortawesome/free-solid-svg-icons';
+
 
 export const VariantLookupSearchCriteria = props => {
   const dispatch = useDispatch();
@@ -27,9 +26,9 @@ export const VariantLookupSearchCriteria = props => {
 
   const CollapseCaret = () => {
     if (!collapseCriteria && searchCriteriaVariantLookup.phenotypes) {
-      return <FontAwesomeIcon icon={faCaretDown} size="lg" />;
+      return <i className="fas fa-caret-down fa-lg"></i>;
     } else {
-      return <FontAwesomeIcon icon={faCaretRight} size="lg" />;
+      return <i className="fas fa-caret-right fa-lg"></i>;
     }
   };
 
