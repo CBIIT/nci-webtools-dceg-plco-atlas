@@ -207,6 +207,7 @@ export function insertAdjacentNode(element, position, html) {
  * @param {Element} element
  */
 export function removeChildren(element) {
+  if (!element || !element.children) return;
   for (let child of element.children) {
     element.removeChild(child);
   }
@@ -222,4 +223,10 @@ export function canvasToBlob(canvas, mimeType, qualityArgument) {
   return new Promise((resolve, reject) => {
     canvas.toBlob(resolve, mimeType, qualityArgument);
   })
+}
+
+export function withSavedContext(context, callback) {
+  context.save();
+  callback(context);
+  context.restore();
 }

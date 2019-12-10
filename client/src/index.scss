@@ -7,6 +7,12 @@ $enable-shadows: true;
 @import '~react-bootstrap-table2-paginator/dist/react-bootstrap-table2-paginator.min.css';
 @import '~react-bootstrap-table2-filter/dist/react-bootstrap-table2-filter.min.css';
 
+@media (min-width: 1600px) {
+  .container {
+    min-width: 1440px;
+  }
+}
+
 .bg-primary-lighter {
   background-color: #d9e8f6;
 }
@@ -189,6 +195,18 @@ $enable-shadows: true;
 
 .link:hover {
   color: #444 !important;
+  text-decoration: underline !important;
+}
+
+.small-link {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #007bff !important;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.small-link:hover {
   text-decoration: underline !important;
 }
 
@@ -441,7 +459,7 @@ footer {
 .footer-nav h2 {
   font-size: 1.2em !important;
   line-height: 1.215em !important;
-  font-weight: 400 !important; 
+  font-weight: 400 !important;
 }
 
 .footer-link {

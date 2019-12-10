@@ -33,12 +33,21 @@ export function hideTooltip(tooltip) {
  * @param {Element|string} html
  */
 export function showTooltip(tooltip, ev, html) {
+  let localX, localY;
   // get coordinates relative to event's target
-  let { x: localX, y: localY } = viewportToLocalCoordinates(
-    ev.clientX,
-    ev.clientY,
-    ev.target
-  );
+  if (!ev.localX && !ev.localY) {
+    let { x, y } = viewportToLocalCoordinates(
+      ev.clientX,
+      ev.clientY,
+      ev.target
+    );
+
+    localX = x;
+    localY = y;
+  } else {
+    localX = ev.localX;
+    localY = ev.localY;
+  }
 
   // set tooltip contents and make tooltip visible
   removeChildren(tooltip);
@@ -51,7 +60,7 @@ export function showTooltip(tooltip, ev, html) {
   const targetHeight = ev.target.clientHeight;
   const tooltipHeight = tooltip.clientHeight;
   const tooltipWidth = tooltip.clientWidth;
-  const tooltipOffset = -2;
+  const tooltipOffset = 5;
   const leftOffset =
     Math.min(localX, targetWidth - tooltipWidth) - tooltipOffset;
   const topOffset =

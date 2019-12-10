@@ -13,8 +13,7 @@ import filterFactory, { textFilter } from 'react-bootstrap-table2-filter';
 import ToolkitProvider, { CSVExport } from 'react-bootstrap-table2-toolkit';
 import { Alert, Button, Tabs, Tab, Collapse } from 'react-bootstrap';
 import { VariantLookupSearchCriteria } from '../controls/variant-lookup-search-criteria';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCaretRight, faCaretLeft } from '@fortawesome/free-solid-svg-icons';
+
 
 export function VariantLookup() {
   const dispatch = useDispatch();
@@ -190,6 +189,7 @@ export function VariantLookup() {
       ]);
       return;
     }
+    setOpenSidebar(false);
     setSearchCriteriaVariantLookup({
       phenotypes: selectedPhenotypes.map(item => item.title),
       variant: selectedVariant,
@@ -224,34 +224,36 @@ export function VariantLookup() {
     <div style={{ position: 'relative' }}>
       <h1 className="d-none">Explore GWAS data - Search for variant across phenotypes</h1>
       <div className={openSidebar ? 'row mx-3' : 'mx-3'}>
-        <div className="col-md-3">
-          {openSidebar && (
-            <Tabs defaultActiveKey="variant-lookup-form">
-              <Tab
-                eventKey="variant-lookup-form"
-                // title="Table"
-                className="p-2 bg-white tab-pane-bordered rounded-0"
-                // style={{minHeight: '550px'}}
-              >
-                <VariantLookupForm
-                  onSubmit={handleSubmit}
-                  onChange={handleChange}
-                  onReset={handleReset}
-                />
-                {messages &&
-                  messages.map(({ type, content }) => (
-                    <Alert
-                      className="mt-3"
-                      key={content}
-                      variant={type}
-                      onClose={clearMessages}
-                      dismissible>
-                      {content}
-                    </Alert>
-                  ))}
-              </Tab>
-            </Tabs>
-          )}
+        <div className="col-lg-3">
+          {/* {openSidebar && ( */}
+          <Tabs defaultActiveKey="variant-lookup-form"
+            style={{display: openSidebar ? 'block' : 'none'}}>
+            <Tab
+              eventKey="variant-lookup-form"
+              className="p-2 bg-white tab-pane-bordered rounded-0"
+              style={{display: openSidebar ? 'block' : 'none'}}
+              // style={{minHeight: '550px'}}
+            >
+              <VariantLookupForm
+                onSubmit={handleSubmit}
+                onChange={handleChange}
+                onReset={handleReset}
+                style={{display: openSidebar ? 'block' : 'none'}}
+              />
+              {messages &&
+                messages.map(({ type, content }) => (
+                  <Alert
+                    className="mt-3"
+                    key={content}
+                    variant={type}
+                    onClose={clearMessages}
+                    dismissible>
+                    {content}
+                  </Alert>
+                ))}
+            </Tab>
+          </Tabs>
+          {/* )} */}
           <Button
             className="pt-0 border-0"
             title={openSidebar ? "Hide search panel" : "Show search panel"}
@@ -267,16 +269,16 @@ export function VariantLookup() {
             aria-controls="variant-lookup-collapse-input-panel"
             aria-expanded={openSidebar}>
             {openSidebar ? (
-              <FontAwesomeIcon icon={faCaretLeft} size="lg" />
+              <i className="fas fa-caret-left fa-lg"></i>
             ) : (
-              <FontAwesomeIcon icon={faCaretRight} size="lg" />
+              <i className="fas fa-caret-right fa-lg"></i>
             )}
           </Button>
         </div>
 
-        <div className="d-md-none p-2"></div>
+        <div className="d-lg-none p-2"></div>
 
-        <div className={openSidebar ? 'col-md-9' : 'col-md-12'}>
+        <div className={openSidebar ? 'col-lg-9' : 'col-lg-12'}>
           <VariantLookupSearchCriteria />
 
           <Tabs defaultActiveKey="variant-lookup">
