@@ -132,11 +132,14 @@ export function TreeSelectCustom({
 
   const toggleHideChildren = name => {
     const className = 'children-of-' + name;
+    let node =  document.getElementsByClassName(className)[0];
+    if (!node) return true;
     if (
       document.getElementsByClassName(className)[0].style.display &&
       document.getElementsByClassName(className)[0].style.display === 'none'
     ) {
       document.getElementsByClassName(className)[0].style.display = 'block';
+      // return false;
       const collapseButton = document.getElementsByClassName(
         'collapse-button-text-' + name
       )[0];
@@ -146,6 +149,7 @@ export function TreeSelectCustom({
       );
     } else {
       document.getElementsByClassName(className)[0].style.display = 'none';
+      // return true;
       const collapseButton = document.getElementsByClassName(
         'collapse-button-text-' + name
       )[0];
@@ -318,8 +322,18 @@ export function TreeSelectCustom({
                   style={{ all: 'unset' }}
                   className="collapse-button text-secondary"
                   onClick={e => toggleHideChildren(item.value)}>
+                  {/* <FontAweseomeIcon icon={
+                    itemCollapsed('collapse-button-text-' + item.value)
+                      ? faPlusSquare
+                      : faPlusMinus
+                  } /> */}
                   <span className={'collapse-button-text-' + item.value}>
                     <FontAwesomeIcon icon={faPlusSquare} size="1x" />
+                    {/* <FontAwesomeIcon icon={
+                      toggleHideChildren(item.value)
+                        ? faPlusSquare
+                        : faMinusSquare
+                    } /> */}
                   </span>
                 </button>
 
