@@ -322,11 +322,6 @@ export function TreeSelectCustom({
                   style={{ all: 'unset' }}
                   className="collapse-button text-secondary"
                   onClick={e => toggleHideChildren(item.value)}>
-                  {/* <FontAweseomeIcon icon={
-                    itemCollapsed('collapse-button-text-' + item.value)
-                      ? faPlusSquare
-                      : faPlusMinus
-                  } /> */}
                   <span className={'collapse-button-text-' + item.value}>
                     <FontAwesomeIcon icon={faPlusSquare} size="1x" />
                     {/* <FontAwesomeIcon icon={
@@ -376,16 +371,20 @@ export function TreeSelectCustom({
                 />
 
                 <button
+                  // title={singleSelect? "Show/hide " + item.title + " phenotypes" : item.title}
                   title={item.title}
                   className="ml-1"
                   style={{
                     all: 'unset',
                     cursor: 'pointer',
+                    // cursor: singleSelect ? 'not-allowed' : 'pointer',
                     textOverflow: 'ellipsis',
                     whiteSpace: 'nowrap',
                     overflow: 'hidden'
                   }}
-                  onClick={e => handleSelect(item)}>
+                  onClick={e => singleSelect ? toggleHideChildren(item.value) : handleSelect(item)}
+                  // disabled={singleSelect}
+                  >
                   {item.title}
                 </button>
               </div>
