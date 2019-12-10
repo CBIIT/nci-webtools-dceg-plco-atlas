@@ -20,7 +20,7 @@ export function Navbar({ links }) {
                   to={route}>
                   {action} {title}
                 </NavLink>
-                <div className="d-md-none w-100"></div>
+                <div className="d-lg-none w-100"></div>
               </>
             ))}
           {/* <pre>{JSON.stringify(links)}</pre> */}

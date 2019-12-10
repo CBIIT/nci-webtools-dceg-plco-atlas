@@ -224,7 +224,7 @@ export function VariantLookup() {
     <div style={{ position: 'relative' }}>
       <h1 className="d-none">Explore GWAS data - Search for variant across phenotypes</h1>
       <div className={openSidebar ? 'row mx-3' : 'mx-3'}>
-        <div className="col-md-3">
+        <div className="col-lg-3">
           {/* {openSidebar && ( */}
           <Tabs defaultActiveKey="variant-lookup-form"
             style={{display: openSidebar ? 'block' : 'none'}}>
@@ -276,9 +276,9 @@ export function VariantLookup() {
           </Button>
         </div>
 
-        <div className="d-md-none p-2"></div>
+        <div className="d-lg-none p-2"></div>
 
-        <div className={openSidebar ? 'col-md-9' : 'col-md-12'}>
+        <div className={openSidebar ? 'col-lg-9' : 'col-lg-12'}>
           <VariantLookupSearchCriteria />
 
           <Tabs defaultActiveKey="variant-lookup">
