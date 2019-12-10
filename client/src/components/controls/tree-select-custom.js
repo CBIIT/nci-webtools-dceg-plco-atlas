@@ -1,12 +1,4 @@
 import React, { useState } from 'react';
-import ReactDOM from 'react-dom';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import {
-  faPlusSquare,
-  faMinusSquare,
-  faSearch,
-  faTimes
-} from '@fortawesome/free-solid-svg-icons';
 
 export function TreeSelectCustom({
   onChange,
@@ -101,10 +93,8 @@ export function TreeSelectCustom({
           const collapseButton = document.getElementsByClassName(
             'collapse-button-text-' + dataCategories[i].value
           )[0];
-          ReactDOM.render(
-            <FontAwesomeIcon icon={faMinusSquare} size="1x" />,
-            collapseButton
-          );
+          collapseButton.classList.toggle('fa-plus-square', false);
+          collapseButton.classList.toggle('fa-minus-square', true);
         }
       }
       setExpandAll(true);
@@ -120,10 +110,8 @@ export function TreeSelectCustom({
           const collapseButton = document.getElementsByClassName(
             'collapse-button-text-' + dataCategories[i].value
           )[0];
-          ReactDOM.render(
-            <FontAwesomeIcon icon={faPlusSquare} size="1x" />,
-            collapseButton
-          );
+          collapseButton.classList.toggle('fa-plus-square', true);
+          collapseButton.classList.toggle('fa-minus-square', false);
         }
       }
       setExpandAll(false);
@@ -139,24 +127,19 @@ export function TreeSelectCustom({
       document.getElementsByClassName(className)[0].style.display === 'none'
     ) {
       document.getElementsByClassName(className)[0].style.display = 'block';
-      // return false;
       const collapseButton = document.getElementsByClassName(
         'collapse-button-text-' + name
       )[0];
-      ReactDOM.render(
-        <FontAwesomeIcon icon={faMinusSquare} size="1x" />,
-        collapseButton
-      );
+      collapseButton.classList.toggle('fa-plus-square', false);
+      collapseButton.classList.toggle('fa-minus-square', true);
     } else {
       document.getElementsByClassName(className)[0].style.display = 'none';
       // return true;
       const collapseButton = document.getElementsByClassName(
         'collapse-button-text-' + name
       )[0];
-      ReactDOM.render(
-        <FontAwesomeIcon icon={faPlusSquare} size="1x" />,
-        collapseButton
-      );
+      collapseButton.classList.toggle('fa-plus-square', true);
+      collapseButton.classList.toggle('fa-minus-square', false);
     }
   };
 
@@ -322,14 +305,7 @@ export function TreeSelectCustom({
                   style={{ all: 'unset' }}
                   className="collapse-button text-secondary"
                   onClick={e => toggleHideChildren(item.value)}>
-                  <span className={'collapse-button-text-' + item.value}>
-                    <FontAwesomeIcon icon={faPlusSquare} size="1x" />
-                    {/* <FontAwesomeIcon icon={
-                      toggleHideChildren(item.value)
-                        ? faPlusSquare
-                        : faMinusSquare
-                    } /> */}
-                  </span>
+                  <i className={"fas fa-plus-square collapse-button-text-" + item.value}></i>
                 </button>
 
                 <div
@@ -571,10 +547,10 @@ export function TreeSelectCustom({
                 className="ml-1 collapse-button-all text-secondary"
                 onClick={e => toggleExpandAllParents()}>
                 {expandAll && (
-                  <FontAwesomeIcon icon={faMinusSquare} size="1x" />
+                  <i className="fas fa-minus-square"></i>
                 )}
                 {!expandAll && (
-                  <FontAwesomeIcon icon={faPlusSquare} size="1x" />
+                  <i className="fas fa-plus-square"></i>
                 )}
               </button>
 
@@ -634,11 +610,11 @@ export function TreeSelectCustom({
                     setSearchInput('');
                     setListType('categorical');
                   }}>
-                  <FontAwesomeIcon icon={faTimes} size="xs" />
+                  <i className="fas fa-times fa-xs"></i>
                 </button>
               ) : (
                 <button className="input-group-text bg-white" disabled>
-                  <FontAwesomeIcon icon={faSearch} size="xs" />
+                  <i className="fas fa-search fa-xs"></i>
                 </button>
               )}
             </div>
