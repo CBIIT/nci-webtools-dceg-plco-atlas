@@ -108,27 +108,28 @@ export function PhenotypeCorrelations() {
       <h1 className="d-none">Explore GWAS data - Visualize phenotype correlations</h1>
       <div className={openSidebar ? 'row mx-3' : 'mx-3'}>
         <div className="col-md-3">
-          {openSidebar && (
-            <Tabs defaultActiveKey="phenotype-correlations-form">
-              <Tab
-                eventKey="phenotype-correlations-form"
-                // title="Table"
-                className="p-2 bg-white tab-pane-bordered rounded-0"
-                style={{ minHeight: '100%' }}>
-                <PhenotypeCorrelationsForm
-                  onSubmit={handleSubmit}
-                  onChange={handleChange}
-                  onReset={handleReset}
-                />
-                {messages &&
-                  messages.map(({ type, content }) => (
-                    <Alert className="mt-3" variant={type} onClose={clearMessages} dismissible>
-                      {content}
-                    </Alert>
-                  ))}
-              </Tab>
-            </Tabs>
-          )}
+        {/* {openSidebar && ( */}
+          <Tabs defaultActiveKey="phenotype-correlations-form"
+            style={{display: openSidebar ? 'block' : 'none'}}>
+            <Tab
+              eventKey="phenotype-correlations-form"
+              className="p-2 bg-white tab-pane-bordered rounded-0"
+              style={{ minHeight: '100%', display: openSidebar ? 'block' : 'none' }}>
+              <PhenotypeCorrelationsForm
+                onSubmit={handleSubmit}
+                onChange={handleChange}
+                onReset={handleReset}
+                style={{display: openSidebar ? 'block' : 'none'}}
+              />
+              {messages &&
+                messages.map(({ type, content }) => (
+                  <Alert className="mt-3" variant={type} onClose={clearMessages} dismissible>
+                    {content}
+                  </Alert>
+                ))}
+            </Tab>
+          </Tabs>
+          {/* )} */}
           <Button
             className="pt-0 border-0"
             title={openSidebar ? "Hide search panel" : "Show search panel"}
