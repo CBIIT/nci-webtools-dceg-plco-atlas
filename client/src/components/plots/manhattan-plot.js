@@ -15,7 +15,8 @@ export function ManhattanPlot({
   onChromosomeSelected,
   onVariantLookup,
   onZoom,
-  loading
+  loading,
+  panelCollapsed,
 }) {
   const [zoomStack, setZoomStack] = useState([]);
   const [genes, setGenes] = useState([]);
@@ -72,6 +73,10 @@ export function ManhattanPlot({
       plot.current.destroy();
     };
   }, [manhattanPlotData, manhattanPlotMirroredData, selectedPlot]);
+
+  useEffect(() => {
+    plot.current && plot.current.redraw();
+  }, [panelCollapsed]);
 
   function getMirroredSummaryPlot(plotData, mirroredPlotData) {
     let columnIndexes = {
@@ -536,7 +541,7 @@ export function ManhattanPlot({
       </div>
       <div
         style={{
-          overflowX: 'visible'
+          overflowX: 'auto'
           // overflowY: 'auto',
           // height: '600px',
         }}>
@@ -547,6 +552,7 @@ export function ManhattanPlot({
             (genePlotCollapsed || getXRange() > 1e6 || !genes.length) && 'gene-plot-collapsed'
           ].join(' ')}
         />
+        {/* <button onClick={e => plot.current.redraw()}>Redraw</button> */}
 
         {manhattanPlotView !== 'summary' && (
           <div className="text-center px-5">
@@ -574,9 +580,6 @@ export function ManhattanPlot({
                   </div>
                 )
               }
-
-
-
             })()}
             <button
               className="btn-collapse"
