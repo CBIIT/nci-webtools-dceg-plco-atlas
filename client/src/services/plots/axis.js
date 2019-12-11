@@ -1,5 +1,6 @@
 import { renderText, measureWidth } from './text.js';
 import { interpolateTicks } from './scale.js';
+import * as clone from 'lodash.clonedeep';
 
 export function axisLeft(config, ctx) {
   const margins = config.margins;
@@ -142,6 +143,7 @@ export function axisLeft(config, ctx) {
 }
 
 export function axisBottom(config, ctx) {
+  console.log('drawing axis', clone(config), ctx);
   const margins = config.margins;
   const [xMin, xMax] = config.xAxis.extent;
   const [yMin, yMax] = config.yAxis.extent;
@@ -176,6 +178,10 @@ export function axisBottom(config, ctx) {
 
   // draw axis line
   ctx.fillRect(xScale(xMin), 0, xScale(xMax) - xScale(xMin) + 3, axisWidth);
+
+  // remove tick 0 if defined, and labelsBetweenTicks is true
+  if (labelsBetweenTicks && interpolatedTicks[0] == 0)
+    interpolatedTicks.shift();
 
   // draw each tick (do not use forEach to avoid creating new scopes)
   for (let i = 0; i < ticks.length; i++) {
