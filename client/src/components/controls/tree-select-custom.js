@@ -597,6 +597,7 @@ export function TreeSelectCustom({
             <input
               className="form-control py-1 h-100 border-right-0"
               style={{ display: 'block' }}
+              title="Search Phenotype"
               placeholder="Search Phenotype"
               aria-label="Search Phenotype"
               value={searchInput}
