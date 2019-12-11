@@ -447,6 +447,7 @@ export function SummaryResults() {
                 onVariantLookup={handleVariantLookup}
                 onZoom={handleZoom}
                 loading={loadingManhattanPlot}
+                panelCollapsed={openSidebar}
               />
               <div
                 className="mw-100 my-4 px-5"
