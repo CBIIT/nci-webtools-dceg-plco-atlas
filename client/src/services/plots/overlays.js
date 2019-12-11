@@ -1,4 +1,4 @@
-import { viewportToLocalCoordinates, min, max } from './utils.js';
+import { viewportToLocalCoordinates, min, max, addEventListener } from './utils.js';
 import { getScale } from './scale.js';
 
 export function drawSelectionOverlay(config, ctx, overlayCtx) {
@@ -14,10 +14,10 @@ export function drawSelectionOverlay(config, ctx, overlayCtx) {
   if (ticks[0] != 0) ticks.unshift(0);
 
   canvas.removeEventListener('mousemove', drawOverlay);
-  canvas.addEventListener('click', selectOverlay);
+  canvas.removeEventListener('click', selectOverlay);
 
-  canvas.addEventListener('mousemove', drawOverlay);
-  canvas.addEventListener('click', selectOverlay);
+  addEventListener(canvas, 'mousemove', drawOverlay);
+  addEventListener(canvas, 'click', selectOverlay);
 
   function drawOverlay(ev) {
     overlayCtx.clearRect(0, 0, overlayCanvas.width, overlayCanvas.height);
@@ -70,10 +70,10 @@ export function drawZoomOverlay(config, ctx, overlayCtx) {
   canvas.removeEventListener('mouseup', endZoom);
   canvas.removeEventListener('dblclick', resetZoom);
 
-  canvas.addEventListener('mousedown', startZoom);
-  canvas.addEventListener('mousemove', updateZoomWindow);
-  canvas.addEventListener('mouseup', endZoom);
-  canvas.addEventListener('dblclick', resetZoom);
+  addEventListener(canvas, 'mousedown', startZoom);
+  addEventListener(canvas, 'mousemove', updateZoomWindow);
+  addEventListener(canvas, 'mouseup', endZoom);
+  addEventListener(canvas, 'dblclick', resetZoom);
 
   //
   config.zoomOverlayActive = false;
