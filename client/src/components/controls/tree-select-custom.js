@@ -355,8 +355,7 @@ export function TreeSelectCustom({
                 />
 
                 <button
-                  // title={singleSelect? "Show/hide " + item.title + " phenotypes" : item.title}
-                  title={item.title}
+                  title={singleSelect? "Show/hide " + item.title + " phenotypes" : 'Select/deselect all ' + item.title + ' phenotypes'}
                   className="ml-1"
                   style={{
                     all: 'unset',
