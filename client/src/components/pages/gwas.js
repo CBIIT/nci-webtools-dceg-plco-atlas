@@ -59,7 +59,7 @@ export function Gwas() {
   ];
 
   return (
-    <div className="container px-0">
+    <div className="px-0">
       <div className="mx-3">
         <div
           className="mx-3 bg-white border border-top-0">
