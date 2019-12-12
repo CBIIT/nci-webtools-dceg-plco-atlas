@@ -192,7 +192,7 @@ export function ManhattanPlot({
         // draw genes if zoom is at less than 50 MB
         setGenes([]);
         plot.current.drawGenes([]);
-        if (zoomRange <= 1e6) {
+        if (zoomRange <= 2e6) {
           let genes = await query('genes', {
             database: 'gene.db',
             chr: selectedChromosome,
@@ -375,7 +375,7 @@ export function ManhattanPlot({
         // draw genes if zoom is at less than 50 MB
         setGenes([]);
         plot.current.drawGenes([]);
-        if (zoomRange <= 1e6) {
+        if (zoomRange <= 2e6) {
           let genes = await query('genes', {
             database: 'gene.db',
             chr: selectedChromosome,
@@ -549,7 +549,7 @@ export function ManhattanPlot({
           ref={plotContainer}
           className={[
             `manhattan-plot`,
-            (genePlotCollapsed || getXRange() > 1e6 || !genes.length) && 'gene-plot-collapsed'
+            (genePlotCollapsed || getXRange() > 2e6 || !genes.length) && 'gene-plot-collapsed'
           ].join(' ')}
         />
         {/* <button onClick={e => plot.current.redraw()}>Redraw</button> */}
@@ -563,13 +563,13 @@ export function ManhattanPlot({
                   className="p-4 mb-0 text-muted small"
                   style={{ border: '1px solid #eee' }}>
                   Gene plot is not available at the current zoom level. To show
-                  genes, please zoom in to a 1MB viewport.
+                  genes, please zoom in to a 2MB viewport.
                 </div>
               );
               if (!zoomStack || !zoomStack.length) return zoomMessage;
               let { xMax, xMin } = zoomStack[zoomStack.length - 1].bounds;
               let xRange = xMax - xMin;
-              if (xRange > 1e6) {
+              if (xRange > 2e6) {
                 return zoomMessage;
               } else if (!genes.length) {
                 return (
