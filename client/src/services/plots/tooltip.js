@@ -32,21 +32,20 @@ export function hideTooltip(tooltip) {
  * @param {Event} ev
  * @param {Element|string} html
  */
-export function showTooltip(tooltip, ev, html) {
-  let localX, localY;
+export function showTooltip(tooltip, ev, html, options) {
+  let { localX, localY } = ev;
+  options = options || {};
+
   // get coordinates relative to event's target
-  if (!ev.localX && !ev.localY) {
-    let { x, y } = viewportToLocalCoordinates(
+  if (!localX || !localY) {
+    let coords = viewportToLocalCoordinates(
       ev.clientX,
       ev.clientY,
       ev.target
     );
 
-    localX = x;
-    localY = y;
-  } else {
-    localX = ev.localX;
-    localY = ev.localY;
+    localX = coords.x;
+    localY = coords.y;
   }
 
   // set tooltip contents and make tooltip visible
@@ -56,18 +55,22 @@ export function showTooltip(tooltip, ev, html) {
 
   // determine where to place tooltip relative to event source
   // ensure tooltip is not drawn outside event target's boundaries
-  const targetWidth = ev.target.clientWidth;
-  const targetHeight = ev.target.clientHeight;
-  const tooltipHeight = tooltip.clientHeight;
-  const tooltipWidth = tooltip.clientWidth;
-  const tooltipOffset = 5;
-  const leftOffset =
-    Math.min(localX, targetWidth - tooltipWidth) - tooltipOffset;
-  const topOffset =
+  let targetWidth = ev.target.clientWidth;
+  let targetHeight = ev.target.clientHeight;
+  let tooltipHeight = tooltip.clientHeight;
+  let tooltipWidth = tooltip.clientWidth;
+  let tooltipOffset = 5;
+  let tooltipXOffset = options.center
+    ? - tooltipWidth / 2
+    : 0
+
+  let leftOffset =
+    Math.min(localX + tooltipXOffset, targetWidth - tooltipWidth) - tooltipOffset;
+  let topOffset =
     Math.min(localY, targetHeight - tooltipHeight) - tooltipOffset;
 
   setStyles(tooltip, {
-    left: leftOffset + 'px',
+    left: Math.max(leftOffset, 0) + 'px',
     top: topOffset + 'px'
   });
 }

@@ -481,15 +481,20 @@ export class ManhattanPlot {
       let gene = getGeneAtPosition(x, y);
       if (gene && !config.tooltipOpen && config.geneTooltipContent) {
         config.tooltipOpen = true;
-        let yOffset = Math.floor(y / rowHeight) * rowHeight;
+        let yOffset = (Math.floor(y / rowHeight) + 1) * rowHeight;
         let content = await config.geneTooltipContent(gene.gene, this.tooltip);
-        console.log('showing tooltip', gene, content, this.geneTooltip)
-        showTooltip(this.geneTooltip, ev, content);
-        /*
-        showTooltip(this.geneTooltip, {
-          localX: gene.pxStart,
+        let tooltipLocation = {
+          localX: gene.gene.pxCenter,
           localY: yOffset,
-        }, content);
+        }
+        ev.localX = gene.gene.pxCenter
+        ev.localY = yOffset
+
+        console.log('showing tooltip', gene, content, this.geneTooltip, tooltipLocation)
+        showTooltip(this.geneTooltip, ev, content, {center: true});
+
+        /*
+        showTooltip(this.geneTooltip, , content);
         */
       } else if (!gene) {
         config.tooltipOpen = false;
