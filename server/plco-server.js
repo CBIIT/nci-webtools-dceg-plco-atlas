@@ -13,7 +13,8 @@ if (cluster.isMaster) {
   const numProcesses = require("os").cpus().length * 2; // two processes per cpu
   for (let i = 0; i < numProcesses; i++) cluster.fork();
   cluster.on("exit", worker => {
-    logger.info(`Exited worker process: ${worker.process.pid}`);
+    logger.info(`Restarted worker process: ${worker.process.pid}`);
+    cluster.fork();
   });
   return;
 }
