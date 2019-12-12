@@ -64,7 +64,8 @@ export function PhenotypeCorrelations() {
       ]);
       return;
     }
-    setOpenSidebar(false);
+    // close sidebar on submit
+    // setOpenSidebar(false);
     setSearchCriteriaPhenotypeCorrelations({
       phenotypes: selectedPhenotypes.map(item =>
         item.title ? item.title : item.label

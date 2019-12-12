@@ -4,7 +4,7 @@ import { NavLink } from 'react-router-dom';
 export function Navbar({ links }) {
   return (
     <div className="bg-primary text-white shadow-sm">
-      <div className="container px-0">
+      <div className="px-0">
         <div className="ml-3">
           {[{ route: '/', title: 'Home', exact: true }]
             .concat(links)
