@@ -7,11 +7,11 @@ $enable-shadows: true;
 @import '~react-bootstrap-table2-paginator/dist/react-bootstrap-table2-paginator.min.css';
 @import '~react-bootstrap-table2-filter/dist/react-bootstrap-table2-filter.min.css';
 
-@media (min-width: 1600px) {
-  .container {
-    min-width: 1440px;
-  }
-}
+// @media (min-width: 1600px) {
+//   .container {
+//     min-width: 1440px;
+//   }
+// }
 
 .bg-primary-lighter {
   background-color: #d9e8f6;
