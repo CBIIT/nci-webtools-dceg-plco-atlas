@@ -465,9 +465,10 @@ export class ManhattanPlot {
     geneOverlayCanvas.width = geneCanvas.width;
 
     const getGeneAtPosition = (x, y) => {
+      let padding = 5;
       return geneOverlayPositions.find(pos => {
-        return x > pos.x1 && x < pos.x2
-          && y > pos.y1 && y < pos.y2;
+        return x > pos.x1 - padding && x < pos.x2 + padding
+          && y > pos.y1 - padding && y < pos.y2 + padding;
       })
     }
 
@@ -480,9 +481,16 @@ export class ManhattanPlot {
       let gene = getGeneAtPosition(x, y);
       if (gene && !config.tooltipOpen && config.geneTooltipContent) {
         config.tooltipOpen = true;
+        let yOffset = Math.floor(y / rowHeight) * rowHeight;
         let content = await config.geneTooltipContent(gene.gene, this.tooltip);
         console.log('showing tooltip', gene, content, this.geneTooltip)
         showTooltip(this.geneTooltip, ev, content);
+        /*
+        showTooltip(this.geneTooltip, {
+          localX: gene.pxStart,
+          localY: yOffset,
+        }, content);
+        */
       } else if (!gene) {
         config.tooltipOpen = false;
         hideTooltip(this.geneTooltip);
