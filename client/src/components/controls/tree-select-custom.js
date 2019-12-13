@@ -355,8 +355,7 @@ export function TreeSelectCustom({
                 />
 
                 <button
-                  // title={singleSelect? "Show/hide " + item.title + " phenotypes" : item.title}
-                  title={item.title}
+                  title={singleSelect? "Show/hide " + item.title + " phenotypes" : 'Select/deselect all ' + item.title + ' phenotypes'}
                   className="ml-1"
                   style={{
                     all: 'unset',
@@ -597,6 +596,7 @@ export function TreeSelectCustom({
             <input
               className="form-control py-1 h-100 border-right-0"
               style={{ display: 'block' }}
+              title="Search Phenotype"
               placeholder="Search Phenotype"
               aria-label="Search Phenotype"
               value={searchInput}

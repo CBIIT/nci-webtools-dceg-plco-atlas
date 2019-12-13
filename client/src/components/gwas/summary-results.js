@@ -105,7 +105,8 @@ export function SummaryResults() {
 
     // determine which tables to use for summary results
     const variantTable = getVariantTable(manhattanPlotType);
-    setOpenSidebar(false);
+    // close sidebar on submit
+    // setOpenSidebar(false);
     setPopupTooltipData(null);
     dispatch(drawQQPlot(phenotype, variantTable));
 
@@ -447,6 +448,7 @@ export function SummaryResults() {
                 onVariantLookup={handleVariantLookup}
                 onZoom={handleZoom}
                 loading={loadingManhattanPlot}
+                panelCollapsed={openSidebar}
               />
               <div
                 className="mw-100 my-4 px-5"
