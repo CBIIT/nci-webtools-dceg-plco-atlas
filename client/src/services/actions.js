@@ -2,6 +2,8 @@ import { query, rawQuery } from './query';
 
 export const UPDATE_SUMMARY_RESULTS = 'UPDATE_SUMMARY_RESULTS';
 export const UPDATE_SUMMARY_TABLE = 'UPDATE_SUMMARY_TABLE';
+export const UPDATE_SUMMARY_SNP_TABLE = 'UPDATE_SUMMARY_SNP_TABLE';
+export const UPDATE_SUMMARY_SNP = 'UPDATE_SUMMARY_SNP';
 export const UPDATE_VARIANT_LOOKUP = 'UPDATE_VARIANT_LOOKUP';
 export const UPDATE_PHENOTYPE_CORRELATIONS = 'UPDATE_PHENOTYPE_CORRELATIONS';
 export const UPDATE_PHENOTYPES = 'UPDATE_PHENOTYPES';
@@ -24,8 +26,24 @@ export function updateSummaryResults(data) {
   return { type: UPDATE_SUMMARY_RESULTS, data };
 }
 
-export function updateSummaryTable(data, index) {
-  return { type: UPDATE_SUMMARY_TABLE, data, index };
+export function updateSummaryTable(key, data) {
+  return { type: UPDATE_SUMMARY_TABLE, key, data };
+}
+
+export function setSummaryTableLoading(loading) {
+  return updateSummaryTable('loading', loading);
+}
+
+export function updateSummarySnp(key, data) {
+  return { type: UPDATE_SUMMARY_SNP, key, data };
+}
+
+export function updateSummarySnpTable(key, data) {
+  return { type: UPDATE_SUMMARY_SNP_TABLE, key, data };
+}
+
+export function setSummarySnpLoading(loading) {
+  return updateSummarySnp('loading', loading);
 }
 
 export function updateVariantLookup(data) {
@@ -43,31 +61,53 @@ export function fetchRanges() {
   };
 }
 
-export function fetchSummaryTable(params, countKey, tableIndex) {
+export function fetchSummaryTable(tableKey, params) {
   return async function(dispatch) {
-    dispatch(updateSummaryResults({ loadingManhattanTable: true }));
+    dispatch(setSummaryTableLoading(true));
+
+    // fetch variants given parameters
     const response = await query('variants', params);
-    if (!response.error) {
-      let data = { results: response.data };
-      if (response.count) data.resultsCount = response.count;
-      else if (countKey)
-        data.resultsCount = +(await query('metadata', {
-          ...params,
-          key: countKey
-        }));
-      dispatch(
-        updateSummaryTable(
-          {
-            ...data,
-            page: params.page,
-            pageSize: params.pageSize
-          },
-          tableIndex
-        )
-      );
-    }
-    dispatch(updateSummaryResults({ loadingManhattanTable: false }));
-    return response;
+    if (response.error) return setLoading(false);
+
+    let results = response.data;
+
+    // fetch results count (use key if supplied as parameter)
+    let resultsCount = response.count || + await query('metadata', {
+      database: params.database,
+      key: params.key
+    });
+
+    dispatch(
+      updateSummaryTable(tableKey, {
+        results: results,
+        resultsCount: resultsCount,
+        page: 1 + Math.floor(params.offset / params.limit),
+        pageSize: params.limit
+      })
+    );
+
+    dispatch(setSummaryTableLoading(false));
+  }
+}
+
+export function fetchSummarySnpTable(tableKey, params) {
+  return async function(dispatch) {
+    dispatch(setSummarySnpLoading(true));
+
+    setLoading(true);
+    const response = await query('variants', params);
+    if (response.error) return setLoading(false);
+
+    dispatch(
+      updateSummarySnpTable(tableKey, {
+        results: response.data,
+        resultsCount: response.count || response.data.length,
+        page: 1 + Math.floor(params.offset / params.limit),
+        pageSize: params.limit
+      })
+    );
+
+    dispatch(setSummarySnpLoading(false));
   };
 }
 
@@ -211,7 +251,7 @@ export function drawQQPlot(phenotype, variantTable) {
         'subsetObservedVariants.length',
         subsetObservedVariants.length
       );
-      
+
       const markerColor = table !== 'variant_female' ? '#006bb8' : '#e47618';
 
       let qqplotTopData = {
@@ -558,7 +598,7 @@ export function drawQQPlot(phenotype, variantTable) {
             '<b>Female \u03BB</b> = ' +
             metadata_lambdaGC_female +
             '        <b>Female Sample Size</b> = ' +
-            metadata_count_female.toLocaleString() + 
+            metadata_count_female.toLocaleString() +
             '        <b>Male \u03BB</b> = ' +
             metadata_lambdaGC_male +
             '        <b>Male Sample Size</b> = ' +
@@ -618,14 +658,14 @@ export function drawQQPlot(phenotype, variantTable) {
           itemdoubleclick: false
         }
       };
-      
+
       setQQPlotLayout(qqplotLayout);
       setQQPlotData([
-        qqplotTopDataFemale, 
-        qqplotSubsetDataFemale, 
-        qqplotLineDataFemale, 
-        qqplotTopDataMale, 
-        qqplotSubsetDataMale, 
+        qqplotTopDataFemale,
+        qqplotSubsetDataFemale,
+        qqplotLineDataFemale,
+        qqplotTopDataMale,
+        qqplotSubsetDataMale,
         qqplotLineDataMale
       ]);
     }

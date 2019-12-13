@@ -3,7 +3,7 @@ import { rootReducer } from './reducers';
 import { fetchRanges } from './actions';
 import ReduxThunk from 'redux-thunk';
 
-const initialState = {
+export const getInitialState = () => ({
   phenotypes: [],
   phenotypeCategories: [],
   phenotypesTree: [],
@@ -30,31 +30,62 @@ const initialState = {
     loadingManhattanPlot: false,
     loadingQQPlot: false,
     drawManhattanPlot: null,
-    updateResultsTable: null,
     // popupTooltipData: null,
     // tooltipData: null,
-    snp: '',
-    snpResults: null,
-    showSnpResults: null,
     qqplotData: [],
     qqplotLayout: {},
     searchCriteriaSummaryResults: {},
     sampleSize: null
   },
-  summaryTables: [
-    {
+  manhattanPlot: {
+    data: {},
+    mirroredData: {},
+  },
+  summaryTables: {
+    visible: true,
+    loading: false,
+    all: {
       results: [],
       resultsCount: 0,
       page: 1,
-      pageSize: 10
+      pageSize: 10,
     },
-    {
+    female: {
       results: [],
       resultsCount: 0,
       page: 1,
-      pageSize: 10
-    }
-  ],
+      pageSize: 10,
+    },
+    male: {
+      results: [],
+      resultsCount: 0,
+      page: 1,
+      pageSize: 10,
+    },
+  },
+  summarySnpTables: {
+    snp: '',
+    visible: false,
+    loading: false,
+    all: {
+      results: [],
+      resultsCount: 0,
+      page: 1,
+      pageSize: 10,
+    },
+    female: {
+      results: [],
+      resultsCount: 0,
+      page: 1,
+      pageSize: 10,
+    },
+    male: {
+      results: [],
+      resultsCount: 0,
+      page: 1,
+      pageSize: 10,
+    },
+  },
   variantLookup: {
     selectedListType: 'categorical',
     selectedPhenotype: null,
@@ -83,11 +114,11 @@ const initialState = {
     collapseCriteria: true
     // tooltipData: null
   }
-};
+});
 
 export const store = createStore(
   rootReducer,
-  initialState,
+  getInitialState(),
   compose(
     applyMiddleware(ReduxThunk),
     window.__REDUX_DEVTOOLS_EXTENSION__
