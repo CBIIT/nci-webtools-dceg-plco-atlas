@@ -34,6 +34,7 @@ export function SummaryResultsTable() {
     snpResults,
     showSnpResults,
   } = useSelector(state => state.summaryResults);
+  let [gender, setGender] = useState('female');
 
   const columns = [
     {
@@ -70,7 +71,7 @@ export function SummaryResultsTable() {
     }
   ];
 
-  const snpColumns = [
+  let snpColumns = [
     {
       dataField: 'chr',
       text: 'Chromosome'
@@ -106,6 +107,7 @@ export function SummaryResultsTable() {
     { page, sizePerPage: limit, sortField: orderBy, sortOrder: order },
     index
   ) => {
+    console.log('handling table change');
     if (!selectedPhenotype || !selectedPhenotype.value) return;
 
     console.log({ order, orderBy, limit, page, bpMin, bpMax });
@@ -140,7 +142,7 @@ export function SummaryResultsTable() {
     if (!snp) return;
     const table = {
       all: 'variant_all',
-      stacked: 'variant_all',
+      stacked: ['variant_female', 'variant_male'],
       female: 'variant_female',
       male: 'variant_male'
     }[selectedManhattanPlotType];
@@ -178,81 +180,96 @@ export function SummaryResultsTable() {
 
   return (
     <div className="mt-3">
-      {showTabs && (
-        <Tabs defaultActiveKey="female">
-          {tabs.map(({ title, key, index }) => (
-            <Tab eventKey={key} title={title}>
-              <Table
-                remote
-                keyField="variant_id"
-                loading={loadingManhattanTable}
-                data={summaryTables[index].results}
-                columns={columns}
-                onTableChange={(type, ev) => handleTableChange(type, ev, index)}
-                overlay={loadingOverlay}
-                pagination={paginationFactory({
-                  page: summaryTables[index].page,
-                  sizePerPage: summaryTables[index].pageSize,
-                  totalSize: summaryTables[index].resultsCount,
-                  showTotal: summaryTables[index].results.length > 0,
-                  sizePerPageList: [10, 25, 50, 100],
-                  paginationTotalRenderer: paginationText,
-                  sizePerPageRenderer: paginationSizeSelector,
-                  pageButtonRenderer: paginationButton
-                })}
-                defaultSorted={[{ dataField: 'p', order: 'asc' }]}
-              />
-            </Tab>
-          ))}
-        </Tabs>
-      )}
-
-      {!showTabs && (
-        <Table
-          remote
-          keyField="variant_id"
-          loading={loadingManhattanTable}
-          data={summaryTables[0].results}
-          columns={columns}
-          onTableChange={(type, ev) => handleTableChange(type, ev, 0)}
-          overlay={loadingOverlay}
-          pagination={paginationFactory({
-            page: summaryTables[0].page,
-            sizePerPage: summaryTables[0].pageSize,
-            totalSize: summaryTables[0].resultsCount,
-            showTotal: summaryTables[0].results.length > 0,
-            sizePerPageList: [10, 25, 50, 100],
-            paginationTotalRenderer: paginationText,
-            sizePerPageRenderer: paginationSizeSelector,
-            pageButtonRenderer: paginationButton
-          })}
-          defaultSorted={[{ dataField: 'p', order: 'asc' }]}
-        />
-      )}
-
-      <div>
-        <div className="d-flex mb-2">
-          <input
-            type="text"
-            style={{ maxWidth: '400px' }}
-            className="form-control"
-            placeholder="Search for a SNP"
-            value={snp}
-            onChange={e => setSnp(e.target.value)}
-          />
-          <button
-            className="btn btn-silver flex-shrink-auto d-flex"
-            onClick={handleSnpReset}>
-            <Icon className="opacity-50" name="times" width="12" />
-            <span className="sr-only">Clear</span>
-          </button>
-          <button
-            className="btn btn-silver flex-shrink-auto mx-2"
-            onClick={handleSnpLookup}>
-            Search
-          </button>
+      <div className="d-flex align-items-center justify-content-between">
+        <div className="d-flex align-items-center">
+          {showTabs && <div class="btn-group" role="group" aria-label="Basic example">
+            <button
+              className={`btn btn-primary ${gender === 'female' && 'active'}`}
+              onClick={e => setGender('female')}>
+              Female
+            </button>
+            <button
+              className={`btn btn-primary ${gender === 'male' && 'active'}`}
+              onClick={e => setGender('male')}>
+              Male
+            </button>
+          </div>}
         </div>
 
+        <div className="d-flex mb-2">
+            <input
+              type="text"
+              style={{ maxWidth: '400px' }}
+              className="form-control"
+              placeholder="Search for a SNP"
+              value={snp}
+              onChange={e => setSnp(e.target.value)}
+            />
+            <button
+              className="btn btn-silver flex-shrink-auto d-flex"
+              onClick={handleSnpReset}>
+              <Icon className="opacity-50" name="times" width="12" />
+              <span className="sr-only">Clear</span>
+            </button>
+            <button
+              className="btn btn-silver flex-shrink-auto mx-2"
+              onClick={handleSnpLookup}>
+              Search
+            </button>
+          </div>
+      </div>
+
+      <div style={{display: showSnpResults ? 'none' : 'block'}}>
+        {(!showTabs || gender === 'female') && (
+          <Table
+            remote
+            keyField="variant_id"
+            loading={loadingManhattanTable}
+            data={summaryTables[0].results}
+            columns={columns}
+            onTableChange={(type, ev) => handleTableChange(type, ev, 0)}
+            overlay={loadingOverlay}
+            pagination={paginationFactory({
+              page: summaryTables[0].page,
+              sizePerPage: summaryTables[0].pageSize,
+              totalSize: summaryTables[0].resultsCount,
+              showTotal: summaryTables[0].results.length > 0,
+              sizePerPageList: [10, 25, 50, 100],
+              paginationTotalRenderer: paginationText,
+              sizePerPageRenderer: paginationSizeSelector,
+              pageButtonRenderer: paginationButton
+            })}
+            defaultSorted={[{ dataField: 'p', order: 'asc' }]}
+          />
+        )}
+
+        {showTabs &&
+          <div style={{display: gender === 'male' ? 'block' : 'none'}}>
+          <Table
+            remote
+            keyField="variant_id"
+            loading={loadingManhattanTable}
+            data={summaryTables[1].results}
+            columns={columns}
+            onTableChange={(type, ev) => handleTableChange(type, ev, 1)}
+            overlay={loadingOverlay}
+            pagination={paginationFactory({
+              page: summaryTables[1].page,
+              sizePerPage: summaryTables[1].pageSize,
+              totalSize: summaryTables[1].resultsCount,
+              showTotal: summaryTables[1].results.length > 0,
+              sizePerPageList: [10, 25, 50, 100],
+              paginationTotalRenderer: paginationText,
+              sizePerPageRenderer: paginationSizeSelector,
+              pageButtonRenderer: paginationButton
+            })}
+            defaultSorted={[{ dataField: 'p', order: 'asc' }]}
+          />
+          </div>
+        }
+        </div>
+
+      <div>
         {showSnpResults && (
           <Table keyField="variant_id" data={snpResults} columns={columns} />
         )}
