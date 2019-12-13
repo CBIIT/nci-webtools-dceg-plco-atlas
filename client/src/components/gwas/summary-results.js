@@ -453,11 +453,7 @@ export function SummaryResults() {
               <div
                 className="mw-100 my-4 px-5"
                 style={{ display: submitted ? 'block' : 'none' }}>
-                <SnpSearchForm />
-
-                <div style={{ display: showSnpResults ? 'none' : 'block' }}>
-                  <SummaryResultsTable />
-                </div>
+                <SummaryResultsTable />
               </div>
               {placeholder}
             </Tab>
