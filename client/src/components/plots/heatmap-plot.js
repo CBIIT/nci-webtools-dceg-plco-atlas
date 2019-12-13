@@ -109,6 +109,7 @@ export function Heatmap() {
   };
 
   const config = {
+    responsive: true,
     toImageButtonOptions: {
       format: 'svg', // one of png, svg, jpeg, webp
       filename: 'custom_image',
@@ -122,7 +123,6 @@ export function Heatmap() {
       'hoverClosestCartesian',
       'hoverCompareCartesian'
     ]
-    // responsive: true
   };
 
   return (
@@ -134,16 +134,6 @@ export function Heatmap() {
             display: heatmapData.length > 0 && !loading ? 'block' : 'none'
           }}>
           <div style={{ display: loading ? 'none' : 'block' }}>
-            {/* {popupTooltipData && ( */}
-            {/* <div style={popupTooltipStyle} className="popup-tooltip shadow" id="heatmap-tooltip">
-              <a href="/">{popupTooltipData ? popupTooltipData.phenotypeX : ''}</a>
-              <br />
-              <a href="/">{popupTooltipData ? popupTooltipData.phenotypeY : ''}</a>
-              <br />
-              <b>Correlation:</b> {popupTooltipData ? popupTooltipData.r2 : ''}
-              <br />
-            </div> */}
-            {/* )} */}
             <div
               style={{
                 display: 'flex',
@@ -153,26 +143,15 @@ export function Heatmap() {
               }}>
               <Plot
                 className="heatmap"
-                style={{ position: 'relative' }}
+                style={{ position: 'relative', height: '1000px', width: '1000px' }}
                 data={heatmapData}
                 layout={heatmapLayout}
                 config={config}
                 onClick={e => popupMarkerClick(e)}
                 onRelayout={relayout => {
-                  console.log('RELAYOUT');
                   hideTooltip();
                 }}
               />
-              {/* { tooltipData && (
-                <div className="heatmap-tooltip" style={{display: 'none', position: 'absolute'}}>
-                  <a href="/">{tooltipData ? tooltipData.phenotypeX : ''}</a>
-                  <br />
-                  <a href="/">{tooltipData ? tooltipData.phenotypeY : ''}</a>
-                  <br />
-                  <b>Correlation:</b> {tooltipData ? tooltipData.r2 : ''}
-                  <br />
-                </div>
-              )} */}
             </div>
           </div>
         </div>

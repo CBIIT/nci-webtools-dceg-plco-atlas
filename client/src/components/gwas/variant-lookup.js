@@ -189,7 +189,8 @@ export function VariantLookup() {
       ]);
       return;
     }
-    setOpenSidebar(false);
+    // close sidebar on submit
+    // setOpenSidebar(false);
     setSearchCriteriaVariantLookup({
       phenotypes: selectedPhenotypes.map(item => item.title),
       variant: selectedVariant,

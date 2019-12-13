@@ -19,6 +19,7 @@ export function QQPlot({ onVariantLookup }) {
 
 
   const config = {
+    responsive: true,
     toImageButtonOptions: {
       format: 'svg', // one of png, svg, jpeg, webp
       filename: 'custom_image',
@@ -37,7 +38,6 @@ export function QQPlot({ onVariantLookup }) {
       'hoverCompareCartesian',
       'lasso2d'
     ]
-    // responsive: true
   };
 
   const createTooltip = () => {
@@ -176,7 +176,9 @@ export function QQPlot({ onVariantLookup }) {
               className="qq-plot"
               style={{
                 display: !loadingQQPlot ? 'block' : 'none',
-                position: 'relative'
+                position: 'relative', 
+                height: '800px', 
+                width: '800px'
               }}
               data={qqplotData}
               layout={qqplotLayout}

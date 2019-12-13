@@ -12,6 +12,8 @@ import {
   ensureNonStaticPositioning,
   min, max,
   withSavedContext,
+  addEventListener,
+  removeEventListeners,
 } from './utils.js';
 import { measureWidth, renderText, systemFont } from './text.js';
 import { getScale, getTicks } from './scale.js';
@@ -41,6 +43,7 @@ export class ManhattanPlot {
 
     // create a canvas to be used for drawing main plot elements
     [this.canvas, this.ctx] = getCanvasAndContext();
+    this.canvas.listeners = [];
     setStyles(this.canvas, { display: 'block' });
     this.container.appendChild(this.canvas);
 
@@ -70,6 +73,8 @@ export class ManhattanPlot {
     });
 
     [this.geneCanvas, this.geneCtx] = getCanvasAndContext();
+    this.geneCanvas.listeners = [];
+
     // setStyles(this.geneCanvas, { display: 'block' });
     this.geneCanvas.height = 0;
     this.geneCanvasContainer.appendChild(this.geneCanvas);
@@ -110,6 +115,9 @@ export class ManhattanPlot {
     // draw plot and attach handlers for interactive events
     this.draw();
     this.attachEventHandlers(this.canvas);
+    addEventListener(window, 'resize', debounce(() => {
+      this.redraw();
+    }, 300))
   }
 
   draw() {
@@ -273,6 +281,21 @@ export class ManhattanPlot {
     console.log(config);
   }
 
+  redraw() {
+    withSavedContext(this.ctx, ctx => {
+      ctx.fillStyle = this.defaultConfig.backgroundColor;
+      ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+    })
+
+    this.draw();
+    removeEventListeners(this.canvas);
+    removeEventListeners(this.geneCanvas);
+    this.attachEventHandlers(this.canvas);
+    // this.drawGenes();
+  }
+
+
+
   setTitle(title) {
     if (!title) return;
 
@@ -284,7 +307,7 @@ export class ManhattanPlot {
 //    ctx.clearRect(0, 0, this.canvas.width, margins.top);
     withSavedContext(ctx, ctx => {
       ctx.fillStyle = this.defaultConfig.backgroundColor;
-      ctx.fillRect(0, 0, this.canvas.width, margins.top);
+      ctx.fillRect(0, 0, this.canvas.width, margins.top - 5);
     })
 
 
@@ -442,12 +465,14 @@ export class ManhattanPlot {
     geneOverlayCanvas.width = geneCanvas.width;
 
     const getGeneAtPosition = (x, y) => {
+      let padding = 5;
       return geneOverlayPositions.find(pos => {
-        return x > pos.x1 && x < pos.x2
-          && y > pos.y1 && y < pos.y2;
+        return x > pos.x1 - padding && x < pos.x2 + padding
+          && y > pos.y1 - padding && y < pos.y2 + padding;
       })
     }
-    geneCanvas.onmousemove = async (ev) => {
+
+    addEventListener(geneCanvas, 'mousemove', async (ev) => {
       let { x, y } = viewportToLocalCoordinates(
         ev.clientX,
         ev.clientY,
@@ -456,21 +481,33 @@ export class ManhattanPlot {
       let gene = getGeneAtPosition(x, y);
       if (gene && !config.tooltipOpen && config.geneTooltipContent) {
         config.tooltipOpen = true;
+        let yOffset = (Math.floor(y / rowHeight) + 1) * rowHeight;
         let content = await config.geneTooltipContent(gene.gene, this.tooltip);
-        console.log('showing tooltip', gene, content, this.geneTooltip)
-        showTooltip(this.geneTooltip, ev, content);
+        let tooltipLocation = {
+          localX: gene.gene.pxCenter,
+          localY: yOffset,
+        }
+        ev.localX = gene.gene.pxCenter
+        ev.localY = yOffset
+
+        console.log('showing tooltip', gene, content, this.geneTooltip, tooltipLocation)
+        showTooltip(this.geneTooltip, ev, content, {center: true});
+
+        /*
+        showTooltip(this.geneTooltip, , content);
+        */
       } else if (!gene) {
         config.tooltipOpen = false;
         hideTooltip(this.geneTooltip);
       }
 
      // console.log('found gene', gene);
-    }
+    });
 
-    geneCanvas.onclick = (ev) => {
+    addEventListener(geneCanvas, 'click', (ev) => {
       config.tooltipOpen = false;
       hideTooltip(this.geneTooltip);
-    }
+    });
 
     // this.container.style.height = (geneCanvas.height + this.canvas.height) + 'px';
 
@@ -592,7 +629,8 @@ export class ManhattanPlot {
     const config = this.config;
 
     // change mouse cursor depending on what is being hovered over
-    canvas.onmousemove = ev => {
+
+    addEventListener(canvas, 'mousemove', ev => {
       let { x, y } = viewportToLocalCoordinates(
         ev.clientX,
         ev.clientY,
@@ -611,10 +649,11 @@ export class ManhattanPlot {
       } else if (withinMargins && config.allowZoom) cursor = 'crosshair';
 
       canvas.style.cursor = cursor;
-    };
+    });
 
     if (config.point.onhover || config.point.tooltip) {
-      canvas.addEventListener(
+      addEventListener(
+        canvas,
         'mousemove',
         debounce(async ev => {
           // this.hideTooltip();
@@ -633,7 +672,7 @@ export class ManhattanPlot {
 
     // call click event callbacks
     if (config.point.onclick || config.point.tooltip)
-      canvas.addEventListener('click', async ev => {
+      addEventListener(canvas, 'click', async ev => {
         hideTooltip(this.tooltip);
         const { tooltip, onclick } = config.point;
         const { trigger, content } = tooltip;
@@ -709,7 +748,9 @@ export class ManhattanPlot {
     this.geneCanvasContainer.remove();
     this.geneCanvas.remove();
 
-    this.canvas.onclick = null;
+    removeEventListeners(this.canvas);
+    removeEventListeners(this.geneCanvas);
+
     this.hiddenCanvas = null;
     this.overlayCanvas = null;
     this.tooltip = null;

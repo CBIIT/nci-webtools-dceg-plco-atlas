@@ -266,8 +266,9 @@ export function drawQQPlot(phenotype, variantTable) {
         dragmode: 'pan',
         clickmode: 'event',
         hovermode: 'closest',
-        width: 800,
-        height: 800,
+        // width: 800,
+        // height: 800,
+        autosize: true,
         title: {
           text:
             '<b>\u03BB</b> = ' +
@@ -549,8 +550,9 @@ export function drawQQPlot(phenotype, variantTable) {
         dragmode: 'pan',
         clickmode: 'event',
         hovermode: 'closest',
-        width: 800,
-        height: 800,
+        // width: 800,
+        // height: 800,
+        autosize: true,
         title: {
           text:
             '<b>Female \u03BB</b> = ' +
@@ -753,8 +755,9 @@ export function drawHeatmap(phenotypes) {
         '<extra></extra>'
     };
     let heatmapLayout = {
-      width: 1000,
-      height: 1000,
+      // width: 1000,
+      // height: 1000,
+      autosize: true,
       margin: {
         t: 120
       },
