@@ -1,8 +1,9 @@
 const fs = require('fs');
 const path = require('path');
 const Database = require('better-sqlite3');
-const { dbpath } = require('./config.json');
+const config = require('./config.json');
 const logger = require("./logger");
+const { dbpath } = config;
 const ranges = require(path.resolve(dbpath, 'chromosome_ranges.json'));
 
 function getRawResults(stmt, params) {
@@ -247,4 +248,11 @@ function getGenes(filepath, params) {
     return records;
 }
 
-module.exports = {getSummary, getVariants, getMetadata, getGenes};
+function getConfig(key) {
+    const allowedKeys = ['downloadRoot'];
+    return allowedKeys.includes(key)
+        ? config[key]
+        : null;
+}
+
+module.exports = {getSummary, getVariants, getMetadata, getGenes, getConfig};
