@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Alert, Tab, Tabs, Button } from 'react-bootstrap';
 import { SummaryResultsForm } from '../forms/summary-results-form';
-import { SnpSearchForm } from '../forms/snp-search-form';
 import { ManhattanPlot } from '../plots/manhattan-plot';
 import { QQPlot } from '../plots/qq-plot';
 import { SummaryResultsTable } from './summary-results-table';
@@ -13,11 +12,8 @@ import {
   lookupVariants,
   drawQQPlot,
   drawManhattanPlot,
-  fetchSummaryTable,
-  updateSummaryTable
+  fetchSummaryTable
 } from '../../services/actions';
-import { query } from '../../services/query';
-
 
 export function SummaryResults() {
   const dispatch = useDispatch();
@@ -28,13 +24,8 @@ export function SummaryResults() {
     submitted,
     ranges,
     messages,
-    page,
-    pageSize,
-    resultsCount,
-    selectedGender,
     selectedManhattanPlotType,
     loadingManhattanPlot,
-    showSnpResults
   } = useSelector(state => state.summaryResults);
 
   const setPopupTooltipData = popupTooltipData => {
@@ -88,6 +79,47 @@ export function SummaryResults() {
     // tooltip.style.display = 'none';
   };
 
+  // phenotype is selected phenotype's value
+  // plotType is all, stacked, female, or male
+  const fetchVariantTables = (phenotype, plotType, params) => {
+    params = params || {};
+    let storeKeys = {
+      all: ['all'],
+      stacked: ['female', 'male'],
+      female: ['female'],
+      male: ['male'],
+    }[plotType];
+
+    // fetch variant results tables
+    getVariantTable(plotType).forEach((table, i) => {
+      let key = storeKeys[i];
+
+      // if a chromosome is supplied, append the chromosome to the
+      // metadata key used to retrieve counts
+      let countKey = params.chr
+        ? `count_${key}_${params.chr}`
+        : `count_${key}`;
+
+      dispatch(
+        fetchSummaryTable(key, {
+          database: phenotype + '.db',
+          table: table,
+          offset: 0,
+          limit: 10,
+          columns: ['chr', 'bp', 'snp', 'a1', 'a2', 'or', 'p'],
+          orderBy: 'p',
+          order: 'asc',
+          key: params.count ? null : countKey, // metadata key for counts
+          ...params
+        })
+      );
+    });
+  }
+
+
+  // when submitting:
+  // 1. Fetch aggregate data for displaying manhattan plot(s)
+  // 2. Fetch variant data for each selected gender
   const handleSubmit = (phenotype, manhattanPlotType) => {
     phenotype = phenotype ? phenotype.value : null;
 
@@ -105,6 +137,7 @@ export function SummaryResults() {
 
     // determine which tables to use for summary results
     const variantTable = getVariantTable(manhattanPlotType);
+
     // close sidebar on submit
     // setOpenSidebar(false);
     setPopupTooltipData(null);
@@ -135,34 +168,10 @@ export function SummaryResults() {
     );
 
     // fetch variant results tables
-    variantTable.forEach((table, tableIndex) => {
-      // gender is specified by manhattan plot type (all, stacked, male, female)
-      let gender = manhattanPlotType;
-
-      // if stacked, gender will be female first, then male
-      if (manhattanPlotType === 'stacked')
-        gender = [`female`, `male`][tableIndex];
-
-      // metadata key for counts
-      let countKey = `count_${gender}`;
-
-      dispatch(
-        fetchSummaryTable(
-          {
-            database: phenotype + '.db',
-            table: table,
-            gender: gender,
-            offset: 0,
-            limit: 10,
-            columns: ['chr', 'bp', 'snp', 'a1', 'a2', 'or', 'p'],
-            orderBy: 'p',
-            order: 'asc'
-          },
-          countKey,
-          tableIndex
-        )
-      );
-    });
+    fetchVariantTables(
+      selectedPhenotype.value,
+      selectedManhattanPlotType
+    );
 
     setSearchCriteriaSummaryResults({
       phenotype: [...selectedPhenotype.title],
@@ -203,6 +212,7 @@ export function SummaryResults() {
     );
 
     // reset summary results tables
+/*
     for (let i = 0; i < 2; i++) {
       dispatch(
         updateSummaryTable(
@@ -216,7 +226,7 @@ export function SummaryResults() {
         )
       );
     }
-
+*/
     // if any Q-Q plot tooltips exist, destory
     hideQQTooltips();
   };
@@ -239,10 +249,10 @@ export function SummaryResults() {
         selectedTable: variantTable,
         selectedChromosome: chr,
         selectedManhattanPlotType,
-        bpMin: range.bp_min,
-        bpMax: range.bp_max,
-        nlogpMin: 2,
-        nlogpMax: null
+        // bpMin: range.bp_min,
+        // bpMax: range.bp_max,
+        // nlogpMin: 2,
+        // nlogpMax: null
       })
     );
 
@@ -259,42 +269,16 @@ export function SummaryResults() {
       })
     );
 
-    // fetch the table(s) for the selected chromosome
-    variantTable.forEach((table, tableIndex) => {
-      // gender is specified by manhattan plot type (all, stacked, male, female)
-      let gender = selectedManhattanPlotType;
-
-      // if stacked, gender will be female first, then male
-      if (selectedManhattanPlotType === 'stacked')
-        gender = [`female`, `male`][tableIndex];
-
-      dispatch(
-        fetchSummaryTable(
-          {
-            database,
-            table,
-            chr,
-            gender,
-            offset: 0,
-            limit: 10,
-            columns: ['chr', 'bp', 'snp', 'a1', 'a2', 'or', 'p'],
-            orderBy: 'p',
-            order: 'asc'
-          },
-          `count_${gender}_${chr}`,
-          tableIndex
-        )
-      );
-    });
+    // fetch variant results tables
+    fetchVariantTables(
+      selectedPhenotype.value,
+      selectedManhattanPlotType,
+      {chr}
+    );
   };
 
   // zoom is only initiated from the chromosome view
   const handleZoom = ({ bounds }) => {
-    const database = selectedPhenotype.value + '.db';
-    const chr = selectedChromosome;
-    const page = 1;
-    const pageSize = 10;
-    const variantTable = getVariantTable(selectedManhattanPlotType);
     const zoomParams = {
       bpMin: bounds.xMin,
       bpMax: bounds.xMax,
@@ -302,44 +286,19 @@ export function SummaryResults() {
       nlogpMax: bounds.yMax
     };
 
-    // reset page/pageSize, and update zoom params
-    dispatch(
-      updateSummaryResults({
-        page,
-        pageSize,
-        ...zoomParams
-      })
+    // update zoom params
+    dispatch(updateSummaryResults({...zoomParams}));
+
+    // fetch variant results tables
+    fetchVariantTables(
+      selectedPhenotype.value,
+      selectedManhattanPlotType,
+      {
+        ...zoomParams,
+        chr: selectedChromosome,
+        count: true
+      }
     );
-
-    // handle zoom for each table
-    variantTable.forEach((table, tableIndex) => {
-      // gender is specified by manhattan plot type (all, stacked, male, female)
-      let gender = selectedManhattanPlotType;
-
-      // if stacked, gender will be female first, then male
-      if (selectedManhattanPlotType === 'stacked')
-        gender = [`female`, `male`][tableIndex];
-
-      dispatch(
-        fetchSummaryTable(
-          {
-            database,
-            table,
-            chr,
-            gender,
-            offset: (page - 1) * pageSize,
-            limit: pageSize,
-            columns: ['chr', 'bp', 'snp', 'a1', 'a2', 'or', 'p'],
-            orderBy: 'p',
-            order: 'asc',
-            count: true,
-            ...zoomParams
-          },
-          null,
-          tableIndex
-        )
-      );
-    });
   };
 
   const handleVariantLookup = ({ snp }, gender) => {
@@ -453,11 +412,7 @@ export function SummaryResults() {
               <div
                 className="mw-100 my-4 px-5"
                 style={{ display: submitted ? 'block' : 'none' }}>
-                <SnpSearchForm />
-
-                <div style={{ display: showSnpResults ? 'none' : 'block' }}>
-                  <SummaryResultsTable />
-                </div>
+                <SummaryResultsTable />
               </div>
               {placeholder}
             </Tab>

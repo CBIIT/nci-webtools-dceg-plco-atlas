@@ -586,7 +586,7 @@ export function ManhattanPlot({
               onClick={e => setGenePlotCollapsed(!genePlotCollapsed)}>
               {genePlotCollapsed
                 ? <div className="small-link">Show Gene Plot</div>
-                : <Icon name="angle-up" width="10" />
+                : <Icon name="angle-up" width="10" title="Hide Gene Plot" />
               }
             </button>
           </div>

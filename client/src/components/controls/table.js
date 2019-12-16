@@ -116,7 +116,7 @@ export const overlayConfig = {
     }),
     wrapper: base => ({
       ...base,
-      'pointer-events': 'none'
+      // 'pointer-events': 'none'
     }),
     overlay: base => ({
       ...base,
