@@ -226,6 +226,7 @@ export function canvasToBlob(canvas, mimeType, qualityArgument) {
 }
 
 export function withSavedContext(context, callback) {
+  if (!context) return;
   context.save();
   callback(context);
   context.restore();

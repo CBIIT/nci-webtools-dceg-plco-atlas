@@ -1,6 +1,7 @@
 /** We must specify variables before importing bootstrap in order to customize the generated css */
 
 $enable-shadows: true;
+$enable-gradients: true;
 
 @import '~bootstrap/scss/bootstrap';
 @import '~react-bootstrap-table-next/dist/react-bootstrap-table2.min.css';
@@ -43,6 +44,13 @@ $enable-shadows: true;
 
 .bg-primary-darker {
   background-color: #162e51;
+}
+
+.btn-primary {
+  color: #fff;
+  background: #007bff linear-gradient(180deg, #268fff, #007bff) repeat-x !important;
+  border-color: #007bff;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15), 0 1px 1px rgba(0, 0, 0, 0.075);
 }
 
 .btn-silver {
@@ -327,11 +335,6 @@ select.form-control-sm {
 //   border-bottom: 3px solid #c0c0c5;
 //   margin-bottom: -5px;
 // }
-
-._loading_overlay_wrapper {
-  pointer-events: none;
-}
-
 // .navlinks-card {
 //   font-size: 10pt;
 // }
