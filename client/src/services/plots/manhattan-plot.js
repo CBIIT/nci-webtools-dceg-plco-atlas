@@ -359,7 +359,6 @@ export class ManhattanPlot {
     exportCanvas.width = plot.canvas.width;
     exportCanvas.height = plot.canvas.height + plot.geneCanvas.height;
 
-
     withSavedContext(exportCtx, ctx => {
       ctx.fillStyle = this.defaultConfig.backgroundColor;
       ctx.fillRect(0, 0, exportCanvas.width, exportCanvas.height);
@@ -483,7 +482,14 @@ export class ManhattanPlot {
       let gene = getGeneAtPosition(x, y);
       if (gene && !config.tooltipOpen && config.geneTooltipContent) {
         config.tooltipOpen = true;
-        let yOffset = (Math.floor(y / rowHeight) + 1) * rowHeight;
+        let row = Math.floor(y / rowHeight);
+        let showAbove = row > packedGeneRanges.length - 3;
+        // console.log('showAbove', showAbove);
+        let yOffset = showAbove
+          ? row * rowHeight
+          : (row + 1) * rowHeight;
+
+
         let content = await config.geneTooltipContent(gene.gene, this.tooltip);
         let tooltipLocation = {
           localX: gene.gene.pxCenter,
@@ -492,8 +498,8 @@ export class ManhattanPlot {
         ev.localX = gene.gene.pxCenter
         ev.localY = yOffset
 
-        console.log('showing tooltip', gene, content, this.geneTooltip, tooltipLocation)
-        showTooltip(this.geneTooltip, ev, content, {center: true});
+        // console.log('showing tooltip', gene, content, this.geneTooltip, tooltipLocation)
+        showTooltip(this.geneTooltip, ev, content, {center: true, above: showAbove});
 
         /*
         showTooltip(this.geneTooltip, , content);
