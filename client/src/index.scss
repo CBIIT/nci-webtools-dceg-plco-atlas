@@ -1,7 +1,7 @@
 /** We must specify variables before importing bootstrap in order to customize the generated css */
 
 $enable-shadows: true;
-$enable-gradients: true;
+// $enable-gradients: true;
 
 @import '~bootstrap/scss/bootstrap';
 @import '~react-bootstrap-table-next/dist/react-bootstrap-table2.min.css';
@@ -46,7 +46,7 @@ $enable-gradients: true;
   background-color: #162e51;
 }
 
-.btn-primary {
+.btn-primary-gradient {
   color: #fff;
   background: #007bff linear-gradient(180deg, #268fff, #007bff) repeat-x !important;
   border-color: #007bff;
