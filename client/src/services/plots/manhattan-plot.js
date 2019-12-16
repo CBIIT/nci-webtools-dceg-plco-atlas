@@ -458,6 +458,7 @@ export class ManhattanPlot {
     let txColor = '#ddd';
     let exonColor = '#049372';
     let geneOverlayPositions = [];
+    let padding = 5;
 
     geneCanvas.height = rowHeight * numRows;
     geneCanvas.width = this.canvas.width - config.margins.left - config.margins.right;
@@ -466,7 +467,6 @@ export class ManhattanPlot {
     geneOverlayCanvas.width = geneCanvas.width;
 
     const getGeneAtPosition = (x, y) => {
-      let padding = 5;
       return geneOverlayPositions.find(pos => {
         return x > pos.x1 - padding && x < pos.x2 + padding
           && y > pos.y1 - padding && y < pos.y2 + padding;
@@ -486,15 +486,10 @@ export class ManhattanPlot {
         let showAbove = row > 1 && row > packedGeneRanges.length - 3;
         // console.log('showAbove', showAbove);
         let yOffset = showAbove
-          ? row * rowHeight
+          ? row * rowHeight + padding
           : (row + 1) * rowHeight;
 
-
         let content = await config.geneTooltipContent(gene.gene, this.tooltip);
-        let tooltipLocation = {
-          localX: gene.gene.pxCenter,
-          localY: yOffset,
-        }
         ev.localX = gene.gene.pxCenter
         ev.localY = yOffset
 
@@ -558,7 +553,7 @@ export class ManhattanPlot {
         geneOverlayPositions.push({
           x1: Math.min(geneLabel.pxStart, start),
           x2: Math.max(geneLabel.pxEnd, start + width),
-          y1: yOffset + exonOffsetY,
+          y1: yOffset + exonOffsetY - labelHeight,
           y2: yOffset + exonOffsetY + 30,
           gene: gene
         });
