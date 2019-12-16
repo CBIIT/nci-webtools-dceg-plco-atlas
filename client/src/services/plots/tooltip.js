@@ -62,12 +62,16 @@ export function showTooltip(tooltip, ev, html, options) {
   let tooltipOffset = 5;
   let tooltipXOffset = options.center
     ? - tooltipWidth / 2
-    : 0
+    : 0;
+
+  let tooltipYOffset = options.above
+    ? - tooltipHeight
+    : 0;
 
   let leftOffset =
     Math.min(localX + tooltipXOffset, targetWidth - tooltipWidth) - tooltipOffset;
   let topOffset =
-    Math.min(localY, targetHeight - tooltipHeight) - tooltipOffset;
+    Math.min(localY + tooltipYOffset, targetHeight - tooltipHeight) - tooltipOffset;
 
   setStyles(tooltip, {
     left: Math.max(leftOffset, 0) + 'px',
