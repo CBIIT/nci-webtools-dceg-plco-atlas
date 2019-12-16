@@ -5,7 +5,7 @@ const cors = require("fastify-cors");
 const compress = require("fastify-compress");
 const static = require("fastify-static");
 const { port, dbpath } = require("./config.json");
-const { getSummary, getVariants, getMetadata, getGenes } = require("./query");
+const { getSummary, getVariants, getMetadata, getGenes, getConfig } = require("./query");
 const logger = require("./logger");
 
 if (cluster.isMaster) {
@@ -75,6 +75,11 @@ app.get("/metadata", async ({ query }, res) => {
 // retrieves genes
 app.get("/genes", async ({ query }, res) => {
   return getGenes(dbpath + query.database, query);
+});
+
+// retrieves configuration
+app.get("/config", async ({ query }, res) => {
+  return getConfig(query.key);
 });
 
 app
