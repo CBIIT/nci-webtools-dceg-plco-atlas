@@ -1,6 +1,9 @@
 import {
+  UPDATE_KEY,
   UPDATE_SUMMARY_RESULTS,
   UPDATE_SUMMARY_TABLE,
+  UPDATE_SUMMARY_SNP,
+  UPDATE_SUMMARY_SNP_TABLE,
   UPDATE_VARIANT_LOOKUP,
   UPDATE_PHENOTYPE_CORRELATIONS,
   UPDATE_PHENOTYPES,
@@ -10,6 +13,11 @@ import {
 
 export const rootReducer = (state, action) => {
   switch (action.type) {
+    case UPDATE_KEY:
+      return {
+        ...state,
+        [action.key]: action.data
+      }
     case UPDATE_SUMMARY_RESULTS:
       return {
         ...state,
@@ -19,11 +27,23 @@ export const rootReducer = (state, action) => {
         }
       };
     case UPDATE_SUMMARY_TABLE:
-      let summaryTables = state.summaryTables;
-      summaryTables[action.index] = action.data;
+      let summaryTables = {
+        ...state.summaryTables,
+        [action.key]: action.data
+      };
       return {
         ...state,
         summaryTables
+      };
+    case UPDATE_SUMMARY_SNP:
+    case UPDATE_SUMMARY_SNP_TABLE:
+      let summarySnpTables = {
+        ...state.summarySnpTables,
+        [action.key]: action.data
+      };
+      return {
+        ...state,
+        summarySnpTables
       };
     case UPDATE_VARIANT_LOOKUP:
       return {

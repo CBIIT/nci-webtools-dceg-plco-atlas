@@ -117,7 +117,7 @@ export class ManhattanPlot {
     this.attachEventHandlers(this.canvas);
     addEventListener(window, 'resize', debounce(() => {
       this.redraw();
-    }, 300))
+    }, 500))
   }
 
   draw() {
@@ -282,16 +282,18 @@ export class ManhattanPlot {
   }
 
   redraw() {
-    withSavedContext(this.ctx, ctx => {
-      ctx.fillStyle = this.defaultConfig.backgroundColor;
-      ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-    })
+    if (this && this.config && this.config.data) {
+      withSavedContext(this.ctx, ctx => {
+        ctx.fillStyle = this.defaultConfig.backgroundColor;
+        ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+      })
 
-    this.draw();
-    removeEventListeners(this.canvas);
-    removeEventListeners(this.geneCanvas);
-    this.attachEventHandlers(this.canvas);
-    // this.drawGenes();
+      this.draw();
+      removeEventListeners(this.canvas);
+      removeEventListeners(this.geneCanvas);
+      this.attachEventHandlers(this.canvas);
+      // this.drawGenes();
+    }
   }
 
 

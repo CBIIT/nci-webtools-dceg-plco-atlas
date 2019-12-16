@@ -152,6 +152,9 @@ function getVariants(filepath, params) {
             coalesce(params.plot_qq, `plot_qq = 1`)
         ].filter(Boolean).join(' AND ') + `${groupby}`;
 
+    // create count sql based on original query
+    let countSql = `SELECT COUNT(1) FROM (${sql})`;
+
     // adds "order by" statement, if both order and orderBy are provided
     let { order, orderBy } = params;
     if (order && orderBy) {
@@ -166,10 +169,6 @@ function getVariants(filepath, params) {
     // adds limit and offset, if provided
     if (params.limit) sql += ' LIMIT :limit ';
     if (params.offset) sql += ' OFFSET :offset ';
-
-
-    // create count sql based on original query
-    let countSql = `SELECT COUNT(1) FROM (${sql})`;
 
     logger.debug(`SQL: ${sql}`);
     // query database
