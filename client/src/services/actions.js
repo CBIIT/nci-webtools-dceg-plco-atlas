@@ -1,5 +1,6 @@
 import { query, rawQuery } from './query';
 
+export const UPDATE_KEY = 'UPDATE_KEY';
 export const UPDATE_SUMMARY_RESULTS = 'UPDATE_SUMMARY_RESULTS';
 export const UPDATE_SUMMARY_TABLE = 'UPDATE_SUMMARY_TABLE';
 export const UPDATE_SUMMARY_SNP_TABLE = 'UPDATE_SUMMARY_SNP_TABLE';
@@ -9,6 +10,10 @@ export const UPDATE_PHENOTYPE_CORRELATIONS = 'UPDATE_PHENOTYPE_CORRELATIONS';
 export const UPDATE_PHENOTYPES = 'UPDATE_PHENOTYPES';
 export const UPDATE_PHENOTYPE_CATEGORIES = 'UPDATE_PHENOTYPE_CATEGORIES';
 export const UPDATE_PHENOTYPES_TREE = 'UPDATE_PHENOTYPES_TREE';
+
+export function updateKey(key, data) {
+  return { type: UPDATE_KEY, key, data };
+}
 
 export function updatePhenotypes(data) {
   return { type: UPDATE_PHENOTYPES, data };
@@ -67,7 +72,7 @@ export function fetchSummaryTable(tableKey, params) {
 
     // fetch variants given parameters
     const response = await query('variants', params);
-    if (response.error) return setLoading(false);
+    if (response.error) return;
 
     let results = response.data;
 
@@ -94,9 +99,8 @@ export function fetchSummarySnpTable(tableKey, params) {
   return async function(dispatch) {
     dispatch(setSummarySnpLoading(true));
 
-    setLoading(true);
     const response = await query('variants', params);
-    if (response.error) return setLoading(false);
+    if (response.error) return;
 
     dispatch(
       updateSummarySnpTable(tableKey, {
