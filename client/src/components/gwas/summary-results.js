@@ -344,12 +344,15 @@ export function SummaryResults() {
   );
 
   return (
-    <div style={{ position: 'relative' }}>
-      <h1 className="d-none">Explore GWAS data - Visualize summary results</h1>
+    <div className="position-relative">
+      <h1 className="sr-only">Explore GWAS data - Visualize summary results</h1>
 
-      <SidebarContainer containerClass="mx-3" collapsed={!openSidebar} onCollapse={collapsed => setOpenSidebar(!collapsed)}>
-        <SidebarPanel className="col-md-3">
-          <div className="p-2 bg-white tab-pane-bordered rounded-0">
+      <SidebarContainer
+        className="mx-3"
+        collapsed={!openSidebar}
+        onCollapse={collapsed => setOpenSidebar(!collapsed)}>
+        <SidebarPanel className="col-lg-3">
+          <div className="p-2 bg-white border rounded-0">
             <SummaryResultsForm
               onSubmit={handleSubmit}
               onChange={handleChange}
@@ -364,7 +367,7 @@ export function SummaryResults() {
             </div>
         </SidebarPanel>
 
-        <MainPanel className="col-md-9">
+        <MainPanel className="col-lg-9">
           <SummaryResultsSearchCriteria />
           <Tabs
             className="mt-2"
