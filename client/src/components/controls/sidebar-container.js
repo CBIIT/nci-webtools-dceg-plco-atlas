@@ -25,18 +25,18 @@ export function SidebarContainer({
     collapsed = false,
     onCollapsed = () => {},
     children = [],
-    containerClass = '',
-    sidebarPanelClass = 'col-md-3',
-    mainPanelClass = 'col-md-9',
+    className = '',
     collapseButton = CollapseButton
 }) {
     // find children for sidebar and main panel
     let sidebarPanel = children.find(c => c.type === SidebarPanel);
     let mainPanel = children.find(c => c.type === MainPanel);
 
-    console.log(sidebarPanel);
+    // determine css classes for panel containers
+    let sidebarPanelClass = sidebarPanel.props.className || 'col-md-3';
+    let mainPanelClass = mainPanel.props.className || 'col-md-9';
 
-    // assign collapsed prop to internal collapsed state
+    // assign collapsed prop to internal _collapsed state
     let [_collapsed, _setCollapsed] = useState(collapsed || false);
     useEffect(() => _setCollapsed(collapsed), [collapsed]);
 
@@ -48,7 +48,7 @@ export function SidebarContainer({
     }
 
     return (
-        <div className={`row ${containerClass}`}>
+        <div className={`row ${className}`}>
             <div className={_collapsed ? 'd-none' : sidebarPanelClass}>
                 {sidebarPanel}
             </div>
