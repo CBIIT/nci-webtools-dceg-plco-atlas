@@ -14,6 +14,7 @@ function App() {
     {
       route: '/about',
       title: 'About',
+      // cardTitle: 'About',
       image: 'assets/images/about.svg',
       navIndex: 3
     },
@@ -21,6 +22,8 @@ function App() {
       route: '/gwas',
       action: 'Explore',
       title: 'GWAS',
+      cardTitle: 'GWAS Results',
+      cardText: 'Visualize genome-wide association results with dynamic Manhattan plots and tables',
       image: 'assets/images/gwas.svg',
       navIndex: 0
     },
@@ -28,6 +31,8 @@ function App() {
       route: '/phenotypes',
       action: 'Browse',
       title: 'Phenotypes',
+      cardTitle: 'Phenotype Characteristics',
+      cardText: 'Browse trait and case definitions, descriptive characteristics and genetic correlations',
       image: 'assets/images/phenotypes.svg',
       navIndex: 1
     },
@@ -35,6 +40,8 @@ function App() {
       route: '/downloads',
       action: 'Download',
       title: 'Data',
+      cardTitle: 'Access Data',
+      cardText: 'Download files of genome-wide association study estimates and summary statistics',
       image: 'assets/images/downloads.svg',
       navIndex: 2
     }
