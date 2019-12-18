@@ -26,6 +26,10 @@ export function Downloads() {
   );
 
   function handleSubmit() {
+    if (!selectedPhenotypes.length || selectedPhenotypes.length > 5) {
+      return;
+    }
+
     dispatch(updateDownloads({
       submitted: true
     }));
@@ -46,7 +50,7 @@ export function Downloads() {
 
   function handleChange(items) {
     dispatch(updateDownloads({
-      selectedPhenotypes: items.slice(0, 5),
+      selectedPhenotypes: items,//.slice(0, 5),
       submitted: false,
     }));
   }
@@ -79,15 +83,20 @@ export function Downloads() {
               value={selectedPhenotypes}
               onChange={handleChange}
             />
-            <small class="text-muted">Up to five phenotypes may be selected for download.</small>
+            <small class="text-muted"><i>Up to five phenotypes may be selected for download.</i></small>
           </div>
 
           <div>
             <Button
               variant="silver"
               onClick={handleSubmit}
-              disabled={!selectedPhenotypes.length}
-              title={selectedPhenotypes.length ? '' : 'Please select phenotype(s) to download.'}>
+              disabled={!selectedPhenotypes.length || selectedPhenotypes.length > 5}
+              title={
+                selectedPhenotypes.length == 0
+                  ? 'Please select phenotype(s) to download.'
+                  : selectedPhenotypes.length > 5
+                  ? 'A maximum of five phenotypes may be selected to download.'
+                  : ''}>
               Download
             </Button>
             <Button
