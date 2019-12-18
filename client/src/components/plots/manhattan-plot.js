@@ -570,7 +570,7 @@ export function ManhattanPlot({
       </div>
       <div
         style={{
-          overflowX: 'auto'
+          overflowX: 'hidden'
           // overflowY: 'auto',
           // height: '600px',
         }}>
