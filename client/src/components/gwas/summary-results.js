@@ -7,6 +7,11 @@ import { QQPlot } from '../plots/qq-plot';
 import { SummaryResultsTable } from './summary-results-table';
 import { SummaryResultsSearchCriteria } from '../controls/summary-results-search-criteria';
 import {
+  SidebarContainer,
+  SidebarPanel,
+  MainPanel,
+} from '../controls/sidebar-container';
+import {
   updateSummaryResults,
   updateVariantLookup,
   lookupVariants,
@@ -27,6 +32,8 @@ export function SummaryResults() {
     selectedManhattanPlotType,
     loadingManhattanPlot,
   } = useSelector(state => state.summaryResults);
+
+  const [openSidebar, setOpenSidebar] = useState(true);
 
   const setPopupTooltipData = popupTooltipData => {
     dispatch(updateSummaryResults({ popupTooltipData }));
@@ -336,62 +343,32 @@ export function SummaryResults() {
     </div>
   );
 
-  const [openSidebar, setOpenSidebar] = useState(true);
-
   return (
-    <div style={{ position: 'relative' }}>
-      <h1 className="d-none">Explore GWAS data - Visualize summary results</h1>
-      <div className={openSidebar ? 'row mx-3' : 'mx-3'}>
-        <div className="col-lg-3">
-          {/* {openSidebar && ( */}
-          <Tabs defaultActiveKey="summary-results-form"
-            style={{display: openSidebar ? 'block' : 'none'}}>
-            <Tab
-              eventKey="summary-results-form"
-              className="p-2 bg-white tab-pane-bordered rounded-0"
-              style={{ minHeight: '100%', display: openSidebar ? 'block' : 'none' }}>
-              <SummaryResultsForm
-                onSubmit={handleSubmit}
-                onChange={handleChange}
-                onReset={handleReset}
-                style={{display: openSidebar ? 'block' : 'none'}}
-              />
-              {messages &&
-                messages.map(({ type, content }) => (
-                  <Alert className="mt-3" variant={type} onClose={clearMessages} dismissible>
-                    {content}
-                  </Alert>
-                ))}
-            </Tab>
-          </Tabs>
-          {/* )} */}
-          <Button
-            className="pt-0 border-0"
-            title={openSidebar ? "Hide search panel" : "Show search panel"}
-            variant="link"
-            style={{
-              color: '#008CBA',
-              position: 'absolute',
-              zIndex: 100,
-              top: '0px',
-              [openSidebar ? 'right' : 'left']: '-15px'
-            }}
-            onClick={() => setOpenSidebar(!openSidebar)}
-            aria-controls="summary-results-collapse-input-panel"
-            aria-expanded={openSidebar}>
-            {openSidebar ? (
-              <i className="fas fa-caret-left fa-lg"></i>
-            ) : (
-              <i className="fas fa-caret-right fa-lg"></i>
-            )}
-          </Button>
-        </div>
+    <div className="position-relative">
+      <h1 className="sr-only">Explore GWAS data - Visualize summary results</h1>
 
-        <div className="d-lg-none p-2"></div>
+      <SidebarContainer
+        className="mx-3"
+        collapsed={!openSidebar}
+        onCollapsed={collapsed => setOpenSidebar(!collapsed)}>
+        <SidebarPanel className="col-lg-3">
+          <div className="p-2 bg-white border rounded-0">
+            <SummaryResultsForm
+              onSubmit={handleSubmit}
+              onChange={handleChange}
+              onReset={handleReset}
+            />
+            {messages &&
+              messages.map(({ type, content }) => (
+                <Alert className="mt-3" variant={type} onClose={clearMessages} dismissible>
+                  {content}
+                </Alert>
+              ))}
+            </div>
+        </SidebarPanel>
 
-        <div className={openSidebar ? 'col-lg-9' : 'col-lg-12'}>
+        <MainPanel className="col-lg-9">
           <SummaryResultsSearchCriteria />
-
           <Tabs
             className="mt-2"
             defaultActiveKey={selectedPlot}
@@ -429,8 +406,8 @@ export function SummaryResults() {
               {placeholder}
             </Tab>
           </Tabs>
-        </div>
-      </div>
+        </MainPanel>
+      </SidebarContainer>
     </div>
   );
 }

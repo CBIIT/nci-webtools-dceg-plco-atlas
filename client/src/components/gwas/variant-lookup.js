@@ -3,6 +3,11 @@ import { useDispatch, useSelector } from 'react-redux';
 import { VariantLookupForm } from '../forms/variant-lookup-form';
 import { updateVariantLookup, lookupVariants } from '../../services/actions';
 import {
+  SidebarContainer,
+  SidebarPanel,
+  MainPanel,
+} from '../controls/sidebar-container';
+import {
   Table,
   paginationText,
   paginationSizeSelector,
@@ -129,9 +134,9 @@ export function VariantLookup() {
 
   const validateVariantInput = variant => {
     if (
-      variant.match(/^[r|R][s|S][0-9]+$/) != null ||
+      variant.match(/^rs[0-9]+$/i) != null ||
       variant.match(
-        /^([c|C][h|H][r|R])?(([1-9]|[1][0-9]|[2][0-2])|[x|X|y|Y]):[0-9]+/
+        /^(chr)?(([1-9]|[1][0-9]|[2][0-2])|[x|y]):[0-9]+/i
       ) != null
       // ||
       // selectedVariant.match(
@@ -219,67 +224,30 @@ export function VariantLookup() {
     );
   };
 
-  const [openSidebar, setOpenSidebar] = useState(true);
-
   return (
-    <div style={{ position: 'relative' }}>
-      <h1 className="d-none">Explore GWAS data - Search for variant across phenotypes</h1>
-      <div className={openSidebar ? 'row mx-3' : 'mx-3'}>
-        <div className="col-lg-3">
-          {/* {openSidebar && ( */}
-          <Tabs defaultActiveKey="variant-lookup-form"
-            style={{display: openSidebar ? 'block' : 'none'}}>
-            <Tab
-              eventKey="variant-lookup-form"
-              className="p-2 bg-white tab-pane-bordered rounded-0"
-              style={{display: openSidebar ? 'block' : 'none'}}
-              // style={{minHeight: '550px'}}
-            >
-              <VariantLookupForm
-                onSubmit={handleSubmit}
-                onChange={handleChange}
-                onReset={handleReset}
-                style={{display: openSidebar ? 'block' : 'none'}}
-              />
-              {messages &&
-                messages.map(({ type, content }) => (
-                  <Alert
-                    className="mt-3"
-                    key={content}
-                    variant={type}
-                    onClose={clearMessages}
-                    dismissible>
-                    {content}
-                  </Alert>
-                ))}
-            </Tab>
-          </Tabs>
-          {/* )} */}
-          <Button
-            className="pt-0 border-0"
-            title={openSidebar ? "Hide search panel" : "Show search panel"}
-            variant="link"
-            style={{
-              color: '#008CBA',
-              position: 'absolute',
-              zIndex: 100,
-              top: '0px',
-              [openSidebar ? 'right' : 'left']: '-15px'
-            }}
-            onClick={() => setOpenSidebar(!openSidebar)}
-            aria-controls="variant-lookup-collapse-input-panel"
-            aria-expanded={openSidebar}>
-            {openSidebar ? (
-              <i className="fas fa-caret-left fa-lg"></i>
-            ) : (
-              <i className="fas fa-caret-right fa-lg"></i>
-            )}
-          </Button>
-        </div>
-
-        <div className="d-lg-none p-2"></div>
-
-        <div className={openSidebar ? 'col-lg-9' : 'col-lg-12'}>
+    <div className="position-relative">
+      <h1 className="sr-only">Explore GWAS data - Search for variant across phenotypes</h1>
+      <SidebarContainer className="mx-3">
+        <SidebarPanel className="col-lg-3">
+          <div className="p-2 bg-white border rounded-0">
+            <VariantLookupForm
+              onSubmit={handleSubmit}
+              onChange={handleChange}
+              onReset={handleReset}
+            />
+            {(messages || []).map(({ type, content }) => (
+              <Alert
+                className="mt-3"
+                key={content}
+                variant={type}
+                onClose={clearMessages}
+                dismissible>
+                {content}
+              </Alert>
+            ))}
+          </div>
+        </SidebarPanel>
+        <MainPanel className="col-lg-9">
           <VariantLookupSearchCriteria />
 
           <Tabs defaultActiveKey="variant-lookup">
@@ -335,8 +303,8 @@ export function VariantLookup() {
               {placeholder}
             </Tab>
           </Tabs>
-        </div>
-      </div>
+        </MainPanel>
+      </SidebarContainer>
     </div>
   );
 }

@@ -14,7 +14,6 @@ export function Navbar({ links }) {
                 <NavLink
                   key={title}
                   className="navlinks text-white py-2 px-4 d-inline-block "
-                  style={{ fontWeight: 600 }}
                   activeClassName="active-navlinks"
                   exact={exact}
                   to={route}>

@@ -55,19 +55,19 @@ $enable-shadows: true;
 
 .btn-silver {
   // background-color:#D3D3D3;
-  background-image: linear-gradient(#ffffff, #dfdfdf);
+  background-image: linear-gradient(#ffffff, #eeeeee);
   color: black;
   border-color: #dee2e6;
 }
 
 .btn-silver:hover {
-  background-image: linear-gradient(#ffffff, #dfdfdf);
+  background-image: linear-gradient(#ffffff, #eeeeee);
   color: black;
   border-color: #dee2e6;
 }
 
 .btn-silver:active {
-  background-image: linear-gradient(#dfdfdf, #e5e5e5) !important;
+  background-image: linear-gradient(#ffffff, #e4e4e4) !important;
   color: black !important;
   border-color: #dee2e6 !important;
 }
@@ -83,6 +83,10 @@ $enable-shadows: true;
 
 .text-orange {
   color: orange !important;
+}
+
+.text-secondary {
+  color: #595959 !important;
 }
 
 .text-green {
@@ -288,21 +292,25 @@ select.form-control-sm {
 /** navbar.js tab links*/
 .navlinks {
   text-decoration: none !important;
+  font-weight: 700;
 }
 
 .navlinks:hover {
   color: #ddd !important;
 }
 
+.navlinks.active-navlinks:hover {
+  color: #444 !important;
+}
+
 .active-navlinks {
   background-color: #2cc799 !important;
   color: #333c4e !important;
-  font-weight: bold !important;
 
   button {
     background-color: white !important;
     color: black !important;
-    font-weight: bold !important;
+    font-weight: 700 !important;
   }
 
   // &:hover {
