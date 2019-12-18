@@ -1,6 +1,6 @@
 import { createStore, applyMiddleware, compose } from 'redux';
 import { rootReducer } from './reducers';
-import { fetchRanges } from './actions';
+import { initialize } from './actions';
 import ReduxThunk from 'redux-thunk';
 
 export const getInitialState = () => ({
@@ -113,6 +113,10 @@ export const getInitialState = () => ({
     searchCriteriaPhenotypeCorrelations: {},
     collapseCriteria: true
     // tooltipData: null
+  },
+  downloads: {
+    selectedPhenotypes: [],
+    downloadRoot: '',
   }
 });
 
@@ -127,4 +131,4 @@ export const store = createStore(
   )
 );
 
-store.dispatch(fetchRanges());
+store.dispatch(initialize());

@@ -10,6 +10,7 @@ export const UPDATE_PHENOTYPE_CORRELATIONS = 'UPDATE_PHENOTYPE_CORRELATIONS';
 export const UPDATE_PHENOTYPES = 'UPDATE_PHENOTYPES';
 export const UPDATE_PHENOTYPE_CATEGORIES = 'UPDATE_PHENOTYPE_CATEGORIES';
 export const UPDATE_PHENOTYPES_TREE = 'UPDATE_PHENOTYPES_TREE';
+export const UPDATE_DOWNLOADS = 'UPDATE_DOWNLOADS';
 
 export function updateKey(key, data) {
   return { type: UPDATE_KEY, key, data };
@@ -57,6 +58,49 @@ export function updateVariantLookup(data) {
 
 export function updatePhenotypeCorrelations(data) {
   return { type: UPDATE_PHENOTYPE_CORRELATIONS, data };
+}
+
+export function updateDownloads(data) {
+  return { type: UPDATE_DOWNLOADS, data };
+}
+
+export function initialize() {
+  return async function(dispatch) {
+    // update ranges
+    const ranges = await query('data/chromosome_ranges.json')
+    dispatch(updateSummaryResults({ranges}));
+
+    // update download root
+    const { downloadRoot } = await query('config', {key: 'downloadRoot'})
+    dispatch(updateDownloads({downloadRoot}));
+
+    // update phenotypes
+    const data = await query('data/phenotypes.json');
+    const records = [];
+    const categories = [];
+    const populateRecords = node => {
+      // only populate alphabetic phenotype list with leaf nodes
+      if (node.children === undefined) {
+        records.push({
+          title: node.title,
+          value: node.value,
+          disabled: node.disabled
+        });
+      } else {
+        categories.push({
+          title: node.title,
+          value: node.value
+        });
+      }
+      if (node.children) {
+        node.children.forEach(populateRecords);
+      }
+    };
+    data.forEach(populateRecords, 0);
+    dispatch(updatePhenotypes(records));
+    dispatch(updatePhenotypeCategories(categories));
+    dispatch(updatePhenotypesTree(data));
+  }
 }
 
 export function fetchRanges() {
