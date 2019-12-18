@@ -521,11 +521,12 @@ export function ManhattanPlot({
 
       <div className="d-flex align-items-center justify-content-between mx-4 mt-3">
         <div
-          className="small d-flex align-items-center"
+          className="d-flex align-items-center"
           style={{ visibility: selectedChromosome ? 'visible' : 'hidden' }}>
           <a
-            className="link"
-            onClick={e => onAllChromosomeSelected && onAllChromosomeSelected()}>
+          href="javascript:void(0)"
+          style={{color: 'rgb(0, 140, 186)'}}
+          onClick={e => onAllChromosomeSelected && onAllChromosomeSelected()}>
             All Chromosomes
           </a>
 
@@ -536,7 +537,10 @@ export function ManhattanPlot({
                 className="mx-2 opacity-50"
                 width="10"
               />
-              <a className="link" onClick={resetZoom}>
+              <a
+                href="javascript:void(0)"
+                style={{color: 'rgb(0, 140, 186)'}}
+                onClick={resetZoom}>
                 Chromosome {selectedChromosome}
               </a>
             </>
@@ -545,7 +549,10 @@ export function ManhattanPlot({
           {zoomStack.length > 1 ? (
             <>
               <Icon name="arrow-left" className="mx-2 opacity-50" width="10" />
-              <a className="link" onClick={zoomOut}>
+              <a
+                href="javascript:void(0)"
+                style={{color: 'rgb(0, 140, 186)'}}
+                onClick={zoomOut}>
                 Previous Zoom
                 {(() => {
                   let bounds = zoomStack[zoomStack.length - 2].bounds;
