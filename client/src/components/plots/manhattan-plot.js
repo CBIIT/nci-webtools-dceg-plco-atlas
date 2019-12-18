@@ -519,55 +519,55 @@ export function ManhattanPlot({
       style={{ display: hasData() ? 'block' : 'none', position: 'relative' }}>
       {loading && <LoadingOverlay active={loading} {...plotOverlayConfig} />}
 
-      <div
-        className="mx-2 mt-3 small d-flex align-items-center"
-        style={{ visibility: selectedChromosome ? 'visible' : 'hidden' }}>
-        <a
-          className="link"
-          onClick={e => onAllChromosomeSelected && onAllChromosomeSelected()}>
-          All Chromosomes
-        </a>
+      <div className="d-flex align-items-center justify-content-between mx-4 mt-3">
+        <div
+          className="small d-flex align-items-center"
+          style={{ visibility: selectedChromosome ? 'visible' : 'hidden' }}>
+          <a
+            className="link"
+            onClick={e => onAllChromosomeSelected && onAllChromosomeSelected()}>
+            All Chromosomes
+          </a>
 
-        {zoomStack.length ? (
-          <>
-            <Icon
-              name="arrow-left"
-              className="mx-2 opacity-50"
-              width="10"
-            />
-            <a className="link" onClick={resetZoom}>
-              Chromosome {selectedChromosome}
-            </a>
-          </>
-        ) : null}
+          {zoomStack.length ? (
+            <>
+              <Icon
+                name="arrow-left"
+                className="mx-2 opacity-50"
+                width="10"
+              />
+              <a className="link" onClick={resetZoom}>
+                Chromosome {selectedChromosome}
+              </a>
+            </>
+          ) : null}
 
-        {zoomStack.length > 1 ? (
-          <>
-            <Icon name="arrow-left" className="mx-2 opacity-50" width="10" />
-            <a className="link" onClick={zoomOut}>
-              Previous Zoom
-              {(() => {
-                let bounds = zoomStack[zoomStack.length - 2].bounds;
-                return ` (${(bounds.xMin / 1e6).toPrecision(4)} MB - ${(
-                  bounds.xMax / 1e6
-                ).toPrecision(4)} MB)`;
-              })()}
-            </a>
-          </>
-        ) : null}
-        <Icon name="arrow-left" className="mx-2 opacity-50" width="10" />
-      </div>
+          {zoomStack.length > 1 ? (
+            <>
+              <Icon name="arrow-left" className="mx-2 opacity-50" width="10" />
+              <a className="link" onClick={zoomOut}>
+                Previous Zoom
+                {(() => {
+                  let bounds = zoomStack[zoomStack.length - 2].bounds;
+                  return ` (${(bounds.xMin / 1e6).toPrecision(4)} MB - ${(
+                    bounds.xMax / 1e6
+                  ).toPrecision(4)} MB)`;
+                })()}
+              </a>
+            </>
+          ) : null}
+          <Icon name="arrow-left" className="mx-2 opacity-50" width="10" />
+        </div>
 
-      <div className="text-right">
         <a
           rel="tooltip"
           href="javascript:void(0)"
-          className="d-flex-inline align-items-center mr-5"
           style={{color: 'rgb(0, 140, 186)'}}
           onClick={e => plot.current.exportPng(2000, 3000, getFilename())}>
             Export
         </a>
       </div>
+
       <div
         style={{
           overflowX: 'hidden'
