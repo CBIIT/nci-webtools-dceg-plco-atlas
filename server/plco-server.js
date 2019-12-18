@@ -44,7 +44,7 @@ app.addHook("onSend", (req, res, payload, done) => {
   let pathname = req.raw.url.replace(/\?.*$/, "");
   let timestamp = res.getHeader("Timestamp");
 
-  if (timestamp && /summary|variants|metadata|genes/.test(pathname)) {
+  if (timestamp && /summary|variants|metadata|genes|config/.test(pathname)) {
     let duration = new Date().getTime() - timestamp;
     logger.info(`[${process.pid}] ${pathname}: ${duration/1000}s`, req.query);
 

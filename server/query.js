@@ -251,7 +251,7 @@ function getGenes(filepath, params) {
 function getConfig(key) {
     const allowedKeys = ['downloadRoot'];
     return allowedKeys.includes(key)
-        ? config[key]
+        ? {[key]: config[key]}
         : null;
 }
 
