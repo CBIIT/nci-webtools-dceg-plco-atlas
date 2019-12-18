@@ -244,3 +244,11 @@ export function removeEventListeners(el) {
     el.removeEventListener(type, callback);
   });
 }
+
+export function getElementOffset(el) {
+  const rect = el.getBoundingClientRect();
+  return {
+    top: rect.top,// + window.pageYOffset,
+    left: rect.left// + window.pageXOffset,
+  };
+}
