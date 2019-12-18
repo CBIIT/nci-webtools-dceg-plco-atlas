@@ -499,14 +499,6 @@ export function ManhattanPlot({
   }
 
   function getFilename() {
-/*    selectedPlot,
-    manhattanPlotData,
-    manhattanPlotMirroredData,
-    manhattanPlotView,
-    selectedManhattanPlotType,
-    selectedPhenotype,
-    selectedChromosome,
-*/
     const titlecase = str => str[0].toUpperCase() + str.substring(1, str.length)
     const formatTitle = str => str.split(' ').map(titlecase).join('-');
     let title = formatTitle(selectedPhenotype.title);
@@ -597,8 +589,8 @@ export function ManhattanPlot({
                 <div
                   className="p-4 mb-0 text-muted small"
                   style={{ border: '1px solid #eee' }}>
-                  Gene plot is not available at the current zoom level. To show
-                  genes, please zoom in to a 2MB range.
+                  Gene plot is not available at the current zoom level. Please zoom in to a 2MB range
+                  to see genes.
                 </div>
               );
               if (!zoomStack || !zoomStack.length) return zoomMessage;
@@ -611,7 +603,7 @@ export function ManhattanPlot({
                   <div
                     className="p-4 mb-0 text-muted small"
                     style={{ border: '1px solid #eee' }}>
-                    No genes are available at the current zoom level.
+                    No genes are available within the current bp range.
                   </div>
                 )
               }
