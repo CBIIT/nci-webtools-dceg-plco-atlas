@@ -350,7 +350,7 @@ export function SummaryResults() {
       <SidebarContainer
         className="mx-3"
         collapsed={!openSidebar}
-        onCollapse={collapsed => setOpenSidebar(!collapsed)}>
+        onCollapsed={collapsed => setOpenSidebar(!collapsed)}>
         <SidebarPanel className="col-lg-3">
           <div className="p-2 bg-white border rounded-0">
             <SummaryResultsForm

@@ -75,6 +75,7 @@ export function ManhattanPlot({
   }, [manhattanPlotData, manhattanPlotMirroredData, selectedPlot]);
 
   useEffect(() => {
+    console.log('panel collapsed');
     plot.current && plot.current.redraw();
   }, [panelCollapsed]);
 
