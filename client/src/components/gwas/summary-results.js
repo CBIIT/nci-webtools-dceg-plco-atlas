@@ -146,7 +146,7 @@ export function SummaryResults() {
     const variantTable = getVariantTable(manhattanPlotType);
 
     // close sidebar on submit
-    setOpenSidebar(false);
+    // setOpenSidebar(false);
     setPopupTooltipData(null);
     dispatch(drawQQPlot(phenotype, variantTable));
 

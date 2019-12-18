@@ -561,7 +561,9 @@ export function ManhattanPlot({
       <div className="text-right">
         <a
           rel="tooltip"
-          className="d-flex-inline align-items-center small-link mr-5"
+          href="javascript:void(0)"
+          className="d-flex-inline align-items-center mr-5"
+          style={{color: 'rgb(0, 140, 186)'}}
           onClick={e => plot.current.exportPng(2000, 3000, getFilename())}>
             Export
         </a>
@@ -612,7 +614,12 @@ export function ManhattanPlot({
               className="btn-collapse"
               onClick={e => setGenePlotCollapsed(!genePlotCollapsed)}>
               {genePlotCollapsed
-                ? <div className="small-link">Show Gene Plot</div>
+                ? <a
+                      href="javascript:void(0)"
+                      className="d-flex-inline align-items-center mr-5"
+                      style={{color: 'rgb(0, 140, 186)'}}>
+                    Show Gene Plot
+                  </a>
                 : <Icon name="angle-up" width="10" title="Hide Gene Plot" />
               }
             </button>
