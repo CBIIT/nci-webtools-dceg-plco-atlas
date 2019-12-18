@@ -115,7 +115,7 @@ export function Home({ links }) {
                   </Card.Body>
                   <Card.Footer className="bg-white border-top-0" style={{ width: '100%' }}>
                     <Button
-                      className="my-2 border border-0"
+                      className="my-2 border border-0 font-weight-bold"
                       style={{
                         backgroundColor: '#2CC799',
                         // borderRadius: '10px',
@@ -149,8 +149,8 @@ export function Home({ links }) {
             <b>OUR FOCUS</b>
           </h3>
           <h4 className="container mt-3 text-dark" style={{fontSize: '16pt'}}>
-            GWAS Explorer accelerates innovative analysis of GWAS results 
-            through a dynamic framework of interactive visualizations designed 
+            GWAS Explorer accelerates innovative analysis of GWAS results
+            through a dynamic framework of interactive visualizations designed
             to aid in uncovering novel connections and spark new avenues of investigation
           </h4>
         </div>
