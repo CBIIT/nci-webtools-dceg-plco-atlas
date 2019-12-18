@@ -8,7 +8,8 @@ import {
   UPDATE_PHENOTYPE_CORRELATIONS,
   UPDATE_PHENOTYPES,
   UPDATE_PHENOTYPE_CATEGORIES,
-  UPDATE_PHENOTYPES_TREE
+  UPDATE_PHENOTYPES_TREE,
+  UPDATE_DOWNLOADS
 } from './actions';
 
 export const rootReducer = (state, action) => {
@@ -75,6 +76,14 @@ export const rootReducer = (state, action) => {
       return {
         ...state,
         phenotypesTree: action.data
+      };
+    case UPDATE_DOWNLOADS:
+      return {
+        ...state,
+        downloads: {
+          ...state.downloads,
+          ...action.data
+        }
       };
     default:
       return state;

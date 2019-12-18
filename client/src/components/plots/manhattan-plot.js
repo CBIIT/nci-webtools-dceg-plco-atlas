@@ -488,10 +488,37 @@ export function ManhattanPlot({
     return xMax - xMin;
   }
 
+  function getXRangeTitle() {
+    if (zoomStack.length > 0) {
+      let bounds = zoomStack[zoomStack.length - 1].bounds;
+      return `${(bounds.xMin / 1e6).toPrecision(4)}MB-${(
+        bounds.xMax / 1e6
+      ).toPrecision(4)}MB`;
+    }
+    return '';
+  }
+
+  function getFilename() {
+    const titlecase = str => str[0].toUpperCase() + str.substring(1, str.length)
+    const formatTitle = str => str.split(' ').map(titlecase).join('-');
+    let title = formatTitle(selectedPhenotype.title);
+    let plotType = formatTitle(selectedManhattanPlotType);
+    let chr = selectedChromosome ? formatTitle(`Chr${selectedChromosome}`) : '';
+    let range = getXRangeTitle();
+
+    return [
+      title,
+      plotType,
+      chr,
+      range
+    ].filter(Boolean).join('-') + '.png'
+  }
+
   return (
     <div
       style={{ display: hasData() ? 'block' : 'none', position: 'relative' }}>
-      <LoadingOverlay active={loading} {...plotOverlayConfig} />
+      {loading && <LoadingOverlay active={loading} {...plotOverlayConfig} />}
+
       <div
         className="mx-2 mt-3 small d-flex align-items-center"
         style={{ visibility: selectedChromosome ? 'visible' : 'hidden' }}>
@@ -534,8 +561,10 @@ export function ManhattanPlot({
       <div className="text-right">
         <a
           rel="tooltip"
-          className="d-flex-inline align-items-center small-link mr-5"
-          onClick={e => plot.current.exportPng(2000, 3000)}>
+          href="javascript:void(0)"
+          className="d-flex-inline align-items-center mr-5"
+          style={{color: 'rgb(0, 140, 186)'}}
+          onClick={e => plot.current.exportPng(2000, 3000, getFilename())}>
             Export
         </a>
       </div>
@@ -562,8 +591,8 @@ export function ManhattanPlot({
                 <div
                   className="p-4 mb-0 text-muted small"
                   style={{ border: '1px solid #eee' }}>
-                  Gene plot is not available at the current zoom level. To show
-                  genes, please zoom in to a 2MB viewport.
+                  Gene plot is not available at the current zoom level. Please zoom in to a 2MB range
+                  to see genes.
                 </div>
               );
               if (!zoomStack || !zoomStack.length) return zoomMessage;
@@ -576,7 +605,7 @@ export function ManhattanPlot({
                   <div
                     className="p-4 mb-0 text-muted small"
                     style={{ border: '1px solid #eee' }}>
-                    No genes are available at the current zoom level.
+                    No genes are available within the current bp range.
                   </div>
                 )
               }
@@ -585,7 +614,12 @@ export function ManhattanPlot({
               className="btn-collapse"
               onClick={e => setGenePlotCollapsed(!genePlotCollapsed)}>
               {genePlotCollapsed
-                ? <div className="small-link">Show Gene Plot</div>
+                ? <a
+                      href="javascript:void(0)"
+                      className="d-flex-inline align-items-center mr-5"
+                      style={{color: 'rgb(0, 140, 186)'}}>
+                    Show Gene Plot
+                  </a>
                 : <Icon name="angle-up" width="10" title="Hide Gene Plot" />
               }
             </button>

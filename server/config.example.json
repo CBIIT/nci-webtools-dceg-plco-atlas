@@ -2,5 +2,6 @@
     "port": 9000,
     "dbpath": "server/data/",
     "logpath": "server/logs/",
-    "loglevel": "info"
+    "loglevel": "info",
+    "downloadRoot": "http://hostname:8080/downloads/"
 }

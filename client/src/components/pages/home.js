@@ -26,9 +26,9 @@ export function Home({ links }) {
           <div
             className="col-12 text-center mt-2 font-weight-bold"
             style={{ width: '100%', fontSize: '18pt' }}>
-            Simplifying GWAS for the Prostate, Lung, Colorectal and Ovarian
+            Visualize and interact with
             <br />
-            Cancer Screening Trial
+            genome-wide association study results
           </div>
           <div
             className="col-12 text-center mt-5"
@@ -53,10 +53,7 @@ export function Home({ links }) {
         </h1>
         <hr className="w-75"></hr>
         <div className="px-3 text-center">
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-          eiusmod tempor incididunt ut labore et dolore magna aliqua. Quam lacus
-          suspendisse faucibus interdum posuere lorem ipsum. Integer malesuada
-          nunc vel risus commodo viverra maecenas accumsan lacus.
+        Visualize and interact with genome-wide association study results
         </div>
         {/* <div
           className="text-center mt-4"
@@ -80,7 +77,7 @@ export function Home({ links }) {
         <CardDeck>
           {links
             .slice(1, 4)
-            .map(({ exact, route, action, title, image }, index) => (
+            .map(({ exact, route, action, title, cardTitle, cardText, image }, index) => (
               <>
                 <Card
                   key={title}
@@ -90,6 +87,7 @@ export function Home({ links }) {
                     justifyContent: 'center',
                     alignItems: 'center',
                     border: '1px solid #DADBE6',
+                    // minHeight: '280px'
                     // borderRadius: '10px'
                   }}>
                   <Link
@@ -104,23 +102,20 @@ export function Home({ links }) {
                     </div>
                   </Link>
                   <Card.Body>
-                    <Card.Title style={{ color: '#545871' }}>
+                    <Card.Title style={{ color: '#545871', wordSpacing: '100vw' }}>
                       <h3>
-                        <b>{title}</b>
+                        <b>{cardTitle}</b>
                       </h3>
                     </Card.Title>
                     <Card.Text className="text-secondary">
                       <small>
-                        Lorem ipsum dolor sit amet, consectetur adipiscing elit,
-                        sed do eiusmod tempor incididunt ut labore et dolore
-                        magna aliqua. Id velit ut tortor pretium viverra
-                        suspendisse potenti.
+                        {cardText}
                       </small>
                     </Card.Text>
                   </Card.Body>
                   <Card.Footer className="bg-white border-top-0" style={{ width: '100%' }}>
                     <Button
-                      className="my-2 border border-0"
+                      className="my-2 border border-0 font-weight-bold"
                       style={{
                         backgroundColor: '#2CC799',
                         // borderRadius: '10px',
@@ -153,23 +148,20 @@ export function Home({ links }) {
           <h3 style={{ color: '#545871' }}>
             <b>OUR FOCUS</b>
           </h3>
-          <h4 className="container text-secondary mt-3 text-dark">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-            eiusmod tempor incididunt ut labore et dolore magna aliqua. Quam
-            lacus suspendisse faucibus interdum posuere lorem ipsum.
+          <h4 className="container mt-3 text-dark" style={{fontSize: '16pt'}}>
+            GWAS Explorer accelerates innovative analysis of GWAS results
+            through a dynamic framework of interactive visualizations designed
+            to aid in uncovering novel connections and spark new avenues of investigation
           </h4>
         </div>
       </div>
       <div className="bg-egg py-4">
         <div className="container my-3 text-dark">
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-          eiusmod tempor incididunt ut labore et dolore magna aliqua. Magna
-          fringilla urna porttitor rhoncus dolor purus. Risus sed vulputate odio
-          ut. Dictum varius duis at consectetur lorem donec massa. Orci
-          phasellus egestas tellus rutrum. Vivamus arcu felis bibendum ut
-          tristique. Non quam lacus suspendisse faucibus interdum posuere lorem
-          ipsum. Condimentum vitae sapien pellentesque habitant morbi. Ac turpis
-          egestas integer eget aliquet nibh praesent tristique magna.
+          Credits: TBD
+          <br />
+          Citation: TBD
+          <br />
+          GWAS Explorer is available under the MIT license, an Open Source Initiative approved license.
         </div>
       </div>
     </>
