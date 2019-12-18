@@ -46,6 +46,10 @@ $enable-shadows: true;
   background-color: #162e51;
 }
 
+.btn:disabled {
+  cursor: not-allowed;
+}
+
 .btn-primary-gradient {
   color: #fff;
   background: #007bff linear-gradient(180deg, #268fff, #007bff) repeat-x !important;
