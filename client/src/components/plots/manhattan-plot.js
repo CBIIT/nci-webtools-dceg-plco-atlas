@@ -75,7 +75,6 @@ export function ManhattanPlot({
   }, [manhattanPlotData, manhattanPlotMirroredData, selectedPlot]);
 
   useEffect(() => {
-    console.log('panel collapsed');
     plot.current && plot.current.redraw();
   }, [panelCollapsed]);
 
@@ -492,7 +491,8 @@ export function ManhattanPlot({
   return (
     <div
       style={{ display: hasData() ? 'block' : 'none', position: 'relative' }}>
-      <LoadingOverlay active={loading} {...plotOverlayConfig} />
+      {loading && <LoadingOverlay active={loading} {...plotOverlayConfig} />}
+
       <div
         className="mx-2 mt-3 small d-flex align-items-center"
         style={{ visibility: selectedChromosome ? 'visible' : 'hidden' }}>
@@ -564,7 +564,7 @@ export function ManhattanPlot({
                   className="p-4 mb-0 text-muted small"
                   style={{ border: '1px solid #eee' }}>
                   Gene plot is not available at the current zoom level. To show
-                  genes, please zoom in to a 2MB viewport.
+                  genes, please zoom in to a 2MB range.
                 </div>
               );
               if (!zoomStack || !zoomStack.length) return zoomMessage;
