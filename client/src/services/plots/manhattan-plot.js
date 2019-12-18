@@ -292,7 +292,7 @@ export class ManhattanPlot {
       removeEventListeners(this.canvas);
       removeEventListeners(this.geneCanvas);
       this.attachEventHandlers(this.canvas);
-      // this.drawGenes();
+      this.drawGenes();
     }
   }
 
@@ -466,6 +466,11 @@ export class ManhattanPlot {
     geneOverlayCanvas.height = geneCanvas.height;
     geneOverlayCanvas.width = geneCanvas.width;
 
+    withSavedContext(geneCtx, ctx => {
+      ctx.fillStyle = this.defaultConfig.backgroundColor;
+      ctx.fillRect(0, 0, geneCanvas.width, geneCanvas.height);
+    });
+
     const getGeneAtPosition = (x, y) => {
       return geneOverlayPositions.find(pos => {
         return x > pos.x1 - padding && x < pos.x2 + padding
@@ -576,7 +581,6 @@ export class ManhattanPlot {
 
       geneCtx.restore();
     });
-    console.log(geneOverlayPositions);
   }
 
   drawLine(line) {
