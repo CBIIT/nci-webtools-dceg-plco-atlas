@@ -524,9 +524,8 @@ export function ManhattanPlot({
           className="d-flex align-items-center"
           style={{ visibility: selectedChromosome ? 'visible' : 'hidden' }}>
           <a
-          href="javascript:void(0)"
-          style={{color: 'rgb(0, 140, 186)'}}
-          onClick={e => onAllChromosomeSelected && onAllChromosomeSelected()}>
+            href="javascript:void(0)"
+            onClick={e => onAllChromosomeSelected && onAllChromosomeSelected()}>
             All Chromosomes
           </a>
 
@@ -539,7 +538,6 @@ export function ManhattanPlot({
               />
               <a
                 href="javascript:void(0)"
-                style={{color: 'rgb(0, 140, 186)'}}
                 onClick={resetZoom}>
                 Chromosome {selectedChromosome}
               </a>
@@ -551,7 +549,6 @@ export function ManhattanPlot({
               <Icon name="arrow-left" className="mx-2 opacity-50" width="10" />
               <a
                 href="javascript:void(0)"
-                style={{color: 'rgb(0, 140, 186)'}}
                 onClick={zoomOut}>
                 Previous Zoom
                 {(() => {
@@ -569,7 +566,6 @@ export function ManhattanPlot({
         <a
           rel="tooltip"
           href="javascript:void(0)"
-          style={{color: 'rgb(0, 140, 186)'}}
           onClick={e => plot.current.exportPng(2000, 3000, getFilename())}>
             Export
         </a>
@@ -623,8 +619,7 @@ export function ManhattanPlot({
               {genePlotCollapsed
                 ? <a
                       href="javascript:void(0)"
-                      className="d-flex-inline align-items-center mr-5"
-                      style={{color: 'rgb(0, 140, 186)'}}>
+                      className="d-flex-inline align-items-center mr-5">
                     Show Gene Plot
                   </a>
                 : <Icon name="angle-up" width="10" title="Hide Gene Plot" />
