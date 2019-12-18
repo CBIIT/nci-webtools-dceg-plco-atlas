@@ -14,6 +14,16 @@ $enable-shadows: true;
 //   }
 // }
 
+a {
+  color: rgb(0, 140, 186);
+  text-decoration: none;
+}
+
+a:hover, a:focus {
+  text-decoration: underline;
+}
+
+
 .bg-primary-lighter {
   background-color: #d9e8f6;
 }
