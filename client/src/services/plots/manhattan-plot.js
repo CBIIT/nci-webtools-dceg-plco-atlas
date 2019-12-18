@@ -330,7 +330,7 @@ export class ManhattanPlot {
     this.genes = null;
   }
 
-  async exportPng(height, width) {
+  async exportPng(height, width, filename) {
     let container = document.createElement('div');
     let config = clone(this.config);
     config.manhattanPlotMaxHeight = height;
@@ -370,7 +370,7 @@ export class ManhattanPlot {
     }
 
     let canvasData = await canvasToBlob(exportCanvas, 'image/png');
-    saveAs(canvasData, 'export.png');
+    saveAs(canvasData, filename || 'export.png');
     // window.document.body.appendChild(container);
     console.log(plot);
   }

@@ -488,6 +488,40 @@ export function ManhattanPlot({
     return xMax - xMin;
   }
 
+  function getXRangeTitle() {
+    if (zoomStack.length > 0) {
+      let bounds = zoomStack[zoomStack.length - 1].bounds;
+      return `${(bounds.xMin / 1e6).toPrecision(4)}MB-${(
+        bounds.xMax / 1e6
+      ).toPrecision(4)}MB`;
+    }
+    return '';
+  }
+
+  function getFilename() {
+/*    selectedPlot,
+    manhattanPlotData,
+    manhattanPlotMirroredData,
+    manhattanPlotView,
+    selectedManhattanPlotType,
+    selectedPhenotype,
+    selectedChromosome,
+*/
+    const titlecase = str => str[0].toUpperCase() + str.substring(1, str.length)
+    const formatTitle = str => str.split(' ').map(titlecase).join('-');
+    let title = formatTitle(selectedPhenotype.title);
+    let plotType = formatTitle(selectedManhattanPlotType);
+    let chr = selectedChromosome ? formatTitle(`Chr${selectedChromosome}`) : '';
+    let range = getXRangeTitle();
+
+    return [
+      title,
+      plotType,
+      chr,
+      range
+    ].filter(Boolean).join('-') + '.png'
+  }
+
   return (
     <div
       style={{ display: hasData() ? 'block' : 'none', position: 'relative' }}>
@@ -536,7 +570,7 @@ export function ManhattanPlot({
         <a
           rel="tooltip"
           className="d-flex-inline align-items-center small-link mr-5"
-          onClick={e => plot.current.exportPng(2000, 3000)}>
+          onClick={e => plot.current.exportPng(2000, 3000, getFilename())}>
             Export
         </a>
       </div>
