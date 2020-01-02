@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import { Button, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import { TreeSelectCustom } from '../controls/tree-select-custom';
@@ -13,6 +13,7 @@ export function SummaryResultsForm({
   // private members prefixed with _
   const [_phenotype, _setPhenotype] = useState(null);
   const [_gender, _setGender] = useState('all');
+  const submitRef = useRef(null);
 
   // update state when props change
   useEffect(() => _setPhenotype(phenotype), [phenotype]);
@@ -57,21 +58,26 @@ export function SummaryResultsForm({
       </div>
 
       <div>
-        <OverlayTrigger overlay={
-          <Tooltip id="summary-results-submit-disabled">
-              Please select a phenotype.
-            </Tooltip>
-          }>
-          <Button
-            type="submit"
-            variant="silver"
-            onClick={e => {
-              e.preventDefault();
-              onSubmit(_phenotype, _gender);
-            }}
-            disabled={!_phenotype}>
-            Submit
-          </Button>
+        <OverlayTrigger
+          overlay={
+            <Tooltip
+              style={{display: _phenotype ? 'none' : 'block'}}
+              id="submit-summary-results">
+              Please select a phenotype
+          </Tooltip>}>
+          <span className={`d-inline-block ${!_phenotype && 'c-not-allowed'}`}>
+            <Button
+              type="submit"
+              variant="silver"
+              className={!_phenotype && 'pointer-events-none'}
+              disabled={!_phenotype}
+              onClick={e => {
+                e.preventDefault();
+                onSubmit(_phenotype, _gender);
+              }}>
+              Submit
+            </Button>
+          </span>
         </OverlayTrigger>
 
         <Button
@@ -79,6 +85,8 @@ export function SummaryResultsForm({
           variant="silver"
           onClick={e => {
             e.preventDefault();
+            _setPhenotype(null);
+            _setGender('all');
             onReset();
           }}>
           Reset
