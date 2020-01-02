@@ -63,17 +63,19 @@ export function drawZoomOverlay(config, ctx, overlayCtx) {
   let height = canvas.height - margins.top - margins.bottom;
   let zoomArea = { x1: 0, x2: 0, y1: 0, y2: 0 };
   let mouseDown = false;
+  let body = window.document.body;
 
   // remove previously attached event listeners
+
   canvas.removeEventListener('mousedown', startZoom);
   canvas.removeEventListener('mousemove', updateZoomWindow);
-  canvas.removeEventListener('mouseup', endZoom);
-  canvas.removeEventListener('dblclick', resetZoom);
+  body.removeEventListener('mouseup', endZoom);
+  // canvas.removeEventListener('dblclick', resetZoom);
 
   addEventListener(canvas, 'mousedown', startZoom);
   addEventListener(canvas, 'mousemove', updateZoomWindow);
-  addEventListener(canvas, 'mouseup', endZoom);
-  addEventListener(canvas, 'dblclick', resetZoom);
+  addEventListener(body, 'mouseup', endZoom);
+  // addEventListener(canvas, 'dblclick', resetZoom);
 
   //
   config.zoomOverlayActive = false;
@@ -82,7 +84,7 @@ export function drawZoomOverlay(config, ctx, overlayCtx) {
     let { x, y } = viewportToLocalCoordinates(
       ev.clientX,
       ev.clientY,
-      ev.target
+      canvas
     );
     let withinMargins = isWithinMargins(x, y, canvas, margins);
     zoomArea = { x1: x, x2: x, y1: y, y2: y };
@@ -95,7 +97,7 @@ export function drawZoomOverlay(config, ctx, overlayCtx) {
     let { x, y } = viewportToLocalCoordinates(
       ev.clientX,
       ev.clientY,
-      ev.target
+      canvas
     );
     let dx = Math.abs(x - zoomArea.x1);
     let dy = Math.abs(y - zoomArea.y1);
@@ -144,11 +146,14 @@ export function drawZoomOverlay(config, ctx, overlayCtx) {
   }
 
   function endZoom(ev) {
+    if (!mouseDown) return;
+
     let { x, y } = viewportToLocalCoordinates(
       ev.clientX,
       ev.clientY,
-      ev.target
+      canvas
     );
+
     let yMidpoint = margins.top + height / 2;
     overlayCtx.clearRect(margins.left, margins.top, width, height);
     config.zoomOverlayActive = false;

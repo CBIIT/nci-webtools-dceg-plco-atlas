@@ -135,6 +135,22 @@ label.required::after {
   opacity: 0.5;
 }
 
+.c-pointer {
+  cursor: pointer;
+}
+
+.c-not-allowed {
+  cursor: not-allowed;
+}
+
+.pointer-events-all {
+  pointer-events: all;
+}
+
+.pointer-events-none {
+  pointer-events: none;
+}
+
 .nav-pills.nav-pills-inverse {
   .nav-link {
     color: white;
