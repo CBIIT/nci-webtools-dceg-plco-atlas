@@ -507,7 +507,12 @@ export class ManhattanPlot {
          console.log(ev);
 
         // console.log('showing tooltip', gene, content, this.geneTooltip, tooltipLocation)
-        showTooltip(this.geneTooltip, ev, content, {center: true, above: showAbove, body: true});
+        showTooltip(this.geneTooltip, ev, content, {
+          center: true,
+          //above: showAbove,
+          body: true,
+          constraints: {xMin: canvasOffset.left}}
+        );
 
         /*
         showTooltip(this.geneTooltip, , content);
