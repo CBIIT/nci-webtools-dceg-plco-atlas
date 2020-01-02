@@ -688,6 +688,12 @@ export class ManhattanPlot {
             showTooltip(this.tooltip, ev, await content(point, this.tooltip));
         }, config.point.tooltipDelay || 100)
       );
+
+      addEventListener(
+          canvas,
+          'mousedown',
+          () => hideTooltip(this.tooltip)
+      )
     }
 
     // call click event callbacks
