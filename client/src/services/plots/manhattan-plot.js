@@ -14,6 +14,7 @@ import {
   withSavedContext,
   addEventListener,
   removeEventListeners,
+  getElementOffset,
 } from './utils.js';
 import { measureWidth, renderText, systemFont } from './text.js';
 import { getScale, getTicks } from './scale.js';
@@ -104,7 +105,8 @@ export class ManhattanPlot {
     this.geneTooltip = createTooltip({
       className: 'manhattan-plot-tooltip'
     });
-    this.geneCanvasContainer.appendChild(this.geneTooltip);
+    this.geneTooltip.style.position = 'fixed';
+    document.body.appendChild(this.geneTooltip);
 
     // save default extents, if they are provided
     if (this.config.xAxis.extent)
@@ -494,12 +496,23 @@ export class ManhattanPlot {
           ? row * rowHeight + padding
           : (row + 1) * rowHeight;
 
+        let canvasOffset = getElementOffset(geneCanvas);
+
         let content = await config.geneTooltipContent(gene.gene, this.tooltip);
-        ev.localX = gene.gene.pxCenter
-        ev.localY = yOffset
+         ev.localX = canvasOffset.left + gene.gene.pxCenter;
+         ev.localY = canvasOffset.top + yOffset;// ev.clientY //yOffset;
+       //  ev.target = document.body;
+
+
+         console.log(ev);
 
         // console.log('showing tooltip', gene, content, this.geneTooltip, tooltipLocation)
-        showTooltip(this.geneTooltip, ev, content, {center: true, above: showAbove});
+        showTooltip(this.geneTooltip, ev, content, {
+          center: true,
+          //above: showAbove,
+          body: true,
+          constraints: {xMin: canvasOffset.left}}
+        );
 
         /*
         showTooltip(this.geneTooltip, , content);
@@ -752,6 +765,7 @@ export class ManhattanPlot {
     this.canvas.remove();
     this.overlayCanvas.remove();
     this.tooltip.remove();
+    this.geneTooltip.remove();
     this.geneCanvasContainer.remove();
     this.geneCanvas.remove();
 
