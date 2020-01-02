@@ -128,8 +128,6 @@ export function SummaryResults() {
   // 1. Fetch aggregate data for displaying manhattan plot(s)
   // 2. Fetch variant data for each selected gender
   const handleSubmit = (phenotype, manhattanPlotType) => {
-    phenotype = phenotype ? phenotype.value : null;
-
     if (!phenotype) {
       return setMessages([
         {
@@ -148,11 +146,13 @@ export function SummaryResults() {
     // close sidebar on submit
     // setOpenSidebar(false);
     setPopupTooltipData(null);
-    dispatch(drawQQPlot(phenotype, variantTable));
+    dispatch(drawQQPlot(phenotype.value, variantTable));
 
     // update summary results filters
     dispatch(
       updateSummaryResults({
+        selectedPhenotype: phenotype,
+        selectedManhattanPlotType: manhattanPlotType,
         manhattanPlotView: 'summary',
         selectedTable: aggregateTable,
         selectedChromosome: null,
@@ -168,7 +168,7 @@ export function SummaryResults() {
     // draw summary plot using aggregate data
     dispatch(
       drawManhattanPlot('summary', {
-        database: phenotype + '.db',
+        database: phenotype.value + '.db',
         table: aggregateTable,
         nlogpMin: 3
       })
@@ -176,13 +176,13 @@ export function SummaryResults() {
 
     // fetch variant results tables
     fetchVariantTables(
-      selectedPhenotype.value,
-      selectedManhattanPlotType
+      phenotype.value,
+      manhattanPlotType
     );
 
     setSearchCriteriaSummaryResults({
-      phenotype: [...selectedPhenotype.title],
-      gender: selectedManhattanPlotType
+      phenotype: [...phenotype.title],
+      gender: manhattanPlotType
     });
     // if any Q-Q plot tooltips exist, destory
     hideQQTooltips();
@@ -354,8 +354,9 @@ export function SummaryResults() {
         <SidebarPanel className="col-lg-3">
           <div className="p-2 bg-white border rounded-0">
             <SummaryResultsForm
+              phenotype={selectedPhenotype}
+              gender={selectedManhattanPlotType}
               onSubmit={handleSubmit}
-              onChange={handleChange}
               onReset={handleReset}
             />
             {messages &&

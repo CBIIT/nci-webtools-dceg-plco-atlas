@@ -95,6 +95,20 @@ a:hover, a:focus {
   outline: none;
 }
 
+label {
+  font-weight: bold;
+  margin-bottom: 0;
+}
+
+label.required {
+  font-weight: bold;
+}
+
+label.required::after {
+  content: '*';
+  color: red;
+}
+
 .text-orange {
   color: orange !important;
 }
