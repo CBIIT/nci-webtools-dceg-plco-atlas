@@ -1,59 +1,53 @@
-import React from 'react';
-import { useSelector, useDispatch } from 'react-redux';
+import React, { useState, useEffect } from 'react';
+import { useSelector } from 'react-redux';
 import { Button, OverlayTrigger, Tooltip } from 'react-bootstrap';
-import { updateSummaryResults } from '../../services/actions';
 import { TreeSelectCustom } from '../controls/tree-select-custom';
 
-export function SummaryResultsForm({ onChange, onSubmit, onReset }) {
-  const dispatch = useDispatch();
+export function SummaryResultsForm({
+  phenotype = null,
+  gender = 'all',
+  onSubmit,
+  onReset
+}) {
+
+  // private members prefixed with _
+  const [_phenotype, _setPhenotype] = useState(null);
+  const [_gender, _setGender] = useState('all');
+
+  // update state when props change
+  useEffect(() => _setPhenotype(phenotype), [phenotype]);
+  useEffect(() => _setGender(gender), [gender]);
+
+  // select store members
   const phenotypes = useSelector(state => state.phenotypes);
   const phenotypeCategories = useSelector(state => state.phenotypeCategories);
   const phenotypesTree = useSelector(state => state.phenotypesTree);
-
-  const { selectedPhenotype, selectedManhattanPlotType } = useSelector(
-    state => state.summaryResults
-  );
-
-  const setSelectedPhenotype = selectedPhenotype => {
-    dispatch(updateSummaryResults({ selectedPhenotype }));
-  };
-
-  const setSelectedManhattanPlotType = selectedManhattanPlotType => {
-    dispatch(updateSummaryResults({ selectedManhattanPlotType }));
-  };
-
-  const handleChangeCustom = item => {
-    if (item && item[0]) {
-      setSelectedPhenotype(item[0]);
-    }
-  };
-
   const alphabetizedPhenotypes = [...phenotypes].sort((a, b) =>
     a.title.localeCompare(b.title)
   );
 
   return (
-    <> 
+    <>
+      {/* <pre>{JSON.stringify({_phenotype, _gender}, null, 2)}</pre> */}
       <div className="mb-2">
-        <b>Phenotypes</b>
-        <span style={{ color: 'red' }}>*</span>
+        <label className="required">Phenotypes</label>
         <TreeSelectCustom
           data={phenotypesTree}
           dataAlphabetical={alphabetizedPhenotypes}
           dataCategories={phenotypeCategories}
-          value={selectedPhenotype}
-          onChange={handleChangeCustom}
-          singleSelect={true}
+          value={_phenotype}
+          onChange={val => _setPhenotype((val && val.length) ? val[0] : null)}
+          singleSelect
         />
       </div>
-      
 
       <div className="mb-3">
-        <b>Gender</b>
+        <label htmlFor="summary-results-gender" className="required">Gender</label>
         <select
+          id="summary-results-gender"
           className="form-control"
-          value={selectedManhattanPlotType}
-          onChange={e => setSelectedManhattanPlotType(e.target.value)}
+          value={_gender}
+          onChange={e => _setGender(e.target.value)}
           aria-label="Select the type of data you wish to plot">
           <option value="all">All</option>
           <option value="stacked">Female/Male (Stacked)</option>
@@ -64,38 +58,28 @@ export function SummaryResultsForm({ onChange, onSubmit, onReset }) {
 
       <div>
         <OverlayTrigger overlay={
-            <Tooltip id="tooltip-disabled" 
-              style={{
-                display: 
-                  (!selectedPhenotype || selectedPhenotype.length < 1) 
-                  ? 'block' 
-                  : 'none'
-                }}>
+          <Tooltip id="summary-results-submit-disabled">
               Please select a phenotype.
             </Tooltip>
           }>
-          <span className="d-inline-block">
-            <Button
-              className=""
-              variant="silver"
-              style={{ maxHeight: '38px', pointerEvents: (!selectedPhenotype || selectedPhenotype.length < 2) ? 'none' : 'auto' }}
-              onClick={e => {
-                e.preventDefault();
-                onSubmit(selectedPhenotype, selectedManhattanPlotType);
-              }}
-              disabled={!selectedPhenotype || selectedPhenotype.length < 1}>
-              Submit
-            </Button>
-          </span>
+          <Button
+            type="submit"
+            variant="silver"
+            onClick={e => {
+              e.preventDefault();
+              onSubmit(_phenotype, _gender);
+            }}
+            disabled={!_phenotype}>
+            Submit
+          </Button>
         </OverlayTrigger>
 
         <Button
           className="ml-2"
           variant="silver"
-          style={{ maxHeight: '38px' }}
           onClick={e => {
             e.preventDefault();
-            onReset(e);
+            onReset();
           }}>
           Reset
         </Button>
