@@ -34,6 +34,7 @@ export function hideTooltip(tooltip) {
  */
 export function showTooltip(tooltip, ev, html, options) {
   options = options || {};
+  options.constraints = options.constraints || {};
 
   let { localX, localY, target } = ev;
   if (options.body)
@@ -76,8 +77,15 @@ export function showTooltip(tooltip, ev, html, options) {
   let topOffset =
     Math.min(localY + tooltipYOffset, targetHeight - tooltipHeight) - tooltipOffset;
 
+  let left = Math.max(leftOffset, 0);
+
+  if (options.constraints) {
+    let {xMin, xMax, yMin, yMax} = options.constraints;
+    if (xMin) left = Math.max(left, xMin);
+  }
+
   setStyles(tooltip, {
-    left: Math.max(leftOffset, 0) + 'px',
+    left: left + 'px',
     top: topOffset + 'px'
   });
 }
