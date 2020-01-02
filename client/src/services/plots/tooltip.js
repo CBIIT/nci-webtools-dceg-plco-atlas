@@ -33,15 +33,19 @@ export function hideTooltip(tooltip) {
  * @param {Element|string} html
  */
 export function showTooltip(tooltip, ev, html, options) {
-  let { localX, localY } = ev;
   options = options || {};
+  options.constraints = options.constraints || {};
+
+  let { localX, localY, target } = ev;
+  if (options.body)
+    target = document.body;
 
   // get coordinates relative to event's target
   if (!localX || !localY) {
     let coords = viewportToLocalCoordinates(
       ev.clientX,
       ev.clientY,
-      ev.target
+      target
     );
 
     localX = coords.x;
@@ -55,8 +59,8 @@ export function showTooltip(tooltip, ev, html, options) {
 
   // determine where to place tooltip relative to event source
   // ensure tooltip is not drawn outside event target's boundaries
-  let targetWidth = ev.target.clientWidth;
-  let targetHeight = ev.target.clientHeight;
+  let targetWidth = target.clientWidth;
+  let targetHeight = target.clientHeight;
   let tooltipHeight = tooltip.clientHeight;
   let tooltipWidth = tooltip.clientWidth;
   let tooltipOffset = 5;
@@ -73,8 +77,15 @@ export function showTooltip(tooltip, ev, html, options) {
   let topOffset =
     Math.min(localY + tooltipYOffset, targetHeight - tooltipHeight) - tooltipOffset;
 
+  let left = Math.max(leftOffset, 0);
+
+  if (options.constraints) {
+    let {xMin, xMax, yMin, yMax} = options.constraints;
+    if (xMin) left = Math.max(left, xMin);
+  }
+
   setStyles(tooltip, {
-    left: Math.max(leftOffset, 0) + 'px',
+    left: left + 'px',
     top: topOffset + 'px'
   });
 }
