@@ -99,36 +99,46 @@ export function QQPlot({ onVariantLookup }) {
   };
 
   function getHTML(tooltipData) {
-    setSelectedVariant(tooltipData);
-    setSelectedGender(tooltipData.gender);
-    return h('div', { className: '' }, [
-      h('div', null, [
-        h('b', null, 'position: '),
-        `${tooltipData.chr ? tooltipData.chr : ''}:${
-          tooltipData.bp ? tooltipData.bp : ''
-        }`
-      ]),
-      h('div', null, [
-        h('b', null, 'p-value: '),
-        `${tooltipData.p ? tooltipData.p : ''}`
-      ]),
-      h('div', null, [
-        h('b', null, 'snp: '),
-        `${tooltipData.snp ? tooltipData.snp : ''}`
-      ]),
-      h('div', null, [
-        h(
-          'a',
-          {
-            className: 'font-weight-bold',
-            href: 'javascript:void(0)',
-            onclick: () =>
-              document.getElementById('hidden-variant-lookup-link').click()
-          },
-          'Go to Variant Lookup'
-        )
-      ])
-    ]);
+    if (tooltipData.display) {
+      setSelectedVariant(tooltipData);
+      setSelectedGender(tooltipData.gender);
+      return h('div', { className: '' }, [
+        h('div', null, [
+          h('b', null, 'position: '),
+          `${tooltipData.chr ? tooltipData.chr : ''}:${
+            tooltipData.bp ? tooltipData.bp : ''
+          }`
+        ]),
+        h('div', null, [
+          h('b', null, 'p-value: '),
+          `${tooltipData.p ? tooltipData.p : ''}`
+        ]),
+        h('div', null, [
+          h('b', null, 'snp: '),
+          `${tooltipData.snp ? tooltipData.snp : ''}`
+        ]),
+        h('div', null, [
+          h(
+            'a',
+            {
+              className: 'font-weight-bold',
+              href: 'javascript:void(0)',
+              onclick: () =>
+                document.getElementById('hidden-variant-lookup-link').click()
+            },
+            'Go to Variant Lookup'
+          )
+        ])
+      ]);
+    } else  {
+      return h('div', { className: '' }, [
+        h('span', null, 'No information for variants'),
+        h('br', null, []),
+        h('span', null, 'with -log'),
+        h('sub', null, '10'),
+        h('span', null, '(p) < 3.')
+      ]);
+    }
   }
 
   function popupMarkerClick(e) {
@@ -137,7 +147,7 @@ export function QQPlot({ onVariantLookup }) {
     const ev = e.event;
     // console.log("EVENT", ev);
     const points = e.points;
-    console.log("POINTS", points)
+    console.log("POINTS hoverinfo", points[0]["data"]["hoverinfo"])
     if (e && ev && points && points[0]) {
       hideTooltip();
       const tooltip = createTooltip();
@@ -149,10 +159,19 @@ export function QQPlot({ onVariantLookup }) {
       }
       qqPlotContainer.appendChild(tooltip);
       // show tooltip
-      const tooltipData = {
-        ...points[0].text,
-        gender: points[0].data.name
-      };
+      let tooltipData = {};
+      // display variant info only if text provided (-nlogp >= 3)
+      if (points[0]["data"]["hoverinfo"] === "text") {
+        tooltipData = {
+          ...points[0].text,
+          gender: points[0].data.name,
+          display: true
+        };
+      } else {
+        tooltipData = {
+          display: false
+        };
+      }
       let containerWidth = containerStyle.width;
       if (tooltipData) {
         const html = getHTML(tooltipData);
