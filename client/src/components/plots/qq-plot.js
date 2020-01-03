@@ -132,9 +132,9 @@ export function QQPlot({ onVariantLookup }) {
       ]);
     } else  {
       return h('div', { className: '' }, [
-        h('span', null, 'No information for variants'),
+        h('span', null, 'No information displayed'),
         h('br', null, []),
-        h('span', null, 'with -log'),
+        h('span', null, 'for variants with -log'),
         h('sub', null, '10'),
         h('span', null, '(p) < 3.')
       ]);
