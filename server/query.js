@@ -6,6 +6,13 @@ const logger = require("./logger");
 const { dbpath } = config;
 const ranges = require(path.resolve(dbpath, 'chromosome_ranges.json'));
 
+/**
+ * Executes a statement with the given parameters, returning
+ * results as an array of arrays to save space when serializing
+ * @param {Statement} stmt - A BetterSqlite3.Statement object
+ * @param {any} params - Parameters to pass to the statement
+ * @return {{columns: string[], data: any[][]}} SQL query results
+ */
 function getRawResults(stmt, params) {
     return {
         columns: stmt.columns().map(c => c.name),
@@ -13,48 +20,91 @@ function getRawResults(stmt, params) {
     };
 }
 
-function wrapColumnName(name){
-    return `"${name}"`;
+/**
+ * Ensures that identifiers with sql keywords in them do not throw errors
+ * @param {string} str - A string which needs to be quoted
+ * @returns {string} The quoted string
+ */
+function quote(str) {
+    return `"${str}"`;
 }
 
+/**
+ * Returns true if the value is not null or undefined. Includes strings
+ * which are also "null" or "undefined"
+ * @param {any} value - The value to check
+ * @returns {{boolean}} True if the value is defined
+ */
 function isDefined(value) {
     return !(/^(null|undefined)$/).test(value);
 }
+
+/**
+ * Returns the value if the condition evaluates to a non-null value
+ * @param {any} condition - A value, which may be null or undefined
+ * @param {any} value - The value to coalesce to, if the condition is defined
+ * @returns - The coalesced value, if the condition is defined
+ */
 function coalesce(condition, value) {
     return isDefined(condition) ? value : null;
 }
 
+/**
+ * Retrieves aggregate data for variants, filtered by search criteria
+ * @param {string} filepath - Path to the sqlite database file
+ * @param {{
+     table: string,
+     columns: string,
+     order: string,
+     orderBy: string,
+     distinct: string,
+     nlogpMin: string,
+     nlogpMax: string,
+     raw: string,
+   }} params - Database query criteria
+ * @returns Records in the aggregate summary table which match query criteria
+ */
 function getSummary(filepath, params) {
-    const validColumns = [
-        'chr', 'bp_abs_1000kb', 'nlog_p2',
-    ];
+    if (!fs.existsSync(filepath)) return [];
+    const db = new Database(filepath, {readonly: true});
+
     const validTables = [
         'aggregate_all',
         'aggregate_female',
         'aggregate_male',
     ];
 
-    const columns = params.columns // given as a comma-separated list
-        ? params.columns.split(',').filter(c => validColumns.includes(c))
-        : validColumns;
+    const validColumns = [
+        'chr',
+        'bp_abs_1000kb',
+        'nlog_p2',
+    ];
 
     const table = validTables.includes(params.table)
         ? params.table
         : validTables[0];
 
+    const columns = params.columns // given as a comma-separated list
+        ? params.columns.split(',').filter(c => validColumns.includes(c))
+        : validColumns;
+
+    const columnNames = columns
+        .map(quote)
+        .join(',');
+
     const distinct = params.distinct
-        ? `DISTINCT  `
+        ? `DISTINCT`
         : ``;
 
-    // filter by -log10(p) if provided
+        // filter by -log10(p) if provided
     let sql = `
-        SELECT ${distinct}${columns.map((name => wrapColumnName(name))).join(',')}
+        SELECT ${distinct} ${columnNames}
         FROM ${table}
-        WHERE ` + [
+        WHERE ${[
             `nlog_p2 IS NOT NULL`,
             coalesce(params.nlogpMin, `nlog_p2 >= :nlogpMin`),
             coalesce(params.nlogpMax, `nlog_p2 <= :nlogpMax`),
-        ].filter(Boolean).join(' AND ');
+        ].filter(Boolean).join(' AND ')}`;
 
     // adds "order by" statement, if both order and orderBy are provided
     let { order, orderBy } = params;
@@ -69,58 +119,68 @@ function getSummary(filepath, params) {
 
     logger.debug(`SQL: ${sql}`);
 
-    const stmt = new Database(filepath, {readonly: true}).prepare(sql);
-
+    const stmt = db.prepare(sql);
     return params.raw
         ? getRawResults(stmt, params)
         : stmt.all(params);
 }
 
 /**
- * Params are as follows:
- *   - id (variant id)
- *   - snp
- *   - chr
- *   - bp
- *   - bpMin
- *   - bpMax
- *   - nlog_p
- *   - nlogpMin
- *   - nlogpMax
- *   - pMin
- *   - pMax
- *   - p
- *   - mod
- *   - order
- *   - orderBy
- *   - limit
- *   - offset
- *   - count
- *   - plot_qq
- * @param {*} filepath
- * @param {*} params
+ * Retrieves variant data, filtered by search criteria
+ * @param {string} filepath - Path to the sqlite database file
+ * @param {{
+     table: string,
+     columns: string,
+     id: string,
+     snp: string,
+     chr: string,
+     bp: string,
+     bpMin: string,
+     bpMax: string,
+     nlogpMin: string,
+     nlogpMax: string,
+     pMin: string,
+     pMax: string,
+     mod: string,
+     plot_qq: string,
+     order: string,
+     orderBy: string,
+     limit: string,
+     offset: string,
+     count: string,
+     raw: string,
+   }} params - Database search criteria
+ * @returns Records in the variant table which match query criteria
  */
 function getVariants(filepath, params) {
-    const validColumns = [
-        'variant_id', 'chr', 'bp', 'snp','a1','a2', 'n',
-        'p','nlog_p', 'p_r', 'or', 'or_r', 'q', 'i', 'expected_p', 'plot_qq',
-    ];
+    if (!fs.existsSync(filepath)) return [];
+    const db = new Database(filepath, {readonly: true});
+
     const validTables = [
         'variant_all',
         'variant_female',
         'variant_male',
     ];
 
-    const columns = params.columns // given as a comma-separated list
-        ? params.columns.split(',').filter(c => validColumns.includes(c))
-        : validColumns;
+    const validColumns = [
+        'variant_id', 'chr', 'bp', 'snp','a1','a2', 'n',
+        'p','nlog_p', 'p_r', 'or', 'or_r', 'q', 'i', 'expected_p', 'plot_qq',
+    ];
 
     const table = validTables.includes(params.table)
         ? params.table
         : validTables[0];
 
+    const columns = params.columns // given as a comma-separated list
+        ? params.columns.split(',').filter(c => validColumns.includes(c))
+        : validColumns;
+
+    const columnNames = columns
+        .map(quote)
+        .join(',');
+
     const groupby = params.groupby
-        ? ` GROUP BY "` + params.groupby + `" `
+        ? ` GROUP BY "${params.groupby}" `
         : ``;
 
     // validate min/max bp for each chromosome if provided
@@ -135,9 +195,9 @@ function getVariants(filepath, params) {
 
     // filter by id, chr, base position, and -log10(p), if provided
     let sql = `
-        SELECT ${columns.map((name => wrapColumnName(name))).join(',')}
+        SELECT ${columnNames}
         FROM ${table}
-        WHERE ` + [
+        WHERE ${[
             `p IS NOT NULL`,
             coalesce(params.id, `variant_id = :id`),
             coalesce(params.snp, `snp = :snp`),
@@ -151,7 +211,8 @@ function getVariants(filepath, params) {
             coalesce(params.pMax, `p <= :pMax`),
             coalesce(params.mod, `(variant_id % :mod) = 0`),
             coalesce(params.plot_qq, `plot_qq = 1`)
-        ].filter(Boolean).join(' AND ') + `${groupby}`;
+        ].filter(Boolean).join(' AND ')}
+        ${groupby}`;
 
     // create count sql based on original query
     let countSql = `SELECT COUNT(1) FROM (${sql})`;
@@ -172,8 +233,8 @@ function getVariants(filepath, params) {
     if (params.offset) sql += ' OFFSET :offset ';
 
     logger.debug(`SQL: ${sql}`);
+
     // query database
-    const db = new Database(filepath, {readonly: true});
     const stmt = db.prepare(sql);
     const records = params.raw
         ? getRawResults(stmt, params)
@@ -190,26 +251,42 @@ function exportVariants(filepath, params) {
     params = {...params, raw: true, count: false};
     const { columns, data } = getVariants(filepath, params);
     // todo: stream csv contents
+    return [];
 }
 
-function getMetadata(filepath, {key}) {
+/**
+ * Retrieves metadata for a phenotype's variants
+ * @param {string} filepath - Path to the sqlite database file
+ * @param {string} key - A specific metadata key to retrieve
+ * @returns {any} A specified key and value, or the entire list of
+ * metadata properties if the key is not specified
+ */
+function getMetadata(filepath, key) {
     const db = new Database(filepath, {readonly: true});
-    if (key)
-        return db.prepare(`SELECT value FROM variant_metadata WHERE key = :key`)
-        .pluck()
-        .get({key});
-
-    const records = db.prepare(`SELECT * FROM variant_metadata`).all();
-    return records.reduce((obj, {key, value}) => {
-        obj[key] = value;
-        return obj;
-    }, {});
+    return key
+        ? db.prepare(`SELECT value FROM variant_metadata WHERE key = :key`)
+            .pluck()
+            .get({key})
+        : db.prepare(`SELECT key, value FROM variant_metadata`)
+            .all()
+            .reduce((obj, v) => ({...obj, [v.key]: v.value}), {});
 }
 
+/**
+ * Retrieves genes from a specific chromosome, filtered by search criteria
+ * @param {string} filepath - Path to the sqlite database file
+ * @param {{
+     columns: string,
+     chr: string,
+     txStart: string,
+     txEnd: string
+   }} params - Criteria to filter genes
+ * @returns {any[]} Genes matching the search criteria
+ */
 function getGenes(filepath, params) {
     if (!fs.existsSync(filepath)) return [];
-
     const db = new Database(filepath, {readonly: true});
+
     const validColumns = [
         'gene_id',
         'name',
@@ -220,34 +297,38 @@ function getGenes(filepath, params) {
         'exon_starts',
         'exon_ends',
     ];
+
     const columns = params.columns
         ? params.columns.split(',').filter(e => validColumns.includes(e))
         : ['gene_id', 'name', 'strand', 'tx_start', 'tx_end', 'exon_starts', 'exon_ends'];
 
-    let records = db.prepare(`
-        SELECT ${columns.map(c => `"${c}"`).join(',')}
+    const columnNames = columns
+        .map(quote)
+        .join(',');
+
+    const splitNumbers = e => (e || '')
+        .split(',')
+        .filter(e => e !== '')
+        .map(e => +e);
+
+    return db.prepare(`
+        SELECT ${columnNames}
         FROM gene
-        WHERE
-            chr = :chr AND
-            (
-                (tx_start BETWEEN :txStart AND :txEnd) OR
-                (tx_end BETWEEN :txStart AND :txEnd)
-            )
-    `).all(params);
-
-    // since exon_starts/ends are comma-delimited strings, we should parse them as arrays
-    if (columns.includes('exon_starts') || columns.includes('exon_ends')) {
-        const split = e => (e || '').split(',').filter(e => e !== '').map(e => +e);
-        records = records.map(e => {
-            e.exon_starts = split(e.exon_starts);
-            e.exon_ends = split(e.exon_ends);
-            return e;
-        });
-    }
-
-    return records;
+        WHERE chr = :chr AND (
+            (tx_start BETWEEN :txStart AND :txEnd) OR
+            (tx_end BETWEEN :txStart AND :txEnd))
+    `).all(params).map(e => ({
+        ...e,
+        exon_starts: splitNumbers(e.exon_starts),
+        exon_ends: splitNumbers(e.exon_ends)
+    }));
 }
 
+/**
+ * Retrieves a specific configuration key
+ * @param {string} key - The key to retrieve
+ * @returns {any} The specified key and its value
+ */
 function getConfig(key) {
     const allowedKeys = ['downloadRoot'];
     return allowedKeys.includes(key)
