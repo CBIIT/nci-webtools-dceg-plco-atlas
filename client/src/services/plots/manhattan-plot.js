@@ -490,7 +490,7 @@ export class ManhattanPlot {
       if (gene && !config.tooltipOpen && config.geneTooltipContent) {
         config.tooltipOpen = true;
         let row = Math.floor(y / rowHeight);
-        let showAbove = row > 1 && row > packedGeneRanges.length - 3;
+        let showAbove = false;//row > 1 && row > packedGeneRanges.length - 3;
         // console.log('showAbove', showAbove);
         let yOffset = showAbove
           ? row * rowHeight + padding
