@@ -69,7 +69,7 @@ app.get("/variants", async ({ query }, res) => {
 
 // retrieves metadata
 app.get("/metadata", async ({ query }, res) => {
-  return getMetadata(dbpath + query.database, query);
+  return getMetadata(dbpath + query.database, query.key);
 });
 
 // retrieves genes
