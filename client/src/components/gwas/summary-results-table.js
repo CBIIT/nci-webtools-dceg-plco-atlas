@@ -92,11 +92,15 @@ export function SummaryResultsTable() {
         ? `count_${key}_${selectedChromosome}`
         : `count_${key}`;
 
+    let table = Array.isArray(selectedTable)
+      ? selectedTable.find(e => e.includes(`_${gender}`))
+      : selectedTable
+
     dispatch(
       fetchSummaryTable(key, {
           database: selectedPhenotype.value + '.db',
           offset: limit * (page - 1),
-          table: selectedTable,
+          table: table,
           chr: selectedChromosome,
           count: shouldCount,
           key: shouldCount ? null : countKey,
