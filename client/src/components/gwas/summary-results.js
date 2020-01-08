@@ -154,7 +154,7 @@ export function SummaryResults() {
         selectedPhenotype: phenotype,
         selectedManhattanPlotType: manhattanPlotType,
         manhattanPlotView: 'summary',
-        selectedTable: aggregateTable,
+        selectedTable: variantTable,
         selectedChromosome: null,
         selectedManhattanPlotType: manhattanPlotType,
         nlogpMin: null,
