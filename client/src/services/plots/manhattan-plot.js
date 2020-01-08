@@ -460,7 +460,8 @@ export class ManhattanPlot {
     let txColor = '#ddd';
     let exonColor = '#049372';
     let geneOverlayPositions = [];
-    let padding = 5;
+    let padding = 10;
+    let lastGene = null;
     let pan = {
       mouseDown: false,
       initialX: 0,
@@ -496,7 +497,8 @@ export class ManhattanPlot {
         geneCanvas
       );
       let gene = getGeneAtPosition(x, y);
-      if (!pan.mouseDown && gene && !config.tooltipOpen && config.geneTooltipContent) {
+      if (!pan.mouseDown && gene && gene != lastGene && config.geneTooltipContent) {
+        lastGene = gene;
         config.tooltipOpen = true;
         let row = Math.floor(y / rowHeight);
         let showAbove = false;//row > 1 && row > packedGeneRanges.length - 3;
@@ -518,7 +520,6 @@ export class ManhattanPlot {
         // console.log('showing tooltip', gene, content, this.geneTooltip, tooltipLocation)
         showTooltip(this.geneTooltip, ev, content, {
           center: true,
-          //above: showAbove,
           body: true,
           constraints: {xMin: canvasOffset.left}}
         );
@@ -527,6 +528,7 @@ export class ManhattanPlot {
         showTooltip(this.geneTooltip, , content);
         */
       } else if (!gene) {
+        lastGene = null;
         config.tooltipOpen = false;
         hideTooltip(this.geneTooltip);
       }
@@ -535,6 +537,7 @@ export class ManhattanPlot {
     });
 
     addEventListener(document.body, 'click', (ev) => {
+      lastGene = null;
       config.tooltipOpen = false;
       hideTooltip(this.geneTooltip);
     });
