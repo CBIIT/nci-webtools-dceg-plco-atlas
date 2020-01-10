@@ -63,7 +63,7 @@ export function showTooltip(tooltip, ev, html, options) {
   let targetHeight = target.clientHeight;
   let tooltipHeight = tooltip.clientHeight;
   let tooltipWidth = tooltip.clientWidth;
-  let tooltipOffset = 5;
+  let tooltipOffset = 0;
   let tooltipXOffset = options.center
     ? - tooltipWidth / 2
     : 0;
