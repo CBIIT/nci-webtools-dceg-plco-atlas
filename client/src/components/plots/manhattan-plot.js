@@ -85,7 +85,10 @@ export function ManhattanPlot({
           ? getSummaryPlot(manhattanPlotData)
           : getChromosomePlot(manhattanPlotData);
     }
-    plot.current = new Plot(plotContainer.current, {...params, ...manhattanPlotConfig});
+    let config = {...params, ...manhattanPlotConfig}
+    plot.current = new Plot(plotContainer.current, config);
+    if (config.genes)
+      plot.current.drawGenes();
     // setZoomStack([]);
     return () => {
       // plot.current.destroy();
