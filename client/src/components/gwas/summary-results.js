@@ -161,7 +161,8 @@ export function SummaryResults() {
         nlogpMax: null,
         bpMin: null,
         bpMax: null,
-        submitted: true
+        submitted: true,
+        manhattanPlotConfig: {},
       })
     );
 
@@ -214,7 +215,8 @@ export function SummaryResults() {
         showSnpResults: false,
         snp: '',
         searchCriteriaSummaryResults: {},
-        sampleSize: null
+        sampleSize: null,
+        manhattanPlotConfig: {},
       })
     );
 

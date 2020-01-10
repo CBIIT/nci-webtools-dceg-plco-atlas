@@ -35,7 +35,10 @@ export const getInitialState = () => ({
     qqplotData: [],
     qqplotLayout: {},
     searchCriteriaSummaryResults: {},
-    sampleSize: null
+    sampleSize: null,
+    manhattanPlotConfig: {},
+    zoomStack: [],
+    genes: [],
   },
   manhattanPlot: {
     data: {},

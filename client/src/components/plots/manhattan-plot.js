@@ -6,7 +6,7 @@ import { plotOverlayConfig } from '../controls/table';
 import { rawQuery, query } from '../../services/query';
 import { ManhattanPlot as Plot } from '../../services/plots/manhattan-plot';
 import { Icon } from '../controls/icon';
-import { createElement as h } from '../../services/plots/utils';
+import { createElement as h, removeChildren } from '../../services/plots/utils';
 import { systemFont } from '../../services/plots/text';
 import { updateSummaryResults } from '../../services/actions';
 
@@ -18,8 +18,9 @@ export function ManhattanPlot({
   loading,
   panelCollapsed,
 }) {
-  const [zoomStack, setZoomStack] = useState([]);
-  const [genes, setGenes] = useState([]);
+  const dispatch = useDispatch();
+  // const [zoomStack, setZoomStack] = useState([]);
+  // const [genes, setGenes] = useState([]);
   const [genePlotCollapsed, setGenePlotCollapsed] = useState(false);
   const plotContainer = useRef(null);
   const plot = useRef(null);
@@ -31,12 +32,27 @@ export function ManhattanPlot({
     selectedManhattanPlotType,
     selectedPhenotype,
     selectedChromosome,
-    ranges
+    ranges,
+    manhattanPlotConfig,
+    zoomStack,
+    genes,
   } = useSelector(state => state.summaryResults);
   const hasData = () =>
     manhattanPlotData &&
     manhattanPlotData.data &&
     manhattanPlotData.data.length;
+
+  const setManhattanPlotConfig = manhattanPlotConfig => {
+    dispatch(updateSummaryResults({manhattanPlotConfig}))
+  }
+
+  const setZoomStack = zoomStack => {
+    dispatch(updateSummaryResults({zoomStack}))
+  }
+
+  const setGenes = genes => {
+    dispatch(updateSummaryResults({genes}))
+  }
 
   const colors = {
     primary: {
@@ -51,6 +67,8 @@ export function ManhattanPlot({
 
   useEffect(() => {
     if (selectedPlot != 'manhattan-plot' || !hasData()) return;
+    // removeChildren(plotContainer.current);
+    plotContainer.current.innerHTML = '';
 
     let params;
     if (selectedManhattanPlotType === 'stacked') {
@@ -67,10 +85,10 @@ export function ManhattanPlot({
           ? getSummaryPlot(manhattanPlotData)
           : getChromosomePlot(manhattanPlotData);
     }
-    plot.current = new Plot(plotContainer.current, params);
-    setZoomStack([]);
+    plot.current = new Plot(plotContainer.current, {...params, ...manhattanPlotConfig});
+    // setZoomStack([]);
     return () => {
-      plot.current.destroy();
+      // plot.current.destroy();
     };
   }, [manhattanPlotData, manhattanPlotMirroredData, selectedPlot]);
 
@@ -167,6 +185,7 @@ export function ManhattanPlot({
         let { xAxis, zoomStack } = config;
         let stack = [...zoomStack]; // need new reference, since zoomStack updates
         let zoomRange = Math.abs(xAxis.extent[1] - xAxis.extent[0]);
+        setManhattanPlotConfig({...config});
         setZoomStack(stack);
         onZoom(e);
 
@@ -351,6 +370,7 @@ export function ManhattanPlot({
         let { xAxis, zoomStack } = config;
         let stack = [...zoomStack]; // need new reference, since zoomStack updates
         let zoomRange = Math.abs(xAxis.extent[1] - xAxis.extent[0]);
+        setManhattanPlotConfig({...config});
         setZoomStack(stack);
         onZoom(e);
 
