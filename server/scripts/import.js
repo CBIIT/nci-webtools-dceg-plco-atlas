@@ -68,7 +68,7 @@ const readFile = filepath => fs.readFileSync(path.resolve(__dirname, filepath), 
 
 // floors a value to the lowest multiple of the size given (usually a power of 10)
 const group = (value, size) =>
-    value === null ? null : +(
+    (value === null || value === undefined || isNaN(value)) ? null : +(
         size * Math.floor(value / size)
     ).toPrecision(12);
 
@@ -143,7 +143,7 @@ const getIntervals = (maxValue, length) => {
         var interval = fx(x);
         if (interval > 0 && !intervals.includes(interval)) {
             intervals.push(interval);
-        } 
+        }
     }
 
     return intervals;
@@ -191,7 +191,7 @@ reader.on('line', line => {
     const {chr, bp, p} = params;
 
     // validate line (not first line, p value not null or non-numeric, bp within grch38)
-    if (++count === 0 || p === null || isNaN(p)) {
+    if (++count === 0 || isNaN(p) || p === null || p === undefined || p < 0 || p > 1) {
         return;
     }
 
@@ -278,15 +278,15 @@ reader.on('close', () => {
     // calculating lambdaGC (eg: lambdagc_male)
     console.log(`[${duration()} s] Calculating lambdaGC value...`);
     const pMedian = db.prepare(`
-        SELECT AVG(p) AS "median" 
+        SELECT AVG(p) AS "median"
         FROM (
             SELECT "p"
-            FROM variant_${tableSuffix} 
+            FROM variant_${tableSuffix}
             ORDER BY "p"
-            LIMIT 2 - (SELECT COUNT(*) FROM variant_${tableSuffix}) % 2 
+            LIMIT 2 - (SELECT COUNT(*) FROM variant_${tableSuffix}) % 2
             OFFSET (
-                SELECT (COUNT(*) - 1) / 2 
-                FROM variant_${tableSuffix} 
+                SELECT (COUNT(*) - 1) / 2
+                FROM variant_${tableSuffix}
             )
         )
     `).pluck().get();
@@ -301,14 +301,14 @@ reader.on('close', () => {
     // updating variants table with expected nlog_p values
     console.log(`[${duration()} s] Updating expected p-values...`);
     const updateExpectedP = db.prepare(`
-        UPDATE variant_${tableSuffix} 
+        UPDATE variant_${tableSuffix}
         SET expected_p = :expected_p
         WHERE variant_id = :id
     `);
     const expected_p = ppoints(totalCount);
     for (let id = 0; id < totalCount; id++) {
         updateExpectedP.run({
-            id: id + 1, 
+            id: id + 1,
             expected_p: expected_p[totalCount - id - 1]
         });
     }
@@ -316,8 +316,8 @@ reader.on('close', () => {
     // updating variants table with Q-Q plot flag
     console.log(`[${duration()} s] Updating plot_qq values...`);
     const updatePlotQQ = db.prepare(`
-        UPDATE variant_${tableSuffix} 
-        SET plot_qq = 1 
+        UPDATE variant_${tableSuffix}
+        SET plot_qq = 1
         WHERE variant_id = :id
     `);
     const plotQQIntervals = getIntervals(totalCount, 10000);
