@@ -55,8 +55,8 @@ export function ManhattanPlot({
 
   const colors = {
     all: {
-      light: '#9A884B',
-      dark: '#6B5220',
+      light: '#24a221',
+      dark: '#135912',
     },
     male: {
       light: '#006bb8',
