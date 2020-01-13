@@ -168,12 +168,12 @@ export function ManhattanPlot({
           },
           { text: `(p)`, font: `600 14px ${systemFont}` }
         ],
-        maleTitle: [{ text: `Female`, font: `600 11px ${systemFont}` }],
+        secondaryTitle: [{ text: `Female`, font: `600 11px ${systemFont}` }],
         key: columnIndexes.nLogP,
         tickFormat: tick => tick.toPrecision(3)
       },
       yAxis2: {
-        maleTitle: [{ text: `Male`, font: `600 11px ${systemFont}` }]
+        secondaryTitle: [{ text: `Male`, font: `600 11px ${systemFont}` }]
       },
       point: {
         size: 2,
@@ -271,12 +271,12 @@ export function ManhattanPlot({
           },
           { text: `(p)`, font: `600 14px ${systemFont}` }
         ],
-        maleTitle: [{ text: `Female`, font: `600 11px ${systemFont}` }],
+        secondaryTitle: [{ text: `Female`, font: `600 11px ${systemFont}` }],
         key: columnIndexes.nLogP,
         tickFormat: tick => tick.toPrecision(3)
       },
       yAxis2: {
-        maleTitle: [{ text: `Male`, font: `600 11px ${systemFont}` }]
+        secondaryTitle: [{ text: `Male`, font: `600 11px ${systemFont}` }]
       },
       point: {
         size: 2,
