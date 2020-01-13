@@ -108,9 +108,9 @@ export class ManhattanPlot {
     document.body.appendChild(this.geneTooltip);
 
     // save default extents, if they are provided
-    if (this.config.xAxis.extent)
+    if (this.config.xAxis.extent && !this.config.xAxis.defaultExtent)
       this.config.xAxis.defaultExtent = this.config.xAxis.extent;
-    if (this.config.yAxis.extent)
+    if (this.config.yAxis.extent && !this.config.yAxis.defaultExtent)
       this.config.yAxis.defaultExtent = this.config.yAxis.extent;
 
     // draw plot and attach handlers for interactive events
@@ -811,8 +811,13 @@ export class ManhattanPlot {
       config.resetZoom = window => {
         const xData = config.data.map(d => d[config.xAxis.key]);
         const yData = config.data.map(d => d[config.yAxis.key]);
-        config.xAxis.extent = config.xAxis.defaultExtent || extent(xData);
-        config.yAxis.extent = config.yAxis.defaultExtent || extent(yData);
+        const yData2 = config.data2
+          ? config.data2.map(d => d[config.yAxis.key])
+          : [];
+
+        config.xAxis.extent =  extent(xData);
+        config.yAxis.extent =  extent(yData.concat(yData2));
+
         config.zoomStack = [];
         this.draw();
         if (config.onZoom) {
