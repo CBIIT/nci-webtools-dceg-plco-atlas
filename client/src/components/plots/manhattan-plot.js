@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Spinner } from 'react-bootstrap';
 import LoadingOverlay from 'react-loading-overlay';
+import * as merge from 'lodash.merge';
 import { plotOverlayConfig } from '../controls/table';
 import { rawQuery, query } from '../../services/query';
 import { ManhattanPlot as Plot } from '../../services/plots/manhattan-plot';
@@ -85,10 +86,36 @@ export function ManhattanPlot({
           ? getSummaryPlot(manhattanPlotData)
           : getChromosomePlot(manhattanPlotData);
     }
-    let config = {...params, ...manhattanPlotConfig}
+    let config = {...params};
+    config.genes = genes;
+    config.zoomStack = zoomStack;
+
+    if (manhattanPlotConfig) {
+      if (manhattanPlotConfig.zoomWindow)
+        config.zoomWindow = manhattanPlotConfig.zoomWindow;
+
+      if (manhattanPlotConfig.xAxis) {
+        config.xAxis.extent = manhattanPlotConfig.xAxis.extent;
+        config.xAxis.defaultExtent = manhattanPlotConfig.xAxis.defaultExtent;
+      }
+
+      if (manhattanPlotConfig.yAxis) {
+        config.yAxis.extent = manhattanPlotConfig.yAxis.extent;
+        config.yAxis.defaultExtent = manhattanPlotConfig.yAxis.defaultExtent;
+      }
+
+      if (manhattanPlotConfig.yAxis2) {
+        config.yAxis2.extent = manhattanPlotConfig.yAxis2.extent;
+        config.yAxis2.defaultExtent = manhattanPlotConfig.yAxis2.defaultExtent;
+      }
+
+      }
+
     plot.current = new Plot(plotContainer.current, config);
-    if (config.genes)
-      plot.current.drawGenes();
+    if (genes && genes.length)
+      plot.current.drawGenes(genes);
+    else
+      plot.current.clearGenes();
     // setZoomStack([]);
     return () => {
       // plot.current.destroy();
@@ -500,8 +527,18 @@ export function ManhattanPlot({
   }
 
   function zoomOut() {
-    if (plot.current && plot.current.config.zoomOut) {
-      plot.current.config.zoomOut();
+    if (plot.current) {
+      console.log('ZOOMSTACK', plot.current.config, zoomStack);
+      if (zoomStack.length < 2) {
+        this.resetZoom();
+      } else {
+        zoomStack.pop();
+        let window = zoomStack[zoomStack.length - 1];
+        plot.current.config.setZoomWindow({...window})
+        setZoomStack([...zoomStack]);
+        // plot.current.config.zoomOut();
+      }
+
     }
   }
 
