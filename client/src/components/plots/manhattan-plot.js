@@ -20,8 +20,6 @@ export function ManhattanPlot({
   panelCollapsed,
 }) {
   const dispatch = useDispatch();
-  // const [zoomStack, setZoomStack] = useState([]);
-  // const [genes, setGenes] = useState([]);
   const [genePlotCollapsed, setGenePlotCollapsed] = useState(false);
   const plotContainer = useRef(null);
   const plot = useRef(null);
@@ -56,11 +54,15 @@ export function ManhattanPlot({
   }
 
   const colors = {
-    primary: {
+    all: {
+      light: '#9A884B',
+      dark: '#6B5220',
+    },
+    male: {
       light: '#006bb8',
       dark: '#002a47'
     },
-    secondary: {
+    female: {
       light: '#F2990D',
       dark: '#A76909'
     }
@@ -166,20 +168,20 @@ export function ManhattanPlot({
           },
           { text: `(p)`, font: `600 14px ${systemFont}` }
         ],
-        secondaryTitle: [{ text: `Female`, font: `600 11px ${systemFont}` }],
+        maleTitle: [{ text: `Female`, font: `600 11px ${systemFont}` }],
         key: columnIndexes.nLogP,
         tickFormat: tick => tick.toPrecision(3)
       },
       yAxis2: {
-        secondaryTitle: [{ text: `Male`, font: `600 11px ${systemFont}` }]
+        maleTitle: [{ text: `Male`, font: `600 11px ${systemFont}` }]
       },
       point: {
         size: 2,
         opacity: 1,
-        color: (d, i) => (d[columnIndexes.chr] % 2 ? colors.primary.light : colors.primary.dark)
+        color: (d, i) => (d[columnIndexes.chr] % 2 ? colors.female.light : colors.female.dark)
       },
       point2: {
-        color: (d, i) => (d[columnIndexes.chr] % 2 ? colors.secondary.light : colors.secondary.dark) //#e47833')
+        color: (d, i) => (d[columnIndexes.chr] % 2 ? colors.male.light : colors.male.dark) //#e47833')
       },
       lines: [{ y: -Math.log10(5e-8), style: 'dashed' }]
     };
@@ -269,18 +271,18 @@ export function ManhattanPlot({
           },
           { text: `(p)`, font: `600 14px ${systemFont}` }
         ],
-        secondaryTitle: [{ text: `Female`, font: `600 11px ${systemFont}` }],
+        maleTitle: [{ text: `Female`, font: `600 11px ${systemFont}` }],
         key: columnIndexes.nLogP,
         tickFormat: tick => tick.toPrecision(3)
       },
       yAxis2: {
-        secondaryTitle: [{ text: `Male`, font: `600 11px ${systemFont}` }]
+        maleTitle: [{ text: `Male`, font: `600 11px ${systemFont}` }]
       },
       point: {
         size: 2,
         interactiveSize: 3,
         opacity: 1,
-        color: selectedChromosome % 2 ? colors.primary.light : colors.primary.dark,
+        color: selectedChromosome % 2 ? colors.female.light : colors.female.dark,
         tooltip: {
           trigger: 'hover',
           class: 'custom-tooltip',
@@ -316,7 +318,7 @@ export function ManhattanPlot({
         }
       },
       point2: {
-        color: selectedChromosome % 2 ? colors.secondary.light : colors.secondary.dark
+        color: selectedChromosome % 2 ? colors.male.light : colors.male.dark
       },
       lines: [{ y: -Math.log10(5e-8), style: 'dashed' }],
       zoomStack: (plot.current && plot.current.zoomStack) || []
@@ -367,7 +369,9 @@ export function ManhattanPlot({
       point: {
         size: 2,
         opacity: 1,
-        color: (d, i) => (d[columnIndexes.chr] % 2 ? colors.primary.light : colors.primary.dark) //#e47833')
+        color: (d, i) => (d[columnIndexes.chr] % 2
+            ? colors[selectedManhattanPlotType].light
+            : colors[selectedManhattanPlotType].dark) //#e47833')
       },
       lines: [{ y: -Math.log10(5e-8) }]
     };
@@ -460,7 +464,9 @@ export function ManhattanPlot({
         size: 2,
         interactiveSize: 3,
         opacity: 1,
-        color: selectedChromosome % 2 ? colors.primary.light : colors.primary.dark,
+        color: selectedChromosome % 2
+          ? colors[selectedManhattanPlotType].light
+          : colors[selectedManhattanPlotType].dark,
         tooltip: {
           trigger: 'hover',
           class: 'custom-tooltip',
