@@ -63,7 +63,7 @@ export function SummaryResults() {
   const getAggregateTable = plotType =>
     ({
       all: ['aggregate_all'],
-      stacked: ['aggregate_male', 'aggregate_female'],
+      stacked: ['aggregate_female', 'aggregate_male'],
       female: ['aggregate_female'],
       male: ['aggregate_male']
     }[plotType]);
@@ -72,7 +72,7 @@ export function SummaryResults() {
   const getVariantTable = plotType =>
     ({
       all: ['variant_all'],
-      stacked: ['variant_male', 'variant_female'],
+      stacked: ['variant_female', 'variant_male'],
       female: ['variant_female'],
       male: ['variant_male']
     }[plotType]);
