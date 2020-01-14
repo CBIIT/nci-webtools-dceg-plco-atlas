@@ -55,16 +55,16 @@ export function ManhattanPlot({
 
   const colors = {
     all: {
-      light: '#24a221',
-      dark: '#135912',
+      light: '#F2990D',
+      dark: '#A76909',
     },
     male: {
       light: '#006bb8',
       dark: '#002a47'
     },
     female: {
-      light: '#F2990D',
-      dark: '#A76909'
+      light: '#bf55ec',
+      dark: '#663399'
     }
   }
 
