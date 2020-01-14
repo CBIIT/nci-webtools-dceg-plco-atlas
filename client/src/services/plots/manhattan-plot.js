@@ -389,7 +389,7 @@ export class ManhattanPlot {
       genes = config.genes;
     }
 
-    if (!genes) return;
+    if (!genes || !this.config.zoomWindow) return;
 
     let getName = gene =>
       gene.strand === '+' ? `${gene.name} 🡪` : `🡨 ${gene.name}`;
