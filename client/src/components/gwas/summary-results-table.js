@@ -233,12 +233,12 @@ export function SummaryResultsTable() {
             data={summarySnpTables[selectedManhattanPlotType].results}
             columns={columns} />}
 
-
         {/^stacked$/.test(selectedManhattanPlotType) &&
           <Table
             keyField="variant_id"
             data={summarySnpTables[gender].results}
             columns={columns} />}
+
       </>}
     </div>
   );
