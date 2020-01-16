@@ -63,8 +63,8 @@ export function ManhattanPlot({
       dark: '#002a47'
     },
     female: {
-      light: '#f97b9b',  // '#bf55ec',
-      dark: '#dd2050'  // '#663399'
+      light: '#f41c52',
+      dark: '#a2173a'
     }
   }
 
