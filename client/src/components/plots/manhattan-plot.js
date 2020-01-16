@@ -63,8 +63,8 @@ export function ManhattanPlot({
       dark: '#002a47'
     },
     female: {
-      light: '#bf55ec',
-      dark: '#663399'
+      light: '#f97b9b',  // '#bf55ec',
+      dark: '#dd2050'  // '#663399'
     }
   }
 
@@ -110,8 +110,7 @@ export function ManhattanPlot({
         config.yAxis2.extent = manhattanPlotConfig.yAxis2.extent;
         config.yAxis2.defaultExtent = manhattanPlotConfig.yAxis2.defaultExtent;
       }
-
-      }
+    }
 
     plot.current = new Plot(plotContainer.current, config);
     if (genes && genes.length)
@@ -212,6 +211,7 @@ export function ManhattanPlot({
       data2: mirroredPlotData.data,
       genes: plotData.genes,
       allowZoom: true,
+      allowPan: true,
       onZoom: async e => {
         let config = plot.current.config;
         let { xAxis, zoomStack } = config;
@@ -399,6 +399,7 @@ export function ManhattanPlot({
       data: plotData.data,
       genes: plotData.genes,
       allowZoom: true,
+      allowPan: true,
       onZoom: async e => {
         let config = plot.current.config;
         let { xAxis, zoomStack } = config;

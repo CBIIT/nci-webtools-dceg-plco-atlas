@@ -20,7 +20,7 @@ import { measureWidth, renderText, systemFont } from './text.js';
 import { getScale, getTicks } from './scale.js';
 import { axisLeft, axisBottom } from './axis.js';
 import { drawPoints } from './points.js';
-import { drawSelectionOverlay, drawZoomOverlay } from './overlays.js';
+import { drawSelectionOverlay, drawZoomOverlay, drawPanOverlay } from './overlays.js';
 import { createTooltip, showTooltip, hideTooltip } from './tooltip.js';
 
 export class ManhattanPlot {
@@ -828,6 +828,10 @@ export class ManhattanPlot {
           });
         }
       };
+    }
+
+    if (config.allowPan) {
+      drawPanOverlay(config, this.ctx, this.overlayCtx);
     }
   }
 
