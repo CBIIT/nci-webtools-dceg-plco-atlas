@@ -267,7 +267,7 @@ export function drawPanOverlay(config, ctx, overlayCtx) {
     panArea.xEnd = x;
     panArea.yEnd = y;
     panArea.deltaX = xScale(panArea.xEnd - panArea.xStart);
-    panArea.deltaY = yScale(panArea.yEnd - panArea.yStart); // inverse y scale
+    panArea.deltaY = - yScale(panArea.yEnd - panArea.yStart); // inverse y scale
 
     withSavedContext(overlayCtx, ctx => {
       ctx.globalAlpha = 0.5;
@@ -317,15 +317,17 @@ export function drawPanOverlay(config, ctx, overlayCtx) {
       ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
     });
 
-    config.setZoomWindow({
-      bounds: {
-        xMin: currentBounds.xMin + deltaX,
-        xMax: currentBounds.xMax + deltaX,
-        yMin: currentBounds.yMin + deltaY,
-        yMax: currentBounds.yMax + deltaY,
-      }
-    });
+    let bounds = {
+      xMin: currentBounds.xMin + deltaX,
+      xMax: currentBounds.xMax + deltaX,
+      yMin: currentBounds.yMin + deltaY,
+      yMax: currentBounds.yMax + deltaY,
+    }
 
+    config.setZoomWindow({bounds});
+    if (config.onPan) {
+      config.onPan(bounds);
+    }
   })
 }
 
