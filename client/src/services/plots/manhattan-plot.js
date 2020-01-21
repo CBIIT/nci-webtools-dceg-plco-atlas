@@ -20,7 +20,7 @@ import { measureWidth, renderText, systemFont } from './text.js';
 import { getScale, getTicks } from './scale.js';
 import { axisLeft, axisBottom } from './axis.js';
 import { drawPoints } from './points.js';
-import { drawSelectionOverlay, drawZoomOverlay } from './overlays.js';
+import { drawSelectionOverlay, drawZoomOverlay, drawPanOverlay } from './overlays.js';
 import { createTooltip, showTooltip, hideTooltip } from './tooltip.js';
 
 export class ManhattanPlot {
@@ -306,6 +306,7 @@ export class ManhattanPlot {
     let margins = config.margins;
     let width = this.canvas.width - margins.left - margins.right;
     let ctx = this.ctx;
+    config.title = title;
 
 //    ctx.clearRect(0, 0, this.canvas.width, margins.top);
     withSavedContext(ctx, ctx => {
@@ -654,13 +655,15 @@ export class ManhattanPlot {
       if (!pan.mouseDown || !pan.deltaX) return;
       pan.mouseDown = false;
       let deltaX = pan.scale(pan.deltaX);
-      this.config.setZoomWindow({
-        bounds: {
-          ...currentBounds,
-          xMin: currentBounds.xMin + deltaX,
-          xMax: currentBounds.xMax + deltaX,
-        }
-      })
+      let bounds = {
+        ...currentBounds,
+        xMin: currentBounds.xMin + deltaX,
+        xMax: currentBounds.xMax + deltaX,
+      }
+      this.config.setZoomWindow({bounds});
+      if (this.config.onPan) {
+        this.config.onPan(bounds);
+      }
     });
   }
 
@@ -828,6 +831,10 @@ export class ManhattanPlot {
           });
         }
       };
+    }
+
+    if (config.allowPan) {
+      drawPanOverlay(config, this.ctx, this.overlayCtx);
     }
   }
 

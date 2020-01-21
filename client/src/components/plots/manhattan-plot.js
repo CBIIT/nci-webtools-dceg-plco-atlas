@@ -63,9 +63,19 @@ export function ManhattanPlot({
       dark: '#002a47'
     },
     female: {
-      light: '#bf55ec',
-      dark: '#663399'
+      light: '#f41c52',
+      dark: '#a2173a'
     }
+  }
+
+
+  const getTitle = bounds => {
+    if (!bounds)
+      return `${selectedPhenotype.title} - Chromosome ${selectedChromosome}`;
+    let boundsText = `(${(bounds.xMin / 1e6).toPrecision(4)} MB - ${(
+      bounds.xMax / 1e6
+    ).toPrecision(4)} MB)`;
+    return `${selectedPhenotype.title} - Chromosome ${selectedChromosome} ${boundsText}`;
   }
 
   useEffect(() => {
@@ -93,6 +103,9 @@ export function ManhattanPlot({
     config.zoomStack = zoomStack;
 
     if (manhattanPlotConfig) {
+      if (manhattanPlotConfig.title)
+        config.title = manhattanPlotConfig.title;
+
       if (manhattanPlotConfig.zoomWindow)
         config.zoomWindow = manhattanPlotConfig.zoomWindow;
 
@@ -110,8 +123,7 @@ export function ManhattanPlot({
         config.yAxis2.extent = manhattanPlotConfig.yAxis2.extent;
         config.yAxis2.defaultExtent = manhattanPlotConfig.yAxis2.defaultExtent;
       }
-
-      }
+    }
 
     plot.current = new Plot(plotContainer.current, config);
     if (genes && genes.length)
@@ -212,6 +224,17 @@ export function ManhattanPlot({
       data2: mirroredPlotData.data,
       genes: plotData.genes,
       allowZoom: true,
+      allowPan: true,
+
+      onPan: bounds => {
+        plot.current.setTitle([
+          {
+            text: getTitle(bounds),
+            font: `600 16px ${systemFont}`
+          }
+        ]);
+      },
+
       onZoom: async e => {
         let config = plot.current.config;
         let { xAxis, zoomStack } = config;
@@ -221,24 +244,16 @@ export function ManhattanPlot({
         setZoomStack(stack);
         onZoom(e);
 
-        let title = '';
-        if (zoomStack.length > 0) {
-          let bounds = zoomStack[zoomStack.length - 1].bounds;
-          let boundsText = `(${(bounds.xMin / 1e6).toPrecision(4)} MB - ${(
-            bounds.xMax / 1e6
-          ).toPrecision(4)} MB)`;
-          title = `${selectedPhenotype.title} - Chromosome ${selectedChromosome} ${boundsText}`;
-        } else {
-          title = `${selectedPhenotype.title} - Chromosome ${selectedChromosome}`;
-        }
+        let bounds = zoomStack.length > 0
+          ? zoomStack[zoomStack.length - 1].bounds
+          : null
 
         plot.current.setTitle([
           {
-            text: title,
+            text: getTitle(bounds),
             font: `600 16px ${systemFont}`
           }
         ]);
-
 
         // draw genes if zoom is at less than 50 MB
         setGenes([]);
@@ -399,6 +414,17 @@ export function ManhattanPlot({
       data: plotData.data,
       genes: plotData.genes,
       allowZoom: true,
+      allowPan: true,
+
+      onPan: bounds => {
+        plot.current.setTitle([
+          {
+            text: getTitle(bounds),
+            font: `600 16px ${systemFont}`
+          }
+        ]);
+      },
+
       onZoom: async e => {
         let config = plot.current.config;
         let { xAxis, zoomStack } = config;
@@ -408,20 +434,13 @@ export function ManhattanPlot({
         setZoomStack(stack);
         onZoom(e);
 
-        let title = '';
-        if (zoomStack.length > 0) {
-          let bounds = zoomStack[zoomStack.length - 1].bounds;
-          let boundsText = `(${(bounds.xMin / 1e6).toPrecision(4)} MB - ${(
-            bounds.xMax / 1e6
-          ).toPrecision(4)} MB)`;
-          title = `${selectedPhenotype.title} - Chromosome ${selectedChromosome} ${boundsText}`;
-        } else {
-          title = `${selectedPhenotype.title} - Chromosome ${selectedChromosome}`;
-        }
+        let bounds = zoomStack.length > 0
+          ? zoomStack[zoomStack.length - 1].bounds
+          : null;
 
         plot.current.setTitle([
           {
-            text: title,
+            text: getTitle(bounds),
             font: `600 16px ${systemFont}`
           }
         ]);
