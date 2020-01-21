@@ -10,6 +10,7 @@ export const UPDATE_PHENOTYPE_CORRELATIONS = 'UPDATE_PHENOTYPE_CORRELATIONS';
 export const UPDATE_PHENOTYPES = 'UPDATE_PHENOTYPES';
 export const UPDATE_PHENOTYPE_CATEGORIES = 'UPDATE_PHENOTYPE_CATEGORIES';
 export const UPDATE_PHENOTYPES_TREE = 'UPDATE_PHENOTYPES_TREE';
+export const UPDATE_BROWSE_PHENOTYPES = 'UPDATE_BROWSE_PHENOTYPES';
 export const UPDATE_DOWNLOADS = 'UPDATE_DOWNLOADS';
 
 export function updateKey(key, data) {
@@ -58,6 +59,10 @@ export function updateVariantLookup(data) {
 
 export function updatePhenotypeCorrelations(data) {
   return { type: UPDATE_PHENOTYPE_CORRELATIONS, data };
+}
+
+export function updateBrowsePhenotypes(data) {
+  return { type: UPDATE_BROWSE_PHENOTYPES, data };
 }
 
 export function updateDownloads(data) {

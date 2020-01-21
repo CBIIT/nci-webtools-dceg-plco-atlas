@@ -55,9 +55,9 @@ export function SummaryResults() {
     setMessages([]);
   };
 
-  const handleChange = () => {
-    clearMessages();
-  };
+  // const handleChange = () => {
+  //   clearMessages();
+  // };
 
   // determine which aggregate tables correspond to the selected plot type
   const getAggregateTable = plotType =>
@@ -347,7 +347,7 @@ export function SummaryResults() {
 
   return (
     <div className="position-relative">
-      <h1 className="sr-only">Explore GWAS data - Visualize summary results</h1>
+      <h1 className="sr-only">GWAS Results - Visualize summary results</h1>
 
       <SidebarContainer
         className="mx-3"
