@@ -117,6 +117,12 @@ export const getInitialState = () => ({
     collapseCriteria: true
     // tooltipData: null
   },
+  browsePhenotypes: {
+    selectedPhenotype: null,
+    submitted: null, 
+    messages: [],
+    searchCriteriaPhenotypes: {}
+  },
   downloads: {
     selectedPhenotypes: [],
     downloadRoot: '',
