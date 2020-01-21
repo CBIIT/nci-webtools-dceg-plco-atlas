@@ -118,7 +118,10 @@ export const getInitialState = () => ({
     // tooltipData: null
   },
   browsePhenotypes: {
-    selectedPhenotypes: [],
+    selectedPhenotype: null,
+    submitted: null, 
+    messages: [],
+    searchCriteriaPhenotypes: {}
   },
   downloads: {
     selectedPhenotypes: [],
