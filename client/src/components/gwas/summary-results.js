@@ -55,9 +55,9 @@ export function SummaryResults() {
     setMessages([]);
   };
 
-  const handleChange = () => {
-    clearMessages();
-  };
+  // const handleChange = () => {
+  //   clearMessages();
+  // };
 
   // determine which aggregate tables correspond to the selected plot type
   const getAggregateTable = plotType =>
