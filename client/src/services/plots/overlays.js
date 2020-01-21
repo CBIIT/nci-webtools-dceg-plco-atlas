@@ -1,4 +1,5 @@
-import { viewportToLocalCoordinates, min, max, addEventListener } from './utils.js';
+import { viewportToLocalCoordinates, min, max, addEventListener, withSavedContext } from './utils.js';
+import { renderText, systemFont } from './text.js';
 import { getScale } from './scale.js';
 
 export function drawSelectionOverlay(config, ctx, overlayCtx) {
@@ -81,6 +82,7 @@ export function drawZoomOverlay(config, ctx, overlayCtx) {
   config.zoomOverlayActive = false;
 
   function startZoom(ev) {
+    if (ev.button !== 0) return;
     let { x, y } = viewportToLocalCoordinates(
       ev.clientX,
       ev.clientY,
@@ -213,6 +215,120 @@ export function drawZoomOverlay(config, ctx, overlayCtx) {
   function zoomOut(ev) {
     config.zoomOut && config.zoomOut();
   }
+}
+
+export function drawPanOverlay(config, ctx, overlayCtx) {
+  let canvas = ctx.canvas;
+  let margins = config.margins;
+  let width = canvas.width - margins.left - margins.right;
+  let height = canvas.height - margins.top - margins.bottom;
+  let panArea = { xStart: 0, xEnd: 0, yStart: 0, yEnd: 0, deltaX: 0, deltaY: 0 };
+  let mouseDown = false;
+  let body = window.document.body;
+  let xScale, yScale;
+
+  addEventListener(canvas, 'contextmenu', ev => {
+    ev.preventDefault();
+  })
+
+  addEventListener(canvas, 'mousedown', ev => {
+    if (ev.button !== 2 || config.zoomAreaActive || !config.zoomWindow) return;
+    let currentBounds = config.zoomWindow.bounds;
+
+    xScale = getScale(
+      [0, width],
+      [0, currentBounds.xMax - currentBounds.xMin]
+    );
+
+    yScale = getScale(
+      [0, height],
+      [0, currentBounds.yMax - currentBounds.yMin]
+    );
+
+    mouseDown = true;
+    canvas.style.cursor = 'move';
+    let { x, y } = viewportToLocalCoordinates(
+      ev.clientX,
+      ev.clientY,
+      canvas
+    );
+    panArea.xStart = x;
+    panArea.yStart = y;
+  });
+
+  addEventListener(canvas, 'mousemove', ev => {
+    if (!mouseDown) return;
+    canvas.style.cursor = 'move';
+    let { x, y } = viewportToLocalCoordinates(
+      ev.clientX,
+      ev.clientY,
+      canvas
+    );
+    panArea.xEnd = x;
+    panArea.yEnd = y;
+    panArea.deltaX = xScale(panArea.xEnd - panArea.xStart);
+    panArea.deltaY = - yScale(panArea.yEnd - panArea.yStart); // inverse y scale
+
+    withSavedContext(overlayCtx, ctx => {
+      ctx.globalAlpha = 0.5;
+      ctx.fillStyle = '#eee';
+      ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+      ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+
+      let center = {
+        x: (config.margins.left + width) / 2,
+        y: (config.margins.top + height) / 2,
+      }
+
+      ctx.translate(center.x, center.y);
+      let deltaX = (Math.abs(panArea.deltaX) / 1e6).toPrecision(4);
+      let deltaY = Math.abs(panArea.deltaY).toPrecision(4)
+
+      let titles = [
+        `${panArea.deltaY > 0 ? '🡩' : '🡫'} ${deltaY} P`,
+        `${panArea.deltaX > 0 ? '🡪' : '🡨'} ${deltaX} MB`,
+      ];
+
+      if (panArea.deltaY < 0)
+        titles = [titles[1], titles[0]]
+
+      titles.forEach(title => {
+        let size = 16;
+        renderText(ctx, title, {
+          font: `${size}px ${systemFont}`,
+          //textAlign: 'center',
+          textBaseline: 'center',
+          fillStyle: 'black'
+        });
+        ctx.translate(0, size);
+      })
+
+    })
+  });
+
+  addEventListener(body, 'mouseup', ev => {
+    if (!mouseDown) return;
+    mouseDown  = false;
+    canvas.style.cursor = 'crosshair';
+    let currentBounds = config.zoomWindow.bounds;
+    let {deltaX, deltaY} = panArea;
+
+    withSavedContext(overlayCtx, ctx => {
+      ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+    });
+
+    let bounds = {
+      xMin: currentBounds.xMin + deltaX,
+      xMax: currentBounds.xMax + deltaX,
+      yMin: currentBounds.yMin + deltaY,
+      yMax: currentBounds.yMax + deltaY,
+    }
+
+    config.setZoomWindow({bounds});
+    if (config.onPan) {
+      config.onPan(bounds);
+    }
+  })
 }
 
 function getSectionBounds(value, ticks) {
