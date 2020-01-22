@@ -1,10 +1,6 @@
 const fs = require('fs');
-const path = require('path');
-const Database = require('better-sqlite3');
 const config = require('./config.json');
 const logger = require("./logger");
-const { dbpath } = config;
-const ranges = require(path.resolve(dbpath, 'chromosome_ranges.json'));
 
 /**
  * Executes a statement with the given parameters, returning
@@ -182,16 +178,6 @@ function getVariants(filepath, params) {
     const groupby = params.groupby
         ? ` GROUP BY "${params.groupby}" `
         : ``;
-
-    // validate min/max bp for each chromosome if provided
-    if (params.chr) {
-        let validRange = ranges.find(e => e.chr === +params.chr);
-        if (params.bpMin && +params.bpMin < validRange.bp_min)
-            params.bpMin = validRange.bp_min;
-
-        if (params.bpMax && +params.bpMax > validRange.bp_max)
-            params.bpMax = validRange.bp_max;
-    }
 
     // filter by id, chr, base position, and -log10(p), if provided
     let sql = `
