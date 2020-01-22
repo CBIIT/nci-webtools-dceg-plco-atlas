@@ -1,8 +1,5 @@
-const assert = require('assert');
 const fs = require('fs');
-const readline = require('readline');
 const mysql = require('mysql2');
-
 
 // retrieve arguments
 const argv = process.argv.slice(2);
@@ -13,6 +10,8 @@ if (argv.length !== 4 || argv.includes('-h')) {
 
 // parse arguments and set defaults
 const [ inputFilePath, phenotype, schema, gender ] = argv;
+const {columns, mapToSchema} = require(`./schema-maps/${schema}.js`);
+const getDuration = timestamp();
 
 // input file should exist
 if (!fs.existsSync(inputFilePath)) {
@@ -20,19 +19,22 @@ if (!fs.existsSync(inputFilePath)) {
     process.exit(1);
 }
 
-const {columns, mapToSchema} = require(`./schema-maps/${schema}.js`);
+// schema should exist
+if (!columns) {
+    console.error(`ERROR: ${schema} is not a valid schema`);
+    process.exit(1);
+}
 
-// validate first line
-const firstLine = parseLine(getFirstLine(inputFilePath));
-assert.deepStrictEqual(firstLine, headers, `Headers do not match expected values: ${headers}`, firstLine);
+if (!/^(all|female|male)$/.test(gender)) {
+    console.error(`ERROR: Gender must be all, female, or male`);
+    process.exit(1);
+}
 
-// set up timestamp function
-const startTime = new Date();
-const duration = _ => ((new Date() - startTime) / 1000).toPrecision(4);
+validateHeaders(inputFilePath, columns);
 
 if (!dbExists) {
     // execute schema script for new databases
-    console.log(`[${duration()} s] Creating new database...`);
+    console.log(`[${getDuration()} s] Creating new database...`);
     const ddl = readFile('variant-schema.sql')
         .replace('$PHENOTYPE', phenotype);
     db.exec(ddl);
@@ -61,11 +63,6 @@ const insert = db.prepare(`
         :plot_qq
     )
 `);
-
-// stream the input file line by line
-const reader = readline.createInterface({
-    input: fs.createReadStream(inputFilePath)
-});
 
 let count = 0;
 let previousChr = 1;

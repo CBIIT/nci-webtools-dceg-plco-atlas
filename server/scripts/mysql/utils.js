@@ -1,3 +1,4 @@
+const assert = require('assert');
 const fs = require('fs');
 const path = require('path');
 const fs = require('fs');
@@ -10,7 +11,14 @@ const { ChiSquared, R: { numberPrecision } } = libR;
 const precision4 = numberPrecision(4)
 const { qchisq } = ChiSquared();
 
+// streams a file file line by line
+function getFileReader(filepath) {
+    return readline.createInterface({
+        input: fs.createReadStream(filepath)
+    });
+}
 
+// reads the contents of a file
 function readFile(filepath) {
     return fs.readFileSync(
         path.resolve(__dirname, filepath),
@@ -34,6 +42,11 @@ function parseLine(line) {
         else if (!isNaN(value)) return parseFloat(value); // try to parse nums as floats
         return value;
     });
+}
+
+function validateHeaders(filepath, headers) {
+    const firstLine = parseLine(getFirstLine(filepath));
+    assert.deepStrictEqual(firstLine, headers, `Headers do not match expected values: ${headers}`, firstLine);
 }
 
 // gets a function which returns elapsed time
@@ -92,8 +105,8 @@ function getLambdaGC(pMedian) {
 
 module.exports = {
     readFile,
-    readFirstLine,
     parseLine,
+    validateHeaders,
     ppoints,
     getIntervals,
     getLambdaGC
