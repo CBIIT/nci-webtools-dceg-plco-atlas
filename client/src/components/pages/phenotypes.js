@@ -9,6 +9,7 @@ import {
   MainPanel,
 } from '../controls/sidebar-container';
 import { updateBrowsePhenotypes } from '../../services/actions';
+import { BubbleChart } from '../plots/bubble-chart';
 
 export function Phenotypes() {
   const dispatch = useDispatch();
@@ -101,9 +102,10 @@ export function Phenotypes() {
         <PhenotypesSearchCriteria />
         <div className="bg-white border rounded-0 p-4">
           {!submitted && 
-            <p class="h4 text-center text-secondary my-5">
-              hierarchical bubble chart
-            </p>
+            // <p class="h4 text-center text-secondary my-5">
+            //   hierarchical bubble chart
+            // </p>
+            <BubbleChart />
           }
         </div>
       </MainPanel>
