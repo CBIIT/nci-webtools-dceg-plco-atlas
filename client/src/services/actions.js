@@ -839,7 +839,16 @@ export function drawHeatmap(phenotypes) {
         ['0.50000001', 'rgb(255,255,255)'],
         ['1.0', 'rgb(255,0,0)']
       ],
-      showscale: false,
+      colorbar: {
+        tickvals: [-1, -0.75, -0.5, -0.25, 0, 0.25, 0.5, 0.75, 1],
+        tickmode: "array",
+        thickness: 15,
+        title: {
+          text: 'Correlation',
+          side: 'right'
+        }
+      },
+      showscale: true,
       hoverinfo: 'text',
       hovertemplate:
         '%{x}<br>' +
