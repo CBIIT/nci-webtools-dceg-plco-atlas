@@ -5,17 +5,10 @@
     "loglevel": "info",
     "downloadRoot": "http://hostname:8080/downloads/",
     "database": {
-<<<<<<< HEAD
         "name": "example-database",
         "host": "host",
         "port": "port",
         "user": "username",
-=======
-        "hostname": "localhost",
-        "port": 3306,
-        "name": "database-name",
-        "username": "username",
->>>>>>> gene-plot-panning-limits
         "password": "password"
     }
 }
