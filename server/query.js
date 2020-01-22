@@ -1,20 +1,5 @@
-const fs = require('fs');
 const config = require('./config.json');
 const logger = require("./logger");
-
-/**
- * Executes a statement with the given parameters, returning
- * results as an array of arrays to save space when serializing
- * @param {Statement} stmt - A BetterSqlite3.Statement object
- * @param {any} params - Parameters to pass to the statement
- * @return {{columns: string[], data: any[][]}} SQL query results
- */
-function getRawResults(stmt, params) {
-    return {
-        columns: stmt.columns().map(c => c.name),
-        data: stmt.raw().all(params)
-    };
-}
 
 /**
  * Ensures that identifiers with sql keywords in them do not throw errors
@@ -22,7 +7,7 @@ function getRawResults(stmt, params) {
  * @returns {string} The quoted string
  */
 function quote(str) {
-    return `"${str}"`;
+    return `\`${str}\``;
 }
 
 /**
@@ -60,9 +45,7 @@ function coalesce(condition, value) {
    }} params - Database query criteria
  * @returns Records in the aggregate summary table which match query criteria
  */
-function getSummary(filepath, params) {
-    if (!fs.existsSync(filepath)) return [];
-    const db = new Database(filepath, {readonly: true});
+async function getSummary(connection, params) {
 
     const validTables = [
         'aggregate_all',
@@ -115,10 +98,12 @@ function getSummary(filepath, params) {
 
     logger.debug(`SQL: ${sql}`);
 
-    const stmt = db.prepare(sql);
-    return params.raw
-        ? getRawResults(stmt, params)
-        : stmt.all(params);
+    const [data, columns] = await connection.query({
+        rowsAsArray: params.raw,
+        sql,
+    }, params);
+
+    return {data, columns};
 }
 
 /**
@@ -148,15 +133,17 @@ function getSummary(filepath, params) {
    }} params - Database search criteria
  * @returns Records in the variant table which match query criteria
  */
-function getVariants(filepath, params) {
-    if (!fs.existsSync(filepath)) return [];
-    const db = new Database(filepath, {readonly: true});
 
-    const validTables = [
-        'variant_all',
-        'variant_female',
-        'variant_male',
+function getVariantTables() {
+    return [
+        'ewings_sarcoma_variant',
+        'renal_cell_carcinoma_variant',
+        'melanoma_variant',
     ];
+}
+
+async function getVariants(connection, params) {
+    const validTables = getVariantTables();
 
     const validColumns = [
         'variant_id', 'chr', 'bp', 'snp','a1','a2', 'n',
@@ -201,7 +188,7 @@ function getVariants(filepath, params) {
         ${groupby}`;
 
     // create count sql based on original query
-    let countSql = `SELECT COUNT(1) FROM (${sql})`;
+    let countSql = `SELECT COUNT(1) as count FROM (${sql})`;
 
     // adds "order by" statement, if both order and orderBy are provided
     let { order, orderBy } = params;
@@ -221,19 +208,23 @@ function getVariants(filepath, params) {
     logger.debug(`SQL: ${sql}`);
 
     // query database
-    const stmt = db.prepare(sql);
-    const records = params.raw
-        ? getRawResults(stmt, params)
-        : {data: stmt.all(params)};
+    let [data, columns] = await connection.query({
+        rowsAsArray: params.raw,
+        sql,
+    }, params);
+
+    const records = {data, columns};
 
     // add counts if necessary
-    if (params.count)
-        records.count = db.prepare(countSql).pluck().get(params);
+    if (params.count) {
+        let [results] = await connection.query(countSql, params);
+        records.count = results[0].count;
+    }
 
     return records;
 }
 
-function exportVariants(filepath, params) {
+async function exportVariants(filepath, params) {
     params = {...params, raw: true, count: false};
     const { columns, data } = getVariants(filepath, params);
     // todo: stream csv contents
@@ -247,20 +238,19 @@ function exportVariants(filepath, params) {
  * @returns {any} A specified key and value, or the entire list of
  * metadata properties if the key is not specified
  */
-function getMetadata(filepath, key) {
-    const db = new Database(filepath, {readonly: true});
-    return key
-        ? db.prepare(`SELECT value FROM variant_metadata WHERE key = :key`)
-            .pluck()
-            .get({key})
-        : db.prepare(`SELECT key, value FROM variant_metadata`)
-            .all()
-            .reduce((obj, v) => ({...obj, [v.key]: v.value}), {});
+async function getMetadata(connection, key) {
+    if (key) {
+        let [results] = await connection.query(`SELECT value FROM variant_metadata WHERE key = :key`, key);
+        return results[0].value;
+    } else {
+        let [results]  = await connection.query(`SELECT key, value FROM variant_metadata`)
+        return results.reduce((obj, v) => ({...obj, [v.key]: v.value}), {});
+    }
 }
 
 /**
  * Retrieves genes from a specific chromosome, filtered by search criteria
- * @param {string} filepath - Path to the sqlite database file
+ * @param {mysql.Connection} connection - Connection to the database
  * @param {{
      columns: string,
      chr: string,
@@ -269,10 +259,7 @@ function getMetadata(filepath, key) {
    }} params - Criteria to filter genes
  * @returns {any[]} Genes matching the search criteria
  */
-function getGenes(filepath, params) {
-    if (!fs.existsSync(filepath)) return [];
-    const db = new Database(filepath, {readonly: true});
-
+async function getGenes(connection, params) {
     const validColumns = [
         'gene_id',
         'name',
@@ -297,13 +284,15 @@ function getGenes(filepath, params) {
         .filter(e => e !== '')
         .map(e => +e);
 
-    return db.prepare(`
+    const [results] = await connection.query(`
         SELECT ${columnNames}
         FROM gene
         WHERE chr = :chr AND (
             (tx_start BETWEEN :txStart AND :txEnd) OR
             (tx_end BETWEEN :txStart AND :txEnd))
-    `).all(params).map(e => ({
+    `, params);
+
+    return results.map(e => ({
         ...e,
         exon_starts: splitNumbers(e.exon_starts),
         exon_ends: splitNumbers(e.exon_ends)

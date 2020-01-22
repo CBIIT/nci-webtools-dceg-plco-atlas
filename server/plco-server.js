@@ -68,6 +68,7 @@ app.addHook("onSend", (req, res, payload, done) => {
   let pathname = req.raw.url.replace(/\?.*$/, "");
   let timestamp = res.getHeader("Timestamp");
 
+  // only log the specified routes
   if (timestamp && /summary|variants|metadata|genes|config/.test(pathname)) {
     let duration = new Date().getTime() - timestamp;
     logger.info(`[${process.pid}] ${pathname}: ${duration/1000}s`, req.query);
@@ -79,15 +80,25 @@ app.addHook("onSend", (req, res, payload, done) => {
   done();
 });
 
-app.get("/ping", (req, res) => res.send(true));
+app.get("/ping", (req, res) => {
+  try {
+    await connection.ping()
+    res.send(true)
+  } catch (error) {
+    logger.error(`[${process.pid}] ${ERROR}: ${error}`, req.query);
+    throw(error);
+  }
+});
 
 // retrieves all variant groups for all chroms. at the lowest granularity (in MBases)
 app.get("/summary", async ({ query }, res) => {
+  // todo: validate summary table (query.table)
   return getSummary(connection, query);
 });
 
 // retrieves all variants within the specified range
 app.get("/variants", async ({ query }, res) => {
+  // todo: validate variants table (query.table)
   return getVariants(connection, query);
 });
 
