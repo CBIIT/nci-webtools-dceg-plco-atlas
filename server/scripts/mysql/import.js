@@ -1,25 +1,18 @@
 const assert = require('assert');
 const fs = require('fs');
-const path = require('path');
 const readline = require('readline');
-const sqlite = require('better-sqlite3');
-const ranges = require('../data/chromosome_ranges.json');
-const libR = require('lib-r-math.js');
-const { ChiSquared, R: { numberPrecision } } = libR;
-//uses as default: "Inversion" and "Mersenne-Twister"
-const precision4 = numberPrecision(4)
-const { qchisq } = ChiSquared();
+const mysql = require('mysql2');
+
 
 // retrieve arguments
 const argv = process.argv.slice(2);
 if (argv.length !== 4 || argv.includes('-h')) {
-    console.log(`USAGE: node import.js input.meta output.db schema[ewing/mel/rcc] table_suffix[male/female/all]`)
+    console.log(`USAGE: node import.js input.meta phenotype schema[ewing/melanoma/renal_cell_carcinoma] gender[all/female/male]`)
     process.exit(0);
 }
 
 // parse arguments and set defaults
-const [ inputFilePath, databaseFilePath, schema, tableSuffix ] = argv;
-const dbExists =  fs.existsSync(databaseFilePath);
+const [ inputFilePath, phenotype, schema, gender ] = argv;
 
 // input file should exist
 if (!fs.existsSync(inputFilePath)) {
@@ -27,147 +20,43 @@ if (!fs.existsSync(inputFilePath)) {
     process.exit(1);
 }
 
-// maps rows to objects for the default schema
-const mapToSchema = {
-    ewing: values => {
-        const [chr, bp, snp, a1, a2, n, p, p_r, or, or_r, q, i] = values;
-        return {chr, bp, snp, a1, a2, n, p, p_r, or, or_r, q, i};
-    },
-    mel: values => {
-        const [chr, bp, snp, a1, a2, n, p, p_r, or, or_r, q, i, case_n, control_n, sample_n, se_fixed, z_fixed, rsid] = values;
-        return {chr, bp, snp, a1, a2, n, p, p_r, or, or_r, q, i};
-        // return {chr: +chr.replace('chr', ''), r, bp, snp, a1, a2, n, p, p_r, or, or_r, q, i};
-    },
-    rcc: values => {
-        // use this map once we have the original rcc.txt
-        // const [snp, chr, loc, group, category, info, num_control, num_case, reference_allele, effect_allele, effect_allele_freq_control, effect_allele_freq_case, or, ci, p, phet, i2] = values;
+const {columns, mapToSchema} = require(`./schema-maps/${schema}.js`);
 
-        const [id, chr, bp, snp, a1, a2, p, or, i2] = values;
+// validate first line
+const firstLine = parseLine(getFirstLine(inputFilePath));
+assert.deepStrictEqual(firstLine, headers, `Headers do not match expected values: ${headers}`, firstLine);
 
-        return {
-            chr,
-            bp,
-            snp,
-            a1,
-            a2,
-            n: null,
-            p,
-            p_r: null,
-            or,
-            or_r: null,
-            q: null,
-            i: i2
-        };
-    },
-};
-
-// set up utility functions/constants
+// set up timestamp function
 const startTime = new Date();
 const duration = _ => ((new Date() - startTime) / 1000).toPrecision(4);
-const readFile = filepath => fs.readFileSync(path.resolve(__dirname, filepath), 'utf8');
-
-// floors a value to the lowest multiple of the size given (usually a power of 10)
-const group = (value, size) =>
-    (value === null || value === undefined || isNaN(value)) ? null : +(
-        size * Math.floor(value / size)
-    ).toPrecision(12);
-
-// parses each line in the file
-const parseLine = line => line.trim().split(/,|\s+/).map(value => {
-    if (value === 'NA') return null; // nulls are represented as 'NA' values
-    else if (!isNaN(value)) return parseFloat(value); // try to parse nums as floats
-    return value;
-});
-
-// gets the first line in a file
-const getFirstLine = filepath => {
-    const size = 4096;
-    const buffer = Buffer.alloc(size);
-    fs.readSync(fs.openSync(filepath, 'r'), buffer, 0, size);
-    const contents = buffer.toString();
-    return contents.substring(0, contents.indexOf('\n')).trim();
-};
-
-// validate headers
-const headers = {
-    ewing: ['CHR','BP','SNP','A1','A2','N','P','P(R)','OR','OR(R)','Q','I'],
-    mel: ['CHR','BP','SNP','A1','A2','N','P','P.R.','OR','OR.R.','Q','I','Case_N','Control_N','Sample_N','SE_fixed','Z_fixed','RSID'],
-    // rcc: ['SNP','CHR','LOC','GROUP','CATEGORY','INFO','NUM_CONTROL','NUM_CASE','REFERENCE_ALLELE','EFFECT_ALLELE','EFFECT_ALLELE_FREQ_CONTROL', "EFFECT_ALLELE_FREQ_CASE",'OR','CI','P','Phet','I2'],
-}[schema];
-
-if (headers) {
-    const firstLine = parseLine(getFirstLine(inputFilePath));
-    assert.deepStrictEqual(firstLine, headers, `Headers do not match expected values: ${headers}`, firstLine);
-}
-
-// create variant_stage (temp), variant, variant_summary, and variant_lookup
-const db = new sqlite(databaseFilePath);
 
 if (!dbExists) {
     // execute schema script for new databases
     console.log(`[${duration()} s] Creating new database...`);
-    db.exec(readFile('schema.sql'));
-}
-else {
-    // otherwise, drop indexes to speed up insertion
-    console.log(`[${duration()} s] Dropping indexes...`);
-    db.exec(readFile('drop-indexes.sql'));
-}
-
-const ppoints = (n, limit, a) => {
-    var size = limit ? Math.min(n, limit) : n;
-    var points = new Array(size);
-    for (var i = 0; i < points.length; i ++)
-        points[i] = ppoint(n, i, a);
-    return points;
-};
-
-const ppoint = (n, i, a) => {
-    if (!a) {
-        a = n <= 10 ? 3/8 : 1/2;
-    }
-    i ++;
-    return parseFloat((Math.abs(Math.log10((i - a) / (n + (1 - a) - a)) * - 1.0)).toFixed(3));
-};
-
-const getIntervals = (maxValue, length) => {
-    var sqMax = Math.sqrt(maxValue);
-
-    const fx = (x) => {
-        return Math.round(maxValue - Math.pow(x - sqMax, 2));
-    }
-
-    var intervals = [];
-    for (var i = 1; i <= length; i ++) {
-        var x = (i / length) * sqMax;
-        var interval = fx(x);
-        if (interval > 0 && !intervals.includes(interval)) {
-            intervals.push(interval);
-        }
-    }
-
-    return intervals;
+    const ddl = readFile('variant-schema.sql')
+        .replace('$PHENOTYPE', phenotype);
+    db.exec(ddl);
 }
 
 const insert = db.prepare(`
     INSERT INTO variant_stage VALUES (
-        :chr,
-        :bp,
+        :chr, --
+        :bp, --
         :bp_1000kb,
         :bp_abs,
         :bp_abs_1000kb,
-        :snp,
-        :a1,
-        :a2,
-        :n,
-        :p,
-        :nlog_p,
-        :nlog_p2,
-        :p_r,
-        :or,
-        :or_r,
-        :q,
-        :i,
+        :snp, --
+        :a1, --
+        :a2, --
+        :n, --
+        :p, --
+        :nlog_p, --
+        :nlog_p2, --
+        :p_r, --
+        :or, --
+        :or_r, -- odds_ratio
+        :q, -- quantitative
+        :i, -- tests of heterogenity
         :expected_p,
         :plot_qq
     )
