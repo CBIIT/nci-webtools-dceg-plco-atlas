@@ -22,12 +22,12 @@ export function BubbleChartContainer() {
     { label: 'Content', value: 26 },
   ];
 
-  const legendFont = {
-    family: 'Arial',
-    size: 12,
-    color: '#000',
-    weight: 'bold',
-  };
+  // const legendFont = {
+  //   family: 'Arial',
+  //   size: 12,
+  //   color: '#000',
+  //   weight: 'bold',
+  // };
 
   const labelFont = {
     family: 'Arial',
@@ -62,9 +62,9 @@ export function BubbleChartContainer() {
         width={800}
         height={800}
         padding={0} // optional value, number that set the padding between bubbles
-        showLegend={true} // optional value, pass false to disable the legend.
-        legendPercentage={20} // number that represent the % of with that legend going to use.
-        legendFont={legendFont}
+        showLegend={false} // optional value, pass false to disable the legend.
+        // legendPercentage={20} // number that represent the % of with that legend going to use.
+        // legendFont={legendFont}
         labelFont={labelFont}
         valueFont={valueFont}
         //Custom bubble/legend click functions such as searching using the label, redirecting to other page
