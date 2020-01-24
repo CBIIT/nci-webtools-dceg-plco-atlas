@@ -17,7 +17,6 @@
     "react-bootstrap-table2-overlay": "^2.0.0",
     "react-bootstrap-table2-paginator": "^2.0.7",
     "react-bootstrap-table2-toolkit": "^2.1.0",
-    "react-d3-treemap": "^1.0.15",
     "react-dom": "^16.8.6",
     "react-loading-overlay": "^1.0.1",
     "react-plotly.js": "^2.4.0",
