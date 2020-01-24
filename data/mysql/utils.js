@@ -45,8 +45,26 @@ function parseLine(line) {
 }
 
 function validateHeaders(filepath, headers) {
+    if (!headers) return;
     const firstLine = parseLine(getFirstLine(filepath));
     assert.deepStrictEqual(firstLine, headers, `Headers do not match expected values: ${headers}`, firstLine);
+}
+
+async function phenotypeExists(connection, phenotype) {
+    return pluck(await connection.execute(
+        `SELECT COUNT(1) FROM phenotype WHERE name = ?`,
+        phenotype
+    )) != 0;
+}
+
+async function tableExists(connection, databaseName, tableName) {
+    return pluck(await connection.execute(
+        `SELECT COUNT(*) as count
+            FROM information_schema.tables
+            WHERE table_schema = :databaseName
+            AND table_name = :tableName`,
+        {databaseName, tableName}
+    )) != 0;
 }
 
 // gets a function which returns elapsed time
@@ -103,11 +121,21 @@ function getLambdaGC(pMedian) {
     return precision4((qchisq(1 - pMedian, 1) / qchisq(0.5, 1)));
 }
 
+function pluck(rows) {
+    if (!rows) return null;
+    let [firstRow] = rows;
+    let [firstKey] = Object.keys(firstRow);
+    return firstRow[firstKey];
+}
+
 module.exports = {
     readFile,
     parseLine,
     validateHeaders,
+    phenotypeExists,
+    tableExists,
     ppoints,
     getIntervals,
-    getLambdaGC
+    getLambdaGC,
+    pluck
 };
