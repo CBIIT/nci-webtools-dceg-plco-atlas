@@ -7,10 +7,10 @@
 *.log
 *-audit.json
 config.json
-/data/**/*.db
-/data/**/*.meta
-/data/**/*.txt
-/data/**/*.txt.gz
+/data/import/**/*.db
+/data/import/**/*.meta
+/data/import/**/*.txt
+/data/import/**/*.txt.gz
 /data/qq-plots/
 /server/logs/
 /www/
