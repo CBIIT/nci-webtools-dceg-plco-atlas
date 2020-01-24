@@ -139,7 +139,16 @@ export const VariantLookupSearchCriteria = props => {
               </span>
               {searchCriteriaVariantLookup &&
               searchCriteriaVariantLookup.variant
-                ? searchCriteriaVariantLookup.variant
+                ? searchCriteriaVariantLookup.variant.includes('rs') 
+                  ? <a 
+                    href={'https://www.ncbi.nlm.nih.gov/snp/' + searchCriteriaVariantLookup.variant} 
+                    target="_blank" 
+                    style={{
+                      textDecoration: 'underline',
+                    }}>
+                      {searchCriteriaVariantLookup.variant}
+                    </a> 
+                  : <span>{searchCriteriaVariantLookup.variant}</span>
                 : 'None'}
 
               <span className="mx-3">|</span>
