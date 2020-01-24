@@ -2,7 +2,9 @@ const fs = require('fs');
 const mysql = require('mysql2');
 const ranges = require('../json/chromosome_ranges.json');
 const { database } = require('../../server/config.json');
-
+const { getFileReader, parseLine, readFile, validateHeaders } = rquire('./utils/file');
+const { getRecords, pluck, getMedian, tableExists } = require('./utils/query');
+const { getIntervals, getLambdaGC, group, ppoints, timestamp  } = require('./utils/math');
 
 // retrieve arguments
 const argv = process.argv.slice(2);
@@ -13,7 +15,7 @@ if (argv.length !== 4 || argv.includes('-h')) {
 
 // parse arguments and set defaults
 const [ inputFilePath, phenotype, schema, gender ] = argv;
-const {columns, mapToSchema} = require(`./schema-maps/${schema}.js`);
+const {columns, mapToSchema} = require(`./schema-maps/${schema}`);
 const getDuration = timestamp();
 const connection = mysql.createConnection({
     host: database.host,
@@ -45,9 +47,27 @@ validateHeaders(inputFilePath, columns);
 importVariants();
 
 async function importVariants() {
-    const stageTable = `${phenotype}_stage`;
-    const variantTable = `${phenotype}_variant`;
-    const aggregateTable = `${phenotype}_aggregate`;
+    // find phenotypes either by name or id (if a numeric value was provided)
+    let phenotypes = await getRecords(connection, 'lu_phenotype', /^\d+$/.test(phenotype)
+        ? {id: phenotype}
+        : {name: phenotype}
+    );
+
+    if (phenotypes.length === 0) {
+        console.error(`ERROR: Phenotype does not exist`)
+        process.exit(1);
+    }
+
+    if (phenotypes.length > 1) {
+        console.error(`ERROR: More than one phenotype was found with the same name. Please specify the phenotype id instead of the name.`)
+        process.exit(1);
+    }
+
+    const phenotype = phenotypes[0].name;
+    const phenotypeId = phenotypes[0].id;
+    const stageTable = `${phenotype}_${phenotypeId}_stage`;
+    const variantTable = `${phenotype}_${phenotypeId}_variant`;
+    const aggregateTable = `${phenotype}_${phenotypeId}_aggregate`;
     const isValidPValue = p => isNaN(p) || p === null || p === undefined || p < 0 || p > 1;
 
     await connection.execute(`START TRANSACTION`);
@@ -56,8 +76,11 @@ async function importVariants() {
     // execute schema script for new databases
     if (!await tableExists(connection, database.name, variantTable)) {
         console.log(`[${getDuration()} s] Creating [${variantTable}, ${aggregateTable}])...`);
-        const ddl = readFile('variant-schema.sql').replace('$PHENOTYPE', phenotype);
-        connection.execute(ddl);
+        const schemaSql = readFile('variant-schema.sql')
+            .replace(/\$PHENOTYPE/g, phenotype);
+        connection.execute(schemaSql);
+    } else {
+        // replace existing entries
     }
 
     // prepare statement to insert into staging table
@@ -176,19 +199,7 @@ async function importVariants() {
 
         // calculating lambdaGC (eg: lambdagc_male)
         console.log(`[${duration()} s] Calculating lambdaGC value...`);
-        const pMedian = pluck(await connection.execute(`
-            SELECT AVG(p) AS "median"
-            FROM (
-                SELECT "p_value"
-                FROM ${variantTable}
-                ORDER BY "p_value"
-                LIMIT 2 - (SELECT COUNT(*) FROM ${variantTable}) % 2
-                OFFSET (
-                    SELECT (COUNT(*) - 1) / 2
-                    FROM ${variantTable}
-                )
-            )
-        `));
+        const pMedian  = getMedian(connection, variantTable, 'p_value');
         const lambdaGC = getLambdaGC(pMedian);
         await connection.execute(`
                 INSERT INTO ${variantTable}
