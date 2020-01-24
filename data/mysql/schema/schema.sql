@@ -19,7 +19,7 @@ CREATE TABLE `phenotype_correlation` (
 
 CREATE TABLE `phenotype_metadata` (
     `id`            INTEGER PRIMARY KEY NOT NULL AUTO_INCREMENT,
-    `phenotype_id`  INTEGER,
+    `phenotype_id`  INTEGER UNIQUE,
     `gender`        ENUM('all', 'female', 'male'),
     `lambda_gc`     DOUBLE,
     `other`         VARCHAR(2000),
