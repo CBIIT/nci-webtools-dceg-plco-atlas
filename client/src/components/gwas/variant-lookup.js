@@ -81,7 +81,7 @@ export function VariantLookup() {
     },
     {
       dataField: 'or',
-      text: 'Odds Ratio',
+      text: 'Odds Ratio/Beta',
       sort: true,
       sortFunc: (a, b, order, dataField, rowA, rowB) => {
         if (order === 'asc') {
