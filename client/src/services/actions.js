@@ -305,7 +305,11 @@ export function drawQQPlot(phenotype, variantTable) {
         subsetObservedVariants.length
       );
 
-      const markerColor = table !== 'variant_female' ? '#006bb8' : '#e47618';
+      const markerColor = {
+        variant_all: '#F2990D',
+        variant_female: '#f41c52',
+        variant_male: '#006bb8'
+      }[table];
 
       let qqplotTopData = {
         x: topExpectedVariants,
@@ -533,16 +537,14 @@ export function drawQQPlot(phenotype, variantTable) {
         'subsetObservedVariantsMale.length',
         subsetObservedVariantsMale.length
       );
-
-      // const subsetMarkerColorFemale = '#b55117';
-      const markerColorFemale = '#e47618';
-      // const subsetMarkerColorMale = '#002a47';
+      
+      const markerColorFemale = '#f41c52';
       const markerColorMale = '#006bb8';
 
       let qqplotTopDataFemale = {
         x: topExpectedVariantsFemale,
         y: topObservedVariantsFemale,
-        name: 'Female',
+        name: 'Female: <b>\u03BB</b> = ' + metadata_lambdaGC_female + '    <b>Sample Size</b> = ' + metadata_count_female.toLocaleString(),
         text: topObservedVariantsTextFemale,
         hovertemplate:
           '<b>position:</b> %{text.chr}:%{text.bp}<br>' +
@@ -563,7 +565,7 @@ export function drawQQPlot(phenotype, variantTable) {
       let qqplotSubsetDataFemale = {
         x: subsetExpectedVariantsFemale,
         y: subsetObservedVariantsFemale,
-        name: 'Female',
+        name: 'Female: <b>\u03BB</b> = ' + metadata_lambdaGC_female + '    <b>Sample Size</b> = ' + metadata_count_female.toLocaleString(),
         hoverinfo: 'none',
         mode: 'markers',
         type: 'scattergl',
@@ -592,7 +594,7 @@ export function drawQQPlot(phenotype, variantTable) {
       let qqplotTopDataMale = {
         x: topExpectedVariantsMale,
         y: topObservedVariantsMale,
-        name: 'Male',
+        name: 'Male:     <b>\u03BB</b> = ' + metadata_lambdaGC_male + '    <b>Sample Size</b> = ' + metadata_count_male.toLocaleString(),
         text: topObservedVariantsTextMale,
         hovertemplate:
           '<b>position:</b> %{text.chr}:%{text.bp}<br>' +
@@ -613,7 +615,7 @@ export function drawQQPlot(phenotype, variantTable) {
       let qqplotSubsetDataMale = {
         x: subsetExpectedVariantsMale,
         y: subsetObservedVariantsMale,
-        name: 'Male',
+        name: 'Male:     <b>\u03BB</b> = ' + metadata_lambdaGC_male + '    <b>Sample Size</b> = ' + metadata_count_male.toLocaleString(),
         hoverinfo: 'none',
         mode: 'markers',
         type: 'scattergl',
@@ -646,22 +648,6 @@ export function drawQQPlot(phenotype, variantTable) {
         // width: 800,
         // height: 800,
         autosize: true,
-        title: {
-          text:
-            '<b>Female \u03BB</b> = ' +
-            metadata_lambdaGC_female +
-            '        <b>Female Sample Size</b> = ' +
-            metadata_count_female.toLocaleString() +
-            '        <b>Male \u03BB</b> = ' +
-            metadata_lambdaGC_male +
-            '        <b>Male Sample Size</b> = ' +
-            metadata_count_male.toLocaleString(),
-          font: {
-            family: 'Arial',
-            size: 14,
-            color: 'black'
-          }
-        },
         xaxis: {
           automargin: true,
           rangemode: 'tozero', // only show positive
@@ -706,7 +692,9 @@ export function drawQQPlot(phenotype, variantTable) {
         },
         showlegend: true,
         legend: {
-          orientation: 'h',
+          x: 0.2,
+          y: 1.1,
+          orientation: 'v',
           itemclick: false,
           itemdoubleclick: false
         }
