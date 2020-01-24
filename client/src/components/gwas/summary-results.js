@@ -317,7 +317,7 @@ export function SummaryResults() {
         selectedPhenotypes: [selectedPhenotype],
         selectedVariant: snp,
         selectedGender:
-          gender ? (gender === 'Male' ? 'male' : 'female') :
+          gender ? (gender.includes('Male') ? 'male' : 'female') :
           selectedManhattanPlotType === 'male' ||
           selectedManhattanPlotType === 'female'
             ? selectedManhattanPlotType
@@ -326,7 +326,7 @@ export function SummaryResults() {
           phenotypes: [selectedPhenotype].map(item => item.title),
           variant: snp,
           gender:
-            gender ? (gender === 'Male' ? 'male' : 'female') :
+            gender ? (gender.includes('Male') ? 'male' : 'female') :
             selectedManhattanPlotType === 'male' ||
             selectedManhattanPlotType === 'female'
               ? selectedManhattanPlotType

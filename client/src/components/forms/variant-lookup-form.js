@@ -105,7 +105,7 @@ export function VariantLookupForm({ onChange, onSubmit, onReset }) {
                 )
               }
               {
-                (selectedPhenotypes && selectedPhenotypes.length > 1) &&
+                (selectedPhenotypes && selectedPhenotypes.length >= 1) &&
                 (!selectedVariant || selectedVariant.length < 1) && (
                   <>Please input a search variant.</>
                 )

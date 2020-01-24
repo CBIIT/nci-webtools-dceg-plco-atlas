@@ -113,8 +113,8 @@ export function Heatmap() {
     toImageButtonOptions: {
       format: 'svg', // one of png, svg, jpeg, webp
       filename: 'custom_image',
-      // height: 800,
-      // width: 800,
+      height: 1000,
+      width: 1000,
       scale: 1 // Multiply title/legend/axis/canvas sizes by this factor
     },
     displaylogo: false,
