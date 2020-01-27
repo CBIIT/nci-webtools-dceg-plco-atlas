@@ -88,8 +88,7 @@ export function initialize() {
       if (node.children === undefined) {
         records.push({
           title: node.title,
-          value: node.value,
-          disabled: node.disabled
+          value: node.value
         });
       } else {
         categories.push({
