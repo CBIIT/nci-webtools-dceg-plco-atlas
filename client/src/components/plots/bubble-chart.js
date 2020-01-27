@@ -8,20 +8,21 @@ export function BubbleChartContainer({
   dataCategories
 }) {
 
-  console.log("data", data);
-  console.log("dataAlphabetical", dataAlphabetical);
-  console.log("dataCategories", dataCategories);
+  // console.log("data", data);
+  // console.log("dataAlphabetical", dataAlphabetical);
+  // console.log("dataCategories", dataCategories);
+  const initialData = data.map((item) => {
+    return {
+      label: item.title,
+      value: 1
+    }
+  });
+
+  // console.log("initialData", initialData);
 
   // d3 bubble chart
-  const [bubbleData, setBubbleData] = useState([
-    { label: 'CRM', value: 1 },
-    { label: 'API', value: 1 },
-    { label: 'Data', value: 1 },
-    { label: 'Commerce', value: 1 },
-    { label: 'AI', value: 1 },
-    { label: 'Management', value: 1 },
-    { label: 'Testing', value: 1 },
-  ]);
+  const [bubbleData, setBubbleData] = useState(initialData);
+  const [breadCrumb, setBreadCrumb] =  useState([]);
 
   // const legendFont = {
   //   family: 'Arial',
@@ -45,43 +46,91 @@ export function BubbleChartContainer({
   };
 
   const bubbleClick = (label) =>{
-    // console.log("Custom bubble click func", label);
-    setBubbleData([
-      { label: 'Mobile', value: 1 },
-      { label: 'Conversion', value: 1 },
-      { label: 'Misc', value: 1 },
-      { label: 'Databases', value: 1 },
-      { label: 'DevOps', value: 1 },
-      { label: 'Javascript', value: 1 },
-      { label: 'Languages / Frameworks', value: 1 },
-      { label: 'Front End', value: 1 },
-      { label: 'Content', value: 1 },
-    ]);
-  }
+    if (dataAlphabetical.map((item) => item.title).includes(label)) {
+      // is leaf
+      console.log("leaf!", label);
+    } else {
+      // is parent
+      dataCategories.map((item) => {
+        if (item.title === label) {
+          if (item.children && item.children.length > 0) {
+            // has children
+            let next = item.children.map((item) => {
+              return {
+                label: item.title,
+                value: 1
+              }
+            });
+            setBubbleData(next);
+            if (breadCrumb.length === 0) {
+              setBreadCrumb(breadCrumb.concat("All Phenotypes"));
+            } else {
+              if (!breadCrumb.includes(label)) {
+                setBreadCrumb(breadCrumb.concat(label));
+              }
+            }
+          } 
+        }
+      });
+    }
+  };
   
   // const legendClick = (label) =>{
   //   // console.log("Customer legend click func", label);
-  // }
+  // };
+
+  const crumbClick = (label) => {
+    if (label === "All Phenotypes") {
+      setBubbleData(initialData);
+      setBreadCrumb([]);
+    } else {
+      // get parent
+      dataCategories.map((parentItem) => {
+        parentItem.children.map((childrenItem) => {
+          if (childrenItem.title === label) {
+            console.log("parent:", parentItem.title);
+            dataCategories.map((item) => {
+              if (item.title === parentItem.title) {
+                // has children
+                let next = item.children.map((item) => {
+                  return {
+                    label: item.title,
+                    value: 1
+                  }
+                });
+                setBubbleData(next);
+              }
+            });
+            // trim breadCrumbs
+            setBreadCrumb(breadCrumb.slice(0, breadCrumb.indexOf(label)));
+          }
+        })
+      });
+    }
+  };
   
   return (
     <>
       <div className="text-left">
-        <a href="javascript:void(0)" onClick={_ => setBubbleData([
-          { label: 'CRM', value: 1 },
-          { label: 'API', value: 1 },
-          { label: 'Data', value: 1 },
-          { label: 'Commerce', value: 1 },
-          { label: 'AI', value: 1 },
-          { label: 'Management', value: 1 },
-          { label: 'Testing', value: 1 },
-        ])}>
-          All Phenotypes
-        </a>
-        <Icon
-          name="arrow-left"
-          className="mx-2 opacity-50"
-          width="10"
-        />
+        {
+          breadCrumb && breadCrumb.length > 0 && breadCrumb.map((item) => {
+            return(
+              <>
+                <a 
+                  href="javascript:void(0)" 
+                  onClick={_ => crumbClick(item)}
+                >
+                  {item}
+                </a>
+                <Icon
+                  name="arrow-left"
+                  className="mx-2 opacity-50"
+                  width="10"
+                />
+              </>
+            )
+          })
+        }
       </div> 
       <BubbleChart
         graph= {{
@@ -100,7 +149,7 @@ export function BubbleChartContainer({
         //Custom bubble/legend click functions such as searching using the label, redirecting to other page
         bubbleClickFun={bubbleClick}
         // legendClickFun={legendClick}
-        data={bubbleData}
+        data={bubbleData.length > 0 ? bubbleData : initialData}
         // overflow={true}
       />
     </>
