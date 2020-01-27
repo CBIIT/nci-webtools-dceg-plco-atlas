@@ -19,6 +19,13 @@ export function Phenotypes() {
     submitted
   } = useSelector(state => state.browsePhenotypes);
 
+  const phenotypes = useSelector(state => state.phenotypes);
+  const phenotypeCategories = useSelector(state => state.phenotypeCategories);
+  const phenotypesTree = useSelector(state => state.phenotypesTree);
+  const alphabetizedPhenotypes = [...phenotypes].sort((a, b) =>
+    a.title.localeCompare(b.title)
+  );
+
   const [openSidebar, setOpenSidebar] = useState(true);
 
   const setMessages = messages => {
@@ -102,7 +109,11 @@ export function Phenotypes() {
         <PhenotypesSearchCriteria />
         <div className="bg-white border rounded-0 p-4 text-center">
           {!submitted && 
-            <BubbleChartContainer />
+            <BubbleChartContainer 
+              data={phenotypesTree}
+              dataAlphabetical={alphabetizedPhenotypes}
+              dataCategories={phenotypeCategories}  
+            />
           }
         </div>
       </MainPanel>
