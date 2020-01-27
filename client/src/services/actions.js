@@ -93,7 +93,8 @@ export function initialize() {
       } else {
         categories.push({
           title: node.title,
-          value: node.value
+          value: node.value,
+          children: node.children
         });
       }
       if (node.children) {
