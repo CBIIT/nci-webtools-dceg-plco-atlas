@@ -2,20 +2,25 @@ import React, { useState } from 'react';
 import BubbleChart from '@weknow/react-bubble-chart-d3';
 import { Icon } from '../controls/icon';
 
-export function BubbleChartContainer() {
-  const randomIntGen = () => {
-    return Math.floor(Math.random() * 10) + 1;
-  }
+export function BubbleChartContainer({
+  data,
+  dataAlphabetical,
+  dataCategories
+}) {
+
+  console.log("data", data);
+  console.log("dataAlphabetical", dataAlphabetical);
+  console.log("dataCategories", dataCategories);
 
   // d3 bubble chart
   const [bubbleData, setBubbleData] = useState([
-    { label: 'CRM', value: randomIntGen() },
-    { label: 'API', value: randomIntGen() },
-    { label: 'Data', value: randomIntGen() },
-    { label: 'Commerce', value: randomIntGen() },
-    { label: 'AI', value: randomIntGen() },
-    { label: 'Management', value: randomIntGen() },
-    { label: 'Testing', value: randomIntGen() },
+    { label: 'CRM', value: 1 },
+    { label: 'API', value: 1 },
+    { label: 'Data', value: 1 },
+    { label: 'Commerce', value: 1 },
+    { label: 'AI', value: 1 },
+    { label: 'Management', value: 1 },
+    { label: 'Testing', value: 1 },
   ]);
 
   // const legendFont = {
@@ -42,15 +47,15 @@ export function BubbleChartContainer() {
   const bubbleClick = (label) =>{
     // console.log("Custom bubble click func", label);
     setBubbleData([
-      { label: 'Mobile', value: randomIntGen() },
-      { label: 'Conversion', value: randomIntGen() },
-      { label: 'Misc', value: randomIntGen() },
-      { label: 'Databases', value: randomIntGen() },
-      { label: 'DevOps', value: randomIntGen() },
-      { label: 'Javascript', value: randomIntGen() },
-      { label: 'Languages / Frameworks', value: randomIntGen() },
-      { label: 'Front End', value: randomIntGen() },
-      { label: 'Content', value: randomIntGen() },
+      { label: 'Mobile', value: 1 },
+      { label: 'Conversion', value: 1 },
+      { label: 'Misc', value: 1 },
+      { label: 'Databases', value: 1 },
+      { label: 'DevOps', value: 1 },
+      { label: 'Javascript', value: 1 },
+      { label: 'Languages / Frameworks', value: 1 },
+      { label: 'Front End', value: 1 },
+      { label: 'Content', value: 1 },
     ]);
   }
   
@@ -62,13 +67,13 @@ export function BubbleChartContainer() {
     <>
       <div className="text-left">
         <a href="javascript:void(0)" onClick={_ => setBubbleData([
-          { label: 'CRM', value: randomIntGen() },
-          { label: 'API', value: randomIntGen() },
-          { label: 'Data', value: randomIntGen() },
-          { label: 'Commerce', value: randomIntGen() },
-          { label: 'AI', value: randomIntGen() },
-          { label: 'Management', value: randomIntGen() },
-          { label: 'Testing', value: randomIntGen() },
+          { label: 'CRM', value: 1 },
+          { label: 'API', value: 1 },
+          { label: 'Data', value: 1 },
+          { label: 'Commerce', value: 1 },
+          { label: 'AI', value: 1 },
+          { label: 'Management', value: 1 },
+          { label: 'Testing', value: 1 },
         ])}>
           All Phenotypes
         </a>
