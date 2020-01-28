@@ -8,17 +8,12 @@ export function BubbleChartContainer({
   dataCategories
 }) {
 
-  // console.log("data", data);
-  // console.log("dataAlphabetical", dataAlphabetical);
-  // console.log("dataCategories", dataCategories);
   const initialData = data.map((item) => {
     return {
       label: item.title,
       value: 1
     }
   });
-
-  // console.log("initialData", initialData);
 
   // d3 bubble chart
   const [bubbleData, setBubbleData] = useState(initialData);
@@ -84,7 +79,6 @@ export function BubbleChartContainer({
       dataCategories.map((parentItem) => {
         parentItem.children.map((childrenItem) => {
           if (childrenItem.title === label) {
-            // console.log("parent:", parentItem.title);
             dataCategories.map((item) => {
               if (item.title === parentItem.title) {
                 // has children
@@ -140,7 +134,6 @@ export function BubbleChartContainer({
         showLegend={false} // optional value, pass false to disable the legend.
         labelFont={labelFont}
         valueFont={valueFont}
-        //Custom bubble/legend click functions such as searching using the label, redirecting to other page
         bubbleClickFun={bubbleClick}
         data={bubbleData.length > 0 ? bubbleData : initialData}
         // overflow={true}
