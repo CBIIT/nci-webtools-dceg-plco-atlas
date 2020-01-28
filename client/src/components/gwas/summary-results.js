@@ -311,30 +311,21 @@ export function SummaryResults() {
   };
 
   const handleVariantLookup = ({ snp }, gender) => {
-    console.log("gender", gender);
+    const genderSanitized = gender ? (gender.includes('Male') ? 'male' : 'female') : selectedManhattanPlotType === 'male' || selectedManhattanPlotType === 'female' ? selectedManhattanPlotType : 'combined';
+    console.log("genderSanitized", genderSanitized);
     dispatch(
       updateVariantLookup({
         selectedPhenotypes: [selectedPhenotype],
         selectedVariant: snp,
-        selectedGender:
-          gender ? (gender.includes('Male') ? 'male' : 'female') :
-          selectedManhattanPlotType === 'male' ||
-          selectedManhattanPlotType === 'female'
-            ? selectedManhattanPlotType
-            : 'combined',
+        selectedGender: genderSanitized,
         searchCriteriaVariantLookup: {
           phenotypes: [selectedPhenotype].map(item => item.title),
           variant: snp,
-          gender:
-            gender ? (gender.includes('Male') ? 'male' : 'female') :
-            selectedManhattanPlotType === 'male' ||
-            selectedManhattanPlotType === 'female'
-              ? selectedManhattanPlotType
-              : 'combined'
+          gender: genderSanitized
         }
       })
     );
-    dispatch(lookupVariants([selectedPhenotype], snp));
+    dispatch(lookupVariants([selectedPhenotype], snp, genderSanitized));
   };
 
   const placeholder = (
