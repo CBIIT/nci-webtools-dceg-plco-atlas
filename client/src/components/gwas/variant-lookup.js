@@ -100,7 +100,12 @@ export function VariantLookup() {
         }
         return b - a; // desc
       }
-    }
+    },
+    {
+      dataField: 'gender',
+      text: 'Gender',
+      hidden: true
+    },
   ];
   // add filter to column headers
   // .map(c => {
@@ -202,7 +207,7 @@ export function VariantLookup() {
       gender: selectedGender
     });
     setSubmitted(new Date());
-    dispatch(lookupVariants(selectedPhenotypes, selectedVariant));
+    dispatch(lookupVariants(selectedPhenotypes, selectedVariant, selectedGender));
   };
 
   const handleReset = params => {

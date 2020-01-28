@@ -890,7 +890,7 @@ export function drawHeatmap(phenotypes) {
   };
 }
 
-export function lookupVariants(phenotypes, variant) {
+export function lookupVariants(phenotypes, variant, gender) {
   return async function(dispatch) {
     dispatch(
       updateVariantLookup({
@@ -899,6 +899,14 @@ export function lookupVariants(phenotypes, variant) {
         submitted: new Date()
       })
     );
+
+    const gender_table = {
+      all: 'variant_all',
+      combined: 'variant_all',
+      female: 'variant_female',
+      male: 'variant_male',
+      undefined: 'variant_all'
+    }[gender];
 
     var tableList = [];
     var tableListNull = [];
@@ -913,6 +921,7 @@ export function lookupVariants(phenotypes, variant) {
     for (let i = 0; i < phenotypes.length; i++) {
       var { data } = await query('variants', {
         database: phenotypes[i].value + '.db',
+        table: gender_table,
         snp: chr && bp ? null : variant,
         chr: chr ? chr : null,
         bp: bp ? bp : null
@@ -929,12 +938,14 @@ export function lookupVariants(phenotypes, variant) {
           or: '-',
           p: '-',
           variant_id: 'not-found-' + phenotypes[i].title ? phenotypes[i].title : phenotypes[i].label,
+          gender: gender,
         });
       } else {
         for (let j = 0; j < data.length; j++) {
           data[j]['phenotype'] = phenotypes[i].title
             ? phenotypes[i].title
             : phenotypes[i].label;
+          data[j]['gender'] = gender;
           tableList.push(data[j]);
         }
       }
