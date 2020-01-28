@@ -5,7 +5,8 @@ import { Icon } from '../controls/icon';
 export function BubbleChartContainer({
   data,
   dataAlphabetical,
-  dataCategories
+  dataCategories,
+  onSubmit
 }) {
 
   const initialData = data.map((item) => {
@@ -43,7 +44,10 @@ export function BubbleChartContainer({
   const bubbleClick = (label) =>{
     if (dataAlphabetical.map((item) => item.title).includes(label)) {
       // is leaf
-      console.log("leaf!", label);
+      let found = dataAlphabetical.filter(item => item.title === label);
+      if (found.length > 0) {
+        onSubmit(found[0]);
+      }
     } else {
       // is parent
       dataCategories.map((item) => {
@@ -103,23 +107,20 @@ export function BubbleChartContainer({
     <>
       <div className="text-left">
         {
-          breadCrumb && breadCrumb.length > 0 && breadCrumb.map((item) => {
-            return(
-              <>
-                <a 
-                  href="javascript:void(0)" 
-                  onClick={_ => crumbClick(item)}
-                >
-                  {item}
-                </a>
-                <Icon
-                  name="arrow-left"
-                  className="mx-2 opacity-50"
-                  width="10"
-                />
-              </>
-            )
-          })
+          breadCrumb && breadCrumb.length > 0 && breadCrumb.map((item) => (
+            <span className="" key={"crumb-" + item}>
+              <a 
+                href="javascript:void(0)" 
+                onClick={_ => crumbClick(item)}>
+                {item}
+              </a>
+              <Icon
+                name="arrow-left"
+                className="mx-2 opacity-50"
+                width="10"
+              />
+            </span>
+          ))
         }
       </div> 
       <BubbleChart

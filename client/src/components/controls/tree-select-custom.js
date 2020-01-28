@@ -304,7 +304,7 @@ export function TreeSelectCustom({
       if (item.children && item.children.length > 0) {
         return (
           // PARENT
-          <>
+          <div key={'categorical-parent-' + item.value}>
             <li className="my-1" style={{ display: 'block' }}>
               <div className="d-flex align-items-center">
                 <button
@@ -377,13 +377,13 @@ export function TreeSelectCustom({
                 {selectTreeCategorical(item.children)}
               </ul>
             </li>
-          </>
+          </div>
         );
       } else {
         return (
           // LEAF
           <li
-            key={'categorical-' + item.value}
+            key={'categorical-leaf-' + item.value}
             style={{
               textOverflow: 'ellipsis',
               whiteSpace: 'nowrap',
