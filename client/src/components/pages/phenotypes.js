@@ -112,7 +112,8 @@ export function Phenotypes() {
             <BubbleChartContainer 
               data={phenotypesTree}
               dataAlphabetical={alphabetizedPhenotypes}
-              dataCategories={phenotypeCategories}  
+              dataCategories={phenotypeCategories}
+              onSubmit={handleSubmit}
             />
           }
         </div>
