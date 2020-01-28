@@ -207,7 +207,7 @@ export function VariantLookup() {
       gender: selectedGender
     });
     setSubmitted(new Date());
-    dispatch(lookupVariants(selectedPhenotypes, selectedVariant, selectedGender));
+    dispatch(lookupVariants(selectedPhenotypes, selectedVariant, selectedGender === 'combined' ? 'all' : selectedGender));
   };
 
   const handleReset = params => {

@@ -311,7 +311,7 @@ export function SummaryResults() {
   };
 
   const handleVariantLookup = ({ snp }, gender) => {
-    const genderSanitized = gender ? (gender.includes('Male') ? 'male' : 'female') : selectedManhattanPlotType === 'male' || selectedManhattanPlotType === 'female' ? selectedManhattanPlotType : 'combined';
+    const genderSanitized = gender ? (gender.includes('Male') ? 'male' : 'female') : selectedManhattanPlotType === 'male' || selectedManhattanPlotType === 'female' ? selectedManhattanPlotType : 'all';
     console.log("genderSanitized", genderSanitized);
     dispatch(
       updateVariantLookup({
