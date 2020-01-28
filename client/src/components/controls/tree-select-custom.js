@@ -49,10 +49,7 @@ export function TreeSelectCustom({
 
   const getLeafs = (item, node, allLeafs = []) => {
     if (!node.children || node.children.length === 0) {
-      // ignore disabled attribute for now
-      // if (!node.disabled) {
       allLeafs.push(node);
-      // }
     } else {
       if (document.getElementsByClassName('parent-checkbox-' + node.value)[0]) {
         document.getElementsByClassName(
@@ -69,14 +66,16 @@ export function TreeSelectCustom({
   const getAllLeafs = item => {
     let allLeafs = [];
     if (item.children && item.children.length > 0) {
+      // check if item is parent
       for (var i = 0; i < item.children.length; i++) {
         let child = item.children[i];
         allLeafs = allLeafs.concat(getLeafs(item, child));
       }
     } else {
-      if (!item.parent) {
-        allLeafs.push(item);
-      }
+      // if (!item.parent) {
+      // check if item is not parent
+      allLeafs.push(item);
+      // }
     }
     return allLeafs;
   };
