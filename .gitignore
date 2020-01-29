@@ -7,6 +7,7 @@
 *.log
 *-audit.json
 config.json
+server/data
 /data/import/**/*.db
 /data/import/**/*.meta
 /data/import/**/*.txt
