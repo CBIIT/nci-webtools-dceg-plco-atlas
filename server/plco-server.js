@@ -68,8 +68,9 @@ app.addHook("onSend", (req, res, payload, done) => {
   let pathname = req.raw.url.replace(/\?.*$/, "");
   let timestamp = res.getHeader("Timestamp");
 
-  // only log the specified routes
-  if (timestamp && /summary|variants|metadata|genes|config/.test(pathname)) {
+  // log response time and parameters for the specified routes
+  const loggedRoutes = /summary|variants|metadata|genes|correlations|config/
+  if (timestamp && loggedRoutes.test(pathname)) {
     let duration = new Date().getTime() - timestamp;
     logger.info(`[${process.pid}] ${pathname}: ${duration/1000}s`, req.query);
 
@@ -110,6 +111,17 @@ app.get("/metadata", async ({ query }, res) => {
 // retrieves genes
 app.get("/genes", async ({ query }, res) => {
   return getGenes(connection, query);
+});
+
+
+// retrieves genes
+app.get("/phenotypes", async ({ query }, res) => {
+  return getPhenotypes(connection);
+});
+
+// retrieves genes
+app.get("/correlation", async ({ query }, res) => {
+  return getCorrelation(connection, query);
 });
 
 // retrieves configuration

@@ -304,6 +304,48 @@ async function getGenes(connection, params) {
  * @param {string} key - The key to retrieve
  * @returns {any} The specified key and its value
  */
+function getCorrelation(connection, {phenotypeA, phenotypeB}) {
+    if (phenotypeA && phenotypeB) {
+        let [results] = await connection.query(`
+            SELECT value FROM phenotype_correlation
+                WHERE phenotype_a = :phenotypeA
+                AND phenotype_b = :phenotypeB
+        `, {phenotypeA, phenotypeB});
+        return results[0].value;
+    } else {
+        let [results]  = await connection.query(`
+            SELECT
+                phenotype_a as phenotypeA,
+                phenotype_b as phenotypeB,
+                value
+            FROM phenotype_correlation
+        `);
+        return results;
+    }
+}
+
+function getPhenotypes(connection) {
+    let [phenotypes] = await connection.query(`
+        SELECT id, name, display_name as displayName, parent_id as parentId
+        FROM lu_phenotype
+    `);
+
+    phenotypes.forEach(phenotype => {
+        let parent = phenotypes.find(parent => parent.id === phenotype.parentId);
+        if (parent) {
+            if (!parent.children) parent.children = [];
+            parent.children.push(phenotype);
+        }
+    });
+
+    return phenotypes;
+}
+
+/**
+ * Retrieves a specific configuration key
+ * @param {string} key - The key to retrieve
+ * @returns {any} The specified key and its value
+ */
 function getConfig(key) {
     const allowedKeys = ['downloadRoot'];
     return allowedKeys.includes(key)
