@@ -104,7 +104,7 @@ export function BubbleChartContainer({
   };
   
   return (
-    <div className="bg-white border rounded-0 p-4 text-center">
+    <>
       <div className="text-left">
         {
           breadCrumb && breadCrumb.length > 0 && breadCrumb.map((item) => (
@@ -139,6 +139,6 @@ export function BubbleChartContainer({
         data={bubbleData.length > 0 ? bubbleData : initialData}
         // overflow={true}
       />
-    </div>
+    </>
   );
 }
