@@ -95,15 +95,15 @@ async function importGenes() {
             INSERT INTO ${geneTable} SELECT
                 null,
                 name,
-                chr,
+                chromosome,
                 strand,
-                MIN(tx_start) as tx_start,
-                MAX(tx_end) as tx_end,
+                MIN(transcription_start) as transcription_start,
+                MAX(transcription_end) as transcription_end,
                 GROUP_CONCAT(exon_starts, '') as exon_starts,
                 GROUP_CONCAT(exon_ends, '') as exon_ends
             FROM ${geneStageTable}
             GROUP BY name
-            ORDER BY chr, tx_start
+            ORDER BY chromosome, transcription_start, transcription_end, strand, name
         `);
 
         // drop staging table

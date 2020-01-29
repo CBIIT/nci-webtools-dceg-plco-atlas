@@ -1,8 +1,8 @@
 CREATE TABLE `lu_phenotype` (
     `id`            INTEGER PRIMARY KEY NOT NULL AUTO_INCREMENT,
-    `name`          VARCHAR(200) NOT NULL,
-    `display_name`  VARCHAR(200) NOT NULL,
     `parent_id`     INTEGER NULL,
+    `name`          VARCHAR(200) NOT NULL,
+    `display_name`  VARCHAR(200) NOT NULL
     FOREIGN KEY (parent_id) REFERENCES lu_phenotype(id)
 );
 
@@ -22,7 +22,6 @@ CREATE TABLE `phenotype_metadata` (
     `phenotype_id`  INTEGER UNIQUE,
     `gender`        ENUM('all', 'female', 'male'),
     `lambda_gc`     DOUBLE,
-    `other`         VARCHAR(2000),
     FOREIGN KEY (phenotype_id) REFERENCES lu_phenotype(id),
     INDEX (phenotype_id),
     INDEX (gender)
@@ -44,10 +43,8 @@ CREATE TABLE `gene` (
 CREATE TABLE `import_log` (
     `id`                    INTEGER PRIMARY KEY NOT NULL AUTO_INCREMENT,
     `phenotype_id`          INTEGER UNIQUE,
-    `gender`                ENUM('all', 'female', 'male'),
-    `num_variants`          BIGINT,
-    `datetime_start`        DATETIME,
-    `datetime_end`          DATETIME,
-    `comments`              VARCHAR(2000),
+    `variants_provided`     BIGINT,
+    `variants_imported`     BIGINT,
+    `created_date`          DATETIME
     FOREIGN KEY (phenotype_id) REFERENCES lu_phenotype(id)
 );
