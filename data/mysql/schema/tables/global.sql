@@ -12,9 +12,7 @@ CREATE TABLE `phenotype_correlation` (
     `phenotype_b`   INTEGER NOT NULL,
     `value`         DOUBLE NOT NULL,
     FOREIGN KEY (phenotype_a) REFERENCES lu_phenotype(id),
-    FOREIGN KEY (phenotype_b) REFERENCES lu_phenotype(id),
-    INDEX (phenotype_a),
-    INDEX (phenotype_b)
+    FOREIGN KEY (phenotype_b) REFERENCES lu_phenotype(id)
 );
 
 CREATE TABLE `phenotype_metadata` (
@@ -22,9 +20,7 @@ CREATE TABLE `phenotype_metadata` (
     `phenotype_id`  INTEGER,
     `gender`        ENUM('all', 'female', 'male'),
     `lambda_gc`     DOUBLE,
-    FOREIGN KEY (phenotype_id) REFERENCES lu_phenotype(id),
-    INDEX (phenotype_id),
-    INDEX (gender)
+    FOREIGN KEY (phenotype_id) REFERENCES lu_phenotype(id)
 );
 
 CREATE TABLE `gene` (
@@ -35,9 +31,7 @@ CREATE TABLE `gene` (
     `transcription_start`   INTEGER NOT NULL,
     `transcription_end`     INTEGER NOT NULL,
     `exon_starts`           MEDIUMTEXT,
-    `exon_ends`             MEDIUMTEXT,
-    INDEX (transcription_start),
-    INDEX (transcription_end)
+    `exon_ends`             MEDIUMTEXT
 );
 
 CREATE TABLE `import_log` (
