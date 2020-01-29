@@ -19,7 +19,7 @@ CREATE TABLE `phenotype_correlation` (
 
 CREATE TABLE `phenotype_metadata` (
     `id`            INTEGER PRIMARY KEY NOT NULL AUTO_INCREMENT,
-    `phenotype_id`  INTEGER UNIQUE,
+    `phenotype_id`  INTEGER,
     `gender`        ENUM('all', 'female', 'male'),
     `lambda_gc`     DOUBLE,
     FOREIGN KEY (phenotype_id) REFERENCES lu_phenotype(id),
@@ -42,7 +42,7 @@ CREATE TABLE `gene` (
 
 CREATE TABLE `import_log` (
     `id`                    INTEGER PRIMARY KEY NOT NULL AUTO_INCREMENT,
-    `phenotype_id`          INTEGER UNIQUE,
+    `phenotype_id`          INTEGER,
     `variants_provided`     BIGINT,
     `variants_imported`     BIGINT,
     `created_date`          DATETIME
