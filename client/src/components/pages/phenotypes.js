@@ -11,6 +11,7 @@ import {
 } from '../controls/sidebar-container';
 import { updateBrowsePhenotypes } from '../../services/actions';
 import { BubbleChartContainer } from '../plots/bubble-chart';
+import BubbleChart from '../../services/plots/bubble-chart';
 
 export function Phenotypes() {
   const dispatch = useDispatch();
@@ -111,12 +112,15 @@ export function Phenotypes() {
       <MainPanel className="col-lg-9">
         <PhenotypesSearchCriteria />
         {!submitted && 
-          <BubbleChartContainer 
-            data={phenotypesTree}
-            dataAlphabetical={alphabetizedPhenotypes}
-            dataCategories={phenotypeCategories}
-            onSubmit={handleSubmit}
-          />
+          <div className="bg-white border rounded-0 p-4 text-center">
+            <BubbleChartContainer 
+              data={phenotypesTree}
+              dataAlphabetical={alphabetizedPhenotypes}
+              dataCategories={phenotypeCategories}
+              onSubmit={handleSubmit}
+            />
+            <BubbleChart />
+          </div>
         }
         {
           submitted &&
