@@ -121,7 +121,9 @@ export const getInitialState = () => ({
     selectedPhenotype: null,
     submitted: null, 
     messages: [],
-    searchCriteriaPhenotypes: {}
+    searchCriteriaPhenotypes: {},
+    selectedPlot: 'frequency',
+    phenotypeType: 'binary',
   },
   downloads: {
     selectedPhenotypes: [],
