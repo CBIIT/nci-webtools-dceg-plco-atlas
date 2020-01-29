@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Alert } from 'react-bootstrap';
 import { PhenotypesForm } from '../forms/phenotypes-form';
+import { PhenotypesTabs } from '../phenotypes/phenotypes-tabs';
 import { PhenotypesSearchCriteria } from '../controls/phenotypes-search-criteria';
 import {
   SidebarContainer,
@@ -80,7 +81,9 @@ export function Phenotypes() {
       selectedPhenotype: null,
       messages: [],
       submitted: null,
-      searchCriteriaPhenotypes: {}
+      searchCriteriaPhenotypes: {},
+      selectedPlot: 'frequency',
+      phenotypeType: 'binary'
     }));
   }
 
@@ -107,16 +110,18 @@ export function Phenotypes() {
 
       <MainPanel className="col-lg-9">
         <PhenotypesSearchCriteria />
-        <div className="bg-white border rounded-0 p-4 text-center">
-          {!submitted && 
-            <BubbleChartContainer 
-              data={phenotypesTree}
-              dataAlphabetical={alphabetizedPhenotypes}
-              dataCategories={phenotypeCategories}
-              onSubmit={handleSubmit}
-            />
-          }
-        </div>
+        {!submitted && 
+          <BubbleChartContainer 
+            data={phenotypesTree}
+            dataAlphabetical={alphabetizedPhenotypes}
+            dataCategories={phenotypeCategories}
+            onSubmit={handleSubmit}
+          />
+        }
+        {
+          submitted &&
+          <PhenotypesTabs />
+        }
       </MainPanel>
     </SidebarContainer>
   );
