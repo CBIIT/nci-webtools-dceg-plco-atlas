@@ -4,12 +4,6 @@ const { ChiSquared, R: { numberPrecision } } = libR;
 const precision4 = numberPrecision(4)
 const { qchisq } = ChiSquared();
 
-// gets a function which returns elapsed time
-function timestamp() {
-    var startTime = new Date();
-    return () => ((new Date() - startTime) / 1000).toPrecision(4);
-}
-
 // floors a value to the lowest multiple of the size given (usually a power of 10)
 function group(value, size) {
     var isInvalid = value === null || value === undefined || isNaN(value);
@@ -59,7 +53,6 @@ function getLambdaGC(pMedian) {
 }
 
 module.exports = {
-    timestamp,
     group,
     ppoints,
     getIntervals,

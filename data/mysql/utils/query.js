@@ -15,17 +15,25 @@ async function tableExists(connection, databaseName, tableName) {
     )) != 0;
 }
 
-async function getMedian(connection, tableName, columnName) {
+async function getMedian(connection, tableName, columnName, queryConditions) {
+    const conditions = queryConditions
+        ? 'WHERE ' + Object.values(queryConditions)
+            .map(v => `${v.key} = ${v.value}`)
+            .join(' AND ')
+        : '';
+
     return pluck(await connection.execute(`
         SELECT AVG(${columnName}) AS "median"
         FROM (
             SELECT "${columnName}"
             FROM ${tableName}
+            ${conditions}
             ORDER BY "${columnName}"
-            LIMIT 2 - (SELECT COUNT(*) FROM ${tableName}) % 2
+            LIMIT 2 - (SELECT COUNT(*) FROM ${tableName} ${conditions}) % 2
             OFFSET (
                 SELECT (COUNT(*) - 1) / 2
                 FROM ${tableName}
+                ${conditions}
             )
         )
     `));
