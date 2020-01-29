@@ -40,3 +40,14 @@ CREATE TABLE `gene` (
     INDEX (transcription_start),
     INDEX (transcription_end)
 );
+
+CREATE TABLE `import_log` (
+    `id`                    INTEGER PRIMARY KEY NOT NULL AUTO_INCREMENT,
+    `phenotype_id`          INTEGER UNIQUE,
+    `gender`                ENUM('all', 'female', 'male'),
+    `num_variants`          BIGINT,
+    `datetime_start`        DATETIME,
+    `datetime_end`          DATETIME,
+    `comments`              VARCHAR(2000),
+    FOREIGN KEY (phenotype_id) REFERENCES lu_phenotype(id)
+);
