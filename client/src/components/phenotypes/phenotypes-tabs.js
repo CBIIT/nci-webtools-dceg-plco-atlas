@@ -54,6 +54,7 @@ export function PhenotypesTabs() {
               <PhenotypesDistribution 
                 selectedPhenotype={selectedPhenotype}
                 phenotypeType={phenotypeType}
+                option="age"
               />
           </Tab>
 
@@ -65,6 +66,7 @@ export function PhenotypesTabs() {
               <PhenotypesDistribution 
                 selectedPhenotype={selectedPhenotype}
                 phenotypeType={phenotypeType}
+                option="sex"
               />
           </Tab>
 
@@ -76,6 +78,7 @@ export function PhenotypesTabs() {
               <PhenotypesDistribution 
                 selectedPhenotype={selectedPhenotype}
                 phenotypeType={phenotypeType}
+                option="ancestry"
               />
           </Tab>
 

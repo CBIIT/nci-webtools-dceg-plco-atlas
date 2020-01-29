@@ -2,12 +2,13 @@ import React from 'react';
 
 export function PhenotypesDistribution({
   selectedPhenotype,
-  phenotypeType
+  phenotypeType,
+  option
 }) {
   
   return (
     <>
-      PhenotypesDistribution: {selectedPhenotype.title} {phenotypeType}
+      PhenotypesDistribution: {selectedPhenotype.title} {phenotypeType} {option}
     </>
   );
 }
