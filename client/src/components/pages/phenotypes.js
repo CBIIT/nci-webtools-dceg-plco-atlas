@@ -120,7 +120,7 @@ export function Phenotypes() {
   };
 
   useEffect(() => {
-    if (submitted && !phenotypesTree) return;
+    if (submitted || !phenotypesTree) return;
     plotContainer.current.innerHTML = '';
     drawBubbleChart(phenotypesTree);
   })
