@@ -2,19 +2,20 @@
 import * as d3 from 'd3'
 
 export class BubbleChart {
-    constructor(container, data, setBreadcrumb) {
+    constructor(container, fakeData, realData, setBreadcrumb) {
         console.log("bubble-chart service reached!");
         this.container = container;
-        this.dataset =  data;
+        this.fakeDataset = fakeData;
+        
         this.setBreadcrumb = setBreadcrumb;
-        this.drawBubbleChart(this.container, this.dataset, this.setBreadcrumb);
-        // this.componentDidMount();
+        console.log("this.realDataset", this.realDataset);
+        if (realData && realData.length > 0) {
+            this.realDataset = {
+                children: realData
+            };
+            this.drawBubbleChart(this.container, this.realDataset, this.setBreadcrumb);
+        }
     }
-    // componentDidMount() {
-    //      ...
-    //     };
-    //     this.drawBubbleChart(dataset)
-    // }
 
     drawBubbleChart(container, dataset, setBreadcrumb)  {
         console.log("data reached drawBubbleChart() d3", dataset);
@@ -89,7 +90,7 @@ export class BubbleChart {
         node.on("click", function(e) {
             console.log("node clicked!", e);
             // clicked.push(e.data.title);
-            setBreadcrumb(oldBreadcrumb => [...oldBreadcrumb, e.data.title]);
+            setBreadcrumb(oldBreadcrumb => [...oldBreadcrumb, e]);
             // d3.event.stopPropagation();
           });
 
