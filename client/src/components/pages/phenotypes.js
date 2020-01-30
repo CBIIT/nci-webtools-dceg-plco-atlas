@@ -23,6 +23,7 @@ export function Phenotypes() {
 
   const plotContainer = useRef(null);
   const plot = useRef(null);
+  const clicked = useRef(null);
 
   const phenotypes = useSelector(state => state.phenotypes);
   const phenotypeCategories = useSelector(state => state.phenotypeCategories);
@@ -118,9 +119,11 @@ export function Phenotypes() {
   };
 
   useEffect(() => {
+    if (submitted) return;
     plotContainer.current.innerHTML = '';
+    clicked.current.innerHTML = '';
 
-    plot.current = new Plot(plotContainer.current, dataset);
+    plot.current = new Plot(plotContainer.current, dataset, clicked.current);
   })
 
   // useEffect(() => {
@@ -158,7 +161,10 @@ export function Phenotypes() {
               dataCategories={phenotypeCategories}
               onSubmit={handleSubmit}
             /> */}
-            {/* <Plot /> */}
+            <div
+              ref={clicked}
+              className="clicked-nodes"
+            />
             <div
               ref={plotContainer}
               className="bubble-chart"
