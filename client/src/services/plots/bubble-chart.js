@@ -2,11 +2,12 @@
 import * as d3 from 'd3'
 
 export class BubbleChart {
-    constructor(container, data) {
+    constructor(container, data, clicked) {
         console.log("bubble-chart service reached!");
         this.container = container;
         this.dataset =  data;
-        this.drawBubbleChart(this.container, this.dataset);
+        this.clicked = clicked;
+        this.drawBubbleChart(this.container, this.dataset, this.clicked);
         // this.componentDidMount();
     }
     // componentDidMount() {
@@ -15,7 +16,7 @@ export class BubbleChart {
     //     this.drawBubbleChart(dataset)
     // }
 
-    drawBubbleChart(container, dataset)  {
+    drawBubbleChart(container, dataset, clicked)  {
         console.log("data reached drawBubbleChart() d3", dataset);
         var diameter = 800;
         // var color = d3.scaleOrdinal(d3.schemeCategory20);
@@ -31,7 +32,10 @@ export class BubbleChart {
             .attr("class", "bubble");
 
         var nodes = d3.hierarchy(dataset)
-            .sum(function(d) { return d.count; });
+            .sum(function(d) { 
+                // return d.count; 
+                return 100;
+            });
 
         var node = svg.selectAll(".node")
             .data(bubble(nodes).descendants())
@@ -47,7 +51,8 @@ export class BubbleChart {
 
         node.append("title")
             .text(function(d) {
-                return d.title + ": " + d.count;
+                // return d.data.title + ": " + d.data.count;
+                return d.data.title + ": " + "100";
             });
 
         node.append("circle")
@@ -72,7 +77,8 @@ export class BubbleChart {
             .attr("dy", "1.3em")
             .style("text-anchor", "middle")
             .text(function(d) {
-                return d.data.count;
+                // return d.data.count;
+                return 100;
             })
             .attr("font-family",  "Gill Sans", "Gill Sans MT")
             .attr("font-size", function(d){
@@ -82,6 +88,9 @@ export class BubbleChart {
         
         node.on("click", function(e) {
             console.log("node clicked!", e);
+            // clicked.push(e.data.title);
+            clicked.append(e.data.title);
+            console.log("clicked", clicked);
             // d3.event.stopPropagation();
           });
 
