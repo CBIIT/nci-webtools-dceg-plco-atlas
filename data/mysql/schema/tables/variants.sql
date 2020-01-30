@@ -42,13 +42,7 @@ CREATE TABLE `$PHENOTYPE_variant` (
     `n`                 BIGINT,
     `q`                 DOUBLE,
     `i`                 DOUBLE,
-    `show_qq_plot`      BOOLEAN,
-    INDEX (gender),
-    INDEX (chromosome),
-    INDEX (position),
-    INDEX (p_value_nlog),
-    INDEX (snp),
-    INDEX (show_qq_plot)
+    `show_qq_plot`      BOOLEAN
 );
 
 -- Phenotype name is used as prefix
@@ -57,8 +51,5 @@ CREATE TABLE `$PHENOTYPE_aggregate` (
     `id`            BIGINT PRIMARY KEY NOT NULL AUTO_INCREMENT,
     `gender`        ENUM('all', 'female', 'male') NOT NULL,
     `position_abs`  BIGINT NOT NULL,
-    `p_value_nlog`  DOUBLE NOT NULL,
-    INDEX (gender),
-    INDEX (position_abs),
-    INDEX (p_value_nlog)
+    `p_value_nlog`  DOUBLE NOT NULL
 );
