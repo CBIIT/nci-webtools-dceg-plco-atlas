@@ -12,6 +12,7 @@ import {
 import { updateBrowsePhenotypes } from '../../services/actions';
 // import { BubbleChartContainer } from '../plots/bubble-chart';
 import { BubbleChart as Plot } from '../../services/plots/bubble-chart';
+import { Icon } from '../controls/icon';
 
 export function Phenotypes() {
   const dispatch = useDispatch();
@@ -23,7 +24,7 @@ export function Phenotypes() {
 
   const plotContainer = useRef(null);
   const plot = useRef(null);
-  const clicked = useRef(null);
+  const [breadcrumb, setBreadcrumb] = useState([]);
 
   const phenotypes = useSelector(state => state.phenotypes);
   const phenotypeCategories = useSelector(state => state.phenotypeCategories);
@@ -121,9 +122,7 @@ export function Phenotypes() {
   useEffect(() => {
     if (submitted) return;
     plotContainer.current.innerHTML = '';
-    clicked.current.innerHTML = '';
-
-    plot.current = new Plot(plotContainer.current, dataset, clicked.current);
+    plot.current = new Plot(plotContainer.current, dataset, setBreadcrumb);
   })
 
   // useEffect(() => {
@@ -154,20 +153,35 @@ export function Phenotypes() {
       <MainPanel className="col-lg-9">
         <PhenotypesSearchCriteria />
         {!submitted && 
-          <div className="bg-white border rounded-0 p-4 text-center">
+          <div className="bg-white border rounded-0 p-4">
+
             {/* <BubbleChartContainer 
               data={phenotypesTree}
               dataAlphabetical={alphabetizedPhenotypes}
               dataCategories={phenotypeCategories}
               onSubmit={handleSubmit}
             /> */}
-            <div
-              ref={clicked}
-              className="clicked-nodes"
-            />
+
+            {
+              breadcrumb.map((item) =>
+                <span className="" key={"crumb-" + item}>
+                  <a 
+                    href="javascript:void(0)" 
+                    // onClick={_ => crumbClick(item)}
+                  >
+                    {item}
+                  </a>
+                  <Icon
+                    name="arrow-left"
+                    className="mx-2 opacity-50"
+                    width="10"
+                  />
+                </span>
+              )
+            }
             <div
               ref={plotContainer}
-              className="bubble-chart"
+              className="bubble-chart text-center"
             />
           </div>
         }

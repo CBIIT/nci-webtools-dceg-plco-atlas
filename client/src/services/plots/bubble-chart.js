@@ -2,12 +2,12 @@
 import * as d3 from 'd3'
 
 export class BubbleChart {
-    constructor(container, data, clicked) {
+    constructor(container, data, setBreadcrumb) {
         console.log("bubble-chart service reached!");
         this.container = container;
         this.dataset =  data;
-        this.clicked = clicked;
-        this.drawBubbleChart(this.container, this.dataset, this.clicked);
+        this.setBreadcrumb = setBreadcrumb;
+        this.drawBubbleChart(this.container, this.dataset, this.setBreadcrumb);
         // this.componentDidMount();
     }
     // componentDidMount() {
@@ -16,7 +16,7 @@ export class BubbleChart {
     //     this.drawBubbleChart(dataset)
     // }
 
-    drawBubbleChart(container, dataset, clicked)  {
+    drawBubbleChart(container, dataset, setBreadcrumb)  {
         console.log("data reached drawBubbleChart() d3", dataset);
         var diameter = 800;
         // var color = d3.scaleOrdinal(d3.schemeCategory20);
@@ -89,8 +89,7 @@ export class BubbleChart {
         node.on("click", function(e) {
             console.log("node clicked!", e);
             // clicked.push(e.data.title);
-            clicked.append(e.data.title);
-            console.log("clicked", clicked);
+            setBreadcrumb(oldBreadcrumb => [...oldBreadcrumb, e.data.title]);
             // d3.event.stopPropagation();
           });
 
