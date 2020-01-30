@@ -23,7 +23,7 @@ export function Phenotypes() {
   } = useSelector(state => state.browsePhenotypes);
 
   const plotContainer = useRef(null);
-  const plot = useRef(null);
+  // const plot = useRef(null);
   const [breadcrumb, setBreadcrumb] = useState([]);
 
   const phenotypes = useSelector(state => state.phenotypes);
@@ -120,10 +120,14 @@ export function Phenotypes() {
   };
 
   useEffect(() => {
-    if (submitted) return;
+    if (submitted && !phenotypesTree) return;
     plotContainer.current.innerHTML = '';
-    plot.current = new Plot(plotContainer.current, dataset, setBreadcrumb);
+    drawBubbleChart(phenotypesTree);
   })
+
+  const drawBubbleChart = (data) => {
+    new Plot(plotContainer.current, dataset, data, setBreadcrumb);
+  }
 
   // useEffect(() => {
   //   plot.current && plot.current.redraw();
@@ -164,12 +168,12 @@ export function Phenotypes() {
 
             {
               breadcrumb.map((item) =>
-                <span className="" key={"crumb-" + item}>
+                <span className="" key={"crumb-" + item.data.title}>
                   <a 
                     href="javascript:void(0)" 
                     // onClick={_ => crumbClick(item)}
                   >
-                    {item}
+                    {item.data.title}
                   </a>
                   <Icon
                     name="arrow-left"
