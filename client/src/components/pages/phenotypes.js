@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect} from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Alert } from 'react-bootstrap';
 import { PhenotypesForm } from '../forms/phenotypes-form';
@@ -10,8 +10,8 @@ import {
   MainPanel,
 } from '../controls/sidebar-container';
 import { updateBrowsePhenotypes } from '../../services/actions';
-import { BubbleChartContainer } from '../plots/bubble-chart';
-import BubbleChart from '../../services/plots/bubble-chart';
+// import { BubbleChartContainer } from '../plots/bubble-chart';
+import { BubbleChart as Plot } from '../../services/plots/bubble-chart';
 
 export function Phenotypes() {
   const dispatch = useDispatch();
@@ -20,6 +20,9 @@ export function Phenotypes() {
     messages,
     submitted
   } = useSelector(state => state.browsePhenotypes);
+
+  const plotContainer = useRef(null);
+  const plot = useRef(null);
 
   const phenotypes = useSelector(state => state.phenotypes);
   const phenotypeCategories = useSelector(state => state.phenotypeCategories);
@@ -88,6 +91,42 @@ export function Phenotypes() {
     }));
   }
 
+  const dataset = {
+    "children": [
+        {title: "Olives", count: 4319},
+        {title: "Tea", count: 4159},
+        {title: "Mashed Potatoes", count: 2583},
+        {title: "Boiled Potatoes", count: 2074},
+        {title: "Milk", count: 1894},
+        {title: "Chicken Salad", count: 1809},
+        {title: "Vanilla Ice Cream", count: 1713},
+        {title: "Cocoa", count: 1636},
+        {title: "Lettuce Salad", count: 1566},
+        {title: "Lobster Salad", count: 1511},
+        {title: "Chocolate", count: 1489},
+        {title: "Apple Pie", count: 1487},
+        {title: "Orange Juice", count: 1423},
+        {title: "American Cheese", count: 1372},
+        {title: "Green Peas", count: 1341},
+        {title: "Assorted Cakes", count: 1331},
+        {title: "French Fried Potatoes", count: 1328},
+        {title: "Potato Salad", count: 1306},
+        {title: "Baked Potatoes", count: 1293},
+        {title: "Roquefort", count: 1273},
+        {title: "Stewed Prunes", count: 1268}
+    ]
+  };
+
+  useEffect(() => {
+    plotContainer.current.innerHTML = '';
+
+    plot.current = new Plot(plotContainer.current, dataset);
+  })
+
+  // useEffect(() => {
+  //   plot.current && plot.current.redraw();
+  // }, [panelCollapsed]);
+
   return (
     <SidebarContainer 
       className="m-3"
@@ -113,13 +152,17 @@ export function Phenotypes() {
         <PhenotypesSearchCriteria />
         {!submitted && 
           <div className="bg-white border rounded-0 p-4 text-center">
-            <BubbleChartContainer 
+            {/* <BubbleChartContainer 
               data={phenotypesTree}
               dataAlphabetical={alphabetizedPhenotypes}
               dataCategories={phenotypeCategories}
               onSubmit={handleSubmit}
+            /> */}
+            {/* <Plot /> */}
+            <div
+              ref={plotContainer}
+              className="bubble-chart"
             />
-            <BubbleChart />
           </div>
         }
         {
