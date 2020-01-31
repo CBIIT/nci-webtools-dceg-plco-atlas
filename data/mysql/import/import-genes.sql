@@ -4,24 +4,23 @@ SET autocommit = 0
 ALTER TABLE gene DISABLE KEYS
 TRUNCATE gene;
 
-select * from gene
 CREATE TEMPORARY TABLE gene_stage (
-    `bin`           MEDIUMTEXT,
-    `name`          MEDIUMTEXT,
-    `chrom`         MEDIUMTEXT,
-    `strand`        MEDIUMTEXT,
-    `txStart`       MEDIUMTEXT,
-    `txEnd`         MEDIUMTEXT,
-    `cdsStart`      MEDIUMTEXT,
-    `cdsEnd`        MEDIUMTEXT,
-    `exonCount`     MEDIUMTEXT,
+    `bin`           TEXT,
+    `name`          TEXT,
+    `chrom`         TEXT,
+    `strand`        TEXT,
+    `txStart`       TEXT,
+    `txEnd`         TEXT,
+    `cdsStart`      TEXT,
+    `cdsEnd`        TEXT,
+    `exonCount`     TEXT,
     `exonStarts`    MEDIUMTEXT,
     `exonEnds`      MEDIUMTEXT,
-    `score`         MEDIUMTEXT,
-    `name2`         MEDIUMTEXT,
-    `cdsStartStat`  MEDIUMTEXT,
-    `cdsEndStat`    MEDIUMTEXT,
-    `exonFrames`    MEDIUMTEXT
+    `score`         TEXT,
+    `name2`         TEXT,
+    `cdsStartStat`  TEXT,
+    `cdsEndStat`    TEXT,
+    `exonFrames`    TEXT
 );
 
 LOAD DATA LOCAL INFILE "raw/genes.tsv" INTO TABLE gene_stage
