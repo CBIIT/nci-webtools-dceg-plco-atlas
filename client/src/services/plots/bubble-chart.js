@@ -72,13 +72,16 @@ export class BubbleChart {
             .attr("dy", ".2em")
             .style("text-anchor", "middle")
             .text(function (d) {
+                console.log("d.r", d.r);
+                // do someting clever to prevent text overflow here
                 return d.data.title.substring(0, d.r / 3);
             })
             .attr("font-family", "sans-serif")
             .attr("font-size", function (d) {
-                return d.r / 5;
+                return d.r / 6;
             })
-            .attr("fill", "white");
+            .attr("fill", "white")
+            .attr("class", "dotme");;
 
         node.append("text")
             .attr("dy", "1.3em")

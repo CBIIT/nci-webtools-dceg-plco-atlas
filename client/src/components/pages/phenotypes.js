@@ -124,7 +124,8 @@ export function Phenotypes() {
       setBreadcrumb([...breadcrumb, e]);
       drawBubbleChart(nextData);
     } else {
-        console.log("LEAF!");
+        // console.log("LEAF!", e);
+        handleSubmit(e.data);
     }
   }
 
@@ -134,10 +135,6 @@ export function Phenotypes() {
     setCurrentBubbleData(item.parent.data.children);
     drawBubbleChart(item.parent.data.children);
   }
-
-  // useEffect(() => {
-  //   plot.current && plot.current.redraw();
-  // }, [panelCollapsed]);
 
   return (
     <SidebarContainer 
