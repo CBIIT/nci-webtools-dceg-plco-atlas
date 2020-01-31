@@ -179,6 +179,8 @@ async function importVariants() {
             i,
             show_qq_plot,
         FROM ${stageTable}
+        WHERE p_value IS NOT NULL AND p_value >=0 AND p_value <= 1 AND
+        chromosome IS NOT NULL
         ORDER BY gender, chromosome, p_value_nlog, position;
     `);
     const totalCount = results.affectedRows;
@@ -192,6 +194,8 @@ async function importVariants() {
             chromosome,
             position_abs_aggregate as position_abs,
             p_value_nlog_aggregate as p_value_nlog
+        WHERE p_value IS NOT NULL AND p_value >=0 AND p_value <= 1 AND
+        chromosome IS NOT NULL
         FROM ${stageTable};
     `);
 
