@@ -52,6 +52,10 @@ export function Phenotypes() {
     dispatch(updateBrowsePhenotypes({ currentBubbleData }))
   };
 
+  const setSelectedPhenotype = selectedPhenotype => {
+    dispatch(updateBrowsePhenotypes({ selectedPhenotype }));
+  }
+
   const clearMessages = e => {
     setMessages([]);
   };
@@ -106,17 +110,37 @@ export function Phenotypes() {
   }
 
   useEffect(() => {
+    console.log("useEffect() triggered!");
+    // need to prevent handle-clicks from triggering drawBubbleChart() 
     if (submitted || !phenotypesTree) return;
     plotContainer.current.innerHTML = '';
     drawBubbleChart(currentBubbleData ? currentBubbleData : phenotypesTree);
   })
 
   const drawBubbleChart = (data) => {
-    new Plot(plotContainer.current, data, updateBubbleChart);
+    new Plot(plotContainer.current, data, handleSingleClick, handleDoubleClick);
   }
 
-  const updateBubbleChart = (e) => {
+  const handleSingleClick = (e) => {
     if (e.data.children && e.data.children.length > 0) {
+      // parent
+      // let nextData = {
+      //     children: e.data.children
+      // }
+      // setCurrentBubbleData(e.data.children);
+      // setBreadcrumb([...breadcrumb, e]);
+      // drawBubbleChart(nextData);
+    } else {
+      //leaf
+      console.log("LEAF!", e.data);
+      setSelectedPhenotype(e.data);
+      // handleSubmit(e.data);
+    }
+  }
+
+  const handleDoubleClick = (e) => {
+    if (e.data.children && e.data.children.length > 0) {
+      // parent
       let nextData = {
           children: e.data.children
       }
@@ -124,8 +148,9 @@ export function Phenotypes() {
       setBreadcrumb([...breadcrumb, e]);
       drawBubbleChart(nextData);
     } else {
-        // console.log("LEAF!", e);
-        handleSubmit(e.data);
+      // leaf
+      // console.log("LEAF!", e);
+      handleSubmit(e.data);
     }
   }
 

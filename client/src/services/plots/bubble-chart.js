@@ -1,22 +1,23 @@
 import * as d3 from 'd3'
 
 export class BubbleChart {
-    constructor(container, realData, updateBubbleChart) {
-        console.log("bubble-chart service reached!");
+    constructor(container, realData, handleSingleClick, handleDoubleClick) {
+        // console.log("bubble-chart service reached!");
         this.container = container;
         // this.fakeDataset = fakeData;
         // this.setBreadcrumb = setBreadcrumb;
         // this.setCurrentBubbleData = setCurrentBubbleData;
-        this.updateBubbleChart = updateBubbleChart;
+        this.handleSingleClick = handleSingleClick;
+        this.handleDoubleClick = handleDoubleClick;
         if (realData && realData.length > 0) {
             this.realDataset = {
                 children: realData
             };
-            this.drawBubbleChart(this.container, this.realDataset, updateBubbleChart);
+            this.drawBubbleChart(this.container, this.realDataset, this.handleSingleClick, this.handleDoubleClick);
         }
     }
 
-    drawBubbleChart(container, dataset, updateBubbleChart) {
+    drawBubbleChart(container, dataset, handleSingleClick, handleDoubleClick) {
         console.log("data reached drawBubbleChart() d3", dataset);
 
         d3.selectAll(".bubble")
@@ -66,13 +67,18 @@ export class BubbleChart {
             .attr("r", function (d) {
                 return d.r;
             })
-            .style("fill", "orange");
+            .style("fill", function (d) {
+                // console.log("d", d);
+                // color leaf bubbles #007bff
+                return d.children ? "orange" : "#007bff";
+            })
+            .attr("class", "circle");
 
         node.append("text")
             .attr("dy", ".2em")
             .style("text-anchor", "middle")
             .text(function (d) {
-                console.log("d.r", d.r);
+                // console.log("d.r", d.r);
                 // do someting clever to prevent text overflow here
                 return d.data.title.substring(0, d.r / 3);
             })
@@ -80,8 +86,7 @@ export class BubbleChart {
             .attr("font-size", function (d) {
                 return d.r / 6;
             })
-            .attr("fill", "white")
-            .attr("class", "dotme");;
+            .attr("fill", "white");
 
         node.append("text")
             .attr("dy", "1.3em")
@@ -98,21 +103,30 @@ export class BubbleChart {
 
         node.on("click", function (e) {
             console.log("node clicked!", e);
+            // d3.selectAll(".circle")
+            //     .filter(function (d) {
+            //         return !d.children;
+            //     })
+            //     .style("fill", function (d) {
+            //         return "#007bff";
+            //     });
+            // d3.selectAll(".node")
+            //     .filter(function (d) {
+            //         console.log("!", d, e, d === e);
+            //         return d === e && !d.children;
+            //     })
+            //     .select(".circle")
+            //     .style("fill", function (d) {
+            //         return "red";
+            //     });
+            // e.selectAll(".circle")
+            //     .style("fill", "black");
+            handleSingleClick(e);
         });
 
         node.on("dblclick", function (e) {
             console.log("node double-clicked!", e);
-            updateBubbleChart(e);
-            // if (e.data.children && e.data.children.length > 0) {
-            //     let nextData = {
-            //         children: e.data.children
-            //     }
-            //     setCurrentBubbleData(e.data.children);
-            //     drawBubbleChart(container, nextData, setBreadcrumb, drawBubbleChart);
-            //     // setBreadcrumb(oldBreadcrumb => [...oldBreadcrumb, e]);
-            // } else {
-            //     console.log("LEAF!");
-            // }
+            handleDoubleClick(e);
         });
 
         d3.select(container)
