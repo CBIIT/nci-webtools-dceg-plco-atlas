@@ -1,12 +1,58 @@
 const assert = require('assert');
 const fs = require('fs');
 const path = require('path');
-const readline = require('readline');
+const { Transform } = require('stream');
 
-// streams a file file line by line
-function getFileReader(filepath) {
-    return readline.createInterface({
-        input: fs.createReadStream(filepath)
+// chunks an input stream into lines
+function lineStream(options = {}) {
+    let currentRow = 0;
+    let {
+        skipRows = 0,
+        skipEmpty = false,
+        limit = -1
+    } = options;
+
+    return new Transform({
+        objectMode: true,
+        transform(chunk, encoding, done) {
+            let data = chunk.toString();
+
+            // append remainder from previous line
+            if (this._lastLineData)
+                data = this._lastLineData + data;
+
+            // split into lines, saving the last item which may be a partial line
+            const lines = data.split(/\r?\n/);
+            this._lastLineData = lines.pop();
+            lines.forEach(line => {
+                let shouldSkip = currentRow >= skipRows;
+                let shouldSkipEmpty = !skipEmpty || skipEmpty && line.length > 0;
+                let shouldSkipLimit = limit === -1 || currentRow < limit;
+
+                if (shouldSkip && shouldSkipEmpty && shouldSkipLimit)
+                    this.push(line);
+
+                currentRow ++;
+            });
+            done();
+        },
+        flush(done) {
+            if (this._lastLineData)
+                this.push(this._lastLineData);
+            this._lastLineData = null;
+            done();
+        }
+    });
+}
+
+// transforms an input stream with the specified map function
+function mappedStream(map) {
+    return new Transform({
+        objectMode: true,
+        transform(data, encoding, done) {
+            this.push(map(data));
+            done();
+        }
     });
 }
 
@@ -38,12 +84,13 @@ function parseLine(line) {
 
 function validateHeaders(filepath, headers) {
     if (!headers) return;
-    const firstLine = parseLine(getFirstLine(filepath));
+    const firstLine = parseLine(readFirstLine(filepath));
     assert.deepStrictEqual(firstLine, headers, `Headers do not match expected values: ${headers}`, firstLine);
 }
 
 module.exports = {
-    getFileReader,
+    lineStream,
+    mappedStream,
     parseLine,
     readFile,
     validateHeaders,
