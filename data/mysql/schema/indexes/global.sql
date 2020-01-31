@@ -7,6 +7,7 @@ CREATE INDEX idx_phenotype_metadata__phenotype_id ON phenotype_metadata(phenotyp
 CREATE INDEX idx_phenotype_metadata__gender ON phenotype_metadata(gender);
 
 -- gene
+CREATE INDEX idx_gene__chromosome ON gene(chromosome);
 CREATE INDEX idx_gene__transcription_start ON gene(transcription_start);
 CREATE INDEX idx_gene__transcription_end ON gene(transcription_end);
 
