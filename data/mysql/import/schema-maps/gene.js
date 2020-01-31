@@ -1,21 +1,18 @@
-const columns = ['CHR','BP','SNP','A1','A2','N','P','P.R.','OR','OR.R.','Q','I','Case_N','Control_N','Sample_N','SE_fixed','Z_fixed','RSID'];
+const columns = ['#bin', 'name', 'chrom', 'strand', 'txStart', 'txEnd', 'cdsStart', 'cdsEnd', 'exonCount', 'exonStarts', 'exonEnds', 'score', 'name2', 'cdsStartStat', 'cdsEndStat', 'exonFrames'];
 
 const mapToSchema = values => {
-    const [chr, bp, snp, a1, a2, n, p, p_r, or, or_r, q, i, case_n, control_n, sample_n, se_fixed, z_fixed, rsid] = values;
-    return {
-        chromosome: chr,
-        position: bp,
-        snp: snp,
-        allele_reference: a1,
-        allele_effect: a2,
-        n: n,
-        p_value: p,
-        p_value_r: p_r,
-        odds_ratio: or,
-        odds_ratio_r: or_r,
-        q: q,
-        i: i,
-    };
+    const [bin, ensembl_name, chromosome, strand, transcription_start, transcription_end, cds_start, cds_end, exon_count, exon_starts, exon_ends, score, name, cds_start_stat, cds_end_stat, exon_frames] = values;
+    return  {name, chromosome, strand, transcription_start, transcription_end, exon_starts, exon_ends};
 }
 
-module.exports = {columns, mapToSchema};
+const mapToSql = line => {
+    const values = line.split(/\s+/g);
+    let [bin, ensembl_name, chromosome, strand, transcription_start, transcription_end, cds_start, cds_end, exon_count, exon_starts, exon_ends, score, name, cds_start_stat, cds_end_stat, exon_frames] = values;
+    chromosome = +chromosome.replace(/chr/, '');
+    chromosome = isNaN(chromosome) ? null : chromosome;
+    return Buffer.from([name, chromosome, strand, transcription_start, transcription_end, exon_starts, exon_ends]
+        .map(e => e === null ? null : `"${e}"`).join(',') + '\n');
+}
+
+
+module.exports = {columns, mapToSchema, mapToSql};
