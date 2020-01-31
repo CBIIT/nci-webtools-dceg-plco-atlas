@@ -98,32 +98,46 @@ async function importVariants() {
         await connection.execute(`TRUNCATE TABLE ${aggregateTable}`);
     }
 
-    // prepare statement to insert into staging table
-    const insert = await connection.prepare(`
-        INSERT INTO ${stageTable} VALUES (
-            :gender,
-            :chromosome,
-            :position,
-            :snp,
-            :allele_reference,
-            :allele_effect,
-            :n,
-            :p_value,
-            :p_value_expected,
-            :p_value_nlog,
-            :p_value_r,
-            :odds_ratio,
-            :odds_ratio_r,
-            :q,
-            :i,
-            :show_qq_plot
-        );
-    `);
+    // load input stream from file
+    console.log(`[${duration()} s] Importing genes to staging table...`);
+    await connection.query({
+        sql: `LOAD DATA LOCAL INFILE "${inputFilePath}" INTO TABLE ${stageTable}
+            FIELDS TERMINATED BY ',' ENCLOSED BY '"' (
+                chromosome,
+                position,
+                position_aggregate,
+                position_abs_aggregate,
+                snp,
+                allele_reference,
+                allele_effect,
+                p_value,
+                p_value_aggregate,
+                p_value_expected,
+                p_value_nlog,
+                p_value_r,
+                odds_ratio,
+                odds_ratio_r,
+                n,
+                q,
+                i,
+            )`,
+        infileStreamFactory: path => {
+            const inputStream = fs.createReadStream(path);
+            const outputStream = mappedStream((row, index) => {
+                let data = mapToSql(row);
+                return data;
+            });
+            inputStream
+                .pipe(lineStream({skipRows: 1})) // reads line by line
+                .pipe(outputStream); // pipe raw lines to mapToSql
+            return outputStream;
+        }
+    });
 
     // set up counters
-    let lineCount = 0;
-    let previousChromosome = 1;
-    let positionOffset = 0;
+    // let lineCount = 0;
+    // let previousChromosome = 1;
+    // let positionOffset = 0;
 
     // set up validation functions
     const isValidChromosome = chr => !isNaN(chr) && chr >= 1 && chr <= 22;
@@ -144,6 +158,114 @@ async function importVariants() {
         }
         return true;
     }
+
+    const results = await connection.execute(`
+        INSERT INTO ${variantTable} SELECT
+            null,
+            "${gender}",
+            chromosome,
+            position,
+            snp,
+            allele_reference,
+            allele_effect,
+            p_value,
+            p_value_expected,
+            p_value_nlog,
+            p_value_r,
+            odds_ratio,
+            odds_ratio_r,
+            n,
+            q,
+            i,
+            show_qq_plot,
+        FROM ${stageTable}
+        ORDER BY gender, chromosome, p_value_nlog, position;
+    `);
+    const totalCount = results.affectedRows;
+    const lastId = pluck(await connection.execute(`SELECT LAST_INSERT_ID()`));
+    const firstId = lastId - totalCount;
+
+    // store aggregate table for variants
+    console.log(`[${duration()} s] Storing summary...`);
+    await connection.execute(`
+        INSERT INTO ${aggregateTable} SELECT DISTINCT
+            chromosome,
+            position_abs_aggregate as position_abs,
+            p_value_nlog_aggregate as p_value_nlog
+        FROM ${stageTable};
+    `);
+
+    /*
+
+    // calculating lambdaGC (eg: lambdagc_male)
+    console.log(`[${duration()} s] Calculating lambdaGC value...`);
+    const pMedian  = getMedian(connection, variantTable, 'p_value', {gender});
+    const lambdaGC = getLambdaGC(pMedian);
+    await connection.execute(`
+            INSERT INTO ${variantTable}
+                (phenotype_id, lambdaGC)
+            VALUES
+                (:phenotypeId, :lambdaGC)
+            ON DUPLICATE KEY UPDATE
+                lambdaGC = :lambdaGC
+    `, {phenotypeId, lambdaGC})
+
+    // updating variants table with expected nlog_p values
+    console.log(`[${duration()} s] Updating expected p-values...`);
+    const updateExpectedPValues = await connection.prepare(`
+        UPDATE ${variantTable}
+        SET p_value_expected = :expected
+        WHERE variant_id = :id
+    `);
+
+    const expectedPValues = ppoints(totalCount);
+    for (let i = 0; i < totalCount; i++) {
+        await updateExpectedPValues.execute({
+            id: firstId + i,
+            expected: expectedPValues[totalCount - i - 1]
+        });
+    }
+    updateExpectedPValues.close();
+
+    // updating variants table with Q-Q plot flag
+    console.log(`[${duration()} s] Updating plot_qq values...`);
+    const updateQQPlotIntervals = await connection.prepare(`
+        UPDATE ${variantTable}
+        SET show_qq_plot = 1
+        WHERE id = :id
+    `);
+
+    const qqPlotIntervals = getIntervals(totalCount, 10000);
+    for (let id of qqPlotIntervals) {
+        await updateQQPlotIntervals.execute({
+            id: firstId + id
+        });
+    }
+    updateQQPlotIntervals.close();
+
+    */
+
+    // drop staging table
+    connection.execute(`DELETE FROM ${stageTable}`);
+
+    // log imported variants
+    connection.execute(`
+        INSERT INTO import_log
+            (phenotype_id, variants_provided, variants_imported, created_date)
+        VALUES
+            (:phenotypeId, :lineCount, :totalCount, NOW())`,
+        {phenotypeId, lineCount, totalCount}
+    );
+
+    // enable indexes
+    console.log(`[${duration()} s] Indexing database...`);
+    await connection.execute(`ALTER TABLE ${variantTable} ENABLE KEYS`);
+    await connection.execute(`ALTER TABLE ${aggregateTable} ENABLE KEYS`);
+    await connection.execute(`COMMIT`);
+    console.log(`[${duration()} s] Created database`);
+    await connection.end();
+
+    /*
 
     reader.on('line', async line => {
         // trim, split by spaces, and parse 'NA' as null
@@ -186,113 +308,8 @@ async function importVariants() {
             console.log(`[${duration()} s] Read ${lineCount} rows`);
     });
 
-
+*/
     reader.on('close', async () => {
         console.log(`[${duration()} s] Storing variants...`);
-        const results = await connection.execute(`
-            INSERT INTO ${variantTable} SELECT
-                null,
-                "${gender}",
-                chromosome,
-                position,
-                snp,
-                allele_reference,
-                allele_effect,
-                p_value,
-                p_value_expected,
-                p_value_nlog,
-                p_value_r,
-                odds_ratio,
-                odds_ratio_r,
-                n,
-                q,
-                i,
-                show_qq_plot,
-            FROM ${stageTable}
-            ORDER BY gender, chromosome, p_value_nlog, position;
-        `);
-        const totalCount = results.affectedRows;
-        const lastId = pluck(await connection.execute(`SELECT LAST_INSERT_ID()`));
-        const firstId = lastId - totalCount;
-
-        // store aggregate table for variants
-        console.log(`[${duration()} s] Storing summary...`);
-        await connection.execute(`
-            INSERT INTO ${aggregateTable} SELECT DISTINCT
-                chromosome,
-                position_abs_aggregate as position_abs,
-                p_value_nlog_aggregate as p_value_nlog
-            FROM ${stageTable};
-        `);
-
-        /*
-
-        // calculating lambdaGC (eg: lambdagc_male)
-        console.log(`[${duration()} s] Calculating lambdaGC value...`);
-        const pMedian  = getMedian(connection, variantTable, 'p_value', {gender});
-        const lambdaGC = getLambdaGC(pMedian);
-        await connection.execute(`
-                INSERT INTO ${variantTable}
-                    (phenotype_id, lambdaGC)
-                VALUES
-                    (:phenotypeId, :lambdaGC)
-                ON DUPLICATE KEY UPDATE
-                    lambdaGC = :lambdaGC
-        `, {phenotypeId, lambdaGC})
-
-        // updating variants table with expected nlog_p values
-        console.log(`[${duration()} s] Updating expected p-values...`);
-        const updateExpectedPValues = await connection.prepare(`
-            UPDATE ${variantTable}
-            SET p_value_expected = :expected
-            WHERE variant_id = :id
-        `);
-
-        const expectedPValues = ppoints(totalCount);
-        for (let i = 0; i < totalCount; i++) {
-            await updateExpectedPValues.execute({
-                id: firstId + i,
-                expected: expectedPValues[totalCount - i - 1]
-            });
-        }
-        updateExpectedPValues.close();
-
-        // updating variants table with Q-Q plot flag
-        console.log(`[${duration()} s] Updating plot_qq values...`);
-        const updateQQPlotIntervals = await connection.prepare(`
-            UPDATE ${variantTable}
-            SET show_qq_plot = 1
-            WHERE id = :id
-        `);
-
-        const qqPlotIntervals = getIntervals(totalCount, 10000);
-        for (let id of qqPlotIntervals) {
-            await updateQQPlotIntervals.execute({
-                id: firstId + id
-            });
-        }
-        updateQQPlotIntervals.close();
-
-        */
-
-        // drop staging table
-        connection.execute(`DELETE FROM ${stageTable}`);
-
-        // log imported variants
-        connection.execute(`
-            INSERT INTO import_log
-                (phenotype_id, variants_provided, variants_imported, created_date)
-            VALUES
-                (:phenotypeId, :lineCount, :totalCount, NOW())`,
-            {phenotypeId, lineCount, totalCount}
-        );
-
-        // enable indexes
-        console.log(`[${duration()} s] Indexing database...`);
-        await connection.execute(`ALTER TABLE ${variantTable} ENABLE KEYS`);
-        await connection.execute(`ALTER TABLE ${aggregateTable} ENABLE KEYS`);
-        await connection.execute(`COMMIT`);
-        console.log(`[${duration()} s] Created database`);
-        await connection.end();
     });
 }
