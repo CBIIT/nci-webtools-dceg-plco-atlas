@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect} from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Alert } from 'react-bootstrap';
+import { Alert, Breadcrumb } from 'react-bootstrap';
 import { PhenotypesForm } from '../forms/phenotypes-form';
 import { PhenotypesTabs } from '../phenotypes/phenotypes-tabs';
 import { PhenotypesSearchCriteria } from '../controls/phenotypes-search-criteria';
@@ -10,7 +10,6 @@ import {
   MainPanel,
 } from '../controls/sidebar-container';
 import { updateBrowsePhenotypes } from '../../services/actions';
-// import { BubbleChartContainer } from '../plots/bubble-chart';
 import { BubbleChart as Plot } from '../../services/plots/bubble-chart';
 import { Icon } from '../controls/icon';
 
@@ -19,12 +18,14 @@ export function Phenotypes() {
   const {
     selectedPhenotype,
     messages,
-    submitted
+    submitted,
+    breadcrumb,
+    currentBubbleData
   } = useSelector(state => state.browsePhenotypes);
 
   const plotContainer = useRef(null);
   // const plot = useRef(null);
-  const [breadcrumb, setBreadcrumb] = useState([]);
+  // const [breadcrumb, setBreadcrumb] = useState([]);
 
   const phenotypes = useSelector(state => state.phenotypes);
   const phenotypeCategories = useSelector(state => state.phenotypeCategories);
@@ -41,6 +42,14 @@ export function Phenotypes() {
 
   const setSearchCriteriaPhenotypes = searchCriteriaPhenotypes => {
     dispatch(updateBrowsePhenotypes({ searchCriteriaPhenotypes }));
+  };
+
+  const setBreadcrumb = breadcrumb => {
+    dispatch(updateBrowsePhenotypes({ breadcrumb}));
+  };
+
+  const setCurrentBubbleData = currentBubbleData => {
+    dispatch(updateBrowsePhenotypes({ currentBubbleData }))
   };
 
   const clearMessages = e => {
@@ -89,44 +98,41 @@ export function Phenotypes() {
       submitted: null,
       searchCriteriaPhenotypes: {},
       selectedPlot: 'frequency',
-      phenotypeType: 'binary'
+      phenotypeType: 'binary',
+      breadcrumb: [],
+      currentBubbleData: null
     }));
+    // drawBubbleChart(phenotypesTree);
   }
-
-  const dataset = {
-    "children": [
-        {title: "Olives", count: 4319},
-        {title: "Tea", count: 4159},
-        {title: "Mashed Potatoes", count: 2583},
-        {title: "Boiled Potatoes", count: 2074},
-        {title: "Milk", count: 1894},
-        {title: "Chicken Salad", count: 1809},
-        {title: "Vanilla Ice Cream", count: 1713},
-        {title: "Cocoa", count: 1636},
-        {title: "Lettuce Salad", count: 1566},
-        {title: "Lobster Salad", count: 1511},
-        {title: "Chocolate", count: 1489},
-        {title: "Apple Pie", count: 1487},
-        {title: "Orange Juice", count: 1423},
-        {title: "American Cheese", count: 1372},
-        {title: "Green Peas", count: 1341},
-        {title: "Assorted Cakes", count: 1331},
-        {title: "French Fried Potatoes", count: 1328},
-        {title: "Potato Salad", count: 1306},
-        {title: "Baked Potatoes", count: 1293},
-        {title: "Roquefort", count: 1273},
-        {title: "Stewed Prunes", count: 1268}
-    ]
-  };
 
   useEffect(() => {
     if (submitted || !phenotypesTree) return;
     plotContainer.current.innerHTML = '';
-    drawBubbleChart(phenotypesTree);
+    drawBubbleChart(currentBubbleData ? currentBubbleData : phenotypesTree);
   })
 
   const drawBubbleChart = (data) => {
-    new Plot(plotContainer.current, dataset, data, setBreadcrumb);
+    new Plot(plotContainer.current, data, updateBubbleChart);
+  }
+
+  const updateBubbleChart = (e) => {
+    if (e.data.children && e.data.children.length > 0) {
+      let nextData = {
+          children: e.data.children
+      }
+      setCurrentBubbleData(e.data.children);
+      setBreadcrumb([...breadcrumb, e]);
+      drawBubbleChart(nextData);
+    } else {
+        console.log("LEAF!");
+    }
+  }
+
+  const crumbClick = (item, idx) => {
+    let newBreadcrumb = breadcrumb.splice(0, idx);
+    setBreadcrumb(newBreadcrumb);
+    setCurrentBubbleData(item.parent.data.children);
+    drawBubbleChart(item.parent.data.children);
   }
 
   // useEffect(() => {
@@ -158,22 +164,14 @@ export function Phenotypes() {
         <PhenotypesSearchCriteria />
         {!submitted && 
           <div className="bg-white border rounded-0 p-4">
-
-            {/* <BubbleChartContainer 
-              data={phenotypesTree}
-              dataAlphabetical={alphabetizedPhenotypes}
-              dataCategories={phenotypeCategories}
-              onSubmit={handleSubmit}
-            /> */}
-
             {
-              breadcrumb.map((item) =>
+              breadcrumb.length > 0 && breadcrumb.map((item, idx) =>
                 <span className="" key={"crumb-" + item.data.title}>
                   <a 
                     href="javascript:void(0)" 
-                    // onClick={_ => crumbClick(item)}
+                    onClick={_ => crumbClick(item, idx)}
                   >
-                    {item.data.title}
+                    { idx === 0 ? 'All Phenotypes' : item.data.title}
                   </a>
                   <Icon
                     name="arrow-left"
@@ -182,6 +180,10 @@ export function Phenotypes() {
                   />
                 </span>
               )
+            }
+            {
+              breadcrumb.length === 0 &&
+              <br />
             }
             <div
               ref={plotContainer}
