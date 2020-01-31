@@ -2,7 +2,7 @@ CREATE TABLE `lu_phenotype` (
     `id`            INTEGER PRIMARY KEY NOT NULL AUTO_INCREMENT,
     `parent_id`     INTEGER NULL,
     `name`          VARCHAR(200) NOT NULL,
-    `display_name`  VARCHAR(200) NOT NULL
+    `display_name`  VARCHAR(200) NOT NULL,
     FOREIGN KEY (parent_id) REFERENCES lu_phenotype(id)
 );
 
@@ -37,8 +37,8 @@ CREATE TABLE `gene` (
 CREATE TABLE `import_log` (
     `id`                    INTEGER PRIMARY KEY NOT NULL AUTO_INCREMENT,
     `phenotype_id`          INTEGER,
-    `variants_provided`     BIGINT,
+    `variants_original`     BIGINT,
     `variants_imported`     BIGINT,
-    `created_date`          DATETIME
+    `created_date`          DATETIME,
     FOREIGN KEY (phenotype_id) REFERENCES lu_phenotype(id)
 );
