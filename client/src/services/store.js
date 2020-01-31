@@ -124,6 +124,8 @@ export const getInitialState = () => ({
     searchCriteriaPhenotypes: {},
     selectedPlot: 'frequency',
     phenotypeType: 'binary',
+    breadcrumb: [],
+    currentBubbleData: null
   },
   downloads: {
     selectedPhenotypes: [],
