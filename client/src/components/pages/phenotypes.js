@@ -115,7 +115,7 @@ export function Phenotypes() {
     if (submitted || !phenotypesTree) return;
     plotContainer.current.innerHTML = '';
     drawBubbleChart(currentBubbleData ? currentBubbleData : phenotypesTree);
-  })
+  }, [phenotypesTree, breadcrumb, currentBubbleData])
 
   const drawBubbleChart = (data) => {
     new Plot(plotContainer.current, data, handleSingleClick, handleDoubleClick);
