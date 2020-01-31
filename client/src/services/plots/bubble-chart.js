@@ -103,24 +103,22 @@ export class BubbleChart {
 
         node.on("click", function (e) {
             console.log("node clicked!", e);
-            // d3.selectAll(".circle")
-            //     .filter(function (d) {
-            //         return !d.children;
-            //     })
-            //     .style("fill", function (d) {
-            //         return "#007bff";
-            //     });
-            // d3.selectAll(".node")
-            //     .filter(function (d) {
-            //         console.log("!", d, e, d === e);
-            //         return d === e && !d.children;
-            //     })
-            //     .select(".circle")
-            //     .style("fill", function (d) {
-            //         return "red";
-            //     });
-            // e.selectAll(".circle")
-            //     .style("fill", "black");
+            d3.selectAll(".circle")
+                .filter(function (d) {
+                    return !d.children;
+                })
+                .style("fill", function (d) {
+                    return "#007bff";
+                });
+            d3.selectAll(".node")
+                .filter(function (d) {
+                    console.log("!", d, e, d === e);
+                    return d === e && !d.children;
+                })
+                .select(".circle")
+                .style("fill", function (d) {
+                    return "red";
+                });
             handleSingleClick(e);
         });
 
