@@ -36,6 +36,24 @@ export class BubbleChart {
             .attr("height", diameter)
             .attr("class", "bubble");
 
+
+        svg.append("rect")
+            .attr("class", "overlay")
+            .attr("width", diameter)
+            .attr("height", diameter)
+            .style("fill", "white")
+            .style("opacity", "0%")
+            .on("click", function() { 
+                d3.selectAll(".node")
+                    .select(".circle")
+                    .style("opacity", function (d) {
+                        return "100%";
+                    });
+            })
+            .on("dblclick", function() {
+                console.log("go back!");
+            });
+
         var nodes = d3.hierarchy(dataset)
             .sum(function (d) {
                 // return d.count; 
@@ -77,6 +95,7 @@ export class BubbleChart {
         node.append("text")
             .attr("dy", ".2em")
             .style("text-anchor", "middle")
+            // .style("user-select", "none")
             .text(function (d) {
                 // console.log("d.r", d.r);
                 // do someting clever to prevent text overflow here
@@ -91,6 +110,7 @@ export class BubbleChart {
         node.append("text")
             .attr("dy", "1.3em")
             .style("text-anchor", "middle")
+            // .style("user-select", "none")
             .text(function (d) {
                 // return d.data.count;
                 return 100;
@@ -104,27 +124,17 @@ export class BubbleChart {
         node.on("click", function (e) {
             console.log("node clicked!", e);
             d3.selectAll(".circle")
-                .filter(function (d) {
-                    return !d.children;
-                })
-                .style("fill", function (d) {
-                    return "#007bff";
-                });
-            d3.selectAll(".circle")
-                .filter(function (d) {
-                    return d.children;
-                })
-                .style("fill", function (d) {
-                    return "orange";
+                .style("opacity", function (d) {
+                    return "50%";
                 });
             d3.selectAll(".node")
                 .filter(function (d) {
-                    console.log("!", d, e, d === e);
+                    // console.log("!", d, e, d === e);
                     return d === e;
                 })
                 .select(".circle")
-                .style("fill", function (d) {
-                    return "red";
+                .style("opacity", function (d) {
+                    return "100%";
                 });
             handleSingleClick(e);
         });
