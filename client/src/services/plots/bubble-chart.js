@@ -1,7 +1,7 @@
 import * as d3 from 'd3'
 
 export class BubbleChart {
-    constructor(container, realData, handleSingleClick, handleDoubleClick) {
+    constructor(container, realData, handleSingleClick, handleDoubleClick, handleBackgroundDoubleClick) {
         // console.log("bubble-chart service reached!");
         this.container = container;
         // this.fakeDataset = fakeData;
@@ -9,15 +9,16 @@ export class BubbleChart {
         // this.setCurrentBubbleData = setCurrentBubbleData;
         this.handleSingleClick = handleSingleClick;
         this.handleDoubleClick = handleDoubleClick;
+        this.handleBackgroundDoubleClick = handleBackgroundDoubleClick
         if (realData && realData.length > 0) {
             this.realDataset = {
                 children: realData
             };
-            this.drawBubbleChart(this.container, this.realDataset, this.handleSingleClick, this.handleDoubleClick);
+            this.drawBubbleChart(this.container, this.realDataset, this.handleSingleClick, this.handleDoubleClick, this.handleBackgroundDoubleClick);
         }
     }
 
-    drawBubbleChart(container, dataset, handleSingleClick, handleDoubleClick) {
+    drawBubbleChart(container, dataset, handleSingleClick, handleDoubleClick, handleBackgroundDoubleClick) {
         console.log("data reached drawBubbleChart() d3", dataset);
 
         d3.selectAll(".bubble")
@@ -52,6 +53,7 @@ export class BubbleChart {
             })
             .on("dblclick", function() {
                 console.log("go back!");
+                handleBackgroundDoubleClick();
             });
 
         var nodes = d3.hierarchy(dataset)
