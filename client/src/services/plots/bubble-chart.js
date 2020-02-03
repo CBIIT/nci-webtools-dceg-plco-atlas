@@ -2,11 +2,8 @@ import * as d3 from 'd3'
 
 export class BubbleChart {
     constructor(container, realData, handleSingleClick, handleDoubleClick, handleBackgroundDoubleClick) {
-        // console.log("bubble-chart service reached!");
+        // console.log("bubble-chart service reached!", realData);
         this.container = container;
-        // this.fakeDataset = fakeData;
-        // this.setBreadcrumb = setBreadcrumb;
-        // this.setCurrentBubbleData = setCurrentBubbleData;
         this.handleSingleClick = handleSingleClick;
         this.handleDoubleClick = handleDoubleClick;
         this.handleBackgroundDoubleClick = handleBackgroundDoubleClick
@@ -19,7 +16,7 @@ export class BubbleChart {
     }
 
     drawBubbleChart(container, dataset, handleSingleClick, handleDoubleClick, handleBackgroundDoubleClick) {
-        console.log("data reached drawBubbleChart() d3", dataset);
+        // console.log("data reached drawBubbleChart() d3", dataset);
 
         d3.selectAll(".bubble")
             .remove()
@@ -52,7 +49,6 @@ export class BubbleChart {
                     });
             })
             .on("dblclick", function() {
-                console.log("go back!");
                 handleBackgroundDoubleClick();
             });
 
@@ -124,7 +120,7 @@ export class BubbleChart {
             .attr("fill", "white");
 
         node.on("click", function (e) {
-            console.log("node clicked!", e);
+            // console.log("node clicked!", e);
             d3.selectAll(".circle")
                 .style("opacity", function (d) {
                     return "50%";
@@ -142,7 +138,7 @@ export class BubbleChart {
         });
 
         node.on("dblclick", function (e) {
-            console.log("node double-clicked!", e);
+            // console.log("node double-clicked!", e);
             handleDoubleClick(e);
         });
 
