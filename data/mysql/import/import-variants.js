@@ -213,12 +213,14 @@ async function importVariants() {
         WHERE id IN (${intervals})
     `);
 
-
     // calculating lambdaGC (eg: lambdagc_male)
     console.log(`[${duration()} s] Calculating lambdaGC value...`);
-    const midId = (firstId + lastId) / 2;
-    const averageIds = totalCount % 2 ? [midId] : [Math.floor(midId), Math.ceil(midId)];
-    const [medianRows] = await connection.execute(`SELECT AVG(p_value) FROM ${variantTable} WHERE id IN (${averageIds})`)
+    const [medianRows] = await connection.execute(`
+        SELECT x.p_value FROM ${variantTable} x, ${variantTable} y
+        GROUP BY x.p_value
+        HAVING SUM(SIGN(1-SIGN(y.p_value - x.p_value)))/COUNT(*) > .5
+        LIMIT 1
+    `);
     const pMedian = pluck(medianRows);
     const lambdaGC = getLambdaGC(pMedian);
     await connection.execute(`
