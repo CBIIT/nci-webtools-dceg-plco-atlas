@@ -1,5 +1,5 @@
 START TRANSACTION;
-SET sql_mode = ''; --  // disable only_full_group_by
+-- SET sql_mode = ''; --  // disable only_full_group_by
 SET autocommit = 0;
 
 -- clear gene table and drop indexes (faster insertion)
@@ -25,8 +25,7 @@ CREATE TEMPORARY TABLE gene_stage (
 );
 
 -- load data into staging table
-# LOAD DATA LOCAL INFILE "raw/genes.tsv" INTO TABLE gene_stage
-LOAD DATA LOCAL INFILE "C:\\Projects\\plco-atlas\\data\\mysql\\import\\raw\\genes.tsv" INTO TABLE gene_stage
+LOAD DATA LOCAL INFILE "raw/genes.tsv" INTO TABLE gene_stage
     FIELDS TERMINATED BY '\t'
     IGNORE 1 ROWS;
 
@@ -45,7 +44,7 @@ SELECT
     GROUP_CONCAT(exonStarts, '') as exon_starts,
     GROUP_CONCAT(exonEnds, '') as exon_ends
 FROM gene_stage
-WHERE CAST(chrom AS UNSIGNED) BETWEEN 1 AND 22
+WHERE chrom IN (SELECT chromosome FROM chromosome_range)
 GROUP BY name
 ORDER BY chromosome, transcription_start, transcription_end;
 
