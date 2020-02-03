@@ -3,6 +3,7 @@ CREATE TABLE `lu_phenotype` (
     `parent_id`     INTEGER NULL,
     `name`          VARCHAR(200) NOT NULL,
     `display_name`  VARCHAR(200) NOT NULL,
+    `color`         VARCHAR(40) NULL,
     FOREIGN KEY (parent_id) REFERENCES lu_phenotype(id)
 );
 
@@ -20,7 +21,17 @@ CREATE TABLE `phenotype_metadata` (
     `phenotype_id`  INTEGER,
     `gender`        ENUM('all', 'female', 'male'),
     `lambda_gc`     DOUBLE,
-    FOREIGN KEY (phenotype_id) REFERENCES lu_phenotype(id)
+    FOREIGN KEY (phenotype_id) REFERENCES lu_phenotype(id),
+    UNIQUE KEY (`phenotype_id`, `gender`)
+);
+
+CREATE TABLE `chromosome_range` (
+    `id`                    INTEGER PRIMARY KEY NOT NULL AUTO_INCREMENT,
+    `chromosome`            VARCHAR(2) NOT NULL,
+    `position_min`          BIGINT NOT NULL,
+    `position_max`          BIGINT NOT NULL,
+    `position_abs_min`      BIGINT NOT NULL,
+    `position_abs_max`      BIGINT NOT NULL
 );
 
 CREATE TABLE `gene` (
