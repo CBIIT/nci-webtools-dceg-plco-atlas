@@ -40,10 +40,11 @@ async function getMedian(connection, tableName, columnName, queryConditions) {
 }
 
 async function getRecords(connection, tableName, query) {
-    let queryConditions = Object.entries(query)
-        .map(e => `${e.key} = ${connection.escape(e.value)}`);
+    let queryConditions = Object.entries(query).map(
+        ([key, value]) => `${key} = ${connection.escape(value)}`
+    );
 
-    const [records] = await connection.execute(
+    const [records] = await connection.query(
         `SELECT * FROM ${tableName}
             WHERE ${queryConditions.join(' AND ')}`,
     );
