@@ -2,46 +2,48 @@ const fs = require('fs');
 const mysql = require('mysql2');
 const args = require('minimist')(process.argv.slice(2));
 const ranges = require('../../json/chromosome_ranges.json');
-const { database } = require('../../server/config.json');
+const { database } = require('../../../server/config.json');
 const { timestamp, getLogStream } = require('./utils/logging');
-const { getFileReader, parseLine, readFile, validateHeaders } = require('./utils/file');
+const { getFileReader, parseLine, readFile, validateHeaders, mappedStream, tappedStream, lineStream } = require('./utils/file');
 const { getRecords, pluck, getMedian, tableExists } = require('./utils/query');
 const { getIntervals, getLambdaGC, group, ppoints } = require('./utils/math');
+const { pipeline } = require('stream');
+
+/**
+lambdagc_ewing|1.036
+lambdagc_rcc|1.029
+lambdagc_mel|0.83
+ */
+
+args.file = 'D:\\Development\\Work\\nci-webtools-dceg-plco-atlas\\data\\mysql\\import\\raw\\ewings_sarcoma.csv';
 
 // display help if needed
-if (!(args.file && args.phenotype && args.schema && args.gender)) {
-    console.log(`USAGE: node import-variants.js \
-        --file "filename" \
-        --phenotype "phenotype name or id" \
-        --schema "schema map name, eg: ewings_sarcoma, melanoma, or renal_cell_carcinoma" \
-        --gender "all" | "female" | "male" \
-        --reset (if specified, remove all records in phenotype)`);
+if (!(args.file && args.phenotype && args.gender)) {
+    console.log(`USAGE: node import-variants.js
+            --file "filename"
+            --phenotype "phenotype name or id"
+            --gender "all" | "female" | "male"
+            --reset (if specified, remove all records in phenotype)`);
     process.exit(0);
 }
 
 // parse arguments and set defaults
-const { file: inputFilePath, phenotype, schema, gender, reset: shouldReset } = args;
-const { columns, mapToSchema } = require(`./schema-maps/${schema}`);
-const reader = getFileReader(inputFilePath);
-const errorLog = getLogStream(`failed-variants-${new Date().toISOString()}.txt`);
-const getDuration = timestamp();
+const { file: inputFilePath, phenotype: phenotypeNameOrId, gender, reset: shouldReset } = args;
+//const errorLog = getLogStream(`./failed-variants-${new Date().toISOString()}.txt`);
+const errorLog = {write: e => console.log(e)};
+const duration = timestamp();
 const connection = mysql.createConnection({
     host: database.host,
     database: database.name,
     user: database.user,
     password: database.user,
-    namedPlaceholders: true
+    namedPlaceholders: true,
+    multipleStatements: true,
   }).promise();
 
 // input file should exist
 if (!fs.existsSync(inputFilePath)) {
     console.error(`ERROR: ${inputFilePath} does not exist.`);
-    process.exit(1);
-}
-
-// schema map should exist
-if (!mapToSchema) {
-    console.error(`ERROR: ${schema} is not a valid schema`);
     process.exit(1);
 }
 
@@ -51,14 +53,13 @@ if (!/^(all|female|male)$/.test(gender)) {
     process.exit(1);
 }
 
-validateHeaders(inputFilePath, columns);
-importVariants();
+importVariants().then(e => process.exit(0));
 
 async function importVariants() {
     // find phenotypes either by name or id (if a numeric value was provided)
-    let phenotypes = await getRecords(connection, 'lu_phenotype', /^\d+$/.test(phenotype)
-        ? {id: phenotype}
-        : {name: phenotype}
+    let phenotypes = await getRecords(connection, 'lu_phenotype', /^\d+$/.test(phenotypeNameOrId)
+        ? {id: phenotypeNameOrId}
+        : {name: phenotypeNameOrId}
     );
 
     if (phenotypes.length === 0) {
@@ -74,102 +75,90 @@ async function importVariants() {
     const phenotype = phenotypes[0].name;
     const phenotypeId = phenotypes[0].id;
     const phenotypeName = `${phenotype}_${phenotypeId}`;
-    const stageTable = `${phenotypeName}_stage`;
     const variantTable = `${phenotypeName}_variant`;
     const aggregateTable = `${phenotypeName}_aggregate`;
 
-    await connection.execute(`START TRANSACTION`);
-    await connection.execute(`SET autocommit = 0`);
-    await connection.execute(`ALTER TABLE ${variantTable} DISABLE KEYS`);
-    await connection.execute(`ALTER TABLE ${aggregateTable} DISABLE KEYS`);
-
-    // execute schema script for new databases
-    if (!await tableExists(connection, database.name, variantTable)) {
-        console.log(`[${getDuration()} s] Creating [${variantTable}, ${aggregateTable}])...`);
-        const schemaSql = readFile('../schema/tables/variants.sql')
-            .replace(/\$PHENOTYPE/g, phenotypeName);
-        await connection.execute(schemaSql);
-    }
 
     // clear variants if needed
     if (shouldReset) {
-        console.log(`[${getDuration()} s] Clearing [${variantTable}, ${aggregateTable}])...`);
-        await connection.execute(`TRUNCATE TABLE ${variantTable}`);
-        await connection.execute(`TRUNCATE TABLE ${aggregateTable}`);
+        console.log(`[${duration()} s] Clearing [${variantTable}, ${aggregateTable}])...`);
+        await connection.query(`
+            DROP TABLE ${variantTable};
+            DROP TABLE ${aggregateTable};
+        `);
     }
 
-    // load input stream from file
+    await connection.query(`
+        START TRANSACTION;
+        SET autocommit = 0;
+
+        -- drop indexes on variant table
+        CALL drop_index_if_exists('${variantTable}', 'idx_${variantTable}__gender');
+        CALL drop_index_if_exists('${variantTable}', 'idx_${variantTable}__chromosome');
+        CALL drop_index_if_exists('${variantTable}', 'idx_${variantTable}__position');
+        CALL drop_index_if_exists('${variantTable}', 'idx_${variantTable}__p_value_nlog');
+        CALL drop_index_if_exists('${variantTable}', 'idx_${variantTable}__snp');
+        CALL drop_index_if_exists('${variantTable}', 'idx_${variantTable}__show_qq_plot');
+
+        -- drop indexes on aggregate table
+        CALL drop_index_if_exists('${aggregateTable}', 'idx_${aggregateTable}__gender');
+        CALL drop_index_if_exists('${aggregateTable}', 'idx_${aggregateTable}__position_abs');
+        CALL drop_index_if_exists('${aggregateTable}', 'idx_${aggregateTable}__p_value_nlog');
+
+        -- create staging table
+        DROP TABLE stage;
+        CREATE TABLE stage (
+            chromosome              VARCHAR(2),
+            position                BIGINT,
+            position_abs_aggregate  BIGINT,
+            snp                     VARCHAR(200),
+            allele_reference        VARCHAR(200),
+            allele_effect           VARCHAR(200),
+            p_value                 DOUBLE,
+            p_value_nlog            DOUBLE, -- negative log10(P)
+            p_value_nlog_aggregate  DOUBLE,
+            p_value_r               DOUBLE,
+            odds_ratio              DOUBLE,
+            odds_ratio_r            DOUBLE,
+            n                       BIGINT,
+            q                       DOUBLE,
+            i                       DOUBLE
+        ) ENGINE = MYISAM;
+    ` + readFile('../../schema/tables/variants.sql').replace(/\$PHENOTYPE/g, phenotypeName));
+
     console.log(`[${duration()} s] Importing genes to staging table...`);
     await connection.query({
-        sql: `LOAD DATA LOCAL INFILE "${inputFilePath}" INTO TABLE ${stageTable}
-            FIELDS TERMINATED BY ',' ENCLOSED BY '"' (
-                chromosome,
-                position,
-                position_aggregate,
-                position_abs_aggregate,
-                snp,
-                allele_reference,
-                allele_effect,
-                p_value,
-                p_value_aggregate,
-                p_value_expected,
-                p_value_nlog,
-                p_value_r,
-                odds_ratio,
-                odds_ratio_r,
-                n,
-                q,
-                i,
-            )`,
-        infileStreamFactory: path => {
-            const inputStream = fs.createReadStream(path);
-            const outputStream = mappedStream((row, index) => {
-                let data = mapToSql(row);
-                return data;
-            });
-            inputStream
-                .pipe(lineStream({skipRows: 1})) // reads line by line
-                .pipe(outputStream); // pipe raw lines to mapToSql
-            return outputStream;
-        }
+        infileStreamFactory: path => fs.createReadStream(inputFilePath),
+        sql: `LOAD DATA LOCAL INFILE "${inputFilePath}"
+            INTO TABLE stage
+            FIELDS TERMINATED BY ','
+            IGNORE 1 LINES
+            (@chromosome, @position, snp, allele_reference, allele_effect, @p_value, p_value_r, odds_ratio, odds_ratio_r, n, q, i)
+            SET chromosome = @chromosome,
+                position = @position,
+                p_value = @p_value,
+                p_value_nlog = -LOG10(@p_value),
+                p_value_nlog_aggregate = 1e-2 * FLOOR(1e2 * -LOG10(@p_value)),
+                position_abs_aggregate = 1e6 * FLOOR(1e-6 * (SELECT @position + position_abs_min FROM chromosome_range cr WHERE cr.chromosome = @chromosome))`
     });
 
-    // set up counters
-    // let lineCount = 0;
-    // let previousChromosome = 1;
-    // let positionOffset = 0;
+    const [lineCountRows] = await connection.query(`SELECT ROW_COUNT()`);
+    const lineCount = pluck(lineCountRows);
 
-    // set up validation functions
-    const isValidChromosome = chr => !isNaN(chr) && chr >= 1 && chr <= 22;
-    const isValidPValue = p => isNaN(p) || p === null || p === undefined || p < 0 || p > 1;
-    const isValidRange = (chr, pos) => pos >= 0 && pos < ranges[+chr - 1].bp_max;
-    const validateParams = ({ chromosome, position, p_value }, msg) => {
-        if (!isValidChromosome(chromosome)) {
-            errorLog.write(`[CHROMOSOME ERROR ON LINE ${lineCount}]: ${msg}`);
-            return false;
-        }
-        if (!isValidPValue(p_value)) {
-            errorLog.write(`[P-VALUE ERROR ON LINE ${lineCount}]: ${msg}`);
-            return false;
-        }
-        if (!isValidRange(chromosome, position)) {
-            errorLog.write(`[RANGE ERROR ON LINE ${lineCount}]: ${msg}`);
-            return false;
-        }
-        return true;
-    }
+    console.log(`[${duration()} s] Finished importing, storing variants...`);
 
-    const results = await connection.execute(`
-        INSERT INTO ${variantTable} SELECT
-            null,
-            "${gender}",
+    const [firstIdRows] = await connection.query(`SELECT MAX(id) FROM ${variantTable}`)
+    const firstId = 1 + (pluck(firstIdRows) || 0);
+
+    await connection.execute(`
+        INSERT INTO ${variantTable} (
+            gender,
             chromosome,
             position,
             snp,
             allele_reference,
             allele_effect,
             p_value,
-            p_value_expected,
             p_value_nlog,
             p_value_r,
             odds_ratio,
@@ -177,85 +166,75 @@ async function importVariants() {
             n,
             q,
             i,
-            show_qq_plot,
-        FROM ${stageTable}
-        WHERE p_value IS NOT NULL AND p_value >=0 AND p_value <= 1 AND
-        chromosome IS NOT NULL
-        ORDER BY gender, chromosome, p_value_nlog, position;
-    `);
-    const totalCount = results.affectedRows;
-    const lastId = pluck(await connection.execute(`SELECT LAST_INSERT_ID()`));
-    const firstId = lastId - totalCount;
-
-    // store aggregate table for variants
-    console.log(`[${duration()} s] Storing summary...`);
-    await connection.execute(`
-        INSERT INTO ${aggregateTable} SELECT DISTINCT
+            show_qq_plot
+        ) SELECT
+            "${gender}",
             chromosome,
+            position,
+            snp,
+            allele_reference,
+            allele_effect,
+            p_value,
+            p_value_nlog,
+            p_value_r,
+            odds_ratio,
+            odds_ratio_r,
+            n,
+            q,
+            i,
+            0
+        FROM stage
+        WHERE p_value BETWEEN 0 AND 1 AND chromosome IS NOT NULL
+        ORDER BY chromosome ASC, p_value_nlog DESC;
+    `);
+
+    const [totalCountRows] = await connection.query(`SELECT ROW_COUNT()`);
+    const totalCount = pluck(totalCountRows);
+    const lastId = firstId + totalCount;
+
+    console.log(`[${duration()} s] Storing aggregated variants...`);
+    await connection.execute(`
+        INSERT INTO ${aggregateTable}
+            (gender, position_abs, p_value_nlog)
+        SELECT DISTINCT
+            "${gender}",
             position_abs_aggregate as position_abs,
             p_value_nlog_aggregate as p_value_nlog
-        WHERE p_value IS NOT NULL AND p_value >=0 AND p_value <= 1 AND
-        chromosome IS NOT NULL
-        FROM ${stageTable};
+        FROM stage
+        WHERE p_value BETWEEN 0 AND 1 AND chromosome IS NOT NULL;
     `);
-
-    /*
-
-    // calculating lambdaGC (eg: lambdagc_male)
-    console.log(`[${duration()} s] Calculating lambdaGC value...`);
-    const pMedian  = getMedian(connection, variantTable, 'p_value', {gender});
-    const lambdaGC = getLambdaGC(pMedian);
-    await connection.execute(`
-            INSERT INTO ${variantTable}
-                (phenotype_id, lambdaGC)
-            VALUES
-                (:phenotypeId, :lambdaGC)
-            ON DUPLICATE KEY UPDATE
-                lambdaGC = :lambdaGC
-    `, {phenotypeId, lambdaGC})
-
-    // updating variants table with expected nlog_p values
-    console.log(`[${duration()} s] Updating expected p-values...`);
-    const updateExpectedPValues = await connection.prepare(`
-        UPDATE ${variantTable}
-        SET p_value_expected = :expected
-        WHERE variant_id = :id
-    `);
-
-    const expectedPValues = ppoints(totalCount);
-    for (let i = 0; i < totalCount; i++) {
-        await updateExpectedPValues.execute({
-            id: firstId + i,
-            expected: expectedPValues[totalCount - i - 1]
-        });
-    }
-    updateExpectedPValues.close();
 
     // updating variants table with Q-Q plot flag
     console.log(`[${duration()} s] Updating plot_qq values...`);
-    const updateQQPlotIntervals = await connection.prepare(`
+    const intervals = getIntervals(totalCount, 10000);
+    await connection.query(`
         UPDATE ${variantTable}
         SET show_qq_plot = 1
-        WHERE id = :id
+        WHERE id IN (${intervals})
     `);
 
-    const qqPlotIntervals = getIntervals(totalCount, 10000);
-    for (let id of qqPlotIntervals) {
-        await updateQQPlotIntervals.execute({
-            id: firstId + id
-        });
-    }
-    updateQQPlotIntervals.close();
 
-    */
+    // calculating lambdaGC (eg: lambdagc_male)
+    console.log(`[${duration()} s] Calculating lambdaGC value...`);
+    const midId = (firstId + lastId) / 2;
+    const averageIds = totalCount % 2 ? [midId] : [Math.floor(midId), Math.ceil(midId)];
+    const [medianRows] = await connection.execute(`SELECT AVG(p_value) FROM ${variantTable} WHERE id IN (${averageIds})`)
+    const pMedian = pluck(medianRows);
+    const lambdaGC = getLambdaGC(pMedian);
+    await connection.execute(`
+        INSERT INTO phenotype_metadata (phenotype_id, gender, lambda_gc)
+        VALUES (:phenotypeId, :gender, :lambdaGC)
+        ON DUPLICATE KEY UPDATE
+            lambda_gc = :lambdaGC
+    `, {phenotypeId, gender, lambdaGC});
 
     // drop staging table
-    connection.execute(`DELETE FROM ${stageTable}`);
+    connection.query(`TRUNCATE TABLE stage`);
 
     // log imported variants
     connection.execute(`
         INSERT INTO import_log
-            (phenotype_id, variants_provided, variants_imported, created_date)
+            (phenotype_id, variants_original, variants_imported, created_date)
         VALUES
             (:phenotypeId, :lineCount, :totalCount, NOW())`,
         {phenotypeId, lineCount, totalCount}
@@ -263,57 +242,9 @@ async function importVariants() {
 
     // enable indexes
     console.log(`[${duration()} s] Indexing database...`);
-    await connection.execute(`ALTER TABLE ${variantTable} ENABLE KEYS`);
-    await connection.execute(`ALTER TABLE ${aggregateTable} ENABLE KEYS`);
-    await connection.execute(`COMMIT`);
+    const indexSql = readFile('../../schema/indexes/variants.sql').replace(/\$PHENOTYPE/g, phenotypeName);
+    await connection.query(indexSql);
+    await connection.query(`COMMIT`);
     console.log(`[${duration()} s] Created database`);
     await connection.end();
-
-    /*
-
-    reader.on('line', async line => {
-        // trim, split by spaces, and parse 'NA' as null
-        const values = parseLine(line);
-        const params = mapToSchema(values);
-        const { chromosome, position, p_value } = params;
-
-        // validate line (chromosome, position, and p-value)
-        if (++lineCount === 0 || !validateParams(params, line)) return;
-
-        // group base pairs
-        params.position_aggregate = group(position, 10**6);
-
-        // calculate -log10(p) and group its values
-        params.p_value_nlog = p_value ? -Math.log10(p_value) : null;
-        params.p_value_nlog_aggregate = group(params.p_value_nlog, 10**-2);
-
-        // determine absolute position of variant relative to the start of the genome
-        if (chromsome !== previousChromosome) {
-            previousChromosome = chromsome;
-            positionOffset = chromosome > 1
-                ? ranges[chromosome - 1].abs_position_min
-                : 0;
-        }
-
-        // store the absolute BP and group by megabases
-        params.position_abs = positionOffset + position;
-        params.position_abs_aggregate = group(params.position_abs, 10**6);
-
-        // initialize plot_qq to false
-        params.show_qq_plot = false;
-
-        // initiaize expected_p to 0
-        params.p_value_expected = 0;
-
-        await insert.execute(params);
-
-        // show progress message every 10000 rows
-        if (lineCount % 10000 === 0)
-            console.log(`[${duration()} s] Read ${lineCount} rows`);
-    });
-
-*/
-    reader.on('close', async () => {
-        console.log(`[${duration()} s] Storing variants...`);
-    });
 }
