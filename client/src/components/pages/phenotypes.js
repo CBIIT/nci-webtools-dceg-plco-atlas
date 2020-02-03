@@ -118,7 +118,7 @@ export function Phenotypes() {
   }, [phenotypesTree, breadcrumb, currentBubbleData])
 
   const drawBubbleChart = (data) => {
-    new Plot(plotContainer.current, data, handleSingleClick, handleDoubleClick);
+    new Plot(plotContainer.current, data, handleSingleClick, handleDoubleClick, handleBackgroundDoubleClick);
   }
 
   const handleSingleClick = (e) => {
@@ -141,12 +141,12 @@ export function Phenotypes() {
   const handleDoubleClick = (e) => {
     if (e.data.children && e.data.children.length > 0) {
       // parent
-      let nextData = {
-          children: e.data.children
-      }
+      // let nextData = {
+      //     children: e.data.children
+      // }
       setCurrentBubbleData(e.data.children);
       setBreadcrumb([...breadcrumb, e]);
-      drawBubbleChart(nextData);
+      // drawBubbleChart(nextData);
     } else {
       // leaf
       // console.log("LEAF!", e);
@@ -154,11 +154,25 @@ export function Phenotypes() {
     }
   }
 
+  const handleBackgroundDoubleClick = () => {
+    if (breadcrumb.length >= 1) {
+      // let lastData = {
+      //   children: breadcrumb[breadcrumb.length - 1]
+      // }
+      console.log("lastData", breadcrumb[breadcrumb.length - 1]);
+      setCurrentBubbleData(breadcrumb[breadcrumb.length - 1].data.children);
+      setBreadcrumb([...breadcrumb.splice(0, breadcrumb.length -  1)]);
+      // drawBubbleChart(lastData);
+    } else {
+      console.log("no data to go back!");
+    }
+  }
+
   const crumbClick = (item, idx) => {
     let newBreadcrumb = breadcrumb.splice(0, idx);
     setBreadcrumb(newBreadcrumb);
     setCurrentBubbleData(item.parent.data.children);
-    drawBubbleChart(item.parent.data.children);
+    // drawBubbleChart(item.parent.data.children);
   }
 
   return (
