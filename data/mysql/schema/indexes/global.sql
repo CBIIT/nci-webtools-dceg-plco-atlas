@@ -1,15 +1,19 @@
 -- phenotype correlations
-CREATE INDEX idx_phenotype_correlation__phenotype_a ON phenotype_correlation(phenotype_a);
-CREATE INDEX idx_phenotype_correlation__phenotype_b ON phenotype_correlation(phenotype_b);
+ALTER TABLE phenotype_correlation
+    ADD INDEX idx_phenotype_correlation__phenotype_a (phenotype_a),
+    ADD INDEX idx_phenotype_correlation__phenotype_b (phenotype_b);
 
 -- phenotype metadata
-CREATE INDEX idx_phenotype_metadata__phenotype_id ON phenotype_metadata(phenotype_id);
-CREATE INDEX idx_phenotype_metadata__gender ON phenotype_metadata(gender);
+ALTER TABLE phenotype_metadata
+    ADD INDEX idx_phenotype_metadata__phenotype_id  (phenotype_id),
+    ADD INDEX idx_phenotype_metadata__gender        (gender);
 
 -- gene
-CREATE INDEX idx_gene__chromosome ON gene(chromosome);
-CREATE INDEX idx_gene__transcription_start ON gene(transcription_start);
-CREATE INDEX idx_gene__transcription_end ON gene(transcription_end);
+ALTER TABLE gene
+    ADD INDEX idx_gene__chromosome           (chromosome),
+    ADD INDEX idx_gene__transcription_start  (transcription_start),
+    ADD INDEX idx_gene__transcription_end    (transcription_end);
 
 -- import log
-CREATE INDEX idx_import_log__phenotype_id ON import_log(phenotype_id);
+ALTER TABLE import_log
+    ADD INDEX idx_import_log__phenotype_id   (phenotype_id);
