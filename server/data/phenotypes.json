@@ -2,40 +2,48 @@
     {
         "title": "Test",
         "value": "test",
+        "color": "red",
         "children": [
             {
                 "title": "Ewing's sarcoma",
                 "value": "meta_fixed_assoc",
-                "count": 200
+                "count": 200,
+                "color": "red"
             },
             {
                 "title": "Renal Cell Carcinoma",
                 "value": "rcc",
-                "count": 300
+                "count": 300,
+                "color": "red"
             },
             {
                 "title": "Melanoma",
                 "value": "mel",
-                "count": 400
+                "count": 400,
+                "color": "red"
             }
         ]
     },
     {
         "title": "Anthropometric measures",
         "value": "none_8482",
+        "color": "green",
         "children": [
             {
                 "title": "Height",
                 "value": "none_962",
+                "color": "green",
                 "children": [
                     {
                         "title": "Height when standing",
                         "value": "none_4478",
+                        "color": "green",
                         "count": 200
                     },
                     {
                         "title": "Height when sitting",
                         "value": "none_5981",
+                        "color": "green",
                         "count": 300
                     }
                 ]
@@ -43,25 +51,30 @@
             {
                 "title": "Weight",
                 "value": "none_2935",
+                "color": "green",
                 "children": [
                     {
                         "title": "BMI",
                         "value": "none_8108",
+                        "color": "green",
                         "count": 200
                     },
                     {
                         "title": "Weight Gain Area",
                         "value": "none_7702",
+                        "color": "green",
                         "count": 300
                     },
                     {
                         "title": "Weight Loss Area",
                         "value": "none_9528",
+                        "color": "green",
                         "count": 400
                     },
                     {
                         "title": "Waist-Hip Comparison",
                         "value": "none_8702",
+                        "color": "green",
                         "count": 300
                     }
                 ]
@@ -69,6 +82,7 @@
             {
                 "title": "Hair pattern at 45",
                 "value": "none_5270",
+                "color": "green",
                 "count": 200
 
             }
@@ -77,48 +91,58 @@
     {
         "title": "Cancer",
         "value": "none_8484",
+        "color": "blue",
         "children": [
             {
                 "title": "By location",
                 "value": "none_7014",
+                "color": "blue",
                 "children": [
                     {
                         "title": "Biliary cancer",
                         "value": "none_1005",
+                        "color": "blue",
                         "count": 200
                     },
                     {
                         "title": "Bladder cancer",
                         "value": "none_9533",
+                        "color": "blue",
                         "count": 300
                     },
                     {
                         "title": "Breast cancer",
                         "value": "none_3416",
+                        "color": "blue",
                         "children": [
                             {
                                 "title": "Breast cancer (lobular)",
                                 "value": "none_6574",
+                                "color": "blue",
                                 "count": 200
                             },
                             {
                                 "title": "Breast cancer (ER positive)",
                                 "value": "none_1651",
+                                "color": "blue",
                                 "count": 300
                             },
                             {
                                 "title": "Breast cancer (PR positive)",
                                 "value": "none_9891", 
+                                "color": "blue",
                                 "count": 400
                             },
                             {
                                 "title": "Breast cancer (ER/PR negative)",
                                 "value": "none_3350", 
+                                "color": "blue",
                                 "count": 300
                             },
                             {
                                 "title": "Breast cancer (tubular)",
                                 "value": "none_2865", 
+                                "color": "blue",
                                 "count": 200
                             }
                         ]
@@ -126,30 +150,36 @@
                     {
                         "title": "Colorectal cancer",
                         "value": "none_1740",
+                        "color": "blue",
                         "children": [
                             {
                                 "title": "Colon cancer (distal)",
                                 "value": "none_6604",
+                                "color": "blue",
                                 "count": 200
                             },
                             {
                                 "title": "Colon cancer (proximal)",
                                 "value": "none_7515",
+                                "color": "blue",
                                 "count": 300
                             },
                             {
                                 "title": "Colorectal cancer (adenocarcinoma)",
                                 "value": "none_2940",
+                                "color": "blue",
                                 "count": 400
                             },
                             {
                                 "title": "Colorectal cancer (advanced)",
                                 "value": "none_2734",
+                                "color": "blue",
                                 "count": 300
                             },
                             {
                                 "title": "Rectal cancer",
                                 "value": "none_7543",
+                                "color": "blue",
                                 "count": 200
                             }
                         ]
@@ -157,45 +187,54 @@
                     {
                         "title": "Endometrial cancer",
                         "value": "none_1857",
+                        "color": "blue",
                         "count": 200
                     },
                     {
                         "title": "Glioma cancer",
                         "value": "none_4860",
+                        "color": "blue",
                         "count": 300
                     },
                     {
                         "title": "Head and neck cancer",
                         "value": "none_4638",
+                        "color": "blue",
                         "count": 400
                     },
                     {
                         "title": "Hematologic malignancies",
                         "value": "none_3843",
+                        "color": "blue",
                         "children": [
                             {
                                 "title": "Hodgkin lymphoma",
                                 "value": "none_2153",
+                                "color": "blue",
                                 "count": 200
                             },
                             {
                                 "title": "Lymphocytic leukemia",
                                 "value": "none_5272",
+                                "color": "blue",
                                 "count": 300
                             },
                             {
                                 "title": "Myeloid/Monocytic leukemia",
                                 "value": "none_4332",
+                                "color": "blue",
                                 "count": 400
                             },
                             {
                                 "title": "Myeloma",
                                 "value": "none_1577",
+                                "color": "blue",
                                 "count": 300
                             },
                             {
                                 "title": "Non-Hodgkin lymphoma",
                                 "value": "none_4564",
+                                "color": "blue",
                                 "count": 200
                             }
                         ]
@@ -203,25 +242,30 @@
                     {
                         "title": "Liver cancer",
                         "value": "none_2479",
+                        "color": "blue",
                         "count": 200
                     },
                     {
                         "title": "Lung cancer",
                         "value": "none_1730",
+                        "color": "blue",
                         "children": [
                             {
                                 "title": "Lung cancer (small cell)",
                                 "value": "none_8794",
+                                "color": "blue",
                                 "count": 200
                             },
                             {
                                 "title": "Lung cancer (adenocarcinoma)",
                                 "value": "none_1098",
+                                "color": "blue",
                                 "count": 300
                             },
                             {
                                 "title": "Lung cancer (squamous cell)",
                                 "value": "none_1153",
+                                "color": "blue",
                                 "count": 400
                             }
                         ]
@@ -229,25 +273,30 @@
                     {
                         "title": "Melanoma",
                         "value": "none_312344",
+                        "color": "blue",
                         "count": 200
                     },
                     {
                         "title": "Non-melanoma skin cancer",
                         "value": "none_6744",
+                        "color": "blue",
                         "children": [
                             {
                                 "title": "Basal cell only",
                                 "value": "none_5859",
+                                "color": "blue",
                                 "count": 200
                             },
                             {
                                 "title": "Basal and squamous cell",
                                 "value": "none_8359",
+                                "color": "blue",
                                 "count": 300
                             },
                             {
                                 "title": "Squamous cell only",
                                 "value": "none_1339",
+                                "color": "blue",
                                 "count": 400
                             }
                         ]
@@ -255,25 +304,30 @@
                     {
                         "title": "Ovarian cancer",
                         "value": "none_8331",
+                        "color": "blue",
                         "count": 200
                     },
                     {
                         "title": "Pancreatic cancer",
                         "value": "none_8924",
+                        "color": "blue",
                         "count": 300
                     },
                     {
                         "title": "Prostate cancer",
                         "value": "none_5934",
+                        "color": "blue",
                         "children": [
                             {
                                 "title": "Prostate cancer (advanced)",
                                 "value": "none_1279",
+                                "color": "blue",
                                 "count": 200
                             },
                             {
                                 "title": "Prostate cancer (not advanced)",
                                 "value": "none_8342",
+                                "color": "blue",
                                 "count": 300
                             }
                         ]
@@ -281,25 +335,30 @@
                     {
                         "title": "Renal cancer",
                         "value": "none_432432",
+                        "color": "blue",
                         "count": 200
                     },
                     {
                         "title": "Thyroid cancer",
                         "value": "none_2404",
+                        "color": "blue",
                         "count": 300
                     },
                     {
                         "title": "Upper GI cancer",
                         "value": "none_1685",
+                        "color": "blue",
                         "children": [
                             {
                                 "title": "Esophageal cancer",
                                 "value": "none_7808",
+                                "color": "blue",
                                 "count": 200
                             },
                             {
                                 "title": "Gastric cancer",
                                 "value": "none_6910",
+                                "color": "blue",
                                 "count": 300
                             }
                         ]
@@ -309,52 +368,63 @@
             {
                 "title": "By pathology",
                 "value": "none_9816",
+                "color": "blue",
                 "children": [
                     {
                         "title": "Solid tumors",
                         "value": "none_2837",
+                        "color": "blue",
                         "children": [
                             {
                                 "title": "Carcinomas",
                                 "value": "none_217",
+                                "color": "blue",
                                 "children": [
                                     {
                                         "title": "Adenocarcinomas",
                                         "value": "none_653",
+                                        "color": "blue",
                                         "children": [
                                             {
                                                 "title": "Breast (adenocarcinoma)",
                                                 "value": "none_1617",
+                                                "color": "blue",
                                                 "count": 200
                                             },
                                             {
                                                 "title": "Colorectal cancer (adenocarcinoma)",
                                                 "value": "none_827",
+                                                "color": "blue",
                                                 "count": 300
                                             },
                                             {
                                                 "title": "Endometrial cancer (adenocarcinoma)",
                                                 "value": "none_9262",
+                                                "color": "blue",
                                                 "count": 400
                                             },
                                             {
                                                 "title": "Lung cancer (adenocarcinoma)",
                                                 "value": "none_1842",
+                                                "color": "blue",
                                                 "count": 300
                                             },
                                             {
                                                 "title": "Pancreatic cancer (adenocarcinoma)",
                                                 "value": "none_4760",
+                                                "color": "blue",
                                                 "count": 200
                                             },
                                             {
                                                 "title": "Prostate cancer (adenocarcinoma)",
                                                 "value": "none_363",
+                                                "color": "blue",
                                                 "count": 300
                                             },
                                             {
                                                 "title": "Thyroid cancer (adenocarcinoma)",
                                                 "value": "none_3809",
+                                                "color": "blue",
                                                 "count": 200
                                             }
                                         ]
@@ -362,15 +432,18 @@
                                     {
                                         "title": "Squamous cell cancers",
                                         "value": "none_9830",
+                                        "color": "blue",
                                         "children": [
                                             {
                                                 "title": "Esophageal cancer (squamous cell)",
                                                 "value": "none_3637",
+                                                "color": "blue",
                                                 "count": 200
                                             },
                                             {
                                                 "title": "Lung cancer (squamous cell)",
                                                 "value": "none_2950",
+                                                "color": "blue",
                                                 "count": 300
                                             }
                                         ]
@@ -378,15 +451,18 @@
                                     {
                                         "title": "Urothelial cancers",
                                         "value": "none_9236",
+                                        "color": "blue",
                                         "children": [
                                             {
                                                 "title": "Bladder cancer (urothelial)",
                                                 "value": "none_2962",
+                                                "color": "blue",
                                                 "count": 200
                                             },
                                             {
                                                 "title": "Renal cancer (urothelial)",
                                                 "value": "none_6976",
+                                                "color": "blue",
                                                 "count": 300
                                             }
                                         ]
@@ -394,10 +470,12 @@
                                     {
                                         "title": "Sarcomas",
                                         "value": "none_2678",
+                                        "color": "blue",
                                         "children": [
                                             {
                                                 "title": "Need to look into",
                                                 "value": "none_429",
+                                                "color": "blue",
                                                 "count": 200
                                             }
                                         ]
@@ -405,20 +483,24 @@
                                     {
                                         "title": "Neuroendocrine related cancers",
                                         "value": "none_8325",
+                                        "color": "blue",
                                         "children": [
                                             {
                                                 "title": "Lung cancer (neuroendocrine)",
                                                 "value": "none_9876",
+                                                "color": "blue",
                                                 "count": 200
                                             },
                                             {
                                                 "title": "Pancreatic cancer (neuroendocrine)",
                                                 "value": "none_9197",
+                                                "color": "blue",
                                                 "count": 300
                                             },
                                             {
                                                 "title": "Thyroid cancer (neuroendocrine)",
                                                 "value": "none_2628",
+                                                "color": "blue",
                                                 "count": 400
                                             }
                                         ]
@@ -426,20 +508,24 @@
                                     {
                                         "title": "Hematologic malignancies",
                                         "value": "none_9543",
+                                        "color": "blue",
                                         "children": [
                                             {
                                                 "title": "Hodgkin’s lymphoma",
                                                 "value": "none_5774",
+                                                "color": "blue",
                                                 "count": 200
                                             },
                                             {
                                                 "title": "Non-Hodgkin’s lymphoma",
                                                 "value": "none_209",
+                                                "color": "blue",
                                                 "count": 300
                                             },
                                             {
                                                 "title": "Multiple myeloma",
                                                 "value": "none_4198",
+                                                "color": "blue",
                                                 "count": 400
                                             }
                                         ]
@@ -447,19 +533,23 @@
                                     {
                                         "title": "By risk factor",
                                         "value": "none_2637",
+                                        "color": "blue",
                                         "children": [
                                             {
                                                 "title": "Smoking related cancers",
                                                 "value": "none_8062",
+                                                "color": "blue",
                                                 "children": [
                                                     {
                                                         "title": "Lung cancer",
                                                         "value": "none_5292",
+                                                        "color": "blue",
                                                         "count": 200
                                                     },
                                                     {
                                                         "title": "Bladder cancer",
                                                         "value": "none_8395",
+                                                        "color": "blue",
                                                         "count": 300
                                                     }
                                                 ]
@@ -467,25 +557,30 @@
                                             {
                                                 "title": "Obesity related cancers",
                                                 "value": "none_4368",
+                                                "color": "blue",
                                                 "children": [
                                                     {
                                                         "title": "Breast cancer",
                                                         "value": "none_923",
+                                                        "color": "blue",
                                                         "count": 200
                                                     },
                                                     {
                                                         "title": "Colorectal cancer",
                                                         "value": "none_2466",
+                                                        "color": "blue",
                                                         "count": 300
                                                     },
                                                     {
                                                         "title": "Esophageal cancer",
                                                         "value": "none_6280",
+                                                        "color": "blue",
                                                         "count": 400
                                                     },
                                                     {
                                                         "title": "Kidney cancer",
                                                         "value": "none_5467",
+                                                        "color": "blue",
                                                         "count": 300
                                                     }
                                                 ]
@@ -493,25 +588,30 @@
                                             {
                                                 "title": "Hormone-related cancers",
                                                 "value": "none_5782",
+                                                "color": "blue",
                                                 "children": [
                                                     {
                                                         "title": "Breast cancer",
                                                         "value": "none_3986",
+                                                        "color": "blue",
                                                         "count": 200
                                                     },
                                                     {
                                                         "title": "Endometrial cancer",
                                                         "value": "none_3966",
+                                                        "color": "blue",
                                                         "count": 300
                                                     },
                                                     {
                                                         "title": "Ovarian cancer",
                                                         "value": "none_8838",
+                                                        "color": "blue",
                                                         "count": 400
                                                     },
                                                     {
                                                         "title": "Prostate cancer",
                                                         "value": "none_9281",
+                                                        "color": "blue",
                                                         "count": 300
                                                     }
                                                 ]
@@ -519,10 +619,12 @@
                                             {
                                                 "title": "Physical activity related cancers",
                                                 "value": "none_9189",
+                                                "color": "blue",
                                                 "children": [
                                                     {
                                                         "title": "Need to look into",
                                                         "value": "none_8628",
+                                                        "color": "blue",
                                                         "count": 200
                                                     }
                                                 ]
@@ -530,15 +632,18 @@
                                             {
                                                 "title": "Alcohol-related cancers",
                                                 "value": "none_5314",
+                                                "color": "blue",
                                                 "children": [
                                                     {
                                                         "title": "Breast cancer",
                                                         "value": "none_4782",
+                                                        "color": "blue",
                                                         "count": 200
                                                     },
                                                     {
                                                         "title": "Liver cancer",
                                                         "value": "none_7107",
+                                                        "color": "blue",
                                                         "count": 300
                                                     }
                                                 ]
@@ -546,14 +651,17 @@
                                             {
                                                 "title": "Infection-related cancers",
                                                 "value": "none_3780",
+                                                "color": "blue",
                                                 "children": [
                                                     {
                                                         "title": "H. pylori cancers",
                                                         "value": "none_4635",
+                                                        "color": "blue",
                                                         "children": [
                                                             {
                                                                 "title": "Gastric cancer",
                                                                 "value": "none_3545",
+                                                                "color": "blue",
                                                                 "count": 200
                                                             }
                                                         ]
@@ -561,15 +669,18 @@
                                                     {
                                                         "title": "HPV-related cancers",
                                                         "value": "none_9767",
+                                                        "color": "blue",
                                                         "children": [
                                                             {
                                                                 "title": "Cervical cancer",
                                                                 "value": "none_8284",
+                                                                "color": "blue",
                                                                 "count": 200
                                                             },
                                                             {
                                                                 "title": "Head and neck cancer",
                                                                 "value": "none_4008",
+                                                                "color": "blue",
                                                                 "count": 300
                                                             }
                                                         ]
@@ -577,6 +688,7 @@
                                                     {
                                                         "title": "Family history of cancer",
                                                         "value": "none_4342",
+                                                        "color": "blue",
                                                         "count": 200
                                                     }
                                                 ]
@@ -594,29 +706,35 @@
     {
         "title": "Lifestyle factors",
         "value": "none_9856",
+        "color": "cyan",
         "children": [
             {
                 "title": "Alcohol consumption",
                 "value": "none_6802",
+                "color": "cyan",
                 "count": 200
             },
             {
                 "title": "Diet",
                 "value": "none_1578",
+                "color": "cyan",
                 "children": [
                     {
                         "title": "Caffeine intake",
                         "value": "none_9975",
+                        "color": "cyan",
                         "count": 200
                     },
                     {
                         "title": "Fat intake",
                         "value": "none_661",
+                        "color": "cyan",
                         "count": 300
                     },
                     {
                         "title": "Protein intake",
                         "value": "none_5746",
+                        "color": "cyan",
                         "count": 400
                     }
                 ]
@@ -624,50 +742,60 @@
             {
                 "title": "Exercise",
                 "value": "none_3330",
+                "color": "cyan",
                 "children": [
                     {
                         "title": "Flights of stairs",
                         "value": "none_186",
+                        "color": "cyan",
                         "count": 200
                     },
                     {
                         "title": "Light activity duration",
                         "value": "none_564",
+                        "color": "cyan",
                         "count": 300
                     },
                     {
                         "title": "Mile walk frequency",
                         "value": "none_6641",
+                        "color": "cyan",
                         "count": 400
                     },
                     {
                         "title": "Moderate activity duration",
                         "value": "none_4419",
+                        "color": "cyan",
                         "count": 300
                     },
                     {
                         "title": "Strenuous activity frequency",
                         "value": "none_1142",
+                        "color": "cyan",
                         "count": 200
                     },
                     {
                         "title": "Strenuous activity duration",
                         "value": "none_7673",
+                        "color": "cyan",
                         "count": 300
                     },
                     {
                         "title": "Vigorous activity at 40",
                         "value": "none_5113",
+                        "color": "cyan",
                         "count": 400
                     },
                     {
                         "title": "Vigorous activity current",
                         "value": "none_2606",
+                        "color": "cyan",
                         "count": 300
                     },
                     {
                         "title": "Walking pace",
                         "value": "none_2072",
+                        "color": "cyan",
                         "count": 200
                     }
                 ]
@@ -675,45 +803,54 @@
             {
                 "title": "Smoking",
                 "value": "none_5080",
+                "color": "cyan",
                 "children": [
                     {
                         "title": "Cigarette smoking status",
                         "value": "none_8656",
+                        "color": "cyan",
                         "count": 200
                     },
                     {
                         "title": "Cigarette type",
                         "value": "none_1344",
+                        "color": "cyan",
                         "count": 300
                     },
                     {
                         "title": "Cigarettes per day",
                         "value": "none_5657",
+                        "color": "cyan",
                         "count": 400
                     },
                     {
                         "title": "Experience cigarette cravings",
                         "value": "none_1468",
+                        "color": "cyan",
                         "count": 300
                     },
                     {
                         "title": "Filtered or Non-filtered",
                         "value": "none_8485",
+                        "color": "cyan",
                         "count": 200
                     },
                     {
                         "title": "Menthol or non-menthol",
                         "value": "none_8667",
+                        "color": "cyan",
                         "count": 300
                     },
                     {
                         "title": "Number of cigarettes smoked per day",
                         "value": "none_4954",
+                        "color": "cyan",
                         "count": 400
                     },
                     {
                         "title": "Wake up smoke",
                         "value": "none_9888",
+                        "color": "cyan",
                         "count": 300
                     }
                 ]
@@ -723,44 +860,53 @@
     {
         "title": "Medical conditions",
         "value": "none_9645",
+        "color": "purple",
         "children": [
             {
                 "title": "Arthritis",
                 "value": "none_5077",
+                "color": "purple",
                 "count": 200
             },
             {
                 "title": "Asthma",
                 "value": "none_6259",
+                "color": "purple",
                 "count": 300
             },
             {
                 "title": "Benign ovarian cyst/tumor",
                 "value": "none_6373",
+                "color": "purple",
                 "count": 400
             },
             {
                 "title": "Broken bone",
                 "value": "none_4883",
+                "color": "purple",
                 "children": [
                     {
                         "title": "Broken arm",
                         "value": "none_5431",
+                        "color": "purple",
                         "count": 200
                     },
                     {
                         "title": "Broken hip",
                         "value": "none_8227",
+                        "color": "purple",
                         "count": 300
                     },
                     {
                         "title": "Broken vertebra",
                         "value": "none_3452",
+                        "color": "purple",
                         "count": 400
                     },
                     {
                         "title": "Broken other",
                         "value": "none_5335",
+                        "color": "purple",
                         "count": 300
                     }
                 ]
@@ -768,101 +914,121 @@
             {
                 "title": "Bronchitis",
                 "value": "none_9336",
+                "color": "purple",
                 "count": 200
             },
             {
                 "title": "Cirrhosis",
                 "value": "none_5164",
+                "color": "purple",
                 "count": 300
             },
             {
                 "title": "Colorectal polyps",
                 "value": "none_7533",
+                "color": "purple",
                 "count": 400
             },
             {
                 "title": "Crohn’s disease",
                 "value": "none_2401",
+                "color": "purple",
                 "count": 300
             },
             {
                 "title": "Diabetes",
                 "value": "none_9530",
+                "color": "purple",
                 "count": 200
             },
             {
                 "title": "Diverticulitis/Diverticulosis",
                 "value": "none_6127",
+                "color": "purple",
                 "count": 300
             },
             {
                 "title": "Emphysema",
                 "value": "none_757",
+                "color": "purple",
                 "count": 400
             },
             {
                 "title": "Endometriosis",
                 "value": "none_2601",
+                "color": "purple",
                 "count": 300
             },
             {
                 "title": "Enlarged prostate of BPH",
                 "value": "none_4991",
+                "color": "purple",
                 "count": 200
             },
             {
                 "title": "Fibrotic breast disease",
                 "value": "none_9021",
+                "color": "purple",
                 "count": 300
             },
             {
                 "title": "Gallbladder stones or inflammation",
                 "value": "none_2761",
+                "color": "purple",
                 "count": 400
             },
             {
                 "title": "Heart attack",
                 "value": "none_204",
+                "color": "purple",
                 "count": 300
             },
             {
                 "title": "Hepatitis",
                 "value": "none_2954",
+                "color": "purple",
                 "count": 200
             },
             {
                 "title": "High cholesterol",
                 "value": "none_5463",
+                "color": "purple",
                 "count": 300
             },
             {
                 "title": "Hypertension",
                 "value": "none_8195",
+                "color": "purple",
                 "count": 400
             },
             {
                 "title": "Inflamed prostate",
                 "value": "none_2143",
+                "color": "purple",
                 "count": 300
             },
             {
                 "title": "Osteoporosis",
                 "value": "none_1696",
+                "color": "purple",
                 "count": 200
             },
             {
                 "title": "Stroke",
                 "value": "none_7058",
+                "color": "purple",
                 "count": 300
             },
             {
                 "title": "Ulcerative colitis",
                 "value": "none_1838",
+                "color": "purple",
                 "count": 400
             },
             {
                 "title": "Uterine fibroid tumors",
                 "value": "none_2510",
+                "color": "purple",
                 "count": 300
             }
         ]
@@ -870,20 +1036,24 @@
     {
         "title": "Reproductive factors",
         "value": "none_2736",
+        "color": "magenta",
         "children": [
             {
                 "title": "Age of menarche",
                 "value": "none_7280",
+                "color": "magenta",
                 "count": 200
             },
             {
                 "title": "Age of menopause",
                 "value": "none_1296",
+                "color": "magenta",
                 "count": 300
             },
             {
                 "title": "Ever try to become pregnant without success",
                 "value": "none_5150",
+                "color": "magenta",
                 "count": 400
             }
         ]
@@ -891,15 +1061,18 @@
     {
         "title": "Mortality",
         "value": "none_4085",
+        "color": "yellow",
         "children": [
             {
                 "title": "All-cause mortality",
                 "value": "none_922",
+                "color": "yellow",
                 "count": 200
             },
             {
                 "title": "Cancer-specific mortality",
                 "value": "none_7340",
+                "color": "yellow",
                 "count": 300
             }
         ]
