@@ -860,53 +860,53 @@
     {
         "title": "Medical conditions",
         "value": "none_9645",
-        "color": "yellow",
+        "color": "purple",
         "children": [
             {
                 "title": "Arthritis",
                 "value": "none_5077",
-                "color": "yellow",
+                "color": "purple",
                 "count": 200
             },
             {
                 "title": "Asthma",
                 "value": "none_6259",
-                "color": "yellow",
+                "color": "purple",
                 "count": 300
             },
             {
                 "title": "Benign ovarian cyst/tumor",
                 "value": "none_6373",
-                "color": "yellow",
+                "color": "purple",
                 "count": 400
             },
             {
                 "title": "Broken bone",
                 "value": "none_4883",
-                "color": "yellow",
+                "color": "purple",
                 "children": [
                     {
                         "title": "Broken arm",
                         "value": "none_5431",
-                        "color": "yellow",
+                        "color": "purple",
                         "count": 200
                     },
                     {
                         "title": "Broken hip",
                         "value": "none_8227",
-                        "color": "yellow",
+                        "color": "purple",
                         "count": 300
                     },
                     {
                         "title": "Broken vertebra",
                         "value": "none_3452",
-                        "color": "yellow",
+                        "color": "purple",
                         "count": 400
                     },
                     {
                         "title": "Broken other",
                         "value": "none_5335",
-                        "color": "yellow",
+                        "color": "purple",
                         "count": 300
                     }
                 ]
@@ -914,121 +914,121 @@
             {
                 "title": "Bronchitis",
                 "value": "none_9336",
-                "color": "yellow",
+                "color": "purple",
                 "count": 200
             },
             {
                 "title": "Cirrhosis",
                 "value": "none_5164",
-                "color": "yellow",
+                "color": "purple",
                 "count": 300
             },
             {
                 "title": "Colorectal polyps",
                 "value": "none_7533",
-                "color": "yellow",
+                "color": "purple",
                 "count": 400
             },
             {
                 "title": "Crohn’s disease",
                 "value": "none_2401",
-                "color": "yellow",
+                "color": "purple",
                 "count": 300
             },
             {
                 "title": "Diabetes",
                 "value": "none_9530",
-                "color": "yellow",
+                "color": "purple",
                 "count": 200
             },
             {
                 "title": "Diverticulitis/Diverticulosis",
                 "value": "none_6127",
-                "color": "yellow",
+                "color": "purple",
                 "count": 300
             },
             {
                 "title": "Emphysema",
                 "value": "none_757",
-                "color": "yellow",
+                "color": "purple",
                 "count": 400
             },
             {
                 "title": "Endometriosis",
                 "value": "none_2601",
-                "color": "yellow",
+                "color": "purple",
                 "count": 300
             },
             {
                 "title": "Enlarged prostate of BPH",
                 "value": "none_4991",
-                "color": "yellow",
+                "color": "purple",
                 "count": 200
             },
             {
                 "title": "Fibrotic breast disease",
                 "value": "none_9021",
-                "color": "yellow",
+                "color": "purple",
                 "count": 300
             },
             {
                 "title": "Gallbladder stones or inflammation",
                 "value": "none_2761",
-                "color": "yellow",
+                "color": "purple",
                 "count": 400
             },
             {
                 "title": "Heart attack",
                 "value": "none_204",
-                "color": "yellow",
+                "color": "purple",
                 "count": 300
             },
             {
                 "title": "Hepatitis",
                 "value": "none_2954",
-                "color": "yellow",
+                "color": "purple",
                 "count": 200
             },
             {
                 "title": "High cholesterol",
                 "value": "none_5463",
-                "color": "yellow",
+                "color": "purple",
                 "count": 300
             },
             {
                 "title": "Hypertension",
                 "value": "none_8195",
-                "color": "yellow",
+                "color": "purple",
                 "count": 400
             },
             {
                 "title": "Inflamed prostate",
                 "value": "none_2143",
-                "color": "yellow",
+                "color": "purple",
                 "count": 300
             },
             {
                 "title": "Osteoporosis",
                 "value": "none_1696",
-                "color": "yellow",
+                "color": "purple",
                 "count": 200
             },
             {
                 "title": "Stroke",
                 "value": "none_7058",
-                "color": "yellow",
+                "color": "purple",
                 "count": 300
             },
             {
                 "title": "Ulcerative colitis",
                 "value": "none_1838",
-                "color": "yellow",
+                "color": "purple",
                 "count": 400
             },
             {
                 "title": "Uterine fibroid tumors",
                 "value": "none_2510",
-                "color": "yellow",
+                "color": "purple",
                 "count": 300
             }
         ]
@@ -1061,18 +1061,18 @@
     {
         "title": "Mortality",
         "value": "none_4085",
-        "color": "purple",
+        "color": "yellow",
         "children": [
             {
                 "title": "All-cause mortality",
                 "value": "none_922",
-                "color": "purple",
+                "color": "yellow",
                 "count": 200
             },
             {
                 "title": "Cancer-specific mortality",
                 "value": "none_7340",
-                "color": "purple",
+                "color": "yellow",
                 "count": 300
             }
         ]
