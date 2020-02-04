@@ -1,22 +1,24 @@
 import * as d3 from 'd3'
 
 export class BubbleChart {
-    constructor(container, realData, handleSingleClick, handleDoubleClick, handleBackgroundDoubleClick) {
+    constructor(container, realData, handleSingleClick, handleDoubleClick, handleBackgroundDoubleClick, selectedPhenotype) {
         // console.log("bubble-chart service reached!", realData);
         this.container = container;
         this.handleSingleClick = handleSingleClick;
         this.handleDoubleClick = handleDoubleClick;
-        this.handleBackgroundDoubleClick = handleBackgroundDoubleClick
+        this.handleBackgroundDoubleClick = handleBackgroundDoubleClick;
+        this.selectedPhenotype = selectedPhenotype;
         if (realData && realData.length > 0) {
             this.realDataset = {
                 children: realData
             };
-            this.drawBubbleChart(this.container, this.realDataset, this.handleSingleClick, this.handleDoubleClick, this.handleBackgroundDoubleClick);
+            this.drawBubbleChart(this.container, this.realDataset, this.handleSingleClick, this.handleDoubleClick, this.handleBackgroundDoubleClick, this.selectedPhenotype);
         }
     }
 
-    drawBubbleChart(container, dataset, handleSingleClick, handleDoubleClick, handleBackgroundDoubleClick) {
+    drawBubbleChart(container, dataset, handleSingleClick, handleDoubleClick, handleBackgroundDoubleClick, selectedPhenotype) {
         // console.log("data reached drawBubbleChart() d3", dataset);
+        console.log("selectedPhenotype", selectedPhenotype);
 
         d3.selectAll(".bubble")
             .remove()
@@ -139,6 +141,7 @@ export class BubbleChart {
             });
 
         node.on("click", function (e) {
+            // console.log(e.children);
             d3.selectAll(".circle")
                 .style("opacity", function (d) {
                     return "50%";
@@ -163,6 +166,22 @@ export class BubbleChart {
 
         d3.select(container)
             .style("height", diameter + "px");
+
+        if (selectedPhenotype) {
+            d3.selectAll(".circle")
+                .style("opacity", function (d) {
+                    return "50%";
+                });
+            d3.selectAll(".node")
+                .filter(function (d) {
+                    console.log(d, selectedPhenotype);
+                    return d.data === selectedPhenotype;
+                })
+                .select(".circle")
+                .style("opacity", function (d) {
+                    return "100%";
+                });
+        }
 
     }
 

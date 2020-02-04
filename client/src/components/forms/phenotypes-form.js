@@ -6,6 +6,7 @@ import { TreeSelectCustom } from '../controls/tree-select-custom';
 export function PhenotypesForm({
   phenotype = null,
   onSubmit,
+  onChange,
   onReset
 }) {
 
@@ -34,7 +35,8 @@ export function PhenotypesForm({
           dataAlphabetical={alphabetizedPhenotypes}
           dataCategories={phenotypeCategories}
           value={_phenotype}
-          onChange={val => _setPhenotype((val && val.length) ? val[0] : null)}
+          // onChange={val => _setPhenotype((val && val.length) ? val[0] : null)}
+          onChange={val => onChange((val && val.length) ? val[0] : null)}
           singleSelect
         />
       </div>

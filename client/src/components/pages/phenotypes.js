@@ -27,12 +27,12 @@ export function Phenotypes() {
   // const plot = useRef(null);
   // const [breadcrumb, setBreadcrumb] = useState([]);
 
-  const phenotypes = useSelector(state => state.phenotypes);
-  const phenotypeCategories = useSelector(state => state.phenotypeCategories);
+  // const phenotypes = useSelector(state => state.phenotypes);
+  // const phenotypeCategories = useSelector(state => state.phenotypeCategories);
   const phenotypesTree = useSelector(state => state.phenotypesTree);
-  const alphabetizedPhenotypes = [...phenotypes].sort((a, b) =>
-    a.title.localeCompare(b.title)
-  );
+  // const alphabetizedPhenotypes = [...phenotypes].sort((a, b) =>
+  //   a.title.localeCompare(b.title)
+  // );
 
   const [openSidebar, setOpenSidebar] = useState(true);
 
@@ -49,7 +49,10 @@ export function Phenotypes() {
   };
 
   const setCurrentBubbleData = currentBubbleData => {
-    dispatch(updateBrowsePhenotypes({ currentBubbleData }))
+    dispatch(updateBrowsePhenotypes({ 
+      currentBubbleData,
+      selectedPhenotype: null
+    }))
   };
 
   const setSelectedPhenotype = selectedPhenotype => {
@@ -60,12 +63,9 @@ export function Phenotypes() {
     setMessages([]);
   };
 
-  // function handleChange(items) {
-  //   dispatch(updateBrowsePhenotypes({
-  //     selectedPhenotypes: items,
-  //     submitted: false,
-  //   }));
-  // }
+  function handleChange(phenotype) {
+    setSelectedPhenotype(phenotype);
+  }
 
   // when submitting:
   // 1. Fetch aggregate data for displaying manhattan plot(s)
@@ -106,18 +106,17 @@ export function Phenotypes() {
       breadcrumb: [],
       currentBubbleData: null
     }));
-    // drawBubbleChart(phenotypesTree);
   }
 
   useEffect(() => {
-    // console.log("useEffect() triggered!");
+    console.log("useEffect() triggered!");
     if (submitted || !phenotypesTree) return;
     plotContainer.current.innerHTML = '';
     drawBubbleChart(currentBubbleData ? currentBubbleData : phenotypesTree);
-  }, [phenotypesTree, breadcrumb, currentBubbleData])
+  }, [phenotypesTree, breadcrumb, currentBubbleData, selectedPhenotype])
 
   const drawBubbleChart = (data) => {
-    new Plot(plotContainer.current, data, handleSingleClick, handleDoubleClick, handleBackgroundDoubleClick);
+    new Plot(plotContainer.current, data, handleSingleClick, handleDoubleClick, handleBackgroundDoubleClick, selectedPhenotype);
   }
 
   const handleSingleClick = (e) => {
@@ -163,6 +162,7 @@ export function Phenotypes() {
         <div className="p-2 bg-white border rounded-0">
           <PhenotypesForm
             phenotype={selectedPhenotype}
+            onChange={handleChange}
             onSubmit={handleSubmit}
             onReset={handleReset}
           />
