@@ -1,9 +1,13 @@
 CREATE TABLE `lu_phenotype` (
-    `id`            INTEGER PRIMARY KEY NOT NULL AUTO_INCREMENT,
-    `parent_id`     INTEGER NULL,
-    `name`          VARCHAR(200) NOT NULL,
-    `display_name`  VARCHAR(200) NOT NULL,
-    `color`         VARCHAR(40) NULL,
+    `id`                    INTEGER PRIMARY KEY NOT NULL AUTO_INCREMENT,
+    `parent_id`             INTEGER NULL,
+    `name`                  VARCHAR(200) NOT NULL,
+    `display_name`          VARCHAR(200) NOT NULL,
+    `color`                 VARCHAR(40) NULL,
+    `type`                  ENUM('binary', 'categorical', 'continuous')
+    `variants_original`     BIGINT,
+    `variants_imported`     BIGINT,
+    `updated_date`          DATETIME,
     FOREIGN KEY (parent_id) REFERENCES lu_phenotype(id)
 );
 
@@ -43,13 +47,4 @@ CREATE TABLE `gene` (
     `transcription_end`     INTEGER NOT NULL,
     `exon_starts`           MEDIUMTEXT,
     `exon_ends`             MEDIUMTEXT
-);
-
-CREATE TABLE `import_log` (
-    `id`                    INTEGER PRIMARY KEY NOT NULL AUTO_INCREMENT,
-    `phenotype_id`          INTEGER,
-    `variants_original`     BIGINT,
-    `variants_imported`     BIGINT,
-    `created_date`          DATETIME,
-    FOREIGN KEY (phenotype_id) REFERENCES lu_phenotype(id)
 );
