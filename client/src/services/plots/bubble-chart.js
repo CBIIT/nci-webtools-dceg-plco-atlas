@@ -61,7 +61,7 @@ export class BubbleChart {
 
         var nodes = d3.hierarchy(dataset)
             .sum(function (d) {
-                console.log("d", d);
+                // console.log("d", d);
                 return d.count ? d.count : 0; 
                 // return 100;
             });
@@ -92,8 +92,10 @@ export class BubbleChart {
                 return d.r;
             })
             .style("fill", function (d) {
-                // color leaf bubbles #007bff
-                return d.children ? "orange" : "#007bff";
+                // color leaf bubbles #007bff (bluish)
+                console.log("AH COLOR", d);
+                // return d.children ? "orange" : "#007bff";
+                return d.data.color ? d.data.color : "pink";
             })
             .attr("class", "circle");
 
@@ -112,10 +114,11 @@ export class BubbleChart {
             })
             .style("fill", function (d) {
                 // color leaf bubbles #007bff
-                return d.children ? "orange" : "#FFFFFF";
+                // return d.children ? "orange" : "#FFFFFF";
+                return d.children ? d.data.color ? d.data.color : "pink" : "#FFFFFF";
             })
             .style("opacity", function (d) {
-                return d.children ? "66%" : "100%";
+                return d.children ? "20%" : "100%";
             })
             .attr("class", "inner-circle");
 
@@ -132,7 +135,8 @@ export class BubbleChart {
                 return d.r / 6;
             })
             .attr("fill", function(d) {
-                return d.children ? "white" : "black";
+                // return d.children ? "white" : "black";
+                return "black"
             });
 
         node.append("text")
@@ -147,7 +151,8 @@ export class BubbleChart {
                 return d.r / 5;
             })
             .attr("fill", function(d) {
-                return d.children ? "white" : "black";
+                // return d.children ? "white" : "black";
+                return "black";
             });
 
         node.on("click", function (e) {
