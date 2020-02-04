@@ -110,7 +110,7 @@ export function Phenotypes() {
   }
 
   useEffect(() => {
-    console.log("useEffect() triggered!");
+    // console.log("useEffect() triggered!");
     if (submitted || !phenotypesTree) return;
     plotContainer.current.innerHTML = '';
     drawBubbleChart(currentBubbleData ? currentBubbleData : phenotypesTree);
