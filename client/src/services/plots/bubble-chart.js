@@ -1,22 +1,24 @@
 import * as d3 from 'd3'
 
 export class BubbleChart {
-    constructor(container, realData, handleSingleClick, handleDoubleClick, handleBackgroundDoubleClick) {
+    constructor(container, realData, handleSingleClick, handleDoubleClick, handleBackgroundDoubleClick, selectedPhenotype) {
         // console.log("bubble-chart service reached!", realData);
         this.container = container;
         this.handleSingleClick = handleSingleClick;
         this.handleDoubleClick = handleDoubleClick;
-        this.handleBackgroundDoubleClick = handleBackgroundDoubleClick
+        this.handleBackgroundDoubleClick = handleBackgroundDoubleClick;
+        this.selectedPhenotype = selectedPhenotype;
         if (realData && realData.length > 0) {
             this.realDataset = {
                 children: realData
             };
-            this.drawBubbleChart(this.container, this.realDataset, this.handleSingleClick, this.handleDoubleClick, this.handleBackgroundDoubleClick);
+            this.drawBubbleChart(this.container, this.realDataset, this.handleSingleClick, this.handleDoubleClick, this.handleBackgroundDoubleClick, this.selectedPhenotype);
         }
     }
 
-    drawBubbleChart(container, dataset, handleSingleClick, handleDoubleClick, handleBackgroundDoubleClick) {
+    drawBubbleChart(container, dataset, handleSingleClick, handleDoubleClick, handleBackgroundDoubleClick, selectedPhenotype) {
         // console.log("data reached drawBubbleChart() d3", dataset);
+        console.log("selectedPhenotype", selectedPhenotype);
 
         d3.selectAll(".bubble")
             .remove()
@@ -53,6 +55,7 @@ export class BubbleChart {
                     .style("opacity", function (d) {
                         return "100%";
                     });
+                handleSingleClick(null);
             })
             .on("dblclick", function() {
                 handleBackgroundDoubleClick();
@@ -63,9 +66,26 @@ export class BubbleChart {
                 return d.count ? d.count : 0; 
             });
 
+        var bubbleNodes = bubble(nodes).descendants()
+            .filter(function(d) {
+                // console.log("filter bubble nodes", d);
+                if (selectedPhenotype) {
+                    console.log("filter bubble nodes", d.data, selectedPhenotype);
+                    return true;
+                    // return d.data === selectedPhenotype;
+                } else {
+                    return true;
+                }
+            });
+
+        // console.log("bubbleNodes", bubbleNodes);
+        // console.log("bubbleNodes[0].parent.children", selectedPhenotype ? bubbleNodes[0].parent.children : null);
+
+        // console.log("bubble(nodes).descendants()", bubble(nodes).descendants());
         // find a way to only output first level of tree as nodes
         var node = svg.selectAll(".node")
-            .data(bubble(nodes).descendants())
+            // .data(selectedPhenotype ? bubbleNodes[0].parent.children : bubbleNodes)
+            .data(bubbleNodes)
             .enter()
             .filter(function (d) {
                 return d.depth === 1;
@@ -139,6 +159,7 @@ export class BubbleChart {
             });
 
         node.on("click", function (e) {
+            // console.log(e.children);
             d3.selectAll(".circle")
                 .style("opacity", function (d) {
                     return "50%";
@@ -163,6 +184,22 @@ export class BubbleChart {
 
         d3.select(container)
             .style("height", diameter + "px");
+
+        if (selectedPhenotype) {
+            d3.selectAll(".circle")
+                .style("opacity", function (d) {
+                    return "50%";
+                });
+            d3.selectAll(".node")
+                .filter(function (d) {
+                    // console.log(d, selectedPhenotype);
+                    return d.data === selectedPhenotype;
+                })
+                .select(".circle")
+                .style("opacity", function (d) {
+                    return "100%";
+                });
+        }
 
     }
 
