@@ -55,6 +55,7 @@ export class BubbleChart {
                     .style("opacity", function (d) {
                         return "100%";
                     });
+                handleSingleClick(null);
             })
             .on("dblclick", function() {
                 handleBackgroundDoubleClick();
@@ -65,9 +66,26 @@ export class BubbleChart {
                 return d.count ? d.count : 0; 
             });
 
+        var bubbleNodes = bubble(nodes).descendants()
+            .filter(function(d) {
+                // console.log("filter bubble nodes", d);
+                if (selectedPhenotype) {
+                    console.log("filter bubble nodes", d.data, selectedPhenotype);
+                    return true;
+                    // return d.data === selectedPhenotype;
+                } else {
+                    return true;
+                }
+            });
+
+        // console.log("bubbleNodes", bubbleNodes);
+        // console.log("bubbleNodes[0].parent.children", selectedPhenotype ? bubbleNodes[0].parent.children : null);
+
+        // console.log("bubble(nodes).descendants()", bubble(nodes).descendants());
         // find a way to only output first level of tree as nodes
         var node = svg.selectAll(".node")
-            .data(bubble(nodes).descendants())
+            // .data(selectedPhenotype ? bubbleNodes[0].parent.children : bubbleNodes)
+            .data(bubbleNodes)
             .enter()
             .filter(function (d) {
                 return d.depth === 1;
@@ -174,7 +192,7 @@ export class BubbleChart {
                 });
             d3.selectAll(".node")
                 .filter(function (d) {
-                    console.log(d, selectedPhenotype);
+                    // console.log(d, selectedPhenotype);
                     return d.data === selectedPhenotype;
                 })
                 .select(".circle")
