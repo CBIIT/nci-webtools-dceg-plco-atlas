@@ -1,7 +1,7 @@
 import React from 'react';
 import Plot from 'react-plotly.js';
 
-export function PhenotypesSex({
+export function PhenotypesGender({
   selectedPhenotype,
   phenotypeType,
   sexData,
@@ -15,16 +15,21 @@ export function PhenotypesSex({
   },];
 
   const layout = {
-    title: `Distribution of ${selectedPhenotype.title} by Sex`,
+    title: `Distribution of ${selectedPhenotype.title} by Gender`,
     showlegend: true,
-    width: 1000,
+  };
+
+  const config = {
+    // responsive: true,
   };
 
   return (
     <div className="m-2 text-center">
         <Plot
+            // className="w-100"
             data={data}
             layout={layout}
+            config={config}
             onLegendClick={_ => false}
             />
     </div>

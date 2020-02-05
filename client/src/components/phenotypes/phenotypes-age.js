@@ -23,14 +23,19 @@ export function PhenotypesAge({
 
   const layout = {
     title: `Distribution of ${selectedPhenotype.title} by Age`,
-    width: 1000,
   };
+
+  const config = {
+    // responsive: true,
+  }
 
   return (
     <div className="m-2  text-center">
         <Plot
+          // className="w-100"
           data={data}
           layout={layout}
+          config={config}
           onLegendClick={_ => false}
         />
     </div>

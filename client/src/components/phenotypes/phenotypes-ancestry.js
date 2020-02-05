@@ -25,14 +25,20 @@ export function PhenotypesAncestry({
 
   const layout = {
     title: `Distribution of ${selectedPhenotype.title} by Ancestry`,
-    autosize: true,
+    xaxis: {automargin: true},
+    yaxis: {automargin: true},
   };
 
+  const config = {
+    // responsive: true
+  };
   return (
     <div className="m-2 text-center">
         <Plot
+            // className="w-100"
             data={data}
             layout={layout}
+            config={config}
             onLegendClick={_ => false}
         />
     </div>
