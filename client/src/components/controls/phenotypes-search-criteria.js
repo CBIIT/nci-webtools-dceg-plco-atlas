@@ -3,7 +3,7 @@ import { useSelector } from 'react-redux';
 import { Tab, Tabs } from 'react-bootstrap';
 
 export const PhenotypesSearchCriteria = () => {
-  const { 
+  const {
     searchCriteriaPhenotypes,
     submitted
   } = useSelector(
@@ -24,12 +24,19 @@ export const PhenotypesSearchCriteria = () => {
         <Tab
           eventKey="phenotypes-search-criteria"
           className="d-flex justify-content-between px-3 py-2 bg-white tab-pane-bordered rounded-0">
-          <div 
+          <div
             className="left"
             style={{ display: !submitted ? 'none' : 'block' }}>
             <p className="h4 my-1">
               {searchCriteriaPhenotypes.phenotype}
+
+              <span className="text-muted ml-3" style={{fontSize: '13px'}}>
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed et venenatis mauris. Etiam aliquam accumsan enim, in sodales urna ultrices sed. Duis et vehicula ante, tempor semper nisl. Suspendisse in tempor erat, at tincidunt elit. Etiam scelerisque venenatis nulla eu maximus. Ut sit amet ipsum odio.
+          </span>
+
+
             </p>
+
           </div>
           {placeholder}
         </Tab>

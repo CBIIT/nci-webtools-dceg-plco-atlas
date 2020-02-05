@@ -22,11 +22,12 @@ export function PhenotypesAge({
   }];
 
   const layout = {
-    title: `Distribution of ${selectedPhenotype.title} by Age`,
+    // title: `Distribution of ${selectedPhenotype.title} by Age`,
   };
 
   const config = {
     // responsive: true,
+    displayModeBar: false,
   }
 
   return (

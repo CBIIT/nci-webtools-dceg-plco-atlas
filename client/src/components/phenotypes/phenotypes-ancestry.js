@@ -24,12 +24,13 @@ export function PhenotypesAncestry({
   }];
 
   const layout = {
-    title: `Distribution of ${selectedPhenotype.title} by Ancestry`,
+    // title: `Distribution of ${selectedPhenotype.title} by Ancestry`,
     xaxis: {automargin: true},
     yaxis: {automargin: true},
   };
 
   const config = {
+    displayModeBar: false,
     // responsive: true
   };
   return (
