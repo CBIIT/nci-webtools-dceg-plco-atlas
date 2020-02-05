@@ -1,11 +1,11 @@
-import React from 'react';
+import React, {useState} from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Tab, Tabs } from 'react-bootstrap';
 import { updateBrowsePhenotypes } from '../../services/actions';
 import { PhenotypesFrequency } from './phenotypes-frequency'
 import { PhenotypesRelated } from './phenotypes-related'
 import { PhenotypesAge } from './phenotypes-age';
-import { PhenotypesSex } from './phenotypes-sex';
+import { PhenotypesGender } from './phenotypes-gender';
 import { PhenotypesAncestry } from './phenotypes-ancestry';
 
 export function PhenotypesTabs() {
@@ -15,12 +15,14 @@ export function PhenotypesTabs() {
     // submitted,
     selectedPlot,
     phenotypeType,
-    phenotypeData
+    phenotypeData,
   } = useSelector(state => state.browsePhenotypes);
 
   const setSelectedPlot = selectedPlot => {
     dispatch(updateBrowsePhenotypes({ selectedPlot }));
   };
+
+  const [distributionType, setDistributionType] = useState('age');
 
   return (
     <Tabs
@@ -43,56 +45,64 @@ export function PhenotypesTabs() {
       <Tab
         eventKey="distribution"
         title="Distribution"
-        className=""
+        className="p-2 bg-white tab-pane-bordered rounded-0"
         style={{ minHeight: '50vh' }}>
+          <div className="m-2">
+            <label className="mr-3">
+              <input
+                type="radio"
+                value="age"
+                onChange={e => setDistributionType(e.target.value)}
+                checked={distributionType == 'age'}/>
+              Age
+            </label>
 
-        <Tabs
-          className="bg-white border border-bottom-0"
-          defaultActiveKey="age">
+            <label className="mr-3">
+              <input
+                type="radio"
+                value="gender"
+                onChange={e => setDistributionType(e.target.value)}
+                checked={distributionType == 'gender'} />
+              Gender
+            </label>
 
-          <Tab
-            eventKey="age"
-            title="Age"
-            className="p-2 bg-white border rounded-0"
-            style={{ minHeight: '50vh' }}>
-              <PhenotypesAge
-                selectedPhenotype={selectedPhenotype}
-                phenotypeType={phenotypeType}
-                ageData={phenotypeData.distribution.age}
-                option="age"
-              />
-          </Tab>
+            <label className="mr-3">
+              <input
+                type="radio"
+                value="ancestry"
+                onChange={e => setDistributionType(e.target.value)}
+                checked={distributionType == 'ancestry'} />
+              Ancestry
+            </label>
+          </div>
 
-          <Tab
-            eventKey="sex"
-            title="Sex"
-            className="p-2 bg-white border rounded-0"
-            style={{ minHeight: '50vh' }}>
-              <PhenotypesSex
+          {distributionType === 'age' &&
+            <PhenotypesAge
+              selectedPhenotype={selectedPhenotype}
+              phenotypeType={phenotypeType}
+              ageData={phenotypeData.distribution.age}
+              option="age"
+            />
+          }
+
+          {distributionType === 'gender' &&
+            <PhenotypesGender
                 selectedPhenotype={selectedPhenotype}
                 phenotypeType={phenotypeType}
                 sexData={phenotypeData.distribution.sex}
-                option="sex"
-              />
-          </Tab>
+                option="gender"
+            />
+          }
 
-          <Tab
-            eventKey="ancestry"
-            title="Ancestry"
-            className="p-2 bg-white border rounded-0"
-            style={{ minHeight: '50vh' }}>
-              <PhenotypesAncestry
-                selectedPhenotype={selectedPhenotype}
-                phenotypeType={phenotypeType}
-                ancestryData={phenotypeData.distribution.ancestry}
-                option="ancestry"
-              />
-          </Tab>
-
-        </Tabs>
-
+          {distributionType === 'ancestry' &&
+            <PhenotypesAncestry
+              selectedPhenotype={selectedPhenotype}
+              phenotypeType={phenotypeType}
+              ancestryData={phenotypeData.distribution.ancestry}
+              option="ancestry"
+            />
+          }
       </Tab>
-
       <Tab
         eventKey="related-phenotypes"
         title="Related Phenotypes"
@@ -101,7 +111,7 @@ export function PhenotypesTabs() {
         <PhenotypesRelated
           selectedPhenotype={selectedPhenotype}
           phenotypeType={phenotypeType}
-          data={phenotypeData.related}
+          relatedData={phenotypeData.related}
         />
       </Tab>
 
