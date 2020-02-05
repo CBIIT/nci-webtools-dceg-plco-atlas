@@ -183,7 +183,7 @@ export function Phenotypes() {
       <MainPanel className="col-lg-9">
         <PhenotypesSearchCriteria />
         {!submitted &&
-          <div className="bg-white border rounded-0 p-4">
+          <div className="bg-white border rounded-0 p-4" style={{ minHeight: '50vh' }}>
             {
               breadcrumb.length > 0 && breadcrumb.map((item, idx) =>
                 <span className="" key={"crumb-" + item.data.title}>
@@ -208,6 +208,7 @@ export function Phenotypes() {
             <div
               ref={plotContainer}
               className="mt-3 bubble-chart text-center"
+              style={{ minHeight: '50vh' }}
             />
           </div>
         }
