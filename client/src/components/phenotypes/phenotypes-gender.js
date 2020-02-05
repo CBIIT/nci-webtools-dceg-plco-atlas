@@ -15,11 +15,12 @@ export function PhenotypesGender({
   },];
 
   const layout = {
-    title: `Distribution of ${selectedPhenotype.title} by Gender`,
+    // title: `Distribution of ${selectedPhenotype.title} by Gender`,
     showlegend: true,
   };
 
   const config = {
+    displayModeBar: false,
     // responsive: true,
   };
 

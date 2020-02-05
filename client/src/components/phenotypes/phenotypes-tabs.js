@@ -48,7 +48,7 @@ export function PhenotypesTabs() {
         className="p-2 bg-white tab-pane-bordered rounded-0"
         style={{ minHeight: '50vh' }}>
           <div className="m-2">
-            <label className="mr-3">
+            <label className="mr-3 font-weight-normal">
               <input
                 type="radio"
                 value="age"
@@ -57,7 +57,7 @@ export function PhenotypesTabs() {
               Age
             </label>
 
-            <label className="mr-3">
+            <label className="mr-3 font-weight-normal">
               <input
                 type="radio"
                 value="gender"
@@ -66,7 +66,7 @@ export function PhenotypesTabs() {
               Gender
             </label>
 
-            <label className="mr-3">
+            <label className="mr-3 font-weight-normal">
               <input
                 type="radio"
                 value="ancestry"
