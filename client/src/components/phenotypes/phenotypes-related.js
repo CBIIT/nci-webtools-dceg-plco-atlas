@@ -27,7 +27,7 @@ export function PhenotypesRelated({
   },];
 
   const layout = {
-    title: `Phenotypes Related to ${selectedPhenotype.title}`,
+    // title: `Phenotypes Related to ${selectedPhenotype.title}`,
     showlegend: false,
     xaxis: {
       showticklabels: false,
@@ -42,6 +42,7 @@ export function PhenotypesRelated({
   };
 
   const config = {
+    displayModeBar: false,
     // responsive: true,
   };
 
