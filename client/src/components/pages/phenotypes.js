@@ -27,14 +27,8 @@ export function Phenotypes() {
 
   const plotContainer = useRef(null);
   // const plot = useRef(null);
-  // const [breadcrumb, setBreadcrumb] = useState([]);
 
-  // const phenotypes = useSelector(state => state.phenotypes);
-  // const phenotypeCategories = useSelector(state => state.phenotypeCategories);
   const phenotypesTree = useSelector(state => state.phenotypesTree);
-  // const alphabetizedPhenotypes = [...phenotypes].sort((a, b) =>
-  //   a.title.localeCompare(b.title)
-  // );
 
   const [openSidebar, setOpenSidebar] = useState(true);
 
@@ -128,21 +122,16 @@ export function Phenotypes() {
     if (e) {
       if (e.data.children && e.data.children.length > 0) {
         // parent
+        setSelectedPhenotype(null);
       } else {
         //leaf
         // console.log("LEAF!", e.data);
         setSelectedPhenotype(e.data);
       }
     } else {
+      // background is clicked
       setSelectedPhenotype(null);
     }
-    // if (e.data.children && e.data.children.length > 0) {
-    //   // parent
-    // } else {
-    //   //leaf
-    //   // console.log("LEAF!", e.data);
-    //   setSelectedPhenotype(e.data);
-    // }
   }
 
   const handleDoubleClick = (e) => {
@@ -194,7 +183,7 @@ export function Phenotypes() {
       <MainPanel className="col-lg-9">
         <PhenotypesSearchCriteria />
         {!submitted &&
-          <div className="bg-white border rounded-0 p-4">
+          <div className="bg-white border rounded-0 p-4" style={{ minHeight: '50vh' }}>
             {
               breadcrumb.length > 0 && breadcrumb.map((item, idx) =>
                 <span className="" key={"crumb-" + item.data.title}>
@@ -218,7 +207,8 @@ export function Phenotypes() {
             }
             <div
               ref={plotContainer}
-              className="bubble-chart text-center"
+              className="mt-3 bubble-chart text-center"
+              style={{ minHeight: '50vh' }}
             />
           </div>
         }

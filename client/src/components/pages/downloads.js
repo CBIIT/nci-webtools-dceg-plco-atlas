@@ -110,7 +110,7 @@ export function Downloads() {
       </SidebarPanel>
 
       <MainPanel className="col-lg-9">
-        <div className="bg-white border rounded-0 p-4">
+        <div className="bg-white border rounded-0 p-4" style={{ minHeight: '50vh' }}>
           {!submitted && <p class="h4 text-center text-secondary my-5">Please select phenotypes to download</p>}
           {submitted && <>
             <h2>Downloading Data</h2>
