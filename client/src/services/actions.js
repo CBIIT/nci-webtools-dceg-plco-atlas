@@ -94,6 +94,7 @@ export function initialize() {
         categories.push({
           title: node.title,
           value: node.value,
+          color: node.color,
           children: node.children
         });
       }

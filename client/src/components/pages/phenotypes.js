@@ -29,12 +29,12 @@ export function Phenotypes() {
   // const plot = useRef(null);
   // const [breadcrumb, setBreadcrumb] = useState([]);
 
-  const phenotypes = useSelector(state => state.phenotypes);
-  const phenotypeCategories = useSelector(state => state.phenotypeCategories);
+  // const phenotypes = useSelector(state => state.phenotypes);
+  // const phenotypeCategories = useSelector(state => state.phenotypeCategories);
   const phenotypesTree = useSelector(state => state.phenotypesTree);
-  const alphabetizedPhenotypes = [...phenotypes].sort((a, b) =>
-    a.title.localeCompare(b.title)
-  );
+  // const alphabetizedPhenotypes = [...phenotypes].sort((a, b) =>
+  //   a.title.localeCompare(b.title)
+  // );
 
   const [openSidebar, setOpenSidebar] = useState(true);
 
@@ -51,7 +51,10 @@ export function Phenotypes() {
   };
 
   const setCurrentBubbleData = currentBubbleData => {
-    dispatch(updateBrowsePhenotypes({ currentBubbleData }))
+    dispatch(updateBrowsePhenotypes({
+      currentBubbleData,
+      selectedPhenotype: null
+    }))
   };
 
   const setSelectedPhenotype = selectedPhenotype => {
@@ -62,12 +65,9 @@ export function Phenotypes() {
     setMessages([]);
   };
 
-  // function handleChange(items) {
-  //   dispatch(updateBrowsePhenotypes({
-  //     selectedPhenotypes: items,
-  //     submitted: false,
-  //   }));
-  // }
+  function handleChange(phenotype) {
+    setSelectedPhenotype(phenotype);
+  }
 
   // when submitting:
   // 1. Fetch aggregate data for displaying manhattan plot(s)
@@ -111,65 +111,55 @@ export function Phenotypes() {
       currentBubbleData: null,
       phenotypeData: null,
     }));
-    // drawBubbleChart(phenotypesTree);
   }
 
   useEffect(() => {
     console.log("useEffect() triggered!");
-    // need to prevent handle-clicks from triggering drawBubbleChart()
     if (submitted || !phenotypesTree) return;
     plotContainer.current.innerHTML = '';
     drawBubbleChart(currentBubbleData ? currentBubbleData : phenotypesTree);
-  }, [phenotypesTree, breadcrumb, currentBubbleData])
+  }, [phenotypesTree, breadcrumb, currentBubbleData, selectedPhenotype])
 
   const drawBubbleChart = (data) => {
-    new Plot(plotContainer.current, data, handleSingleClick, handleDoubleClick, handleBackgroundDoubleClick);
+    new Plot(plotContainer.current, data, handleSingleClick, handleDoubleClick, handleBackgroundDoubleClick, selectedPhenotype);
   }
 
   const handleSingleClick = (e) => {
-    if (e.data.children && e.data.children.length > 0) {
-      // parent
-      // let nextData = {
-      //     children: e.data.children
-      // }
-      // setCurrentBubbleData(e.data.children);
-      // setBreadcrumb([...breadcrumb, e]);
-      // drawBubbleChart(nextData);
+    if (e) {
+      if (e.data.children && e.data.children.length > 0) {
+        // parent
+      } else {
+        //leaf
+        // console.log("LEAF!", e.data);
+        setSelectedPhenotype(e.data);
+      }
     } else {
-      //leaf
-      console.log("LEAF!", e.data);
-      setSelectedPhenotype(e.data);
-      // handleSubmit(e.data);
+      setSelectedPhenotype(null);
     }
+    // if (e.data.children && e.data.children.length > 0) {
+    //   // parent
+    // } else {
+    //   //leaf
+    //   // console.log("LEAF!", e.data);
+    //   setSelectedPhenotype(e.data);
+    // }
   }
 
   const handleDoubleClick = (e) => {
     if (e.data.children && e.data.children.length > 0) {
       // parent
-      // let nextData = {
-      //     children: e.data.children
-      // }
       setCurrentBubbleData(e.data.children);
       setBreadcrumb([...breadcrumb, e]);
-      // drawBubbleChart(nextData);
     } else {
       // leaf
-      // console.log("LEAF!", e);
       handleSubmit(e.data);
     }
   }
 
   const handleBackgroundDoubleClick = () => {
     if (breadcrumb.length >= 1) {
-      // let lastData = {
-      //   children: breadcrumb[breadcrumb.length - 1]
-      // }
-      console.log("lastData", breadcrumb[breadcrumb.length - 1]);
-      setCurrentBubbleData(breadcrumb[breadcrumb.length - 1].data.children);
+      setCurrentBubbleData(breadcrumb[breadcrumb.length - 1].parent.data.children);
       setBreadcrumb([...breadcrumb.splice(0, breadcrumb.length -  1)]);
-      // drawBubbleChart(lastData);
-    } else {
-      console.log("no data to go back!");
     }
   }
 
@@ -177,7 +167,6 @@ export function Phenotypes() {
     let newBreadcrumb = breadcrumb.splice(0, idx);
     setBreadcrumb(newBreadcrumb);
     setCurrentBubbleData(item.parent.data.children);
-    // drawBubbleChart(item.parent.data.children);
   }
 
   return (
@@ -189,6 +178,7 @@ export function Phenotypes() {
         <div className="p-2 bg-white border rounded-0">
           <PhenotypesForm
             phenotype={selectedPhenotype}
+            onChange={handleChange}
             onSubmit={handleSubmit}
             onReset={handleReset}
           />
