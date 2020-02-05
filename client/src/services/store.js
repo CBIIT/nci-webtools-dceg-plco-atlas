@@ -119,13 +119,14 @@ export const getInitialState = () => ({
   },
   browsePhenotypes: {
     selectedPhenotype: null,
-    submitted: null, 
+    submitted: null,
     messages: [],
     searchCriteriaPhenotypes: {},
     selectedPlot: 'frequency',
     phenotypeType: 'binary',
     breadcrumb: [],
-    currentBubbleData: null
+    currentBubbleData: null,
+    phenotypeData: null,
   },
   downloads: {
     selectedPhenotypes: [],

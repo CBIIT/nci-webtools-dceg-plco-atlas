@@ -10,6 +10,7 @@ import {
   MainPanel,
 } from '../controls/sidebar-container';
 import { updateBrowsePhenotypes } from '../../services/actions';
+import { query } from '../../services/query';
 import { BubbleChart as Plot } from '../../services/plots/bubble-chart';
 import { Icon } from '../controls/icon';
 
@@ -20,7 +21,8 @@ export function Phenotypes() {
     messages,
     submitted,
     breadcrumb,
-    currentBubbleData
+    currentBubbleData,
+    data,
   } = useSelector(state => state.browsePhenotypes);
 
   const plotContainer = useRef(null);
@@ -49,7 +51,7 @@ export function Phenotypes() {
   };
 
   const setCurrentBubbleData = currentBubbleData => {
-    dispatch(updateBrowsePhenotypes({ 
+    dispatch(updateBrowsePhenotypes({
       currentBubbleData,
       selectedPhenotype: null
     }))
@@ -70,7 +72,7 @@ export function Phenotypes() {
   // when submitting:
   // 1. Fetch aggregate data for displaying manhattan plot(s)
   // 2. Fetch variant data for each selected gender
-  const handleSubmit = (phenotype) => {
+  const handleSubmit = async (phenotype) => {
     if (!phenotype) {
       return setMessages([
         {
@@ -80,15 +82,17 @@ export function Phenotypes() {
       ]);
     }
 
+    // some action here
+    const data = await query('data/phenotype_data_binary.json');
+
     // update browse phenotypes filters
     dispatch(
       updateBrowsePhenotypes({
         selectedPhenotype: phenotype,
         submitted: true,
+        phenotypeData: data,
       })
     );
-
-    // some action here
 
     setSearchCriteriaPhenotypes({
       phenotype: [...phenotype.title]
@@ -104,7 +108,8 @@ export function Phenotypes() {
       selectedPlot: 'frequency',
       phenotypeType: 'binary',
       breadcrumb: [],
-      currentBubbleData: null
+      currentBubbleData: null,
+      phenotypeData: null,
     }));
   }
 
@@ -160,7 +165,7 @@ export function Phenotypes() {
   }
 
   return (
-    <SidebarContainer 
+    <SidebarContainer
       className="m-3"
       collapsed={!openSidebar}
       onCollapsed={collapsed => setOpenSidebar(!collapsed)}>
@@ -183,13 +188,13 @@ export function Phenotypes() {
 
       <MainPanel className="col-lg-9">
         <PhenotypesSearchCriteria />
-        {!submitted && 
+        {!submitted &&
           <div className="bg-white border rounded-0 p-4">
             {
               breadcrumb.length > 0 && breadcrumb.map((item, idx) =>
                 <span className="" key={"crumb-" + item.data.title}>
-                  <a 
-                    href="javascript:void(0)" 
+                  <a
+                    href="javascript:void(0)"
                     onClick={_ => crumbClick(item, idx)}
                   >
                     { idx === 0 ? 'All Phenotypes' : item.data.title}
