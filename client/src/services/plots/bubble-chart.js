@@ -18,21 +18,21 @@ export class BubbleChart {
 
     drawBubbleChart(container, data, handleSingleClick, handleDoubleClick, handleBackgroundDoubleClick, selectedPhenotype) {
         // console.log("data reached drawBubbleChart() d3", dataset);
-        console.log("selectedPhenotype", selectedPhenotype);
 
         d3.selectAll(".bubble")
             .remove()
 
         var diameter = 800;
-        // const normalize = (val, min, max) => {
-        //     return (val - min) / (max - min);
-        // }
+        // var linearScale = d3.scaleLinear()
+        //     .domain([500, 19200])
+        //     .range([25, 250]);
 
         var bubble = d3.pack(data)
             .size([diameter, diameter])
             // .radius(function (d) {
             //     // return sizeScale(d.value);
-            //     return normalize(d.count, 20, 50);
+            //     // return normalize(d.count, 20, 50);
+            //     return linearScale(d.value);
             // })
             .padding(1.5);
 
@@ -102,7 +102,7 @@ export class BubbleChart {
                 return d.r - 10;
             })
             .style("fill", "#FFFFFF")
-            .style("opacity", "50%")
+            // .style("opacity", "100%")
             .attr("class", "inner-circle-background");
         
         node.append("circle")
@@ -110,40 +110,27 @@ export class BubbleChart {
                 return d.r - 10;
             })
             .style("fill", function (d) {
-                return d.children ? d.data.color ? d.data.color : "pink" : "#FFFFFF";
+                return d.data.color ? d.data.color : "pink";
             })
             .style("opacity", function (d) {
-                return d.children ? "20%" : "100%";
+                return d.children ? "75%" : "25%";
             })
             .attr("class", "inner-circle");
 
         node.append("text")
+            .attr("dy", "0em")
             .style("text-anchor", "middle")
             .text(function (d) {
-                return d.value;
-            })
-            .attr("font-family", "Gill Sans", "Gill Sans MT")
-            .attr("font-size", function (d) {
-                return d.r / 5 < 10 ? 10 : d.r / 5;
-            })
-            .attr("fill", function(d) {
-                return "black";
-            });
-
-        node.append("text")
-            .attr("class", "phenotype-title")
-            .attr("dy", "1em")
-            .style("text-anchor", "middle")
-            .text(function (d) {
-                return d.data.title;
+                return [d.data.title, d.value];
             })
             .attr("font-family", "sans-serif")
             .attr("font-size", function (d) {
                 return d.r / 6 < 10 ? 10 : d.r / 6;
             })
             .attr("fill", function(d) {
-                return "black"
-            });
+                return d.children ? "white" : "black";
+            })
+            .call(wrap, 18);
 
         node.on("click", function (e) {
             if (!e.children) {
@@ -166,9 +153,6 @@ export class BubbleChart {
         node.on("dblclick", function (e) {
             handleDoubleClick(e);
         });
-
-        d3.selectAll(".phenotype-title")
-            .call(wrap, 18);
 
         d3.select(container)
             .style("height", diameter + "px");
@@ -196,25 +180,30 @@ export class BubbleChart {
 }
 
 function wrap(text, width) {
+    console.log("text",text);
+    // var [label, value] = text.split(',');
     text.each(function() {
-      var text = d3.select(this),
-          words = text.text().split(/\s+/).reverse(),
-          word,
-          line = [],
-          lineNumber = 0,
-          lineHeight = .1, // ems
-          y = text.attr("y"),
-          dy = parseFloat(text.attr("dy")),
-          tspan = text.text(null).append("tspan").attr("x", 0).attr("y", y).attr("dy", dy + "em");
-      while (word = words.pop()) {
-        line.push(word);
-        tspan.text(line.join(" "));
-        if (line.join(" ").length > width) {
-          line.pop();
-          tspan.text(line.join(" "));
-          line = [word];
-          tspan = text.append("tspan").attr("x", 0).attr("y", y).attr("dy", ++lineNumber * lineHeight + dy + "em").text(word);
+        var text = d3.select(this),
+            label = text.text().split(',')[0],
+            value = text.text().split(',')[1],
+            words = label.split(/[\/\\\s+]/).reverse(),
+            word,
+            line = [],
+            // lineNumber = 0,
+            // lineHeight = 1, // ems
+            y = text.attr("y"),
+            dy = parseFloat(text.attr("dy")),
+            tspan = text.text(null).append("tspan").attr("x", 0).attr("y", y).attr("dy", dy + "em");
+        while (word = words.pop()) {
+            line.push(word);
+            tspan.text(line.join(" "));
+            if (line.join(" ").length > width) {
+                line.pop();
+                tspan.text(line.join(" "));
+                line = [word];
+                tspan = text.append("tspan").attr("x", 0).attr("y", y).attr("dy", "1em").text(word);
+            }
         }
-      }
+        tspan = text.append("tspan").attr("x", 0).attr("y", y).attr("dy", "1.2em").text(value);
     });
   }
