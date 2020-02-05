@@ -22,7 +22,7 @@ export class BubbleChart {
         d3.selectAll(".bubble")
             .remove()
 
-        var diameter = 800;
+        var diameter = 750;
         // var linearScale = d3.scaleLinear()
         //     .domain([500, 19200])
         //     .range([25, 250]);
@@ -41,7 +41,6 @@ export class BubbleChart {
             .attr("width", diameter)
             .attr("height", diameter)
             .attr("class", "bubble");
-
 
         svg.append("rect")
             .attr("class", "overlay")
