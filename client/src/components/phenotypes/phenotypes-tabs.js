@@ -53,7 +53,8 @@ export function PhenotypesTabs() {
                 type="radio"
                 value="age"
                 onChange={e => setDistributionType(e.target.value)}
-                checked={distributionType == 'age'}/>
+                checked={distributionType == 'age'}
+                className="mr-1" />
               Age
             </label>
 
@@ -62,7 +63,8 @@ export function PhenotypesTabs() {
                 type="radio"
                 value="gender"
                 onChange={e => setDistributionType(e.target.value)}
-                checked={distributionType == 'gender'} />
+                checked={distributionType == 'gender'} 
+                className="mr-1" />
               Gender
             </label>
 
@@ -71,7 +73,8 @@ export function PhenotypesTabs() {
                 type="radio"
                 value="ancestry"
                 onChange={e => setDistributionType(e.target.value)}
-                checked={distributionType == 'ancestry'} />
+                checked={distributionType == 'ancestry'} 
+                className="mr-1"/>
               Ancestry
             </label>
           </div>
