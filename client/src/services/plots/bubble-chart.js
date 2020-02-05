@@ -1,22 +1,22 @@
 import * as d3 from 'd3'
 
 export class BubbleChart {
-    constructor(container, realData, handleSingleClick, handleDoubleClick, handleBackgroundDoubleClick, selectedPhenotype) {
+    constructor(container, currentData, handleSingleClick, handleDoubleClick, handleBackgroundDoubleClick, selectedPhenotype) {
         // console.log("bubble-chart service reached!", realData);
         this.container = container;
         this.handleSingleClick = handleSingleClick;
         this.handleDoubleClick = handleDoubleClick;
         this.handleBackgroundDoubleClick = handleBackgroundDoubleClick;
         this.selectedPhenotype = selectedPhenotype;
-        if (realData && realData.length > 0) {
-            this.realDataset = {
-                children: realData
+        if (currentData && currentData.length > 0) {
+            this.currentData = {
+                children: currentData
             };
-            this.drawBubbleChart(this.container, this.realDataset, this.handleSingleClick, this.handleDoubleClick, this.handleBackgroundDoubleClick, this.selectedPhenotype);
+            this.drawBubbleChart(this.container, this.currentData, this.handleSingleClick, this.handleDoubleClick, this.handleBackgroundDoubleClick, this.selectedPhenotype);
         }
     }
 
-    drawBubbleChart(container, dataset, handleSingleClick, handleDoubleClick, handleBackgroundDoubleClick, selectedPhenotype) {
+    drawBubbleChart(container, data, handleSingleClick, handleDoubleClick, handleBackgroundDoubleClick, selectedPhenotype) {
         // console.log("data reached drawBubbleChart() d3", dataset);
         console.log("selectedPhenotype", selectedPhenotype);
 
@@ -28,7 +28,7 @@ export class BubbleChart {
         //     return (val - min) / (max - min);
         // }
 
-        var bubble = d3.pack(dataset)
+        var bubble = d3.pack(data)
             .size([diameter, diameter])
             // .radius(function (d) {
             //     // return sizeScale(d.value);
@@ -61,30 +61,17 @@ export class BubbleChart {
                 handleBackgroundDoubleClick();
             });
 
-        var nodes = d3.hierarchy(dataset)
+        var nodes = d3.hierarchy(data)
             .sum(function (d) {
                 return d.count ? d.count : 0; 
             });
 
-        var bubbleNodes = bubble(nodes).descendants()
-            .filter(function(d) {
-                // console.log("filter bubble nodes", d);
-                if (selectedPhenotype) {
-                    console.log("filter bubble nodes", d.data, selectedPhenotype);
-                    return true;
-                    // return d.data === selectedPhenotype;
-                } else {
-                    return true;
-                }
-            });
-
-        // console.log("bubbleNodes", bubbleNodes);
-        // console.log("bubbleNodes[0].parent.children", selectedPhenotype ? bubbleNodes[0].parent.children : null);
-
+        var bubbleNodes = bubble(nodes).descendants();
+            
         // console.log("bubble(nodes).descendants()", bubble(nodes).descendants());
-        // find a way to only output first level of tree as nodes
+        // console.log("bubble(nodes).links()", bubble(nodes).links());
+
         var node = svg.selectAll(".node")
-            // .data(selectedPhenotype ? bubbleNodes[0].parent.children : bubbleNodes)
             .data(bubbleNodes)
             .enter()
             .filter(function (d) {
@@ -159,19 +146,20 @@ export class BubbleChart {
             });
 
         node.on("click", function (e) {
-            // console.log(e.children);
-            d3.selectAll(".circle")
+            if (!e.children) {
+                d3.selectAll(".circle")
                 .style("opacity", function (d) {
                     return "50%";
                 });
-            d3.selectAll(".node")
-                .filter(function (d) {
-                    return d === e;
-                })
-                .select(".circle")
-                .style("opacity", function (d) {
-                    return "100%";
-                });
+                d3.selectAll(".node")
+                    .filter(function (d) {
+                        return d === e;
+                    })
+                    .select(".circle")
+                    .style("opacity", function (d) {
+                        return "100%";
+                    });
+            }
             handleSingleClick(e);
         });
 

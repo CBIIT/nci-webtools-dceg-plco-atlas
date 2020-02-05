@@ -123,21 +123,16 @@ export function Phenotypes() {
     if (e) {
       if (e.data.children && e.data.children.length > 0) {
         // parent
+        setSelectedPhenotype(null);
       } else {
         //leaf
         // console.log("LEAF!", e.data);
         setSelectedPhenotype(e.data);
       }
     } else {
+      // background is clicked
       setSelectedPhenotype(null);
     }
-    // if (e.data.children && e.data.children.length > 0) {
-    //   // parent
-    // } else {
-    //   //leaf
-    //   // console.log("LEAF!", e.data);
-    //   setSelectedPhenotype(e.data);
-    // }
   }
 
   const handleDoubleClick = (e) => {
