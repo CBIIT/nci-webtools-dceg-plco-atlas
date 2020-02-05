@@ -3,8 +3,10 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Tab, Tabs } from 'react-bootstrap';
 import { updateBrowsePhenotypes } from '../../services/actions';
 import { PhenotypesFrequency } from './phenotypes-frequency'
-import { PhenotypesDistribution } from './phenotypes-distribution'
 import { PhenotypesRelated } from './phenotypes-related'
+import { PhenotypesAge } from './phenotypes-age';
+import { PhenotypesSex } from './phenotypes-sex';
+import { PhenotypesAncestry } from './phenotypes-ancestry';
 
 export function PhenotypesTabs() {
   const dispatch = useDispatch();
@@ -12,7 +14,8 @@ export function PhenotypesTabs() {
     selectedPhenotype,
     // submitted,
     selectedPlot,
-    phenotypeType
+    phenotypeType,
+    phenotypeData
   } = useSelector(state => state.browsePhenotypes);
 
   const setSelectedPlot = selectedPlot => {
@@ -30,9 +33,10 @@ export function PhenotypesTabs() {
         title="Frequency"
         className="p-2 bg-white tab-pane-bordered rounded-0"
         style={{ minHeight: '50vh' }}>
-        <PhenotypesFrequency 
+        <PhenotypesFrequency
           selectedPhenotype={selectedPhenotype}
           phenotypeType={phenotypeType}
+          frequencyData={phenotypeData.frequency}
         />
       </Tab>
 
@@ -51,9 +55,10 @@ export function PhenotypesTabs() {
             title="Age"
             className="p-2 bg-white border rounded-0"
             style={{ minHeight: '50vh' }}>
-              <PhenotypesDistribution 
+              <PhenotypesAge
                 selectedPhenotype={selectedPhenotype}
                 phenotypeType={phenotypeType}
+                ageData={phenotypeData.distribution.age}
                 option="age"
               />
           </Tab>
@@ -63,9 +68,10 @@ export function PhenotypesTabs() {
             title="Sex"
             className="p-2 bg-white border rounded-0"
             style={{ minHeight: '50vh' }}>
-              <PhenotypesDistribution 
+              <PhenotypesSex
                 selectedPhenotype={selectedPhenotype}
                 phenotypeType={phenotypeType}
+                sexData={phenotypeData.distribution.sex}
                 option="sex"
               />
           </Tab>
@@ -75,9 +81,10 @@ export function PhenotypesTabs() {
             title="Ancestry"
             className="p-2 bg-white border rounded-0"
             style={{ minHeight: '50vh' }}>
-              <PhenotypesDistribution 
+              <PhenotypesAncestry
                 selectedPhenotype={selectedPhenotype}
                 phenotypeType={phenotypeType}
+                ancestryData={phenotypeData.distribution.ancestry}
                 option="ancestry"
               />
           </Tab>
@@ -91,9 +98,10 @@ export function PhenotypesTabs() {
         title="Related Phenotypes"
         className="p-2 bg-white tab-pane-bordered rounded-0"
         style={{ minHeight: '50vh' }}>
-        <PhenotypesRelated 
+        <PhenotypesRelated
           selectedPhenotype={selectedPhenotype}
           phenotypeType={phenotypeType}
+          data={phenotypeData.related}
         />
       </Tab>
 
