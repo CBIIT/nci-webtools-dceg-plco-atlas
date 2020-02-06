@@ -163,8 +163,7 @@ export class BubbleChart {
                 });
             d3.selectAll(".node")
                 .filter(function (d) {
-                    // console.log(d, selectedPhenotype);
-                    return d.data === selectedPhenotype;
+                    return d.data.title === selectedPhenotype.title && d.data.value === selectedPhenotype.value;
                 })
                 .select(".circle")
                 .style("opacity", function (d) {

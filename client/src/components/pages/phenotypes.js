@@ -59,7 +59,39 @@ export function Phenotypes() {
     setMessages([]);
   };
 
-  function handleChange(phenotype) {
+  const getParent = (item, node, parent, found = []) => {
+    if (item.children && item.children.length > 0) {
+      // has children = PARENT
+      for (var i = 0; i < item.children.length; i++) {
+        getParent(item.children[i], node, item, found)
+      }
+    } 
+    else {
+      // no children = LEAF
+      if (item.title === node.title && item.value === node.value) {
+        found.push(parent);
+      }
+    }
+    return found;
+  };
+
+  const handleChange = (phenotype) => {
+    // console.log("handleChange", phenotype);
+    let phenotypesTreeFull = {
+        children: phenotypesTree
+    };
+    const parent = getParent(phenotypesTreeFull, phenotype, null)[0];
+    setCurrentBubbleData(parent.children);
+    setBreadcrumb([{
+      data: {
+        title: parent.title
+      },
+      parent: {
+        data:  {
+          children: phenotypesTree
+        }
+      }
+    }]);
     setSelectedPhenotype(phenotype);
   }
 
@@ -111,6 +143,7 @@ export function Phenotypes() {
     // console.log("useEffect() triggered!");
     if (submitted || !phenotypesTree) return;
     plotContainer.current.innerHTML = '';
+    // console.log("currentBubbleData", currentBubbleData);
     drawBubbleChart(currentBubbleData ? currentBubbleData : phenotypesTree);
   }, [phenotypesTree, breadcrumb, currentBubbleData, selectedPhenotype, submitted])
 
@@ -141,6 +174,8 @@ export function Phenotypes() {
       setBreadcrumb([...breadcrumb, e]);
     } else {
       // leaf
+      // console.log("leaf!", e.parent.data.children);
+      // setCurrentBubbleData(e.parent.data.children);
       handleSubmit(e.data);
     }
   }
@@ -153,6 +188,7 @@ export function Phenotypes() {
   }
 
   const crumbClick = (item, idx) => {
+    console.log("CRUMB ITEM", item);
     let newBreadcrumb = breadcrumb.splice(0, idx);
     setBreadcrumb(newBreadcrumb);
     setCurrentBubbleData(item.parent.data.children);
