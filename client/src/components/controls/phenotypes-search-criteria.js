@@ -1,8 +1,10 @@
 import React from 'react';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { updateBrowsePhenotypes } from '../../services/actions';
 import { Tab, Tabs } from 'react-bootstrap';
 
 export const PhenotypesSearchCriteria = () => {
+  const dispatch = useDispatch();
   const {
     searchCriteriaPhenotypes,
     submitted
@@ -18,6 +20,12 @@ export const PhenotypesSearchCriteria = () => {
     </div>
   );
 
+  const setSubmitted = () => {
+    dispatch(updateBrowsePhenotypes({ 
+      submitted: null,
+     }));
+  }
+
   return (
     <div className="mb-2">
       <Tabs className="" defaultActiveKey="phenotypes-search-criteria">
@@ -27,6 +35,14 @@ export const PhenotypesSearchCriteria = () => {
           <div
             className="left"
             style={{ display: !submitted ? 'none' : 'block' }}>
+            <div
+              className="left">
+              <a 
+                href="javascript:void(0)"
+                onClick={setSubmitted}>
+                Go back
+              </a>
+            </div>
             <p className="h4 my-1">
               {searchCriteriaPhenotypes.phenotype}
 

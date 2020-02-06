@@ -203,6 +203,6 @@ function wrap(text, width) {
                 tspan = text.append("tspan").attr("x", 0).attr("y", y).attr("dy", "1em").text(word);
             }
         }
-        tspan = text.append("tspan").attr("x", 0).attr("y", y).attr("dy", "1.2em").text(value);
+        tspan = text.append("tspan").attr("x", 0).attr("y", y).attr("dy", "1.2em").text(Number(value).toLocaleString());
     });
   }

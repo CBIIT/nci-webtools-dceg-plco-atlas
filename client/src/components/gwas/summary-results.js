@@ -358,7 +358,7 @@ export function SummaryResults() {
                   {content}
                 </Alert>
               ))}
-            </div>
+          </div>
         </SidebarPanel>
 
         <MainPanel className="col-lg-9">
