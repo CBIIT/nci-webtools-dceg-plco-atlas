@@ -174,7 +174,7 @@ export function drawManhattanPlot(plotType, params) {
   console.log('drawing plot', plotType, params);
   return async function(dispatch) {
     dispatch(updateSummaryResults({ loadingManhattanPlot: true }));
-    if (params.table.length == 2) {
+    if (params.table.length === 2) {
       // if 2 tables are provided, this is a mirrored plot
       const manhattanPlotData = await rawQuery(plotType, {
         ...params,

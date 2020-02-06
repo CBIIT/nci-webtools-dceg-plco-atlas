@@ -29,9 +29,11 @@ export function Gwas() {
           <div className="">
             <Nav defaultActiveKey="summary">
               {gwasLinks.map(({ name, pathId }) => (
-                <>
+                <div
+                  key={pathId}
+                  className="d-inline-block">
                   <NavLink
-                    key={pathId}
+                    // key={pathId}
                     className="secondary-navlinks px-3 py-1 d-inline-block"
                     activeClassName="active-secondary-navlinks"
                     style={{
@@ -45,7 +47,7 @@ export function Gwas() {
                     {name}
                   </NavLink>
                   <div className="d-md-none w-100"></div>
-                </>
+                </div>
               ))}
             </Nav>
           </div>

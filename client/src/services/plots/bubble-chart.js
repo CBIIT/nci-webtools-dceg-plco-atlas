@@ -163,8 +163,7 @@ export class BubbleChart {
                 });
             d3.selectAll(".node")
                 .filter(function (d) {
-                    // console.log(d, selectedPhenotype);
-                    return d.data === selectedPhenotype;
+                    return d.data.title === selectedPhenotype.title && d.data.value === selectedPhenotype.value;
                 })
                 .select(".circle")
                 .style("opacity", function (d) {
@@ -179,13 +178,11 @@ export class BubbleChart {
 }
 
 function wrap(text, width) {
-    console.log("text",text);
-    // var [label, value] = text.split(',');
     text.each(function() {
         var text = d3.select(this),
             label = text.text().split(',')[0],
             value = text.text().split(',')[1],
-            words = label.split(/[\/\\\s+]/).reverse(),
+            words = label.split(/[/\s+]/).reverse(),
             word,
             line = [],
             // lineNumber = 0,
@@ -193,7 +190,8 @@ function wrap(text, width) {
             y = text.attr("y"),
             dy = parseFloat(text.attr("dy")),
             tspan = text.text(null).append("tspan").attr("x", 0).attr("y", y).attr("dy", dy + "em");
-        while (word = words.pop()) {
+        while (words.length > 0) {
+            word = words.pop()
             line.push(word);
             tspan.text(line.join(" "));
             if (line.join(" ").length > width) {
