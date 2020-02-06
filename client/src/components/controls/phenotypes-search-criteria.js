@@ -2,6 +2,8 @@ import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { updateBrowsePhenotypes } from '../../services/actions';
 import { Tab, Tabs } from 'react-bootstrap';
+import { Icon } from './icon';
+
 
 export const PhenotypesSearchCriteria = () => {
   const dispatch = useDispatch();
@@ -35,22 +37,27 @@ export const PhenotypesSearchCriteria = () => {
           <div
             className="left"
             style={{ display: !submitted ? 'none' : 'block' }}>
+
             <div
               className="left">
               <a 
                 href="javascript:void(0)"
                 onClick={setSubmitted}>
-                Go back
+                Bubble Chart
               </a>
+              <Icon
+                name="arrow-left"
+                className="mx-2 opacity-50"
+                width="10"
+              />
             </div>
+            
             <p className="h4 my-1">
               {searchCriteriaPhenotypes.phenotype}
 
               <span className="text-muted ml-3" style={{fontSize: '13px'}}>
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed et venenatis mauris. Etiam aliquam accumsan enim, in sodales urna ultrices sed. Duis et vehicula ante, tempor semper nisl. Suspendisse in tempor erat, at tincidunt elit. Etiam scelerisque venenatis nulla eu maximus. Ut sit amet ipsum odio.
-          </span>
-
-
+                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed et venenatis mauris. Etiam aliquam accumsan enim, in sodales urna ultrices sed. Duis et vehicula ante, tempor semper nisl. Suspendisse in tempor erat, at tincidunt elit. Etiam scelerisque venenatis nulla eu maximus. Ut sit amet ipsum odio.
+              </span>
             </p>
 
           </div>
