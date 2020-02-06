@@ -83,7 +83,7 @@ export function Downloads() {
               value={selectedPhenotypes}
               onChange={handleChange}
             />
-            <small class="text-muted"><i>Up to five phenotypes may be selected for download.</i></small>
+            <small className="text-muted"><i>Up to five phenotypes may be selected for download.</i></small>
           </div>
 
           <div>
@@ -111,7 +111,7 @@ export function Downloads() {
 
       <MainPanel className="col-lg-9">
         <div className="bg-white border rounded-0 p-4" style={{ minHeight: '50vh' }}>
-          {!submitted && <p class="h4 text-center text-secondary my-5">Please select phenotypes to download</p>}
+          {!submitted && <p className="h4 text-center text-secondary my-5">Please select phenotypes to download</p>}
           {submitted && <>
             <h2>Downloading Data</h2>
             <p>If your downloads do not begin within five seconds, use the links below to download data for each selected phenotype.</p>
