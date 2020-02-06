@@ -12,7 +12,7 @@ export function PhenotypesForm({
 
   // private members prefixed with _
   const [_phenotype, _setPhenotype] = useState(null);
-  const submitRef = useRef(null);
+  // const submitRef = useRef(null);
 
   // update state when props change
   useEffect(() => _setPhenotype(phenotype), [phenotype]);
