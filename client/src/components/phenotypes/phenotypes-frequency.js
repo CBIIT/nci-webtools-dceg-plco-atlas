@@ -13,27 +13,26 @@ export function PhenotypesFrequency({
     hoverinfo: 'label+percent',
     hole: .4,
     type: 'pie',
-  },];
+  }];
 
   const plotLayout = {
     // title: `Frequency of ${selectedPhenotype.title}`,
-    showlegend: true
+    showlegend: true,
+    autosize: true,
   };
 
   const plotConfig = {
     displayModeBar: false,
-    // responsive: true,
+    responsive: true,
   }
 
   return (
-    <div className="m-2 text-center">
-      <Plot
-        // className="w-100"
-        data={plotData}
-        layout={plotLayout}
-        config={plotConfig}
-        onLegendClick={_ => false}
-        />
-    </div>
+    <Plot
+      style={{ width: "100%", height: "600px" }}
+      data={plotData}
+      layout={plotLayout}
+      config={plotConfig}
+      onLegendClick={_ => false}
+    />
   );
 }

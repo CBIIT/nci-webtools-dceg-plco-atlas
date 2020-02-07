@@ -27,22 +27,21 @@ export function PhenotypesAge({
   const plotLayout = {
     // title: `Distribution of ${selectedPhenotype.title} by Age`,
     barmode: 'stack',
+    autosize: true,
   };
 
   const plotConfig = {
-    // responsive: true,
+    responsive: true,
     displayModeBar: false,
   }
 
   return (
-    <div className="m-2  text-center">
-        <Plot
-          // className="w-100"
-          data={plotData}
-          layout={plotLayout}
-          config={plotConfig}
-          onLegendClick={_ => false}
-        />
-    </div>
+    <Plot
+      style={{ width: "100%", height: "600px" }}
+      data={plotData}
+      layout={plotLayout}
+      config={plotConfig}
+      onLegendClick={_ => false}
+    />
   );
 }

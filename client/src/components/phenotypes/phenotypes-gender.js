@@ -52,20 +52,19 @@ export function PhenotypesGender({
   const plotLayout = {
     // title: `Distribution of ${selectedPhenotype.title} by Gender`,
     // showlegend: true,
+    autosize: true,
   };
 
   const plotConfig = {
     displayModeBar: false,
-    // responsive: true,
+    responsive: true,
   };
 
   return (
-    <div className="m-2 text-center">
-        <Plot
-            // className="w-100"
-            data={plotData}
-            config={plotConfig}
-        />
-    </div>
+    <Plot
+      style={{ width: "100%", height: "600px" }}
+      data={plotData}
+      config={plotConfig}
+    />
   );
 }
