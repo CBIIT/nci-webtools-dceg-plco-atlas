@@ -1,31 +1,30 @@
 {
     "type": "binary",
-    "frequency": {
-        "positive": 0.01,
-        "negative": 0.99
-    },
+    "categories": ["% with", "% without"],
+    "distributionCategories": ["% with"],
+    "frequency": [0.01, 0.09],
     "distribution": {
         "age": {
-            "40-44": 100,
-            "45-49": 200,
-            "50-54": 350,
-            "55-59": 450,
-            "60-64": 500,
-            "65-69": 450,
-            "70-74": 200,
-            "80-84": 100
+            "40-44": [100],
+            "45-49": [200],
+            "50-54": [350],
+            "55-59": [450],
+            "60-64": [500],
+            "65-69": [450],
+            "70-74": [200],
+            "80-84": [100]
         },
         "gender": {
-            "female": 0.51,
-            "male": 0.49
+            "female": [0.51],
+            "male": [0.49]
         },
         "ancestry": {
-            "American Indian": 100,
-            "Pacific Islander": 300,
-            "Asian": 150,
-            "Hispanic": 400,
-            "Black": 350,
-            "White": 450
+            "American Indian": [100],
+            "Pacific Islander": [300],
+            "Asian": [150],
+            "Hispanic": [400],
+            "Black": [350],
+            "White": [450]
         }
     },
     "related": [
@@ -37,7 +36,7 @@
         {
             "name": "Melanoma",
             "sampleSize": 100000,
-            "correlation": 0.4
+            "correlation": 1
         },
         {
             "name": "Renal Cell Carcinoma",
