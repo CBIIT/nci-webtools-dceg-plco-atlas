@@ -52,7 +52,12 @@ export class BubbleChart {
                 d3.selectAll(".node")
                     .select(".circle")
                     .style("opacity", function (d) {
-                        return "100%";
+                        return d.children ? "100%" : "50%";
+                    });
+                d3.selectAll(".node")
+                    .select(".inner-circle")
+                    .style("opacity", function (d) {
+                        return "75%";
                     });
                 handleSingleClick(null);
             })
@@ -66,9 +71,6 @@ export class BubbleChart {
             });
 
         var bubbleNodes = bubble(nodes).descendants();
-            
-        // console.log("bubble(nodes).descendants()", bubble(nodes).descendants());
-        // console.log("bubble(nodes).links()", bubble(nodes).links());
 
         var node = svg.selectAll(".node")
             .data(bubbleNodes)
@@ -84,7 +86,7 @@ export class BubbleChart {
 
         node.append("title")
             .text(function (d) {
-                return d.data.title + ": " + d.value;
+                return "Phenotype: " + d.data.title + " - " + "Sample Size: " + d.value;
             });
 
         node.append("circle")
@@ -94,25 +96,27 @@ export class BubbleChart {
             .style("fill", function (d) {
                 return d.data.color ? d.data.color : "pink";
             })
+            .style("opacity", function (d) {
+                return d.children ? "100%" : "50%";
+            })
             .attr("class", "circle");
 
         node.append("circle")
             .attr("r", function (d) {
-                return d.r - 5;
+                return d.children ? d.r - 5 : 0;
             })
             .style("fill", "#FFFFFF")
-            // .style("opacity", "100%")
             .attr("class", "inner-circle-background");
         
         node.append("circle")
             .attr("r", function (d) {
-                return d.r - 5;
+                return d.children ? d.r - 5 : 0;
             })
             .style("fill", function (d) {
                 return d.data.color ? d.data.color : "pink";
             })
             .style("opacity", function (d) {
-                return d.children ? "75%" : "25%";
+                return "75%";
             })
             .attr("class", "inner-circle");
 
@@ -134,16 +138,20 @@ export class BubbleChart {
         node.on("click", function (e) {
             if (!e.children) {
                 d3.selectAll(".circle")
-                .style("opacity", function (d) {
-                    return "50%";
-                });
+                    .style("opacity", function (d) {
+                        return d.children ? "75%" : "25%";
+                    });
+                d3.selectAll(".inner-circle")
+                    .style("opacity", function (d) {
+                        return "50%";
+                    });
                 d3.selectAll(".node")
                     .filter(function (d) {
                         return d === e;
                     })
                     .select(".circle")
                     .style("opacity", function (d) {
-                        return "100%";
+                        return "75%";
                     });
             }
             handleSingleClick(e);
@@ -159,6 +167,10 @@ export class BubbleChart {
         if (selectedPhenotype) {
             d3.selectAll(".circle")
                 .style("opacity", function (d) {
+                    return d.children ? "75%" : "25%";
+                });
+            d3.selectAll(".inner-circle")
+                .style("opacity", function (d) {
                     return "50%";
                 });
             d3.selectAll(".node")
@@ -167,13 +179,11 @@ export class BubbleChart {
                 })
                 .select(".circle")
                 .style("opacity", function (d) {
-                    return "100%";
+                    return "75%";
                 });
         }
 
     }
-
-    
 
 }
 

@@ -9,14 +9,13 @@ export function TreeSelectCustom({
   singleSelect
 }) {
 
-  useEffect(() => {
-    if (!value) {
-      console.log("reached1");
-      // on reset
-      setSearchInput('');
-      setListType('categorical');
-    }
-  }, [onChange])
+  // useEffect(() => {
+  //   if (!value) {
+  //     // on reset
+  //     setSearchInput('');
+  //     setListType('categorical');
+  //   }
+  // }, [onChange])
 
   const [searchInput, setSearchInput] = useState('');
   const [listType, setListType] = useState('categorical');
