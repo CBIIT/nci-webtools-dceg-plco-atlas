@@ -199,7 +199,7 @@ export function Phenotypes() {
   }
 
   const crumbClick = (item, idx) => {
-    console.log("CRUMB ITEM", item);
+    // console.log("CRUMB ITEM", item);
     let newBreadcrumb = breadcrumb.splice(0, idx);
     setBreadcrumb(newBreadcrumb);
     setCurrentBubbleData(item.parent.data.children);

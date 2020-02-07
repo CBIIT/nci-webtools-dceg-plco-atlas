@@ -21,7 +21,7 @@ export function PhenotypesForm({
 
   useEffect(() => {
     if (!displayTreeParent) return;
-    console.log("useEffect() displayTreeParent", displayTreeParent);
+    // console.log("useEffect() displayTreeParent", displayTreeParent);
     treeRef.current.expandSelectedPhenotype(displayTreeParent);
   }, [displayTreeParent]);
 
