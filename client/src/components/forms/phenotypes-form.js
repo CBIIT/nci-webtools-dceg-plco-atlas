@@ -7,7 +7,8 @@ export function PhenotypesForm({
   phenotype = null,
   onSubmit,
   onChange,
-  onReset
+  onReset,
+  displayTreeParent
 }) {
 
   // private members prefixed with _
@@ -17,6 +18,12 @@ export function PhenotypesForm({
 
   // update state when props change
   useEffect(() => _setPhenotype(phenotype), [phenotype]);
+
+  useEffect(() => {
+    if (!displayTreeParent) return;
+    console.log("useEffect() displayTreeParent", displayTreeParent);
+    treeRef.current.expandSelectedPhenotype(displayTreeParent);
+  }, [displayTreeParent]);
 
   // select store members
   const phenotypes = useSelector(state => state.phenotypes);

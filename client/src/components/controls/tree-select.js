@@ -15,6 +15,10 @@ export const TreeSelect = forwardRef(({
     resetSearchFilter() {
       clearSearchFilter();
       collapseAllParents();
+    },
+    expandSelectedPhenotype(displayTreeParent) {
+      console.log("tree-select reached! please collapse all and expand", displayTreeParent);
+      collapseAllParents();
     }
   }));
 
