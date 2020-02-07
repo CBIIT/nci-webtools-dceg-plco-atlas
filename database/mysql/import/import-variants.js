@@ -28,7 +28,7 @@ if (!(args.file && args.phenotype && args.gender)) {
 }
 
 // parse arguments and set defaults
-const { file: inputFilePath, phenotype: phenotypeNameOrId, gender, reset: shouldReset } = args;
+const { file: inputFilePath, phenotype, gender, reset: shouldReset } = args;
 //const errorLog = getLogStream(`./failed-variants-${new Date().toISOString()}.txt`);
 const errorLog = {write: e => console.log(e)};
 const duration = timestamp();
@@ -53,14 +53,17 @@ if (!/^(all|female|male)$/.test(gender)) {
     process.exit(1);
 }
 
-importVariants().then(e => process.exit(0));
+importVariants().then(e => {
+    console.log(`[${duration()} s] Imported variants`);
+    process.exit(0)
+});
 
 async function importVariants() {
     // find phenotypes either by name or id (if a numeric value was provided)
-    let phenotypes = await getRecords(connection, 'lu_phenotype', /^\d+$/.test(phenotypeNameOrId)
-        ? {id: phenotypeNameOrId}
-        : {name: phenotypeNameOrId}
-    );
+    const phenotypeKey = /^\d+$/.test(phenotype) ? 'id' : 'name';
+    const phenotypes = await getRecords(connection, 'lu_phenotype', {
+        [phenotypeKey]: phenotype
+    });
 
     if (phenotypes.length === 0) {
         console.error(`ERROR: Phenotype does not exist`)
@@ -72,12 +75,11 @@ async function importVariants() {
         process.exit(1);
     }
 
-    const phenotype = phenotypes[0].name;
+    const phenotypeName = phenotypes[0].name;
     const phenotypeId = phenotypes[0].id;
-    const phenotypeName = `${phenotype}_${phenotypeId}`;
-    const variantTable = `${phenotypeName}_variant`;
-    const aggregateTable = `${phenotypeName}_aggregate`;
-
+    const phenotypePrefix = `${phenotypeName}_${phenotypeId}`;
+    const variantTable = `${phenotypePrefix}_variant`;
+    const aggregateTable = `${phenotypePrefix}_aggregate`;
 
     // clear variants if needed
     if (shouldReset) {
@@ -106,8 +108,7 @@ async function importVariants() {
         CALL drop_index_if_exists('${aggregateTable}', 'idx_${aggregateTable}__p_value_nlog');
 
         -- create staging table
-        DROP TABLE stage;
-        CREATE TABLE stage (
+        CREATE TEMPORARY TABLE stage (
             chromosome              VARCHAR(2),
             position                BIGINT,
             position_abs_aggregate  BIGINT,
@@ -124,7 +125,7 @@ async function importVariants() {
             q                       DOUBLE,
             i                       DOUBLE
         ) ENGINE = MYISAM;
-    ` + readFile('../../schema/tables/variants.sql').replace(/\$PHENOTYPE/g, phenotypeName));
+    ` + readFile('../../schema/tables/variants.sql').replace(/\$PHENOTYPE/g, phenotypePrefix));
 
     console.log(`[${duration()} s] Importing genes to staging table...`);
     await connection.query({
@@ -142,13 +143,7 @@ async function importVariants() {
                 position_abs_aggregate = 1e6 * FLOOR(1e-6 * (SELECT @position + position_abs_min FROM chromosome_range cr WHERE cr.chromosome = @chromosome))`
     });
 
-    const [lineCountRows] = await connection.query(`SELECT ROW_COUNT()`);
-    const lineCount = pluck(lineCountRows);
-
     console.log(`[${duration()} s] Finished importing, storing variants...`);
-
-    const [firstIdRows] = await connection.query(`SELECT MAX(id) FROM ${variantTable}`)
-    const firstId = 1 + (pluck(firstIdRows) || 0);
 
     await connection.execute(`
         INSERT INTO ${variantTable} (
@@ -190,7 +185,10 @@ async function importVariants() {
 
     const [totalCountRows] = await connection.query(`SELECT ROW_COUNT()`);
     const totalCount = pluck(totalCountRows);
-    const lastId = firstId + totalCount;
+
+    // last_insert_id() retrieves the FIRST successfully generated autoincremented id
+    const [firstIdRows] = await connection.query(`SELECT LAST_INSERT_ID()`)
+    const firstId = pluck(firstIdRows);
 
     console.log(`[${duration()} s] Storing aggregated variants...`);
     await connection.execute(`
@@ -204,9 +202,14 @@ async function importVariants() {
         WHERE p_value BETWEEN 0 AND 1 AND chromosome IS NOT NULL;
     `);
 
+    // enable indexes to speed up next steps
+    console.log(`[${duration()} s] Indexing database...`);
+    const indexSql = readFile('../../schema/indexes/variants.sql').replace(/\$PHENOTYPE/g, phenotypePrefix);
+    await connection.query(indexSql);
+
     // updating variants table with Q-Q plot flag
     console.log(`[${duration()} s] Updating plot_qq values...`);
-    const intervals = getIntervals(totalCount, 10000);
+    const intervals = getIntervals(totalCount, 10000).map(i => i + firstId);
     await connection.query(`
         UPDATE ${variantTable}
         SET show_qq_plot = 1
@@ -235,18 +238,15 @@ async function importVariants() {
 
     // log imported variants
     connection.execute(`
-        INSERT INTO import_log
-            (phenotype_id, variants_original, variants_imported, created_date)
-        VALUES
-            (:phenotypeId, :lineCount, :totalCount, NOW())`,
-        {phenotypeId, lineCount, totalCount}
+        UPDATE phenotype SET
+            import_count = :totalCount,
+            import_date = NOW()
+        WHERE
+            id = :phenotypeId`,
+        {phenotypeId, totalCount}
     );
 
-    // enable indexes
-    console.log(`[${duration()} s] Indexing database...`);
-    const indexSql = readFile('../../schema/indexes/variants.sql').replace(/\$PHENOTYPE/g, phenotypeName);
-    await connection.query(indexSql);
     await connection.query(`COMMIT`);
-    console.log(`[${duration()} s] Created database`);
     await connection.end();
+    return;
 }
