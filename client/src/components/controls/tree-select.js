@@ -1,25 +1,31 @@
-import React, { useState, useEffect } from 'react';
+import React, { forwardRef, useState, useEffect, useImperativeHandle } from 'react';
 
-export function TreeSelectCustom({
+export const TreeSelect = forwardRef(({
   onChange,
   data,
   dataAlphabetical,
   dataCategories,
   value,
   singleSelect
-}) {
+}, ref) => {
 
-  // useEffect(() => {
-  //   if (!value) {
-  //     // on reset
-  //     setSearchInput('');
-  //     setListType('categorical');
-  //   }
-  // }, [onChange])
+  const [expandAll, setExpandAll] = useState(false);
+
+  useImperativeHandle(ref, () => ({
+    resetSearchFilter() {
+      clearSearchFilter();
+      collapseAllParents();
+    }
+  }));
 
   const [searchInput, setSearchInput] = useState('');
   const [listType, setListType] = useState('categorical');
-  const [expandAll, setExpandAll] = useState(false);
+
+  const clearSearchFilter = () => {
+    setSearchInput('');
+    setListType('categorical');
+  };
+
   const containsVal = (arr, val) => {
     let result = false;
     for (var i = 0; i < arr.length; i++) {
@@ -124,6 +130,25 @@ export function TreeSelectCustom({
       }
       setExpandAll(false);
     }
+  };
+
+  const collapseAllParents = () => {
+    for (let i = 0; i < dataCategories.length; i++) {
+      const className = 'children-of-' + dataCategories[i].value;
+      if (
+        document.getElementsByClassName(className)[0].style.display &&
+        document.getElementsByClassName(className)[0].style.display ===
+          'block'
+      ) {
+        document.getElementsByClassName(className)[0].style.display = 'none';
+        const collapseButton = document.getElementsByClassName(
+          'collapse-button-text-' + dataCategories[i].value
+        )[0];
+        collapseButton.classList.toggle('fa-plus-square', true);
+        collapseButton.classList.toggle('fa-minus-square', false);
+      }
+    }
+    setExpandAll(false);
   };
 
   const toggleHideChildren = name => {
@@ -623,8 +648,7 @@ export function TreeSelectCustom({
                 <button
                   className="input-group-text bg-white"
                   onClick={e => {
-                    setSearchInput('');
-                    setListType('categorical');
+                    clearSearchFilter();
                   }}>
                   <i className="fas fa-times fa-xs"></i>
                 </button>
@@ -660,4 +684,4 @@ export function TreeSelectCustom({
       </div>
     </>
   );
-}
+});
