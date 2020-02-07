@@ -5,31 +5,33 @@ export function PhenotypesAncestry({
   selectedPhenotype,
   phenotypeType,
   option,
-  ancestryData,
+  data,
 }) {
 
-  let x = [];
-  let y = [];
+  let colors = ["#1f77b4","#ff7f0e","#2ca02c","#d62728","#9467bd","#8c564b","#e377c2","#7f7f7f","#bcbd22","#17becf"];
 
-  for (let key in ancestryData) {
-    x.push(ancestryData[key]);
-    y.push(key);
-  }
+  // create traces for stacked bar chart
+  const plotData = data.distributionCategories.map((name, i) => {
+    let ancestryData = data.distribution.ancestry;
+    let x = [];
+    let y = [];
 
+    for (let key in ancestryData) {
+      x.push(ancestryData[key][i]);
+      y.push(key);
+    }
 
-  const data = [{
-    x, y,
-    type: 'bar',
-    orientation: 'h',
-  }];
+    return {x, y, name, type: 'bar', orientation: 'h', marker: {color: colors[i]}};
+  })
 
-  const layout = {
+  const plotLayout = {
     // title: `Distribution of ${selectedPhenotype.title} by Ancestry`,
     xaxis: {automargin: true},
     yaxis: {automargin: true},
+    barmode: 'stack',
   };
 
-  const config = {
+  const plotConfig = {
     displayModeBar: false,
     // responsive: true
   };
@@ -37,9 +39,9 @@ export function PhenotypesAncestry({
     <div className="m-2 text-center">
         <Plot
             // className="w-100"
-            data={data}
-            layout={layout}
-            config={config}
+            data={plotData}
+            layout={plotLayout}
+            config={plotConfig}
             onLegendClick={_ => false}
         />
     </div>

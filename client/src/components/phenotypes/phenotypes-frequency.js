@@ -4,22 +4,23 @@ import Plot from 'react-plotly.js';
 export function PhenotypesFrequency({
   selectedPhenotype,
   phenotypeType,
-  frequencyData,
+  data,
 }) {
-  const data = [{
-    values: [frequencyData.positive, frequencyData.negative],
-    labels: ['% With', '% Without'],
+
+  const plotData = [{
+    values: data.frequency,
+    labels: data.categories,
     hoverinfo: 'label+percent',
     hole: .4,
     type: 'pie',
   },];
 
-  const layout = {
+  const plotLayout = {
     // title: `Frequency of ${selectedPhenotype.title}`,
     showlegend: true
   };
 
-  const config = {
+  const plotConfig = {
     displayModeBar: false,
     // responsive: true,
   }
@@ -28,9 +29,9 @@ export function PhenotypesFrequency({
     <div className="m-2 text-center">
       <Plot
         // className="w-100"
-        data={data}
-        layout={layout}
-        config={config}
+        data={plotData}
+        layout={plotLayout}
+        config={plotConfig}
         onLegendClick={_ => false}
         />
     </div>
