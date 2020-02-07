@@ -1,8 +1,8 @@
-import React from 'react';
+import React, { useState, useRef } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { Button, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import { updatePhenotypeCorrelations } from '../../services/actions';
-import { TreeSelectCustom } from '../controls/tree-select-custom';
+import { TreeSelect } from '../controls/tree-select';
 
 export function PhenotypeCorrelationsForm({ onChange, onSubmit, onReset }) {
   const dispatch = useDispatch();
@@ -14,6 +14,8 @@ export function PhenotypeCorrelationsForm({ onChange, onSubmit, onReset }) {
     state => state.phenotypeCorrelations
   );
   const { selectedPhenotypes, selectedGender } = phenotypeCorrelations;
+
+  const treeRef = useRef();
 
   const setSelectedPhenotypes = selectedPhenotypes => {
     dispatch(updatePhenotypeCorrelations({ selectedPhenotypes }));
@@ -55,12 +57,13 @@ export function PhenotypeCorrelationsForm({ onChange, onSubmit, onReset }) {
       <div className="mb-2">
         <b>Phenotypes</b>
         <span style={{ color: 'red' }}>*</span>
-        <TreeSelectCustom
+        <TreeSelect
           data={phenotypesTree}
           dataAlphabetical={alphabetizedPhenotypes}
           dataCategories={phenotypeCategories}
           value={selectedPhenotypes}
           onChange={handleChangeCustom}
+          ref={treeRef}
         />
       </div>
       
@@ -106,6 +109,7 @@ export function PhenotypeCorrelationsForm({ onChange, onSubmit, onReset }) {
           onClick={e => {
             e.preventDefault();
             onReset(e);
+            treeRef.current.resetSearchFilter();
           }}>
           Reset
         </Button>
