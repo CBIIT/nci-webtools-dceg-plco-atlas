@@ -38,19 +38,19 @@ export const PhenotypesSearchCriteria = () => {
             className="left"
             style={{ display: !submitted ? 'none' : 'block' }}>
 
-            <div
+            {/* <div
               className="left">
               <a 
                 href="javascript:void(0)"
                 onClick={setSubmitted}>
-                Bubble Chart
+                Go back
               </a>
               <Icon
                 name="arrow-left"
                 className="mx-2 opacity-50"
                 width="10"
               />
-            </div>
+            </div> */}
             
             <p className="h4 my-1">
               {searchCriteriaPhenotypes.phenotype}
