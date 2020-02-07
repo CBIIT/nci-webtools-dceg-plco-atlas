@@ -3,6 +3,10 @@ ALTER TABLE phenotype_correlation
     ADD INDEX idx_phenotype_correlation__phenotype_a (phenotype_a),
     ADD INDEX idx_phenotype_correlation__phenotype_b (phenotype_b);
 
+-- phenotype data
+ALTER TABLE phenotype_data
+    ADD INDEX idx_phenotype_data__phenotype_id  (phenotype_id);
+
 -- phenotype metadata
 ALTER TABLE phenotype_metadata
     ADD INDEX idx_phenotype_metadata__phenotype_id  (phenotype_id),
