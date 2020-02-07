@@ -98,7 +98,7 @@ export class BubbleChart {
 
         node.append("circle")
             .attr("r", function (d) {
-                return d.r - 10;
+                return d.r - 5;
             })
             .style("fill", "#FFFFFF")
             // .style("opacity", "100%")
@@ -106,7 +106,7 @@ export class BubbleChart {
         
         node.append("circle")
             .attr("r", function (d) {
-                return d.r - 10;
+                return d.r - 5;
             })
             .style("fill", function (d) {
                 return d.data.color ? d.data.color : "pink";
