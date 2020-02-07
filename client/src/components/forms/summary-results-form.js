@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import { Button, OverlayTrigger, Tooltip } from 'react-bootstrap';
-import { TreeSelectCustom } from '../controls/tree-select-custom';
+import { TreeSelect } from '../controls/tree-select';
 
 export function SummaryResultsForm({
   phenotype = null,
@@ -27,18 +27,21 @@ export function SummaryResultsForm({
     a.title.localeCompare(b.title)
   );
 
+  const treeRef = useRef();
+
   return (
     <>
       {/* <pre>{JSON.stringify({_phenotype, _gender}, null, 2)}</pre> */}
       <div className="mb-2">
         <label className="required">Phenotypes</label>
-        <TreeSelectCustom
+        <TreeSelect
           data={phenotypesTree}
           dataAlphabetical={alphabetizedPhenotypes}
           dataCategories={phenotypeCategories}
           value={_phenotype}
           onChange={val => _setPhenotype((val && val.length) ? val[0] : null)}
           singleSelect
+          ref={treeRef}
         />
       </div>
 
@@ -88,6 +91,7 @@ export function SummaryResultsForm({
             _setPhenotype(null);
             _setGender('all');
             onReset();
+            treeRef.current.clearSearchFilter();
           }}>
           Reset
         </Button>

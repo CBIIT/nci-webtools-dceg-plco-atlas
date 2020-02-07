@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import { Button, OverlayTrigger, Tooltip } from 'react-bootstrap';
-import { TreeSelectCustom } from '../controls/tree-select-custom';
+import { TreeSelect } from '../controls/tree-select';
 
 export function PhenotypesForm({
   phenotype = null,
@@ -13,6 +13,7 @@ export function PhenotypesForm({
   // private members prefixed with _
   const [_phenotype, _setPhenotype] = useState(null);
   // const submitRef = useRef(null);
+  const treeRef = useRef();
 
   // update state when props change
   useEffect(() => _setPhenotype(phenotype), [phenotype]);
@@ -30,7 +31,7 @@ export function PhenotypesForm({
       {/* <pre>{JSON.stringify({_phenotype, _gender}, null, 2)}</pre> */}
       <div className="mb-2">
         <label className="required">Phenotypes</label>
-        <TreeSelectCustom
+        <TreeSelect
           data={phenotypesTree}
           dataAlphabetical={alphabetizedPhenotypes}
           dataCategories={phenotypeCategories}
@@ -38,6 +39,7 @@ export function PhenotypesForm({
           // onChange={val => _setPhenotype((val && val.length) ? val[0] : null)}
           onChange={val => onChange((val && val.length) ? val[0] : null)}
           singleSelect
+          ref={treeRef}
         />
       </div>
 
@@ -71,6 +73,7 @@ export function PhenotypesForm({
             e.preventDefault();
             _setPhenotype(null);
             onReset();
+            treeRef.current.clearSearchFilter();
           }}>
           Reset
         </Button>

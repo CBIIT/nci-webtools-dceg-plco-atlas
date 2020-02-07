@@ -1,13 +1,17 @@
-import React, { useState, useEffect } from 'react';
+import React, { forwardRef, useState, useEffect, useImperativeHandle } from 'react';
 
-export function TreeSelectCustom({
+export const TreeSelect = forwardRef(({
   onChange,
   data,
   dataAlphabetical,
   dataCategories,
   value,
-  singleSelect
-}) {
+  singleSelect,
+  // searchInput,
+  // setSearchInput,
+  // listType,
+  // setListType
+}, ref) => {
 
   // useEffect(() => {
   //   if (listType === 'alphabetical') {
@@ -16,9 +20,22 @@ export function TreeSelectCustom({
   //   }
   // }, [onChange])
 
+  const [expandAll, setExpandAll] = useState(false);
+
+  useImperativeHandle(ref, () => ({
+    clearSearchFilter() {
+      clearSearchFilter();
+    }
+  }));
+
   const [searchInput, setSearchInput] = useState('');
   const [listType, setListType] = useState('categorical');
-  const [expandAll, setExpandAll] = useState(false);
+
+  const clearSearchFilter = () => {
+    setSearchInput('');
+    setListType('categorical');
+  };
+
   const containsVal = (arr, val) => {
     let result = false;
     for (var i = 0; i < arr.length; i++) {
@@ -622,8 +639,9 @@ export function TreeSelectCustom({
                 <button
                   className="input-group-text bg-white"
                   onClick={e => {
-                    setSearchInput('');
-                    setListType('categorical');
+                    clearSearchFilter();
+                    // setSearchInput('');
+                    // setListType('categorical');
                   }}>
                   <i className="fas fa-times fa-xs"></i>
                 </button>
@@ -659,4 +677,4 @@ export function TreeSelectCustom({
       </div>
     </>
   );
-}
+});

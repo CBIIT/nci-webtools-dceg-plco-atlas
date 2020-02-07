@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import {
   SidebarContainer,
   SidebarPanel,
@@ -6,7 +6,7 @@ import {
 } from '../controls/sidebar-container';
 import { Button, Tooltip, OverlayTrigger } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
-import { TreeSelectCustom } from '../controls/tree-select-custom';
+import { TreeSelect } from '../controls/tree-select';
 import { updateDownloads } from '../../services/actions';
 
 export function Downloads() {
@@ -69,6 +69,8 @@ export function Downloads() {
     document.body.removeChild(a);
   }
 
+  const treeRef = useRef();
+
   return (
     <SidebarContainer className="m-3">
       <SidebarPanel className="col-lg-3">
@@ -76,12 +78,13 @@ export function Downloads() {
           <div className="mb-2">
             <b>Phenotypes</b>
             <span style={{ color: 'red' }}>*</span>
-            <TreeSelectCustom
+            <TreeSelect
               data={phenotypesTree}
               dataAlphabetical={alphabetizedPhenotypes}
               dataCategories={phenotypeCategories}
               value={selectedPhenotypes}
               onChange={handleChange}
+              ref={treeRef}
             />
             <small className="text-muted"><i>Up to five phenotypes may be selected for download.</i></small>
           </div>
@@ -102,7 +105,11 @@ export function Downloads() {
             <Button
               className="ml-2"
               variant="silver"
-              onClick={handleReset}>
+              onClick={e => {
+                e.preventDefault();
+                handleReset();
+                treeRef.current.clearSearchFilter();
+              }}>
               Reset
             </Button>
           </div>
