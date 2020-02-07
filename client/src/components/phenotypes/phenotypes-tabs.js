@@ -22,7 +22,7 @@ export function PhenotypesTabs() {
     dispatch(updateBrowsePhenotypes({ selectedPlot }));
   };
 
-  const [distributionType, setDistributionType] = useState('age');
+  const [selectedDistribution, setSelectedDistribution] = useState('age');
 
   return (
     <Tabs
@@ -38,7 +38,7 @@ export function PhenotypesTabs() {
         <PhenotypesFrequency
           selectedPhenotype={selectedPhenotype}
           phenotypeType={phenotypeType}
-          frequencyData={phenotypeData.frequency}
+          data={phenotypeData}
         />
       </Tab>
 
@@ -52,8 +52,8 @@ export function PhenotypesTabs() {
               <input
                 type="radio"
                 value="age"
-                onChange={e => setDistributionType(e.target.value)}
-                checked={distributionType == 'age'}
+                onChange={e => setSelectedDistribution(e.target.value)}
+                checked={selectedDistribution == 'age'}
                 className="mr-1" />
               Age
             </label>
@@ -62,8 +62,8 @@ export function PhenotypesTabs() {
               <input
                 type="radio"
                 value="gender"
-                onChange={e => setDistributionType(e.target.value)}
-                checked={distributionType == 'gender'} 
+                onChange={e => setSelectedDistribution(e.target.value)}
+                checked={selectedDistribution == 'gender'}
                 className="mr-1" />
               Gender
             </label>
@@ -72,36 +72,33 @@ export function PhenotypesTabs() {
               <input
                 type="radio"
                 value="ancestry"
-                onChange={e => setDistributionType(e.target.value)}
-                checked={distributionType == 'ancestry'} 
+                onChange={e => setSelectedDistribution(e.target.value)}
+                checked={selectedDistribution == 'ancestry'}
                 className="mr-1"/>
               Ancestry
             </label>
           </div>
 
-          {distributionType === 'age' &&
+          {selectedDistribution === 'age' &&
             <PhenotypesAge
               selectedPhenotype={selectedPhenotype}
               phenotypeType={phenotypeType}
-              ageData={phenotypeData.distribution.age}
-              option="age"
+              data={phenotypeData}
             />
           }
 
-          {distributionType === 'gender' &&
+          {selectedDistribution === 'gender' &&
             <PhenotypesGender
                 selectedPhenotype={selectedPhenotype}
                 phenotypeType={phenotypeType}
-                sexData={phenotypeData.distribution.sex}
-                option="gender"
+                data={phenotypeData}
             />
           }
 
-          {distributionType === 'ancestry' &&
+          {selectedDistribution === 'ancestry' &&
             <PhenotypesAncestry
               selectedPhenotype={selectedPhenotype}
-              phenotypeType={phenotypeType}
-              ancestryData={phenotypeData.distribution.ancestry}
+              data={phenotypeData}
               option="ancestry"
             />
           }
