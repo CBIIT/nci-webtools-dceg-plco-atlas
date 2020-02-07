@@ -10,8 +10,12 @@ export function TreeSelectCustom({
 }) {
 
   useEffect(() => {
-    setSearchInput('');
-    setListType('categorical');
+    if (!value) {
+      console.log("reached1");
+      // on reset
+      setSearchInput('');
+      setListType('categorical');
+    }
   }, [onChange])
 
   const [searchInput, setSearchInput] = useState('');
