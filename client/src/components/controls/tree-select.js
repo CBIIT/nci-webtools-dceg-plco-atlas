@@ -647,6 +647,7 @@ export const TreeSelect = forwardRef(({
               {searchInput.length > 0 ? (
                 <button
                   className="input-group-text bg-white"
+                  title="Clear to go back to categorical view"
                   onClick={e => {
                     clearSearchFilter();
                   }}>
