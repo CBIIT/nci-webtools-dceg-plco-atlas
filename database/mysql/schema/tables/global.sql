@@ -1,14 +1,14 @@
-CREATE TABLE `lu_phenotype` (
+CREATE TABLE `phenotype` (
     `id`                    INTEGER PRIMARY KEY NOT NULL AUTO_INCREMENT,
     `parent_id`             INTEGER NULL,
     `name`                  VARCHAR(200) NOT NULL,
     `display_name`          VARCHAR(200) NOT NULL,
+    `description`           MEDIUMTEXT,
     `color`                 VARCHAR(40) NULL,
     `type`                  ENUM('binary', 'categorical', 'continuous')
-    `variants_original`     BIGINT,
-    `variants_imported`     BIGINT,
-    `updated_date`          DATETIME,
-    FOREIGN KEY (parent_id) REFERENCES lu_phenotype(id)
+    `import_count`          BIGINT,
+    `import_date`          DATETIME,
+    FOREIGN KEY (parent_id) REFERENCES phenotype(id)
 );
 
 CREATE TABLE `phenotype_correlation` (
@@ -16,8 +16,16 @@ CREATE TABLE `phenotype_correlation` (
     `phenotype_a`   INTEGER NOT NULL,
     `phenotype_b`   INTEGER NOT NULL,
     `value`         DOUBLE NOT NULL,
-    FOREIGN KEY (phenotype_a) REFERENCES lu_phenotype(id),
-    FOREIGN KEY (phenotype_b) REFERENCES lu_phenotype(id)
+    FOREIGN KEY (phenotype_a) REFERENCES phenotype(id),
+    FOREIGN KEY (phenotype_b) REFERENCES phenotype(id)
+);
+
+CREATE TABLE `phenotype_data` (
+    `id`            BIGINT PRIMARY KEY NOT NULL AUTO_INCREMENT,
+    `phenotype_id`  INTEGER NOT NULL,
+    `sample_id`     INTEGER,
+    `value`         DOUBLE,
+    FOREIGN KEY (phenotype_id) REFERENCES phenotype(id)
 );
 
 CREATE TABLE `phenotype_metadata` (
@@ -25,7 +33,7 @@ CREATE TABLE `phenotype_metadata` (
     `phenotype_id`  INTEGER,
     `gender`        ENUM('all', 'female', 'male'),
     `lambda_gc`     DOUBLE,
-    FOREIGN KEY (phenotype_id) REFERENCES lu_phenotype(id),
+    FOREIGN KEY (phenotype_id) REFERENCES phenotype(id),
     UNIQUE KEY (`phenotype_id`, `gender`)
 );
 
