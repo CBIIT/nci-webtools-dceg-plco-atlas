@@ -10,8 +10,7 @@ export function TreeSelectCustom({
 }) {
 
   // useEffect(() => {
-  //   if (!value) {
-  //     // on reset
+  //   if (listType === 'alphabetical') {
   //     setSearchInput('');
   //     setListType('categorical');
   //   }
