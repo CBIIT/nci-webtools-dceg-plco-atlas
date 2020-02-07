@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 export function TreeSelectCustom({
   onChange,
@@ -8,6 +8,12 @@ export function TreeSelectCustom({
   value,
   singleSelect
 }) {
+
+  useEffect(() => {
+    setSearchInput('');
+    setListType('categorical');
+  }, [onChange])
+
   const [searchInput, setSearchInput] = useState('');
   const [listType, setListType] = useState('categorical');
   const [expandAll, setExpandAll] = useState(false);
