@@ -15,8 +15,8 @@
             "80-84": [100]
         },
         "gender": {
-            "female": [0.51],
-            "male": [0.49]
+            "female": [510],
+            "male": [490]
         },
         "ancestry": {
             "American Indian": [100],
