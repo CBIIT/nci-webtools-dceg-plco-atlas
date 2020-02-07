@@ -23,6 +23,7 @@ export function Phenotypes() {
     breadcrumb,
     currentBubbleData,
     data,
+    displayTreeParent
   } = useSelector(state => state.browsePhenotypes);
 
   const plotContainer = useRef(null);
@@ -53,7 +54,11 @@ export function Phenotypes() {
 
   const setSelectedPhenotype = selectedPhenotype => {
     dispatch(updateBrowsePhenotypes({ selectedPhenotype }));
-  }
+  };
+
+  const setDisplayTreeParent = displayTreeParent => {
+    dispatch(updateBrowsePhenotypes({ displayTreeParent }));
+  };
 
   const clearMessages = e => {
     setMessages([]);
@@ -165,6 +170,7 @@ export function Phenotypes() {
         //leaf
         // console.log("LEAF!", e.data);
         setSelectedPhenotype(e.data);
+        setDisplayTreeParent(e);
       }
     } else {
       // background is clicked
@@ -193,7 +199,7 @@ export function Phenotypes() {
   }
 
   const crumbClick = (item, idx) => {
-    console.log("CRUMB ITEM", item);
+    // console.log("CRUMB ITEM", item);
     let newBreadcrumb = breadcrumb.splice(0, idx);
     setBreadcrumb(newBreadcrumb);
     setCurrentBubbleData(item.parent.data.children);
@@ -211,6 +217,7 @@ export function Phenotypes() {
             onChange={handleChange}
             onSubmit={handleSubmit}
             onReset={handleReset}
+            displayTreeParent={displayTreeParent}
           />
           {messages &&
             messages.map(({ type, content }) => (

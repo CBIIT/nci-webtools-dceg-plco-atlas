@@ -119,6 +119,7 @@ export const getInitialState = () => ({
   },
   browsePhenotypes: {
     selectedPhenotype: null,
+    displayTreeParent: null,
     submitted: null,
     messages: [],
     searchCriteriaPhenotypes: {},
