@@ -1,8 +1,8 @@
-import React from 'react';
+import React, { useState, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Button, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import { updateVariantLookup } from '../../services/actions';
-import { TreeSelectCustom } from '../controls/tree-select-custom';
+import { TreeSelect } from '../controls/tree-select';
 
 export function VariantLookupForm({ onChange, onSubmit, onReset }) {
   const dispatch = useDispatch();
@@ -38,17 +38,20 @@ export function VariantLookupForm({ onChange, onSubmit, onReset }) {
     }
   };
 
+  const treeRef = useRef();
+
   return (
     <> 
       <div className="mb-2">
         <b>Phenotypes</b>
         <span style={{ color: 'red' }}>*</span>
-        <TreeSelectCustom
+        <TreeSelect
           data={phenotypesTree}
           dataAlphabetical={alphabetizedPhenotypes}
           dataCategories={phenotypeCategories}
           value={selectedPhenotypes}
           onChange={handleChangeCustom}
+          ref={treeRef}
         />
       </div>
 
@@ -145,6 +148,7 @@ export function VariantLookupForm({ onChange, onSubmit, onReset }) {
           onClick={e => {
             e.preventDefault();
             onReset(e);
+            treeRef.current.clearSearchFilter();
           }}>
           Reset
         </Button>
