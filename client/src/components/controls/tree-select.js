@@ -15,6 +15,10 @@ export const TreeSelect = forwardRef(({
     resetSearchFilter() {
       clearSearchFilter();
       collapseAllParents();
+    },
+    expandSelectedPhenotype(displayTreeParent) {
+      collapseAllParents();
+      expandParents(displayTreeParent)
     }
   }));
 
@@ -61,6 +65,25 @@ export const TreeSelect = forwardRef(({
     }
     return arr;
   };
+
+  const expandParents = (displayTreeParent) => {
+    let parents = getParents(displayTreeParent.data);
+    parents.map((item) => {
+      document.getElementsByClassName('collapse-button-text-' + item.value)[0].click();
+    });
+  }
+
+  const getParents = (node, parents = []) => {
+    dataCategories.map((item) => {
+      item.children.map((child) => {
+        if (child.title === node.title && child.value === node.value) {
+          parents.push(item)
+          getParents(item, parents);
+        }
+      })
+    });
+    return parents;
+  }
 
   const getLeafs = (item, node, allLeafs = []) => {
     if (!node.children || node.children.length === 0) {
@@ -647,6 +670,7 @@ export const TreeSelect = forwardRef(({
               {searchInput.length > 0 ? (
                 <button
                   className="input-group-text bg-white"
+                  title="Clear to go back to categorical view"
                   onClick={e => {
                     clearSearchFilter();
                   }}>
