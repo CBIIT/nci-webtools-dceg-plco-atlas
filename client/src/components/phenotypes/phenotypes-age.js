@@ -5,27 +5,31 @@ export function PhenotypesAge({
   selectedPhenotype,
   phenotypeType,
   option,
-  ageData,
+  data,
+  distributionType,
 }) {
-  let x = [];
-  let y = [];
+  let colors = ["#1f77b4","#ff7f0e","#2ca02c","#d62728","#9467bd","#8c564b","#e377c2","#7f7f7f","#bcbd22","#17becf"];
 
-  for (let key in ageData) {
-    x.push(key);
-    y.push(ageData[key]);
-  }
+  // create traces for stacked bar chart
+  const plotData = data.distributionCategories.map((name, i) => {
+    let ageData = data.distribution.age;
+    let x = [];
+    let y = [];
 
-  const data = [{
-    x: x,
-    y: y,
-    type: 'bar'
-  }];
+    for (let key in ageData) {
+      x.push(key);
+      y.push(ageData[key][i]);
+    }
 
-  const layout = {
+    return {x, y, name, type: 'bar', marker: {color: colors[i]}};
+  })
+
+  const plotLayout = {
     // title: `Distribution of ${selectedPhenotype.title} by Age`,
+    barmode: 'stack',
   };
 
-  const config = {
+  const plotConfig = {
     // responsive: true,
     displayModeBar: false,
   }
@@ -34,9 +38,9 @@ export function PhenotypesAge({
     <div className="m-2  text-center">
         <Plot
           // className="w-100"
-          data={data}
-          layout={layout}
-          config={config}
+          data={plotData}
+          layout={plotLayout}
+          config={plotConfig}
           onLegendClick={_ => false}
         />
     </div>
