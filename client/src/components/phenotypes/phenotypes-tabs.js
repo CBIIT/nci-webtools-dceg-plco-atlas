@@ -34,7 +34,7 @@ export function PhenotypesTabs() {
         eventKey="frequency"
         title="Frequency"
         className="p-2 bg-white tab-pane-bordered rounded-0"
-        style={{ minHeight: '50vh' }}>
+        style={{ minHeight: '700px', textAlign: 'center' }}>
         <PhenotypesFrequency
           selectedPhenotype={selectedPhenotype}
           phenotypeType={phenotypeType}
@@ -79,6 +79,7 @@ export function PhenotypesTabs() {
             </label>
           </div>
 
+          <div style={{minHeight: '700px', width: '100%', textAlign: 'center'}}>
           {selectedDistribution === 'age' &&
             <PhenotypesAge
               selectedPhenotype={selectedPhenotype}
@@ -87,7 +88,7 @@ export function PhenotypesTabs() {
             />
           }
 
-          {selectedDistribution === 'gender' &&
+         {selectedDistribution === 'gender' &&
             <PhenotypesGender
                 selectedPhenotype={selectedPhenotype}
                 phenotypeType={phenotypeType}
@@ -102,6 +103,7 @@ export function PhenotypesTabs() {
               option="ancestry"
             />
           }
+          </div>
       </Tab>
       <Tab
         eventKey="related-phenotypes"

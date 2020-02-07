@@ -29,21 +29,20 @@ export function PhenotypesAncestry({
     xaxis: {automargin: true},
     yaxis: {automargin: true},
     barmode: 'stack',
+    autosize: true,
   };
 
   const plotConfig = {
     displayModeBar: false,
-    // responsive: true
+    responsive: true
   };
   return (
-    <div className="m-2 text-center">
-        <Plot
-            // className="w-100"
-            data={plotData}
-            layout={plotLayout}
-            config={plotConfig}
-            onLegendClick={_ => false}
-        />
-    </div>
+      <Plot
+        style={{ width: "100%", height: "600px" }}
+        data={plotData}
+        layout={plotLayout}
+        config={plotConfig}
+        onLegendClick={_ => false}
+      />
   );
 }
