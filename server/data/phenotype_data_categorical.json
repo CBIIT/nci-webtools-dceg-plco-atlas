@@ -1,0 +1,50 @@
+{
+    "type": "categorical",
+    "categories": ["Frequent Smoker", "Occasional Smoker", "Non-smoker"],
+    "frequency": {
+        "Frequent Smoker": 0.01,
+        "Occasional Smoker": 0.09,
+        "Non-Smoker": 0.9,
+    },
+    "distribution": {
+        "age": {
+            "40-44": [100, 100, 1100],
+            "45-49": [200, 200, 1200],
+            "50-54": [350, 350, 1350],
+            "55-59": [450, 450, 1450],
+            "60-64": [500, 500, 1500],
+            "65-69": [450, 450, 1450],
+            "70-74": [200, 200, 1200],
+            "80-84": [100, 100, 1100]
+        },
+        "gender": {
+            "female": [0.01, 0.09, 0.9],
+            "male": [0.01, 0.09, 0.9],
+        },
+        "ancestry": {
+            "American Indian": [100, 200, 300],
+            "Pacific Islander": [300, 200, 300],
+            "Asian": [150, 200, 300],
+            "Hispanic": [400, 200, 300],
+            "Black": [350, 200, 300],
+            "White": [450, 200, 300],
+        }
+    },
+    "related": [
+        {
+            "name": "Ewing's Sarcoma",
+            "sampleSize": 1000,
+            "correlation": 0.2
+        },
+        {
+            "name": "Melanoma",
+            "sampleSize": 100000,
+            "correlation": 0.4
+        },
+        {
+            "name": "Renal Cell Carcinoma",
+            "sampleSize": 4000,
+            "correlation": 0.1
+        }
+    ]
+}
