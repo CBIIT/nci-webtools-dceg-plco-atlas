@@ -6,25 +6,15 @@ export const TreeSelect = forwardRef(({
   dataAlphabetical,
   dataCategories,
   value,
-  singleSelect,
-  // searchInput,
-  // setSearchInput,
-  // listType,
-  // setListType
+  singleSelect
 }, ref) => {
-
-  // useEffect(() => {
-  //   if (listType === 'alphabetical') {
-  //     setSearchInput('');
-  //     setListType('categorical');
-  //   }
-  // }, [onChange])
 
   const [expandAll, setExpandAll] = useState(false);
 
   useImperativeHandle(ref, () => ({
-    clearSearchFilter() {
+    resetSearchFilter() {
       clearSearchFilter();
+      collapseAllParents();
     }
   }));
 
@@ -140,6 +130,25 @@ export const TreeSelect = forwardRef(({
       }
       setExpandAll(false);
     }
+  };
+
+  const collapseAllParents = () => {
+    for (let i = 0; i < dataCategories.length; i++) {
+      const className = 'children-of-' + dataCategories[i].value;
+      if (
+        document.getElementsByClassName(className)[0].style.display &&
+        document.getElementsByClassName(className)[0].style.display ===
+          'block'
+      ) {
+        document.getElementsByClassName(className)[0].style.display = 'none';
+        const collapseButton = document.getElementsByClassName(
+          'collapse-button-text-' + dataCategories[i].value
+        )[0];
+        collapseButton.classList.toggle('fa-plus-square', true);
+        collapseButton.classList.toggle('fa-minus-square', false);
+      }
+    }
+    setExpandAll(false);
   };
 
   const toggleHideChildren = name => {
@@ -640,8 +649,6 @@ export const TreeSelect = forwardRef(({
                   className="input-group-text bg-white"
                   onClick={e => {
                     clearSearchFilter();
-                    // setSearchInput('');
-                    // setListType('categorical');
                   }}>
                   <i className="fas fa-times fa-xs"></i>
                 </button>

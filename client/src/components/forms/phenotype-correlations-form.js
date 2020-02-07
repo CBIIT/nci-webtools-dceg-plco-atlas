@@ -109,7 +109,7 @@ export function PhenotypeCorrelationsForm({ onChange, onSubmit, onReset }) {
           onClick={e => {
             e.preventDefault();
             onReset(e);
-            treeRef.current.clearSearchFilter();
+            treeRef.current.resetSearchFilter();
           }}>
           Reset
         </Button>

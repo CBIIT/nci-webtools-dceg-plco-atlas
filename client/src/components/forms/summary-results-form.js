@@ -91,7 +91,7 @@ export function SummaryResultsForm({
             _setPhenotype(null);
             _setGender('all');
             onReset();
-            treeRef.current.clearSearchFilter();
+            treeRef.current.resetSearchFilter();
           }}>
           Reset
         </Button>

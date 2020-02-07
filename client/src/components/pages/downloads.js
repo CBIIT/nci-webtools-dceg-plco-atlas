@@ -108,7 +108,7 @@ export function Downloads() {
               onClick={e => {
                 e.preventDefault();
                 handleReset();
-                treeRef.current.clearSearchFilter();
+                treeRef.current.resetSearchFilter();
               }}>
               Reset
             </Button>
