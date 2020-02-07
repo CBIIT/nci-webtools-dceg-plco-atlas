@@ -65,7 +65,7 @@ export function Phenotypes() {
       for (var i = 0; i < item.children.length; i++) {
         getParent(item.children[i], node, item, found)
       }
-    } 
+    }
     else {
       // no children = LEAF
       if (item.title === node.title && item.value === node.value) {
@@ -109,7 +109,12 @@ export function Phenotypes() {
     }
 
     // some action here
-    const data = await query('data/phenotype_data_binary.json');
+
+    const phenotypeEndpoint = {
+      mel: 'data/phenotype_data_categorical.json',
+      none_4478: 'data/phenotype_data_continuous.json',
+    }[phenotype.value] || 'data/phenotype_data_binary.json';
+    const data = await query(phenotypeEndpoint);
 
     // update browse phenotypes filters
     dispatch(
