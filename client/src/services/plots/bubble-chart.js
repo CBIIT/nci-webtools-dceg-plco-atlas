@@ -86,7 +86,7 @@ export class BubbleChart {
 
         node.append("title")
             .text(function (d) {
-                return "Phenotype: " + d.data.title + " - " + "Sample Size: " + d.value;
+                return "Phenotype: " + d.data.title + " - " + "Sample size: " + d.value;
             });
 
         node.append("circle")
