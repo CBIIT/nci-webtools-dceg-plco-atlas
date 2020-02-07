@@ -73,7 +73,7 @@ export function PhenotypesForm({
             e.preventDefault();
             _setPhenotype(null);
             onReset();
-            treeRef.current.clearSearchFilter();
+            treeRef.current.resetSearchFilter();
           }}>
           Reset
         </Button>
