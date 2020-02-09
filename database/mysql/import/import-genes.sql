@@ -1,5 +1,11 @@
 START TRANSACTION;
--- SET sql_mode = ''; --  // disable only_full_group_by
+
+-- needed if local_infile is disabled, need root privileges
+-- SET GLOBAL local_infile = 'ON';
+
+-- disable only_full_group_by
+SET sql_mode = '';
+
 SET autocommit = 0;
 
 -- clear gene table and drop indexes (faster insertion)
