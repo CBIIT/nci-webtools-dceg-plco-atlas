@@ -6,6 +6,9 @@ START TRANSACTION;
 -- disable only_full_group_by
 SET sql_mode = '';
 
+-- maximum length for output from group_concat()
+SET group_concat_max_len = 4294967295;
+
 SET autocommit = 0;
 
 -- clear gene table and drop indexes (faster insertion)
@@ -33,7 +36,25 @@ CREATE TEMPORARY TABLE gene_stage (
 -- load data into staging table
 LOAD DATA LOCAL INFILE "raw/genes.tsv" INTO TABLE gene_stage
     FIELDS TERMINATED BY '\t'
-    IGNORE 1 ROWS;
+    IGNORE 1 ROWS
+    (
+      bin,
+      name,
+      chrom,
+      strand,
+      txStart,
+      txEnd,
+      cdsStart,
+      cdsEnd,
+      exonCount,
+      exonStarts,
+      exonEnds,
+      @dummy,
+      @dummy,
+      @dummy,
+      @dummy,
+      @dummy
+    );
 
 -- trim chromosome names in staging table
 UPDATE gene_stage SET chrom = replace(chrom, 'chr', '');
