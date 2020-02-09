@@ -65,8 +65,8 @@ ALTER TABLE phenotype AUTO_INCREMENT = 1;
 INSERT INTO phenotype (`id`, `parent_id`, `name`, `display_name`) VALUES
 (1, null, 'test', 'Test'),
 (2, 1, 'ewings_sarcoma', 'Ewing''s sarcoma'),
-(3, 1, 'renal_cell_carcinoma', 'Renal Cell Carcinoma'),
-(4, 1, 'melanoma', 'Melanoma'),
+(3, 1, 'melanoma', 'Melanoma'),
+(4, 1, 'renal_cell_carcinoma', 'Renal Cell Carcinoma'),
 (5, null, 'anthropometric_measures', 'Anthropometric measures'),
 (6, 5, 'height', 'Height'),
 (7, 6, 'height_when_standing', 'Height when standing'),
