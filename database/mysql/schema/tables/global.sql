@@ -5,7 +5,7 @@ CREATE TABLE `phenotype` (
     `display_name`          VARCHAR(200) NOT NULL,
     `description`           MEDIUMTEXT,
     `color`                 VARCHAR(40) NULL,
-    `type`                  ENUM('binary', 'categorical', 'continuous')
+    `type`                  ENUM('binary', 'categorical', 'continuous'),
     `import_count`          BIGINT,
     `import_date`          DATETIME,
     FOREIGN KEY (parent_id) REFERENCES phenotype(id)
