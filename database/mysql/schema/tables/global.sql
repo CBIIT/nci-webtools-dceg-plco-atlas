@@ -11,13 +11,11 @@ CREATE TABLE `phenotype` (
     FOREIGN KEY (parent_id) REFERENCES phenotype(id)
 );
 
-CREATE TABLE `phenotype_correlation` (
+CREATE TABLE `phenotype_sample` (
     `id`            INTEGER PRIMARY KEY NOT NULL AUTO_INCREMENT,
-    `phenotype_a`   INTEGER NOT NULL,
-    `phenotype_b`   INTEGER NOT NULL,
-    `value`         DOUBLE NOT NULL,
-    FOREIGN KEY (phenotype_a) REFERENCES phenotype(id),
-    FOREIGN KEY (phenotype_b) REFERENCES phenotype(id)
+    `age`           INTEGER,
+    `gender`        ENUM('female', 'male', 'other'),
+    `ancestry`      ENUM('american_indian', 'asian', 'black', 'hispanic', 'pacific_islander', 'white', 'other')
 );
 
 CREATE TABLE `phenotype_data` (
@@ -25,7 +23,8 @@ CREATE TABLE `phenotype_data` (
     `phenotype_id`  INTEGER NOT NULL,
     `sample_id`     INTEGER,
     `value`         DOUBLE,
-    FOREIGN KEY (phenotype_id) REFERENCES phenotype(id)
+    FOREIGN KEY (phenotype_id) REFERENCES phenotype(id),
+    FOREIGN KEY (sample_id) REFERENCES phenotype_sample(id)
 );
 
 CREATE TABLE `phenotype_metadata` (
@@ -35,6 +34,15 @@ CREATE TABLE `phenotype_metadata` (
     `lambda_gc`     DOUBLE,
     FOREIGN KEY (phenotype_id) REFERENCES phenotype(id),
     UNIQUE KEY (`phenotype_id`, `gender`)
+);
+
+CREATE TABLE `phenotype_correlation` (
+    `id`            INTEGER PRIMARY KEY NOT NULL AUTO_INCREMENT,
+    `phenotype_a`   INTEGER NOT NULL,
+    `phenotype_b`   INTEGER NOT NULL,
+    `value`         DOUBLE NOT NULL,
+    FOREIGN KEY (phenotype_a) REFERENCES phenotype(id),
+    FOREIGN KEY (phenotype_b) REFERENCES phenotype(id)
 );
 
 CREATE TABLE `chromosome_range` (
