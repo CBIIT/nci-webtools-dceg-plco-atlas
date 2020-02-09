@@ -3,19 +3,16 @@ const mysql = require('mysql2');
 const args = require('minimist')(process.argv.slice(2));
 const ranges = require('../../json/chromosome_ranges.json');
 const { database } = require('../../../server/config.json');
-const { timestamp, getLogStream } = require('./utils/logging');
-const { getFileReader, parseLine, readFile, validateHeaders, mappedStream, tappedStream, lineStream } = require('./utils/file');
-const { getRecords, pluck, getMedian, tableExists } = require('./utils/query');
-const { getIntervals, getLambdaGC, group, ppoints } = require('./utils/math');
-const { pipeline } = require('stream');
+const { timestamp } = require('./utils/logging');
+const { readFile } = require('./utils/file');
+const { getRecords, pluck } = require('./utils/query');
+const { getIntervals, getLambdaGC } = require('./utils/math');
 
 /**
 lambdagc_ewing|1.036
 lambdagc_rcc|1.029
 lambdagc_mel|0.83
  */
-
-args.file = 'D:\\Development\\Work\\nci-webtools-dceg-plco-atlas\\data\\mysql\\import\\raw\\ewings_sarcoma.csv';
 
 // display help if needed
 if (!(args.file && args.phenotype && args.gender)) {
@@ -36,7 +33,7 @@ const connection = mysql.createConnection({
     host: database.host,
     database: database.name,
     user: database.user,
-    password: database.user,
+    password: database.password,
     namedPlaceholders: true,
     multipleStatements: true,
   }).promise();
@@ -61,7 +58,7 @@ importVariants().then(e => {
 async function importVariants() {
     // find phenotypes either by name or id (if a numeric value was provided)
     const phenotypeKey = /^\d+$/.test(phenotype) ? 'id' : 'name';
-    const phenotypes = await getRecords(connection, 'lu_phenotype', {
+    const phenotypes = await getRecords(connection, 'phenotype', {
         [phenotypeKey]: phenotype
     });
 
@@ -80,32 +77,28 @@ async function importVariants() {
     const phenotypePrefix = `${phenotypeName}_${phenotypeId}`;
     const variantTable = `${phenotypePrefix}_variant`;
     const aggregateTable = `${phenotypePrefix}_aggregate`;
+    const schemaSql = readFile('../../schema/tables/variant.sql').replace(/\$PHENOTYPE/g, phenotypePrefix);
+    const indexSql = readFile('../../schema/indexes/variant.sql').replace(/\$PHENOTYPE/g, phenotypePrefix);
 
     // clear variants if needed
     if (shouldReset) {
-        console.log(`[${duration()} s] Clearing [${variantTable}, ${aggregateTable}])...`);
+        console.log(`[${duration()} s] Clearing ${variantTable}, ${aggregateTable}...`);
         await connection.query(`
-            DROP TABLE ${variantTable};
-            DROP TABLE ${aggregateTable};
+            DROP TABLE IF EXISTS ${variantTable};
+            DROP TABLE IF EXISTS ${aggregateTable};
+            ${schemaSql}
+            ${indexSql}
         `);
     }
 
+    console.log(`[${duration()} s] Setting up temporary table...`);
     await connection.query(`
         START TRANSACTION;
         SET autocommit = 0;
 
-        -- drop indexes on variant table
-        CALL drop_index_if_exists('${variantTable}', 'idx_${variantTable}__gender');
-        CALL drop_index_if_exists('${variantTable}', 'idx_${variantTable}__chromosome');
-        CALL drop_index_if_exists('${variantTable}', 'idx_${variantTable}__position');
-        CALL drop_index_if_exists('${variantTable}', 'idx_${variantTable}__p_value_nlog');
-        CALL drop_index_if_exists('${variantTable}', 'idx_${variantTable}__snp');
-        CALL drop_index_if_exists('${variantTable}', 'idx_${variantTable}__show_qq_plot');
-
-        -- drop indexes on aggregate table
-        CALL drop_index_if_exists('${aggregateTable}', 'idx_${aggregateTable}__gender');
-        CALL drop_index_if_exists('${aggregateTable}', 'idx_${aggregateTable}__position_abs');
-        CALL drop_index_if_exists('${aggregateTable}', 'idx_${aggregateTable}__p_value_nlog');
+        -- disable indexes
+        ALTER TABLE ${variantTable} DISABLE KEYS;
+        ALTER TABLE ${aggregateTable} DISABLE KEYS;
 
         -- create staging table
         CREATE TEMPORARY TABLE stage (
@@ -125,9 +118,9 @@ async function importVariants() {
             q                       DOUBLE,
             i                       DOUBLE
         ) ENGINE = MYISAM;
-    ` + readFile('../../schema/tables/variants.sql').replace(/\$PHENOTYPE/g, phenotypePrefix));
+    `);
 
-    console.log(`[${duration()} s] Importing genes to staging table...`);
+    console.log(`[${duration()} s] Loading genes into staging table...`);
     await connection.query({
         infileStreamFactory: path => fs.createReadStream(inputFilePath),
         sql: `LOAD DATA LOCAL INFILE "${inputFilePath}"
@@ -143,7 +136,7 @@ async function importVariants() {
                 position_abs_aggregate = 1e6 * FLOOR(1e-6 * (SELECT @position + position_abs_min FROM chromosome_range cr WHERE cr.chromosome = @chromosome))`
     });
 
-    console.log(`[${duration()} s] Finished importing, storing variants...`);
+    console.log(`[${duration()} s] Finished loading, storing variants...`);
 
     await connection.execute(`
         INSERT INTO ${variantTable} (
@@ -203,9 +196,11 @@ async function importVariants() {
     `);
 
     // enable indexes to speed up next steps
-    console.log(`[${duration()} s] Indexing database...`);
-    const indexSql = readFile('../../schema/indexes/variants.sql').replace(/\$PHENOTYPE/g, phenotypePrefix);
-    await connection.query(indexSql);
+    console.log(`[${duration()} s] Indexing tables...`);
+    await connection.query(`
+        ALTER TABLE ${variantTable} ENABLE KEYS;
+        ALTER TABLE ${aggregateTable} ENABLE KEYS;
+    `);
 
     // updating variants table with Q-Q plot flag
     console.log(`[${duration()} s] Updating plot_qq values...`);
@@ -217,14 +212,26 @@ async function importVariants() {
     `);
 
     // calculating lambdaGC (eg: lambdagc_male)
+    // note: statement needed to be rewritten for mysql
     console.log(`[${duration()} s] Calculating lambdaGC value...`);
-    const [medianRows] = await connection.execute(`
-        SELECT x.p_value FROM ${variantTable} x, ${variantTable} y
-        GROUP BY x.p_value
-        HAVING SUM(SIGN(1-SIGN(y.p_value - x.p_value)))/COUNT(*) > .5
-        LIMIT 1
+    const [medianRows] = await connection.query(`
+        CREATE TEMPORARY TABLE variant_median (
+            id INTEGER NOT NULL AUTO_INCREMENT PRIMARY KEY,
+            p_value double
+        ) ENGINE=MYISAM
+            SELECT p_value
+            FROM ${variantTable}
+            WHERE gender = '${gender}'
+            ORDER BY p_value;
+
+        set @count = (SELECT count(*) FROM variant_median);
+        set @midpoint = (SELECT CEIL(@count / 2));
+        set @midpoint_offset = (SELECT @count % 2);
+
+        SELECT AVG(p_value) FROM variant_median
+            WHERE id IN (@midpoint, 1 + @midpoint - @midpoint_offset);
     `);
-    const pMedian = pluck(medianRows);
+    const pMedian = pluck(medianRows.pop()); // get last result set
     const lambdaGC = getLambdaGC(pMedian);
     await connection.execute(`
         INSERT INTO phenotype_metadata (phenotype_id, gender, lambda_gc)
@@ -234,7 +241,7 @@ async function importVariants() {
     `, {phenotypeId, gender, lambdaGC});
 
     // drop staging table
-    connection.query(`TRUNCATE TABLE stage`);
+    connection.query(`DROP TEMPORARY TABLE stage`);
 
     // log imported variants
     connection.execute(`
