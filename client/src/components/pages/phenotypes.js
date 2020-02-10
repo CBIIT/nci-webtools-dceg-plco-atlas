@@ -145,6 +145,7 @@ export function Phenotypes() {
       phenotypeType: 'binary',
       breadcrumb: [],
       currentBubbleData: null,
+      displayTreeParent: null,
       phenotypeData: null,
     }));
   }
@@ -170,6 +171,7 @@ export function Phenotypes() {
         //leaf
         // console.log("LEAF!", e.data);
         setSelectedPhenotype(e.data);
+        console.log("single click", e);
         setDisplayTreeParent(e);
       }
     } else {
@@ -183,6 +185,7 @@ export function Phenotypes() {
       // parent
       setCurrentBubbleData(e.data.children);
       setBreadcrumb([...breadcrumb, e]);
+      setDisplayTreeParent(e);
     } else {
       // leaf
       // console.log("leaf!", e.parent.data.children);
