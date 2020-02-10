@@ -67,9 +67,12 @@ export const TreeSelect = forwardRef(({
   };
 
   const expandParents = (displayTreeParent) => {
-    let parents = getParents(displayTreeParent.data);
+    var parents = getParents(displayTreeParent.data);
+    parents.push(displayTreeParent.data);
     parents.map((item) => {
-      document.getElementsByClassName('collapse-button-text-' + item.value)[0].click();
+      if (document.getElementsByClassName('collapse-button-text-' + item.value)[0]) {
+        document.getElementsByClassName('collapse-button-text-' + item.value)[0].click();
+      }
     });
   }
 
