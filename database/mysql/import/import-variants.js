@@ -1,31 +1,20 @@
-const fs = require('fs');
 const mysql = require('mysql2');
 const args = require('minimist')(process.argv.slice(2));
-const ranges = require('../../json/chromosome_ranges.json');
 const { database } = require('../../../server/config.json');
 const { timestamp } = require('./utils/logging');
-const { readFile } = require('./utils/file');
 const { getRecords, pluck } = require('./utils/query');
 const { getIntervals, getLambdaGC } = require('./utils/math');
 
-/**
-lambdagc_ewing|1.036
-lambdagc_rcc|1.029
-lambdagc_mel|0.83
- */
-
 // display help if needed
-if (!(args.file && args.phenotype && args.gender)) {
+if (!(args.phenotype && args.gender)) {
     console.log(`USAGE: node import-variants.js
-            --file "filename"
             --phenotype "phenotype name or id"
-            --gender "all" | "female" | "male"
-            --reset (if specified, remove all records in phenotype)`);
+            --gender "all" | "female" | "male"`);
     process.exit(0);
 }
 
 // parse arguments and set defaults
-const { file: inputFilePath, phenotype, gender, reset: shouldReset } = args;
+const { phenotype, gender } = args;
 //const errorLog = getLogStream(`./failed-variants-${new Date().toISOString()}.txt`);
 const errorLog = {write: e => console.log(e)};
 const duration = timestamp();
@@ -71,7 +60,6 @@ async function importVariants() {
     const phenotypeId = phenotypes[0].id;
     const phenotypePrefix = `${phenotypeName}_${phenotypeId}`;
     const variantTable = `${phenotypePrefix}_variant`;
-    const aggregateTable = `${phenotypePrefix}_aggregate`;
 
     const [totalCountRows] = await connection.execute(`
         SELECT MIN(id) as firstId,
@@ -92,6 +80,9 @@ async function importVariants() {
 
     // calculating lambdaGC (eg: lambdagc_male)
     // note: statement needed to be rewritten for mysql
+    // lambdagc_ewing|1.036
+    // lambdagc_rcc|1.029
+    // lambdagc_mel|0.83
     console.log(`[${duration()} s] Calculating lambdaGC value...`);
     const [medianRows] = await connection.query(`
         CREATE TEMPORARY TABLE variant_median (
@@ -129,6 +120,5 @@ async function importVariants() {
         {phenotypeId, totalCount}
     );
 
-    await connection.end();
-    return 0;
+    return await connection.end();
 }
