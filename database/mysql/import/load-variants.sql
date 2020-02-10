@@ -35,7 +35,7 @@ CREATE TABLE IF NOT EXISTS __TABLE_PREFIX___variant (
 
 -- Phenotype name is used as prefix
 -- eg: melanoma_aggregate
-CREATE TABLE IF NOT EXISTS __TABLE__PREFIX___aggregate (
+CREATE TABLE IF NOT EXISTS __TABLE_PREFIX___aggregate (
     `id`            BIGINT PRIMARY KEY NOT NULL AUTO_INCREMENT,
     `gender`        ENUM('all', 'female', 'male') NOT NULL,
     `position_abs`  BIGINT NOT NULL,
@@ -61,6 +61,21 @@ CREATE TEMPORARY TABLE stage (
     i                       DOUBLE
 ) ENGINE=MYISAM;
 
+-- drop indexes before importing
+CALL drop_index_if_exists('__TABLE_PREFIX___variant', 'idx___TABLE_PREFIX___variant__gender');
+CALL drop_index_if_exists('__TABLE_PREFIX___variant', 'idx___TABLE_PREFIX___variant__chromosome');
+CALL drop_index_if_exists('__TABLE_PREFIX___variant', 'idx___TABLE_PREFIX___variant__position');
+CALL drop_index_if_exists('__TABLE_PREFIX___variant', 'idx___TABLE_PREFIX___variant__p_value');
+CALL drop_index_if_exists('__TABLE_PREFIX___variant', 'idx___TABLE_PREFIX___variant__p_value_nlog');
+CALL drop_index_if_exists('__TABLE_PREFIX___variant', 'idx___TABLE_PREFIX___variant__snp');
+CALL drop_index_if_exists('__TABLE_PREFIX___variant', 'idx___TABLE_PREFIX___variant__show_qq_plot');
+
+-- aggregated variants table
+CALL drop_index_if_exists('__TABLE_PREFIX___aggregate', 'idx___TABLE_PREFIX___aggregate__gender');
+CALL drop_index_if_exists('__TABLE_PREFIX___aggregate', 'idx___TABLE_PREFIX___aggregate__position_abs');
+CALL drop_index_if_exists('__TABLE_PREFIX___aggregate', 'idx___TABLE_PREFIX___aggregate__p_value_nlog');
+
+-- load daata into staging table
 LOAD DATA LOCAL INFILE __FILEPATH__
 INTO TABLE stage
 FIELDS TERMINATED BY ','
@@ -73,7 +88,7 @@ SET chromosome = @chromosome,
     p_value_nlog_aggregate = 1e-2 * FLOOR(1e2 * -LOG10(@p_value)),
     position_abs_aggregate = 1e6 * FLOOR(1e-6 * (SELECT @position + position_abs_min FROM chromosome_range cr WHERE cr.chromosome = @chromosome))
 
-INSERT INTO __TABLE__PREFIX___variant (
+INSERT INTO __TABLE_PREFIX___variant (
     gender,
     chromosome,
     position,
@@ -110,7 +125,7 @@ WHERE p_value BETWEEN 0 AND 1 AND chromosome IS NOT NULL
 ORDER BY chromosome ASC, p_value_nlog DESC;
 
 
-INSERT INTO __TABLE__PREFIX___aggregate
+INSERT INTO __TABLE_PREFIX___aggregate
     (gender, position_abs, p_value_nlog)
 SELECT DISTINCT
     "__GENDER__",
@@ -120,18 +135,19 @@ FROM stage
 WHERE p_value BETWEEN 0 AND 1 AND chromosome IS NOT NULL;
 
 -- enable indexes
-ALTER TABLE __TABLE__PREFIX___variant
-    ADD INDEX idx___TABLE__PREFIX___variant__gender        (gender),
-    ADD INDEX idx___TABLE__PREFIX___variant__chromosome    (chromosome),
-    ADD INDEX idx___TABLE__PREFIX___variant__position      (position),
-    ADD INDEX idx___TABLE__PREFIX___variant__p_value_nlog  (p_value_nlog),
-    ADD INDEX idx___TABLE__PREFIX___variant__snp           (snp),
-    ADD INDEX idx___TABLE__PREFIX___variant__show_qq_plot  (show_qq_plot);
+ALTER TABLE __TABLE_PREFIX___variant
+    ADD INDEX idx___TABLE_PREFIX___variant__gender        (gender),
+    ADD INDEX idx___TABLE_PREFIX___variant__chromosome    (chromosome),
+    ADD INDEX idx___TABLE_PREFIX___variant__position      (position),
+    ADD INDEX idx___TABLE_PREFIX___variant__p_value       (p_value),
+    ADD INDEX idx___TABLE_PREFIX___variant__p_value_nlog  (p_value_nlog),
+    ADD INDEX idx___TABLE_PREFIX___variant__snp           (snp),
+    ADD INDEX idx___TABLE_PREFIX___variant__show_qq_plot  (show_qq_plot);
 
 -- aggregated variants table
-ALTER TABLE __TABLE__PREFIX___aggregate
-    ADD INDEX idx___TABLE__PREFIX___aggregate__gender          (gender),
-    ADD INDEX idx___TABLE__PREFIX___aggregate__position_abs    (position_abs),
-    ADD INDEX idx___TABLE__PREFIX___aggregate__p_value_nlog    (p_value_nlog);
+ALTER TABLE __TABLE_PREFIX___aggregate
+    ADD INDEX idx___TABLE_PREFIX___aggregate__gender          (gender),
+    ADD INDEX idx___TABLE_PREFIX___aggregate__position_abs    (position_abs),
+    ADD INDEX idx___TABLE_PREFIX___aggregate__p_value_nlog    (p_value_nlog);
 
 COMMIT;
