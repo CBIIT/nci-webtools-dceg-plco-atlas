@@ -94,6 +94,7 @@ async function importVariants() {
 
     console.log(`[${duration()} s] Setting up temporary table...`);
     await connection.query(`
+        FLUSH TABLES;
         START TRANSACTION;
         SET autocommit = 0;
 
