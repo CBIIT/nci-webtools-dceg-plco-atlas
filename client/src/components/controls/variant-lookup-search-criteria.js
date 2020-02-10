@@ -62,7 +62,7 @@ export const VariantLookupSearchCriteria = props => {
                   onClick={e => toggleCollapseCriteria()}
                   aria-controls="search-criteria-collapse-panel"
                   aria-expanded={!collapseCriteria}
-                  disabled={!searchCriteriaVariantLookup.phenotypes}>
+                  disabled={!searchCriteriaVariantLookup.phenotypes || searchCriteriaVariantLookup.phenotypes.length < 2}>
                   <CollapseCaret />
                 </Button>
               </span>
