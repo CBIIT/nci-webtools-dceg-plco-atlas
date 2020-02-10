@@ -1,12 +1,10 @@
 import React, {useState} from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Tab, Tabs } from 'react-bootstrap';
+import Plot from 'react-plotly.js';
 import { updateBrowsePhenotypes } from '../../services/actions';
-import { PhenotypesFrequency } from './phenotypes-frequency'
 import { PhenotypesRelated } from './phenotypes-related'
-import { PhenotypesAge } from './phenotypes-age';
-import { PhenotypesGender } from './phenotypes-gender';
-import { PhenotypesAncestry } from './phenotypes-ancestry';
+import { PieChart, HorizontalBarChart } from './phenotypes-charts';
 
 export function PhenotypesTabs() {
   const dispatch = useDispatch();
@@ -18,11 +16,15 @@ export function PhenotypesTabs() {
     phenotypeData,
   } = useSelector(state => state.browsePhenotypes);
 
+  const [
+    selectedDistribution,
+    setSelectedDistribution
+  ] = useState('age');
+
   const setSelectedPlot = selectedPlot => {
     dispatch(updateBrowsePhenotypes({ selectedPlot }));
   };
 
-  const [selectedDistribution, setSelectedDistribution] = useState('age');
 
   return (
     <Tabs
@@ -34,12 +36,10 @@ export function PhenotypesTabs() {
         eventKey="frequency"
         title="Frequency"
         className="p-2 bg-white tab-pane-bordered rounded-0"
-        style={{ minHeight: '50vh' }}>
-        <PhenotypesFrequency
-          selectedPhenotype={selectedPhenotype}
-          phenotypeType={phenotypeType}
-          data={phenotypeData}
-        />
+        style={{ minHeight: '600px', textAlign: 'center' }}>
+        <PieChart
+                data={phenotypeData.frequency}
+                categories={phenotypeData.categories} />
       </Tab>
 
       <Tab
@@ -47,61 +47,25 @@ export function PhenotypesTabs() {
         title="Distribution"
         className="p-2 bg-white tab-pane-bordered rounded-0"
         style={{ minHeight: '50vh' }}>
-          <div className="m-2">
-            <label className="mr-3 font-weight-normal">
+          <div className="m-2">{[
+            {label: 'Age', value: 'age'},
+            {label: 'Gender', value: 'gender'},
+            {label: 'Ancestry', value: 'ancestry'},
+          ].map((e, i) =>
+            <label className="mr-3 font-weight-normal" key={`${i}-${e.value}`}>
               <input
                 type="radio"
-                value="age"
+                value={e.value}
                 onChange={e => setSelectedDistribution(e.target.value)}
-                checked={selectedDistribution == 'age'}
+                checked={selectedDistribution == e.value}
                 className="mr-1" />
-              Age
+              {e.label}
             </label>
+          )}</div>
 
-            <label className="mr-3 font-weight-normal">
-              <input
-                type="radio"
-                value="gender"
-                onChange={e => setSelectedDistribution(e.target.value)}
-                checked={selectedDistribution == 'gender'}
-                className="mr-1" />
-              Gender
-            </label>
-
-            <label className="mr-3 font-weight-normal">
-              <input
-                type="radio"
-                value="ancestry"
-                onChange={e => setSelectedDistribution(e.target.value)}
-                checked={selectedDistribution == 'ancestry'}
-                className="mr-1"/>
-              Ancestry
-            </label>
-          </div>
-
-          {selectedDistribution === 'age' &&
-            <PhenotypesAge
-              selectedPhenotype={selectedPhenotype}
-              phenotypeType={phenotypeType}
-              data={phenotypeData}
-            />
-          }
-
-          {selectedDistribution === 'gender' &&
-            <PhenotypesGender
-                selectedPhenotype={selectedPhenotype}
-                phenotypeType={phenotypeType}
-                data={phenotypeData}
-            />
-          }
-
-          {selectedDistribution === 'ancestry' &&
-            <PhenotypesAncestry
-              selectedPhenotype={selectedPhenotype}
-              data={phenotypeData}
-              option="ancestry"
-            />
-          }
+          <HorizontalBarChart
+              data={phenotypeData.distribution[selectedDistribution]}
+              categories={phenotypeData.distributionCategories} />
       </Tab>
       <Tab
         eventKey="related-phenotypes"
