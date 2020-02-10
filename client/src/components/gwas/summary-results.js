@@ -345,7 +345,7 @@ export function SummaryResults() {
         collapsed={!openSidebar}
         onCollapsed={collapsed => setOpenSidebar(!collapsed)}>
         <SidebarPanel className="col-lg-3">
-          <div className="p-2 bg-white border rounded-0">
+          <div className="px-2 pt-2 pb-3 bg-white border rounded-0">
             <SummaryResultsForm
               phenotype={selectedPhenotype}
               gender={selectedManhattanPlotType}
@@ -371,7 +371,7 @@ export function SummaryResults() {
               eventKey="manhattan-plot"
               title="Manhattan Plot"
               className="p-2 bg-white tab-pane-bordered rounded-0"
-              style={{ minHeight: '50vh' }}>
+              style={{ minHeight: '366px' }}>
               <ManhattanPlot
                 onChromosomeSelected={onChromosomeSelected}
                 onAllChromosomeSelected={onAllChromosomeSelected}
@@ -391,7 +391,7 @@ export function SummaryResults() {
               eventKey="qq-plot"
               title="Q-Q Plot"
               className="p-2 bg-white tab-pane-bordered rounded-0"
-              style={{ minHeight: '50vh' }}>
+              style={{ minHeight: '366px' }}>
               <div
                 className="mw-100 my-4"
                 style={{ display: submitted ? 'block' : 'none' }}>

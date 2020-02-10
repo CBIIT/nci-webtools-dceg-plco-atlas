@@ -214,7 +214,7 @@ export function Phenotypes() {
       collapsed={!openSidebar}
       onCollapsed={collapsed => setOpenSidebar(!collapsed)}>
       <SidebarPanel className="col-lg-3">
-        <div className="p-2 bg-white border rounded-0">
+        <div className="px-2 pt-2 pb-3 bg-white border rounded-0">
           <PhenotypesForm
             phenotype={selectedPhenotype}
             onChange={handleChange}

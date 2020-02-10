@@ -696,7 +696,8 @@ export const TreeSelect = forwardRef(({
             overflowY: 'auto',
             overflowX: 'hidden',
             whiteSpace: 'nowrap',
-            maxHeight: '450px',
+            minHeight: '250px',
+            maxHeight: '500px',
             fontSize: '10pt'
           }}>
           <span
