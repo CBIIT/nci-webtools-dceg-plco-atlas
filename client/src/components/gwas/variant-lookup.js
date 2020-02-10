@@ -234,7 +234,7 @@ export function VariantLookup() {
       <h1 className="sr-only">Explore GWAS data - Search for variant across phenotypes</h1>
       <SidebarContainer className="mx-3">
         <SidebarPanel className="col-lg-3">
-          <div className="p-2 bg-white border rounded-0">
+          <div className="px-2 pt-2 pb-3 bg-white border rounded-0">
             <VariantLookupForm
               onSubmit={handleSubmit}
               onChange={handleChange}
@@ -260,7 +260,7 @@ export function VariantLookup() {
               eventKey="variant-lookup"
               // title="Table"
               className="p-2 bg-white tab-pane-bordered rounded-0"
-              style={{ minHeight: '50vh' }}>
+              style={{ minHeight: '474px' }}>
               <div
                 className="mw-100 my-2 px-4"
                 style={{ display: submitted ? 'block' : 'none' }}>
