@@ -1,7 +1,6 @@
 -- This file is a template
 -- Replace the following variables to load variants
---   __VARIANT_TABLE__
---   __AGGREGATE_TABLE__
+--   __TABLE_PREFIX__
 --   __FILEPATH__
 --   __GENDER__
 
@@ -15,7 +14,7 @@ START TRANSACTION;
 SET autocommit = 0;
 
 -- create tables if needed
-CREATE TABLE IF NOT EXISTS __VARIANT_TABLE__ (
+CREATE TABLE IF NOT EXISTS __TABLE_PREFIX___variant (
     `id`                BIGINT PRIMARY KEY NOT NULL AUTO_INCREMENT,
     `gender`            ENUM('all', 'female', 'male') NOT NULL,
     `chromosome`        VARCHAR(2) NOT NULL,
@@ -36,7 +35,7 @@ CREATE TABLE IF NOT EXISTS __VARIANT_TABLE__ (
 
 -- Phenotype name is used as prefix
 -- eg: melanoma_aggregate
-CREATE TABLE IF NOT EXISTS __AGGREGATE_TABLE__ (
+CREATE TABLE IF NOT EXISTS __TABLE__PREFIX___aggregate (
     `id`            BIGINT PRIMARY KEY NOT NULL AUTO_INCREMENT,
     `gender`        ENUM('all', 'female', 'male') NOT NULL,
     `position_abs`  BIGINT NOT NULL,
@@ -74,7 +73,7 @@ SET chromosome = @chromosome,
     p_value_nlog_aggregate = 1e-2 * FLOOR(1e2 * -LOG10(@p_value)),
     position_abs_aggregate = 1e6 * FLOOR(1e-6 * (SELECT @position + position_abs_min FROM chromosome_range cr WHERE cr.chromosome = @chromosome))
 
-INSERT INTO __VARIANT_TABLE__ (
+INSERT INTO __TABLE__PREFIX___variant (
     gender,
     chromosome,
     position,
@@ -111,7 +110,7 @@ WHERE p_value BETWEEN 0 AND 1 AND chromosome IS NOT NULL
 ORDER BY chromosome ASC, p_value_nlog DESC;
 
 
-INSERT INTO __AGGREGATE_TABLE__
+INSERT INTO __TABLE__PREFIX___aggregate
     (gender, position_abs, p_value_nlog)
 SELECT DISTINCT
     "__GENDER__",
@@ -121,18 +120,18 @@ FROM stage
 WHERE p_value BETWEEN 0 AND 1 AND chromosome IS NOT NULL;
 
 -- enable indexes
-ALTER TABLE __VARIANT_TABLE__
-    ADD INDEX idx___VARIANT_TABLE____gender        (gender),
-    ADD INDEX idx___VARIANT_TABLE____chromosome    (chromosome),
-    ADD INDEX idx___VARIANT_TABLE____position      (position),
-    ADD INDEX idx___VARIANT_TABLE____p_value_nlog  (p_value_nlog),
-    ADD INDEX idx___VARIANT_TABLE____snp           (snp),
-    ADD INDEX idx___VARIANT_TABLE____show_qq_plot  (show_qq_plot);
+ALTER TABLE __TABLE__PREFIX___variant
+    ADD INDEX idx___TABLE__PREFIX___variant__gender        (gender),
+    ADD INDEX idx___TABLE__PREFIX___variant__chromosome    (chromosome),
+    ADD INDEX idx___TABLE__PREFIX___variant__position      (position),
+    ADD INDEX idx___TABLE__PREFIX___variant__p_value_nlog  (p_value_nlog),
+    ADD INDEX idx___TABLE__PREFIX___variant__snp           (snp),
+    ADD INDEX idx___TABLE__PREFIX___variant__show_qq_plot  (show_qq_plot);
 
 -- aggregated variants table
-ALTER TABLE __AGGREGATE_TABLE__
-    ADD INDEX idx___AGGREGATE_TABLE____gender          (gender),
-    ADD INDEX idx___AGGREGATE_TABLE____position_abs    (position_abs),
-    ADD INDEX idx___AGGREGATE_TABLE____p_value_nlog    (p_value_nlog);
+ALTER TABLE __TABLE__PREFIX___aggregate
+    ADD INDEX idx___TABLE__PREFIX___aggregate__gender          (gender),
+    ADD INDEX idx___TABLE__PREFIX___aggregate__position_abs    (position_abs),
+    ADD INDEX idx___TABLE__PREFIX___aggregate__p_value_nlog    (p_value_nlog);
 
 COMMIT;
