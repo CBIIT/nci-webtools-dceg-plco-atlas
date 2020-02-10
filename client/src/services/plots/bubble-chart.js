@@ -63,7 +63,9 @@ export class BubbleChart {
             })
             .on("dblclick", function() {
                 handleBackgroundDoubleClick();
-            });
+            })
+            .append("title")
+            .text("Double-click to navigate phenotype categories.\nSingle-click to select a phenotype.");
 
         var nodes = d3.hierarchy(data)
             .sum(function (d) {
@@ -86,7 +88,7 @@ export class BubbleChart {
 
         node.append("title")
             .text(function (d) {
-                return "Phenotype: " + d.data.title + " - " + "Sample size: " + d.value;
+                return "Phenotype: " + d.data.title + "\n" + "Sample size: " + d.value.toLocaleString();
             });
 
         node.append("circle")
