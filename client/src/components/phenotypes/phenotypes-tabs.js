@@ -1,10 +1,10 @@
 import React, {useState} from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Tab, Tabs } from 'react-bootstrap';
+import { Tab, Tabs, Form } from 'react-bootstrap';
 import Plot from 'react-plotly.js';
 import { updateBrowsePhenotypes } from '../../services/actions';
 import { PhenotypesRelated } from './phenotypes-related'
-import { PieChart, HorizontalBarChart } from './phenotypes-charts';
+import { BarChart, PieChart, HorizontalBarChart } from './phenotypes-charts';
 
 export function PhenotypesTabs() {
   const dispatch = useDispatch();
@@ -25,6 +25,9 @@ export function PhenotypesTabs() {
     dispatch(updateBrowsePhenotypes({ selectedPlot }));
   };
 
+  const titleCase = str => str.split(/\s+/g)
+    .map(word => word[0].toUpperCase() + word.substr(1).toLowerCase())
+    .join(' ');
 
   return (
     <Tabs
@@ -35,7 +38,7 @@ export function PhenotypesTabs() {
       <Tab
         eventKey="frequency"
         title="Frequency"
-        className="p-2 bg-white tab-pane-bordered rounded-0"
+        className="p-4 bg-white tab-pane-bordered rounded-0"
         style={{ minHeight: '600px', textAlign: 'center' }}>
         <PieChart
                 data={phenotypeData.frequency}
@@ -45,32 +48,38 @@ export function PhenotypesTabs() {
       <Tab
         eventKey="distribution"
         title="Distribution"
-        className="p-2 bg-white tab-pane-bordered rounded-0"
+        className="p-4 bg-white tab-pane-bordered rounded-0"
         style={{ minHeight: '50vh' }}>
           <div className="m-2">{[
             {label: 'Age', value: 'age'},
             {label: 'Gender', value: 'gender'},
             {label: 'Ancestry', value: 'ancestry'},
           ].map((e, i) =>
-            <label className="mr-3 font-weight-normal" key={`${i}-${e.value}`}>
-              <input
-                type="radio"
-                value={e.value}
-                onChange={e => setSelectedDistribution(e.target.value)}
-                checked={selectedDistribution == e.value}
-                className="mr-1" />
-              {e.label}
-            </label>
+            <Form.Check
+              custom
+              inline
+              label={e.label}
+              className="font-weight-normal cursor-pointer mr-4"
+              onChange={e => setSelectedDistribution(e.target.value)}
+              checked={selectedDistribution == e.value}
+              value={e.value}
+              type="radio"
+              id={`select-distribution-${e.value}`}
+            />
           )}</div>
 
-          <HorizontalBarChart
+
+          <BarChart
               data={phenotypeData.distribution[selectedDistribution]}
-              categories={phenotypeData.distributionCategories} />
+              categories={phenotypeData.distributionCategories}
+              xTitle={titleCase(selectedDistribution)}
+              yTitle="Number of Cases"
+          />
       </Tab>
       <Tab
         eventKey="related-phenotypes"
         title="Related Phenotypes"
-        className="p-2 bg-white tab-pane-bordered rounded-0"
+        className="p-4 bg-white tab-pane-bordered rounded-0"
         style={{ minHeight: '50vh' }}>
         <PhenotypesRelated
           selectedPhenotype={selectedPhenotype}

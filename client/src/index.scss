@@ -109,6 +109,11 @@ label.required::after {
   color: red;
 }
 
+.custom-control-label {
+  font-weight: 500;
+  cursor: pointer;
+}
+
 .text-orange {
   color: orange !important;
 }
