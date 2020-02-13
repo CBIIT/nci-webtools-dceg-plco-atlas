@@ -18,13 +18,22 @@ CREATE TABLE `phenotype_sample` (
     `ancestry`      ENUM('american_indian', 'asian', 'black', 'hispanic', 'pacific_islander', 'white', 'other')
 );
 
+CREATE TABLE `phenotype_category` (
+    `id`                    INTEGER PRIMARY KEY NOT NULL AUTO_INCREMENT,
+    `phenotype_id`          INTEGER NOT NULL,
+    `value`                 INTEGER,
+    `label`                 VARCHAR(200),
+    `display_distribution`  BOOLEAN,
+    FOREIGN KEY (phenotype_id) REFERENCES phenotype(id)
+)
+
 CREATE TABLE `phenotype_data` (
-    `id`            BIGINT PRIMARY KEY NOT NULL AUTO_INCREMENT,
-    `phenotype_id`  INTEGER NOT NULL,
-    `sample_id`     INTEGER,
-    `value`         DOUBLE,
+    `id`                    BIGINT PRIMARY KEY NOT NULL AUTO_INCREMENT,
+    `phenotype_id`          INTEGER NOT NULL,
+    `phenotype_sample_id`   INTEGER,
+    `value`                 DOUBLE,
     FOREIGN KEY (phenotype_id) REFERENCES phenotype(id),
-    FOREIGN KEY (sample_id) REFERENCES phenotype_sample(id)
+    FOREIGN KEY (phenotype_sample_id) REFERENCES phenotype_sample(id)
 );
 
 CREATE TABLE `phenotype_metadata` (
