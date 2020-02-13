@@ -17,7 +17,7 @@ CREATE TABLE IF NOT EXISTS `$PHENOTYPE_variant` (
     `q`                 DOUBLE,
     `i`                 DOUBLE,
     `show_qq_plot`      BOOLEAN
-) ENGINE = MYISAM;
+) ENGINE=MYISAM;
 
 -- Phenotype name is used as prefix
 -- eg: melanoma_aggregate
@@ -26,4 +26,4 @@ CREATE TABLE IF NOT EXISTS `$PHENOTYPE_aggregate` (
     `gender`        ENUM('all', 'female', 'male') NOT NULL,
     `position_abs`  BIGINT NOT NULL,
     `p_value_nlog`  DOUBLE NOT NULL
-) ENGINE = MYISAM;
+) ENGINE=MYISAM;
