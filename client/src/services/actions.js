@@ -8,8 +8,6 @@ export const UPDATE_SUMMARY_SNP = 'UPDATE_SUMMARY_SNP';
 export const UPDATE_VARIANT_LOOKUP = 'UPDATE_VARIANT_LOOKUP';
 export const UPDATE_PHENOTYPE_CORRELATIONS = 'UPDATE_PHENOTYPE_CORRELATIONS';
 export const UPDATE_PHENOTYPES = 'UPDATE_PHENOTYPES';
-export const UPDATE_PHENOTYPE_CATEGORIES = 'UPDATE_PHENOTYPE_CATEGORIES';
-export const UPDATE_PHENOTYPES_TREE = 'UPDATE_PHENOTYPES_TREE';
 export const UPDATE_BROWSE_PHENOTYPES = 'UPDATE_BROWSE_PHENOTYPES';
 export const UPDATE_DOWNLOADS = 'UPDATE_DOWNLOADS';
 
@@ -19,14 +17,6 @@ export function updateKey(key, data) {
 
 export function updatePhenotypes(data) {
   return { type: UPDATE_PHENOTYPES, data };
-}
-
-export function updatePhenotypeCategories(data) {
-  return { type: UPDATE_PHENOTYPE_CATEGORIES, data };
-}
-
-export function updatePhenotypesTree(data) {
-  return { type: UPDATE_PHENOTYPES_TREE, data };
 }
 
 export function updateSummaryResults(data) {
@@ -103,9 +93,16 @@ export function initialize() {
       }
     };
     data.forEach(populateRecords, 0);
-    dispatch(updatePhenotypes(records));
-    dispatch(updatePhenotypeCategories(categories));
-    dispatch(updatePhenotypesTree(data));
+
+    const alphabetizedRecords = [...records].sort((a, b) =>
+      a.title.localeCompare(b.title)
+    );
+
+    dispatch(updatePhenotypes({
+      flat: alphabetizedRecords,
+      categories: categories,
+      tree: data
+    }));
   }
 }
 

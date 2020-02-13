@@ -7,8 +7,8 @@ import {
   UPDATE_VARIANT_LOOKUP,
   UPDATE_PHENOTYPE_CORRELATIONS,
   UPDATE_PHENOTYPES,
-  UPDATE_PHENOTYPE_CATEGORIES,
-  UPDATE_PHENOTYPES_TREE,
+  // UPDATE_PHENOTYPE_CATEGORIES,
+  // UPDATE_PHENOTYPES_TREE,
   UPDATE_BROWSE_PHENOTYPES,
   UPDATE_DOWNLOADS
 } from './actions';
@@ -67,16 +67,6 @@ export const rootReducer = (state, action) => {
       return {
         ...state,
         phenotypes: action.data
-      };
-    case UPDATE_PHENOTYPE_CATEGORIES:
-      return {
-        ...state,
-        phenotypeCategories: action.data
-      };
-    case UPDATE_PHENOTYPES_TREE:
-      return {
-        ...state,
-        phenotypesTree: action.data
       };
     case UPDATE_BROWSE_PHENOTYPES:
       return {

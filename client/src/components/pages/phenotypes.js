@@ -29,7 +29,7 @@ export function Phenotypes() {
   const plotContainer = useRef(null);
   // const plot = useRef(null);
 
-  const phenotypesTree = useSelector(state => state.phenotypesTree);
+  const phenotypes = useSelector(state => state.phenotypes);
 
   const [openSidebar, setOpenSidebar] = useState(true);
 
@@ -83,7 +83,7 @@ export function Phenotypes() {
   const handleChange = (phenotype) => {
     // console.log("handleChange", phenotype);
     let phenotypesTreeFull = {
-        children: phenotypesTree
+        children: phenotypes.tree
     };
     const parent = getParent(phenotypesTreeFull, phenotype, null)[0];
     setCurrentBubbleData(parent.children);
@@ -93,7 +93,7 @@ export function Phenotypes() {
       },
       parent: {
         data:  {
-          children: phenotypesTree
+          children: phenotypes.tree
         }
       }
     }]);
@@ -152,11 +152,11 @@ export function Phenotypes() {
 
   useEffect(() => {
     // console.log("useEffect() triggered!");
-    if (submitted || !phenotypesTree) return;
+    if (submitted || !phenotypes) return;
     plotContainer.current.innerHTML = '';
     // console.log("currentBubbleData", currentBubbleData);
-    drawBubbleChart(currentBubbleData ? currentBubbleData : phenotypesTree);
-  }, [phenotypesTree, breadcrumb, currentBubbleData, selectedPhenotype, submitted])
+    drawBubbleChart(currentBubbleData ? currentBubbleData : phenotypes.tree);
+  }, [phenotypes, breadcrumb, currentBubbleData, selectedPhenotype, submitted])
 
   const drawBubbleChart = (data) => {
     new Plot(plotContainer.current, data, handleSingleClick, handleDoubleClick, handleBackgroundDoubleClick, selectedPhenotype);

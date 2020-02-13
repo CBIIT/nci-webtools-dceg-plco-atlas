@@ -4,9 +4,7 @@ import { initialize } from './actions';
 import ReduxThunk from 'redux-thunk';
 
 export const getInitialState = () => ({
-  phenotypes: [],
-  phenotypeCategories: [],
-  phenotypesTree: [],
+  phenotypes: null,
   summaryResults: {
     selectedListType: 'categorical',
     selectedPhenotype: null,

@@ -12,18 +12,12 @@ import { updateDownloads } from '../../services/actions';
 export function Downloads() {
   const dispatch = useDispatch();
   const phenotypes = useSelector(state => state.phenotypes);
-  const phenotypeCategories = useSelector(state => state.phenotypeCategories);
-  const phenotypesTree = useSelector(state => state.phenotypesTree);
 
   const {
     selectedPhenotypes,
     downloadRoot,
     submitted
   } = useSelector(state => state.downloads);
-
-  const alphabetizedPhenotypes = [...phenotypes].sort((a, b) =>
-    a.title.localeCompare(b.title)
-  );
 
   function handleSubmit() {
     if (!selectedPhenotypes.length || selectedPhenotypes.length > 5) {
@@ -79,9 +73,7 @@ export function Downloads() {
             <b>Phenotypes</b>
             <span style={{ color: 'red' }}>*</span>
             <TreeSelect
-              data={phenotypesTree}
-              dataAlphabetical={alphabetizedPhenotypes}
-              dataCategories={phenotypeCategories}
+              data={phenotypes}
               value={selectedPhenotypes}
               onChange={handleChange}
               ref={treeRef}

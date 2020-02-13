@@ -3,8 +3,6 @@ import React, { forwardRef, useState, useEffect, useImperativeHandle } from 'rea
 export const TreeSelect = forwardRef(({
   onChange,
   data,
-  dataAlphabetical,
-  dataCategories,
   value,
   singleSelect
 }, ref) => {
@@ -77,7 +75,7 @@ export const TreeSelect = forwardRef(({
   }
 
   const getParents = (node, parents = []) => {
-    dataCategories.map((item) => {
+    data && data.categories.map((item) => {
       item.children.map((child) => {
         if (child.title === node.title && child.value === node.value) {
           parents.push(item)
@@ -123,15 +121,15 @@ export const TreeSelect = forwardRef(({
 
   const toggleExpandAllParents = () => {
     if (!expandAll) {
-      for (let i = 0; i < dataCategories.length; i++) {
-        const className = 'children-of-' + dataCategories[i].value;
+      for (let i = 0; i < data.categories.length; i++) {
+        const className = 'children-of-' + data.categories[i].value;
         if (
           document.getElementsByClassName(className)[0].style.display &&
           document.getElementsByClassName(className)[0].style.display === 'none'
         ) {
           document.getElementsByClassName(className)[0].style.display = 'block';
           const collapseButton = document.getElementsByClassName(
-            'collapse-button-text-' + dataCategories[i].value
+            'collapse-button-text-' + data.categories[i].value
           )[0];
           collapseButton.classList.toggle('fa-plus-square', false);
           collapseButton.classList.toggle('fa-minus-square', true);
@@ -139,8 +137,8 @@ export const TreeSelect = forwardRef(({
       }
       setExpandAll(true);
     } else {
-      for (let i = 0; i < dataCategories.length; i++) {
-        const className = 'children-of-' + dataCategories[i].value;
+      for (let i = 0; i < data.categories.length; i++) {
+        const className = 'children-of-' + data.categories[i].value;
         if (
           document.getElementsByClassName(className)[0].style.display &&
           document.getElementsByClassName(className)[0].style.display ===
@@ -148,7 +146,7 @@ export const TreeSelect = forwardRef(({
         ) {
           document.getElementsByClassName(className)[0].style.display = 'none';
           const collapseButton = document.getElementsByClassName(
-            'collapse-button-text-' + dataCategories[i].value
+            'collapse-button-text-' + data.categories[i].value
           )[0];
           collapseButton.classList.toggle('fa-plus-square', true);
           collapseButton.classList.toggle('fa-minus-square', false);
@@ -159,8 +157,8 @@ export const TreeSelect = forwardRef(({
   };
 
   const collapseAllParents = () => {
-    for (let i = 0; i < dataCategories.length; i++) {
-      const className = 'children-of-' + dataCategories[i].value;
+    for (let i = 0; i < data.categories.length; i++) {
+      const className = 'children-of-' + data.categories[i].value;
       if (
         document.getElementsByClassName(className)[0].style.display &&
         document.getElementsByClassName(className)[0].style.display ===
@@ -168,7 +166,7 @@ export const TreeSelect = forwardRef(({
       ) {
         document.getElementsByClassName(className)[0].style.display = 'none';
         const collapseButton = document.getElementsByClassName(
-          'collapse-button-text-' + dataCategories[i].value
+          'collapse-button-text-' + data.categories[i].value
         )[0];
         collapseButton.classList.toggle('fa-plus-square', true);
         collapseButton.classList.toggle('fa-minus-square', false);
@@ -500,7 +498,7 @@ export const TreeSelect = forwardRef(({
       }
     });
 
-  const selectTreeAlphabetical = dataAlphabetical => {
+  const selectTreeAlphabetical = () => {
     const stringMatch = item => {
       // console.log("searchInput", searchInput);
       let re1 = new RegExp(/[()~`!#$%\^&*+=\[\]\\;,/{}|\\":<>\?]/, 'gi');
@@ -509,7 +507,7 @@ export const TreeSelect = forwardRef(({
         return item.title.match(re2);
       }
     };
-    const dataAlphabeticalFiltered = dataAlphabetical.filter(stringMatch);
+    const dataAlphabeticalFiltered = data.flat.filter(stringMatch);
     if (dataAlphabeticalFiltered && dataAlphabeticalFiltered.length > 0) {
       return dataAlphabeticalFiltered.map(item => (
         <div
@@ -575,14 +573,14 @@ export const TreeSelect = forwardRef(({
       onChange([]);
     } else {
       const allLeafs = [];
-      data.map(item => allLeafs.push(getAllLeafs(item)));
+      data.tree.map(item => allLeafs.push(getAllLeafs(item)));
       onChange(allLeafs.flat());
     }
   };
 
   const checkAllLeafsSelected = () => {
     let allLeafs = [];
-    data.map(item => allLeafs.push(getAllLeafs(item)));
+    data.tree.map(item => allLeafs.push(getAllLeafs(item)));
     allLeafs = allLeafs.flat().map(item => item.value);
     for (var i = 0; i < allLeafs.length; i++) {
       if (value.map(item => item.value).indexOf(allLeafs[i]) === -1)
@@ -702,11 +700,11 @@ export const TreeSelect = forwardRef(({
           }}>
           <span
             style={{ display: listType === 'categorical' ? 'block' : 'none' }}>
-            {selectTreeCategorical(data)}
+            {data && selectTreeCategorical(data.tree)}
           </span>
           <span
             style={{ display: listType === 'categorical' ? 'none' : 'block' }}>
-            {selectTreeAlphabetical(dataAlphabetical)}
+            {data && selectTreeAlphabetical()}
           </span>
         </ul>
       </div>
