@@ -7,8 +7,6 @@ import { TreeSelect } from '../controls/tree-select';
 export function VariantLookupForm({ onChange, onSubmit, onReset }) {
   const dispatch = useDispatch();
   const phenotypes = useSelector(state => state.phenotypes);
-  const phenotypeCategories = useSelector(state => state.phenotypeCategories);
-  const phenotypesTree = useSelector(state => state.phenotypesTree);
   const variantLookup = useSelector(state => state.variantLookup);
   const { selectedPhenotypes, selectedVariant, selectedGender } = variantLookup;
 
@@ -23,10 +21,6 @@ export function VariantLookupForm({ onChange, onSubmit, onReset }) {
   const setSelectedGender = selectedGender => {
     dispatch(updateVariantLookup({ selectedGender }));
   };
-
-  const alphabetizedPhenotypes = [...phenotypes].sort((a, b) =>
-    a.title.localeCompare(b.title)
-  );
 
   const handleChangeCustom = items => {
     setSelectedPhenotypes(items);
@@ -46,9 +40,7 @@ export function VariantLookupForm({ onChange, onSubmit, onReset }) {
         <b>Phenotypes</b>
         <span style={{ color: 'red' }}>*</span>
         <TreeSelect
-          data={phenotypesTree}
-          dataAlphabetical={alphabetizedPhenotypes}
-          dataCategories={phenotypeCategories}
+          data={phenotypes}
           value={selectedPhenotypes}
           onChange={handleChangeCustom}
           ref={treeRef}

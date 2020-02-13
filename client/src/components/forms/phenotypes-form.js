@@ -26,11 +26,6 @@ export function PhenotypesForm({
 
   // select store members
   const phenotypes = useSelector(state => state.phenotypes);
-  const phenotypeCategories = useSelector(state => state.phenotypeCategories);
-  const phenotypesTree = useSelector(state => state.phenotypesTree);
-  const alphabetizedPhenotypes = [...phenotypes].sort((a, b) =>
-    a.title.localeCompare(b.title)
-  );
 
   return (
     <>
@@ -38,9 +33,7 @@ export function PhenotypesForm({
       <div className="mb-2">
         <label className="required">Phenotypes</label>
         <TreeSelect
-          data={phenotypesTree}
-          dataAlphabetical={alphabetizedPhenotypes}
-          dataCategories={phenotypeCategories}
+          data={phenotypes}
           value={_phenotype}
           // onChange={val => _setPhenotype((val && val.length) ? val[0] : null)}
           onChange={val => onChange((val && val.length) ? val[0] : null)}

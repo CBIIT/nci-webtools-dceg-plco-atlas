@@ -7,8 +7,6 @@ import { TreeSelect } from '../controls/tree-select';
 export function PhenotypeCorrelationsForm({ onChange, onSubmit, onReset }) {
   const dispatch = useDispatch();
   const phenotypes = useSelector(state => state.phenotypes);
-  const phenotypeCategories = useSelector(state => state.phenotypeCategories);
-  const phenotypesTree = useSelector(state => state.phenotypesTree);
 
   const phenotypeCorrelations = useSelector(
     state => state.phenotypeCorrelations
@@ -29,38 +27,13 @@ export function PhenotypeCorrelationsForm({ onChange, onSubmit, onReset }) {
     setSelectedPhenotypes(items);
   };
 
-  // const removeTreeDisabled = phenoTree => {
-  //   let phenoTreeAllEnabled = [...phenoTree];
-  //   let phenoTreeAllEnabledString = JSON.stringify(phenoTreeAllEnabled);
-  //   phenoTreeAllEnabledString = phenoTreeAllEnabledString.replace(
-  //     /\"disabled\":true/g,
-  //     `\"disabled\":false`
-  //   );
-  //   phenoTreeAllEnabled = JSON.parse(phenoTreeAllEnabledString);
-  //   return phenoTreeAllEnabled;
-  // };
-
-  // const removeFlatDisabled = phenoList =>
-  //   phenoList.map(node => {
-  //     return {
-  //       value: node.value,
-  //       title: node.title
-  //     };
-  //   });
-
-  const alphabetizedPhenotypes = [...phenotypes].sort((a, b) =>
-    a.title.localeCompare(b.title)
-  );
-
   return (
     <>
       <div className="mb-2">
         <b>Phenotypes</b>
         <span style={{ color: 'red' }}>*</span>
         <TreeSelect
-          data={phenotypesTree}
-          dataAlphabetical={alphabetizedPhenotypes}
-          dataCategories={phenotypeCategories}
+          data={phenotypes}
           value={selectedPhenotypes}
           onChange={handleChangeCustom}
           ref={treeRef}
