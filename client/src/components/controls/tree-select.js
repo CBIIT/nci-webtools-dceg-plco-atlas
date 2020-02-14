@@ -1,4 +1,5 @@
 import React, { forwardRef, useState, useEffect, useImperativeHandle } from 'react';
+import { Spinner } from 'react-bootstrap';
 
 export const TreeSelect = forwardRef(({
   onChange,
@@ -569,6 +570,7 @@ export const TreeSelect = forwardRef(({
   };
 
   const selectAll = () => {
+    if (!data) return;
     if (checkAllLeafsSelected()) {
       onChange([]);
     } else {
@@ -579,6 +581,7 @@ export const TreeSelect = forwardRef(({
   };
 
   const checkAllLeafsSelected = () => {
+    if (!data) return;
     let allLeafs = [];
     data.tree.map(item => allLeafs.push(getAllLeafs(item)));
     allLeafs = allLeafs.flat().map(item => item.value);
@@ -686,9 +689,20 @@ export const TreeSelect = forwardRef(({
           </div>
         </div>
 
+        <div
+          className="text-center justify-content-center p-5"
+          style={{ display: !data ? 'block' : 'none' }}>
+          {!data && 
+            <Spinner animation="border" variant="primary" role="status">
+              <span className="sr-only">Loading...</span>
+            </Spinner>
+          }
+        </div>
+
         <ul
           className="pl-0 ml-1 mr-0 my-0"
           style={{
+            display: data ? 'block' : 'none',
             listStyleType: 'none',
             textOverflow: 'ellipsis',
             overflowY: 'auto',
@@ -706,6 +720,7 @@ export const TreeSelect = forwardRef(({
             style={{ display: listType === 'categorical' ? 'none' : 'block' }}>
             {data && selectTreeAlphabetical()}
           </span>
+          
         </ul>
       </div>
     </>
