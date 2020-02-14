@@ -1,4 +1,9 @@
 /node_modules/
+/database/mysql/import/raw/*
+/server/logs/
+/server/data/
+/www/
+config.json
 *.meta
 *.db
 *.db-journal
@@ -6,11 +11,3 @@
 *.Rhistory
 *.log
 *-audit.json
-config.json
-/server/data/**/*.db
-/server/data/**/*.meta
-/server/data/**/*.txt
-/server/data/**/*.txt.gz
-/server/data/qq-plots/
-/server/logs/
-/www/
