@@ -1,41 +1,44 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import { Button, OverlayTrigger, Tooltip } from 'react-bootstrap';
-import { TreeSelectCustom } from '../controls/tree-select-custom';
+import { TreeSelect } from '../controls/tree-select';
 
 export function PhenotypesForm({
   phenotype = null,
   onSubmit,
-  onReset
+  onChange,
+  onReset,
+  displayTreeParent
 }) {
 
   // private members prefixed with _
   const [_phenotype, _setPhenotype] = useState(null);
-  const submitRef = useRef(null);
+  // const submitRef = useRef(null);
+  const treeRef = useRef();
 
   // update state when props change
   useEffect(() => _setPhenotype(phenotype), [phenotype]);
 
+  useEffect(() => {
+    if (!displayTreeParent) return;
+    treeRef.current.expandSelectedPhenotype(displayTreeParent);
+  }, [displayTreeParent]);
+
   // select store members
   const phenotypes = useSelector(state => state.phenotypes);
-  const phenotypeCategories = useSelector(state => state.phenotypeCategories);
-  const phenotypesTree = useSelector(state => state.phenotypesTree);
-  const alphabetizedPhenotypes = [...phenotypes].sort((a, b) =>
-    a.title.localeCompare(b.title)
-  );
 
   return (
     <>
       {/* <pre>{JSON.stringify({_phenotype, _gender}, null, 2)}</pre> */}
       <div className="mb-2">
         <label className="required">Phenotypes</label>
-        <TreeSelectCustom
-          data={phenotypesTree}
-          dataAlphabetical={alphabetizedPhenotypes}
-          dataCategories={phenotypeCategories}
+        <TreeSelect
+          data={phenotypes}
           value={_phenotype}
-          onChange={val => _setPhenotype((val && val.length) ? val[0] : null)}
+          // onChange={val => _setPhenotype((val && val.length) ? val[0] : null)}
+          onChange={val => onChange((val && val.length) ? val[0] : null)}
           singleSelect
+          ref={treeRef}
         />
       </div>
 
@@ -69,6 +72,7 @@ export function PhenotypesForm({
             e.preventDefault();
             _setPhenotype(null);
             onReset();
+            treeRef.current.resetSearchFilter();
           }}>
           Reset
         </Button>

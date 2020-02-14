@@ -182,7 +182,7 @@ export function SummaryResultsTable() {
       <div className="d-flex align-items-center justify-content-between">
         <div className="d-flex align-items-center">
           {selectedManhattanPlotType === 'stacked' &&
-            <div class="btn-group" role="group">
+            <div className="btn-group" role="group">
               <button
                 className={`btn btn-sm ${gender === 'female' ? 'btn-primary btn-primary-gradient active' : 'btn-silver'}`}
                 onClick={e => setGender('female')}>

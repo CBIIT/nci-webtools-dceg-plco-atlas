@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { updateVariantLookup } from '../../services/actions';
 import { Tab, Tabs, Button } from 'react-bootstrap';
@@ -62,7 +62,7 @@ export const VariantLookupSearchCriteria = props => {
                   onClick={e => toggleCollapseCriteria()}
                   aria-controls="search-criteria-collapse-panel"
                   aria-expanded={!collapseCriteria}
-                  disabled={!searchCriteriaVariantLookup.phenotypes}>
+                  disabled={!searchCriteriaVariantLookup.phenotypes || searchCriteriaVariantLookup.phenotypes.length < 2}>
                   <CollapseCaret />
                 </Button>
               </span>
@@ -139,7 +139,16 @@ export const VariantLookupSearchCriteria = props => {
               </span>
               {searchCriteriaVariantLookup &&
               searchCriteriaVariantLookup.variant
-                ? searchCriteriaVariantLookup.variant
+                ? searchCriteriaVariantLookup.variant.includes('rs') 
+                  ? <a 
+                    href={'https://www.ncbi.nlm.nih.gov/snp/' + searchCriteriaVariantLookup.variant} 
+                    target="_blank" 
+                    style={{
+                      textDecoration: 'underline',
+                    }}>
+                      {searchCriteriaVariantLookup.variant}
+                    </a> 
+                  : <span>{searchCriteriaVariantLookup.variant}</span>
                 : 'None'}
 
               <span className="mx-3">|</span>
