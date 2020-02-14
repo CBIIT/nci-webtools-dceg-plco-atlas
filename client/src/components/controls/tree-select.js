@@ -158,6 +158,7 @@ export const TreeSelect = forwardRef(({
   };
 
   const collapseAllParents = () => {
+    if (!data) return;
     for (let i = 0; i < data.categories.length; i++) {
       const className = 'children-of-' + data.categories[i].value;
       if (
@@ -612,12 +613,13 @@ export const TreeSelect = forwardRef(({
                 title={expandAll ? "Hide all phenotypes" : "Show all phenotypes"}
                 style={{ all: 'unset' }}
                 className="ml-1 collapse-button-all text-secondary"
-                onClick={e => toggleExpandAllParents()}>
+                onClick={e => toggleExpandAllParents()}
+                disabled={!data}>
                 {expandAll && (
-                  <i className="fas fa-minus-square"></i>
+                  <i className="fas fa-minus-square" style={{cursor: !data ? 'not-allowed' : 'pointer'}}></i>
                 )}
                 {!expandAll && (
-                  <i className="fas fa-plus-square"></i>
+                  <i className="fas fa-plus-square" style={{cursor: !data ? 'not-allowed' : 'pointer'}}></i>
                 )}
               </button>
 
@@ -634,11 +636,11 @@ export const TreeSelect = forwardRef(({
 
           <input
             title={singleSelect ? 'Only one phenotype can be selected' : 'Select/deselect all'}
-            style={{ cursor: singleSelect ? 'not-allowed' : 'pointer' }}
+            style={{ cursor: singleSelect || !data ? 'not-allowed' : 'pointer' }}
             className={listType === 'alphabetical' ? 'ml-1' : ''}
             name=""
             type="checkbox"
-            disabled={singleSelect ? true : false}
+            disabled={singleSelect || !data ? true : false}
             checked={!singleSelect && checkAllLeafsSelected()}
             onChange={e => !singleSelect && selectAll()}
           />
@@ -669,6 +671,7 @@ export const TreeSelect = forwardRef(({
                 }
               }}
               type="text"
+              disabled={!data}
             />
             <div className="input-group-append">
               {searchInput.length > 0 ? (
