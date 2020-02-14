@@ -1,16 +1,33 @@
-import React, { useState } from 'react';
+import React, { forwardRef, useState, useEffect, useImperativeHandle } from 'react';
 
-export function TreeSelectCustom({
+export const TreeSelect = forwardRef(({
   onChange,
   data,
-  dataAlphabetical,
-  dataCategories,
   value,
   singleSelect
-}) {
+}, ref) => {
+
+  const [expandAll, setExpandAll] = useState(false);
+
+  useImperativeHandle(ref, () => ({
+    resetSearchFilter() {
+      clearSearchFilter();
+      collapseAllParents();
+    },
+    expandSelectedPhenotype(displayTreeParent) {
+      collapseAllParents();
+      expandParents(displayTreeParent)
+    }
+  }));
+
   const [searchInput, setSearchInput] = useState('');
   const [listType, setListType] = useState('categorical');
-  const [expandAll, setExpandAll] = useState(false);
+
+  const clearSearchFilter = () => {
+    setSearchInput('');
+    setListType('categorical');
+  };
+
   const containsVal = (arr, val) => {
     let result = false;
     for (var i = 0; i < arr.length; i++) {
@@ -47,12 +64,31 @@ export function TreeSelectCustom({
     return arr;
   };
 
+  const expandParents = (displayTreeParent) => {
+    var parents = getParents(displayTreeParent.data);
+    parents.push(displayTreeParent.data);
+    parents.map((item) => {
+      if (document.getElementsByClassName('collapse-button-text-' + item.value)[0]) {
+        document.getElementsByClassName('collapse-button-text-' + item.value)[0].click();
+      }
+    });
+  }
+
+  const getParents = (node, parents = []) => {
+    data && data.categories.map((item) => {
+      item.children.map((child) => {
+        if (child.title === node.title && child.value === node.value) {
+          parents.push(item)
+          getParents(item, parents);
+        }
+      })
+    });
+    return parents;
+  }
+
   const getLeafs = (item, node, allLeafs = []) => {
     if (!node.children || node.children.length === 0) {
-      // ignore disabled attribute for now
-      // if (!node.disabled) {
       allLeafs.push(node);
-      // }
     } else {
       if (document.getElementsByClassName('parent-checkbox-' + node.value)[0]) {
         document.getElementsByClassName(
@@ -69,29 +105,31 @@ export function TreeSelectCustom({
   const getAllLeafs = item => {
     let allLeafs = [];
     if (item.children && item.children.length > 0) {
+      // check if item is parent
       for (var i = 0; i < item.children.length; i++) {
         let child = item.children[i];
         allLeafs = allLeafs.concat(getLeafs(item, child));
       }
     } else {
-      if (!item.parent) {
-        allLeafs.push(item);
-      }
+      // if (!item.parent) {
+      // check if item is not parent
+      allLeafs.push(item);
+      // }
     }
     return allLeafs;
   };
 
   const toggleExpandAllParents = () => {
     if (!expandAll) {
-      for (let i = 0; i < dataCategories.length; i++) {
-        const className = 'children-of-' + dataCategories[i].value;
+      for (let i = 0; i < data.categories.length; i++) {
+        const className = 'children-of-' + data.categories[i].value;
         if (
           document.getElementsByClassName(className)[0].style.display &&
           document.getElementsByClassName(className)[0].style.display === 'none'
         ) {
           document.getElementsByClassName(className)[0].style.display = 'block';
           const collapseButton = document.getElementsByClassName(
-            'collapse-button-text-' + dataCategories[i].value
+            'collapse-button-text-' + data.categories[i].value
           )[0];
           collapseButton.classList.toggle('fa-plus-square', false);
           collapseButton.classList.toggle('fa-minus-square', true);
@@ -99,8 +137,8 @@ export function TreeSelectCustom({
       }
       setExpandAll(true);
     } else {
-      for (let i = 0; i < dataCategories.length; i++) {
-        const className = 'children-of-' + dataCategories[i].value;
+      for (let i = 0; i < data.categories.length; i++) {
+        const className = 'children-of-' + data.categories[i].value;
         if (
           document.getElementsByClassName(className)[0].style.display &&
           document.getElementsByClassName(className)[0].style.display ===
@@ -108,7 +146,7 @@ export function TreeSelectCustom({
         ) {
           document.getElementsByClassName(className)[0].style.display = 'none';
           const collapseButton = document.getElementsByClassName(
-            'collapse-button-text-' + dataCategories[i].value
+            'collapse-button-text-' + data.categories[i].value
           )[0];
           collapseButton.classList.toggle('fa-plus-square', true);
           collapseButton.classList.toggle('fa-minus-square', false);
@@ -116,6 +154,25 @@ export function TreeSelectCustom({
       }
       setExpandAll(false);
     }
+  };
+
+  const collapseAllParents = () => {
+    for (let i = 0; i < data.categories.length; i++) {
+      const className = 'children-of-' + data.categories[i].value;
+      if (
+        document.getElementsByClassName(className)[0].style.display &&
+        document.getElementsByClassName(className)[0].style.display ===
+          'block'
+      ) {
+        document.getElementsByClassName(className)[0].style.display = 'none';
+        const collapseButton = document.getElementsByClassName(
+          'collapse-button-text-' + data.categories[i].value
+        )[0];
+        collapseButton.classList.toggle('fa-plus-square', true);
+        collapseButton.classList.toggle('fa-minus-square', false);
+      }
+    }
+    setExpandAll(false);
   };
 
   const toggleHideChildren = name => {
@@ -305,7 +362,7 @@ export function TreeSelectCustom({
       if (item.children && item.children.length > 0) {
         return (
           // PARENT
-          <>
+          <div key={'categorical-parent-' + item.value}>
             <li className="my-1" style={{ display: 'block' }}>
               <div className="d-flex align-items-center">
                 <button
@@ -378,13 +435,13 @@ export function TreeSelectCustom({
                 {selectTreeCategorical(item.children)}
               </ul>
             </li>
-          </>
+          </div>
         );
       } else {
         return (
           // LEAF
           <li
-            key={'categorical-' + item.value}
+            key={'categorical-leaf-' + item.value}
             style={{
               textOverflow: 'ellipsis',
               whiteSpace: 'nowrap',
@@ -441,7 +498,7 @@ export function TreeSelectCustom({
       }
     });
 
-  const selectTreeAlphabetical = dataAlphabetical => {
+  const selectTreeAlphabetical = () => {
     const stringMatch = item => {
       // console.log("searchInput", searchInput);
       let re1 = new RegExp(/[()~`!#$%\^&*+=\[\]\\;,/{}|\\":<>\?]/, 'gi');
@@ -450,7 +507,7 @@ export function TreeSelectCustom({
         return item.title.match(re2);
       }
     };
-    const dataAlphabeticalFiltered = dataAlphabetical.filter(stringMatch);
+    const dataAlphabeticalFiltered = data.flat.filter(stringMatch);
     if (dataAlphabeticalFiltered && dataAlphabeticalFiltered.length > 0) {
       return dataAlphabeticalFiltered.map(item => (
         <div
@@ -516,14 +573,14 @@ export function TreeSelectCustom({
       onChange([]);
     } else {
       const allLeafs = [];
-      data.map(item => allLeafs.push(getAllLeafs(item)));
+      data.tree.map(item => allLeafs.push(getAllLeafs(item)));
       onChange(allLeafs.flat());
     }
   };
 
   const checkAllLeafsSelected = () => {
     let allLeafs = [];
-    data.map(item => allLeafs.push(getAllLeafs(item)));
+    data.tree.map(item => allLeafs.push(getAllLeafs(item)));
     allLeafs = allLeafs.flat().map(item => item.value);
     for (var i = 0; i < allLeafs.length; i++) {
       if (value.map(item => item.value).indexOf(allLeafs[i]) === -1)
@@ -614,9 +671,9 @@ export function TreeSelectCustom({
               {searchInput.length > 0 ? (
                 <button
                   className="input-group-text bg-white"
+                  title="Clear to go back to categorical view"
                   onClick={e => {
-                    setSearchInput('');
-                    setListType('categorical');
+                    clearSearchFilter();
                   }}>
                   <i className="fas fa-times fa-xs"></i>
                 </button>
@@ -637,19 +694,20 @@ export function TreeSelectCustom({
             overflowY: 'auto',
             overflowX: 'hidden',
             whiteSpace: 'nowrap',
-            maxHeight: '450px',
+            minHeight: '250px',
+            maxHeight: '500px',
             fontSize: '10pt'
           }}>
           <span
             style={{ display: listType === 'categorical' ? 'block' : 'none' }}>
-            {selectTreeCategorical(data)}
+            {data && selectTreeCategorical(data.tree)}
           </span>
           <span
             style={{ display: listType === 'categorical' ? 'none' : 'block' }}>
-            {selectTreeAlphabetical(dataAlphabetical)}
+            {data && selectTreeAlphabetical()}
           </span>
         </ul>
       </div>
     </>
   );
-}
+});

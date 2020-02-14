@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import {
   SidebarContainer,
   SidebarPanel,
@@ -6,24 +6,18 @@ import {
 } from '../controls/sidebar-container';
 import { Button, Tooltip, OverlayTrigger } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
-import { TreeSelectCustom } from '../controls/tree-select-custom';
+import { TreeSelect } from '../controls/tree-select';
 import { updateDownloads } from '../../services/actions';
 
 export function Downloads() {
   const dispatch = useDispatch();
   const phenotypes = useSelector(state => state.phenotypes);
-  const phenotypeCategories = useSelector(state => state.phenotypeCategories);
-  const phenotypesTree = useSelector(state => state.phenotypesTree);
 
   const {
     selectedPhenotypes,
     downloadRoot,
     submitted
   } = useSelector(state => state.downloads);
-
-  const alphabetizedPhenotypes = [...phenotypes].sort((a, b) =>
-    a.title.localeCompare(b.title)
-  );
 
   function handleSubmit() {
     if (!selectedPhenotypes.length || selectedPhenotypes.length > 5) {
@@ -69,21 +63,22 @@ export function Downloads() {
     document.body.removeChild(a);
   }
 
+  const treeRef = useRef();
+
   return (
     <SidebarContainer className="m-3">
       <SidebarPanel className="col-lg-3">
-        <div className="p-2 bg-white border rounded-0">
+        <div className="px-2 pt-2 pb-3 bg-white border rounded-0">
           <div className="mb-2">
             <b>Phenotypes</b>
             <span style={{ color: 'red' }}>*</span>
-            <TreeSelectCustom
-              data={phenotypesTree}
-              dataAlphabetical={alphabetizedPhenotypes}
-              dataCategories={phenotypeCategories}
+            <TreeSelect
+              data={phenotypes}
               value={selectedPhenotypes}
               onChange={handleChange}
+              ref={treeRef}
             />
-            <small class="text-muted"><i>Up to five phenotypes may be selected for download.</i></small>
+            <small className="text-muted"><i>Up to five phenotypes may be selected for download.</i></small>
           </div>
 
           <div>
@@ -102,7 +97,11 @@ export function Downloads() {
             <Button
               className="ml-2"
               variant="silver"
-              onClick={handleReset}>
+              onClick={e => {
+                e.preventDefault();
+                handleReset();
+                treeRef.current.resetSearchFilter();
+              }}>
               Reset
             </Button>
           </div>
@@ -110,8 +109,8 @@ export function Downloads() {
       </SidebarPanel>
 
       <MainPanel className="col-lg-9">
-        <div className="bg-white border rounded-0 p-4">
-          {!submitted && <p class="h4 text-center text-secondary my-5">Please select phenotypes to download</p>}
+        <div className="bg-white border rounded-0 p-4" style={{ minHeight: '409px' }}>
+          {!submitted && <p className="h4 text-center text-secondary my-5">Please select phenotypes to download</p>}
           {submitted && <>
             <h2>Downloading Data</h2>
             <p>If your downloads do not begin within five seconds, use the links below to download data for each selected phenotype.</p>

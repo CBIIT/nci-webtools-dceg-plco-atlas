@@ -1,14 +1,12 @@
-import React from 'react';
+import React, { useState, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Button, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import { updateVariantLookup } from '../../services/actions';
-import { TreeSelectCustom } from '../controls/tree-select-custom';
+import { TreeSelect } from '../controls/tree-select';
 
 export function VariantLookupForm({ onChange, onSubmit, onReset }) {
   const dispatch = useDispatch();
   const phenotypes = useSelector(state => state.phenotypes);
-  const phenotypeCategories = useSelector(state => state.phenotypeCategories);
-  const phenotypesTree = useSelector(state => state.phenotypesTree);
   const variantLookup = useSelector(state => state.variantLookup);
   const { selectedPhenotypes, selectedVariant, selectedGender } = variantLookup;
 
@@ -24,10 +22,6 @@ export function VariantLookupForm({ onChange, onSubmit, onReset }) {
     dispatch(updateVariantLookup({ selectedGender }));
   };
 
-  const alphabetizedPhenotypes = [...phenotypes].sort((a, b) =>
-    a.title.localeCompare(b.title)
-  );
-
   const handleChangeCustom = items => {
     setSelectedPhenotypes(items);
   };
@@ -38,17 +32,18 @@ export function VariantLookupForm({ onChange, onSubmit, onReset }) {
     }
   };
 
+  const treeRef = useRef();
+
   return (
     <> 
       <div className="mb-2">
         <b>Phenotypes</b>
         <span style={{ color: 'red' }}>*</span>
-        <TreeSelectCustom
-          data={phenotypesTree}
-          dataAlphabetical={alphabetizedPhenotypes}
-          dataCategories={phenotypeCategories}
+        <TreeSelect
+          data={phenotypes}
           value={selectedPhenotypes}
           onChange={handleChangeCustom}
+          ref={treeRef}
         />
       </div>
 
@@ -105,7 +100,7 @@ export function VariantLookupForm({ onChange, onSubmit, onReset }) {
                 )
               }
               {
-                (selectedPhenotypes && selectedPhenotypes.length > 1) &&
+                (selectedPhenotypes && selectedPhenotypes.length >= 1) &&
                 (!selectedVariant || selectedVariant.length < 1) && (
                   <>Please input a search variant.</>
                 )
@@ -145,6 +140,7 @@ export function VariantLookupForm({ onChange, onSubmit, onReset }) {
           onClick={e => {
             e.preventDefault();
             onReset(e);
+            treeRef.current.resetSearchFilter();
           }}>
           Reset
         </Button>

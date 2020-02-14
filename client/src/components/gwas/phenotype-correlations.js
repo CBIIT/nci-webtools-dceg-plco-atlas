@@ -114,7 +114,7 @@ export function PhenotypeCorrelations() {
 
       <SidebarContainer className="mx-3">
         <SidebarPanel className="col-lg-3">
-          <div className="p-2 bg-white border rounded-0">
+          <div className="px-2 pt-2 pb-3 bg-white border rounded-0">
             <PhenotypeCorrelationsForm
               onSubmit={handleSubmit}
               onChange={handleChange}
@@ -137,7 +137,7 @@ export function PhenotypeCorrelations() {
               eventKey="phenotype-correlations"
               // title="Heatmap"
               className="p-2 bg-white tab-pane-bordered rounded-0"
-              style={{ minHeight: '50vh' }}>
+              style={{ minHeight: '404px' }}>
               <div
                 className="mw-100 my-4"
                 style={{ display: submitted ? 'block' : 'none' }}>

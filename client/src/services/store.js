@@ -4,9 +4,7 @@ import { initialize } from './actions';
 import ReduxThunk from 'redux-thunk';
 
 export const getInitialState = () => ({
-  phenotypes: [],
-  phenotypeCategories: [],
-  phenotypesTree: [],
+  phenotypes: null,
   summaryResults: {
     selectedListType: 'categorical',
     selectedPhenotype: null,
@@ -119,9 +117,15 @@ export const getInitialState = () => ({
   },
   browsePhenotypes: {
     selectedPhenotype: null,
-    submitted: null, 
+    displayTreeParent: null,
+    submitted: null,
     messages: [],
-    searchCriteriaPhenotypes: {}
+    searchCriteriaPhenotypes: {},
+    selectedPlot: 'frequency',
+    phenotypeType: 'binary',
+    breadcrumb: [],
+    currentBubbleData: null,
+    phenotypeData: null,
   },
   downloads: {
     selectedPhenotypes: [],
