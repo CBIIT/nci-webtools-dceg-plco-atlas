@@ -6,8 +6,8 @@ const cors = require("fastify-cors");
 const compress = require("fastify-compress");
 const static = require("fastify-static");
 const mysql = require("mysql2");
-const { port, database } = require("./config.json");
-const { getSummary, getVariants, getMetadata, getGenes, getConfig } = require("./query");
+const { port, database, dbpath } = require("./config.json");
+const { connection, getSummary, getVariants, getMetadata, getGenes, getConfig } = require("./query");
 const logger = require("./logger");
 
 if (cluster.isMaster) {
@@ -29,17 +29,6 @@ if (cluster.isMaster) {
 }
 
 logger.info(`[${process.pid}] Started worker process`);
-
-// create connection pool for worker processes
-const connection = mysql.createPool({
-  host: database.host,
-  database: database.name,
-  user: database.user,
-  password: database.user,
-  waitForConnections: true,
-  connectionLimit: 20,
-  namedPlaceholders: true
-}).promise();
 
 // create fastify app and register middleware
 const app = server({ ignoreTrailingSlash: true });
@@ -69,7 +58,7 @@ app.addHook("onSend", (req, res, payload, done) => {
   let timestamp = res.getHeader("Timestamp");
 
   // log response time and parameters for the specified routes
-  const loggedRoutes = /summary|variants|metadata|genes|correlations|config/
+  const loggedRoutes = /summary|variants|metadata|genes|correlations|config/;
   if (timestamp && loggedRoutes.test(pathname)) {
     let duration = new Date().getTime() - timestamp;
     logger.info(`[${process.pid}] ${pathname}: ${duration/1000}s`, req.query);
@@ -81,10 +70,10 @@ app.addHook("onSend", (req, res, payload, done) => {
   done();
 });
 
-app.get("/ping", (req, res) => {
+app.get("/ping", async (req, res) => {
   try {
-    await connection.ping()
-    res.send(true)
+//    await connection.ping()
+    return true;
   } catch (error) {
     logger.error(`[${process.pid}] ${ERROR}: ${error}`, req.query);
     throw(error);
