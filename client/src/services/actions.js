@@ -730,10 +730,8 @@ export function drawHeatmap(phenotypes) {
     };
 
     const getZ = (phenotype1, phenotype2, correlationData) => {
-
       var r2 = 0.0;
       var results = filterCorrelationData(phenotype1, phenotype2, correlationData);
-      console.log(results);
       if (results.length > 0) {
         r2 = results[0].value;
       } else {
@@ -748,31 +746,14 @@ export function drawHeatmap(phenotypes) {
 
       return {
         r2Color,
-        r2Text: r2
+        r2Text: {
+          x: phenotype2.display_name,
+          y: phenotype1.display_name,
+          z: r2
+        }
       };
     };
 
-    // const getZText = (phenotype1, phenotype2, correlationData) => {
-    //   var r2 = 0.0;
-    //   if (phenotype1 in correlationData && phenotype2 in correlationData) {
-    //     if (
-    //       phenotype2 in correlationData[phenotype1] ||
-    //       phenotype1 in correlationData[phenotype2]
-    //     ) {
-    //       if (phenotype2 in correlationData[phenotype1]) {
-    //         r2 = correlationData[phenotype1][phenotype2];
-    //       } else {
-    //         r2 = correlationData[phenotype2][phenotype1];
-    //       }
-    //     } else {
-    //       r2 = 0.0;
-    //     }
-    //   } else {
-    //     r2 = 0.0;
-    //   }
-
-    //   return r2;
-    // };
     const setLoading = loading => {
       dispatch(updateSummaryResults({ loading }));
     };
@@ -796,18 +777,16 @@ export function drawHeatmap(phenotypes) {
     setHeatmapLayout({});
     setHeatmapData([]);
 
-    
-    console.log('phenotypes', phenotypes);
     var phenotypesID = phenotypes.map((phenotype) =>
       phenotype.id
     );
-    console.log("phenotypesID", phenotypesID)
 
     const correlationData = await query('correlations', {
       a: phenotypesID,
       b: phenotypesID
     });
-    console.log('correlationData', correlationData);
+
+    // const correlationData = await query('correlations');
 
     let n = phenotypes.length;
     let x = phenotypes;
@@ -816,8 +795,6 @@ export function drawHeatmap(phenotypes) {
       zColor: [],
       zText: []
     };
-    // let zColor = [];
-    // let zText = [];
 
     for (var xidx = 0; xidx < n; xidx++) {
       let rowColor = [];
@@ -831,11 +808,9 @@ export function drawHeatmap(phenotypes) {
       z.zText.push(rowText);
     }
 
-    console.log("z", z);
-
     let heatmapData = {
-      x: phenotypes.map(phenotype => phenotype.title),
-      y: phenotypes.map(phenotype => phenotype.title),
+      x: phenotypes.map(phenotype => phenotype.name),
+      y: phenotypes.map(phenotype => phenotype.name),
       z: z.zColor,
       zmin: -1.0,
       zmax: 1.0,
@@ -862,9 +837,9 @@ export function drawHeatmap(phenotypes) {
       showscale: true,
       hoverinfo: 'text',
       hovertemplate:
-        '%{x}<br>' +
-        '%{y}<br>' +
-        '<b>Correlation:</b> %{text}' +
+        '%{text.x}<br>' +
+        '%{text.y}<br>' +
+        '<b>Correlation:</b> %{text.z}' +
         '<extra></extra>'
     };
     let heatmapLayout = {
@@ -885,9 +860,9 @@ export function drawHeatmap(phenotypes) {
           size: 10,
           color: 'black'
         },
-        tickvals: phenotypes.map(phenotype => phenotype.title),
+        tickvals: phenotypes.map(phenotype => phenotype.name),
         ticktext: phenotypes.map(phenotype =>
-          phenotype.title.length > 20 ? phenotype.title.substring(0, 20) + '...' : phenotype.title
+          phenotype.display_name.length > 20 ? phenotype.display_name.substring(0, 20) + '...' : phenotype.display_name
         )
         // dtick: 5,
       },
@@ -900,9 +875,9 @@ export function drawHeatmap(phenotypes) {
           size: 10,
           color: 'black'
         },
-        tickvals: phenotypes.map(phenotype => phenotype.title),
+        tickvals: phenotypes.map(phenotype => phenotype.name),
         ticktext: phenotypes.map(phenotype =>
-          phenotype.title.length > 20 ? phenotype.title.substring(0, 20) + '...' : phenotype.title
+          phenotype.display_name.length > 20 ? phenotype.display_name.substring(0, 20) + '...' : phenotype.display_name
         )
         // dtick: 5
       }

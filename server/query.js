@@ -270,7 +270,7 @@ async function getCorrelations(connection, {a, b}) {
             value
         FROM phenotype_correlation pc
         JOIN phenotype pa on pc.phenotype_a = pa.id
-        JOIN phenotype pb on pc.phenotype_a = pb.id
+        JOIN phenotype pb on pc.phenotype_b = pb.id
     `;
 
     if (a && b) {
