@@ -62,7 +62,7 @@ export function updateDownloads(data) {
 export function initialize() {
   return async function(dispatch) {
     // update ranges
-    const ranges = await query('data/chromosome_ranges.json')
+    const ranges = await query('ranges')
     dispatch(updateSummaryResults({ranges}));
 
     // update download root
@@ -70,10 +70,13 @@ export function initialize() {
     dispatch(updateDownloads({downloadRoot}));
 
     // update phenotypes
-    const data = await query('data/phenotypes.json');
+    const data = await query('phenotypes');
     const records = [];
     const categories = [];
     const populateRecords = node => {
+      node.title = node.display_name;
+      node.value = node.name;
+
       // only populate alphabetic phenotype list with leaf nodes
       if (node.children === undefined) {
         records.push({
@@ -84,7 +87,7 @@ export function initialize() {
         categories.push({
           title: node.title,
           value: node.value,
-          color: node.color,
+          color: node.color || '#444',
           children: node.children
         });
       }
@@ -535,7 +538,7 @@ export function drawQQPlot(phenotype, variantTable) {
         'subsetObservedVariantsMale.length',
         subsetObservedVariantsMale.length
       );
-      
+
       const markerColorFemale = '#f41c52';
       const markerColorMale = '#006bb8';
 
