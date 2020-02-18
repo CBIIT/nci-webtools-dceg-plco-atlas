@@ -691,20 +691,22 @@ export const TreeSelect = forwardRef(({
             </div>
           </div>
         </div>
-
-        <div
-          className="text-center justify-content-center p-5"
-          style={{ 
-            display: !data ? 'block' : 'none',
-            minHeight: '250px',
-            maxHeight: '500px'
-          }}>
-          {!data && 
-            <Spinner animation="border" variant="primary" role="status">
-              <span className="sr-only">Loading...</span>
-            </Spinner>
-          }
-        </div>
+        {
+          !data &&
+          <div
+            className="d-flex align-items-center justify-content-center"
+            style={{ 
+              // display: !data ? 'block' : 'none',
+              minHeight: '250px',
+              maxHeight: '500px'
+            }}>
+            {!data && 
+              <Spinner animation="border" variant="primary" role="status">
+                <span className="sr-only">Loading...</span>
+              </Spinner>
+            }
+          </div>
+        }
 
         <ul
           className="pl-0 ml-1 mr-0 my-0"
