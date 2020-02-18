@@ -81,7 +81,7 @@ app.addHook("onSend", (req, res, payload, done) => {
 
 app.get("/ping", async (req, res) => {
   try {
-//    await connection.ping()
+    await connection.ping()
     return true;
   } catch (error) {
     logger.error(`[${process.pid}] ${ERROR}: ${error}`, req.query);
@@ -110,13 +110,12 @@ app.get("/genes", async ({ query }, res) => {
   return getGenes(connection, query);
 });
 
-
-// retrieves genes
+// retrieves phenotypes
 app.get("/phenotypes", async ({ query }, res) => {
   return getPhenotypes(connection, query);
 });
 
-// retrieves genes
+// retrieves correlations
 app.get("/correlations", async ({ query }, res) => {
   return getCorrelations(connection, query);
 });
