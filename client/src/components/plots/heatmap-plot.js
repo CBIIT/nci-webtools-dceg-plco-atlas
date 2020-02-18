@@ -76,9 +76,9 @@ export function Heatmap() {
       }
       heatmapContainer.appendChild(tooltip);
       // show tooltip
-      const tooltipX = points[0].x;
-      const tooltipY = points[0].y;
-      const tooltipCorrelation = points[0].text;
+      const tooltipX = points[0].text.x;
+      const tooltipY = points[0].text.y;
+      const tooltipCorrelation = points[0].text.z;
       const html = h('div', { className: '' }, [
         h('div', null, [
           h(
