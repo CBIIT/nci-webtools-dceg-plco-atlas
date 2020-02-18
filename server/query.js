@@ -299,6 +299,13 @@ async function getPhenotypes(connection, params) {
         : phenotypes.filter(phenotype => phenotype.parent_id === null);
 }
 
+
+async function getRanges(connection) {
+    let [ranges] = await connection.query(`SELECT * FROM chromosome_range`);
+    return ranges;
+}
+
+
 /**
  * Retrieves a specific configuration key
  * @param {string} key - The key to retrieve
@@ -318,6 +325,7 @@ module.exports = {
     getMetadata,
     getCorrelations,
     getPhenotypes,
+    getRanges,
     getGenes,
     getConfig
 };
