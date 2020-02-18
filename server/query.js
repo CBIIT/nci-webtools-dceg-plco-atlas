@@ -263,26 +263,29 @@ async function getGenes(connection, params) {
  * @returns {any} The specified key and its value
  */
 async function getCorrelations(connection, {a, b}) {
+    let sql = `
+        SELECT
+            phenotype_a, pa.name as phenotype_a_name, pa.display_name as phenotype_a_display_name,
+            phenotype_b, pb.name as phenotype_b_name, pb.display_name as phenotype_b_display_name,
+            value
+        FROM phenotype_correlation pc
+        JOIN phenotype pa on pc.phenotype_a = pa.id
+        JOIN phenotype pb on pc.phenotype_a = pb.id
+    `;
+
     if (a && b) {
-        let [results] = await connection.query(`
-            SELECT value FROM phenotype_correlation WHERE
-                (phenotype_a = :a AND phenotype_b = :b) OR
-                (phenotype_b = :a AND phenotype_a = :b)
-            LIMIT 1
-        `, {a, b});
-        return results[0] || {value: null};
-    } else {
-        let [results]  = await connection.query(`
-            SELECT
-                phenotype_a, pa.name as phenotype_a_name, pa.display_name as phenotype_a_display_name,
-                phenotype_b, pb.name as phenotype_b_name, pb.display_name as phenotype_b_display_name,
-                value
-            FROM phenotype_correlation pc
-            JOIN phenotype pa on pc.phenotype_a = pa.id
-            JOIN phenotype pb on pc.phenotype_a = pb.id
-        `);
-        return results;
+        let filterNums = e => e.split(',').filter(e => !isNaN(e)).join(',')
+        a = filterNums(a);
+        b = filterNums(b);
+        sql += `WHERE
+        (phenotype_a IN (${a}) AND phenotype_b IN (${b})) OR
+        (phenotype_b IN (${a}) AND phenotype_a IN (${b}))`;
     }
+
+    console.log(sql);
+
+    let [results] = await connection.query(sql);
+    return results;
 }
 
 async function getPhenotypes(connection, params) {
