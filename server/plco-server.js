@@ -1,11 +1,8 @@
-const os = require("os");
-const cluster = require("cluster");
 const path = require("path");
 const server = require("fastify");
 const cors = require("fastify-cors");
 const compress = require("fastify-compress");
 const static = require("fastify-static");
-const mysql = require("mysql2");
 const logger = require("./logger");
 const { port, dbpath } = require("./config.json");
 const {
@@ -16,28 +13,11 @@ const {
   getGenes,
   getCorrelations,
   getPhenotypes,
+  getRanges,
   getConfig
 } = require("./query");
 
-// if (cluster.isMaster) {
-//   logger.info(`[${process.pid}] Started master process`);
-
-//   // create two worker processes per cpu
-//   for (let i = 0; i < 2 * os.cpus(); i++) {
-//     cluster.fork();
-//   }
-
-//   // restart worker processes if they exit unexpectedly
-//   cluster.on("exit", worker => {
-//     logger.info(`Restarted worker process: ${worker.process.pid}`);
-//     cluster.fork();
-//   });
-
-//   // finish execution if in master process
-//   return;
-// }
-
-logger.info(`[${process.pid}] Started worker process`);
+logger.info(`[${process.pid}] Started process`);
 
 // create fastify app and register middleware
 const app = server({ ignoreTrailingSlash: true });
@@ -96,7 +76,6 @@ app.get("/summary", async ({ query }, res) => {
 
 // retrieves all variants within the specified range
 app.get("/variants", async ({ query }, res) => {
-  // todo: validate variants table (query.table)
   return getVariants(connection, query);
 });
 
@@ -118,6 +97,11 @@ app.get("/phenotypes", async ({ query }, res) => {
 // retrieves correlations
 app.get("/correlations", async ({ query }, res) => {
   return getCorrelations(connection, query);
+});
+
+// retrieves chromosome ranges
+app.get("/ranges", async ({ query }, res) => {
+  return getRanges(connection);
 });
 
 // retrieves configuration
