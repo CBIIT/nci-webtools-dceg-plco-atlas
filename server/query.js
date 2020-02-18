@@ -212,14 +212,18 @@ async function exportVariants(filepath, params) {
  * @returns {any} A specified key and value, or the entire list of
  * metadata properties if the key is not specified
  */
-async function getMetadata(connection, {gender, phenotype_id, chromosome, key}) {
-    if (key) {
-        let [results] = await connection.query(`SELECT value FROM variant_metadata WHERE key = :key`, key);
-        return results[0].value;
-    } else {
-        let [results]  = await connection.query(`SELECT key, value FROM variant_metadata`)
-        return results.reduce((obj, v) => ({...obj, [v.key]: v.value}), {});
-    }
+async function getMetadata(connection, {phenotype_id, gender, chromosome}) {
+    let [results] = await connection.query(
+        `SELECT gender, lambda_gc
+            FROM variant_metadata
+        WHERE
+            phenotype_id = :phenotype_id AND
+            gender = :gender AND
+            chromosome = :chromosome
+        LIMIT 1`,
+        {phenotype_id, gender, chromosome}
+    );
+    return results[0];
 }
 
 /**
@@ -266,7 +270,7 @@ async function getCorrelations(connection, {a, b}) {
                 (phenotype_b = :a AND phenotype_a = :b)
             LIMIT 1
         `, {a, b});
-        return pluck(results);
+        return results[0] || {value: null};
     } else {
         let [results]  = await connection.query(`
             SELECT
