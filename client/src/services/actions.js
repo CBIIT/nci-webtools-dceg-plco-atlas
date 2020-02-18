@@ -62,7 +62,7 @@ export function updateDownloads(data) {
 export function initialize() {
   return async function(dispatch) {
     // update ranges
-    const ranges = await query('data/chromosome_ranges.json')
+    const ranges = await query('ranges')
     dispatch(updateSummaryResults({ranges}));
 
     // update download root
@@ -70,22 +70,27 @@ export function initialize() {
     dispatch(updateDownloads({downloadRoot}));
 
     // update phenotypes
-    const data = await query('data/phenotypes.json');
+    const data = await query('phenotypes');
     const records = [];
     const categories = [];
     const populateRecords = node => {
+      node.title = node.display_name;
+      node.value = node.name;
+
       // only populate alphabetic phenotype list with leaf nodes
       if (node.children === undefined) {
         records.push({
-          title: node.title,
-          value: node.value
+          ...node
+          // title: node.title,
+          // value: node.value
         });
       } else {
         categories.push({
-          title: node.title,
-          value: node.value,
-          color: node.color,
-          children: node.children
+          ...node
+          // title: node.title,
+          // value: node.value,
+          // color: node.color || '#444',
+          // children: node.children
         });
       }
       if (node.children) {
@@ -108,7 +113,7 @@ export function initialize() {
 
 export function fetchRanges() {
   return async function(dispatch) {
-    const ranges = await query('data/chromosome_ranges.json');
+    const ranges = await query('ranges');
     dispatch(updateSummaryResults({ ranges }));
   };
 }
@@ -535,7 +540,7 @@ export function drawQQPlot(phenotype, variantTable) {
         'subsetObservedVariantsMale.length',
         subsetObservedVariantsMale.length
       );
-      
+
       const markerColorFemale = '#f41c52';
       const markerColorMale = '#006bb8';
 
@@ -715,52 +720,40 @@ export function drawQQPlot(phenotype, variantTable) {
 
 export function drawHeatmap(phenotypes) {
   return async function(dispatch) {
-    const getZColor = (phenotype1, phenotype2, correlationData) => {
+
+    const filterCorrelationData = (phenotype1, phenotype2, correlationData) => {
+      // console.log("filterCorrelationData", phenotype1, phenotype2);
+      return correlationData.filter((data) => {
+        return (data.phenotype_a === phenotype1.id && data.phenotype_b === phenotype2.id) || 
+          (data.phenotype_a === phenotype2.id && data.phenotype_b === phenotype1.id);
+      });
+    };
+
+    const getZ = (phenotype1, phenotype2, correlationData) => {
       var r2 = 0.0;
-      if (phenotype1 in correlationData && phenotype2 in correlationData) {
-        if (
-          phenotype2 in correlationData[phenotype1] ||
-          phenotype1 in correlationData[phenotype2]
-        ) {
-          if (phenotype2 in correlationData[phenotype1]) {
-            r2 = correlationData[phenotype1][phenotype2];
-          } else {
-            r2 = correlationData[phenotype2][phenotype1];
-          }
-        } else {
-          r2 = 0.0;
-        }
+      var results = filterCorrelationData(phenotype1, phenotype2, correlationData);
+      if (results.length > 0) {
+        r2 = results[0].value;
       } else {
         r2 = 0.0;
       }
-
+      var r2Color;
       if (r2 === -1.0 || r2 === 1.0) {
-        r2 = 0.0;
-      }
-
-      return r2;
-    };
-    const getZText = (phenotype1, phenotype2, correlationData) => {
-      var r2 = 0.0;
-      if (phenotype1 in correlationData && phenotype2 in correlationData) {
-        if (
-          phenotype2 in correlationData[phenotype1] ||
-          phenotype1 in correlationData[phenotype2]
-        ) {
-          if (phenotype2 in correlationData[phenotype1]) {
-            r2 = correlationData[phenotype1][phenotype2];
-          } else {
-            r2 = correlationData[phenotype2][phenotype1];
-          }
-        } else {
-          r2 = 0.0;
-        }
+        r2Color = 0.0;
       } else {
-        r2 = 0.0;
+        r2Color = r2;
       }
 
-      return r2;
+      return {
+        r2Color,
+        r2Text: {
+          x: phenotype2.display_name,
+          y: phenotype1.display_name,
+          z: r2
+        }
+      };
     };
+
     const setLoading = loading => {
       dispatch(updateSummaryResults({ loading }));
     };
@@ -784,37 +777,44 @@ export function drawHeatmap(phenotypes) {
     setHeatmapLayout({});
     setHeatmapData([]);
 
-    const correlationData = await query(
-      `data/sample_correlations_sanitized.json`
+    var phenotypesID = phenotypes.map((phenotype) =>
+      phenotype.id
     );
 
-    var uniquePhenotypes = phenotypes.map(phenotype =>
-      phenotype.title ? phenotype.title : phenotype.label
-    );
-    let n = uniquePhenotypes.length;
-    let x = uniquePhenotypes;
-    let y = uniquePhenotypes;
-    let zColor = [];
-    let zText = [];
+    const correlationData = await query('correlations', {
+      a: phenotypesID,
+      b: phenotypesID
+    });
+
+    // const correlationData = await query('correlations');
+
+    let n = phenotypes.length;
+    let x = phenotypes;
+    let y = phenotypes;
+    let z = {
+      zColor: [],
+      zText: []
+    };
 
     for (var xidx = 0; xidx < n; xidx++) {
       let rowColor = [];
       let rowText = [];
       for (var yidx = 0; yidx < n; yidx++) {
-        rowColor.push(getZColor(x[xidx], y[yidx], correlationData));
-        rowText.push(getZText(x[xidx], y[yidx], correlationData));
+        let zData = getZ(x[xidx], y[yidx], correlationData)
+        rowColor.push(zData['r2Color']);
+        rowText.push(zData['r2Text']);
       }
-      zColor.push(rowColor);
-      zText.push(rowText);
+      z.zColor.push(rowColor);
+      z.zText.push(rowText);
     }
 
     let heatmapData = {
-      x,
-      y,
-      z: zColor,
+      x: phenotypes.map(phenotype => phenotype.name),
+      y: phenotypes.map(phenotype => phenotype.name),
+      z: z.zColor,
       zmin: -1.0,
       zmax: 1.0,
-      text: zText,
+      text: z.zText,
       xgap: 1,
       ygap: 1,
       type: 'heatmap',
@@ -837,9 +837,9 @@ export function drawHeatmap(phenotypes) {
       showscale: true,
       hoverinfo: 'text',
       hovertemplate:
-        '%{x}<br>' +
-        '%{y}<br>' +
-        '<b>Correlation:</b> %{text}' +
+        '%{text.x}<br>' +
+        '%{text.y}<br>' +
+        '<b>Correlation:</b> %{text.z}' +
         '<extra></extra>'
     };
     let heatmapLayout = {
@@ -860,9 +860,9 @@ export function drawHeatmap(phenotypes) {
           size: 10,
           color: 'black'
         },
-        tickvals: uniquePhenotypes,
-        ticktext: uniquePhenotypes.map(phenotype =>
-          phenotype.length > 20 ? phenotype.substring(0, 20) + '...' : phenotype
+        tickvals: phenotypes.map(phenotype => phenotype.name),
+        ticktext: phenotypes.map(phenotype =>
+          phenotype.display_name.length > 20 ? phenotype.display_name.substring(0, 20) + '...' : phenotype.display_name
         )
         // dtick: 5,
       },
@@ -875,9 +875,9 @@ export function drawHeatmap(phenotypes) {
           size: 10,
           color: 'black'
         },
-        tickvals: uniquePhenotypes,
-        ticktext: uniquePhenotypes.map(phenotype =>
-          phenotype.length > 20 ? phenotype.substring(0, 20) + '...' : phenotype
+        tickvals: phenotypes.map(phenotype => phenotype.name),
+        ticktext: phenotypes.map(phenotype =>
+          phenotype.display_name.length > 20 ? phenotype.display_name.substring(0, 20) + '...' : phenotype.display_name
         )
         // dtick: 5
       }

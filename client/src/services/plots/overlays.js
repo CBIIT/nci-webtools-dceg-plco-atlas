@@ -1,6 +1,7 @@
-import { viewportToLocalCoordinates, min, max, addEventListener, withSavedContext } from './utils.js';
+import { viewportToLocalCoordinates, min, max, addEventListener, withSavedContext, extent } from './utils.js';
 import { renderText, systemFont } from './text.js';
 import { getScale } from './scale.js';
+
 
 export function drawSelectionOverlay(config, ctx, overlayCtx) {
   let canvas = ctx.canvas;
@@ -226,6 +227,12 @@ export function drawPanOverlay(config, ctx, overlayCtx) {
   let mouseDown = false;
   let body = window.document.body;
   let xScale, yScale;
+  let limits = {
+    xMin: 0,
+    xMax: 0,
+    yMin: 0,
+    yMax: 0,
+  }
 
   addEventListener(canvas, 'contextmenu', ev => {
     ev.preventDefault();
@@ -234,6 +241,22 @@ export function drawPanOverlay(config, ctx, overlayCtx) {
   addEventListener(canvas, 'mousedown', ev => {
     if (ev.button !== 2 || config.zoomAreaActive || !config.zoomWindow) return;
     let currentBounds = config.zoomWindow.bounds;
+
+    const xData = config.data.map(d => d[config.xAxis.key]);
+    const yData = config.data.map(d => d[config.yAxis.key]);
+    const yData2 = config.data2
+      ? config.data2.map(d => d[config.yAxis.key])
+      : [];
+
+    let xExtent =  extent(xData);
+    let yExtent =  extent(yData.concat(yData2));
+
+    limits = {
+      xMin: xExtent[0],
+      xMax: xExtent[1],
+      yMin: yExtent[0],
+      yMax: yExtent[1],
+    };
 
     xScale = getScale(
       [0, width],
@@ -259,6 +282,7 @@ export function drawPanOverlay(config, ctx, overlayCtx) {
   addEventListener(canvas, 'mousemove', ev => {
     if (!mouseDown) return;
     canvas.style.cursor = 'move';
+    let currentBounds = config.zoomWindow.bounds;
     let { x, y } = viewportToLocalCoordinates(
       ev.clientX,
       ev.clientY,
@@ -268,6 +292,22 @@ export function drawPanOverlay(config, ctx, overlayCtx) {
     panArea.yEnd = y;
     panArea.deltaX = xScale(panArea.xEnd - panArea.xStart);
     panArea.deltaY = - yScale(panArea.yEnd - panArea.yStart); // inverse y scale
+
+    if (currentBounds.xMin + panArea.deltaX < limits.xMin) {
+      panArea.deltaX = limits.xMin - currentBounds.xMin;
+    }
+
+    if (currentBounds.xMax + panArea.deltaX > limits.xMax) {
+      panArea.deltaX = limits.xMax - currentBounds.xMax;
+    }
+
+    if (currentBounds.yMin + panArea.deltaY < limits.yMin) {
+      panArea.deltaY = limits.yMin - currentBounds.yMin;
+    }
+
+    if (currentBounds.yMax + panArea.deltaY > limits.yMax) {
+      panArea.deltaY = limits.yMax - currentBounds.yMax;
+    }
 
     withSavedContext(overlayCtx, ctx => {
       ctx.globalAlpha = 0.5;
