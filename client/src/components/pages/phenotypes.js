@@ -29,7 +29,7 @@ export function Phenotypes() {
   const plotContainer = useRef(null);
   // const plot = useRef(null);
 
-  const phenotypes = useSelector(state => state.phenotypes);
+  const phenotypes = useSelector(state => state.tmp_phenotypes);
 
   const [openSidebar, setOpenSidebar] = useState(true);
 
@@ -159,7 +159,6 @@ export function Phenotypes() {
   }, [phenotypes, breadcrumb, currentBubbleData, selectedPhenotype, submitted])
 
   const drawBubbleChart = (data) => {
-    console.log("DATA", data);
     new Plot(plotContainer.current, data, handleSingleClick, handleDoubleClick, handleBackgroundDoubleClick, selectedPhenotype);
   }
 
@@ -238,7 +237,7 @@ export function Phenotypes() {
           <>
             <div className="bg-white border rounded-0 p-3" 
               style={{ 
-                display: 'none',
+                display: phenotypes ? 'block' : 'none',
                 minHeight: '350px' }}>
               {
                 breadcrumb.length > 0 && breadcrumb.map((item, idx) =>
@@ -269,7 +268,7 @@ export function Phenotypes() {
             </div>
             <div className="bg-white border rounded-0 p-3 d-flex justify-content-center align-items-center"
               style={{
-                display: 'block',
+                display: !phenotypes ? 'block' : 'none',
                 minHeight: '324px'
               }}>
               <Spinner animation="border" variant="primary" role="status">
