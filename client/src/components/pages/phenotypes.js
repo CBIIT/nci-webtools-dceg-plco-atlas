@@ -116,8 +116,8 @@ export function Phenotypes() {
     // some action here
 
     const phenotypeEndpoint = {
-      mel: 'data/phenotype_data_categorical.json',
-      none_4478: 'data/phenotype_data_continuous.json',
+      melanoma_3: 'data/phenotype_data_categorical.json',
+      height_when_standing_7: 'data/phenotype_data_continuous.json',
     }[phenotype.value] || 'data/phenotype_data_binary.json';
     const data = await query(phenotypeEndpoint);
 
