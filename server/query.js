@@ -1,5 +1,15 @@
+const mysql = require('mysql2');
 const config = require('./config.json');
-const logger = require("./logger");
+const logger = require('./logger');
+const connection = mysql.createPool({
+    host: database.host,
+    database: database.name,
+    user: database.user,
+    password: database.user,
+    waitForConnections: true,
+    connectionLimit: 20,
+    namedPlaceholders: true
+  }).promise();
 
 /**
  * Ensures that identifiers with sql keywords in them do not throw errors
@@ -31,6 +41,31 @@ function coalesce(condition, value) {
 }
 
 /**
+ * Returns any values that are in all of the arrays provided
+ */
+function intersection(...arrays) {
+    return arrays[0].filter(value =>
+        arrays.every(array => array.includes(value))
+    );
+}
+
+
+function getValidColumns(tableName, columns) {
+    if (!Array.isArray(columns))
+        columns = (columns || '').split(',').filter(e => e.length);
+
+    let validColumns = {
+        variant: ['id', 'gender', 'chromosome', 'position', 'snp', 'allele_reference', 'allele_effect', 'p_value', 'p_value_expected', 'p_value_nlog', 'odds_ratio', 'show_qq_plot'],
+        aggregate: ['id', 'gender', 'position_abs', 'p_value_nlog'],
+        phenotype: ['id', 'parent_id', 'name', 'display_name', 'description', 'color', 'type'],
+    }[tableName];
+
+    return columns.length
+        ? intersection(columns, validColumns)
+        : validColumns;
+}
+
+/**
  * Retrieves aggregate data for variants, filtered by search criteria
  * @param {string} filepath - Path to the sqlite database file
  * @param {{
@@ -46,62 +81,13 @@ function coalesce(condition, value) {
  * @returns Records in the aggregate summary table which match query criteria
  */
 async function getSummary(connection, params) {
-
-    const validTables = [
-        'aggregate_all',
-        'aggregate_female',
-        'aggregate_male',
-    ];
-
-    const validColumns = [
-        'chr',
-        'bp_abs_1000kb',
-        'nlog_p2',
-    ];
-
-    const table = validTables.includes(params.table)
-        ? params.table
-        : validTables[0];
-
-    const columns = params.columns // given as a comma-separated list
-        ? params.columns.split(',').filter(c => validColumns.includes(c))
-        : validColumns;
-
-    const columnNames = columns
-        .map(quote)
-        .join(',');
-
-    const distinct = params.distinct
-        ? `DISTINCT`
-        : ``;
-
-        // filter by -log10(p) if provided
-    let sql = `
-        SELECT ${distinct} ${columnNames}
-        FROM ${table}
-        WHERE ${[
-            `nlog_p2 IS NOT NULL`,
-            coalesce(params.nlogpMin, `nlog_p2 >= :nlogpMin`),
-            coalesce(params.nlogpMax, `nlog_p2 <= :nlogpMax`),
-        ].filter(Boolean).join(' AND ')}`;
-
-    // adds "order by" statement, if both order and orderBy are provided
-    let { order, orderBy } = params;
-    if (order && orderBy) {
-        // by default, sort by p-value ascending
-        if (!['asc', 'desc'].includes(order))
-            order = 'asc';
-        if (!validColumns.includes(orderBy))
-            orderBy = 'p';
-        sql += ` ORDER BY "${orderBy}" ${order} `;
-    }
-
-    logger.debug(`SQL: ${sql}`);
-
     const [data, columns] = await connection.query({
         rowsAsArray: params.raw,
-        sql,
-    }, params);
+        values: params,
+        sql: `SELECT DISTINCT position_abs, p_value_nlog FROM :table WHERE
+            gender = :gender AND
+            p_value_nlog BETWEEN :min_p_value_nlog AND :max_p_value_nlog`,
+    });
 
     return {data, columns};
 }
@@ -252,50 +238,30 @@ async function getMetadata(connection, key) {
  * Retrieves genes from a specific chromosome, filtered by search criteria
  * @param {mysql.Connection} connection - Connection to the database
  * @param {{
-     columns: string,
-     chr: string,
-     txStart: string,
-     txEnd: string
+     chromosome: string,
+     transcription_start: string,
+     transcription_end: string
    }} params - Criteria to filter genes
  * @returns {any[]} Genes matching the search criteria
  */
 async function getGenes(connection, params) {
-    const validColumns = [
-        'gene_id',
-        'name',
-        'chr',
-        'strand',
-        'tx_start',
-        'tx_end',
-        'exon_starts',
-        'exon_ends',
-    ];
-
-    const columns = params.columns
-        ? params.columns.split(',').filter(e => validColumns.includes(e))
-        : ['gene_id', 'name', 'strand', 'tx_start', 'tx_end', 'exon_starts', 'exon_ends'];
-
-    const columnNames = columns
-        .map(quote)
-        .join(',');
-
     const splitNumbers = e => (e || '')
         .split(',')
         .filter(e => e !== '')
         .map(e => +e);
 
     const [results] = await connection.query(`
-        SELECT ${columnNames}
+        SELECT *
         FROM gene
-        WHERE chr = :chr AND (
-            (tx_start BETWEEN :txStart AND :txEnd) OR
-            (tx_end BETWEEN :txStart AND :txEnd))
+        WHERE chromosome = :chromosome AND (
+            (transcription_start BETWEEN :transcription_start AND :transcription_end) OR
+            (transcription_end BETWEEN :transcription_start AND :transcription_end))
     `, params);
 
-    return results.map(e => ({
-        ...e,
-        exon_starts: splitNumbers(e.exon_starts),
-        exon_ends: splitNumbers(e.exon_ends)
+    return results.map(record => ({
+        ...record,
+        exon_starts: splitNumbers(record.exon_starts),
+        exon_ends: splitNumbers(record.exon_ends)
     }));
 }
 
@@ -304,12 +270,13 @@ async function getGenes(connection, params) {
  * @param {string} key - The key to retrieve
  * @returns {any} The specified key and its value
  */
-function getCorrelation(connection, {phenotypeA, phenotypeB}) {
+function getCorrelations(connection, {phenotypeA, phenotypeB}) {
     if (phenotypeA && phenotypeB) {
         let [results] = await connection.query(`
-            SELECT value FROM phenotype_correlation
-                WHERE phenotype_a = :phenotypeA
-                AND phenotype_b = :phenotypeB
+            SELECT value FROM phenotype_correlation WHERE
+                (phenotype_a = :phenotypeA AND phenotype_b = :phenotypeB) OR
+                (phenotype_b = :phenotypeA AND phenotype_a = :phenotypeB)
+            LIMIT 1
         `, {phenotypeA, phenotypeB});
         return results[0].value;
     } else {
@@ -324,21 +291,22 @@ function getCorrelation(connection, {phenotypeA, phenotypeB}) {
     }
 }
 
-function getPhenotypes(connection) {
-    let [phenotypes] = await connection.query(`
-        SELECT id, name, display_name as displayName, parent_id as parentId
-        FROM lu_phenotype
-    `);
+function getPhenotypes(connection, params) {
+    let columns = getValidColumns('phenotype', params.columns).join(',').map(quote);
+    let [phenotypes] = await connection.execute(`
+        SELECT ${columns}
+        FROM phenotype
+        ${params.id ? 'WHERE id = :id' : ''}
+    `, params);
 
     phenotypes.forEach(phenotype => {
-        let parent = phenotypes.find(parent => parent.id === phenotype.parentId);
-        if (parent) {
-            if (!parent.children) parent.children = [];
-            parent.children.push(phenotype);
-        }
+        let parent = phenotypes.find(parent => parent.id === phenotype.parent_id);
+        if (parent) parent.children = [...parent.children || [], phenotype];
     });
 
-    return phenotypes;
+    return params.flat
+        ? phenotypes
+        : phenotypes.filter(phenotype => phenotype.parent_id === null);
 }
 
 /**
@@ -353,4 +321,4 @@ function getConfig(key) {
         : null;
 }
 
-module.exports = {getSummary, getVariants, getMetadata, getGenes, getConfig};
+module.exports = {connection, getSummary, getVariants, getMetadata, getGenes, getConfig};
