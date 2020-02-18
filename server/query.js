@@ -274,6 +274,8 @@ async function getCorrelations(connection, {a, b}) {
     `;
 
     if (a && b) {
+        console.log("a", a);
+        console.log("b", b);
         // warning: ensure that numbers are properly sanitized
         let filterNums = e => e.split(',').filter(e => !isNaN(e)).map(Number).join(',');
         a = filterNums(a);
