@@ -694,7 +694,11 @@ export const TreeSelect = forwardRef(({
 
         <div
           className="text-center justify-content-center p-5"
-          style={{ display: !data ? 'block' : 'none' }}>
+          style={{ 
+            display: !data ? 'block' : 'none',
+            minHeight: '250px',
+            maxHeight: '500px'
+          }}>
           {!data && 
             <Spinner animation="border" variant="primary" role="status">
               <span className="sr-only">Loading...</span>
