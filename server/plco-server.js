@@ -6,27 +6,36 @@ const cors = require("fastify-cors");
 const compress = require("fastify-compress");
 const static = require("fastify-static");
 const mysql = require("mysql2");
-const { port, database, dbpath } = require("./config.json");
-const { connection, getSummary, getVariants, getMetadata, getGenes, getConfig } = require("./query");
 const logger = require("./logger");
+const { port, dbpath } = require("./config.json");
+const {
+  connection,
+  getSummary,
+  getVariants,
+  getMetadata,
+  getGenes,
+  getCorrelations,
+  getPhenotypes,
+  getConfig
+} = require("./query");
 
-if (cluster.isMaster) {
-  logger.info(`[${process.pid}] Started master process`);
+// if (cluster.isMaster) {
+//   logger.info(`[${process.pid}] Started master process`);
 
-  // create two worker processes per cpu
-  for (let i = 0; i < 2 * os.cpus(); i++) {
-    cluster.fork();
-  }
+//   // create two worker processes per cpu
+//   for (let i = 0; i < 2 * os.cpus(); i++) {
+//     cluster.fork();
+//   }
 
-  // restart worker processes if they exit unexpectedly
-  cluster.on("exit", worker => {
-    logger.info(`Restarted worker process: ${worker.process.pid}`);
-    cluster.fork();
-  });
+//   // restart worker processes if they exit unexpectedly
+//   cluster.on("exit", worker => {
+//     logger.info(`Restarted worker process: ${worker.process.pid}`);
+//     cluster.fork();
+//   });
 
-  // finish execution if in master process
-  return;
-}
+//   // finish execution if in master process
+//   return;
+// }
 
 logger.info(`[${process.pid}] Started worker process`);
 
@@ -82,7 +91,6 @@ app.get("/ping", async (req, res) => {
 
 // retrieves all variant groups for all chroms. at the lowest granularity (in MBases)
 app.get("/summary", async ({ query }, res) => {
-  // todo: validate summary table (query.table)
   return getSummary(connection, query);
 });
 
@@ -94,7 +102,7 @@ app.get("/variants", async ({ query }, res) => {
 
 // retrieves metadata
 app.get("/metadata", async ({ query }, res) => {
-  return getMetadata(connection, query.key);
+  return getMetadata(connection, query);
 });
 
 // retrieves genes
@@ -105,12 +113,12 @@ app.get("/genes", async ({ query }, res) => {
 
 // retrieves genes
 app.get("/phenotypes", async ({ query }, res) => {
-  return getPhenotypes(connection);
+  return getPhenotypes(connection, query);
 });
 
 // retrieves genes
-app.get("/correlation", async ({ query }, res) => {
-  return getCorrelation(connection, query);
+app.get("/correlations", async ({ query }, res) => {
+  return getCorrelations(connection, query);
 });
 
 // retrieves configuration
