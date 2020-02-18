@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect} from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Alert, Breadcrumb } from 'react-bootstrap';
+import { Alert, Spinner } from 'react-bootstrap';
 import { PhenotypesForm } from '../forms/phenotypes-form';
 import { PhenotypesTabs } from '../phenotypes/phenotypes-tabs';
 import { PhenotypesSearchCriteria } from '../controls/phenotypes-search-criteria';
@@ -159,6 +159,7 @@ export function Phenotypes() {
   }, [phenotypes, breadcrumb, currentBubbleData, selectedPhenotype, submitted])
 
   const drawBubbleChart = (data) => {
+    console.log("DATA", data);
     new Plot(plotContainer.current, data, handleSingleClick, handleDoubleClick, handleBackgroundDoubleClick, selectedPhenotype);
   }
 
@@ -234,34 +235,48 @@ export function Phenotypes() {
       <MainPanel className="col-lg-9">
         <PhenotypesSearchCriteria />
         {!submitted &&
-          <div className="bg-white border rounded-0 p-3" style={{ minHeight: '50vh' }}>
-            {
-              breadcrumb.length > 0 && breadcrumb.map((item, idx) =>
-                <span className="" key={"crumb-" + item.data.title}>
-                  <a
-                    href="javascript:void(0)"
-                    onClick={_ => crumbClick(item, idx)}
-                  >
-                    { idx === 0 ? 'All Phenotypes' : item.data.title}
-                  </a>
-                  <Icon
-                    name="arrow-left"
-                    className="mx-2 opacity-50"
-                    width="10"
-                  />
-                </span>
-              )
-            }
-            {
-              breadcrumb.length === 0 &&
-              <br />
-            }
-            <div
-              ref={plotContainer}
-              className="mt-5 bubble-chart text-center"
-              style={{ minHeight: '50vh' }}
-            />
-          </div>
+          <>
+            <div className="bg-white border rounded-0 p-3" 
+              style={{ 
+                display: 'none',
+                minHeight: '350px' }}>
+              {
+                breadcrumb.length > 0 && breadcrumb.map((item, idx) =>
+                  <span className="" key={"crumb-" + item.data.title}>
+                    <a
+                      href="javascript:void(0)"
+                      onClick={_ => crumbClick(item, idx)}
+                    >
+                      { idx === 0 ? 'All Phenotypes' : item.data.title}
+                    </a>
+                    <Icon
+                      name="arrow-left"
+                      className="mx-2 opacity-50"
+                      width="10"
+                    />
+                  </span>
+                )
+              }
+              {
+                breadcrumb.length === 0 &&
+                <br />
+              }
+              <div
+                ref={plotContainer}
+                className="mt-5 bubble-chart text-center"
+                style={{ minHeight: '50vh' }}
+              />
+            </div>
+            <div className="bg-white border rounded-0 p-3 d-flex justify-content-center align-items-center"
+              style={{
+                display: 'block',
+                minHeight: '324px'
+              }}>
+              <Spinner animation="border" variant="primary" role="status">
+                <span className="sr-only">Loading...</span>
+              </Spinner>
+            </div>
+          </>
         }
         {
           submitted &&
