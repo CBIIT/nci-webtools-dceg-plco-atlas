@@ -319,7 +319,7 @@ export function drawQQPlot(phenotype, variantTable) {
         raw: true
       });
 
-      console.log("topVariantData", topVariantData);
+      // console.log("topVariantData", topVariantData);
 
       // let topObservedVariants = [];
       // let topExpectedVariants = [];

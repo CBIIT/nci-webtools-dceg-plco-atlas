@@ -115,7 +115,7 @@ export function VariantLookup() {
   const placeholder = (
     <div style={{ display: submitted ? 'none' : 'block' }}>
       <p className="h4 text-center text-secondary my-5">
-        Please select phenotype(s) and input variant to view this table
+        Please select phenotypes and input variant to view this table
       </p>
     </div>
   );
