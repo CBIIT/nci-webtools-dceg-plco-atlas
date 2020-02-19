@@ -83,7 +83,6 @@ export function SummaryResults() {
     if (elem && elem.length > 0) {
       elem[0].remove();
     }
-    // tooltip.style.display = 'none';
   };
 
   // phenotype is selected phenotype's value
@@ -138,7 +137,7 @@ export function SummaryResults() {
     }
 
     // determine which tables to use for manhattan plot
-    const aggregateTable = getAggregateTable(manhattanPlotType);
+    // const aggregateTable = getAggregateTable(manhattanPlotType);
 
     // determine which tables to use for summary results
     const variantTable = getVariantTable(manhattanPlotType);
@@ -166,20 +165,20 @@ export function SummaryResults() {
       })
     );
 
-    // draw summary plot using aggregate data
-    dispatch(
-      drawManhattanPlot('summary', {
-        database: phenotype.value + '.db',
-        table: aggregateTable,
-        nlogpMin: 3
-      })
-    );
+    // // draw summary plot using aggregate data
+    // dispatch(
+    //   drawManhattanPlot('summary', {
+    //     database: phenotype.value + '.db',
+    //     table: aggregateTable,
+    //     nlogpMin: 3
+    //   })
+    // );
 
-    // fetch variant results tables
-    fetchVariantTables(
-      phenotype.value,
-      manhattanPlotType
-    );
+    // // fetch variant results tables
+    // fetchVariantTables(
+    //   phenotype.value,
+    //   manhattanPlotType
+    // );
 
     setSearchCriteriaSummaryResults({
       phenotype: [...phenotype.title],
@@ -364,8 +363,10 @@ export function SummaryResults() {
         <MainPanel className="col-lg-9">
           <SummaryResultsSearchCriteria />
           <Tabs
+            transition={false}
             className="mt-2"
             defaultActiveKey={selectedPlot}
+            activeKey={selectedPlot}
             onSelect={setSelectedPlot}>
             <Tab
               eventKey="manhattan-plot"

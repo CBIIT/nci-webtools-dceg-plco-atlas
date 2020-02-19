@@ -253,7 +253,9 @@ export function VariantLookup() {
         <MainPanel className="col-lg-9">
           <VariantLookupSearchCriteria />
 
-          <Tabs defaultActiveKey="variant-lookup">
+          <Tabs 
+            transition={false}
+            defaultActiveKey="variant-lookup">
             <Tab
               eventKey="variant-lookup"
               // title="Table"

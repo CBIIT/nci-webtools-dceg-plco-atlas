@@ -31,6 +31,7 @@ export function PhenotypesTabs() {
 
   return (
     <Tabs
+      transition={false}
       className="mt-2"
       defaultActiveKey={selectedPlot}
       onSelect={setSelectedPlot}>

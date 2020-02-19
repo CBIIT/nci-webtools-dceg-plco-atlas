@@ -41,7 +41,10 @@ export const PhenotypeCorrelationsSearchCriteria = props => {
 
   return (
     <div className="mb-2">
-      <Tabs className="" defaultActiveKey="search-criteria">
+      <Tabs 
+        transition={false}
+        className="" 
+        defaultActiveKey="search-criteria">
         <Tab
           eventKey="search-criteria"
           className="d-flex justify-content-between px-3 py-2 bg-white tab-pane-bordered rounded-0">
