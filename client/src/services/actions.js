@@ -810,17 +810,8 @@ export function drawHeatmap(phenotypes) {
     const setHeatmapLayout = heatmapLayout => {
       dispatch(updatePhenotypeCorrelations({ heatmapLayout }));
     };
-    const setPopupTooltipStyle = popupTooltipStyle => {
-      dispatch(updatePhenotypeCorrelations({ popupTooltipStyle }));
-    };
-    const setPopupTooltipData = popupTooltipData => {
-      dispatch(updatePhenotypeCorrelations({ popupTooltipData }));
-    };
 
     setLoading(true);
-    setPopupTooltipStyle({ display: 'none' });
-    setPopupTooltipData(null);
-
     setHeatmapLayout({});
     setHeatmapData([]);
 

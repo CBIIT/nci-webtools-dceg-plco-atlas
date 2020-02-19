@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { PhenotypeCorrelationsForm } from '../forms/phenotype-correlations-form';
 import { Heatmap } from '../plots/heatmap-plot';
@@ -24,16 +24,14 @@ export function PhenotypeCorrelations() {
 
   const { submitted, messages } = phenotypeCorrelations;
 
+  const tooltipRef = useRef();
+
   const setSubmitted = submitted => {
     dispatch(updatePhenotypeCorrelations({ submitted }));
   };
 
   const setMessages = messages => {
     dispatch(updatePhenotypeCorrelations({ messages }));
-  };
-
-  const setPopupTooltipData = popupTooltipData => {
-    dispatch(updatePhenotypeCorrelations({ popupTooltipData }));
   };
 
   const clearMessages = e => {
@@ -80,10 +78,10 @@ export function PhenotypeCorrelations() {
     });
 
     setSubmitted(new Date());
-    setPopupTooltipData(null);
     console.log('submit');
 
     dispatch(drawHeatmap(params));
+    tooltipRef.current.resetTooltip();
   };
 
   const handleReset = params => {
@@ -98,12 +96,11 @@ export function PhenotypeCorrelations() {
         loading: false,
         submitted: null,
         messages: [],
-        popupTooltipStyle: { display: 'none' },
-        popupTooltipData: null,
         searchCriteriaPhenotypeCorrelations: {},
         collapseCriteria: true
       })
     );
+    tooltipRef.current.resetTooltip();
   };
 
   const [openSidebar, setOpenSidebar] = useState(true);
@@ -141,7 +138,7 @@ export function PhenotypeCorrelations() {
               <div
                 className="mw-100 my-4"
                 style={{ display: submitted ? 'block' : 'none' }}>
-                <Heatmap />
+                <Heatmap ref={tooltipRef} />
               </div>
               {placeholder}
             </Tab>
