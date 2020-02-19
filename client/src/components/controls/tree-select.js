@@ -2,13 +2,11 @@ import React, { forwardRef, useState, useEffect, useImperativeHandle } from 'rea
 import { Spinner } from 'react-bootstrap';
 
 export const TreeSelect = forwardRef(({
-  onChange,
-  data,
-  value,
-  singleSelect
-}, ref) => {
-
-  const [expandAll, setExpandAll] = useState(false);
+    onChange,
+    data,
+    value,
+    singleSelect
+  }, ref) => {
 
   useImperativeHandle(ref, () => ({
     resetSearchFilter() {
@@ -21,6 +19,7 @@ export const TreeSelect = forwardRef(({
     }
   }));
 
+  const [expandAll, setExpandAll] = useState(false);
   const [searchInput, setSearchInput] = useState('');
   const [listType, setListType] = useState('categorical');
 
