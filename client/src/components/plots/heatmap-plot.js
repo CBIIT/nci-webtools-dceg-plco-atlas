@@ -1,6 +1,5 @@
 import React, { forwardRef, useImperativeHandle } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { updatePhenotypeCorrelations } from '../../services/actions';
+import { useSelector } from 'react-redux';
 import { Spinner } from 'react-bootstrap';
 import Plot from 'react-plotly.js';
 import {
@@ -16,11 +15,9 @@ export const Heatmap = forwardRef(({}, ref) => {
     }
   }));
 
-  const dispatch = useDispatch();
   const {
     heatmapData,
-    heatmapLayout,
-    loading
+    heatmapLayout
   } = useSelector(state => state.phenotypeCorrelations);
 
   const createTooltip = () => {
@@ -131,45 +128,40 @@ export const Heatmap = forwardRef(({}, ref) => {
   };
 
   return (
-    <>
-      <div className="row">
+    <div className="row">
+      <div
+        className="col-md-12"
+        style={{
+          display: heatmapData && heatmapData.length > 0 ? 'block' : 'none'
+        }}>
         <div
-          className="col-md-12"
           style={{
-            display: heatmapData.length > 0 && !loading ? 'block' : 'none'
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            textAlign: 'left'
           }}>
-          <div style={{ display: loading ? 'none' : 'block' }}>
-            <div
-              style={{
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-                textAlign: 'left'
-              }}>
-              <Plot
-                className="heatmap"
-                style={{ position: 'relative', height: '1000px', width: '1000px' }}
-                data={heatmapData}
-                layout={heatmapLayout}
-                config={config}
-                onClick={e => popupMarkerClick(e)}
-                onRelayout={relayout => {
-                  hideTooltip();
-                }}
-              />
-            </div>
-          </div>
-        </div>
-        <div className="col-md-12">
-          <div
-            className="text-center"
-            style={{ display: loading ? 'block' : 'none' }}>
-            <Spinner animation="border" variant="primary" role="status">
-              <span className="sr-only">Loading...</span>
-            </Spinner>
-          </div>
+          <Plot
+            className="heatmap"
+            style={{ position: 'relative', height: '1000px', width: '1000px' }}
+            data={heatmapData}
+            layout={heatmapLayout}
+            config={config}
+            onClick={e => popupMarkerClick(e)}
+            onRelayout={relayout => {
+              hideTooltip();
+            }}
+          />
         </div>
       </div>
-    </>
+      {
+        heatmapData && heatmapData.length <= 0 && 
+        <div className="col-md-12">
+          <Spinner animation="border" variant="primary" role="status">
+            <span className="sr-only">Loading...</span>
+          </Spinner>
+        </div>
+      }
+    </div>
   );
 });
