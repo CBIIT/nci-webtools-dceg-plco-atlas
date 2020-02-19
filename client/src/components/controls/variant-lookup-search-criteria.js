@@ -78,7 +78,7 @@ export const VariantLookupSearchCriteria = props => {
               </span>
             </div>
             <div
-              className="col-md-auto ml-1 px-0"
+              className="col-md-auto ml-1 pl-0"
               style={{ maxHeight: '300px', overflow: 'auto' }}>
               {collapseCriteria && (
                 <>
@@ -134,9 +134,7 @@ export const VariantLookupSearchCriteria = props => {
                 ))}
             </div>
 
-            <div className="col-md-auto ml-1 px-0">
-              <span className="mx-3">|</span>
-
+            <div className="col-md-auto border-left border-dark">
               <span>
                 <b>Variant</b>:{' '}
               </span>
@@ -153,9 +151,8 @@ export const VariantLookupSearchCriteria = props => {
                     </a> 
                   : <span>{searchCriteriaVariantLookup.variant}</span>
                 : 'None'}
-
-              <span className="mx-3">|</span>
-
+            </div>
+            <div className="col-md-auto border-left border-dark">
               <span>
                 <b>Gender</b>:{' '}
               </span>

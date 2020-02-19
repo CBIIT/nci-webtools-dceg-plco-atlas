@@ -313,7 +313,7 @@ export function VariantLookup() {
                   </div>
               }
               {
-                results && results.length  <= 0 &&
+                results && results.length <= 0 &&
                   <Spinner animation="border" variant="primary" role="status">
                     <span className="sr-only">Loading...</span>
                   </Spinner>
