@@ -130,7 +130,9 @@ export function PhenotypeCorrelations() {
 
         <MainPanel className="col-lg-9">
           <PhenotypeCorrelationsSearchCriteria />
-          <Tabs defaultActiveKey="phenotype-correlations">
+          <Tabs 
+            transition={false}
+            defaultActiveKey="phenotype-correlations">
             <Tab
               eventKey="phenotype-correlations"
               // title="Heatmap"

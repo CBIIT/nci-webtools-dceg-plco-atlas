@@ -43,7 +43,10 @@ export const VariantLookupSearchCriteria = props => {
 
   return (
     <div className="mb-2">
-      <Tabs className="" defaultActiveKey="variant-lookup-search-criteria">
+      <Tabs 
+        transition={false}
+        className="" 
+        defaultActiveKey="variant-lookup-search-criteria">
         <Tab
           eventKey="variant-lookup-search-criteria"
           className="d-flex justify-content-between px-3 py-2 bg-white tab-pane-bordered rounded-0">

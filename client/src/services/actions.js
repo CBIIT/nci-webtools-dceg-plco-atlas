@@ -274,12 +274,12 @@ export function drawQQPlot(phenotype, variantTable) {
 
     const table = variantTable.length === 1 ? variantTable[0] : 'stacked';
 
-    const metadata = await query('metadata', {
-      // database: phenotype + '.db'
-      // phenotype_id,
-      // gender,
-      // chromosome
-    });
+    // const metadata = await query('metadata', {
+    //   // database: phenotype + '.db'
+    //   // phenotype_id,
+    //   // gender,
+    //   // chromosome
+    // });
 
     // const countKey = plotType =>
     //   ({
@@ -312,170 +312,173 @@ export function drawQQPlot(phenotype, variantTable) {
         // database: phenotype + '.db',
         table: 'ewings_sarcoma_2_variant',
         // gender:,
-        columns: ['chr', 'bp', 'snp', 'p', 'nlog_p', 'expected_p'],
+        columns: ['chr', 'bp', 'snp', 'p_value', 'p_value_nlog', 'p_value_expected'],
         p_value_max: pCutOffValue,
         orderBy: 'p_value',
         order: 'asc',
         raw: true
       });
-      let topObservedVariants = [];
-      let topExpectedVariants = [];
-      topVariantData.data.map(row => {
-        topObservedVariants.push(row[4]);
-        topExpectedVariants.push(row[5]);
-      });
-      const topObservedVariantsText = [];
-      topVariantData.data.map(row =>
-        topObservedVariantsText.push({
-          chr: row[0],
-          bp: row[1],
-          snp: row[2],
-          p: row[3]
-        })
-      );
-      console.log('topObservedVariants.length', topObservedVariants.length);
 
-      const subsetVariantData = await query('variants', {
-        // database: phenotype + '.db',
-        table: 'ewings_sarcoma_2_variant',
-        // gender:,
-        columns: ['nlog_p', 'expected_p'],
-        p_value_min: pCutOffValue,
-        orderBy: 'p_value',
-        order: 'asc',
-        show_qq_plot: true,
-        raw: true
-      });
-      let subsetObservedVariants = [];
-      let subsetExpectedVariants = [];
-      subsetVariantData.data.map(row => {
-        subsetObservedVariants.push(row[0]);
-        subsetExpectedVariants.push(row[1]);
-      });
-      console.log(
-        'subsetObservedVariants.length',
-        subsetObservedVariants.length
-      );
+      console.log("topVariantData", topVariantData);
 
-      const markerColor = {
-        variant_all: '#F2990D',
-        variant_female: '#f41c52',
-        variant_male: '#006bb8'
-      }[table];
+      // let topObservedVariants = [];
+      // let topExpectedVariants = [];
+      // topVariantData.data.map(row => {
+      //   topObservedVariants.push(row[4]);
+      //   topExpectedVariants.push(row[5]);
+      // });
+      // const topObservedVariantsText = [];
+      // topVariantData.data.map(row =>
+      //   topObservedVariantsText.push({
+      //     chr: row[0],
+      //     bp: row[1],
+      //     snp: row[2],
+      //     p: row[3]
+      //   })
+      // );
+      // console.log('topObservedVariants.length', topObservedVariants.length);
 
-      let qqplotTopData = {
-        x: topExpectedVariants,
-        y: topObservedVariants,
-        text: topObservedVariantsText,
-        hovertemplate:
-          '<b>position:</b> %{text.chr}:%{text.bp}<br>' +
-          '<b>p-value:</b> %{text.p}<br>' +
-          '<b>snp:</b> %{text.snp}' +
-          '<extra></extra>',
-        hoverinfo: 'text',
-        mode: 'markers',
-        type: 'scattergl',
-        marker: {
-          color: markerColor,
-          size: 8,
-          opacity: 0.65
-        },
-        // showlegend: false
-      };
+      // const subsetVariantData = await query('variants', {
+      //   // database: phenotype + '.db',
+      //   table: 'ewings_sarcoma_2_variant',
+      //   // gender:,
+      //   columns: ['nlog_p', 'expected_p'],
+      //   p_value_min: pCutOffValue,
+      //   orderBy: 'p_value',
+      //   order: 'asc',
+      //   show_qq_plot: true,
+      //   raw: true
+      // });
+      // let subsetObservedVariants = [];
+      // let subsetExpectedVariants = [];
+      // subsetVariantData.data.map(row => {
+      //   subsetObservedVariants.push(row[0]);
+      //   subsetExpectedVariants.push(row[1]);
+      // });
+      // console.log(
+      //   'subsetObservedVariants.length',
+      //   subsetObservedVariants.length
+      // );
 
-      let qqplotSubsetData = {
-        x: subsetExpectedVariants,
-        y: subsetObservedVariants,
-        hoverinfo: 'none',
-        mode: 'markers',
-        type: 'scattergl',
-        marker: {
-          color: markerColor,
-          size: 8
-          // opacity: 0.65
-        },
-        // showlegend: false
-      };
+      // const markerColor = {
+      //   variant_all: '#F2990D',
+      //   variant_female: '#f41c52',
+      //   variant_male: '#006bb8'
+      // }[table];
 
-      let qqplotLineData = {
-        x: [0.0, qqplotTopData.x[0]],
-        y: [0.0, qqplotTopData.x[0]],
-        hoverinfo: 'none',
-        mode: 'lines',
-        type: 'scattergl',
-        line: {
-          color: 'gray',
-          width: 1
-        },
-        opacity: 0.5,
-        // showlegend: false
-      };
+      // let qqplotTopData = {
+      //   x: topExpectedVariants,
+      //   y: topObservedVariants,
+      //   text: topObservedVariantsText,
+      //   hovertemplate:
+      //     '<b>position:</b> %{text.chr}:%{text.bp}<br>' +
+      //     '<b>p-value:</b> %{text.p}<br>' +
+      //     '<b>snp:</b> %{text.snp}' +
+      //     '<extra></extra>',
+      //   hoverinfo: 'text',
+      //   mode: 'markers',
+      //   type: 'scattergl',
+      //   marker: {
+      //     color: markerColor,
+      //     size: 8,
+      //     opacity: 0.65
+      //   },
+      //   // showlegend: false
+      // };
 
-      let qqplotLayout = {
-        dragmode: 'pan',
-        clickmode: 'event',
-        hovermode: 'closest',
-        // width: 800,
-        // height: 800,
-        autosize: true,
-        title: {
-          text:
-            '<b>\u03BB</b> = ' +
-            metadata_lambdaGC +
-            '        <b>Sample Size</b> = ' +
-            metadata_count.toLocaleString(),
-          font: {
-            family: 'Arial',
-            size: 14,
-            color: 'black'
-          }
-        },
-        xaxis: {
-          automargin: true,
-          rangemode: 'tozero', // only show positive
-          showgrid: false, // disable grid lines
-          fixedrange: true, // disable zoom
-          title: {
-            text: '<b>Expected -log<sub>10</sub>(p)</b>',
-            font: {
-              family: 'Arial',
-              size: 14,
-              color: 'black'
-            }
-          },
-          tick0: 0,
-          ticklen: 10,
-          tickfont: {
-            family: 'Arial',
-            size: 10,
-            color: 'black'
-          }
-        },
-        yaxis: {
-          automargin: true,
-          rangemode: 'tozero', // only show positive
-          showgrid: false, // disable grid lines
-          fixedrange: true, // disable zoom
-          title: {
-            text: '<b>Observed -log<sub>10</sub>(p)</b>',
-            font: {
-              family: 'Arial',
-              size: 14,
-              color: 'black'
-            }
-          },
-          tick0: 0,
-          ticklen: 10,
-          tickfont: {
-            family: 'Arial',
-            size: 10,
-            color: 'black'
-          }
-        },
-        showlegend: false
-      };
-      setQQPlotLayout(qqplotLayout);
-      setQQPlotData([qqplotTopData, qqplotSubsetData, qqplotLineData]);
+      // let qqplotSubsetData = {
+      //   x: subsetExpectedVariants,
+      //   y: subsetObservedVariants,
+      //   hoverinfo: 'none',
+      //   mode: 'markers',
+      //   type: 'scattergl',
+      //   marker: {
+      //     color: markerColor,
+      //     size: 8
+      //     // opacity: 0.65
+      //   },
+      //   // showlegend: false
+      // };
+
+      // let qqplotLineData = {
+      //   x: [0.0, qqplotTopData.x[0]],
+      //   y: [0.0, qqplotTopData.x[0]],
+      //   hoverinfo: 'none',
+      //   mode: 'lines',
+      //   type: 'scattergl',
+      //   line: {
+      //     color: 'gray',
+      //     width: 1
+      //   },
+      //   opacity: 0.5,
+      //   // showlegend: false
+      // };
+
+      // let qqplotLayout = {
+      //   dragmode: 'pan',
+      //   clickmode: 'event',
+      //   hovermode: 'closest',
+      //   // width: 800,
+      //   // height: 800,
+      //   autosize: true,
+      //   title: {
+      //     text:
+      //       '<b>\u03BB</b> = ' +
+      //       metadata_lambdaGC +
+      //       '        <b>Sample Size</b> = ' +
+      //       metadata_count.toLocaleString(),
+      //     font: {
+      //       family: 'Arial',
+      //       size: 14,
+      //       color: 'black'
+      //     }
+      //   },
+      //   xaxis: {
+      //     automargin: true,
+      //     rangemode: 'tozero', // only show positive
+      //     showgrid: false, // disable grid lines
+      //     fixedrange: true, // disable zoom
+      //     title: {
+      //       text: '<b>Expected -log<sub>10</sub>(p)</b>',
+      //       font: {
+      //         family: 'Arial',
+      //         size: 14,
+      //         color: 'black'
+      //       }
+      //     },
+      //     tick0: 0,
+      //     ticklen: 10,
+      //     tickfont: {
+      //       family: 'Arial',
+      //       size: 10,
+      //       color: 'black'
+      //     }
+      //   },
+      //   yaxis: {
+      //     automargin: true,
+      //     rangemode: 'tozero', // only show positive
+      //     showgrid: false, // disable grid lines
+      //     fixedrange: true, // disable zoom
+      //     title: {
+      //       text: '<b>Observed -log<sub>10</sub>(p)</b>',
+      //       font: {
+      //         family: 'Arial',
+      //         size: 14,
+      //         color: 'black'
+      //       }
+      //     },
+      //     tick0: 0,
+      //     ticklen: 10,
+      //     tickfont: {
+      //       family: 'Arial',
+      //       size: 10,
+      //       color: 'black'
+      //     }
+      //   },
+      //   showlegend: false
+      // };
+      // setQQPlotLayout(qqplotLayout);
+      // setQQPlotData([qqplotTopData, qqplotSubsetData, qqplotLineData]);
     // } else {
     //   const metadata_count_female = parseInt(metadata[countKey(table)[0]]);
     //   const metadata_count_male = parseInt(metadata[countKey(table)[1]]);

@@ -17,7 +17,10 @@ export const SummaryResultsSearchCriteria = () => {
 
   return (
     <div className="mb-2">
-      <Tabs className="" defaultActiveKey="summary-results-search-criteria">
+      <Tabs 
+        transition={false}
+        className="" 
+        defaultActiveKey="summary-results-search-criteria">
         <Tab
           eventKey="summary-results-search-criteria"
           className="d-flex justify-content-between px-3 py-2 bg-white tab-pane-bordered rounded-0">

@@ -56,7 +56,7 @@ function getValidColumns(tableName, columns) {
         columns = (columns || '').split(',').filter(e => e.length);
 
     let validColumns = {
-        variant: ['id', 'gender', 'chromosome', 'position', 'snp', 'allele_reference', 'allele_effect', 'p_value', 'p_value_nlog', 'odds_ratio', 'show_qq_plot'],
+        variant: ['id', 'gender', 'chromosome', 'position', 'snp', 'allele_reference', 'allele_effect', 'p_value', 'p_value_nlog', 'odds_ratio', 'show_qq_plot', 'p_value_expected'],
         aggregate: ['id', 'gender', 'position_abs', 'p_value_nlog'],
         phenotype: ['id', 'parent_id', 'name', 'display_name', 'description', 'color', 'type'],
     }[tableName];
@@ -134,6 +134,8 @@ async function getSummary(connection, params) {
 async function getVariants(connection, params) {
     let table = getValidTable(params.table);
     let columnNames = getValidColumns('variant', params.columns).map(quote).join(',')
+    // console.log("params.columns", params.columns);
+    // let columnNames = params.columns.map(quote).join(',');
     const groupby = params.groupby
         ? ` GROUP BY "${params.groupby}" `
         : ``;
