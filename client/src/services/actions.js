@@ -803,9 +803,6 @@ export function drawHeatmap(phenotypes) {
       };
     };
 
-    const setLoading = loading => {
-      dispatch(updateSummaryResults({ loading }));
-    };
     const setHeatmapData = heatmapData => {
       dispatch(updatePhenotypeCorrelations({ heatmapData }));
     };
@@ -813,7 +810,6 @@ export function drawHeatmap(phenotypes) {
       dispatch(updatePhenotypeCorrelations({ heatmapLayout }));
     };
 
-    setLoading(true);
     setHeatmapLayout({});
     setHeatmapData([]);
 
@@ -924,7 +920,6 @@ export function drawHeatmap(phenotypes) {
     };
     setHeatmapLayout(heatmapLayout);
     setHeatmapData([heatmapData]);
-    setLoading(false);
   };
 }
 

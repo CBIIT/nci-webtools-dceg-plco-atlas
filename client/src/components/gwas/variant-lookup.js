@@ -259,7 +259,11 @@ export function VariantLookup() {
             <Tab
               eventKey="variant-lookup"
               // title="Table"
-              className="p-2 bg-white tab-pane-bordered rounded-0"
+              className={
+                submitted ?
+                "p-2 bg-white tab-pane-bordered rounded-0" :
+                "p-2 bg-white tab-pane-bordered rounded-0 d-flex justify-content-center align-items-center"
+              }
               style={{ minHeight: '474px' }}>
               <div
                 className="mw-100 my-2 px-4"
