@@ -24,23 +24,28 @@ export const SummaryResultsSearchCriteria = () => {
         <Tab
           eventKey="summary-results-search-criteria"
           className="d-flex justify-content-between px-3 py-2 bg-white tab-pane-bordered rounded-0">
-          <div className="left py-1">
-            <span>
-              <b>Phenotype</b>:{' '}
-            </span>
-            {searchCriteriaSummaryResults &&
-            searchCriteriaSummaryResults.phenotype
-              ? searchCriteriaSummaryResults.phenotype
-              : 'None'}
+          <div className="row left py-1">
+            <div className="col-md-auto ml-1">
+              <span>
+                <b>Phenotype</b>:{' '}
+              </span>
+              {searchCriteriaSummaryResults &&
+              searchCriteriaSummaryResults.phenotype
+                ? searchCriteriaSummaryResults.phenotype
+                : 'None'}
+            </div>
+            <div className="col-md-auto border-left border-dark">
+              <span>
+                <b>Gender</b>:{' '}
+              </span>
+              {searchCriteriaSummaryResults && searchCriteriaSummaryResults.gender
+                ? displayGender(searchCriteriaSummaryResults.gender)
+                : 'None'}
+            </div>
+            
 
-            <span className="mx-3">|</span>
+            {/* <span className="mx-3">|</span> */}
 
-            <span>
-              <b>Gender</b>:{' '}
-            </span>
-            {searchCriteriaSummaryResults && searchCriteriaSummaryResults.gender
-              ? displayGender(searchCriteriaSummaryResults.gender)
-              : 'None'}
           </div>
 
           <div className="right py-1">
