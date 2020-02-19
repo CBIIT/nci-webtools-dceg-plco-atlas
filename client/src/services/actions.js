@@ -927,7 +927,6 @@ export function lookupVariants(phenotypes, variant, gender) {
   return async function(dispatch) {
     dispatch(
       updateVariantLookup({
-        loading: true,
         results: [],
         submitted: new Date()
       })
@@ -987,7 +986,6 @@ export function lookupVariants(phenotypes, variant, gender) {
     tableList = tableList.concat(tableListNull);
     dispatch(
       updateVariantLookup({
-        loading: false,
         results: tableList,
         numResults
       })
