@@ -235,45 +235,58 @@ export function Phenotypes() {
         <PhenotypesSearchCriteria />
         {!submitted &&
           <>
-            <div className="bg-white border rounded-0 p-3" 
+            <div 
+              className={
+                phenotypes ? 
+                "bg-white border rounded-0 p-3" : 
+                "bg-white border rounded-0 p-3 d-flex justify-content-center align-items-center"
+              }
               style={{ 
-                display: phenotypes ? 'block' : 'none',
-                minHeight: '350px' }}>
-              {
-                breadcrumb.length > 0 && breadcrumb.map((item, idx) =>
-                  <span className="" key={"crumb-" + item.data.title}>
-                    <a
-                      href="javascript:void(0)"
-                      onClick={_ => crumbClick(item, idx)}
-                    >
-                      { idx === 0 ? 'All Phenotypes' : item.data.title}
-                    </a>
-                    <Icon
-                      name="arrow-left"
-                      className="mx-2 opacity-50"
-                      width="10"
-                    />
-                  </span>
-                )
-              }
-              {
-                breadcrumb.length === 0 &&
-                <br />
-              }
-              <div
-                ref={plotContainer}
-                className="mt-5 bubble-chart text-center"
-                style={{ minHeight: '50vh' }}
-              />
-            </div>
-            <div className="bg-white border rounded-0 p-3 d-flex justify-content-center align-items-center"
-              style={{
-                display: !phenotypes ? 'block' : 'none',
                 minHeight: '324px'
               }}>
-              <Spinner animation="border" variant="primary" role="status">
-                <span className="sr-only">Loading...</span>
-              </Spinner>
+              <div style={{
+                  display: phenotypes ? 'block' : 'none'
+                }}>
+                {
+                  breadcrumb.length > 0 && breadcrumb.map((item, idx) =>
+                    <span className="" key={"crumb-" + item.data.title}>
+                      <a
+                        href="javascript:void(0)"
+                        onClick={_ => crumbClick(item, idx)}
+                      >
+                        { idx === 0 ? 'All Phenotypes' : item.data.title}
+                      </a>
+                      <Icon
+                        name="arrow-left"
+                        className="mx-2 opacity-50"
+                        width="10"
+                      />
+                    </span>
+                  )
+                }
+                {
+                  breadcrumb.length === 0 &&
+                  <br />
+                }
+                <div
+                  ref={plotContainer}
+                  className="mt-5 bubble-chart text-center"
+                  style={{ minHeight: '50vh' }}
+                />
+              </div>
+              
+              {
+                !phenotypes && 
+                  <div
+                    style={{
+                      display: !phenotypes ? 'block' : 'none',
+                    }}>
+                    <Spinner animation="border" variant="primary" role="status">
+                      <span className="sr-only">Loading...</span>
+                    </Spinner>
+                  </div>
+              }
+              
             </div>
           </>
         }

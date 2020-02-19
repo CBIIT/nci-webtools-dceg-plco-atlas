@@ -114,7 +114,6 @@ export const getInitialState = () => ({
     messages: [],
     searchCriteriaPhenotypeCorrelations: {},
     collapseCriteria: true
-    // tooltipData: null
   },
   browsePhenotypes: {
     selectedPhenotype: null,
