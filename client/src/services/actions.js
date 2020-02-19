@@ -102,17 +102,19 @@ export function initialize() {
         node.children.forEach(populateRecords);
       }
     };
-    data.forEach(populateRecords, 0);
 
-    const alphabetizedRecords = [...records].sort((a, b) =>
-      a.title.localeCompare(b.title)
-    );
+    if (data && data.statusCode !== 500 ) {
+      data.forEach(populateRecords, 0);
+      const alphabetizedRecords = [...records].sort((a, b) =>
+        a.title.localeCompare(b.title)
+      );
 
-    dispatch(updatePhenotypes({
-      flat: alphabetizedRecords,
-      categories: categories,
-      tree: data
-    }));
+      dispatch(updatePhenotypes({
+        flat: alphabetizedRecords,
+        categories: categories,
+        tree: data
+      }));
+    }
 
     // update tmp_phenotypes
     const tmpData = await query('data/phenotypes.json');
