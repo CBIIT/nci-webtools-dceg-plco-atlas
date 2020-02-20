@@ -170,8 +170,8 @@ async function getVariants(connection, params) {
         // by default, sort by p-value ascending
         if (!['asc', 'desc'].includes(order))
             order = 'asc';
-        if (!validColumns.includes(orderBy))
-            orderBy = 'p_value';
+        // if (!validColumns.includes(orderBy))
+        //     orderBy = 'p_value';
         sql += ` ORDER BY "${orderBy}" ${order} `;
     }
 

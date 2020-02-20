@@ -145,7 +145,7 @@ export function SummaryResults() {
     // close sidebar on submit
     // setOpenSidebar(false);
     setPopupTooltipData(null);
-    dispatch(drawQQPlot(phenotype.value, variantTable));
+    dispatch(drawQQPlot(phenotype, variantTable));
 
     // update summary results filters
     dispatch(
