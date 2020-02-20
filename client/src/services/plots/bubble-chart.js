@@ -88,7 +88,11 @@ export class BubbleChart {
 
         node.append("title")
             .text(function (d) {
-                return "Phenotype: " + d.data.title + "\n" + "Sample size: " + d.value.toLocaleString();
+                if (d.children) {
+                    return "Category: " + d.data.title + "\n" + "Sample size: " + d.value.toLocaleString();
+                } else {
+                    return "Phenotype: " + d.data.title + "\n" + "Sample size: " + d.value.toLocaleString();
+                }
             });
 
         node.append("circle")
