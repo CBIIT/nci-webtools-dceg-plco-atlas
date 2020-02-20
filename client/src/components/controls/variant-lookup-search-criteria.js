@@ -43,7 +43,10 @@ export const VariantLookupSearchCriteria = props => {
 
   return (
     <div className="mb-2">
-      <Tabs className="" defaultActiveKey="variant-lookup-search-criteria">
+      <Tabs 
+        transition={false}
+        className="" 
+        defaultActiveKey="variant-lookup-search-criteria">
         <Tab
           eventKey="variant-lookup-search-criteria"
           className="d-flex justify-content-between px-3 py-2 bg-white tab-pane-bordered rounded-0">
@@ -75,7 +78,7 @@ export const VariantLookupSearchCriteria = props => {
               </span>
             </div>
             <div
-              className="col-md-auto ml-1 px-0"
+              className="col-md-auto ml-1 pl-0"
               style={{ maxHeight: '300px', overflow: 'auto' }}>
               {collapseCriteria && (
                 <>
@@ -131,9 +134,7 @@ export const VariantLookupSearchCriteria = props => {
                 ))}
             </div>
 
-            <div className="col-md-auto ml-1 px-0">
-              <span className="mx-3">|</span>
-
+            <div className="col-md-auto border-left border-dark">
               <span>
                 <b>Variant</b>:{' '}
               </span>
@@ -150,9 +151,8 @@ export const VariantLookupSearchCriteria = props => {
                     </a> 
                   : <span>{searchCriteriaVariantLookup.variant}</span>
                 : 'None'}
-
-              <span className="mx-3">|</span>
-
+            </div>
+            <div className="col-md-auto border-left border-dark">
               <span>
                 <b>Gender</b>:{' '}
               </span>

@@ -24,8 +24,8 @@ export function PhenotypeCorrelations() {
     selectedPhenotypes, 
     selectedGender, 
     submitted, 
-    messages,
-    loading } = phenotypeCorrelations;
+    messages 
+  } = phenotypeCorrelations;
 
   const tooltipRef = useRef();
 
@@ -93,10 +93,8 @@ export function PhenotypeCorrelations() {
         selectedListType: 'categorical',
         selectedPhenotypes: [],
         selectedGender: 'combined',
-        heatmapData: [],
+        heatmapData: null,
         heatmapLayout: {},
-        results: [],
-        loading: false,
         submitted: null,
         messages: [],
         searchCriteriaPhenotypeCorrelations: {},
@@ -132,25 +130,16 @@ export function PhenotypeCorrelations() {
 
         <MainPanel className="col-lg-9">
           <PhenotypeCorrelationsSearchCriteria />
-          <Tabs defaultActiveKey="phenotype-correlations">
+          <Tabs 
+            transition={false}
+            defaultActiveKey="phenotype-correlations">
             <Tab
               eventKey="phenotype-correlations"
               // title="Heatmap"
               className={
-                !loading ?
-                "bg-white border rounded-0 p-3" : 
                 "bg-white border rounded-0 p-3 d-flex justify-content-center align-items-center"
               }
-
               style={{ minHeight: '404px' }}>
-              <div
-                style={{
-                  display: loading ? 'block' : 'none',
-                }}>
-                <Spinner animation="border" variant="primary" role="status">
-                  <span className="sr-only">Loading...</span>
-                </Spinner>
-              </div>
               <div
                 className="mw-100 my-4"
                 style={{ display: submitted ? 'block' : 'none' }}>

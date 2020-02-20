@@ -30,7 +30,10 @@ export const PhenotypesSearchCriteria = () => {
 
   return (
     <div className="mb-2">
-      <Tabs className="" defaultActiveKey="phenotypes-search-criteria">
+      <Tabs 
+        transition={false}
+        className="" 
+        defaultActiveKey="phenotypes-search-criteria">
         <Tab
           eventKey="phenotypes-search-criteria"
           className="d-flex justify-content-between px-3 py-2 bg-white tab-pane-bordered rounded-0">

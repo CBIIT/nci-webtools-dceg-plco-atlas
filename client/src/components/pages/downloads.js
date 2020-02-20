@@ -109,7 +109,13 @@ export function Downloads() {
       </SidebarPanel>
 
       <MainPanel className="col-lg-9">
-        <div className="bg-white border rounded-0 p-4" style={{ minHeight: '409px' }}>
+        <div 
+          className={
+            submitted ?
+            "bg-white border rounded-0 p-4" :
+            "bg-white border rounded-0 p-4 d-flex justify-content-center align-items-center"
+          }
+          style={{ minHeight: '409px' }}>
           {!submitted && <p className="h4 text-center text-secondary my-5">Please select phenotypes to download</p>}
           {submitted && <>
             <h2>Downloading Data</h2>

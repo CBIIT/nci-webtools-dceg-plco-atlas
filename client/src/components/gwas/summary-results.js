@@ -83,7 +83,6 @@ export function SummaryResults() {
     if (elem && elem.length > 0) {
       elem[0].remove();
     }
-    // tooltip.style.display = 'none';
   };
 
   // phenotype is selected phenotype's value
@@ -138,7 +137,7 @@ export function SummaryResults() {
     }
 
     // determine which tables to use for manhattan plot
-    const aggregateTable = getAggregateTable(manhattanPlotType);
+    // const aggregateTable = getAggregateTable(manhattanPlotType);
 
     // determine which tables to use for summary results
     const variantTable = getVariantTable(manhattanPlotType);
@@ -146,7 +145,7 @@ export function SummaryResults() {
     // close sidebar on submit
     // setOpenSidebar(false);
     setPopupTooltipData(null);
-    dispatch(drawQQPlot(phenotype.value, variantTable));
+    dispatch(drawQQPlot(phenotype, variantTable));
 
     // update summary results filters
     dispatch(
@@ -166,20 +165,20 @@ export function SummaryResults() {
       })
     );
 
-    // draw summary plot using aggregate data
-    dispatch(
-      drawManhattanPlot('summary', {
-        database: phenotype.value + '.db',
-        table: aggregateTable,
-        nlogpMin: 3
-      })
-    );
+    // // draw summary plot using aggregate data
+    // dispatch(
+    //   drawManhattanPlot('summary', {
+    //     database: phenotype.value + '.db',
+    //     table: aggregateTable,
+    //     nlogpMin: 3
+    //   })
+    // );
 
-    // fetch variant results tables
-    fetchVariantTables(
-      phenotype.value,
-      manhattanPlotType
-    );
+    // // fetch variant results tables
+    // fetchVariantTables(
+    //   phenotype.value,
+    //   manhattanPlotType
+    // );
 
     setSearchCriteriaSummaryResults({
       phenotype: [...phenotype.title],
@@ -364,13 +363,19 @@ export function SummaryResults() {
         <MainPanel className="col-lg-9">
           <SummaryResultsSearchCriteria />
           <Tabs
+            transition={false}
             className="mt-2"
             defaultActiveKey={selectedPlot}
+            activeKey={selectedPlot}
             onSelect={setSelectedPlot}>
             <Tab
               eventKey="manhattan-plot"
               title="Manhattan Plot"
-              className="p-2 bg-white tab-pane-bordered rounded-0"
+              className={
+                selectedPlot === 'manhattan-plot' ?
+                "p-2 bg-white tab-pane-bordered rounded-0 d-flex justify-content-center align-items-center" :
+                "p-2 bg-white tab-pane-bordered rounded-0"
+              }
               style={{ minHeight: '366px' }}>
               <ManhattanPlot
                 onChromosomeSelected={onChromosomeSelected}
@@ -385,12 +390,16 @@ export function SummaryResults() {
                 style={{ display: submitted ? 'block' : 'none' }}>
                 <SummaryResultsTable />
               </div>
-              {placeholder}
+              {placeholder}              
             </Tab>
             <Tab
               eventKey="qq-plot"
               title="Q-Q Plot"
-              className="p-2 bg-white tab-pane-bordered rounded-0"
+              className={
+                selectedPlot === 'qq-plot' ?
+                "p-2 bg-white tab-pane-bordered rounded-0 d-flex justify-content-center align-items-center" :
+                "p-2 bg-white tab-pane-bordered rounded-0"
+              }
               style={{ minHeight: '366px' }}>
               <div
                 className="mw-100 my-4"
