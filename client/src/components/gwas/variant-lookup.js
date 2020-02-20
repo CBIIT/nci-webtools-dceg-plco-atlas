@@ -54,8 +54,18 @@ export function VariantLookup() {
       // }
     },
     {
+      dataField: 'variant',
+      text: 'Variant',
+      hidden: true
+    },
+    {
+      dataField: 'gender',
+      text: 'Gender',
+      hidden: true
+    },
+    {
       headerTitle: () => 'Chromosome',
-      dataField: 'chr',
+      dataField: 'chromosome',
       text: 'Chr.',
       // headerAlign: 'center',
       // align: 'center'
@@ -64,22 +74,22 @@ export function VariantLookup() {
       }
     },
     {
-      dataField: 'bp',
+      dataField: 'position',
       text: 'Position',
       headerStyle: {
         width: '100px'
       }
     },
     {
-      dataField: 'a1',
+      dataField: 'allele_reference',
       text: 'Reference Allele'
     },
     {
-      dataField: 'a2',
+      dataField: 'allele_effect',
       text: 'Alternate Allele'
     },
     {
-      dataField: 'or',
+      dataField: 'odds_ratio',
       text: 'Odds Ratio/Beta',
       sort: true,
       sortFunc: (a, b, order, dataField, rowA, rowB) => {
@@ -90,7 +100,7 @@ export function VariantLookup() {
       }
     },
     {
-      dataField: 'p',
+      dataField: 'p_value',
       text: 'P-value',
       sort: true,
       sortFunc: (a, b, order, dataField, rowA, rowB) => {
@@ -99,12 +109,7 @@ export function VariantLookup() {
         }
         return b - a; // desc
       }
-    },
-    {
-      dataField: 'gender',
-      text: 'Gender',
-      hidden: true
-    },
+    }
   ];
   // add filter to column headers
   // .map(c => {

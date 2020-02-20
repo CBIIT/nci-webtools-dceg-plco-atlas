@@ -947,12 +947,16 @@ export function lookupVariants(phenotypes, variant, gender) {
       })
     );
 
-    const gender_table = {
-      all: 'variant_all',
-      combined: 'variant_all',
-      female: 'variant_female',
-      male: 'variant_male',
-      undefined: 'variant_all'
+    console.log("phenotypes", phenotypes);
+    console.log("variant", variant);
+    console.log("gender", gender);
+
+    const genderSanitized = {
+      all: 'all',
+      combined: 'all',
+      female: 'female',
+      male: 'male',
+      undefined: 'alll'
     }[gender];
 
     var tableList = [];
@@ -966,26 +970,29 @@ export function lookupVariants(phenotypes, variant, gender) {
       bp = coord[1];
     }
     for (let i = 0; i < phenotypes.length; i++) {
+      const table = phenotypes[i].value + '_variant';
       var { data } = await query('variants', {
-        database: phenotypes[i].value + '.db',
-        table: gender_table,
+        table,
+        gender: genderSanitized,
         snp: chr && bp ? null : variant,
-        chr: chr ? chr : null,
-        bp: bp ? bp : null
+        chromosome: chr ? chr : null,
+        position: bp ? bp : null
       });
+      console.log("data", data);
       if (!data || data.length === 0) {
         tableListNull.push({
           phenotype: phenotypes[i].title
             ? phenotypes[i].title
             : phenotypes[i].label,
-          a1: '-',
-          a2: '-',
-          bp: '-',
-          chr: '-',
-          or: '-',
-          p: '-',
+          allele_reference: '-',
+          allele_effect: '-',
+          position: '-',
+          chromosome: '-',
+          odds_ratio: '-',
+          p_value: '-',
           variant_id: 'not-found-' + phenotypes[i].title ? phenotypes[i].title : phenotypes[i].label,
           gender: gender,
+          variant
         });
       } else {
         for (let j = 0; j < data.length; j++) {
@@ -993,6 +1000,7 @@ export function lookupVariants(phenotypes, variant, gender) {
             ? phenotypes[i].title
             : phenotypes[i].label;
           data[j]['gender'] = gender;
+          data[j]['variant'] = variant;
           tableList.push(data[j]);
         }
       }
