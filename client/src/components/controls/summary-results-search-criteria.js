@@ -42,10 +42,6 @@ export const SummaryResultsSearchCriteria = () => {
                 ? displayGender(searchCriteriaSummaryResults.gender)
                 : 'None'}
             </div>
-            
-
-            {/* <span className="mx-3">|</span> */}
-
           </div>
 
           <div className="right py-1">
