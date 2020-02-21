@@ -69,6 +69,17 @@ function getValidColumns(tableName, columns) {
 
 function getValidTable(table) {
     // todo: validate table name
+
+    // let validTable = {
+    //     ewings_sarcoma_2_variant,
+    //     melanoma_3_variant,
+    //     renal_cell_carcinoma_4_variant
+    // }[tableName];
+
+    // return validTable
+    //     ? validTable
+    //     : '';
+
     return table;
 }
 
@@ -140,9 +151,13 @@ async function getVariants(connection, params) {
         ? ` GROUP BY "${params.groupby}" `
         : ``;
 
+    // const showTableName = (tableName) => {
+    //     params.show_table_name ? `, '` + tableName + `' as table_name ` : ``
+    // };
+
     // filter by id, chr, base position, and -log10(p), if provided
     let sql = tables.map(table => `
-        SELECT ${columnNames}
+        SELECT ${columnNames} ${[coalesce(params.show_table_name, `, '${table}' as table_name`)]} 
         FROM ${table} as v
         WHERE ${[
             coalesce(params.id, `id = :id`),
