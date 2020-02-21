@@ -37,6 +37,7 @@ export function PhenotypeCorrelationsForm({ onChange, onSubmit, onReset }) {
           value={selectedPhenotypes}
           onChange={handleChangeCustom}
           ref={treeRef}
+          submitted={submitted}
         />
       </div>
       
@@ -45,7 +46,8 @@ export function PhenotypeCorrelationsForm({ onChange, onSubmit, onReset }) {
         <select
           className="form-control"
           value={selectedGender}
-          onChange={e => setSelectedGender(e.target.value)}>
+          onChange={e => setSelectedGender(e.target.value)}
+          disabled={submitted}>
           <option value="combined">All</option>
           <option value="female">Female</option>
           <option value="male">Male</option>

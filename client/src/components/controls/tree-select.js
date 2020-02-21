@@ -5,7 +5,8 @@ export const TreeSelect = forwardRef(({
     onChange,
     data,
     value,
-    singleSelect
+    singleSelect,
+    submitted
   }, ref) => {
 
   useImperativeHandle(ref, () => ({
@@ -370,7 +371,9 @@ export const TreeSelect = forwardRef(({
                   title={"Show/hide " + item.title + " phenotypes"}
                   style={{ all: 'unset' }}
                   className="collapse-button text-secondary"
-                  onClick={e => toggleHideChildren(item.value)}>
+                  onClick={e => toggleHideChildren(item.value)}
+                  // disabled={submitted}
+                  >
                   <i className={"fas fa-plus-square collapse-button-text-" + item.value}></i>
                 </button>
 
@@ -400,7 +403,7 @@ export const TreeSelect = forwardRef(({
                   // checked={ !singleSelect && value && value.length > 0 && containsAllVals(getAllLeafs(item), value)}
                   checked={checkParents(item)}
                   onChange={e => handleSelect(item)}
-                  disabled={singleSelect ? true : false}
+                  disabled={submitted || singleSelect ? true : false}
                 />
 
                 <div
@@ -425,6 +428,7 @@ export const TreeSelect = forwardRef(({
                   }}
                   onClick={e => singleSelect ? toggleHideChildren(item.value) : handleSelect(item)}
                   // disabled={singleSelect}
+                  disabled={submitted}
                   >
                   {item.title}
                 </button>
@@ -469,6 +473,7 @@ export const TreeSelect = forwardRef(({
                   value.map(item => item.value).includes(item.value))
               }
               onChange={e => handleSelect(item)}
+              disabled={submitted}
             />
 
             <div
@@ -491,7 +496,8 @@ export const TreeSelect = forwardRef(({
                 overflow: 'hidden',
                 width: '65%'
               }}
-              onClick={e => handleSelect(item)}>
+              onClick={e => handleSelect(item)}
+              disabled={submitted}>
               {item.title}
             </button>
           </li>
@@ -531,6 +537,7 @@ export const TreeSelect = forwardRef(({
                 value.map(item => item.value).includes(item.value))
             }
             onChange={e => handleSelect(item)}
+            disabled={submitted}
           />
 
           <button
@@ -543,7 +550,8 @@ export const TreeSelect = forwardRef(({
               whiteSpace: 'nowrap',
               overflow: 'hidden'
             }}
-            onClick={e => handleSelect(item)}>
+            onClick={e => handleSelect(item)}
+            disabled={submitted}>
             {/* {item.title.replace(searchInput, '[' + searchInput + ']')} */}
             {item.title.slice(
               0,
@@ -639,7 +647,7 @@ export const TreeSelect = forwardRef(({
             className={listType === 'alphabetical' ? 'ml-1' : ''}
             name=""
             type="checkbox"
-            disabled={singleSelect || !data ? true : false}
+            disabled={submitted || singleSelect || !data ? true : false}
             checked={!singleSelect && checkAllLeafsSelected()}
             onChange={e => !singleSelect && selectAll()}
           />
@@ -670,7 +678,7 @@ export const TreeSelect = forwardRef(({
                 }
               }}
               type="text"
-              disabled={!data}
+              disabled={!data || submitted}
             />
             <div className="input-group-append">
               {searchInput.length > 0 ? (
@@ -679,7 +687,9 @@ export const TreeSelect = forwardRef(({
                   title="Clear to go back to categorical view"
                   onClick={e => {
                     clearSearchFilter();
-                  }}>
+                  }}
+                  // disabled={submitted}
+                  >
                   <i className="fas fa-times fa-xs"></i>
                 </button>
               ) : (

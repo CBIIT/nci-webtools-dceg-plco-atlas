@@ -44,6 +44,7 @@ export function VariantLookupForm({ onChange, onSubmit, onReset }) {
           value={selectedPhenotypes}
           onChange={handleChangeCustom}
           ref={treeRef}
+          submitted={submitted}
         />
       </div>
 
@@ -61,6 +62,7 @@ export function VariantLookupForm({ onChange, onSubmit, onReset }) {
           }}
           onKeyPress={e => handleKeyPress(e)}
           type="text"
+          disabled={submitted}
           required
         />
       </div>
@@ -70,7 +72,8 @@ export function VariantLookupForm({ onChange, onSubmit, onReset }) {
         <select
           className="form-control"
           value={selectedGender}
-          onChange={e => setSelectedGender(e.target.value)}>
+          onChange={e => setSelectedGender(e.target.value)}
+          disabled={submitted}>
           <option value="combined">All</option>
           <option value="female">Female</option>
           <option value="male">Male</option>
@@ -118,7 +121,6 @@ export function VariantLookupForm({ onChange, onSubmit, onReset }) {
                   : 'auto' 
                 }}
               variant="silver"
-              // disabled={!canSubmit}
               onClick={e => {
                 e.preventDefault();
                 onSubmit({ selectedPhenotypes, selectedVariant });

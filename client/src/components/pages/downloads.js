@@ -77,6 +77,7 @@ export function Downloads() {
               value={selectedPhenotypes}
               onChange={handleChange}
               ref={treeRef}
+              submitted={submitted}
             />
             <small className="text-muted"><i>Up to five phenotypes may be selected for download.</i></small>
           </div>
