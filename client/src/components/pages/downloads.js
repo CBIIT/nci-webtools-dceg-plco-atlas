@@ -85,7 +85,7 @@ export function Downloads() {
             <Button
               variant="silver"
               onClick={handleSubmit}
-              disabled={!selectedPhenotypes.length || selectedPhenotypes.length > 5}
+              disabled={!selectedPhenotypes.length || selectedPhenotypes.length > 5 || submitted}
               title={
                 selectedPhenotypes.length == 0
                   ? 'Please select phenotype(s) to download.'
