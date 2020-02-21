@@ -59,23 +59,6 @@ export function SummaryResults() {
   //   clearMessages();
   // };
 
-  // determine which aggregate tables correspond to the selected plot type
-  const getAggregateTable = plotType =>
-    ({
-      all: ['aggregate_all'],
-      stacked: ['aggregate_female', 'aggregate_male'],
-      female: ['aggregate_female'],
-      male: ['aggregate_male']
-    }[plotType]);
-
-  // determine which variant tables correspond to the selected plot type
-  const getVariantTable = plotType =>
-    ({
-      all: ['variant_all'],
-      stacked: ['variant_female', 'variant_male'],
-      female: ['variant_female'],
-      male: ['variant_male']
-    }[plotType]);
 
   const hideQQTooltips = () => {
     // if tooltip already exists, destroy
@@ -89,7 +72,7 @@ export function SummaryResults() {
   // plotType is all, stacked, female, or male
   const fetchVariantTables = (phenotype, plotType, params) => {
     params = params || {};
-    let storeKeys = {
+    let genders = {
       all: ['all'],
       stacked: ['female', 'male'],
       female: ['female'],
@@ -97,26 +80,20 @@ export function SummaryResults() {
     }[plotType];
 
     // fetch variant results tables
-    getVariantTable(plotType).forEach((table, i) => {
-      let key = storeKeys[i];
-
-      // if a chromosome is supplied, append the chromosome to the
-      // metadata key used to retrieve counts
-      let countKey = params.chr
-        ? `count_${key}_${params.chr}`
-        : `count_${key}`;
+    genders.forEach((gender, i) => {
+      let key = gender;
 
       dispatch(
-        fetchSummaryTable(key, {
-          database: phenotype + '.db',
-          table: table,
+        fetchSummaryTable(gender, {
+          ...params,
+          table: phenotype + '_variant',
+          gender: gender,
           offset: 0,
           limit: 10,
-          columns: ['chr', 'bp', 'snp', 'a1', 'a2', 'or', 'p'],
-          orderBy: 'p',
+          columns: ['chromosome', 'position', 'snp', 'reference_allele', 'effect_allele', 'odds_ratio', 'p_value'],
+          orderBy: 'p_value',
           order: 'asc',
-          key: params.count ? null : countKey, // metadata key for counts
-          ...params
+          // key: params.count ? null : countKey, // metadata key for counts
         })
       );
     });
@@ -135,17 +112,20 @@ export function SummaryResults() {
         }
       ]);
     }
+    let genders = {
+      all: ['all'],
+      stacked: ['female', 'male'],
+      female: ['female'],
+      male: ['male'],
+    }[manhattanPlotType];
 
     // determine which tables to use for manhattan plot
     // const aggregateTable = getAggregateTable(manhattanPlotType);
 
-    // determine which tables to use for summary results
-    const variantTable = getVariantTable(manhattanPlotType);
-
     // close sidebar on submit
     // setOpenSidebar(false);
     setPopupTooltipData(null);
-    dispatch(drawQQPlot(phenotype, variantTable));
+    dispatch(drawQQPlot(phenotype, manhattanPlotType));
 
     // update summary results filters
     dispatch(
@@ -153,7 +133,7 @@ export function SummaryResults() {
         selectedPhenotype: phenotype,
         selectedManhattanPlotType: manhattanPlotType,
         manhattanPlotView: 'summary',
-        selectedTable: variantTable,
+        selectedTable: phenotype.value + '_aggregate',
         selectedChromosome: null,
         selectedManhattanPlotType: manhattanPlotType,
         nlogpMin: null,
@@ -165,20 +145,20 @@ export function SummaryResults() {
       })
     );
 
-    // // draw summary plot using aggregate data
-    // dispatch(
-    //   drawManhattanPlot('summary', {
-    //     database: phenotype.value + '.db',
-    //     table: aggregateTable,
-    //     nlogpMin: 3
-    //   })
-    // );
+    // draw summary plot using aggregate data
+    dispatch(
+      drawManhattanPlot('summary', {
+        table: phenotype.value + '_aggregate',
+        gender: genders,
+        p_value_nlog_min: 3
+      })
+    );
 
     // // fetch variant results tables
-    // fetchVariantTables(
-    //   phenotype.value,
-    //   manhattanPlotType
-    // );
+    fetchVariantTables(
+      phenotype.value,
+      manhattanPlotType
+    );
 
     setSearchCriteriaSummaryResults({
       phenotype: [...phenotype.title],
@@ -245,17 +225,22 @@ export function SummaryResults() {
   };
 
   // redraw plot and update table(s) for single chromosome selection
-  const onChromosomeSelected = chr => {
+  const onChromosomeSelected = chromosome => {
     const database = selectedPhenotype.value + '.db';
-    const range = ranges.find(r => r.chr === chr);
-    const variantTable = getVariantTable(selectedManhattanPlotType);
+    const range = ranges.find(r => r.chromosome === chromosome);
+    const genders = {
+      all: ['all'],
+      stacked: ['female', 'male'],
+      female: ['female'],
+      male: ['male'],
+    }[selectedManhattanPlotType];
 
     // update form parameters
     dispatch(
       updateSummaryResults({
         manhattanPlotView: 'variants',
-        selectedTable: variantTable,
-        selectedChromosome: chr,
+        selectedTable: selectedPhenotype.value + '_variant',
+        selectedChromosome: chromosome,
         selectedManhattanPlotType,
         // bpMin: range.bp_min,
         // bpMax: range.bp_max,
@@ -266,14 +251,14 @@ export function SummaryResults() {
 
     dispatch(
       drawManhattanPlot('variants', {
-        database,
-        table: variantTable,
-        chr,
-        bpMin: range.bp_min,
-        bpMax: range.bp_max,
-        nlogpMin: 2,
-        nlogpMax: null,
-        columns: ['variant_id', 'chr', 'bp', 'nlog_p']
+        table: selectedPhenotype.value + '_variant',
+        gender: genders,
+        chromosome: chromosome,
+        position_min: range.position_min,
+        position_max: range.position_max,
+        p_value_nlog_min: 2,
+        p_value_nlog_max: null,
+        columns: ['id', 'chromosome', 'position', 'p_value_nlog']
       })
     );
 
@@ -281,17 +266,17 @@ export function SummaryResults() {
     fetchVariantTables(
       selectedPhenotype.value,
       selectedManhattanPlotType,
-      {chr}
+      {chromosome}
     );
   };
 
   // zoom is only initiated from the chromosome view
   const handleZoom = ({ bounds }) => {
     const zoomParams = {
-      bpMin: bounds.xMin,
-      bpMax: bounds.xMax,
-      nlogpMin: bounds.yMin,
-      nlogpMax: bounds.yMax
+      position_min: bounds.xMin,
+      position_max: bounds.xMax,
+      p_value_nlog_min: bounds.yMin,
+      p_value_nlog_max: bounds.yMax
     };
 
     // update zoom params
@@ -303,7 +288,7 @@ export function SummaryResults() {
       selectedManhattanPlotType,
       {
         ...zoomParams,
-        chr: selectedChromosome,
+        chromosome: selectedChromosome,
         count: true
       }
     );
@@ -377,20 +362,22 @@ export function SummaryResults() {
                 "p-2 bg-white tab-pane-bordered rounded-0"
               }
               style={{ minHeight: '366px' }}>
-              <ManhattanPlot
-                onChromosomeSelected={onChromosomeSelected}
-                onAllChromosomeSelected={onAllChromosomeSelected}
-                onVariantLookup={handleVariantLookup}
-                onZoom={handleZoom}
-                loading={loadingManhattanPlot}
-                panelCollapsed={openSidebar}
-              />
-              <div
-                className="mw-100 my-4 px-5"
-                style={{ display: submitted ? 'block' : 'none' }}>
-                <SummaryResultsTable />
+              <div>
+                <ManhattanPlot
+                  onChromosomeSelected={onChromosomeSelected}
+                  onAllChromosomeSelected={onAllChromosomeSelected}
+                  onVariantLookup={handleVariantLookup}
+                  onZoom={handleZoom}
+                  loading={loadingManhattanPlot}
+                  panelCollapsed={openSidebar}
+                />
+                <div
+                  className="mw-100 my-4 px-5"
+                  style={{ display: submitted ? 'block' : 'none' }}>
+                  <SummaryResultsTable />
+                </div>
               </div>
-              {placeholder}              
+              {placeholder}
             </Tab>
             <Tab
               eventKey="qq-plot"

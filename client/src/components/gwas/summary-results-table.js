@@ -43,12 +43,12 @@ export function SummaryResultsTable() {
 
   const columns = [
     {
-      dataField: 'chr',
+      dataField: 'chromosome',
       text: 'Chromosome',
       sort: true
     },
     {
-      dataField: 'bp',
+      dataField: 'position',
       text: 'Position',
       sort: true
     },
@@ -58,19 +58,19 @@ export function SummaryResultsTable() {
       sort: true
     },
     {
-      dataField: 'a1',
+      dataField: 'allele_reference',
       text: 'Reference Allele'
     },
     {
-      dataField: 'a2',
+      dataField: 'allele_effect',
       text: 'Alternate Allele'
     },
     {
-      dataField: 'or',
+      dataField: 'odds_ratio',
       text: 'Odds Ratio'
     },
     {
-      dataField: 'p',
+      dataField: 'p_value',
       text: 'P-Value',
       sort: true
     }
@@ -88,29 +88,25 @@ export function SummaryResultsTable() {
     let shouldCount = !!(nlogpMin || nlogpMax || bpMin || bpMax);
 
     // otherwise, determine the metadata key we should use to retrieve aggregate counts
-    let countKey = selectedChromosome
-        ? `count_${key}_${selectedChromosome}`
-        : `count_${key}`;
-
-    let table = Array.isArray(selectedTable)
-      ? selectedTable.find(e => e.includes(`_${gender}`))
-      : selectedTable
+    // let countKey = selectedChromosome
+    //     ? `count_${key}_${selectedChromosome}`
+    //     : `count_${key}`;
 
     dispatch(
       fetchSummaryTable(key, {
-          database: selectedPhenotype.value + '.db',
           offset: limit * (page - 1),
-          table: table,
-          chr: selectedChromosome,
-          count: shouldCount,
-          key: shouldCount ? null : countKey,
+          table: selectedPhenotype.value + '_variant',
+          gender: selectedManhattanPlotType == 'stacked' ? gender : selectedManhattanPlotType,
+          chromosome: selectedChromosome,
+          // count: shouldCount,
+          // key: shouldCount ? null : countKey,
           limit,
           orderBy,
           order,
-          nlogpMin,
-          nlogpMax,
-          bpMin,
-          bpMax
+          p_value_nlog_min: nlogpMin,
+          p_value_nlog_max: nlogpMax,
+          position_min: bpMin,
+          position_max: bpMax
       })
     );
   };
@@ -123,27 +119,18 @@ export function SummaryResultsTable() {
     if (!summarySnpTables.snp) return;
     dispatch(updateSummarySnp('visible', true));
 
-    const storeKeys = {
+    const genders = {
       all: ['all'],
       stacked: ['female', 'male'],
       female: ['female'],
       male: ['male']
     }[selectedManhattanPlotType];
 
-    const tables = {
-      all: ['variant_all'],
-      stacked: ['variant_female', 'variant_male'],
-      female: ['variant_female'],
-      male: ['variant_male']
-    }[selectedManhattanPlotType];
-
-    console.log('handling', storeKeys, tables);
-
-    storeKeys.forEach((storeKey, tableIndex) => {
-      dispatch(fetchSummarySnpTable(storeKey, {
-        database: selectedPhenotype.value + '.db',
-        table: tables[tableIndex],
-        snp: summarySnpTables.snp
+    genders.forEach(gender => {
+      dispatch(fetchSummarySnpTable(gender, {
+        table: selectedPhenotype.value + '_variant',
+        snp: summarySnpTables.snp,
+        gender: gender,
       }))
     })
   };
@@ -157,7 +144,7 @@ export function SummaryResultsTable() {
 
   const getVariantTableProps = (key) => ({
     remote: true,
-    keyField: 'variant_id',
+    keyField: 'id',
     loading: summaryTables.loading,
     data: summaryTables[key].results,
     columns: columns,
@@ -167,7 +154,7 @@ export function SummaryResultsTable() {
     pagination: paginationFactory({
       page: summaryTables[key].page,
       sizePerPage: summaryTables[key].pageSize,
-      totalSize: summaryTables[key].resultsCount,
+      totalSize: summaryTables[key].resultsCount || 10000,
       showTotal: summaryTables[key].results.length > 0,
       sizePerPageList: [10, 25, 50, 100],
       paginationTotalRenderer: paginationText,

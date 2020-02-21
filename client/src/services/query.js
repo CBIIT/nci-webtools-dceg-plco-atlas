@@ -9,6 +9,8 @@ function asQueryString(obj) {
   const query = [];
   for (let key in obj) {
     let value = obj[key];
+    if (Array.isArray(value))
+      value = value.join(',');
     if (![undefined, null, false].includes(value))
       query.push([key, value].map(encodeURIComponent).join('='));
   }

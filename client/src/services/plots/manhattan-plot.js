@@ -378,7 +378,7 @@ export class ManhattanPlot {
   }
 
   drawGenes(genes) {
-    let { config, geneCanvas, geneCtx, geneOverlayCanvas,         geneOverlayCtx } = this;
+    let { config, geneCanvas, geneCtx, geneOverlayCanvas, geneOverlayCtx } = this;
     let { margins, xAxis } = config;
     removeEventListeners(this.geneCanvas);
 
@@ -422,8 +422,8 @@ export class ManhattanPlot {
       let name = getName(gene);
       let padding = 5; // horiz. padding between name and gene
 
-      let geneStart = xAxis.scale(gene.tx_start);
-      let geneEnd = xAxis.scale(gene.tx_end);
+      let geneStart = xAxis.scale(gene.transcription_start);
+      let geneEnd = xAxis.scale(gene.transcription_end);
 
       let labelWidth = measureWidth(geneCtx, name);
       let geneWidth = Math.abs(geneEnd - geneStart);
@@ -557,11 +557,11 @@ export class ManhattanPlot {
         let gene = genePositions[geneIndex];
         let geneLabel = genePositions[geneIndex];
 
-        let start = Math.floor(xAxis.scale(gene.tx_start));
-        let end = Math.ceil(xAxis.scale(gene.tx_end));
+        let start = Math.floor(xAxis.scale(gene.transcription_start));
+        let end = Math.ceil(xAxis.scale(gene.transcription_end));
 
-        // let start = Math.max(xAxis.scale(gene.tx_start), xOffset);
-        // let end = Math.min(xAxis.scale(gene.tx_end), genePlotWidth - margins.right);
+        // let start = Math.max(xAxis.scale(gene.transcription_start), xOffset);
+        // let end = Math.min(xAxis.scale(gene.transcription_end), genePlotWidth - margins.right);
 
         geneCtx.save();
         geneCtx.translate(geneLabel.pxCenter, labelHeight);
