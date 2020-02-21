@@ -40,6 +40,7 @@ export function PhenotypesForm({
           onChange={val => onChange((val && val.length) ? val[0] : null)}
           singleSelect
           ref={treeRef}
+          submitted={submitted}
         />
       </div>
 

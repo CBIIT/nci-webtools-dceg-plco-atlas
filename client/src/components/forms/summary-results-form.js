@@ -36,6 +36,7 @@ export function SummaryResultsForm({
           onChange={val => _setPhenotype((val && val.length) ? val[0] : null)}
           singleSelect
           ref={treeRef}
+          submitted={submitted}
         />
       </div>
 
@@ -46,7 +47,8 @@ export function SummaryResultsForm({
           className="form-control"
           value={_gender}
           onChange={e => _setGender(e.target.value)}
-          aria-label="Select the type of data you wish to plot">
+          aria-label="Select the type of data you wish to plot"
+          disabled={submitted}>
           <option value="all">All</option>
           <option value="stacked">Female/Male (Stacked)</option>
           <option value="female">Female</option>
