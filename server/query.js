@@ -177,8 +177,8 @@ async function getVariants(connection, params) {
 
     // adds limit and offset, if provided
     params.limit = params.limit ? Math.min(params.limit, 1e5) : 1e5; // set hard limit to prevent overflow
-    if (params.limit) sql += ' LIMIT :limit ';
-    if (params.offset) sql += ' OFFSET :offset ';
+    params.offset = +params.offset || 0;
+    if (params.limit) sql += ' LIMIT :offset, :limit ';
 
     logger.debug(`SQL: ${sql}`);
     console.log(`SQL: ${sql}`);
