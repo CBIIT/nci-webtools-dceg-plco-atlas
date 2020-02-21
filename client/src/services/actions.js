@@ -153,13 +153,6 @@ export function initialize() {
   }
 }
 
-export function fetchRanges() {
-  return async function(dispatch) {
-    const ranges = await query('ranges');
-    dispatch(updateSummaryResults({ ranges }));
-  };
-}
-
 export function fetchSummaryTable(tableKey, params) {
   return async function(dispatch) {
     dispatch(setSummaryTableLoading(true));
@@ -171,15 +164,16 @@ export function fetchSummaryTable(tableKey, params) {
     let results = response.data;
 
     // fetch results count (use key if supplied as parameter)
-    let resultsCount = response.count || + await query('metadata', {
-      database: params.database,
-      key: params.key
-    });
+    let resultsCount = 1e6;
+    // let resultsCount = response.count || + await query('metadata', {
+    //   database: params.database,
+    //   key: params.key
+    // });
 
     dispatch(
       updateSummaryTable(tableKey, {
         results: results,
-        resultsCount: resultsCount,
+        resultsCount: response.count || response.data.length,
         page: 1 + Math.floor(params.offset / params.limit),
         pageSize: params.limit
       })
@@ -218,16 +212,16 @@ export function drawManhattanPlot(plotType, params) {
   console.log('drawing plot', plotType, params);
   return async function(dispatch) {
     dispatch(updateSummaryResults({ loadingManhattanPlot: true }));
-    if (params.table.length === 2) {
+    if (params.gender.length === 2) {
       // if 2 tables are provided, this is a mirrored plot
       const manhattanPlotData = await rawQuery(plotType, {
         ...params,
-        table: params.table[0]
+        gender: params.gender[0]
       });
 
       const manhattanPlotMirroredData = await rawQuery(plotType, {
         ...params,
-        table: params.table[1]
+        gender: params.gender[1]
       });
 
       dispatch(
@@ -250,10 +244,10 @@ export function drawManhattanPlot(plotType, params) {
   };
 }
 
-export function drawQQPlot(phenotype, variantTable) {
+export function drawQQPlot(phenotype, gender) {
   return async function(dispatch) {
     console.log('drawQQPlot', phenotype);
-    console.log('variantTable', variantTable);
+    console.log('gender', gender);
 
     const setQQPlotLoading = loadingQQPlot => {
       dispatch(updateSummaryResults({ loadingQQPlot }));
@@ -274,13 +268,13 @@ export function drawQQPlot(phenotype, variantTable) {
 
     const table = phenotype.value + '_variant';
 
-    const gender = variantTable.length === 1 ? 
-      {
-        variant_all: 'all',
-        variant_female: 'female',
-        variant_male: 'male'
-      }[variantTable[0]] : 
-      'stacked';
+    // const gender = variantTable.length === 1 ?
+    //   {
+    //     variant_all: 'all',
+    //     variant_female: 'female',
+    //     variant_male: 'male'
+    //   }[variantTable[0]] :
+    //   'stacked';
 
     // const metadata = await query('metadata', {
     //   // database: phenotype + '.db'
@@ -488,11 +482,11 @@ export function drawQQPlot(phenotype, variantTable) {
       };
       setQQPlotLayout(qqplotLayout);
       setQQPlotData([
-        qqplotTopData, 
-        qqplotSubsetData, 
+        qqplotTopData,
+        qqplotSubsetData,
         qqplotLineData
       ]);
-    } 
+    }
     else {
       // const metadata_count_female = parseInt(metadata[countKey(table)[0]]);
       // const metadata_count_male = parseInt(metadata[countKey(table)[1]]);
@@ -788,7 +782,7 @@ export function drawHeatmap(phenotypes) {
     const filterCorrelationData = (phenotype1, phenotype2, correlationData) => {
       // console.log("filterCorrelationData", phenotype1, phenotype2);
       return correlationData.filter((data) => {
-        return (data.phenotype_a === phenotype1.id && data.phenotype_b === phenotype2.id) || 
+        return (data.phenotype_a === phenotype1.id && data.phenotype_b === phenotype2.id) ||
           (data.phenotype_a === phenotype2.id && data.phenotype_b === phenotype1.id);
       });
     };
