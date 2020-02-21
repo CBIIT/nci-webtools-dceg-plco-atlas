@@ -941,10 +941,6 @@ export function lookupVariants(phenotypes, variant, gender) {
       })
     );
 
-    console.log("phenotypes", phenotypes);
-    console.log("variant", variant);
-    console.log("gender", gender);
-
     const genderSanitized = {
       all: 'all',
       combined: 'all',
@@ -963,16 +959,24 @@ export function lookupVariants(phenotypes, variant, gender) {
       chr = coord[0];
       bp = coord[1];
     }
+
+    const tables = phenotypes.map(phenotype => phenotype.value + '_variant').join(',');
+    var allData = await query('variants', {
+      table: tables,
+      gender: genderSanitized,
+      snp: chr && bp ? null : variant,
+      chromosome: chr ? chr : null,
+      position: bp ? bp : null,
+      show_table_name: true
+    });
+
+    console.log("allData", allData);
+
     for (let i = 0; i < phenotypes.length; i++) {
       const table = phenotypes[i].value + '_variant';
-      var { data } = await query('variants', {
-        table,
-        gender: genderSanitized,
-        snp: chr && bp ? null : variant,
-        chromosome: chr ? chr : null,
-        position: bp ? bp : null
-      });
-      console.log("data", data);
+      var data = allData && allData.data ? allData.data.filter((item) => {
+        return item.table_name === table
+      }) : [];
       if (!data || data.length === 0) {
         tableListNull.push({
           phenotype: phenotypes[i].title
