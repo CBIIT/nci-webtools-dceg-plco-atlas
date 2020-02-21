@@ -395,7 +395,7 @@ export const TreeSelect = forwardRef(({
                   style={{
                     verticalAlign: 'middle',
                     alignSelf: 'center',
-                    cursor: singleSelect ? 'not-allowed' : 'pointer'
+                    cursor: submitted || singleSelect ? 'not-allowed' : 'pointer'
                   }}
                   className={'parent-checkbox-' + item.value}
                   name={'parent-checkbox-' + item.value}
@@ -420,7 +420,7 @@ export const TreeSelect = forwardRef(({
                   className="ml-1"
                   style={{
                     all: 'unset',
-                    cursor: 'pointer',
+                    cursor: submitted ? 'not-allowed' : 'pointer',
                     // cursor: singleSelect ? 'not-allowed' : 'pointer',
                     textOverflow: 'ellipsis',
                     whiteSpace: 'nowrap',
@@ -462,7 +462,7 @@ export const TreeSelect = forwardRef(({
             />
             <input
               title={singleSelect ? "Select phenotype" : "Select/deselect phenotype"}
-              style={{ cursor: 'pointer' }}
+              style={{ cursor: submitted ? 'not-allowed' : 'pointer' }}
               className={'ml-1 leaf-checkbox-' + item.value}
               name={'leaf-checkbox-' + item.value}
               type="checkbox"
@@ -490,7 +490,7 @@ export const TreeSelect = forwardRef(({
               className="ml-1"
               style={{
                 all: 'unset',
-                cursor: 'pointer',
+                cursor: submitted ? 'not-allowed' : 'pointer',
                 textOverflow: 'ellipsis',
                 whiteSpace: 'nowrap',
                 overflow: 'hidden',
