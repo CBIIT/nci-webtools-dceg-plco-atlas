@@ -11,7 +11,7 @@ export function PhenotypeCorrelationsForm({ onChange, onSubmit, onReset }) {
   const phenotypeCorrelations = useSelector(
     state => state.phenotypeCorrelations
   );
-  const { selectedPhenotypes, selectedGender } = phenotypeCorrelations;
+  const { selectedPhenotypes, selectedGender, submitted } = phenotypeCorrelations;
 
   const treeRef = useRef();
 
@@ -54,7 +54,13 @@ export function PhenotypeCorrelationsForm({ onChange, onSubmit, onReset }) {
       
       <div>
         <OverlayTrigger overlay={
-            <Tooltip id="tooltip-disabled" style={{display: (!selectedPhenotypes || selectedPhenotypes.length < 2) ? 'block' : 'none'}}>
+            <Tooltip 
+              id="tooltip-disabled" 
+              style={{
+                display: (!selectedPhenotypes || selectedPhenotypes.length < 2) ? 
+                  'block' : 
+                  'none'
+              }}>
               Please select two or more phenotypes.
             </Tooltip>
           }>
@@ -68,7 +74,7 @@ export function PhenotypeCorrelationsForm({ onChange, onSubmit, onReset }) {
                 e.preventDefault();
                 onSubmit(selectedPhenotypes);
               }}
-              disabled={(!selectedPhenotypes || selectedPhenotypes.length < 2)}
+              disabled={(!selectedPhenotypes || selectedPhenotypes.length < 2) || submitted}
               >
               Submit
             </Button>

@@ -8,7 +8,7 @@ export function VariantLookupForm({ onChange, onSubmit, onReset }) {
   const dispatch = useDispatch();
   const phenotypes = useSelector(state => state.phenotypes);
   const variantLookup = useSelector(state => state.variantLookup);
-  const { selectedPhenotypes, selectedVariant, selectedGender } = variantLookup;
+  const { selectedPhenotypes, selectedVariant, selectedGender, submitted } = variantLookup;
 
   const setSelectedPhenotypes = selectedPhenotypes => {
     dispatch(updateVariantLookup({ selectedPhenotypes }));
@@ -81,9 +81,8 @@ export function VariantLookupForm({ onChange, onSubmit, onReset }) {
         <OverlayTrigger overlay={
             <Tooltip id="tooltip-disabled" 
               style={{
-                display: 
-                  (!selectedPhenotypes || selectedPhenotypes.length < 1) ||
-                  (!selectedVariant || selectedVariant.length < 1) 
+                display: (!selectedPhenotypes || selectedPhenotypes.length < 1) ||
+                  (!selectedVariant || selectedVariant.length < 1)
                   ? 'block' 
                   : 'none'
                 }}>
@@ -126,7 +125,8 @@ export function VariantLookupForm({ onChange, onSubmit, onReset }) {
               }}
               disabled={
                 (!selectedPhenotypes || selectedPhenotypes.length < 1) ||
-                (!selectedVariant || selectedVariant.length < 1)
+                (!selectedVariant || selectedVariant.length < 1) ||
+                submitted
               }>
               Submit
             </Button>
