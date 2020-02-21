@@ -132,7 +132,7 @@ async function getSummary(connection, params) {
 
 
 async function getVariants(connection, params) {
-    let table = getValidTable(params.table);
+    let tables = params.table.split(',').map(getValidTable);
     let columnNames = getValidColumns('variant', params.columns).map(quote).join(',')
     // console.log("params.columns", params.columns);
     // let columnNames = params.columns.map(quote).join(',');
@@ -141,7 +141,7 @@ async function getVariants(connection, params) {
         : ``;
 
     // filter by id, chr, base position, and -log10(p), if provided
-    let sql = `
+    let sql = tables.map(table => `
         SELECT ${columnNames}
         FROM ${table} as v
         WHERE ${[
@@ -159,7 +159,7 @@ async function getVariants(connection, params) {
             coalesce(params.mod, `(id % :mod) = 0`),
             coalesce(params.show_qq_plot, `show_qq_plot = 1`)
         ].filter(Boolean).join(' AND ')}
-        ${groupby}`;
+        ${groupby}`).join(' UNION ');
 
     // create count sql based on original query
     let countSql = `SELECT COUNT(*) as count FROM (${sql}) as c`;
