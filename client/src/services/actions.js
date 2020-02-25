@@ -247,7 +247,7 @@ export function drawManhattanPlot(plotType, params) {
 export function drawQQPlot(phenotype, gender) {
   return async function(dispatch) {
     console.log('drawQQPlot', phenotype);
-    console.log('gender', gender);
+    console.log('gender', gender); // all, stacked, female, male
 
     const setQQPlotLoading = loadingQQPlot => {
       dispatch(updateSummaryResults({ loadingQQPlot }));
@@ -268,45 +268,16 @@ export function drawQQPlot(phenotype, gender) {
 
     const table = phenotype.value + '_variant';
 
-    // const gender = variantTable.length === 1 ?
-    //   {
-    //     variant_all: 'all',
-    //     variant_female: 'female',
-    //     variant_male: 'male'
-    //   }[variantTable[0]] :
-    //   'stacked';
-
-    // const metadata = await query('metadata', {
-    //   // database: phenotype + '.db'
-    //   // phenotype_id,
-    //   // gender,
-    //   // chromosome
-    // });
-
-    // const countKey = plotType =>
-    //   ({
-    //     variant_all: 'count_all',
-    //     stacked: ['count_female', 'count_male'],
-    //     variant_female: 'count_female',
-    //     variant_male: 'count_male'
-    //   }[plotType]);
-
-    // const lambdaGCKey = plotType =>
-    //   ({
-    //     variant_all: 'lambdagc_all',
-    //     stacked: ['lambdagc_female', 'lambdagc_male'],
-    //     variant_female: 'lambdagc_female',
-    //     variant_male: 'lambdagc_male'
-    //   }[plotType]);
-
     if (gender !== 'stacked') {
-      // const metadata_count = parseInt(metadata[countKey(table)]);
-      const metadata_count = 100;
+      const metadata = await query('metadata', {
+        phenotype_id: phenotype.id,
+        gender: gender,
+        chromosome: 'all'
+      });
+      console.log("metadata", metadata);
+      const metadata_count = metadata.count
       setSampleSize(metadata_count);
-      // const metadata_lambdaGC = metadata[lambdaGCKey(table)]
-      //   ? metadata[lambdaGCKey(table)]
-      //   : 'TBD';
-      const metadata_lambdaGC = 1.0;
+      const metadata_lambdaGC = metadata.lambda_gc;
 
       const topVariantData = await query('variants', {
         table,
@@ -317,8 +288,6 @@ export function drawQQPlot(phenotype, gender) {
         order: 'desc',
         raw: true
       });
-
-      console.log("topVariantData", topVariantData);
 
       let topObservedVariants = [];
       let topExpectedVariants = [];
@@ -332,14 +301,9 @@ export function drawQQPlot(phenotype, gender) {
           chr: row[0],
           bp: row[1],
           snp: row[2],
-          p: row[3]
+          p: row[3].toExponential(3)
         })
       );
-
-      console.log("topObservedVariants", topObservedVariants);
-      console.log('topObservedVariants.length', topObservedVariants.length);
-      console.log("topExpectedVariants", topExpectedVariants);
-      console.log('topExpectedVariants.length', topExpectedVariants.length);
 
       const subsetVariantData = await query('variants', {
         table,
@@ -352,8 +316,6 @@ export function drawQQPlot(phenotype, gender) {
         raw: true
       });
 
-      // console.log("subsetVariantData", subsetVariantData);
-
       let subsetObservedVariants = [];
       let subsetExpectedVariants = [];
       subsetVariantData.data.map(row => {
@@ -361,15 +323,10 @@ export function drawQQPlot(phenotype, gender) {
         subsetExpectedVariants.push(row[1]);//Math.log10(row[1]) * -1.0);
       });
 
-      // console.log('subsetObservedVariants', subsetObservedVariants);
-      // console.log('subsetObservedVariants.length', subsetObservedVariants.length);
-      // console.log('subsetExpectedVariants', subsetExpectedVariants);
-      // console.log('subsetExpectedVariants.length', subsetExpectedVariants.length);
-
       const markerColor = {
         all: '#F2990D',
-        male: '#f41c52',
-        female: '#006bb8'
+        female: '#f41c52',
+        male: '#006bb8'
       }[gender];
 
       let qqplotTopData = {
@@ -404,8 +361,8 @@ export function drawQQPlot(phenotype, gender) {
       };
 
       let qqplotLineData = {
-        x: [0.0, qqplotTopData.x[0]],
-        y: [0.0, qqplotTopData.x[0]],
+        x: [0.0, qqplotTopData.x[qqplotTopData.x.length - 1]],
+        y: [0.0, qqplotTopData.x[qqplotTopData.x.length - 1]],
         hoverinfo: 'none',
         mode: 'lines',
         type: 'scattergl',
@@ -488,20 +445,22 @@ export function drawQQPlot(phenotype, gender) {
       ]);
     }
     else {
-      // const metadata_count_female = parseInt(metadata[countKey(table)[0]]);
-      // const metadata_count_male = parseInt(metadata[countKey(table)[1]]);
-      const metadata_count_female = 100;
-      const metadata_count_male = 100;
+      const metadata_female = await query('metadata', {
+        phenotype_id: phenotype.id,
+        gender: 'female',
+        chromosome: 'all'
+      });
+      const metadata_male = await query('metadata', {
+        phenotype_id: phenotype.id,
+        gender: 'male',
+        chromosome: 'all'
+      });
+      const metadata_count_female = metadata_female.count;
+      const metadata_count_male = metadata_male.count;
       // set sampleSize to whichever gender has more variants
       setSampleSize(Math.max(metadata_count_female, metadata_count_male));
-      // const metadata_lambdaGC_female = metadata[lambdaGCKey(table)[0]]
-      //   ? metadata[lambdaGCKey(table)[0]]
-      //   : 'TBD';
-      // const metadata_lambdaGC_male = metadata[lambdaGCKey(table)[1]]
-      //   ? metadata[lambdaGCKey(table)[1]]
-      //   : 'TBD';
-      const metadata_lambdaGC_female = 1.0;
-      const metadata_lambdaGC_male = 1.0;
+      const metadata_lambdaGC_female = metadata_female.lambda_gc;
+      const metadata_lambdaGC_male = metadata_male.lambda_gc;
 
       const topVariantDataFemale = await query('variants', {
         table,
@@ -524,7 +483,7 @@ export function drawQQPlot(phenotype, gender) {
           chr: row[0],
           bp: row[1],
           snp: row[2],
-          p: row[3]
+          p: row[3].toExponential(3)
         })
       );
       console.log(
@@ -574,7 +533,7 @@ export function drawQQPlot(phenotype, gender) {
           chr: row[0],
           bp: row[1],
           snp: row[2],
-          p: row[3]
+          p: row[3].toExponential(3)
         })
       );
       console.log(
@@ -641,8 +600,8 @@ export function drawQQPlot(phenotype, gender) {
       };
 
       let qqplotLineDataFemale = {
-        x: [0.0, qqplotTopDataFemale.x[0]],
-        y: [0.0, qqplotTopDataFemale.x[0]],
+        x: [0.0, qqplotTopDataFemale.x[qqplotTopDataFemale.x.length - 1]],
+        y: [0.0, qqplotTopDataFemale.x[qqplotTopDataFemale.x.length - 1]],
         hoverinfo: 'none',
         mode: 'lines',
         type: 'scattergl',
@@ -689,8 +648,8 @@ export function drawQQPlot(phenotype, gender) {
       };
 
       let qqplotLineDataMale = {
-        x: [0.0, qqplotTopDataMale.x[0]],
-        y: [0.0, qqplotTopDataMale.x[0]],
+        x: [0.0, qqplotTopDataMale.x[qqplotTopDataMale.x.length - 1]],
+        y: [0.0, qqplotTopDataMale.x[qqplotTopDataMale.x.length - 1]],
         hoverinfo: 'none',
         mode: 'lines',
         type: 'scattergl',

@@ -85,7 +85,7 @@ export function VariantLookup() {
       text: 'Reference Allele'
     },
     {
-      dataField: 'allele_effect',
+      dataField: 'allele_alternate',
       text: 'Alternate Allele'
     },
     {
