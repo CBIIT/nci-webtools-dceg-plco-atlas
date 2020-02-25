@@ -332,7 +332,7 @@ export function drawQQPlot(phenotype, gender) {
           chr: row[0],
           bp: row[1],
           snp: row[2],
-          p: row[3]
+          p: row[3].toExponential(3)
         })
       );
 
@@ -524,7 +524,7 @@ export function drawQQPlot(phenotype, gender) {
           chr: row[0],
           bp: row[1],
           snp: row[2],
-          p: row[3]
+          p: row[3].toExponential(3)
         })
       );
       console.log(
@@ -574,7 +574,7 @@ export function drawQQPlot(phenotype, gender) {
           chr: row[0],
           bp: row[1],
           snp: row[2],
-          p: row[3]
+          p: row[3].toExponential(3)
         })
       );
       console.log(
