@@ -147,7 +147,6 @@ export function QQPlot({ onVariantLookup }) {
     const ev = e.event;
     // console.log("EVENT", ev);
     const points = e.points;
-    console.log("POINTS hoverinfo", points[0]["data"]["hoverinfo"])
     if (e && ev && points && points[0]) {
       hideTooltip();
       const tooltip = createTooltip();

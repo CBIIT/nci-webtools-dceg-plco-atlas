@@ -56,7 +56,7 @@ function getValidColumns(tableName, columns) {
         columns = (columns || '').split(',').filter(e => e.length);
 
     let validColumns = {
-        variant: ['id', 'gender', 'chromosome', 'position', 'snp', 'allele_reference', 'allele_effect', 'p_value', 'p_value_nlog', 'p_value_nlog_expected', 'odds_ratio', 'show_qq_plot'],
+        variant: ['id', 'gender', 'chromosome', 'position', 'snp', 'allele_reference', 'allele_alternate', 'p_value', 'p_value_nlog', 'p_value_nlog_expected', 'odds_ratio', 'show_qq_plot'],
         aggregate: ['id', 'gender', 'position_abs', 'p_value_nlog'],
         phenotype: ['id', 'parent_id', 'name', 'display_name', 'description', 'color', 'type'],
     }[tableName];
@@ -231,13 +231,17 @@ async function exportVariants(filepath, params) {
  */
 async function getMetadata(connection, {phenotype_id, gender, chromosome}) {
     let [results] = await connection.query(
-        `SELECT gender, lambda_gc
-            FROM variant_metadata
-        WHERE
-            phenotype_id = :phenotype_id AND
-            gender = :gender AND
-            chromosome = :chromosome
-        LIMIT 1`,
+        `
+            SELECT 
+                *
+            FROM 
+                phenotype_metadata
+            WHERE
+                phenotype_id = :phenotype_id AND
+                gender = :gender AND
+                chromosome = :chromosome
+            LIMIT 1
+        `,
         {phenotype_id, gender, chromosome}
     );
     return results[0];
