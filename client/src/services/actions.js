@@ -311,7 +311,7 @@ export function drawQQPlot(phenotype, gender) {
       const topVariantData = await query('variants', {
         table,
         gender,
-        columns: ['chromosome', 'position', 'snp', 'p_value', 'p_value_nlog', 'p_value_expected'],
+        columns: ['chromosome', 'position', 'snp', 'p_value', 'p_value_nlog', 'p_value_nlog_expected'],
         p_value_nlog_min: 3.0,
         orderBy: 'p_value_nlog',
         order: 'desc',
@@ -324,7 +324,7 @@ export function drawQQPlot(phenotype, gender) {
       let topExpectedVariants = [];
       topVariantData.data.map(row => {
         topObservedVariants.push(row[4]);
-        topExpectedVariants.push(Math.log10(row[5]) * -1.0);
+        topExpectedVariants.push(row[5]);// Math.log10(row[5]) * -1.0);
       });
       const topObservedVariantsText = [];
       topVariantData.data.map(row =>
@@ -344,7 +344,7 @@ export function drawQQPlot(phenotype, gender) {
       const subsetVariantData = await query('variants', {
         table,
         gender,
-        columns: ['p_value_nlog', 'p_value_expected'],
+        columns: ['p_value_nlog', 'p_value_nlog_expected'],
         p_value_nlog_max: 3.0,
         orderBy: 'p_value_nlog',
         order: 'desc',
@@ -358,7 +358,7 @@ export function drawQQPlot(phenotype, gender) {
       let subsetExpectedVariants = [];
       subsetVariantData.data.map(row => {
         subsetObservedVariants.push(row[0]);
-        subsetExpectedVariants.push(Math.log10(row[1]) * -1.0);
+        subsetExpectedVariants.push(row[1]);//Math.log10(row[1]) * -1.0);
       });
 
       // console.log('subsetObservedVariants', subsetObservedVariants);
@@ -506,7 +506,7 @@ export function drawQQPlot(phenotype, gender) {
       const topVariantDataFemale = await query('variants', {
         table,
         gender: 'female',
-        columns: ['chromosome', 'position', 'snp', 'p_value', 'p_value_nlog', 'p_value_expected'],
+        columns: ['chromosome', 'position', 'snp', 'p_value', 'p_value_nlog', 'p_value_nlog_expected'],
         p_value_nlog_min: 3.0,
         orderBy: 'p_value_nlog',
         order: 'desc',
@@ -516,7 +516,7 @@ export function drawQQPlot(phenotype, gender) {
       let topExpectedVariantsFemale = [];
       topVariantDataFemale.data.map(row => {
         topObservedVariantsFemale.push(row[4]);
-        topExpectedVariantsFemale.push(Math.log10(row[5]) * -1.0);
+        topExpectedVariantsFemale.push(row[5]);//Math.log10(row[5]) * -1.0);
       });
       const topObservedVariantsTextFemale = [];
       topVariantDataFemale.data.map(row =>
@@ -535,7 +535,7 @@ export function drawQQPlot(phenotype, gender) {
       const subsetVariantDataFemale = await query('variants', {
         table,
         gender: 'female',
-        columns: ['p_value_nlog', 'p_value_expected'],
+        columns: ['p_value_nlog', 'p_value_nlog_expected'],
         p_value_nlog_max: 3.0,
         orderBy: 'p_value_nlog',
         order: 'desc',
@@ -556,7 +556,7 @@ export function drawQQPlot(phenotype, gender) {
       const topVariantDataMale = await query('variants', {
         table,
         gender: 'male',
-        columns: ['chromosome', 'position', 'snp', 'p_value', 'p_value_nlog', 'p_value_expected'],
+        columns: ['chromosome', 'position', 'snp', 'p_value', 'p_value_nlog', 'p_value_nlog_expected'],
         p_value_nlog_min: 3.0,
         orderBy: 'p_value_nlog',
         order: 'desc',
@@ -566,7 +566,7 @@ export function drawQQPlot(phenotype, gender) {
       let topExpectedVariantsMale = [];
       topVariantDataMale.data.map(row => {
         topObservedVariantsMale.push(row[4]);
-        topExpectedVariantsMale.push(Math.log10(row[5]) * -1.0);
+        topExpectedVariantsMale.push(row[5]);//Math.log10(row[5]) * -1.0);
       });
       const topObservedVariantsTextMale = [];
       topVariantDataMale.data.map(row =>
@@ -585,7 +585,7 @@ export function drawQQPlot(phenotype, gender) {
       const subsetVariantDataMale = await query('variants', {
         table,
         gender: 'male',
-        columns: ['p_value_nlog', 'p_value_expected'],
+        columns: ['p_value_nlog', 'p_value_nlog_expected'],
         p_value_nlog_max: 3.0,
         orderBy: 'p_value_nlog',
         order: 'desc',
