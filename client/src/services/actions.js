@@ -318,8 +318,6 @@ export function drawQQPlot(phenotype, gender) {
         raw: true
       });
 
-      console.log("topVariantData", topVariantData);
-
       let topObservedVariants = [];
       let topExpectedVariants = [];
       topVariantData.data.map(row => {
@@ -336,11 +334,6 @@ export function drawQQPlot(phenotype, gender) {
         })
       );
 
-      console.log("topObservedVariants", topObservedVariants);
-      console.log('topObservedVariants.length', topObservedVariants.length);
-      console.log("topExpectedVariants", topExpectedVariants);
-      console.log('topExpectedVariants.length', topExpectedVariants.length);
-
       const subsetVariantData = await query('variants', {
         table,
         gender,
@@ -352,19 +345,12 @@ export function drawQQPlot(phenotype, gender) {
         raw: true
       });
 
-      // console.log("subsetVariantData", subsetVariantData);
-
       let subsetObservedVariants = [];
       let subsetExpectedVariants = [];
       subsetVariantData.data.map(row => {
         subsetObservedVariants.push(row[0]);
         subsetExpectedVariants.push(row[1]);//Math.log10(row[1]) * -1.0);
       });
-
-      // console.log('subsetObservedVariants', subsetObservedVariants);
-      // console.log('subsetObservedVariants.length', subsetObservedVariants.length);
-      // console.log('subsetExpectedVariants', subsetExpectedVariants);
-      // console.log('subsetExpectedVariants.length', subsetExpectedVariants.length);
 
       const markerColor = {
         all: '#F2990D',
@@ -404,8 +390,8 @@ export function drawQQPlot(phenotype, gender) {
       };
 
       let qqplotLineData = {
-        x: [0.0, qqplotTopData.x[0]],
-        y: [0.0, qqplotTopData.x[0]],
+        x: [0.0, qqplotTopData.x[qqplotTopData.x.length - 1]],
+        y: [0.0, qqplotTopData.x[qqplotTopData.x.length - 1]],
         hoverinfo: 'none',
         mode: 'lines',
         type: 'scattergl',
@@ -641,8 +627,8 @@ export function drawQQPlot(phenotype, gender) {
       };
 
       let qqplotLineDataFemale = {
-        x: [0.0, qqplotTopDataFemale.x[0]],
-        y: [0.0, qqplotTopDataFemale.x[0]],
+        x: [0.0, qqplotTopDataFemale.x[qqplotTopDataFemale.x.length - 1]],
+        y: [0.0, qqplotTopDataFemale.x[qqplotTopDataFemale.x.length - 1]],
         hoverinfo: 'none',
         mode: 'lines',
         type: 'scattergl',
@@ -689,8 +675,8 @@ export function drawQQPlot(phenotype, gender) {
       };
 
       let qqplotLineDataMale = {
-        x: [0.0, qqplotTopDataMale.x[0]],
-        y: [0.0, qqplotTopDataMale.x[0]],
+        x: [0.0, qqplotTopDataMale.x[qqplotTopDataMale.x.length - 1]],
+        y: [0.0, qqplotTopDataMale.x[qqplotTopDataMale.x.length - 1]],
         hoverinfo: 'none',
         mode: 'lines',
         type: 'scattergl',
