@@ -56,7 +56,7 @@ function getValidColumns(tableName, columns) {
         columns = (columns || '').split(',').filter(e => e.length);
 
     let validColumns = {
-        variant: ['id', 'gender', 'chromosome', 'position', 'snp', 'allele_reference', 'allele_effect', 'p_value', 'p_value_nlog', 'odds_ratio', 'show_qq_plot', 'p_value_expected'],
+        variant: ['id', 'gender', 'chromosome', 'position', 'snp', 'allele_reference', 'allele_effect', 'p_value', 'p_value_nlog', 'p_value_nlog_expected', 'odds_ratio', 'show_qq_plot'],
         aggregate: ['id', 'gender', 'position_abs', 'p_value_nlog'],
         phenotype: ['id', 'parent_id', 'name', 'display_name', 'description', 'color', 'type'],
     }[tableName];
@@ -157,7 +157,7 @@ async function getVariants(connection, params) {
 
     // filter by id, chr, base position, and -log10(p), if provided
     let sql = tables.map(table => `
-        SELECT ${columnNames} ${[coalesce(params.show_table_name, `, '${table}' as table_name`)]} 
+        SELECT ${columnNames} ${[coalesce(params.show_table_name, `, '${table}' as table_name`)]}
         FROM ${table} as v
         WHERE ${[
             coalesce(params.id, `id = :id`),
