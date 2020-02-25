@@ -368,8 +368,8 @@ export function drawQQPlot(phenotype, gender) {
 
       const markerColor = {
         all: '#F2990D',
-        male: '#f41c52',
-        female: '#006bb8'
+        female: '#f41c52',
+        male: '#006bb8'
       }[gender];
 
       let qqplotTopData = {
