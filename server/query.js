@@ -330,6 +330,17 @@ async function getRanges(connection) {
     return ranges;
 }
 
+async function getCounts(connection, params) {
+    let table = getValidTable(params.table);
+    let [countRows] = await connection.execute(`
+        SELECT COUNT(*) as count
+        FROM ${table}
+        WHERE gender = :gender
+        ${params.chromosome ? 'AND chromosome = :chromosome' : ''}
+    `, params);
+    return {count: countRows[0].count};
+}
+
 
 /**
  * Retrieves a specific configuration key
@@ -352,6 +363,7 @@ module.exports = {
     getPhenotypes,
     getRanges,
     getGenes,
+    getCounts,
     getConfig
 };
 

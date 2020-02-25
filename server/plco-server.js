@@ -14,6 +14,7 @@ const {
   getCorrelations,
   getPhenotypes,
   getRanges,
+  getCounts,
   getConfig
 } = require("./query");
 
@@ -102,6 +103,11 @@ app.get("/correlations", async ({ query }, res) => {
 // retrieves chromosome ranges
 app.get("/ranges", async ({ query }, res) => {
   return getRanges(connection);
+});
+
+// retrieves variant counts
+app.get("/counts", async ({ query }, res) => {
+  return getCounts(connection, query);
 });
 
 // retrieves configuration
