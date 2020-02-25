@@ -231,13 +231,17 @@ async function exportVariants(filepath, params) {
  */
 async function getMetadata(connection, {phenotype_id, gender, chromosome}) {
     let [results] = await connection.query(
-        `SELECT gender, lambda_gc
-            FROM variant_metadata
-        WHERE
-            phenotype_id = :phenotype_id AND
-            gender = :gender AND
-            chromosome = :chromosome
-        LIMIT 1`,
+        `
+            SELECT 
+                *
+            FROM 
+                phenotype_metadata
+            WHERE
+                phenotype_id = :phenotype_id AND
+                gender = :gender AND
+                chromosome = :chromosome
+            LIMIT 1
+        `,
         {phenotype_id, gender, chromosome}
     );
     return results[0];

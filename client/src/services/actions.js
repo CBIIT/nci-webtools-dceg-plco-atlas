@@ -247,7 +247,7 @@ export function drawManhattanPlot(plotType, params) {
 export function drawQQPlot(phenotype, gender) {
   return async function(dispatch) {
     console.log('drawQQPlot', phenotype);
-    console.log('gender', gender);
+    console.log('gender', gender); // all, stacked, female, male
 
     const setQQPlotLoading = loadingQQPlot => {
       dispatch(updateSummaryResults({ loadingQQPlot }));
@@ -268,45 +268,16 @@ export function drawQQPlot(phenotype, gender) {
 
     const table = phenotype.value + '_variant';
 
-    // const gender = variantTable.length === 1 ?
-    //   {
-    //     variant_all: 'all',
-    //     variant_female: 'female',
-    //     variant_male: 'male'
-    //   }[variantTable[0]] :
-    //   'stacked';
-
-    // const metadata = await query('metadata', {
-    //   // database: phenotype + '.db'
-    //   // phenotype_id,
-    //   // gender,
-    //   // chromosome
-    // });
-
-    // const countKey = plotType =>
-    //   ({
-    //     variant_all: 'count_all',
-    //     stacked: ['count_female', 'count_male'],
-    //     variant_female: 'count_female',
-    //     variant_male: 'count_male'
-    //   }[plotType]);
-
-    // const lambdaGCKey = plotType =>
-    //   ({
-    //     variant_all: 'lambdagc_all',
-    //     stacked: ['lambdagc_female', 'lambdagc_male'],
-    //     variant_female: 'lambdagc_female',
-    //     variant_male: 'lambdagc_male'
-    //   }[plotType]);
-
     if (gender !== 'stacked') {
-      // const metadata_count = parseInt(metadata[countKey(table)]);
-      const metadata_count = 100;
+      const metadata = await query('metadata', {
+        phenotype_id: phenotype.id,
+        gender: gender,
+        chromosome: 'all'
+      });
+      console.log("metadata", metadata);
+      const metadata_count = metadata.count
       setSampleSize(metadata_count);
-      // const metadata_lambdaGC = metadata[lambdaGCKey(table)]
-      //   ? metadata[lambdaGCKey(table)]
-      //   : 'TBD';
-      const metadata_lambdaGC = 1.0;
+      const metadata_lambdaGC = metadata.lambda_gc;
 
       const topVariantData = await query('variants', {
         table,
@@ -474,20 +445,22 @@ export function drawQQPlot(phenotype, gender) {
       ]);
     }
     else {
-      // const metadata_count_female = parseInt(metadata[countKey(table)[0]]);
-      // const metadata_count_male = parseInt(metadata[countKey(table)[1]]);
-      const metadata_count_female = 100;
-      const metadata_count_male = 100;
+      const metadata_female = await query('metadata', {
+        phenotype_id: phenotype.id,
+        gender: 'female',
+        chromosome: 'all'
+      });
+      const metadata_male = await query('metadata', {
+        phenotype_id: phenotype.id,
+        gender: 'male',
+        chromosome: 'all'
+      });
+      const metadata_count_female = metadata_female.count;
+      const metadata_count_male = metadata_male.count;
       // set sampleSize to whichever gender has more variants
       setSampleSize(Math.max(metadata_count_female, metadata_count_male));
-      // const metadata_lambdaGC_female = metadata[lambdaGCKey(table)[0]]
-      //   ? metadata[lambdaGCKey(table)[0]]
-      //   : 'TBD';
-      // const metadata_lambdaGC_male = metadata[lambdaGCKey(table)[1]]
-      //   ? metadata[lambdaGCKey(table)[1]]
-      //   : 'TBD';
-      const metadata_lambdaGC_female = 1.0;
-      const metadata_lambdaGC_male = 1.0;
+      const metadata_lambdaGC_female = metadata_female.lambda_gc;
+      const metadata_lambdaGC_male = metadata_male.lambda_gc;
 
       const topVariantDataFemale = await query('variants', {
         table,
