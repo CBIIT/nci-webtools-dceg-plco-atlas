@@ -11,13 +11,20 @@ SET group_concat_max_len = 4294967295;
 
 SET autocommit = 0;
 
--- clear gene table and drop indexes (faster insertion)
-TRUNCATE gene;
-call drop_index_if_exists('gene', 'idx_gene__chromosome');
-call drop_index_if_exists('gene', 'idx_gene__transcription_start');
-call drop_index_if_exists('gene', 'idx_gene__transcription_end');
+-- recreate gene table
+DROP TABLE IF EXISTS gene;
+CREATE TABLE gene (
+    `id`                    INTEGER PRIMARY KEY NOT NULL AUTO_INCREMENT,
+    `name`                  VARCHAR(200) NOT NULL,
+    `chromosome`            VARCHAR(2) NOT NULL,
+    `strand`                CHAR NOT NULL,
+    `transcription_start`   INTEGER NOT NULL,
+    `transcription_end`     INTEGER NOT NULL,
+    `exon_starts`           MEDIUMTEXT,
+    `exon_ends`             MEDIUMTEXT
+);
 
--- recreate staging table
+-- create staging table
 DROP TEMPORARY TABLE IF EXISTS gene_stage;
 CREATE TEMPORARY TABLE gene_stage (
     `bin`           TEXT,
@@ -77,10 +84,10 @@ ORDER BY chromosome, transcription_start, transcription_end;
 
 DROP TEMPORARY TABLE gene_stage;
 
--- re-add indexes
+-- add indexes
 ALTER TABLE gene
-    ADD INDEX idx_gene__chromosome (chromosome),
-    ADD INDEX idx_gene__transcription_start (transcription_start),
-    ADD INDEX idx_gene__transcription_end (transcription_end);
+    ADD INDEX (chromosome),
+    ADD INDEX (transcription_start),
+    ADD INDEX (transcription_end);
 
 COMMIT;
