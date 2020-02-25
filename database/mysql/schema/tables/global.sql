@@ -40,9 +40,11 @@ CREATE TABLE `phenotype_metadata` (
     `id`            INTEGER PRIMARY KEY NOT NULL AUTO_INCREMENT,
     `phenotype_id`  INTEGER,
     `gender`        ENUM('all', 'female', 'male'),
+    `chromosome`    VARCHAR(3),
     `lambda_gc`     DOUBLE,
+    `count`         BIGINT,
     FOREIGN KEY (phenotype_id) REFERENCES phenotype(id),
-    UNIQUE KEY (`phenotype_id`, `gender`)
+    UNIQUE KEY (`phenotype_id`, `gender`, `chromosome`)
 );
 
 CREATE TABLE `phenotype_correlation` (
