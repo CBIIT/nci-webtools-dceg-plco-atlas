@@ -57,7 +57,7 @@ function getValidColumns(tableName, columns) {
 
     let validColumns = {
         variant: ['id', 'gender', 'chromosome', 'position', 'snp', 'allele_reference', 'allele_alternate', 'p_value', 'p_value_nlog', 'p_value_nlog_expected', 'odds_ratio', 'show_qq_plot'],
-        aggregate: ['id', 'gender', 'position_abs', 'p_value_nlog'],
+        aggregate: ['id', 'gender', 'chromosome', 'position_abs', 'p_value_nlog'],
         phenotype: ['id', 'parent_id', 'name', 'display_name', 'description', 'color', 'type'],
     }[tableName];
 
@@ -104,7 +104,7 @@ async function getSummary(connection, params) {
         values: [params.table, params.gender, params.p_value_nlog_min],
         sql: `
         SELECT
-            position_abs, p_value_nlog FROM ??
+            chromosome, position_abs, p_value_nlog FROM ??
         WHERE
             gender = ? AND
             p_value_nlog > ?`,
@@ -187,7 +187,7 @@ async function getVariants(connection, params) {
             order = 'asc';
         // if (!validColumns.includes(orderBy))
         //     orderBy = 'p_value';
-        sql += ` ORDER BY "${orderBy}" ${order} `;
+        sql += ` ORDER BY ${orderBy} ${order} `;
     }
 
     // adds limit and offset, if provided
@@ -200,8 +200,7 @@ async function getVariants(connection, params) {
 
     // query database
     let [data, columns] = await connection.query({
-        rowsAsArray: params.raw,
-        sql,
+        sql, rowsAsArray: params.raw,
     }, params);
 
     const records = {data, columns: columns.map(c => c.name)};
@@ -232,9 +231,9 @@ async function exportVariants(filepath, params) {
 async function getMetadata(connection, {phenotype_id, gender, chromosome}) {
     let [results] = await connection.query(
         `
-            SELECT 
+            SELECT
                 *
-            FROM 
+            FROM
                 phenotype_metadata
             WHERE
                 phenotype_id = :phenotype_id AND
@@ -370,4 +369,3 @@ module.exports = {
     getCounts,
     getConfig
 };
-
