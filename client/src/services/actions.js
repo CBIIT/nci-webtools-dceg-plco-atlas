@@ -265,8 +265,11 @@ export function drawQQPlot(phenotype, gender) {
         chromosome: 'all'
       });
       console.log("metadata", metadata);
-      const metadata_count = metadata.count
-      setSampleSize(metadata_count);
+      const metadata_count = await query('counts', {
+        table,
+        gender: gender,
+      });
+      setSampleSize(metadata_count.count);
       const metadata_lambdaGC = metadata.lambda_gc;
 
       const topVariantData = await query('variants', {
@@ -274,8 +277,8 @@ export function drawQQPlot(phenotype, gender) {
         gender,
         columns: ['chromosome', 'position', 'snp', 'p_value', 'p_value_nlog', 'p_value_nlog_expected'],
         p_value_nlog_min: 3.0,
-        orderBy: 'p_value_nlog',
-        order: 'desc',
+        // orderBy: 'p_value_nlog',
+        // order: 'desc',
         raw: true
       });
 
@@ -300,8 +303,8 @@ export function drawQQPlot(phenotype, gender) {
         gender,
         columns: ['p_value_nlog', 'p_value_nlog_expected'],
         p_value_nlog_max: 3.0,
-        orderBy: 'p_value_nlog',
-        order: 'desc',
+        // orderBy: 'p_value_nlog',
+        // order: 'desc',
         show_qq_plot: true,
         raw: true
       });
@@ -376,7 +379,7 @@ export function drawQQPlot(phenotype, gender) {
             '<b>\u03BB</b> = ' +
             metadata_lambdaGC +
             '        <b>Sample Size</b> = ' +
-            metadata_count.toLocaleString(),
+            metadata_count.count.toLocaleString(),
           font: {
             family: 'Arial',
             size: 14,
@@ -445,10 +448,16 @@ export function drawQQPlot(phenotype, gender) {
         gender: 'male',
         chromosome: 'all'
       });
-      const metadata_count_female = metadata_female.count;
-      const metadata_count_male = metadata_male.count;
+      const metadata_count_female = await query('counts', {
+        table,
+        gender: "female",
+      });
+      const metadata_count_male = await query('counts', {
+        table,
+        gender: "male",
+      });
       // set sampleSize to whichever gender has more variants
-      setSampleSize(Math.max(metadata_count_female, metadata_count_male));
+      setSampleSize(Math.max(metadata_count_female.count, metadata_count_male.count));
       const metadata_lambdaGC_female = metadata_female.lambda_gc;
       const metadata_lambdaGC_male = metadata_male.lambda_gc;
 
@@ -558,7 +567,7 @@ export function drawQQPlot(phenotype, gender) {
       let qqplotTopDataFemale = {
         x: topExpectedVariantsFemale,
         y: topObservedVariantsFemale,
-        name: 'Female: <b>\u03BB</b> = ' + metadata_lambdaGC_female + '    <b>Sample Size</b> = ' + metadata_count_female.toLocaleString(),
+        name: 'Female: <b>\u03BB</b> = ' + metadata_lambdaGC_female + '    <b>Sample Size</b> = ' + metadata_count_female.count.toLocaleString(),
         text: topObservedVariantsTextFemale,
         hovertemplate:
           '<b>position:</b> %{text.chr}:%{text.bp}<br>' +
@@ -579,7 +588,7 @@ export function drawQQPlot(phenotype, gender) {
       let qqplotSubsetDataFemale = {
         x: subsetExpectedVariantsFemale,
         y: subsetObservedVariantsFemale,
-        name: 'Female: <b>\u03BB</b> = ' + metadata_lambdaGC_female + '    <b>Sample Size</b> = ' + metadata_count_female.toLocaleString(),
+        name: 'Female: <b>\u03BB</b> = ' + metadata_lambdaGC_female + '    <b>Sample Size</b> = ' + metadata_count_female.count.toLocaleString(),
         hoverinfo: 'none',
         mode: 'markers',
         type: 'scattergl',
@@ -606,7 +615,7 @@ export function drawQQPlot(phenotype, gender) {
       let qqplotTopDataMale = {
         x: topExpectedVariantsMale,
         y: topObservedVariantsMale,
-        name: 'Male:     <b>\u03BB</b> = ' + metadata_lambdaGC_male + '    <b>Sample Size</b> = ' + metadata_count_male.toLocaleString(),
+        name: 'Male:     <b>\u03BB</b> = ' + metadata_lambdaGC_male + '    <b>Sample Size</b> = ' + metadata_count_male.count.toLocaleString(),
         text: topObservedVariantsTextMale,
         hovertemplate:
           '<b>position:</b> %{text.chr}:%{text.bp}<br>' +
@@ -627,7 +636,7 @@ export function drawQQPlot(phenotype, gender) {
       let qqplotSubsetDataMale = {
         x: subsetExpectedVariantsMale,
         y: subsetObservedVariantsMale,
-        name: 'Male:     <b>\u03BB</b> = ' + metadata_lambdaGC_male + '    <b>Sample Size</b> = ' + metadata_count_male.toLocaleString(),
+        name: 'Male:     <b>\u03BB</b> = ' + metadata_lambdaGC_male + '    <b>Sample Size</b> = ' + metadata_count_male.count.toLocaleString(),
         hoverinfo: 'none',
         mode: 'markers',
         type: 'scattergl',
