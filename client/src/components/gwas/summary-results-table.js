@@ -62,7 +62,7 @@ export function SummaryResultsTable() {
       text: 'Reference Allele'
     },
     {
-      dataField: 'allele_effect',
+      dataField: 'allele_alternate',
       text: 'Alternate Allele'
     },
     {
@@ -92,13 +92,15 @@ export function SummaryResultsTable() {
     //     ? `count_${key}_${selectedChromosome}`
     //     : `count_${key}`;
 
+    console.log('counts', {...summaryTables[key]})
+
     dispatch(
       fetchSummaryTable(key, {
           offset: limit * (page - 1),
           table: selectedPhenotype.value + '_variant',
           gender: selectedManhattanPlotType == 'stacked' ? gender : selectedManhattanPlotType,
           chromosome: selectedChromosome,
-          // count: shouldCount,
+          count: shouldCount,
           // key: shouldCount ? null : countKey,
           limit,
           orderBy,
@@ -107,7 +109,9 @@ export function SummaryResultsTable() {
           p_value_nlog_max: nlogpMax,
           position_min: bpMin,
           position_max: bpMax
-      })
+        },
+        shouldCount ? {} : {resultsCount: summaryTables[key].resultsCount}
+      )
     );
   };
 
@@ -154,7 +158,7 @@ export function SummaryResultsTable() {
     pagination: paginationFactory({
       page: summaryTables[key].page,
       sizePerPage: summaryTables[key].pageSize,
-      totalSize: summaryTables[key].resultsCount || 10000,
+      totalSize: summaryTables[key].resultsCount,
       showTotal: summaryTables[key].results.length > 0,
       sizePerPageList: [10, 25, 50, 100],
       paginationTotalRenderer: paginationText,

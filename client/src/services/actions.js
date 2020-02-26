@@ -153,27 +153,16 @@ export function initialize() {
   }
 }
 
-export function fetchSummaryTable(tableKey, params) {
+export function fetchSummaryTable(tableKey, params, existingResults) {
   return async function(dispatch) {
     dispatch(setSummaryTableLoading(true));
-
     // fetch variants given parameters
     const response = await query('variants', params);
     if (response.error) return;
-
-    let results = response.data;
-
-    // fetch results count (use key if supplied as parameter)
-    let resultsCount = 1e6;
-    // let resultsCount = response.count || + await query('metadata', {
-    //   database: params.database,
-    //   key: params.key
-    // });
-
     dispatch(
       updateSummaryTable(tableKey, {
-        results: results,
-        resultsCount: response.count || response.data.length,
+        results: response.data,
+        resultsCount: (existingResults && existingResults.resultsCount) || response.count || response.data.length,
         page: 1 + Math.floor(params.offset / params.limit),
         pageSize: params.limit
       })
@@ -183,7 +172,7 @@ export function fetchSummaryTable(tableKey, params) {
   }
 }
 
-export function fetchSummarySnpTable(tableKey, params) {
+export function fetchSummarySnpTable(tableKey, params, existingResults) {
   return async function(dispatch) {
     dispatch(setSummarySnpLoading(true));
 
@@ -192,6 +181,7 @@ export function fetchSummarySnpTable(tableKey, params) {
 
     dispatch(
       updateSummarySnpTable(tableKey, {
+        ...existingResults,
         results: response.data,
         resultsCount: response.count || response.data.length,
         page: 1 + Math.floor(params.offset / params.limit),
