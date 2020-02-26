@@ -209,7 +209,7 @@ async function importVariants() {
             show_qq_plot
         ) SELECT
             "${gender}",
-            chromosome,
+            LPAD(chromosome, 2, '0'),
             position,
             snp,
             allele_reference,
@@ -231,13 +231,14 @@ async function importVariants() {
     console.log(`[${duration()} s] Storing aggregated variants...`);
     await connection.execute(`
         INSERT INTO ${aggregateTable}
-            (gender, position_abs, p_value_nlog)
+            (gender, chromosome, position_abs, p_value_nlog)
         SELECT DISTINCT
             "${gender}",
+            chromosome,
             position_abs_aggregate as position_abs,
             p_value_nlog_aggregate as p_value_nlog
         FROM ${stageTable}
-        ORDER BY position_abs, p_value_nlog
+        ORDER BY chromosome, position_abs, p_value_nlog;
     `);
 
     if (shouldIndex) {
