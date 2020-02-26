@@ -287,8 +287,8 @@ export function drawQQPlot(phenotype, gender) {
         gender,
         columns: ['chromosome', 'position', 'snp', 'p_value', 'p_value_nlog', 'p_value_nlog_expected'],
         p_value_nlog_min: 3.0,
-        orderBy: 'p_value_nlog',
-        order: 'desc',
+        // orderBy: 'p_value_nlog',
+        // order: 'desc',
         raw: true
       });
 
@@ -313,8 +313,8 @@ export function drawQQPlot(phenotype, gender) {
         gender,
         columns: ['p_value_nlog', 'p_value_nlog_expected'],
         p_value_nlog_max: 3.0,
-        orderBy: 'p_value_nlog',
-        order: 'desc',
+        // orderBy: 'p_value_nlog',
+        // order: 'desc',
         show_qq_plot: true,
         raw: true
       });
