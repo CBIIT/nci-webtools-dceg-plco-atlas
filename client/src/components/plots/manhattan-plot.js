@@ -190,10 +190,10 @@ export function ManhattanPlot({
       point: {
         size: 2,
         opacity: 1,
-        color: (d, i) => (d[columnIndexes.chr] % 2 ? colors.female.light : colors.female.dark)
+        color: (d, i) => (+d[columnIndexes.chr] % 2 ? colors.female.light : colors.female.dark)
       },
       point2: {
-        color: (d, i) => (d[columnIndexes.chr] % 2 ? colors.male.light : colors.male.dark) //#e47833')
+        color: (d, i) => (+d[columnIndexes.chr] % 2 ? colors.male.light : colors.male.dark) //#e47833')
       },
       lines: [{ y: -Math.log10(5e-8), style: 'dashed' }]
     };
@@ -531,7 +531,7 @@ export function ManhattanPlot({
           h('div', null, [
             h('a', {
               className: 'font-weight-bold',
-              href: `https://www.ncbi.nlm.nih.gov/gene/?term=${gene.name}`,
+              href: `https://www.ncbi.nlm.nih.gov/gene/?term=${gene.originalName}`,
               target: '_blank'
             }, 'Go to RefSeq'),
           ]),

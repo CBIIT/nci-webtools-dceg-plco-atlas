@@ -90,9 +90,10 @@ export function SummaryResults() {
           gender: gender,
           offset: 0,
           limit: 10,
-          columns: ['chromosome', 'position', 'snp', 'reference_allele', 'effect_allele', 'odds_ratio', 'p_value'],
+          columns: ['chromosome', 'position', 'snp', 'allele_reference', 'allele_alternate', 'odds_ratio', 'p_value'],
           orderBy: 'p_value',
           order: 'asc',
+
           // key: params.count ? null : countKey, // metadata key for counts
         })
       );
@@ -150,14 +151,15 @@ export function SummaryResults() {
       drawManhattanPlot('summary', {
         table: phenotype.value + '_aggregate',
         gender: genders,
-        p_value_nlog_min: 3
+        p_value_nlog_min: 3,
       })
     );
 
     // // fetch variant results tables
     fetchVariantTables(
       phenotype.value,
-      manhattanPlotType
+      manhattanPlotType,
+      {count: true}
     );
 
     setSearchCriteriaSummaryResults({
@@ -179,7 +181,6 @@ export function SummaryResults() {
         manhattanPlotData: {},
         manhattanPlotMirroredData: {},
         manhattanPlotView: '',
-        ranges: [],
         messages: [],
         qqplotSrc: '',
         areaItems: [],
@@ -242,10 +243,10 @@ export function SummaryResults() {
         selectedTable: selectedPhenotype.value + '_variant',
         selectedChromosome: chromosome,
         selectedManhattanPlotType,
-        // bpMin: range.bp_min,
-        // bpMax: range.bp_max,
-        // nlogpMin: 2,
-        // nlogpMax: null
+        bpMin: range.position_min,
+        bpMax: range.position_max,
+        nlogpMin: 2,
+        nlogpMax: null
       })
     );
 
@@ -258,7 +259,7 @@ export function SummaryResults() {
         position_max: range.position_max,
         p_value_nlog_min: 2,
         p_value_nlog_max: null,
-        columns: ['id', 'chromosome', 'position', 'p_value_nlog']
+        columns: ['id', 'chromosome', 'position', 'p_value_nlog'],
       })
     );
 
@@ -266,7 +267,7 @@ export function SummaryResults() {
     fetchVariantTables(
       selectedPhenotype.value,
       selectedManhattanPlotType,
-      {chromosome}
+      {chromosome, count: true}
     );
   };
 
@@ -280,7 +281,13 @@ export function SummaryResults() {
     };
 
     // update zoom params
-    dispatch(updateSummaryResults({...zoomParams}));
+    dispatch(updateSummaryResults({
+      ...zoomParams,
+      bpMin: bounds.xMin,
+      bpMax: bounds.xMax,
+      nlogpMin: bounds.yMin,
+      nlogpMax: bounds.yMax
+    }));
 
     // fetch variant results tables
     fetchVariantTables(
