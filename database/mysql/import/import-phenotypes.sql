@@ -16,8 +16,8 @@ DROP TABLE IF EXISTS phenotype_sample;
 CREATE TABLE `phenotype_sample` (
     `id`            INTEGER PRIMARY KEY NOT NULL AUTO_INCREMENT,
     `age`           INTEGER,
-    `gender`        ENUM('female', 'male', 'other'),
-    `ancestry`      ENUM('american_indian', 'asian', 'black', 'hispanic', 'pacific_islander', 'white', 'other')
+    `gender`        ENUM('male', 'female'),
+    `ancestry`      ENUM('white', 'black', 'hispanic', 'asian', 'pacific_islander', 'american_indian')
 );
 
 CREATE TABLE `phenotype_category` (
@@ -500,7 +500,7 @@ CREATE TABLE phenotype_data_stage (
 
 -- load data into staging table
 -- D:/Development/Work/nci-webtools-dceg-plco-atlas/database/mysql/import/raw
-LOAD DATA LOCAL INFILE "raw/phenotype_data.tsv" INTO TABLE phenotype_data_stage
+LOAD DATA LOCAL INFILE "D:/Development/Work/nci-webtools-dceg-plco-atlas/database/mysql/import/raw/phenotype_data.tsv" INTO TABLE phenotype_data_stage
     FIELDS TERMINATED BY '\t'
     IGNORE 1 ROWS (
         plco_id,
@@ -1415,5 +1415,80 @@ LOAD DATA LOCAL INFILE "raw/phenotype_data.tsv" INTO TABLE phenotype_data_stage
         has_adenoma = IF(@has_adenoma IN('NA', ''), NULL, @has_adenoma),
         has_advanced_adenoma = IF(@has_advanced_adenoma IN('NA', ''), NULL, @has_advanced_adenoma),
         has_nonadvanced_adenoma = IF(@has_nonadvanced_adenoma IN('NA', ''), NULL, @has_nonadvanced_adenoma);
+
+-- import phenotype_sample values
+INSERT INTO phenotype_sample (id, age, ancestry, gender)
+SELECT
+    id,
+    bq_age_co as age,
+    CASE bq_race7_ca
+        WHEN 1 THEN 'white'
+        WHEN 2 THEN 'black'
+        WHEN 3 THEN 'hispanic'
+        WHEN 4 THEN 'asian'
+        WHEN 5 THEN 'pacific_islander'
+        WHEN 6 THEN 'american_indian'
+        ELSE NULL
+    END AS race,
+    CASE sex
+      WHEN 1 THEN 'male'
+      WHEN 2 THEN 'female'
+      ELSE NULL
+    END AS sex
+FROM phenotype_data_stage;
+
+
+-- import phenotype_data values
+INSERT INTO phenotype_data (`phenotype_id`, `phenotype_sample_id`, `value`)
+-- import Arthritis (binary)
+SELECT
+    (SELECT id FROM phenotype WHERE name = 'arthritis_139' LIMIT 1) AS phenotype_id,
+    id AS phenotype_sample_id,
+    sqxbq_arthritis_b AS value
+FROM phenotype_data_stage
+UNION
+
+-- import Asthma (binary)
+SELECT
+    (SELECT id FROM phenotype WHERE name = 'asthma_140' LIMIT 1) AS phenotype_id,
+    id AS phenotype_sample_id,
+    sqx_asthma_b AS value
+FROM phenotype_data_stage
+UNION
+
+-- import BMI (continuous)
+SELECT
+    (SELECT id FROM phenotype WHERE name = 'bmi_10' LIMIT 1) AS phenotype_id,
+    id AS phenotype_sample_id,
+    bq_bmi_curr_co AS value
+FROM phenotype_data_stage
+
+-- import Weight (continuous)
+SELECT
+    (SELECT id FROM phenotype WHERE name = 'weight_9' LIMIT 1) AS phenotype_id,
+    id AS phenotype_sample_id,
+    bq_weight_f_co AS value
+FROM phenotype_data_stage
+
+-- import Height when standing (continuous)
+SELECT
+    (SELECT id FROM phenotype WHERE name = 'height_when_standing_7' LIMIT 1) AS phenotype_id,
+    id AS phenotype_sample_id,
+    bq_height_f_co AS value
+FROM phenotype_data_stage
+
+-- import Height when sitting (categorical)
+SELECT
+    (SELECT id FROM phenotype WHERE name = 'height_when_sitting_8' LIMIT 1) AS phenotype_id,
+    id AS phenotype_sample_id,
+    sqx_sit_ht_o AS value
+FROM phenotype_data_stage
+
+-- import Waist-Hip comparison (categorical)
+SELECT
+    (SELECT id FROM phenotype WHERE name = 'waist_hip_comparison_13' LIMIT 1) AS phenotype_id,
+    id AS phenotype_sample_id,
+    sqx_waist_hip_o AS value
+FROM phenotype_data_stage;
 
 COMMIT;
