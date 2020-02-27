@@ -1,14 +1,9 @@
 START TRANSACTION;
 
+FLUSH TABLES;
 
 -- needed if local_infile is disabled, need root privileges
 -- SET GLOBAL local_infile = 'ON';
-
--- disable only_full_group_by
-SET sql_mode = '';
-
--- maximum length for output from group_concat()
-SET group_concat_max_len = 4294967295;
 
 SET autocommit = 0;
 
@@ -45,923 +40,1378 @@ CREATE TABLE `phenotype_data` (
 
 CREATE TABLE phenotype_data_stage (
     `plco_id` TEXT,
-    `j_adeno_carcinoma` TEXT,
-    `j_adeno_carcinoma_fup_days` TEXT,
-    `j_adeno_carcinoma_fup_age` TEXT,
-    `j_adeno_carcinoma_dx_age` TEXT,
-    `j_alcohol_related_dx_age` TEXT,
-    `j_alcohol_related` TEXT,
-    `j_alcohol_related_fup_age` TEXT,
-    `j_alcohol_related_fup_days` TEXT,
-    `j_bcell` TEXT,
-    `j_bcell_fup_days` TEXT,
-    `j_bcell_fup_age` TEXT,
-    `j_bcell_dx_age` TEXT,
-    `j_bili_cancer` TEXT,
-    `j_bili_cancer_fup_days` TEXT,
-    `j_bili_cancer_fup_age` TEXT,
-    `j_bili_cancer_dx_age` TEXT,
-    `j_blad_cancer` TEXT,
-    `j_blad_cancer_fup_days` TEXT,
-    `j_blad_cancer_fup_age` TEXT,
-    `j_blad_cancer_dx_age` TEXT,
-    `j_breast_cancer` TEXT,
-    `j_breast_cancer_fup_days` TEXT,
-    `j_breast_cancer_fup_age` TEXT,
-    `j_breast_cancer_dx_age` TEXT,
-    `j_breast_invasive` TEXT,
-    `j_breast_insitu` TEXT,
-    `j_breast_ductal` TEXT,
-    `j_breast_lobular` TEXT,
-    `j_breast_tubular` TEXT,
-    `j_breast_er_pos_or_equiv` TEXT,
-    `j_breast_er_neg` TEXT,
-    `j_breast_pr_pos_or_equiv` TEXT,
-    `j_breast_pr_neg` TEXT,
-    `j_breast_er_or_pr_pos` TEXT,
-    `j_breast_er_and_pr_neg` TEXT,
-    `j_breast_her2_pos_or_equiv` TEXT,
-    `j_breast_her2_neg` TEXT,
-    `j_breast_er_pr_and_her2_neg` TEXT,
-    `j_breast_grade34` TEXT,
-    `j_breast_grade2` TEXT,
-    `j_breast_grade1` TEXT,
-    `j_carcinoma` TEXT,
-    `j_carcinoma_fup_days` TEXT,
-    `j_carcinoma_fup_age` TEXT,
-    `j_carcinoma_dx_age` TEXT,
-    `j_colo_cancer` TEXT,
-    `j_colo_cancer_fup_days` TEXT,
-    `j_colo_cancer_fup_age` TEXT,
-    `j_colo_cancer_dx_age` TEXT,
-    `j_colo_distal` TEXT,
-    `j_colo_distal_proximal` TEXT,
-    `j_colo_proximal` TEXT,
-    `j_colo_rectal` TEXT,
-    `j_diabetes_related_dx_age` TEXT,
-    `j_diabetes_related` TEXT,
-    `j_diabetes_related_fup_age` TEXT,
-    `j_diabetes_related_fup_days` TEXT,
-    `j_ebv_related_dx_age` TEXT,
-    `j_ebv_related` TEXT,
-    `j_ebv_related_fup_age` TEXT,
-    `j_ebv_related_fup_days` TEXT,
-    `j_endo_cancer` TEXT,
-    `j_endo_cancer_fup_days` TEXT,
-    `j_endo_cancer_fup_age` TEXT,
-    `j_endo_cancer_dx_age` TEXT,
-    `j_endo_neuro` TEXT,
-    `j_endo_neuro_fup_days` TEXT,
-    `j_endo_neuro_fup_age` TEXT,
-    `j_endo_neuro_dx_age` TEXT,
-    `j_esoph_cancer` TEXT,
-    `j_esoph_cancer_fup_days` TEXT,
-    `j_esoph_cancer_fup_age` TEXT,
-    `j_esoph_cancer_dx_age` TEXT,
-    `j_esoph_squamous` TEXT,
-    `j_hbv_related_dx_age` TEXT,
-    `j_hbv_related` TEXT,
-    `j_hbv_related_fup_age` TEXT,
-    `j_hbv_related_fup_days` TEXT,
-    `j_hcv_related_dx_age` TEXT,
-    `j_hcv_related` TEXT,
-    `j_hcv_related_fup_age` TEXT,
-    `j_hcv_related_fup_days` TEXT,
-    `j_height_related_dx_age` TEXT,
-    `j_height_related` TEXT,
-    `j_height_related_fup_age` TEXT,
-    `j_height_related_fup_days` TEXT,
-    `j_helicobacter_related_dx_age` TEXT,
-    `j_helicobacter_related` TEXT,
-    `j_helicobacter_related_fup_age` TEXT,
-    `j_helicobacter_related_fup_days` TEXT,
-    `j_hematologic` TEXT,
-    `j_hematologic_fup_days` TEXT,
-    `j_hematologic_fup_age` TEXT,
-    `j_hematologic_dx_age` TEXT,
-    `j_hnc_cancer` TEXT,
-    `j_hnc_cancer_fup_days` TEXT,
-    `j_hnc_cancer_fup_age` TEXT,
-    `j_hnc_cancer_dx_age` TEXT,
-    `j_hnc_larynx` TEXT,
-    `j_hnc_lip_oral_pharynx` TEXT,
-    `j_hnc_naso_mid_sinus` TEXT,
-    `j_hpv_related_dx_age` TEXT,
-    `j_hpv_related` TEXT,
-    `j_hpv_related_fup_age` TEXT,
-    `j_hpv_related_fup_days` TEXT,
-    `j_infection_related_dx_age` TEXT,
-    `j_infection_related` TEXT,
-    `j_infection_related_fup_age` TEXT,
-    `j_infection_related_fup_days` TEXT,
-    `j_kidney_cancer_fup_days` TEXT,
-    `j_kidney_cancer_fup_age` TEXT,
-    `j_kidney_cancer_dx_age` TEXT,
-    `j_kidney_cancer` TEXT,
-    `j_kidney_renalcell_clearcell` TEXT,
-    `j_kidney_renalcell_nos` TEXT,
-    `j_gast_cancer` TEXT,
-    `j_gast_cancer_fup_days` TEXT,
-    `j_gast_cancer_fup_age` TEXT,
-    `j_gast_cancer_dx_age` TEXT,
-    `j_gast_cardia` TEXT,
-    `j_gast_noncardia` TEXT,
-    `j_glio_cancer` TEXT,
-    `j_glio_cancer_fup_days` TEXT,
-    `j_glio_cancer_fup_age` TEXT,
-    `j_glio_cancer_dx_age` TEXT,
-    `j_liver_xintra_cancer_fup_days` TEXT,
-    `j_liver_xintra_cancer_fup_age` TEXT,
-    `j_liver_xintra_cancer_dx_age` TEXT,
-    `j_liver_xintra_cancer` TEXT,
-    `j_lung_cancer` TEXT,
-    `j_lung_cancer_fup_days` TEXT,
-    `j_lung_cancer_fup_age` TEXT,
-    `j_lung_cancer_dx_age` TEXT,
-    `j_lung_smallcell` TEXT,
-    `j_lung_adeno` TEXT,
-    `j_lung_squam` TEXT,
-    `j_lymphoid` TEXT,
-    `j_lymphoid_fup_days` TEXT,
-    `j_lymphoid_fup_age` TEXT,
-    `j_lymphoid_dx_age` TEXT,
-    `j_cll` TEXT,
-    `j_cll_fup_days` TEXT,
-    `j_cll_fup_age` TEXT,
-    `j_cll_dx_age` TEXT,
-    `j_mbreast_cancer` TEXT,
-    `j_mbreast_cancer_fup_days` TEXT,
-    `j_mbreast_cancer_fup_age` TEXT,
-    `j_mbreast_cancer_dx_age` TEXT,
-    `j_mela_cancer` TEXT,
-    `j_mela_cancer_fup_days` TEXT,
-    `j_mela_cancer_fup_age` TEXT,
-    `j_mela_cancer_dx_age` TEXT,
-    `j_mesoth` TEXT,
-    `j_mesoth_fup_days` TEXT,
-    `j_mesoth_fup_age` TEXT,
-    `j_mesoth_dx_age` TEXT,
-    `j_myeloid` TEXT,
-    `j_myeloid_fup_days` TEXT,
-    `j_myeloid_fup_age` TEXT,
-    `j_myeloid_dx_age` TEXT,
-    `j_obesity_related_dx_age` TEXT,
-    `j_obesity_related` TEXT,
-    `j_obesity_related_fup_age` TEXT,
-    `j_obesity_related_fup_days` TEXT,
-    `j_osumm_cancer` TEXT,
-    `j_osumm_cancer_fup_days` TEXT,
-    `j_osumm_cancer_fup_age` TEXT,
-    `j_osumm_cancer_dx_age` TEXT,
-    `j_osumm_serous_grade_high` TEXT,
-    `j_panc_cancer` TEXT,
-    `j_panc_cancer_fup_days` TEXT,
-    `j_panc_cancer_fup_age` TEXT,
-    `j_panc_cancer_dx_age` TEXT,
-    `j_phys_act_related_dx_age` TEXT,
-    `j_phys_act_related` TEXT,
-    `j_phys_act_related_fup_age` TEXT,
-    `j_phys_act_related_fup_days` TEXT,
-    `j_pros_cancer` TEXT,
-    `j_pros_cancer_fup_days` TEXT,
-    `j_pros_cancer_fup_age` TEXT,
-    `j_pros_cancer_dx_age` TEXT,
-    `j_pros_non_advanced` TEXT,
-    `j_pros_advanced_including7` TEXT,
-    `j_pros_advanced_excluding7` TEXT,
-    `j_sarcoma` TEXT,
-    `j_sarcoma_fup_days` TEXT,
-    `j_sarcoma_fup_age` TEXT,
-    `j_sarcoma_dx_age` TEXT,
-    `j_smoking_related_dx_age` TEXT,
-    `j_smoking_related` TEXT,
-    `j_smoking_related_fup_age` TEXT,
-    `j_smoking_related_fup_days` TEXT,
-    `j_solid_tumor` TEXT,
-    `j_solid_tumor_fup_days` TEXT,
-    `j_solid_tumor_fup_age` TEXT,
-    `j_solid_tumor_dx_age` TEXT,
-    `j_squamous` TEXT,
-    `j_squamous_fup_days` TEXT,
-    `j_squamous_fup_age` TEXT,
-    `j_squamous_dx_age` TEXT,
-    `j_thyd_cancer` TEXT,
-    `j_thyd_cancer_fup_days` TEXT,
-    `j_thyd_cancer_fup_age` TEXT,
-    `j_thyd_cancer_dx_age` TEXT,
-    `j_upgi_cancer` TEXT,
-    `j_upgi_cancer_fup_days` TEXT,
-    `j_upgi_cancer_fup_age` TEXT,
-    `j_upgi_cancer_dx_age` TEXT,
-    `j_urothelial` TEXT,
-    `j_urothelial_fup_days` TEXT,
-    `j_urothelial_fup_age` TEXT,
-    `j_urothelial_dx_age` TEXT,
-    `is_dead` TEXT,
-    `mortality_exitage` TEXT,
-    `dth_days` TEXT,
-    `mortality_exitdays_unadj` TEXT,
-    `f_death_ischemic` TEXT,
-    `f_death_cerebrovascular` TEXT,
-    `f_death_rheumatic` TEXT,
-    `f_death_hypertensive` TEXT,
-    `f_death_peripheral` TEXT,
-    `f_death_heart` TEXT,
-    `f_death_cardiac` TEXT,
-    `f_death_arrhythmia` TEXT,
-    `f_death_endocarditis` TEXT,
-    `f_death_cardiovascular` TEXT,
-    `f_death_cancer` TEXT,
-    `f_death_chronicresp` TEXT,
-    `f_death_alzheimers` TEXT,
-    `f_death_diabetes` TEXT,
-    `f_death_nephritis` TEXT,
-    `f_death_chronicliver` TEXT,
-    `f_death_parkinsons` TEXT,
-    `bq_educat_o` TEXT,
-    `bq_marital_co` TEXT,
-    `bq_fmenstr_o` TEXT,
-    `bq_tubal_o` TEXT,
-    `bq_bbd_b` TEXT,
-    `bq_benign_ovcyst_b` TEXT,
-    `bq_endometriosis_b` TEXT,
-    `bq_uterine_fib_b` TEXT,
-    `bq_trypreg_b` TEXT,
-    `bq_urinatea_o` TEXT,
-    `bq_infprosa_o` TEXT,
-    `bq_hearta_f_b` TEXT,
-    `bq_bronchit_f_b` TEXT,
-    `bq_polyps_f_b` TEXT,
-    `bq_ulcerative_colitits_b` TEXT,
-    `bq_crohns_disease_b` TEXT,
-    `bq_familial_polyposis_b` TEXT,
-    `bq_hepatitis_b` TEXT,
-    `bq_cirrhosis_b` TEXT,
-    `bq_divertic_f_b` TEXT,
-    `bq_gallblad_f_b` TEXT,
-    `bq_age_co` TEXT,
-    `bq_race7_ca` TEXT,
-    `bq_hispanic_f_b` TEXT,
-    `bq_surg_resection_b` TEXT,
-    `bq_surg_prostatectomy_b` TEXT,
-    `bq_hyster_f_b` TEXT,
-    `bq_ovariesr_f_ca` TEXT,
-    `bq_infpros_f_b` TEXT,
-    `bq_urinate_f_o` TEXT,
-    `bq_smoked_f_b` TEXT,
-    `bq_smokea_f_co` TEXT,
-    `bq_ssmokea_f_co` TEXT,
-    `bq_cig_stop_co` TEXT,
-    `bq_bmi_20_co` TEXT,
-    `bq_bmi_50_co` TEXT,
-    `bq_bmi_curr_co` TEXT,
-    `bq_weight_f_co` TEXT,
-    `bq_weight20_f_co` TEXT,
-    `bq_weight50_f_co` TEXT,
-    `bq_height_f_co` TEXT,
-    `bq_fh_cancer_b` TEXT,
-    `center` TEXT,
-    `arm` TEXT,
-    `sex` TEXT,
-    `in_GSA_study` TEXT,
-    `dqx_age_co` TEXT,
-    `dqx_qxn_physicact_40_o` TEXT,
-    `dqx_qxn_physicact_now_o` TEXT,
-    `sqx_age_co` TEXT,
-    `sqx_sit_ht_o` TEXT,
-    `sqx_waist_hip_o` TEXT,
-    `sqx_height_co` TEXT,
-    `sqx_wt30s_co` TEXT,
-    `sqx_wt40s_co` TEXT,
-    `sqx_wt50s_co` TEXT,
-    `sqx_wt60s_co` TEXT,
-    `sqx_wt70s_co` TEXT,
-    `sqx_wt_curr_co` TEXT,
-    `sqx_bmi30s_co` TEXT,
-    `sqx_bmi40s_co` TEXT,
-    `sqx_bmi50s_co` TEXT,
-    `sqx_bmi60s_co` TEXT,
-    `sqx_bmi70s_co` TEXT,
-    `sqx_bmi_curr_co` TEXT,
-    `sqx_cholesterol_b` TEXT,
-    `sqx_asthma_b` TEXT,
-    `sqxbq_hearta_b` TEXT,
-    `sqxbq_stroke_b` TEXT,
-    `sqxbq_hyperten_b` TEXT,
-    `sqxbq_diabetes_b` TEXT,
-    `sqxbq_osteopor_b` TEXT,
-    `sqxbq_emphysema_b` TEXT,
-    `sqxbq_arthritis_b` TEXT,
-    `sqx_broke_hip_b` TEXT,
-    `sqx_broke_arm_b` TEXT,
-    `sqx_broke_vertebra_b` TEXT,
-    `sqx_broke_none_b` TEXT,
-    `sqx_balding_trend_o` TEXT,
-    `sqx_urinate_o` TEXT,
-    `sqxbq_bpha_o` TEXT,
-    `sqxbq_bph_b` TEXT,
-    `sqx_lift_weights_b` TEXT,
-    `sqx_lift_weights_lev_o` TEXT,
-    `sqx_active_b` TEXT,
-    `sqx_fh_blad_b` TEXT,
-    `sqx_fh_breast_b` TEXT,
-    `sqx_fh_colo_b` TEXT,
-    `sqx_fh_endo_b` TEXT,
-    `sqx_fh_leuk_b` TEXT,
-    `sqx_fh_lung_b` TEXT,
-    `sqx_fh_lymph_b` TEXT,
-    `sqx_fh_ovar_b` TEXT,
-    `sqx_fh_pros_b` TEXT,
-    `sqx_fh_cancer_f_b` TEXT,
-    `sqx_twins_b` TEXT,
-    `sqx_smk100_b` TEXT,
-    `sqx_amt_smk_o` TEXT,
-    `sqx_smk_crave1_b` TEXT,
-    `sqx_smk_crave2_b` TEXT,
-    `sqx_smk_crave3_b` TEXT,
-    `sqx_smk_crave4_b` TEXT,
-    `sqx_smk_try_quit_b` TEXT,
-    `sqx_smk_age_quit_co` TEXT,
-    `sqx_worry_lungca_o` TEXT,
-    `sqx_risk_lungca_o` TEXT,
-    `sqx_smk_his_co` TEXT,
-    `sqx_smk_behv_co` TEXT,
-    `sqx_smk_ftnd_co` TEXT,
-    `sqx_years_quit_co` TEXT,
-    `sqx_cig_years_co` TEXT,
-    `sqx_gain_chest_shoulders_b` TEXT,
-    `sqx_gain_waist_stomach_b` TEXT,
-    `sqx_gain_hips_thighs_b` TEXT,
-    `sqx_gain_equally_over_b` TEXT,
-    `sqx_lose_chest_shoulders_b` TEXT,
-    `sqx_lose_waist_stomach_b` TEXT,
-    `sqx_lose_hips_thighs_b` TEXT,
-    `sqx_lose_equally_over_b` TEXT,
-    `sqxbq_rheumatoid_arthritis_b` TEXT,
-    `sqxbq_osteoarthritis_b` TEXT,
-    `sqx_moderate_week_co` TEXT,
-    `sqx_strenuous_week_co` TEXT,
-    `sqx_ever_balding_b` TEXT,
-    `sqx_top_bald_b` TEXT,
-    `bq_menstr_natural_o` TEXT,
-    `sqx_current_cigarette_b` TEXT,
-    `sqxbq_relapse_b` TEXT,
-    `bq_current_cigarette_b` TEXT,
-    `bq_cig_stat_o` TEXT,
-    `bq_cig_years_co` TEXT,
-    `bq_cigar_o` TEXT,
-    `bq_cigpd_f_o` TEXT,
-    `bq_filtered_f_b` TEXT,
-    `bq_pack_years_co` TEXT,
-    `bq_pipe_o` TEXT,
-    `sqx_pace_o` TEXT,
-    `sqx_stairs_o` TEXT,
-    `sqx_walk_mi_o` TEXT,
-    `pack_years_bqelsesqx_co` TEXT,
-    `sqx_smk_exp_adult_o` TEXT,
-    `sqx_smk_lgt_ca` TEXT,
-    `sqx_smk_menthol_b` TEXT,
-    `sqx_smk_plan_quit_o` TEXT,
-    `sqx_smk_wake_o` TEXT,
-    `sqx_smk30days_b` TEXT,
-    `sqxo_cig_stat_o` TEXT,
-    `sqx_urinatea_o` TEXT,
-    `SV_COFFEE_REG_NOSUG_DHQ` TEXT,
-    `SV_COFFEE_DECAF_NOSUG_DHQ` TEXT,
-    `MPED_FRUIT_NOJUICE_DHQ` TEXT,
-    `DT_ALC_ALC_DRINKS_DHQ` TEXT,
-    `DRINKER_DHQ` TEXT,
-    `G_CANDY_CHOC_DHQ` TEXT,
-    `G_RED5_DHQ` TEXT,
-    `G_PROCESS_6_DHQ` TEXT,
-    `G_FRUIT_DHQ` TEXT,
-    `G_VEGETABLE_DHQ` TEXT,
-    `G_FISH_TOTAL_DHQ` TEXT,
-    `G_SALTY_GRAIN_SNACK_DHQ` TEXT,
-    `G_FRUIT_CITRUS_DHQ` TEXT,
-    `G_SODA_REG_DHQ` TEXT,
-    `DT_KCAL_DHQ` TEXT,
-    `DT_PROT_DHQ` TEXT,
-    `DT_FAT_DHQ` TEXT,
-    `DT_CARB_DHQ` TEXT,
-    `DT_FIBER_CSFII_DHQ` TEXT,
-    `DT_CAFFEINE_DHQ` TEXT,
-    `GLY_LOAD_DHQ` TEXT,
-    `MPED_GRAIN_DHQ` TEXT,
-    `MPED_GRAIN_WHOLE_DHQ` TEXT,
-    `MPED_VEG_DARK_GREEN_DHQ` TEXT,
-    `MPED_DAIRY_DHQ` TEXT,
-    `MPED_DAIRY_MILK_DHQ` TEXT,
-    `MPED_M_SOY_DHQ` TEXT,
-    `MPED_M_NUT_SEED_DHQ` TEXT,
-    `MPED_LEGUME_DHQ` TEXT,
-    `MPED_ADDED_SUGAR_DHQ` TEXT,
-    `PE_FR_PROTEIN_DHQ` TEXT,
-    `PE_FR_FAT_DHQ` TEXT,
-    `PE_FR_CARB_DHQ` TEXT,
-    `PE_FR_ALC_DHQ` TEXT,
-    `GLY_INDEX_DHQ` TEXT,
-    `DT_SUGAR_DHQ` TEXT,
-    `AGE_DHQ` TEXT,
-    `DHQ_COMPLETEDVALID` TEXT,
-    `MPED_ALC_BEV_ALC_DRINKS18_DHQ` TEXT,
-    `MPED_ALC_BEV_ALC_DRINKS25_DHQ` TEXT,
-    `MPED_ALC_BEV_ALC_DRINKS40_DHQ` TEXT,
-    `MPED_ALC_BEV_ALC_DRINKS55_DHQ` TEXT,
-    `QXN_F_COFFEE_DHQ` TEXT,
-    `WHFRDEN_DHQ` TEXT,
-    `GRNDEN_DHQ` TEXT,
-    `WGRNDEN_DHQ` TEXT,
-    `DAIRYDEN_DHQ` TEXT,
-    `HEI2005_TOTAL_SCORE_DHQ` TEXT,
-    `HEI2010_TOTAL_SCORE_DHQ` TEXT,
-    `ADDSUG_PERC2015_DHQ` TEXT,
-    `HEI2015_TOTAL_SCORE_DHQ` TEXT,
-    `SALTSNKDEN_G_DHQ` TEXT,
-    `MILKDEN_DHQ` TEXT,
-    `FRTDEN_G_DHQ` TEXT,
-    `CITFRTDEN_G_DHQ` TEXT,
-    `VEGTOTDEN_G_DHQ` TEXT,
-    `DKGRVEGDEN_DHQ` TEXT,
-    `LEGUMEDEN_DHQ` TEXT,
-    `NUTDEN_DHQ` TEXT,
-    `REDMTDEN_G_DHQ` TEXT,
-    `PROCMTDEN_G_DHQ` TEXT,
-    `FISHDEN_G_DHQ` TEXT,
-    `SOYDEN_DHQ` TEXT,
-    `current_drinker` TEXT,
-    `former_drinker` TEXT,
-    `drinker_status_dhq_o` TEXT,
-    `ph_status` TEXT,
-    `first_psa_level` TEXT,
-    `first_psa_year` TEXT,
-    `first_ca125_level` TEXT,
-    `first_ca125_year` TEXT,
-    `has_adenoma` TEXT,
-    `has_advanced_adenoma` TEXT,
-    `has_nonadvanced_adenoma` TEXT
+    `j_adeno_carcinoma` DOUBLE,
+    `j_adeno_carcinoma_fup_days` DOUBLE,
+    `j_adeno_carcinoma_fup_age` DOUBLE,
+    `j_adeno_carcinoma_dx_age` DOUBLE,
+    `j_alcohol_related_dx_age` DOUBLE,
+    `j_alcohol_related` DOUBLE,
+    `j_alcohol_related_fup_age` DOUBLE,
+    `j_alcohol_related_fup_days` DOUBLE,
+    `j_bcell` DOUBLE,
+    `j_bcell_fup_days` DOUBLE,
+    `j_bcell_fup_age` DOUBLE,
+    `j_bcell_dx_age` DOUBLE,
+    `j_bili_cancer` DOUBLE,
+    `j_bili_cancer_fup_days` DOUBLE,
+    `j_bili_cancer_fup_age` DOUBLE,
+    `j_bili_cancer_dx_age` DOUBLE,
+    `j_blad_cancer` DOUBLE,
+    `j_blad_cancer_fup_days` DOUBLE,
+    `j_blad_cancer_fup_age` DOUBLE,
+    `j_blad_cancer_dx_age` DOUBLE,
+    `j_breast_cancer` DOUBLE,
+    `j_breast_cancer_fup_days` DOUBLE,
+    `j_breast_cancer_fup_age` DOUBLE,
+    `j_breast_cancer_dx_age` DOUBLE,
+    `j_breast_invasive` DOUBLE,
+    `j_breast_insitu` DOUBLE,
+    `j_breast_ductal` DOUBLE,
+    `j_breast_lobular` DOUBLE,
+    `j_breast_tubular` DOUBLE,
+    `j_breast_er_pos_or_equiv` DOUBLE,
+    `j_breast_er_neg` DOUBLE,
+    `j_breast_pr_pos_or_equiv` DOUBLE,
+    `j_breast_pr_neg` DOUBLE,
+    `j_breast_er_or_pr_pos` DOUBLE,
+    `j_breast_er_and_pr_neg` DOUBLE,
+    `j_breast_her2_pos_or_equiv` DOUBLE,
+    `j_breast_her2_neg` DOUBLE,
+    `j_breast_er_pr_and_her2_neg` DOUBLE,
+    `j_breast_grade34` DOUBLE,
+    `j_breast_grade2` DOUBLE,
+    `j_breast_grade1` DOUBLE,
+    `j_carcinoma` DOUBLE,
+    `j_carcinoma_fup_days` DOUBLE,
+    `j_carcinoma_fup_age` DOUBLE,
+    `j_carcinoma_dx_age` DOUBLE,
+    `j_colo_cancer` DOUBLE,
+    `j_colo_cancer_fup_days` DOUBLE,
+    `j_colo_cancer_fup_age` DOUBLE,
+    `j_colo_cancer_dx_age` DOUBLE,
+    `j_colo_distal` DOUBLE,
+    `j_colo_distal_proximal` DOUBLE,
+    `j_colo_proximal` DOUBLE,
+    `j_colo_rectal` DOUBLE,
+    `j_diabetes_related_dx_age` DOUBLE,
+    `j_diabetes_related` DOUBLE,
+    `j_diabetes_related_fup_age` DOUBLE,
+    `j_diabetes_related_fup_days` DOUBLE,
+    `j_ebv_related_dx_age` DOUBLE,
+    `j_ebv_related` DOUBLE,
+    `j_ebv_related_fup_age` DOUBLE,
+    `j_ebv_related_fup_days` DOUBLE,
+    `j_endo_cancer` DOUBLE,
+    `j_endo_cancer_fup_days` DOUBLE,
+    `j_endo_cancer_fup_age` DOUBLE,
+    `j_endo_cancer_dx_age` DOUBLE,
+    `j_endo_neuro` DOUBLE,
+    `j_endo_neuro_fup_days` DOUBLE,
+    `j_endo_neuro_fup_age` DOUBLE,
+    `j_endo_neuro_dx_age` DOUBLE,
+    `j_esoph_cancer` DOUBLE,
+    `j_esoph_cancer_fup_days` DOUBLE,
+    `j_esoph_cancer_fup_age` DOUBLE,
+    `j_esoph_cancer_dx_age` DOUBLE,
+    `j_esoph_squamous` DOUBLE,
+    `j_hbv_related_dx_age` DOUBLE,
+    `j_hbv_related` DOUBLE,
+    `j_hbv_related_fup_age` DOUBLE,
+    `j_hbv_related_fup_days` DOUBLE,
+    `j_hcv_related_dx_age` DOUBLE,
+    `j_hcv_related` DOUBLE,
+    `j_hcv_related_fup_age` DOUBLE,
+    `j_hcv_related_fup_days` DOUBLE,
+    `j_height_related_dx_age` DOUBLE,
+    `j_height_related` DOUBLE,
+    `j_height_related_fup_age` DOUBLE,
+    `j_height_related_fup_days` DOUBLE,
+    `j_helicobacter_related_dx_age` DOUBLE,
+    `j_helicobacter_related` DOUBLE,
+    `j_helicobacter_related_fup_age` DOUBLE,
+    `j_helicobacter_related_fup_days` DOUBLE,
+    `j_hematologic` DOUBLE,
+    `j_hematologic_fup_days` DOUBLE,
+    `j_hematologic_fup_age` DOUBLE,
+    `j_hematologic_dx_age` DOUBLE,
+    `j_hnc_cancer` DOUBLE,
+    `j_hnc_cancer_fup_days` DOUBLE,
+    `j_hnc_cancer_fup_age` DOUBLE,
+    `j_hnc_cancer_dx_age` DOUBLE,
+    `j_hnc_larynx` DOUBLE,
+    `j_hnc_lip_oral_pharynx` DOUBLE,
+    `j_hnc_naso_mid_sinus` DOUBLE,
+    `j_hpv_related_dx_age` DOUBLE,
+    `j_hpv_related` DOUBLE,
+    `j_hpv_related_fup_age` DOUBLE,
+    `j_hpv_related_fup_days` DOUBLE,
+    `j_infection_related_dx_age` DOUBLE,
+    `j_infection_related` DOUBLE,
+    `j_infection_related_fup_age` DOUBLE,
+    `j_infection_related_fup_days` DOUBLE,
+    `j_kidney_cancer_fup_days` DOUBLE,
+    `j_kidney_cancer_fup_age` DOUBLE,
+    `j_kidney_cancer_dx_age` DOUBLE,
+    `j_kidney_cancer` DOUBLE,
+    `j_kidney_renalcell_clearcell` DOUBLE,
+    `j_kidney_renalcell_nos` DOUBLE,
+    `j_gast_cancer` DOUBLE,
+    `j_gast_cancer_fup_days` DOUBLE,
+    `j_gast_cancer_fup_age` DOUBLE,
+    `j_gast_cancer_dx_age` DOUBLE,
+    `j_gast_cardia` DOUBLE,
+    `j_gast_noncardia` DOUBLE,
+    `j_glio_cancer` DOUBLE,
+    `j_glio_cancer_fup_days` DOUBLE,
+    `j_glio_cancer_fup_age` DOUBLE,
+    `j_glio_cancer_dx_age` DOUBLE,
+    `j_liver_xintra_cancer_fup_days` DOUBLE,
+    `j_liver_xintra_cancer_fup_age` DOUBLE,
+    `j_liver_xintra_cancer_dx_age` DOUBLE,
+    `j_liver_xintra_cancer` DOUBLE,
+    `j_lung_cancer` DOUBLE,
+    `j_lung_cancer_fup_days` DOUBLE,
+    `j_lung_cancer_fup_age` DOUBLE,
+    `j_lung_cancer_dx_age` DOUBLE,
+    `j_lung_smallcell` DOUBLE,
+    `j_lung_adeno` DOUBLE,
+    `j_lung_squam` DOUBLE,
+    `j_lymphoid` DOUBLE,
+    `j_lymphoid_fup_days` DOUBLE,
+    `j_lymphoid_fup_age` DOUBLE,
+    `j_lymphoid_dx_age` DOUBLE,
+    `j_cll` DOUBLE,
+    `j_cll_fup_days` DOUBLE,
+    `j_cll_fup_age` DOUBLE,
+    `j_cll_dx_age` DOUBLE,
+    `j_mbreast_cancer` DOUBLE,
+    `j_mbreast_cancer_fup_days` DOUBLE,
+    `j_mbreast_cancer_fup_age` DOUBLE,
+    `j_mbreast_cancer_dx_age` DOUBLE,
+    `j_mela_cancer` DOUBLE,
+    `j_mela_cancer_fup_days` DOUBLE,
+    `j_mela_cancer_fup_age` DOUBLE,
+    `j_mela_cancer_dx_age` DOUBLE,
+    `j_mesoth` DOUBLE,
+    `j_mesoth_fup_days` DOUBLE,
+    `j_mesoth_fup_age` DOUBLE,
+    `j_mesoth_dx_age` DOUBLE,
+    `j_myeloid` DOUBLE,
+    `j_myeloid_fup_days` DOUBLE,
+    `j_myeloid_fup_age` DOUBLE,
+    `j_myeloid_dx_age` DOUBLE,
+    `j_obesity_related_dx_age` DOUBLE,
+    `j_obesity_related` DOUBLE,
+    `j_obesity_related_fup_age` DOUBLE,
+    `j_obesity_related_fup_days` DOUBLE,
+    `j_osumm_cancer` DOUBLE,
+    `j_osumm_cancer_fup_days` DOUBLE,
+    `j_osumm_cancer_fup_age` DOUBLE,
+    `j_osumm_cancer_dx_age` DOUBLE,
+    `j_osumm_serous_grade_high` DOUBLE,
+    `j_panc_cancer` DOUBLE,
+    `j_panc_cancer_fup_days` DOUBLE,
+    `j_panc_cancer_fup_age` DOUBLE,
+    `j_panc_cancer_dx_age` DOUBLE,
+    `j_phys_act_related_dx_age` DOUBLE,
+    `j_phys_act_related` DOUBLE,
+    `j_phys_act_related_fup_age` DOUBLE,
+    `j_phys_act_related_fup_days` DOUBLE,
+    `j_pros_cancer` DOUBLE,
+    `j_pros_cancer_fup_days` DOUBLE,
+    `j_pros_cancer_fup_age` DOUBLE,
+    `j_pros_cancer_dx_age` DOUBLE,
+    `j_pros_non_advanced` DOUBLE,
+    `j_pros_advanced_including7` DOUBLE,
+    `j_pros_advanced_excluding7` DOUBLE,
+    `j_sarcoma` DOUBLE,
+    `j_sarcoma_fup_days` DOUBLE,
+    `j_sarcoma_fup_age` DOUBLE,
+    `j_sarcoma_dx_age` DOUBLE,
+    `j_smoking_related_dx_age` DOUBLE,
+    `j_smoking_related` DOUBLE,
+    `j_smoking_related_fup_age` DOUBLE,
+    `j_smoking_related_fup_days` DOUBLE,
+    `j_solid_tumor` DOUBLE,
+    `j_solid_tumor_fup_days` DOUBLE,
+    `j_solid_tumor_fup_age` DOUBLE,
+    `j_solid_tumor_dx_age` DOUBLE,
+    `j_squamous` DOUBLE,
+    `j_squamous_fup_days` DOUBLE,
+    `j_squamous_fup_age` DOUBLE,
+    `j_squamous_dx_age` DOUBLE,
+    `j_thyd_cancer` DOUBLE,
+    `j_thyd_cancer_fup_days` DOUBLE,
+    `j_thyd_cancer_fup_age` DOUBLE,
+    `j_thyd_cancer_dx_age` DOUBLE,
+    `j_upgi_cancer` DOUBLE,
+    `j_upgi_cancer_fup_days` DOUBLE,
+    `j_upgi_cancer_fup_age` DOUBLE,
+    `j_upgi_cancer_dx_age` DOUBLE,
+    `j_urothelial` DOUBLE,
+    `j_urothelial_fup_days` DOUBLE,
+    `j_urothelial_fup_age` DOUBLE,
+    `j_urothelial_dx_age` DOUBLE,
+    `is_dead` DOUBLE,
+    `mortality_exitage` DOUBLE,
+    `dth_days` DOUBLE,
+    `mortality_exitdays_unadj` DOUBLE,
+    `f_death_ischemic` DOUBLE,
+    `f_death_cerebrovascular` DOUBLE,
+    `f_death_rheumatic` DOUBLE,
+    `f_death_hypertensive` DOUBLE,
+    `f_death_peripheral` DOUBLE,
+    `f_death_heart` DOUBLE,
+    `f_death_cardiac` DOUBLE,
+    `f_death_arrhythmia` DOUBLE,
+    `f_death_endocarditis` DOUBLE,
+    `f_death_cardiovascular` DOUBLE,
+    `f_death_cancer` DOUBLE,
+    `f_death_chronicresp` DOUBLE,
+    `f_death_alzheimers` DOUBLE,
+    `f_death_diabetes` DOUBLE,
+    `f_death_nephritis` DOUBLE,
+    `f_death_chronicliver` DOUBLE,
+    `f_death_parkinsons` DOUBLE,
+    `bq_educat_o` DOUBLE,
+    `bq_marital_co` DOUBLE,
+    `bq_fmenstr_o` DOUBLE,
+    `bq_tubal_o` DOUBLE,
+    `bq_bbd_b` DOUBLE,
+    `bq_benign_ovcyst_b` DOUBLE,
+    `bq_endometriosis_b` DOUBLE,
+    `bq_uterine_fib_b` DOUBLE,
+    `bq_trypreg_b` DOUBLE,
+    `bq_urinatea_o` DOUBLE,
+    `bq_infprosa_o` DOUBLE,
+    `bq_hearta_f_b` DOUBLE,
+    `bq_bronchit_f_b` DOUBLE,
+    `bq_polyps_f_b` DOUBLE,
+    `bq_ulcerative_colitits_b` DOUBLE,
+    `bq_crohns_disease_b` DOUBLE,
+    `bq_familial_polyposis_b` DOUBLE,
+    `bq_hepatitis_b` DOUBLE,
+    `bq_cirrhosis_b` DOUBLE,
+    `bq_divertic_f_b` DOUBLE,
+    `bq_gallblad_f_b` DOUBLE,
+    `bq_age_co` DOUBLE,
+    `bq_race7_ca` DOUBLE,
+    `bq_hispanic_f_b` DOUBLE,
+    `bq_surg_resection_b` DOUBLE,
+    `bq_surg_prostatectomy_b` DOUBLE,
+    `bq_hyster_f_b` DOUBLE,
+    `bq_ovariesr_f_ca` DOUBLE,
+    `bq_infpros_f_b` DOUBLE,
+    `bq_urinate_f_o` DOUBLE,
+    `bq_smoked_f_b` DOUBLE,
+    `bq_smokea_f_co` DOUBLE,
+    `bq_ssmokea_f_co` DOUBLE,
+    `bq_cig_stop_co` DOUBLE,
+    `bq_bmi_20_co` DOUBLE,
+    `bq_bmi_50_co` DOUBLE,
+    `bq_bmi_curr_co` DOUBLE,
+    `bq_weight_f_co` DOUBLE,
+    `bq_weight20_f_co` DOUBLE,
+    `bq_weight50_f_co` DOUBLE,
+    `bq_height_f_co` DOUBLE,
+    `bq_fh_cancer_b` DOUBLE,
+    `center` DOUBLE,
+    `arm` DOUBLE,
+    `sex` DOUBLE,
+    `in_GSA_study` DOUBLE,
+    `dqx_age_co` DOUBLE,
+    `dqx_qxn_physicact_40_o` DOUBLE,
+    `dqx_qxn_physicact_now_o` DOUBLE,
+    `sqx_age_co` DOUBLE,
+    `sqx_sit_ht_o` DOUBLE,
+    `sqx_waist_hip_o` DOUBLE,
+    `sqx_height_co` DOUBLE,
+    `sqx_wt30s_co` DOUBLE,
+    `sqx_wt40s_co` DOUBLE,
+    `sqx_wt50s_co` DOUBLE,
+    `sqx_wt60s_co` DOUBLE,
+    `sqx_wt70s_co` DOUBLE,
+    `sqx_wt_curr_co` DOUBLE,
+    `sqx_bmi30s_co` DOUBLE,
+    `sqx_bmi40s_co` DOUBLE,
+    `sqx_bmi50s_co` DOUBLE,
+    `sqx_bmi60s_co` DOUBLE,
+    `sqx_bmi70s_co` DOUBLE,
+    `sqx_bmi_curr_co` DOUBLE,
+    `sqx_cholesterol_b` DOUBLE,
+    `sqx_asthma_b` DOUBLE,
+    `sqxbq_hearta_b` DOUBLE,
+    `sqxbq_stroke_b` DOUBLE,
+    `sqxbq_hyperten_b` DOUBLE,
+    `sqxbq_diabetes_b` DOUBLE,
+    `sqxbq_osteopor_b` DOUBLE,
+    `sqxbq_emphysema_b` DOUBLE,
+    `sqxbq_arthritis_b` DOUBLE,
+    `sqx_broke_hip_b` DOUBLE,
+    `sqx_broke_arm_b` DOUBLE,
+    `sqx_broke_vertebra_b` DOUBLE,
+    `sqx_broke_none_b` DOUBLE,
+    `sqx_balding_trend_o` DOUBLE,
+    `sqx_urinate_o` DOUBLE,
+    `sqxbq_bpha_o` DOUBLE,
+    `sqxbq_bph_b` DOUBLE,
+    `sqx_lift_weights_b` DOUBLE,
+    `sqx_lift_weights_lev_o` DOUBLE,
+    `sqx_active_b` DOUBLE,
+    `sqx_fh_blad_b` DOUBLE,
+    `sqx_fh_breast_b` DOUBLE,
+    `sqx_fh_colo_b` DOUBLE,
+    `sqx_fh_endo_b` DOUBLE,
+    `sqx_fh_leuk_b` DOUBLE,
+    `sqx_fh_lung_b` DOUBLE,
+    `sqx_fh_lymph_b` DOUBLE,
+    `sqx_fh_ovar_b` DOUBLE,
+    `sqx_fh_pros_b` DOUBLE,
+    `sqx_fh_cancer_f_b` DOUBLE,
+    `sqx_twins_b` DOUBLE,
+    `sqx_smk100_b` DOUBLE,
+    `sqx_amt_smk_o` DOUBLE,
+    `sqx_smk_crave1_b` DOUBLE,
+    `sqx_smk_crave2_b` DOUBLE,
+    `sqx_smk_crave3_b` DOUBLE,
+    `sqx_smk_crave4_b` DOUBLE,
+    `sqx_smk_try_quit_b` DOUBLE,
+    `sqx_smk_age_quit_co` DOUBLE,
+    `sqx_worry_lungca_o` DOUBLE,
+    `sqx_risk_lungca_o` DOUBLE,
+    `sqx_smk_his_co` DOUBLE,
+    `sqx_smk_behv_co` DOUBLE,
+    `sqx_smk_ftnd_co` DOUBLE,
+    `sqx_years_quit_co` DOUBLE,
+    `sqx_cig_years_co` DOUBLE,
+    `sqx_gain_chest_shoulders_b` DOUBLE,
+    `sqx_gain_waist_stomach_b` DOUBLE,
+    `sqx_gain_hips_thighs_b` DOUBLE,
+    `sqx_gain_equally_over_b` DOUBLE,
+    `sqx_lose_chest_shoulders_b` DOUBLE,
+    `sqx_lose_waist_stomach_b` DOUBLE,
+    `sqx_lose_hips_thighs_b` DOUBLE,
+    `sqx_lose_equally_over_b` DOUBLE,
+    `sqxbq_rheumatoid_arthritis_b` DOUBLE,
+    `sqxbq_osteoarthritis_b` DOUBLE,
+    `sqx_moderate_week_co` DOUBLE,
+    `sqx_strenuous_week_co` DOUBLE,
+    `sqx_ever_balding_b` DOUBLE,
+    `sqx_top_bald_b` DOUBLE,
+    `bq_menstr_natural_o` DOUBLE,
+    `sqx_current_cigarette_b` DOUBLE,
+    `sqxbq_relapse_b` DOUBLE,
+    `bq_current_cigarette_b` DOUBLE,
+    `bq_cig_stat_o` DOUBLE,
+    `bq_cig_years_co` DOUBLE,
+    `bq_cigar_o` DOUBLE,
+    `bq_cigpd_f_o` DOUBLE,
+    `bq_filtered_f_b` DOUBLE,
+    `bq_pack_years_co` DOUBLE,
+    `bq_pipe_o` DOUBLE,
+    `sqx_pace_o` DOUBLE,
+    `sqx_stairs_o` DOUBLE,
+    `sqx_walk_mi_o` DOUBLE,
+    `pack_years_bqelsesqx_co` DOUBLE,
+    `sqx_smk_exp_adult_o` DOUBLE,
+    `sqx_smk_lgt_ca` DOUBLE,
+    `sqx_smk_menthol_b` DOUBLE,
+    `sqx_smk_plan_quit_o` DOUBLE,
+    `sqx_smk_wake_o` DOUBLE,
+    `sqx_smk30days_b` DOUBLE,
+    `sqxo_cig_stat_o` DOUBLE,
+    `sqx_urinatea_o` DOUBLE,
+    `SV_COFFEE_REG_NOSUG_DHQ` DOUBLE,
+    `SV_COFFEE_DECAF_NOSUG_DHQ` DOUBLE,
+    `MPED_FRUIT_NOJUICE_DHQ` DOUBLE,
+    `DT_ALC_ALC_DRINKS_DHQ` DOUBLE,
+    `DRINKER_DHQ` DOUBLE,
+    `G_CANDY_CHOC_DHQ` DOUBLE,
+    `G_RED5_DHQ` DOUBLE,
+    `G_PROCESS_6_DHQ` DOUBLE,
+    `G_FRUIT_DHQ` DOUBLE,
+    `G_VEGETABLE_DHQ` DOUBLE,
+    `G_FISH_TOTAL_DHQ` DOUBLE,
+    `G_SALTY_GRAIN_SNACK_DHQ` DOUBLE,
+    `G_FRUIT_CITRUS_DHQ` DOUBLE,
+    `G_SODA_REG_DHQ` DOUBLE,
+    `DT_KCAL_DHQ` DOUBLE,
+    `DT_PROT_DHQ` DOUBLE,
+    `DT_FAT_DHQ` DOUBLE,
+    `DT_CARB_DHQ` DOUBLE,
+    `DT_FIBER_CSFII_DHQ` DOUBLE,
+    `DT_CAFFEINE_DHQ` DOUBLE,
+    `GLY_LOAD_DHQ` DOUBLE,
+    `MPED_GRAIN_DHQ` DOUBLE,
+    `MPED_GRAIN_WHOLE_DHQ` DOUBLE,
+    `MPED_VEG_DARK_GREEN_DHQ` DOUBLE,
+    `MPED_DAIRY_DHQ` DOUBLE,
+    `MPED_DAIRY_MILK_DHQ` DOUBLE,
+    `MPED_M_SOY_DHQ` DOUBLE,
+    `MPED_M_NUT_SEED_DHQ` DOUBLE,
+    `MPED_LEGUME_DHQ` DOUBLE,
+    `MPED_ADDED_SUGAR_DHQ` DOUBLE,
+    `PE_FR_PROTEIN_DHQ` DOUBLE,
+    `PE_FR_FAT_DHQ` DOUBLE,
+    `PE_FR_CARB_DHQ` DOUBLE,
+    `PE_FR_ALC_DHQ` DOUBLE,
+    `GLY_INDEX_DHQ` DOUBLE,
+    `DT_SUGAR_DHQ` DOUBLE,
+    `AGE_DHQ` DOUBLE,
+    `DHQ_COMPLETEDVALID` DOUBLE,
+    `MPED_ALC_BEV_ALC_DRINKS18_DHQ` DOUBLE,
+    `MPED_ALC_BEV_ALC_DRINKS25_DHQ` DOUBLE,
+    `MPED_ALC_BEV_ALC_DRINKS40_DHQ` DOUBLE,
+    `MPED_ALC_BEV_ALC_DRINKS55_DHQ` DOUBLE,
+    `QXN_F_COFFEE_DHQ` DOUBLE,
+    `WHFRDEN_DHQ` DOUBLE,
+    `GRNDEN_DHQ` DOUBLE,
+    `WGRNDEN_DHQ` DOUBLE,
+    `DAIRYDEN_DHQ` DOUBLE,
+    `HEI2005_TOTAL_SCORE_DHQ` DOUBLE,
+    `HEI2010_TOTAL_SCORE_DHQ` DOUBLE,
+    `ADDSUG_PERC2015_DHQ` DOUBLE,
+    `HEI2015_TOTAL_SCORE_DHQ` DOUBLE,
+    `SALTSNKDEN_G_DHQ` DOUBLE,
+    `MILKDEN_DHQ` DOUBLE,
+    `FRTDEN_G_DHQ` DOUBLE,
+    `CITFRTDEN_G_DHQ` DOUBLE,
+    `VEGTOTDEN_G_DHQ` DOUBLE,
+    `DKGRVEGDEN_DHQ` DOUBLE,
+    `LEGUMEDEN_DHQ` DOUBLE,
+    `NUTDEN_DHQ` DOUBLE,
+    `REDMTDEN_G_DHQ` DOUBLE,
+    `PROCMTDEN_G_DHQ` DOUBLE,
+    `FISHDEN_G_DHQ` DOUBLE,
+    `SOYDEN_DHQ` DOUBLE,
+    `current_drinker` DOUBLE,
+    `former_drinker` DOUBLE,
+    `drinker_status_dhq_o` DOUBLE,
+    `ph_status` DOUBLE,
+    `first_psa_level` DOUBLE,
+    `first_psa_year` DOUBLE,
+    `first_ca125_level` DOUBLE,
+    `first_ca125_year` DOUBLE,
+    `has_adenoma` DOUBLE,
+    `has_advanced_adenoma` DOUBLE,
+    `has_nonadvanced_adenoma` DOUBLE
 ) ENGINE=MYISAM;
 
 -- load data into staging table
 LOAD DATA LOCAL INFILE "raw/phenotype_data.tsv" INTO TABLE phenotype_data_stage
     FIELDS TERMINATED BY '\t'
-    IGNORE 1 ROWS;
-
--- replace NA values with NULL
-UPDATE phenotype_data_stage SET `j_adeno_carcinoma` = NULL WHERE j_adeno_carcinoma = 'NA';
-UPDATE phenotype_data_stage SET `j_adeno_carcinoma_fup_days` = NULL WHERE j_adeno_carcinoma_fup_days = 'NA';
-UPDATE phenotype_data_stage SET `j_adeno_carcinoma_fup_age` = NULL WHERE j_adeno_carcinoma_fup_age = 'NA';
-UPDATE phenotype_data_stage SET `j_adeno_carcinoma_dx_age` = NULL WHERE j_adeno_carcinoma_dx_age = 'NA';
-UPDATE phenotype_data_stage SET `j_alcohol_related_dx_age` = NULL WHERE j_alcohol_related_dx_age = 'NA';
-UPDATE phenotype_data_stage SET `j_alcohol_related` = NULL WHERE j_alcohol_related = 'NA';
-UPDATE phenotype_data_stage SET `j_alcohol_related_fup_age` = NULL WHERE j_alcohol_related_fup_age = 'NA';
-UPDATE phenotype_data_stage SET `j_alcohol_related_fup_days` = NULL WHERE j_alcohol_related_fup_days = 'NA';
-UPDATE phenotype_data_stage SET `j_bcell` = NULL WHERE j_bcell = 'NA';
-UPDATE phenotype_data_stage SET `j_bcell_fup_days` = NULL WHERE j_bcell_fup_days = 'NA';
-UPDATE phenotype_data_stage SET `j_bcell_fup_age` = NULL WHERE j_bcell_fup_age = 'NA';
-UPDATE phenotype_data_stage SET `j_bcell_dx_age` = NULL WHERE j_bcell_dx_age = 'NA';
-UPDATE phenotype_data_stage SET `j_bili_cancer` = NULL WHERE j_bili_cancer = 'NA';
-UPDATE phenotype_data_stage SET `j_bili_cancer_fup_days` = NULL WHERE j_bili_cancer_fup_days = 'NA';
-UPDATE phenotype_data_stage SET `j_bili_cancer_fup_age` = NULL WHERE j_bili_cancer_fup_age = 'NA';
-UPDATE phenotype_data_stage SET `j_bili_cancer_dx_age` = NULL WHERE j_bili_cancer_dx_age = 'NA';
-UPDATE phenotype_data_stage SET `j_blad_cancer` = NULL WHERE j_blad_cancer = 'NA';
-UPDATE phenotype_data_stage SET `j_blad_cancer_fup_days` = NULL WHERE j_blad_cancer_fup_days = 'NA';
-UPDATE phenotype_data_stage SET `j_blad_cancer_fup_age` = NULL WHERE j_blad_cancer_fup_age = 'NA';
-UPDATE phenotype_data_stage SET `j_blad_cancer_dx_age` = NULL WHERE j_blad_cancer_dx_age = 'NA';
-UPDATE phenotype_data_stage SET `j_breast_cancer` = NULL WHERE j_breast_cancer = 'NA';
-UPDATE phenotype_data_stage SET `j_breast_cancer_fup_days` = NULL WHERE j_breast_cancer_fup_days = 'NA';
-UPDATE phenotype_data_stage SET `j_breast_cancer_fup_age` = NULL WHERE j_breast_cancer_fup_age = 'NA';
-UPDATE phenotype_data_stage SET `j_breast_cancer_dx_age` = NULL WHERE j_breast_cancer_dx_age = 'NA';
-UPDATE phenotype_data_stage SET `j_breast_invasive` = NULL WHERE j_breast_invasive = 'NA';
-UPDATE phenotype_data_stage SET `j_breast_insitu` = NULL WHERE j_breast_insitu = 'NA';
-UPDATE phenotype_data_stage SET `j_breast_ductal` = NULL WHERE j_breast_ductal = 'NA';
-UPDATE phenotype_data_stage SET `j_breast_lobular` = NULL WHERE j_breast_lobular = 'NA';
-UPDATE phenotype_data_stage SET `j_breast_tubular` = NULL WHERE j_breast_tubular = 'NA';
-UPDATE phenotype_data_stage SET `j_breast_er_pos_or_equiv` = NULL WHERE j_breast_er_pos_or_equiv = 'NA';
-UPDATE phenotype_data_stage SET `j_breast_er_neg` = NULL WHERE j_breast_er_neg = 'NA';
-UPDATE phenotype_data_stage SET `j_breast_pr_pos_or_equiv` = NULL WHERE j_breast_pr_pos_or_equiv = 'NA';
-UPDATE phenotype_data_stage SET `j_breast_pr_neg` = NULL WHERE j_breast_pr_neg = 'NA';
-UPDATE phenotype_data_stage SET `j_breast_er_or_pr_pos` = NULL WHERE j_breast_er_or_pr_pos = 'NA';
-UPDATE phenotype_data_stage SET `j_breast_er_and_pr_neg` = NULL WHERE j_breast_er_and_pr_neg = 'NA';
-UPDATE phenotype_data_stage SET `j_breast_her2_pos_or_equiv` = NULL WHERE j_breast_her2_pos_or_equiv = 'NA';
-UPDATE phenotype_data_stage SET `j_breast_her2_neg` = NULL WHERE j_breast_her2_neg = 'NA';
-UPDATE phenotype_data_stage SET `j_breast_er_pr_and_her2_neg` = NULL WHERE j_breast_er_pr_and_her2_neg = 'NA';
-UPDATE phenotype_data_stage SET `j_breast_grade34` = NULL WHERE j_breast_grade34 = 'NA';
-UPDATE phenotype_data_stage SET `j_breast_grade2` = NULL WHERE j_breast_grade2 = 'NA';
-UPDATE phenotype_data_stage SET `j_breast_grade1` = NULL WHERE j_breast_grade1 = 'NA';
-UPDATE phenotype_data_stage SET `j_carcinoma` = NULL WHERE j_carcinoma = 'NA';
-UPDATE phenotype_data_stage SET `j_carcinoma_fup_days` = NULL WHERE j_carcinoma_fup_days = 'NA';
-UPDATE phenotype_data_stage SET `j_carcinoma_fup_age` = NULL WHERE j_carcinoma_fup_age = 'NA';
-UPDATE phenotype_data_stage SET `j_carcinoma_dx_age` = NULL WHERE j_carcinoma_dx_age = 'NA';
-UPDATE phenotype_data_stage SET `j_colo_cancer` = NULL WHERE j_colo_cancer = 'NA';
-UPDATE phenotype_data_stage SET `j_colo_cancer_fup_days` = NULL WHERE j_colo_cancer_fup_days = 'NA';
-UPDATE phenotype_data_stage SET `j_colo_cancer_fup_age` = NULL WHERE j_colo_cancer_fup_age = 'NA';
-UPDATE phenotype_data_stage SET `j_colo_cancer_dx_age` = NULL WHERE j_colo_cancer_dx_age = 'NA';
-UPDATE phenotype_data_stage SET `j_colo_distal` = NULL WHERE j_colo_distal = 'NA';
-UPDATE phenotype_data_stage SET `j_colo_distal_proximal` = NULL WHERE j_colo_distal_proximal = 'NA';
-UPDATE phenotype_data_stage SET `j_colo_proximal` = NULL WHERE j_colo_proximal = 'NA';
-UPDATE phenotype_data_stage SET `j_colo_rectal` = NULL WHERE j_colo_rectal = 'NA';
-UPDATE phenotype_data_stage SET `j_diabetes_related_dx_age` = NULL WHERE j_diabetes_related_dx_age = 'NA';
-UPDATE phenotype_data_stage SET `j_diabetes_related` = NULL WHERE j_diabetes_related = 'NA';
-UPDATE phenotype_data_stage SET `j_diabetes_related_fup_age` = NULL WHERE j_diabetes_related_fup_age = 'NA';
-UPDATE phenotype_data_stage SET `j_diabetes_related_fup_days` = NULL WHERE j_diabetes_related_fup_days = 'NA';
-UPDATE phenotype_data_stage SET `j_ebv_related_dx_age` = NULL WHERE j_ebv_related_dx_age = 'NA';
-UPDATE phenotype_data_stage SET `j_ebv_related` = NULL WHERE j_ebv_related = 'NA';
-UPDATE phenotype_data_stage SET `j_ebv_related_fup_age` = NULL WHERE j_ebv_related_fup_age = 'NA';
-UPDATE phenotype_data_stage SET `j_ebv_related_fup_days` = NULL WHERE j_ebv_related_fup_days = 'NA';
-UPDATE phenotype_data_stage SET `j_endo_cancer` = NULL WHERE j_endo_cancer = 'NA';
-UPDATE phenotype_data_stage SET `j_endo_cancer_fup_days` = NULL WHERE j_endo_cancer_fup_days = 'NA';
-UPDATE phenotype_data_stage SET `j_endo_cancer_fup_age` = NULL WHERE j_endo_cancer_fup_age = 'NA';
-UPDATE phenotype_data_stage SET `j_endo_cancer_dx_age` = NULL WHERE j_endo_cancer_dx_age = 'NA';
-UPDATE phenotype_data_stage SET `j_endo_neuro` = NULL WHERE j_endo_neuro = 'NA';
-UPDATE phenotype_data_stage SET `j_endo_neuro_fup_days` = NULL WHERE j_endo_neuro_fup_days = 'NA';
-UPDATE phenotype_data_stage SET `j_endo_neuro_fup_age` = NULL WHERE j_endo_neuro_fup_age = 'NA';
-UPDATE phenotype_data_stage SET `j_endo_neuro_dx_age` = NULL WHERE j_endo_neuro_dx_age = 'NA';
-UPDATE phenotype_data_stage SET `j_esoph_cancer` = NULL WHERE j_esoph_cancer = 'NA';
-UPDATE phenotype_data_stage SET `j_esoph_cancer_fup_days` = NULL WHERE j_esoph_cancer_fup_days = 'NA';
-UPDATE phenotype_data_stage SET `j_esoph_cancer_fup_age` = NULL WHERE j_esoph_cancer_fup_age = 'NA';
-UPDATE phenotype_data_stage SET `j_esoph_cancer_dx_age` = NULL WHERE j_esoph_cancer_dx_age = 'NA';
-UPDATE phenotype_data_stage SET `j_esoph_squamous` = NULL WHERE j_esoph_squamous = 'NA';
-UPDATE phenotype_data_stage SET `j_hbv_related_dx_age` = NULL WHERE j_hbv_related_dx_age = 'NA';
-UPDATE phenotype_data_stage SET `j_hbv_related` = NULL WHERE j_hbv_related = 'NA';
-UPDATE phenotype_data_stage SET `j_hbv_related_fup_age` = NULL WHERE j_hbv_related_fup_age = 'NA';
-UPDATE phenotype_data_stage SET `j_hbv_related_fup_days` = NULL WHERE j_hbv_related_fup_days = 'NA';
-UPDATE phenotype_data_stage SET `j_hcv_related_dx_age` = NULL WHERE j_hcv_related_dx_age = 'NA';
-UPDATE phenotype_data_stage SET `j_hcv_related` = NULL WHERE j_hcv_related = 'NA';
-UPDATE phenotype_data_stage SET `j_hcv_related_fup_age` = NULL WHERE j_hcv_related_fup_age = 'NA';
-UPDATE phenotype_data_stage SET `j_hcv_related_fup_days` = NULL WHERE j_hcv_related_fup_days = 'NA';
-UPDATE phenotype_data_stage SET `j_height_related_dx_age` = NULL WHERE j_height_related_dx_age = 'NA';
-UPDATE phenotype_data_stage SET `j_height_related` = NULL WHERE j_height_related = 'NA';
-UPDATE phenotype_data_stage SET `j_height_related_fup_age` = NULL WHERE j_height_related_fup_age = 'NA';
-UPDATE phenotype_data_stage SET `j_height_related_fup_days` = NULL WHERE j_height_related_fup_days = 'NA';
-UPDATE phenotype_data_stage SET `j_helicobacter_related_dx_age` = NULL WHERE j_helicobacter_related_dx_age = 'NA';
-UPDATE phenotype_data_stage SET `j_helicobacter_related` = NULL WHERE j_helicobacter_related = 'NA';
-UPDATE phenotype_data_stage SET `j_helicobacter_related_fup_age` = NULL WHERE j_helicobacter_related_fup_age = 'NA';
-UPDATE phenotype_data_stage SET `j_helicobacter_related_fup_days` = NULL WHERE j_helicobacter_related_fup_days = 'NA';
-UPDATE phenotype_data_stage SET `j_hematologic` = NULL WHERE j_hematologic = 'NA';
-UPDATE phenotype_data_stage SET `j_hematologic_fup_days` = NULL WHERE j_hematologic_fup_days = 'NA';
-UPDATE phenotype_data_stage SET `j_hematologic_fup_age` = NULL WHERE j_hematologic_fup_age = 'NA';
-UPDATE phenotype_data_stage SET `j_hematologic_dx_age` = NULL WHERE j_hematologic_dx_age = 'NA';
-UPDATE phenotype_data_stage SET `j_hnc_cancer` = NULL WHERE j_hnc_cancer = 'NA';
-UPDATE phenotype_data_stage SET `j_hnc_cancer_fup_days` = NULL WHERE j_hnc_cancer_fup_days = 'NA';
-UPDATE phenotype_data_stage SET `j_hnc_cancer_fup_age` = NULL WHERE j_hnc_cancer_fup_age = 'NA';
-UPDATE phenotype_data_stage SET `j_hnc_cancer_dx_age` = NULL WHERE j_hnc_cancer_dx_age = 'NA';
-UPDATE phenotype_data_stage SET `j_hnc_larynx` = NULL WHERE j_hnc_larynx = 'NA';
-UPDATE phenotype_data_stage SET `j_hnc_lip_oral_pharynx` = NULL WHERE j_hnc_lip_oral_pharynx = 'NA';
-UPDATE phenotype_data_stage SET `j_hnc_naso_mid_sinus` = NULL WHERE j_hnc_naso_mid_sinus = 'NA';
-UPDATE phenotype_data_stage SET `j_hpv_related_dx_age` = NULL WHERE j_hpv_related_dx_age = 'NA';
-UPDATE phenotype_data_stage SET `j_hpv_related` = NULL WHERE j_hpv_related = 'NA';
-UPDATE phenotype_data_stage SET `j_hpv_related_fup_age` = NULL WHERE j_hpv_related_fup_age = 'NA';
-UPDATE phenotype_data_stage SET `j_hpv_related_fup_days` = NULL WHERE j_hpv_related_fup_days = 'NA';
-UPDATE phenotype_data_stage SET `j_infection_related_dx_age` = NULL WHERE j_infection_related_dx_age = 'NA';
-UPDATE phenotype_data_stage SET `j_infection_related` = NULL WHERE j_infection_related = 'NA';
-UPDATE phenotype_data_stage SET `j_infection_related_fup_age` = NULL WHERE j_infection_related_fup_age = 'NA';
-UPDATE phenotype_data_stage SET `j_infection_related_fup_days` = NULL WHERE j_infection_related_fup_days = 'NA';
-UPDATE phenotype_data_stage SET `j_kidney_cancer_fup_days` = NULL WHERE j_kidney_cancer_fup_days = 'NA';
-UPDATE phenotype_data_stage SET `j_kidney_cancer_fup_age` = NULL WHERE j_kidney_cancer_fup_age = 'NA';
-UPDATE phenotype_data_stage SET `j_kidney_cancer_dx_age` = NULL WHERE j_kidney_cancer_dx_age = 'NA';
-UPDATE phenotype_data_stage SET `j_kidney_cancer` = NULL WHERE j_kidney_cancer = 'NA';
-UPDATE phenotype_data_stage SET `j_kidney_renalcell_clearcell` = NULL WHERE j_kidney_renalcell_clearcell = 'NA';
-UPDATE phenotype_data_stage SET `j_kidney_renalcell_nos` = NULL WHERE j_kidney_renalcell_nos = 'NA';
-UPDATE phenotype_data_stage SET `j_gast_cancer` = NULL WHERE j_gast_cancer = 'NA';
-UPDATE phenotype_data_stage SET `j_gast_cancer_fup_days` = NULL WHERE j_gast_cancer_fup_days = 'NA';
-UPDATE phenotype_data_stage SET `j_gast_cancer_fup_age` = NULL WHERE j_gast_cancer_fup_age = 'NA';
-UPDATE phenotype_data_stage SET `j_gast_cancer_dx_age` = NULL WHERE j_gast_cancer_dx_age = 'NA';
-UPDATE phenotype_data_stage SET `j_gast_cardia` = NULL WHERE j_gast_cardia = 'NA';
-UPDATE phenotype_data_stage SET `j_gast_noncardia` = NULL WHERE j_gast_noncardia = 'NA';
-UPDATE phenotype_data_stage SET `j_glio_cancer` = NULL WHERE j_glio_cancer = 'NA';
-UPDATE phenotype_data_stage SET `j_glio_cancer_fup_days` = NULL WHERE j_glio_cancer_fup_days = 'NA';
-UPDATE phenotype_data_stage SET `j_glio_cancer_fup_age` = NULL WHERE j_glio_cancer_fup_age = 'NA';
-UPDATE phenotype_data_stage SET `j_glio_cancer_dx_age` = NULL WHERE j_glio_cancer_dx_age = 'NA';
-UPDATE phenotype_data_stage SET `j_liver_xintra_cancer_fup_days` = NULL WHERE j_liver_xintra_cancer_fup_days = 'NA';
-UPDATE phenotype_data_stage SET `j_liver_xintra_cancer_fup_age` = NULL WHERE j_liver_xintra_cancer_fup_age = 'NA';
-UPDATE phenotype_data_stage SET `j_liver_xintra_cancer_dx_age` = NULL WHERE j_liver_xintra_cancer_dx_age = 'NA';
-UPDATE phenotype_data_stage SET `j_liver_xintra_cancer` = NULL WHERE j_liver_xintra_cancer = 'NA';
-UPDATE phenotype_data_stage SET `j_lung_cancer` = NULL WHERE j_lung_cancer = 'NA';
-UPDATE phenotype_data_stage SET `j_lung_cancer_fup_days` = NULL WHERE j_lung_cancer_fup_days = 'NA';
-UPDATE phenotype_data_stage SET `j_lung_cancer_fup_age` = NULL WHERE j_lung_cancer_fup_age = 'NA';
-UPDATE phenotype_data_stage SET `j_lung_cancer_dx_age` = NULL WHERE j_lung_cancer_dx_age = 'NA';
-UPDATE phenotype_data_stage SET `j_lung_smallcell` = NULL WHERE j_lung_smallcell = 'NA';
-UPDATE phenotype_data_stage SET `j_lung_adeno` = NULL WHERE j_lung_adeno = 'NA';
-UPDATE phenotype_data_stage SET `j_lung_squam` = NULL WHERE j_lung_squam = 'NA';
-UPDATE phenotype_data_stage SET `j_lymphoid` = NULL WHERE j_lymphoid = 'NA';
-UPDATE phenotype_data_stage SET `j_lymphoid_fup_days` = NULL WHERE j_lymphoid_fup_days = 'NA';
-UPDATE phenotype_data_stage SET `j_lymphoid_fup_age` = NULL WHERE j_lymphoid_fup_age = 'NA';
-UPDATE phenotype_data_stage SET `j_lymphoid_dx_age` = NULL WHERE j_lymphoid_dx_age = 'NA';
-UPDATE phenotype_data_stage SET `j_cll` = NULL WHERE j_cll = 'NA';
-UPDATE phenotype_data_stage SET `j_cll_fup_days` = NULL WHERE j_cll_fup_days = 'NA';
-UPDATE phenotype_data_stage SET `j_cll_fup_age` = NULL WHERE j_cll_fup_age = 'NA';
-UPDATE phenotype_data_stage SET `j_cll_dx_age` = NULL WHERE j_cll_dx_age = 'NA';
-UPDATE phenotype_data_stage SET `j_mbreast_cancer` = NULL WHERE j_mbreast_cancer = 'NA';
-UPDATE phenotype_data_stage SET `j_mbreast_cancer_fup_days` = NULL WHERE j_mbreast_cancer_fup_days = 'NA';
-UPDATE phenotype_data_stage SET `j_mbreast_cancer_fup_age` = NULL WHERE j_mbreast_cancer_fup_age = 'NA';
-UPDATE phenotype_data_stage SET `j_mbreast_cancer_dx_age` = NULL WHERE j_mbreast_cancer_dx_age = 'NA';
-UPDATE phenotype_data_stage SET `j_mela_cancer` = NULL WHERE j_mela_cancer = 'NA';
-UPDATE phenotype_data_stage SET `j_mela_cancer_fup_days` = NULL WHERE j_mela_cancer_fup_days = 'NA';
-UPDATE phenotype_data_stage SET `j_mela_cancer_fup_age` = NULL WHERE j_mela_cancer_fup_age = 'NA';
-UPDATE phenotype_data_stage SET `j_mela_cancer_dx_age` = NULL WHERE j_mela_cancer_dx_age = 'NA';
-UPDATE phenotype_data_stage SET `j_mesoth` = NULL WHERE j_mesoth = 'NA';
-UPDATE phenotype_data_stage SET `j_mesoth_fup_days` = NULL WHERE j_mesoth_fup_days = 'NA';
-UPDATE phenotype_data_stage SET `j_mesoth_fup_age` = NULL WHERE j_mesoth_fup_age = 'NA';
-UPDATE phenotype_data_stage SET `j_mesoth_dx_age` = NULL WHERE j_mesoth_dx_age = 'NA';
-UPDATE phenotype_data_stage SET `j_myeloid` = NULL WHERE j_myeloid = 'NA';
-UPDATE phenotype_data_stage SET `j_myeloid_fup_days` = NULL WHERE j_myeloid_fup_days = 'NA';
-UPDATE phenotype_data_stage SET `j_myeloid_fup_age` = NULL WHERE j_myeloid_fup_age = 'NA';
-UPDATE phenotype_data_stage SET `j_myeloid_dx_age` = NULL WHERE j_myeloid_dx_age = 'NA';
-UPDATE phenotype_data_stage SET `j_obesity_related_dx_age` = NULL WHERE j_obesity_related_dx_age = 'NA';
-UPDATE phenotype_data_stage SET `j_obesity_related` = NULL WHERE j_obesity_related = 'NA';
-UPDATE phenotype_data_stage SET `j_obesity_related_fup_age` = NULL WHERE j_obesity_related_fup_age = 'NA';
-UPDATE phenotype_data_stage SET `j_obesity_related_fup_days` = NULL WHERE j_obesity_related_fup_days = 'NA';
-UPDATE phenotype_data_stage SET `j_osumm_cancer` = NULL WHERE j_osumm_cancer = 'NA';
-UPDATE phenotype_data_stage SET `j_osumm_cancer_fup_days` = NULL WHERE j_osumm_cancer_fup_days = 'NA';
-UPDATE phenotype_data_stage SET `j_osumm_cancer_fup_age` = NULL WHERE j_osumm_cancer_fup_age = 'NA';
-UPDATE phenotype_data_stage SET `j_osumm_cancer_dx_age` = NULL WHERE j_osumm_cancer_dx_age = 'NA';
-UPDATE phenotype_data_stage SET `j_osumm_serous_grade_high` = NULL WHERE j_osumm_serous_grade_high = 'NA';
-UPDATE phenotype_data_stage SET `j_panc_cancer` = NULL WHERE j_panc_cancer = 'NA';
-UPDATE phenotype_data_stage SET `j_panc_cancer_fup_days` = NULL WHERE j_panc_cancer_fup_days = 'NA';
-UPDATE phenotype_data_stage SET `j_panc_cancer_fup_age` = NULL WHERE j_panc_cancer_fup_age = 'NA';
-UPDATE phenotype_data_stage SET `j_panc_cancer_dx_age` = NULL WHERE j_panc_cancer_dx_age = 'NA';
-UPDATE phenotype_data_stage SET `j_phys_act_related_dx_age` = NULL WHERE j_phys_act_related_dx_age = 'NA';
-UPDATE phenotype_data_stage SET `j_phys_act_related` = NULL WHERE j_phys_act_related = 'NA';
-UPDATE phenotype_data_stage SET `j_phys_act_related_fup_age` = NULL WHERE j_phys_act_related_fup_age = 'NA';
-UPDATE phenotype_data_stage SET `j_phys_act_related_fup_days` = NULL WHERE j_phys_act_related_fup_days = 'NA';
-UPDATE phenotype_data_stage SET `j_pros_cancer` = NULL WHERE j_pros_cancer = 'NA';
-UPDATE phenotype_data_stage SET `j_pros_cancer_fup_days` = NULL WHERE j_pros_cancer_fup_days = 'NA';
-UPDATE phenotype_data_stage SET `j_pros_cancer_fup_age` = NULL WHERE j_pros_cancer_fup_age = 'NA';
-UPDATE phenotype_data_stage SET `j_pros_cancer_dx_age` = NULL WHERE j_pros_cancer_dx_age = 'NA';
-UPDATE phenotype_data_stage SET `j_pros_non_advanced` = NULL WHERE j_pros_non_advanced = 'NA';
-UPDATE phenotype_data_stage SET `j_pros_advanced_including7` = NULL WHERE j_pros_advanced_including7 = 'NA';
-UPDATE phenotype_data_stage SET `j_pros_advanced_excluding7` = NULL WHERE j_pros_advanced_excluding7 = 'NA';
-UPDATE phenotype_data_stage SET `j_sarcoma` = NULL WHERE j_sarcoma = 'NA';
-UPDATE phenotype_data_stage SET `j_sarcoma_fup_days` = NULL WHERE j_sarcoma_fup_days = 'NA';
-UPDATE phenotype_data_stage SET `j_sarcoma_fup_age` = NULL WHERE j_sarcoma_fup_age = 'NA';
-UPDATE phenotype_data_stage SET `j_sarcoma_dx_age` = NULL WHERE j_sarcoma_dx_age = 'NA';
-UPDATE phenotype_data_stage SET `j_smoking_related_dx_age` = NULL WHERE j_smoking_related_dx_age = 'NA';
-UPDATE phenotype_data_stage SET `j_smoking_related` = NULL WHERE j_smoking_related = 'NA';
-UPDATE phenotype_data_stage SET `j_smoking_related_fup_age` = NULL WHERE j_smoking_related_fup_age = 'NA';
-UPDATE phenotype_data_stage SET `j_smoking_related_fup_days` = NULL WHERE j_smoking_related_fup_days = 'NA';
-UPDATE phenotype_data_stage SET `j_solid_tumor` = NULL WHERE j_solid_tumor = 'NA';
-UPDATE phenotype_data_stage SET `j_solid_tumor_fup_days` = NULL WHERE j_solid_tumor_fup_days = 'NA';
-UPDATE phenotype_data_stage SET `j_solid_tumor_fup_age` = NULL WHERE j_solid_tumor_fup_age = 'NA';
-UPDATE phenotype_data_stage SET `j_solid_tumor_dx_age` = NULL WHERE j_solid_tumor_dx_age = 'NA';
-UPDATE phenotype_data_stage SET `j_squamous` = NULL WHERE j_squamous = 'NA';
-UPDATE phenotype_data_stage SET `j_squamous_fup_days` = NULL WHERE j_squamous_fup_days = 'NA';
-UPDATE phenotype_data_stage SET `j_squamous_fup_age` = NULL WHERE j_squamous_fup_age = 'NA';
-UPDATE phenotype_data_stage SET `j_squamous_dx_age` = NULL WHERE j_squamous_dx_age = 'NA';
-UPDATE phenotype_data_stage SET `j_thyd_cancer` = NULL WHERE j_thyd_cancer = 'NA';
-UPDATE phenotype_data_stage SET `j_thyd_cancer_fup_days` = NULL WHERE j_thyd_cancer_fup_days = 'NA';
-UPDATE phenotype_data_stage SET `j_thyd_cancer_fup_age` = NULL WHERE j_thyd_cancer_fup_age = 'NA';
-UPDATE phenotype_data_stage SET `j_thyd_cancer_dx_age` = NULL WHERE j_thyd_cancer_dx_age = 'NA';
-UPDATE phenotype_data_stage SET `j_upgi_cancer` = NULL WHERE j_upgi_cancer = 'NA';
-UPDATE phenotype_data_stage SET `j_upgi_cancer_fup_days` = NULL WHERE j_upgi_cancer_fup_days = 'NA';
-UPDATE phenotype_data_stage SET `j_upgi_cancer_fup_age` = NULL WHERE j_upgi_cancer_fup_age = 'NA';
-UPDATE phenotype_data_stage SET `j_upgi_cancer_dx_age` = NULL WHERE j_upgi_cancer_dx_age = 'NA';
-UPDATE phenotype_data_stage SET `j_urothelial` = NULL WHERE j_urothelial = 'NA';
-UPDATE phenotype_data_stage SET `j_urothelial_fup_days` = NULL WHERE j_urothelial_fup_days = 'NA';
-UPDATE phenotype_data_stage SET `j_urothelial_fup_age` = NULL WHERE j_urothelial_fup_age = 'NA';
-UPDATE phenotype_data_stage SET `j_urothelial_dx_age` = NULL WHERE j_urothelial_dx_age = 'NA';
-UPDATE phenotype_data_stage SET `is_dead` = NULL WHERE is_dead = 'NA';
-UPDATE phenotype_data_stage SET `mortality_exitage` = NULL WHERE mortality_exitage = 'NA';
-UPDATE phenotype_data_stage SET `dth_days` = NULL WHERE dth_days = 'NA';
-UPDATE phenotype_data_stage SET `mortality_exitdays_unadj` = NULL WHERE mortality_exitdays_unadj = 'NA';
-UPDATE phenotype_data_stage SET `f_death_ischemic` = NULL WHERE f_death_ischemic = 'NA';
-UPDATE phenotype_data_stage SET `f_death_cerebrovascular` = NULL WHERE f_death_cerebrovascular = 'NA';
-UPDATE phenotype_data_stage SET `f_death_rheumatic` = NULL WHERE f_death_rheumatic = 'NA';
-UPDATE phenotype_data_stage SET `f_death_hypertensive` = NULL WHERE f_death_hypertensive = 'NA';
-UPDATE phenotype_data_stage SET `f_death_peripheral` = NULL WHERE f_death_peripheral = 'NA';
-UPDATE phenotype_data_stage SET `f_death_heart` = NULL WHERE f_death_heart = 'NA';
-UPDATE phenotype_data_stage SET `f_death_cardiac` = NULL WHERE f_death_cardiac = 'NA';
-UPDATE phenotype_data_stage SET `f_death_arrhythmia` = NULL WHERE f_death_arrhythmia = 'NA';
-UPDATE phenotype_data_stage SET `f_death_endocarditis` = NULL WHERE f_death_endocarditis = 'NA';
-UPDATE phenotype_data_stage SET `f_death_cardiovascular` = NULL WHERE f_death_cardiovascular = 'NA';
-UPDATE phenotype_data_stage SET `f_death_cancer` = NULL WHERE f_death_cancer = 'NA';
-UPDATE phenotype_data_stage SET `f_death_chronicresp` = NULL WHERE f_death_chronicresp = 'NA';
-UPDATE phenotype_data_stage SET `f_death_alzheimers` = NULL WHERE f_death_alzheimers = 'NA';
-UPDATE phenotype_data_stage SET `f_death_diabetes` = NULL WHERE f_death_diabetes = 'NA';
-UPDATE phenotype_data_stage SET `f_death_nephritis` = NULL WHERE f_death_nephritis = 'NA';
-UPDATE phenotype_data_stage SET `f_death_chronicliver` = NULL WHERE f_death_chronicliver = 'NA';
-UPDATE phenotype_data_stage SET `f_death_parkinsons` = NULL WHERE f_death_parkinsons = 'NA';
-UPDATE phenotype_data_stage SET `bq_educat_o` = NULL WHERE bq_educat_o = 'NA';
-UPDATE phenotype_data_stage SET `bq_marital_co` = NULL WHERE bq_marital_co = 'NA';
-UPDATE phenotype_data_stage SET `bq_fmenstr_o` = NULL WHERE bq_fmenstr_o = 'NA';
-UPDATE phenotype_data_stage SET `bq_tubal_o` = NULL WHERE bq_tubal_o = 'NA';
-UPDATE phenotype_data_stage SET `bq_bbd_b` = NULL WHERE bq_bbd_b = 'NA';
-UPDATE phenotype_data_stage SET `bq_benign_ovcyst_b` = NULL WHERE bq_benign_ovcyst_b = 'NA';
-UPDATE phenotype_data_stage SET `bq_endometriosis_b` = NULL WHERE bq_endometriosis_b = 'NA';
-UPDATE phenotype_data_stage SET `bq_uterine_fib_b` = NULL WHERE bq_uterine_fib_b = 'NA';
-UPDATE phenotype_data_stage SET `bq_trypreg_b` = NULL WHERE bq_trypreg_b = 'NA';
-UPDATE phenotype_data_stage SET `bq_urinatea_o` = NULL WHERE bq_urinatea_o = 'NA';
-UPDATE phenotype_data_stage SET `bq_infprosa_o` = NULL WHERE bq_infprosa_o = 'NA';
-UPDATE phenotype_data_stage SET `bq_hearta_f_b` = NULL WHERE bq_hearta_f_b = 'NA';
-UPDATE phenotype_data_stage SET `bq_bronchit_f_b` = NULL WHERE bq_bronchit_f_b = 'NA';
-UPDATE phenotype_data_stage SET `bq_polyps_f_b` = NULL WHERE bq_polyps_f_b = 'NA';
-UPDATE phenotype_data_stage SET `bq_ulcerative_colitits_b` = NULL WHERE bq_ulcerative_colitits_b = 'NA';
-UPDATE phenotype_data_stage SET `bq_crohns_disease_b` = NULL WHERE bq_crohns_disease_b = 'NA';
-UPDATE phenotype_data_stage SET `bq_familial_polyposis_b` = NULL WHERE bq_familial_polyposis_b = 'NA';
-UPDATE phenotype_data_stage SET `bq_hepatitis_b` = NULL WHERE bq_hepatitis_b = 'NA';
-UPDATE phenotype_data_stage SET `bq_cirrhosis_b` = NULL WHERE bq_cirrhosis_b = 'NA';
-UPDATE phenotype_data_stage SET `bq_divertic_f_b` = NULL WHERE bq_divertic_f_b = 'NA';
-UPDATE phenotype_data_stage SET `bq_gallblad_f_b` = NULL WHERE bq_gallblad_f_b = 'NA';
-UPDATE phenotype_data_stage SET `bq_age_co` = NULL WHERE bq_age_co = 'NA';
-UPDATE phenotype_data_stage SET `bq_race7_ca` = NULL WHERE bq_race7_ca = 'NA';
-UPDATE phenotype_data_stage SET `bq_hispanic_f_b` = NULL WHERE bq_hispanic_f_b = 'NA';
-UPDATE phenotype_data_stage SET `bq_surg_resection_b` = NULL WHERE bq_surg_resection_b = 'NA';
-UPDATE phenotype_data_stage SET `bq_surg_prostatectomy_b` = NULL WHERE bq_surg_prostatectomy_b = 'NA';
-UPDATE phenotype_data_stage SET `bq_hyster_f_b` = NULL WHERE bq_hyster_f_b = 'NA';
-UPDATE phenotype_data_stage SET `bq_ovariesr_f_ca` = NULL WHERE bq_ovariesr_f_ca = 'NA';
-UPDATE phenotype_data_stage SET `bq_infpros_f_b` = NULL WHERE bq_infpros_f_b = 'NA';
-UPDATE phenotype_data_stage SET `bq_urinate_f_o` = NULL WHERE bq_urinate_f_o = 'NA';
-UPDATE phenotype_data_stage SET `bq_smoked_f_b` = NULL WHERE bq_smoked_f_b = 'NA';
-UPDATE phenotype_data_stage SET `bq_smokea_f_co` = NULL WHERE bq_smokea_f_co = 'NA';
-UPDATE phenotype_data_stage SET `bq_ssmokea_f_co` = NULL WHERE bq_ssmokea_f_co = 'NA';
-UPDATE phenotype_data_stage SET `bq_cig_stop_co` = NULL WHERE bq_cig_stop_co = 'NA';
-UPDATE phenotype_data_stage SET `bq_bmi_20_co` = NULL WHERE bq_bmi_20_co = 'NA';
-UPDATE phenotype_data_stage SET `bq_bmi_50_co` = NULL WHERE bq_bmi_50_co = 'NA';
-UPDATE phenotype_data_stage SET `bq_bmi_curr_co` = NULL WHERE bq_bmi_curr_co = 'NA';
-UPDATE phenotype_data_stage SET `bq_weight_f_co` = NULL WHERE bq_weight_f_co = 'NA';
-UPDATE phenotype_data_stage SET `bq_weight20_f_co` = NULL WHERE bq_weight20_f_co = 'NA';
-UPDATE phenotype_data_stage SET `bq_weight50_f_co` = NULL WHERE bq_weight50_f_co = 'NA';
-UPDATE phenotype_data_stage SET `bq_height_f_co` = NULL WHERE bq_height_f_co = 'NA';
-UPDATE phenotype_data_stage SET `bq_fh_cancer_b` = NULL WHERE bq_fh_cancer_b = 'NA';
-UPDATE phenotype_data_stage SET `center` = NULL WHERE center = 'NA';
-UPDATE phenotype_data_stage SET `arm` = NULL WHERE arm = 'NA';
-UPDATE phenotype_data_stage SET `sex` = NULL WHERE sex = 'NA';
-UPDATE phenotype_data_stage SET `in_GSA_study` = NULL WHERE in_GSA_study = 'NA';
-UPDATE phenotype_data_stage SET `dqx_age_co` = NULL WHERE dqx_age_co = 'NA';
-UPDATE phenotype_data_stage SET `dqx_qxn_physicact_40_o` = NULL WHERE dqx_qxn_physicact_40_o = 'NA';
-UPDATE phenotype_data_stage SET `dqx_qxn_physicact_now_o` = NULL WHERE dqx_qxn_physicact_now_o = 'NA';
-UPDATE phenotype_data_stage SET `sqx_age_co` = NULL WHERE sqx_age_co = 'NA';
-UPDATE phenotype_data_stage SET `sqx_sit_ht_o` = NULL WHERE sqx_sit_ht_o = 'NA';
-UPDATE phenotype_data_stage SET `sqx_waist_hip_o` = NULL WHERE sqx_waist_hip_o = 'NA';
-UPDATE phenotype_data_stage SET `sqx_height_co` = NULL WHERE sqx_height_co = 'NA';
-UPDATE phenotype_data_stage SET `sqx_wt30s_co` = NULL WHERE sqx_wt30s_co = 'NA';
-UPDATE phenotype_data_stage SET `sqx_wt40s_co` = NULL WHERE sqx_wt40s_co = 'NA';
-UPDATE phenotype_data_stage SET `sqx_wt50s_co` = NULL WHERE sqx_wt50s_co = 'NA';
-UPDATE phenotype_data_stage SET `sqx_wt60s_co` = NULL WHERE sqx_wt60s_co = 'NA';
-UPDATE phenotype_data_stage SET `sqx_wt70s_co` = NULL WHERE sqx_wt70s_co = 'NA';
-UPDATE phenotype_data_stage SET `sqx_wt_curr_co` = NULL WHERE sqx_wt_curr_co = 'NA';
-UPDATE phenotype_data_stage SET `sqx_bmi30s_co` = NULL WHERE sqx_bmi30s_co = 'NA';
-UPDATE phenotype_data_stage SET `sqx_bmi40s_co` = NULL WHERE sqx_bmi40s_co = 'NA';
-UPDATE phenotype_data_stage SET `sqx_bmi50s_co` = NULL WHERE sqx_bmi50s_co = 'NA';
-UPDATE phenotype_data_stage SET `sqx_bmi60s_co` = NULL WHERE sqx_bmi60s_co = 'NA';
-UPDATE phenotype_data_stage SET `sqx_bmi70s_co` = NULL WHERE sqx_bmi70s_co = 'NA';
-UPDATE phenotype_data_stage SET `sqx_bmi_curr_co` = NULL WHERE sqx_bmi_curr_co = 'NA';
-UPDATE phenotype_data_stage SET `sqx_cholesterol_b` = NULL WHERE sqx_cholesterol_b = 'NA';
-UPDATE phenotype_data_stage SET `sqx_asthma_b` = NULL WHERE sqx_asthma_b = 'NA';
-UPDATE phenotype_data_stage SET `sqxbq_hearta_b` = NULL WHERE sqxbq_hearta_b = 'NA';
-UPDATE phenotype_data_stage SET `sqxbq_stroke_b` = NULL WHERE sqxbq_stroke_b = 'NA';
-UPDATE phenotype_data_stage SET `sqxbq_hyperten_b` = NULL WHERE sqxbq_hyperten_b = 'NA';
-UPDATE phenotype_data_stage SET `sqxbq_diabetes_b` = NULL WHERE sqxbq_diabetes_b = 'NA';
-UPDATE phenotype_data_stage SET `sqxbq_osteopor_b` = NULL WHERE sqxbq_osteopor_b = 'NA';
-UPDATE phenotype_data_stage SET `sqxbq_emphysema_b` = NULL WHERE sqxbq_emphysema_b = 'NA';
-UPDATE phenotype_data_stage SET `sqxbq_arthritis_b` = NULL WHERE sqxbq_arthritis_b = 'NA';
-UPDATE phenotype_data_stage SET `sqx_broke_hip_b` = NULL WHERE sqx_broke_hip_b = 'NA';
-UPDATE phenotype_data_stage SET `sqx_broke_arm_b` = NULL WHERE sqx_broke_arm_b = 'NA';
-UPDATE phenotype_data_stage SET `sqx_broke_vertebra_b` = NULL WHERE sqx_broke_vertebra_b = 'NA';
-UPDATE phenotype_data_stage SET `sqx_broke_none_b` = NULL WHERE sqx_broke_none_b = 'NA';
-UPDATE phenotype_data_stage SET `sqx_balding_trend_o` = NULL WHERE sqx_balding_trend_o = 'NA';
-UPDATE phenotype_data_stage SET `sqx_urinate_o` = NULL WHERE sqx_urinate_o = 'NA';
-UPDATE phenotype_data_stage SET `sqxbq_bpha_o` = NULL WHERE sqxbq_bpha_o = 'NA';
-UPDATE phenotype_data_stage SET `sqxbq_bph_b` = NULL WHERE sqxbq_bph_b = 'NA';
-UPDATE phenotype_data_stage SET `sqx_lift_weights_b` = NULL WHERE sqx_lift_weights_b = 'NA';
-UPDATE phenotype_data_stage SET `sqx_lift_weights_lev_o` = NULL WHERE sqx_lift_weights_lev_o = 'NA';
-UPDATE phenotype_data_stage SET `sqx_active_b` = NULL WHERE sqx_active_b = 'NA';
-UPDATE phenotype_data_stage SET `sqx_fh_blad_b` = NULL WHERE sqx_fh_blad_b = 'NA';
-UPDATE phenotype_data_stage SET `sqx_fh_breast_b` = NULL WHERE sqx_fh_breast_b = 'NA';
-UPDATE phenotype_data_stage SET `sqx_fh_colo_b` = NULL WHERE sqx_fh_colo_b = 'NA';
-UPDATE phenotype_data_stage SET `sqx_fh_endo_b` = NULL WHERE sqx_fh_endo_b = 'NA';
-UPDATE phenotype_data_stage SET `sqx_fh_leuk_b` = NULL WHERE sqx_fh_leuk_b = 'NA';
-UPDATE phenotype_data_stage SET `sqx_fh_lung_b` = NULL WHERE sqx_fh_lung_b = 'NA';
-UPDATE phenotype_data_stage SET `sqx_fh_lymph_b` = NULL WHERE sqx_fh_lymph_b = 'NA';
-UPDATE phenotype_data_stage SET `sqx_fh_ovar_b` = NULL WHERE sqx_fh_ovar_b = 'NA';
-UPDATE phenotype_data_stage SET `sqx_fh_pros_b` = NULL WHERE sqx_fh_pros_b = 'NA';
-UPDATE phenotype_data_stage SET `sqx_fh_cancer_f_b` = NULL WHERE sqx_fh_cancer_f_b = 'NA';
-UPDATE phenotype_data_stage SET `sqx_twins_b` = NULL WHERE sqx_twins_b = 'NA';
-UPDATE phenotype_data_stage SET `sqx_smk100_b` = NULL WHERE sqx_smk100_b = 'NA';
-UPDATE phenotype_data_stage SET `sqx_amt_smk_o` = NULL WHERE sqx_amt_smk_o = 'NA';
-UPDATE phenotype_data_stage SET `sqx_smk_crave1_b` = NULL WHERE sqx_smk_crave1_b = 'NA';
-UPDATE phenotype_data_stage SET `sqx_smk_crave2_b` = NULL WHERE sqx_smk_crave2_b = 'NA';
-UPDATE phenotype_data_stage SET `sqx_smk_crave3_b` = NULL WHERE sqx_smk_crave3_b = 'NA';
-UPDATE phenotype_data_stage SET `sqx_smk_crave4_b` = NULL WHERE sqx_smk_crave4_b = 'NA';
-UPDATE phenotype_data_stage SET `sqx_smk_try_quit_b` = NULL WHERE sqx_smk_try_quit_b = 'NA';
-UPDATE phenotype_data_stage SET `sqx_smk_age_quit_co` = NULL WHERE sqx_smk_age_quit_co = 'NA';
-UPDATE phenotype_data_stage SET `sqx_worry_lungca_o` = NULL WHERE sqx_worry_lungca_o = 'NA';
-UPDATE phenotype_data_stage SET `sqx_risk_lungca_o` = NULL WHERE sqx_risk_lungca_o = 'NA';
-UPDATE phenotype_data_stage SET `sqx_smk_his_co` = NULL WHERE sqx_smk_his_co = 'NA';
-UPDATE phenotype_data_stage SET `sqx_smk_behv_co` = NULL WHERE sqx_smk_behv_co = 'NA';
-UPDATE phenotype_data_stage SET `sqx_smk_ftnd_co` = NULL WHERE sqx_smk_ftnd_co = 'NA';
-UPDATE phenotype_data_stage SET `sqx_years_quit_co` = NULL WHERE sqx_years_quit_co = 'NA';
-UPDATE phenotype_data_stage SET `sqx_cig_years_co` = NULL WHERE sqx_cig_years_co = 'NA';
-UPDATE phenotype_data_stage SET `sqx_gain_chest_shoulders_b` = NULL WHERE sqx_gain_chest_shoulders_b = 'NA';
-UPDATE phenotype_data_stage SET `sqx_gain_waist_stomach_b` = NULL WHERE sqx_gain_waist_stomach_b = 'NA';
-UPDATE phenotype_data_stage SET `sqx_gain_hips_thighs_b` = NULL WHERE sqx_gain_hips_thighs_b = 'NA';
-UPDATE phenotype_data_stage SET `sqx_gain_equally_over_b` = NULL WHERE sqx_gain_equally_over_b = 'NA';
-UPDATE phenotype_data_stage SET `sqx_lose_chest_shoulders_b` = NULL WHERE sqx_lose_chest_shoulders_b = 'NA';
-UPDATE phenotype_data_stage SET `sqx_lose_waist_stomach_b` = NULL WHERE sqx_lose_waist_stomach_b = 'NA';
-UPDATE phenotype_data_stage SET `sqx_lose_hips_thighs_b` = NULL WHERE sqx_lose_hips_thighs_b = 'NA';
-UPDATE phenotype_data_stage SET `sqx_lose_equally_over_b` = NULL WHERE sqx_lose_equally_over_b = 'NA';
-UPDATE phenotype_data_stage SET `sqxbq_rheumatoid_arthritis_b` = NULL WHERE sqxbq_rheumatoid_arthritis_b = 'NA';
-UPDATE phenotype_data_stage SET `sqxbq_osteoarthritis_b` = NULL WHERE sqxbq_osteoarthritis_b = 'NA';
-UPDATE phenotype_data_stage SET `sqx_moderate_week_co` = NULL WHERE sqx_moderate_week_co = 'NA';
-UPDATE phenotype_data_stage SET `sqx_strenuous_week_co` = NULL WHERE sqx_strenuous_week_co = 'NA';
-UPDATE phenotype_data_stage SET `sqx_ever_balding_b` = NULL WHERE sqx_ever_balding_b = 'NA';
-UPDATE phenotype_data_stage SET `sqx_top_bald_b` = NULL WHERE sqx_top_bald_b = 'NA';
-UPDATE phenotype_data_stage SET `bq_menstr_natural_o` = NULL WHERE bq_menstr_natural_o = 'NA';
-UPDATE phenotype_data_stage SET `sqx_current_cigarette_b` = NULL WHERE sqx_current_cigarette_b = 'NA';
-UPDATE phenotype_data_stage SET `sqxbq_relapse_b` = NULL WHERE sqxbq_relapse_b = 'NA';
-UPDATE phenotype_data_stage SET `bq_current_cigarette_b` = NULL WHERE bq_current_cigarette_b = 'NA';
-UPDATE phenotype_data_stage SET `bq_cig_stat_o` = NULL WHERE bq_cig_stat_o = 'NA';
-UPDATE phenotype_data_stage SET `bq_cig_years_co` = NULL WHERE bq_cig_years_co = 'NA';
-UPDATE phenotype_data_stage SET `bq_cigar_o` = NULL WHERE bq_cigar_o = 'NA';
-UPDATE phenotype_data_stage SET `bq_cigpd_f_o` = NULL WHERE bq_cigpd_f_o = 'NA';
-UPDATE phenotype_data_stage SET `bq_filtered_f_b` = NULL WHERE bq_filtered_f_b = 'NA';
-UPDATE phenotype_data_stage SET `bq_pack_years_co` = NULL WHERE bq_pack_years_co = 'NA';
-UPDATE phenotype_data_stage SET `bq_pipe_o` = NULL WHERE bq_pipe_o = 'NA';
-UPDATE phenotype_data_stage SET `sqx_pace_o` = NULL WHERE sqx_pace_o = 'NA';
-UPDATE phenotype_data_stage SET `sqx_stairs_o` = NULL WHERE sqx_stairs_o = 'NA';
-UPDATE phenotype_data_stage SET `sqx_walk_mi_o` = NULL WHERE sqx_walk_mi_o = 'NA';
-UPDATE phenotype_data_stage SET `pack_years_bqelsesqx_co` = NULL WHERE pack_years_bqelsesqx_co = 'NA';
-UPDATE phenotype_data_stage SET `sqx_smk_exp_adult_o` = NULL WHERE sqx_smk_exp_adult_o = 'NA';
-UPDATE phenotype_data_stage SET `sqx_smk_lgt_ca` = NULL WHERE sqx_smk_lgt_ca = 'NA';
-UPDATE phenotype_data_stage SET `sqx_smk_menthol_b` = NULL WHERE sqx_smk_menthol_b = 'NA';
-UPDATE phenotype_data_stage SET `sqx_smk_plan_quit_o` = NULL WHERE sqx_smk_plan_quit_o = 'NA';
-UPDATE phenotype_data_stage SET `sqx_smk_wake_o` = NULL WHERE sqx_smk_wake_o = 'NA';
-UPDATE phenotype_data_stage SET `sqx_smk30days_b` = NULL WHERE sqx_smk30days_b = 'NA';
-UPDATE phenotype_data_stage SET `sqxo_cig_stat_o` = NULL WHERE sqxo_cig_stat_o = 'NA';
-UPDATE phenotype_data_stage SET `sqx_urinatea_o` = NULL WHERE sqx_urinatea_o = 'NA';
-UPDATE phenotype_data_stage SET `SV_COFFEE_REG_NOSUG_DHQ` = NULL WHERE SV_COFFEE_REG_NOSUG_DHQ = 'NA';
-UPDATE phenotype_data_stage SET `SV_COFFEE_DECAF_NOSUG_DHQ` = NULL WHERE SV_COFFEE_DECAF_NOSUG_DHQ = 'NA';
-UPDATE phenotype_data_stage SET `MPED_FRUIT_NOJUICE_DHQ` = NULL WHERE MPED_FRUIT_NOJUICE_DHQ = 'NA';
-UPDATE phenotype_data_stage SET `DT_ALC_ALC_DRINKS_DHQ` = NULL WHERE DT_ALC_ALC_DRINKS_DHQ = 'NA';
-UPDATE phenotype_data_stage SET `DRINKER_DHQ` = NULL WHERE DRINKER_DHQ = 'NA';
-UPDATE phenotype_data_stage SET `G_CANDY_CHOC_DHQ` = NULL WHERE G_CANDY_CHOC_DHQ = 'NA';
-UPDATE phenotype_data_stage SET `G_RED5_DHQ` = NULL WHERE G_RED5_DHQ = 'NA';
-UPDATE phenotype_data_stage SET `G_PROCESS_6_DHQ` = NULL WHERE G_PROCESS_6_DHQ = 'NA';
-UPDATE phenotype_data_stage SET `G_FRUIT_DHQ` = NULL WHERE G_FRUIT_DHQ = 'NA';
-UPDATE phenotype_data_stage SET `G_VEGETABLE_DHQ` = NULL WHERE G_VEGETABLE_DHQ = 'NA';
-UPDATE phenotype_data_stage SET `G_FISH_TOTAL_DHQ` = NULL WHERE G_FISH_TOTAL_DHQ = 'NA';
-UPDATE phenotype_data_stage SET `G_SALTY_GRAIN_SNACK_DHQ` = NULL WHERE G_SALTY_GRAIN_SNACK_DHQ = 'NA';
-UPDATE phenotype_data_stage SET `G_FRUIT_CITRUS_DHQ` = NULL WHERE G_FRUIT_CITRUS_DHQ = 'NA';
-UPDATE phenotype_data_stage SET `G_SODA_REG_DHQ` = NULL WHERE G_SODA_REG_DHQ = 'NA';
-UPDATE phenotype_data_stage SET `DT_KCAL_DHQ` = NULL WHERE DT_KCAL_DHQ = 'NA';
-UPDATE phenotype_data_stage SET `DT_PROT_DHQ` = NULL WHERE DT_PROT_DHQ = 'NA';
-UPDATE phenotype_data_stage SET `DT_FAT_DHQ` = NULL WHERE DT_FAT_DHQ = 'NA';
-UPDATE phenotype_data_stage SET `DT_CARB_DHQ` = NULL WHERE DT_CARB_DHQ = 'NA';
-UPDATE phenotype_data_stage SET `DT_FIBER_CSFII_DHQ` = NULL WHERE DT_FIBER_CSFII_DHQ = 'NA';
-UPDATE phenotype_data_stage SET `DT_CAFFEINE_DHQ` = NULL WHERE DT_CAFFEINE_DHQ = 'NA';
-UPDATE phenotype_data_stage SET `GLY_LOAD_DHQ` = NULL WHERE GLY_LOAD_DHQ = 'NA';
-UPDATE phenotype_data_stage SET `MPED_GRAIN_DHQ` = NULL WHERE MPED_GRAIN_DHQ = 'NA';
-UPDATE phenotype_data_stage SET `MPED_GRAIN_WHOLE_DHQ` = NULL WHERE MPED_GRAIN_WHOLE_DHQ = 'NA';
-UPDATE phenotype_data_stage SET `MPED_VEG_DARK_GREEN_DHQ` = NULL WHERE MPED_VEG_DARK_GREEN_DHQ = 'NA';
-UPDATE phenotype_data_stage SET `MPED_DAIRY_DHQ` = NULL WHERE MPED_DAIRY_DHQ = 'NA';
-UPDATE phenotype_data_stage SET `MPED_DAIRY_MILK_DHQ` = NULL WHERE MPED_DAIRY_MILK_DHQ = 'NA';
-UPDATE phenotype_data_stage SET `MPED_M_SOY_DHQ` = NULL WHERE MPED_M_SOY_DHQ = 'NA';
-UPDATE phenotype_data_stage SET `MPED_M_NUT_SEED_DHQ` = NULL WHERE MPED_M_NUT_SEED_DHQ = 'NA';
-UPDATE phenotype_data_stage SET `MPED_LEGUME_DHQ` = NULL WHERE MPED_LEGUME_DHQ = 'NA';
-UPDATE phenotype_data_stage SET `MPED_ADDED_SUGAR_DHQ` = NULL WHERE MPED_ADDED_SUGAR_DHQ = 'NA';
-UPDATE phenotype_data_stage SET `PE_FR_PROTEIN_DHQ` = NULL WHERE PE_FR_PROTEIN_DHQ = 'NA';
-UPDATE phenotype_data_stage SET `PE_FR_FAT_DHQ` = NULL WHERE PE_FR_FAT_DHQ = 'NA';
-UPDATE phenotype_data_stage SET `PE_FR_CARB_DHQ` = NULL WHERE PE_FR_CARB_DHQ = 'NA';
-UPDATE phenotype_data_stage SET `PE_FR_ALC_DHQ` = NULL WHERE PE_FR_ALC_DHQ = 'NA';
-UPDATE phenotype_data_stage SET `GLY_INDEX_DHQ` = NULL WHERE GLY_INDEX_DHQ = 'NA';
-UPDATE phenotype_data_stage SET `DT_SUGAR_DHQ` = NULL WHERE DT_SUGAR_DHQ = 'NA';
-UPDATE phenotype_data_stage SET `AGE_DHQ` = NULL WHERE AGE_DHQ = 'NA';
-UPDATE phenotype_data_stage SET `DHQ_COMPLETEDVALID` = NULL WHERE DHQ_COMPLETEDVALID = 'NA';
-UPDATE phenotype_data_stage SET `MPED_ALC_BEV_ALC_DRINKS18_DHQ` = NULL WHERE MPED_ALC_BEV_ALC_DRINKS18_DHQ = 'NA';
-UPDATE phenotype_data_stage SET `MPED_ALC_BEV_ALC_DRINKS25_DHQ` = NULL WHERE MPED_ALC_BEV_ALC_DRINKS25_DHQ = 'NA';
-UPDATE phenotype_data_stage SET `MPED_ALC_BEV_ALC_DRINKS40_DHQ` = NULL WHERE MPED_ALC_BEV_ALC_DRINKS40_DHQ = 'NA';
-UPDATE phenotype_data_stage SET `MPED_ALC_BEV_ALC_DRINKS55_DHQ` = NULL WHERE MPED_ALC_BEV_ALC_DRINKS55_DHQ = 'NA';
-UPDATE phenotype_data_stage SET `QXN_F_COFFEE_DHQ` = NULL WHERE QXN_F_COFFEE_DHQ = 'NA';
-UPDATE phenotype_data_stage SET `WHFRDEN_DHQ` = NULL WHERE WHFRDEN_DHQ = 'NA';
-UPDATE phenotype_data_stage SET `GRNDEN_DHQ` = NULL WHERE GRNDEN_DHQ = 'NA';
-UPDATE phenotype_data_stage SET `WGRNDEN_DHQ` = NULL WHERE WGRNDEN_DHQ = 'NA';
-UPDATE phenotype_data_stage SET `DAIRYDEN_DHQ` = NULL WHERE DAIRYDEN_DHQ = 'NA';
-UPDATE phenotype_data_stage SET `HEI2005_TOTAL_SCORE_DHQ` = NULL WHERE HEI2005_TOTAL_SCORE_DHQ = 'NA';
-UPDATE phenotype_data_stage SET `HEI2010_TOTAL_SCORE_DHQ` = NULL WHERE HEI2010_TOTAL_SCORE_DHQ = 'NA';
-UPDATE phenotype_data_stage SET `ADDSUG_PERC2015_DHQ` = NULL WHERE ADDSUG_PERC2015_DHQ = 'NA';
-UPDATE phenotype_data_stage SET `HEI2015_TOTAL_SCORE_DHQ` = NULL WHERE HEI2015_TOTAL_SCORE_DHQ = 'NA';
-UPDATE phenotype_data_stage SET `SALTSNKDEN_G_DHQ` = NULL WHERE SALTSNKDEN_G_DHQ = 'NA';
-UPDATE phenotype_data_stage SET `MILKDEN_DHQ` = NULL WHERE MILKDEN_DHQ = 'NA';
-UPDATE phenotype_data_stage SET `FRTDEN_G_DHQ` = NULL WHERE FRTDEN_G_DHQ = 'NA';
-UPDATE phenotype_data_stage SET `CITFRTDEN_G_DHQ` = NULL WHERE CITFRTDEN_G_DHQ = 'NA';
-UPDATE phenotype_data_stage SET `VEGTOTDEN_G_DHQ` = NULL WHERE VEGTOTDEN_G_DHQ = 'NA';
-UPDATE phenotype_data_stage SET `DKGRVEGDEN_DHQ` = NULL WHERE DKGRVEGDEN_DHQ = 'NA';
-UPDATE phenotype_data_stage SET `LEGUMEDEN_DHQ` = NULL WHERE LEGUMEDEN_DHQ = 'NA';
-UPDATE phenotype_data_stage SET `NUTDEN_DHQ` = NULL WHERE NUTDEN_DHQ = 'NA';
-UPDATE phenotype_data_stage SET `REDMTDEN_G_DHQ` = NULL WHERE REDMTDEN_G_DHQ = 'NA';
-UPDATE phenotype_data_stage SET `PROCMTDEN_G_DHQ` = NULL WHERE PROCMTDEN_G_DHQ = 'NA';
-UPDATE phenotype_data_stage SET `FISHDEN_G_DHQ` = NULL WHERE FISHDEN_G_DHQ = 'NA';
-UPDATE phenotype_data_stage SET `SOYDEN_DHQ` = NULL WHERE SOYDEN_DHQ = 'NA';
-UPDATE phenotype_data_stage SET `current_drinker` = NULL WHERE current_drinker = 'NA';
-UPDATE phenotype_data_stage SET `former_drinker` = NULL WHERE former_drinker = 'NA';
-UPDATE phenotype_data_stage SET `drinker_status_dhq_o` = NULL WHERE drinker_status_dhq_o = 'NA';
-UPDATE phenotype_data_stage SET `ph_status` = NULL WHERE ph_status = 'NA';
-UPDATE phenotype_data_stage SET `first_psa_level` = NULL WHERE first_psa_level = 'NA';
-UPDATE phenotype_data_stage SET `first_psa_year` = NULL WHERE first_psa_year = 'NA';
-UPDATE phenotype_data_stage SET `first_ca125_level` = NULL WHERE first_ca125_level = 'NA';
-UPDATE phenotype_data_stage SET `first_ca125_year` = NULL WHERE first_ca125_year = 'NA';
-UPDATE phenotype_data_stage SET `has_adenoma` = NULL WHERE has_adenoma = 'NA';
-UPDATE phenotype_data_stage SET `has_advanced_adenoma` = NULL WHERE has_advanced_adenoma = 'NA';
-UPDATE phenotype_data_stage SET `has_nonadvanced_adenoma` = NULL WHERE has_nonadvanced_adenoma = 'NA';
+    IGNORE 1 ROWS (
+        plco_id,
+        @j_adeno_carcinoma,
+        @j_adeno_carcinoma_fup_days,
+        @j_adeno_carcinoma_fup_age,
+        @j_adeno_carcinoma_dx_age,
+        @j_alcohol_related_dx_age,
+        @j_alcohol_related,
+        @j_alcohol_related_fup_age,
+        @j_alcohol_related_fup_days,
+        @j_bcell,
+        @j_bcell_fup_days,
+        @j_bcell_fup_age,
+        @j_bcell_dx_age,
+        @j_bili_cancer,
+        @j_bili_cancer_fup_days,
+        @j_bili_cancer_fup_age,
+        @j_bili_cancer_dx_age,
+        @j_blad_cancer,
+        @j_blad_cancer_fup_days,
+        @j_blad_cancer_fup_age,
+        @j_blad_cancer_dx_age,
+        @j_breast_cancer,
+        @j_breast_cancer_fup_days,
+        @j_breast_cancer_fup_age,
+        @j_breast_cancer_dx_age,
+        @j_breast_invasive,
+        @j_breast_insitu,
+        @j_breast_ductal,
+        @j_breast_lobular,
+        @j_breast_tubular,
+        @j_breast_er_pos_or_equiv,
+        @j_breast_er_neg,
+        @j_breast_pr_pos_or_equiv,
+        @j_breast_pr_neg,
+        @j_breast_er_or_pr_pos,
+        @j_breast_er_and_pr_neg,
+        @j_breast_her2_pos_or_equiv,
+        @j_breast_her2_neg,
+        @j_breast_er_pr_and_her2_neg,
+        @j_breast_grade34,
+        @j_breast_grade2,
+        @j_breast_grade1,
+        @j_carcinoma,
+        @j_carcinoma_fup_days,
+        @j_carcinoma_fup_age,
+        @j_carcinoma_dx_age,
+        @j_colo_cancer,
+        @j_colo_cancer_fup_days,
+        @j_colo_cancer_fup_age,
+        @j_colo_cancer_dx_age,
+        @j_colo_distal,
+        @j_colo_distal_proximal,
+        @j_colo_proximal,
+        @j_colo_rectal,
+        @j_diabetes_related_dx_age,
+        @j_diabetes_related,
+        @j_diabetes_related_fup_age,
+        @j_diabetes_related_fup_days,
+        @j_ebv_related_dx_age,
+        @j_ebv_related,
+        @j_ebv_related_fup_age,
+        @j_ebv_related_fup_days,
+        @j_endo_cancer,
+        @j_endo_cancer_fup_days,
+        @j_endo_cancer_fup_age,
+        @j_endo_cancer_dx_age,
+        @j_endo_neuro,
+        @j_endo_neuro_fup_days,
+        @j_endo_neuro_fup_age,
+        @j_endo_neuro_dx_age,
+        @j_esoph_cancer,
+        @j_esoph_cancer_fup_days,
+        @j_esoph_cancer_fup_age,
+        @j_esoph_cancer_dx_age,
+        @j_esoph_squamous,
+        @j_hbv_related_dx_age,
+        @j_hbv_related,
+        @j_hbv_related_fup_age,
+        @j_hbv_related_fup_days,
+        @j_hcv_related_dx_age,
+        @j_hcv_related,
+        @j_hcv_related_fup_age,
+        @j_hcv_related_fup_days,
+        @j_height_related_dx_age,
+        @j_height_related,
+        @j_height_related_fup_age,
+        @j_height_related_fup_days,
+        @j_helicobacter_related_dx_age,
+        @j_helicobacter_related,
+        @j_helicobacter_related_fup_age,
+        @j_helicobacter_related_fup_days,
+        @j_hematologic,
+        @j_hematologic_fup_days,
+        @j_hematologic_fup_age,
+        @j_hematologic_dx_age,
+        @j_hnc_cancer,
+        @j_hnc_cancer_fup_days,
+        @j_hnc_cancer_fup_age,
+        @j_hnc_cancer_dx_age,
+        @j_hnc_larynx,
+        @j_hnc_lip_oral_pharynx,
+        @j_hnc_naso_mid_sinus,
+        @j_hpv_related_dx_age,
+        @j_hpv_related,
+        @j_hpv_related_fup_age,
+        @j_hpv_related_fup_days,
+        @j_infection_related_dx_age,
+        @j_infection_related,
+        @j_infection_related_fup_age,
+        @j_infection_related_fup_days,
+        @j_kidney_cancer_fup_days,
+        @j_kidney_cancer_fup_age,
+        @j_kidney_cancer_dx_age,
+        @j_kidney_cancer,
+        @j_kidney_renalcell_clearcell,
+        @j_kidney_renalcell_nos,
+        @j_gast_cancer,
+        @j_gast_cancer_fup_days,
+        @j_gast_cancer_fup_age,
+        @j_gast_cancer_dx_age,
+        @j_gast_cardia,
+        @j_gast_noncardia,
+        @j_glio_cancer,
+        @j_glio_cancer_fup_days,
+        @j_glio_cancer_fup_age,
+        @j_glio_cancer_dx_age,
+        @j_liver_xintra_cancer_fup_days,
+        @j_liver_xintra_cancer_fup_age,
+        @j_liver_xintra_cancer_dx_age,
+        @j_liver_xintra_cancer,
+        @j_lung_cancer,
+        @j_lung_cancer_fup_days,
+        @j_lung_cancer_fup_age,
+        @j_lung_cancer_dx_age,
+        @j_lung_smallcell,
+        @j_lung_adeno,
+        @j_lung_squam,
+        @j_lymphoid,
+        @j_lymphoid_fup_days,
+        @j_lymphoid_fup_age,
+        @j_lymphoid_dx_age,
+        @j_cll,
+        @j_cll_fup_days,
+        @j_cll_fup_age,
+        @j_cll_dx_age,
+        @j_mbreast_cancer,
+        @j_mbreast_cancer_fup_days,
+        @j_mbreast_cancer_fup_age,
+        @j_mbreast_cancer_dx_age,
+        @j_mela_cancer,
+        @j_mela_cancer_fup_days,
+        @j_mela_cancer_fup_age,
+        @j_mela_cancer_dx_age,
+        @j_mesoth,
+        @j_mesoth_fup_days,
+        @j_mesoth_fup_age,
+        @j_mesoth_dx_age,
+        @j_myeloid,
+        @j_myeloid_fup_days,
+        @j_myeloid_fup_age,
+        @j_myeloid_dx_age,
+        @j_obesity_related_dx_age,
+        @j_obesity_related,
+        @j_obesity_related_fup_age,
+        @j_obesity_related_fup_days,
+        @j_osumm_cancer,
+        @j_osumm_cancer_fup_days,
+        @j_osumm_cancer_fup_age,
+        @j_osumm_cancer_dx_age,
+        @j_osumm_serous_grade_high,
+        @j_panc_cancer,
+        @j_panc_cancer_fup_days,
+        @j_panc_cancer_fup_age,
+        @j_panc_cancer_dx_age,
+        @j_phys_act_related_dx_age,
+        @j_phys_act_related,
+        @j_phys_act_related_fup_age,
+        @j_phys_act_related_fup_days,
+        @j_pros_cancer,
+        @j_pros_cancer_fup_days,
+        @j_pros_cancer_fup_age,
+        @j_pros_cancer_dx_age,
+        @j_pros_non_advanced,
+        @j_pros_advanced_including7,
+        @j_pros_advanced_excluding7,
+        @j_sarcoma,
+        @j_sarcoma_fup_days,
+        @j_sarcoma_fup_age,
+        @j_sarcoma_dx_age,
+        @j_smoking_related_dx_age,
+        @j_smoking_related,
+        @j_smoking_related_fup_age,
+        @j_smoking_related_fup_days,
+        @j_solid_tumor,
+        @j_solid_tumor_fup_days,
+        @j_solid_tumor_fup_age,
+        @j_solid_tumor_dx_age,
+        @j_squamous,
+        @j_squamous_fup_days,
+        @j_squamous_fup_age,
+        @j_squamous_dx_age,
+        @j_thyd_cancer,
+        @j_thyd_cancer_fup_days,
+        @j_thyd_cancer_fup_age,
+        @j_thyd_cancer_dx_age,
+        @j_upgi_cancer,
+        @j_upgi_cancer_fup_days,
+        @j_upgi_cancer_fup_age,
+        @j_upgi_cancer_dx_age,
+        @j_urothelial,
+        @j_urothelial_fup_days,
+        @j_urothelial_fup_age,
+        @j_urothelial_dx_age,
+        @is_dead,
+        @mortality_exitage,
+        @dth_days,
+        @mortality_exitdays_unadj,
+        @f_death_ischemic,
+        @f_death_cerebrovascular,
+        @f_death_rheumatic,
+        @f_death_hypertensive,
+        @f_death_peripheral,
+        @f_death_heart,
+        @f_death_cardiac,
+        @f_death_arrhythmia,
+        @f_death_endocarditis,
+        @f_death_cardiovascular,
+        @f_death_cancer,
+        @f_death_chronicresp,
+        @f_death_alzheimers,
+        @f_death_diabetes,
+        @f_death_nephritis,
+        @f_death_chronicliver,
+        @f_death_parkinsons,
+        @bq_educat_o,
+        @bq_marital_co,
+        @bq_fmenstr_o,
+        @bq_tubal_o,
+        @bq_bbd_b,
+        @bq_benign_ovcyst_b,
+        @bq_endometriosis_b,
+        @bq_uterine_fib_b,
+        @bq_trypreg_b,
+        @bq_urinatea_o,
+        @bq_infprosa_o,
+        @bq_hearta_f_b,
+        @bq_bronchit_f_b,
+        @bq_polyps_f_b,
+        @bq_ulcerative_colitits_b,
+        @bq_crohns_disease_b,
+        @bq_familial_polyposis_b,
+        @bq_hepatitis_b,
+        @bq_cirrhosis_b,
+        @bq_divertic_f_b,
+        @bq_gallblad_f_b,
+        @bq_age_co,
+        @bq_race7_ca,
+        @bq_hispanic_f_b,
+        @bq_surg_resection_b,
+        @bq_surg_prostatectomy_b,
+        @bq_hyster_f_b,
+        @bq_ovariesr_f_ca,
+        @bq_infpros_f_b,
+        @bq_urinate_f_o,
+        @bq_smoked_f_b,
+        @bq_smokea_f_co,
+        @bq_ssmokea_f_co,
+        @bq_cig_stop_co,
+        @bq_bmi_20_co,
+        @bq_bmi_50_co,
+        @bq_bmi_curr_co,
+        @bq_weight_f_co,
+        @bq_weight20_f_co,
+        @bq_weight50_f_co,
+        @bq_height_f_co,
+        @bq_fh_cancer_b,
+        @center,
+        @arm,
+        @sex,
+        @in_GSA_study,
+        @dqx_age_co,
+        @dqx_qxn_physicact_40_o,
+        @dqx_qxn_physicact_now_o,
+        @sqx_age_co,
+        @sqx_sit_ht_o,
+        @sqx_waist_hip_o,
+        @sqx_height_co,
+        @sqx_wt30s_co,
+        @sqx_wt40s_co,
+        @sqx_wt50s_co,
+        @sqx_wt60s_co,
+        @sqx_wt70s_co,
+        @sqx_wt_curr_co,
+        @sqx_bmi30s_co,
+        @sqx_bmi40s_co,
+        @sqx_bmi50s_co,
+        @sqx_bmi60s_co,
+        @sqx_bmi70s_co,
+        @sqx_bmi_curr_co,
+        @sqx_cholesterol_b,
+        @sqx_asthma_b,
+        @sqxbq_hearta_b,
+        @sqxbq_stroke_b,
+        @sqxbq_hyperten_b,
+        @sqxbq_diabetes_b,
+        @sqxbq_osteopor_b,
+        @sqxbq_emphysema_b,
+        @sqxbq_arthritis_b,
+        @sqx_broke_hip_b,
+        @sqx_broke_arm_b,
+        @sqx_broke_vertebra_b,
+        @sqx_broke_none_b,
+        @sqx_balding_trend_o,
+        @sqx_urinate_o,
+        @sqxbq_bpha_o,
+        @sqxbq_bph_b,
+        @sqx_lift_weights_b,
+        @sqx_lift_weights_lev_o,
+        @sqx_active_b,
+        @sqx_fh_blad_b,
+        @sqx_fh_breast_b,
+        @sqx_fh_colo_b,
+        @sqx_fh_endo_b,
+        @sqx_fh_leuk_b,
+        @sqx_fh_lung_b,
+        @sqx_fh_lymph_b,
+        @sqx_fh_ovar_b,
+        @sqx_fh_pros_b,
+        @sqx_fh_cancer_f_b,
+        @sqx_twins_b,
+        @sqx_smk100_b,
+        @sqx_amt_smk_o,
+        @sqx_smk_crave1_b,
+        @sqx_smk_crave2_b,
+        @sqx_smk_crave3_b,
+        @sqx_smk_crave4_b,
+        @sqx_smk_try_quit_b,
+        @sqx_smk_age_quit_co,
+        @sqx_worry_lungca_o,
+        @sqx_risk_lungca_o,
+        @sqx_smk_his_co,
+        @sqx_smk_behv_co,
+        @sqx_smk_ftnd_co,
+        @sqx_years_quit_co,
+        @sqx_cig_years_co,
+        @sqx_gain_chest_shoulders_b,
+        @sqx_gain_waist_stomach_b,
+        @sqx_gain_hips_thighs_b,
+        @sqx_gain_equally_over_b,
+        @sqx_lose_chest_shoulders_b,
+        @sqx_lose_waist_stomach_b,
+        @sqx_lose_hips_thighs_b,
+        @sqx_lose_equally_over_b,
+        @sqxbq_rheumatoid_arthritis_b,
+        @sqxbq_osteoarthritis_b,
+        @sqx_moderate_week_co,
+        @sqx_strenuous_week_co,
+        @sqx_ever_balding_b,
+        @sqx_top_bald_b,
+        @bq_menstr_natural_o,
+        @sqx_current_cigarette_b,
+        @sqxbq_relapse_b,
+        @bq_current_cigarette_b,
+        @bq_cig_stat_o,
+        @bq_cig_years_co,
+        @bq_cigar_o,
+        @bq_cigpd_f_o,
+        @bq_filtered_f_b,
+        @bq_pack_years_co,
+        @bq_pipe_o,
+        @sqx_pace_o,
+        @sqx_stairs_o,
+        @sqx_walk_mi_o,
+        @pack_years_bqelsesqx_co,
+        @sqx_smk_exp_adult_o,
+        @sqx_smk_lgt_ca,
+        @sqx_smk_menthol_b,
+        @sqx_smk_plan_quit_o,
+        @sqx_smk_wake_o,
+        @sqx_smk30days_b,
+        @sqxo_cig_stat_o,
+        @sqx_urinatea_o,
+        @SV_COFFEE_REG_NOSUG_DHQ,
+        @SV_COFFEE_DECAF_NOSUG_DHQ,
+        @MPED_FRUIT_NOJUICE_DHQ,
+        @DT_ALC_ALC_DRINKS_DHQ,
+        @DRINKER_DHQ,
+        @G_CANDY_CHOC_DHQ,
+        @G_RED5_DHQ,
+        @G_PROCESS_6_DHQ,
+        @G_FRUIT_DHQ,
+        @G_VEGETABLE_DHQ,
+        @G_FISH_TOTAL_DHQ,
+        @G_SALTY_GRAIN_SNACK_DHQ,
+        @G_FRUIT_CITRUS_DHQ,
+        @G_SODA_REG_DHQ,
+        @DT_KCAL_DHQ,
+        @DT_PROT_DHQ,
+        @DT_FAT_DHQ,
+        @DT_CARB_DHQ,
+        @DT_FIBER_CSFII_DHQ,
+        @DT_CAFFEINE_DHQ,
+        @GLY_LOAD_DHQ,
+        @MPED_GRAIN_DHQ,
+        @MPED_GRAIN_WHOLE_DHQ,
+        @MPED_VEG_DARK_GREEN_DHQ,
+        @MPED_DAIRY_DHQ,
+        @MPED_DAIRY_MILK_DHQ,
+        @MPED_M_SOY_DHQ,
+        @MPED_M_NUT_SEED_DHQ,
+        @MPED_LEGUME_DHQ,
+        @MPED_ADDED_SUGAR_DHQ,
+        @PE_FR_PROTEIN_DHQ,
+        @PE_FR_FAT_DHQ,
+        @PE_FR_CARB_DHQ,
+        @PE_FR_ALC_DHQ,
+        @GLY_INDEX_DHQ,
+        @DT_SUGAR_DHQ,
+        @AGE_DHQ,
+        @DHQ_COMPLETEDVALID,
+        @MPED_ALC_BEV_ALC_DRINKS18_DHQ,
+        @MPED_ALC_BEV_ALC_DRINKS25_DHQ,
+        @MPED_ALC_BEV_ALC_DRINKS40_DHQ,
+        @MPED_ALC_BEV_ALC_DRINKS55_DHQ,
+        @QXN_F_COFFEE_DHQ,
+        @WHFRDEN_DHQ,
+        @GRNDEN_DHQ,
+        @WGRNDEN_DHQ,
+        @DAIRYDEN_DHQ,
+        @HEI2005_TOTAL_SCORE_DHQ,
+        @HEI2010_TOTAL_SCORE_DHQ,
+        @ADDSUG_PERC2015_DHQ,
+        @HEI2015_TOTAL_SCORE_DHQ,
+        @SALTSNKDEN_G_DHQ,
+        @MILKDEN_DHQ,
+        @FRTDEN_G_DHQ,
+        @CITFRTDEN_G_DHQ,
+        @VEGTOTDEN_G_DHQ,
+        @DKGRVEGDEN_DHQ,
+        @LEGUMEDEN_DHQ,
+        @NUTDEN_DHQ,
+        @REDMTDEN_G_DHQ,
+        @PROCMTDEN_G_DHQ,
+        @FISHDEN_G_DHQ,
+        @SOYDEN_DHQ,
+        @current_drinker,
+        @former_drinker,
+        @drinker_status_dhq_o,
+        @ph_status,
+        @first_psa_level,
+        @first_psa_year,
+        @first_ca125_level,
+        @first_ca125_year,
+        @has_adenoma,
+        @has_advanced_adenoma,
+        @has_nonadvanced_adenoma
+    ) SET
+        j_adeno_carcinoma = IF(@j_adeno_carcinoma IN('NA', ''), NULL, @j_adeno_carcinoma),
+        j_adeno_carcinoma_fup_days = IF(@j_adeno_carcinoma_fup_days IN('NA', ''), NULL, @j_adeno_carcinoma_fup_days),
+        j_adeno_carcinoma_fup_age = IF(@j_adeno_carcinoma_fup_age IN('NA', ''), NULL, @j_adeno_carcinoma_fup_age),
+        j_adeno_carcinoma_dx_age = IF(@j_adeno_carcinoma_dx_age IN('NA', ''), NULL, @j_adeno_carcinoma_dx_age),
+        j_alcohol_related_dx_age = IF(@j_alcohol_related_dx_age IN('NA', ''), NULL, @j_alcohol_related_dx_age),
+        j_alcohol_related = IF(@j_alcohol_related IN('NA', ''), NULL, @j_alcohol_related),
+        j_alcohol_related_fup_age = IF(@j_alcohol_related_fup_age IN('NA', ''), NULL, @j_alcohol_related_fup_age),
+        j_alcohol_related_fup_days = IF(@j_alcohol_related_fup_days IN('NA', ''), NULL, @j_alcohol_related_fup_days),
+        j_bcell = IF(@j_bcell IN('NA', ''), NULL, @j_bcell),
+        j_bcell_fup_days = IF(@j_bcell_fup_days IN('NA', ''), NULL, @j_bcell_fup_days),
+        j_bcell_fup_age = IF(@j_bcell_fup_age IN('NA', ''), NULL, @j_bcell_fup_age),
+        j_bcell_dx_age = IF(@j_bcell_dx_age IN('NA', ''), NULL, @j_bcell_dx_age),
+        j_bili_cancer = IF(@j_bili_cancer IN('NA', ''), NULL, @j_bili_cancer),
+        j_bili_cancer_fup_days = IF(@j_bili_cancer_fup_days IN('NA', ''), NULL, @j_bili_cancer_fup_days),
+        j_bili_cancer_fup_age = IF(@j_bili_cancer_fup_age IN('NA', ''), NULL, @j_bili_cancer_fup_age),
+        j_bili_cancer_dx_age = IF(@j_bili_cancer_dx_age IN('NA', ''), NULL, @j_bili_cancer_dx_age),
+        j_blad_cancer = IF(@j_blad_cancer IN('NA', ''), NULL, @j_blad_cancer),
+        j_blad_cancer_fup_days = IF(@j_blad_cancer_fup_days IN('NA', ''), NULL, @j_blad_cancer_fup_days),
+        j_blad_cancer_fup_age = IF(@j_blad_cancer_fup_age IN('NA', ''), NULL, @j_blad_cancer_fup_age),
+        j_blad_cancer_dx_age = IF(@j_blad_cancer_dx_age IN('NA', ''), NULL, @j_blad_cancer_dx_age),
+        j_breast_cancer = IF(@j_breast_cancer IN('NA', ''), NULL, @j_breast_cancer),
+        j_breast_cancer_fup_days = IF(@j_breast_cancer_fup_days IN('NA', ''), NULL, @j_breast_cancer_fup_days),
+        j_breast_cancer_fup_age = IF(@j_breast_cancer_fup_age IN('NA', ''), NULL, @j_breast_cancer_fup_age),
+        j_breast_cancer_dx_age = IF(@j_breast_cancer_dx_age IN('NA', ''), NULL, @j_breast_cancer_dx_age),
+        j_breast_invasive = IF(@j_breast_invasive IN('NA', ''), NULL, @j_breast_invasive),
+        j_breast_insitu = IF(@j_breast_insitu IN('NA', ''), NULL, @j_breast_insitu),
+        j_breast_ductal = IF(@j_breast_ductal IN('NA', ''), NULL, @j_breast_ductal),
+        j_breast_lobular = IF(@j_breast_lobular IN('NA', ''), NULL, @j_breast_lobular),
+        j_breast_tubular = IF(@j_breast_tubular IN('NA', ''), NULL, @j_breast_tubular),
+        j_breast_er_pos_or_equiv = IF(@j_breast_er_pos_or_equiv IN('NA', ''), NULL, @j_breast_er_pos_or_equiv),
+        j_breast_er_neg = IF(@j_breast_er_neg IN('NA', ''), NULL, @j_breast_er_neg),
+        j_breast_pr_pos_or_equiv = IF(@j_breast_pr_pos_or_equiv IN('NA', ''), NULL, @j_breast_pr_pos_or_equiv),
+        j_breast_pr_neg = IF(@j_breast_pr_neg IN('NA', ''), NULL, @j_breast_pr_neg),
+        j_breast_er_or_pr_pos = IF(@j_breast_er_or_pr_pos IN('NA', ''), NULL, @j_breast_er_or_pr_pos),
+        j_breast_er_and_pr_neg = IF(@j_breast_er_and_pr_neg IN('NA', ''), NULL, @j_breast_er_and_pr_neg),
+        j_breast_her2_pos_or_equiv = IF(@j_breast_her2_pos_or_equiv IN('NA', ''), NULL, @j_breast_her2_pos_or_equiv),
+        j_breast_her2_neg = IF(@j_breast_her2_neg IN('NA', ''), NULL, @j_breast_her2_neg),
+        j_breast_er_pr_and_her2_neg = IF(@j_breast_er_pr_and_her2_neg IN('NA', ''), NULL, @j_breast_er_pr_and_her2_neg),
+        j_breast_grade34 = IF(@j_breast_grade34 IN('NA', ''), NULL, @j_breast_grade34),
+        j_breast_grade2 = IF(@j_breast_grade2 IN('NA', ''), NULL, @j_breast_grade2),
+        j_breast_grade1 = IF(@j_breast_grade1 IN('NA', ''), NULL, @j_breast_grade1),
+        j_carcinoma = IF(@j_carcinoma IN('NA', ''), NULL, @j_carcinoma),
+        j_carcinoma_fup_days = IF(@j_carcinoma_fup_days IN('NA', ''), NULL, @j_carcinoma_fup_days),
+        j_carcinoma_fup_age = IF(@j_carcinoma_fup_age IN('NA', ''), NULL, @j_carcinoma_fup_age),
+        j_carcinoma_dx_age = IF(@j_carcinoma_dx_age IN('NA', ''), NULL, @j_carcinoma_dx_age),
+        j_colo_cancer = IF(@j_colo_cancer IN('NA', ''), NULL, @j_colo_cancer),
+        j_colo_cancer_fup_days = IF(@j_colo_cancer_fup_days IN('NA', ''), NULL, @j_colo_cancer_fup_days),
+        j_colo_cancer_fup_age = IF(@j_colo_cancer_fup_age IN('NA', ''), NULL, @j_colo_cancer_fup_age),
+        j_colo_cancer_dx_age = IF(@j_colo_cancer_dx_age IN('NA', ''), NULL, @j_colo_cancer_dx_age),
+        j_colo_distal = IF(@j_colo_distal IN('NA', ''), NULL, @j_colo_distal),
+        j_colo_distal_proximal = IF(@j_colo_distal_proximal IN('NA', ''), NULL, @j_colo_distal_proximal),
+        j_colo_proximal = IF(@j_colo_proximal IN('NA', ''), NULL, @j_colo_proximal),
+        j_colo_rectal = IF(@j_colo_rectal IN('NA', ''), NULL, @j_colo_rectal),
+        j_diabetes_related_dx_age = IF(@j_diabetes_related_dx_age IN('NA', ''), NULL, @j_diabetes_related_dx_age),
+        j_diabetes_related = IF(@j_diabetes_related IN('NA', ''), NULL, @j_diabetes_related),
+        j_diabetes_related_fup_age = IF(@j_diabetes_related_fup_age IN('NA', ''), NULL, @j_diabetes_related_fup_age),
+        j_diabetes_related_fup_days = IF(@j_diabetes_related_fup_days IN('NA', ''), NULL, @j_diabetes_related_fup_days),
+        j_ebv_related_dx_age = IF(@j_ebv_related_dx_age IN('NA', ''), NULL, @j_ebv_related_dx_age),
+        j_ebv_related = IF(@j_ebv_related IN('NA', ''), NULL, @j_ebv_related),
+        j_ebv_related_fup_age = IF(@j_ebv_related_fup_age IN('NA', ''), NULL, @j_ebv_related_fup_age),
+        j_ebv_related_fup_days = IF(@j_ebv_related_fup_days IN('NA', ''), NULL, @j_ebv_related_fup_days),
+        j_endo_cancer = IF(@j_endo_cancer IN('NA', ''), NULL, @j_endo_cancer),
+        j_endo_cancer_fup_days = IF(@j_endo_cancer_fup_days IN('NA', ''), NULL, @j_endo_cancer_fup_days),
+        j_endo_cancer_fup_age = IF(@j_endo_cancer_fup_age IN('NA', ''), NULL, @j_endo_cancer_fup_age),
+        j_endo_cancer_dx_age = IF(@j_endo_cancer_dx_age IN('NA', ''), NULL, @j_endo_cancer_dx_age),
+        j_endo_neuro = IF(@j_endo_neuro IN('NA', ''), NULL, @j_endo_neuro),
+        j_endo_neuro_fup_days = IF(@j_endo_neuro_fup_days IN('NA', ''), NULL, @j_endo_neuro_fup_days),
+        j_endo_neuro_fup_age = IF(@j_endo_neuro_fup_age IN('NA', ''), NULL, @j_endo_neuro_fup_age),
+        j_endo_neuro_dx_age = IF(@j_endo_neuro_dx_age IN('NA', ''), NULL, @j_endo_neuro_dx_age),
+        j_esoph_cancer = IF(@j_esoph_cancer IN('NA', ''), NULL, @j_esoph_cancer),
+        j_esoph_cancer_fup_days = IF(@j_esoph_cancer_fup_days IN('NA', ''), NULL, @j_esoph_cancer_fup_days),
+        j_esoph_cancer_fup_age = IF(@j_esoph_cancer_fup_age IN('NA', ''), NULL, @j_esoph_cancer_fup_age),
+        j_esoph_cancer_dx_age = IF(@j_esoph_cancer_dx_age IN('NA', ''), NULL, @j_esoph_cancer_dx_age),
+        j_esoph_squamous = IF(@j_esoph_squamous IN('NA', ''), NULL, @j_esoph_squamous),
+        j_hbv_related_dx_age = IF(@j_hbv_related_dx_age IN('NA', ''), NULL, @j_hbv_related_dx_age),
+        j_hbv_related = IF(@j_hbv_related IN('NA', ''), NULL, @j_hbv_related),
+        j_hbv_related_fup_age = IF(@j_hbv_related_fup_age IN('NA', ''), NULL, @j_hbv_related_fup_age),
+        j_hbv_related_fup_days = IF(@j_hbv_related_fup_days IN('NA', ''), NULL, @j_hbv_related_fup_days),
+        j_hcv_related_dx_age = IF(@j_hcv_related_dx_age IN('NA', ''), NULL, @j_hcv_related_dx_age),
+        j_hcv_related = IF(@j_hcv_related IN('NA', ''), NULL, @j_hcv_related),
+        j_hcv_related_fup_age = IF(@j_hcv_related_fup_age IN('NA', ''), NULL, @j_hcv_related_fup_age),
+        j_hcv_related_fup_days = IF(@j_hcv_related_fup_days IN('NA', ''), NULL, @j_hcv_related_fup_days),
+        j_height_related_dx_age = IF(@j_height_related_dx_age IN('NA', ''), NULL, @j_height_related_dx_age),
+        j_height_related = IF(@j_height_related IN('NA', ''), NULL, @j_height_related),
+        j_height_related_fup_age = IF(@j_height_related_fup_age IN('NA', ''), NULL, @j_height_related_fup_age),
+        j_height_related_fup_days = IF(@j_height_related_fup_days IN('NA', ''), NULL, @j_height_related_fup_days),
+        j_helicobacter_related_dx_age = IF(@j_helicobacter_related_dx_age IN('NA', ''), NULL, @j_helicobacter_related_dx_age),
+        j_helicobacter_related = IF(@j_helicobacter_related IN('NA', ''), NULL, @j_helicobacter_related),
+        j_helicobacter_related_fup_age = IF(@j_helicobacter_related_fup_age IN('NA', ''), NULL, @j_helicobacter_related_fup_age),
+        j_helicobacter_related_fup_days = IF(@j_helicobacter_related_fup_days IN('NA', ''), NULL, @j_helicobacter_related_fup_days),
+        j_hematologic = IF(@j_hematologic IN('NA', ''), NULL, @j_hematologic),
+        j_hematologic_fup_days = IF(@j_hematologic_fup_days IN('NA', ''), NULL, @j_hematologic_fup_days),
+        j_hematologic_fup_age = IF(@j_hematologic_fup_age IN('NA', ''), NULL, @j_hematologic_fup_age),
+        j_hematologic_dx_age = IF(@j_hematologic_dx_age IN('NA', ''), NULL, @j_hematologic_dx_age),
+        j_hnc_cancer = IF(@j_hnc_cancer IN('NA', ''), NULL, @j_hnc_cancer),
+        j_hnc_cancer_fup_days = IF(@j_hnc_cancer_fup_days IN('NA', ''), NULL, @j_hnc_cancer_fup_days),
+        j_hnc_cancer_fup_age = IF(@j_hnc_cancer_fup_age IN('NA', ''), NULL, @j_hnc_cancer_fup_age),
+        j_hnc_cancer_dx_age = IF(@j_hnc_cancer_dx_age IN('NA', ''), NULL, @j_hnc_cancer_dx_age),
+        j_hnc_larynx = IF(@j_hnc_larynx IN('NA', ''), NULL, @j_hnc_larynx),
+        j_hnc_lip_oral_pharynx = IF(@j_hnc_lip_oral_pharynx IN('NA', ''), NULL, @j_hnc_lip_oral_pharynx),
+        j_hnc_naso_mid_sinus = IF(@j_hnc_naso_mid_sinus IN('NA', ''), NULL, @j_hnc_naso_mid_sinus),
+        j_hpv_related_dx_age = IF(@j_hpv_related_dx_age IN('NA', ''), NULL, @j_hpv_related_dx_age),
+        j_hpv_related = IF(@j_hpv_related IN('NA', ''), NULL, @j_hpv_related),
+        j_hpv_related_fup_age = IF(@j_hpv_related_fup_age IN('NA', ''), NULL, @j_hpv_related_fup_age),
+        j_hpv_related_fup_days = IF(@j_hpv_related_fup_days IN('NA', ''), NULL, @j_hpv_related_fup_days),
+        j_infection_related_dx_age = IF(@j_infection_related_dx_age IN('NA', ''), NULL, @j_infection_related_dx_age),
+        j_infection_related = IF(@j_infection_related IN('NA', ''), NULL, @j_infection_related),
+        j_infection_related_fup_age = IF(@j_infection_related_fup_age IN('NA', ''), NULL, @j_infection_related_fup_age),
+        j_infection_related_fup_days = IF(@j_infection_related_fup_days IN('NA', ''), NULL, @j_infection_related_fup_days),
+        j_kidney_cancer_fup_days = IF(@j_kidney_cancer_fup_days IN('NA', ''), NULL, @j_kidney_cancer_fup_days),
+        j_kidney_cancer_fup_age = IF(@j_kidney_cancer_fup_age IN('NA', ''), NULL, @j_kidney_cancer_fup_age),
+        j_kidney_cancer_dx_age = IF(@j_kidney_cancer_dx_age IN('NA', ''), NULL, @j_kidney_cancer_dx_age),
+        j_kidney_cancer = IF(@j_kidney_cancer IN('NA', ''), NULL, @j_kidney_cancer),
+        j_kidney_renalcell_clearcell = IF(@j_kidney_renalcell_clearcell IN('NA', ''), NULL, @j_kidney_renalcell_clearcell),
+        j_kidney_renalcell_nos = IF(@j_kidney_renalcell_nos IN('NA', ''), NULL, @j_kidney_renalcell_nos),
+        j_gast_cancer = IF(@j_gast_cancer IN('NA', ''), NULL, @j_gast_cancer),
+        j_gast_cancer_fup_days = IF(@j_gast_cancer_fup_days IN('NA', ''), NULL, @j_gast_cancer_fup_days),
+        j_gast_cancer_fup_age = IF(@j_gast_cancer_fup_age IN('NA', ''), NULL, @j_gast_cancer_fup_age),
+        j_gast_cancer_dx_age = IF(@j_gast_cancer_dx_age IN('NA', ''), NULL, @j_gast_cancer_dx_age),
+        j_gast_cardia = IF(@j_gast_cardia IN('NA', ''), NULL, @j_gast_cardia),
+        j_gast_noncardia = IF(@j_gast_noncardia IN('NA', ''), NULL, @j_gast_noncardia),
+        j_glio_cancer = IF(@j_glio_cancer IN('NA', ''), NULL, @j_glio_cancer),
+        j_glio_cancer_fup_days = IF(@j_glio_cancer_fup_days IN('NA', ''), NULL, @j_glio_cancer_fup_days),
+        j_glio_cancer_fup_age = IF(@j_glio_cancer_fup_age IN('NA', ''), NULL, @j_glio_cancer_fup_age),
+        j_glio_cancer_dx_age = IF(@j_glio_cancer_dx_age IN('NA', ''), NULL, @j_glio_cancer_dx_age),
+        j_liver_xintra_cancer_fup_days = IF(@j_liver_xintra_cancer_fup_days IN('NA', ''), NULL, @j_liver_xintra_cancer_fup_days),
+        j_liver_xintra_cancer_fup_age = IF(@j_liver_xintra_cancer_fup_age IN('NA', ''), NULL, @j_liver_xintra_cancer_fup_age),
+        j_liver_xintra_cancer_dx_age = IF(@j_liver_xintra_cancer_dx_age IN('NA', ''), NULL, @j_liver_xintra_cancer_dx_age),
+        j_liver_xintra_cancer = IF(@j_liver_xintra_cancer IN('NA', ''), NULL, @j_liver_xintra_cancer),
+        j_lung_cancer = IF(@j_lung_cancer IN('NA', ''), NULL, @j_lung_cancer),
+        j_lung_cancer_fup_days = IF(@j_lung_cancer_fup_days IN('NA', ''), NULL, @j_lung_cancer_fup_days),
+        j_lung_cancer_fup_age = IF(@j_lung_cancer_fup_age IN('NA', ''), NULL, @j_lung_cancer_fup_age),
+        j_lung_cancer_dx_age = IF(@j_lung_cancer_dx_age IN('NA', ''), NULL, @j_lung_cancer_dx_age),
+        j_lung_smallcell = IF(@j_lung_smallcell IN('NA', ''), NULL, @j_lung_smallcell),
+        j_lung_adeno = IF(@j_lung_adeno IN('NA', ''), NULL, @j_lung_adeno),
+        j_lung_squam = IF(@j_lung_squam IN('NA', ''), NULL, @j_lung_squam),
+        j_lymphoid = IF(@j_lymphoid IN('NA', ''), NULL, @j_lymphoid),
+        j_lymphoid_fup_days = IF(@j_lymphoid_fup_days IN('NA', ''), NULL, @j_lymphoid_fup_days),
+        j_lymphoid_fup_age = IF(@j_lymphoid_fup_age IN('NA', ''), NULL, @j_lymphoid_fup_age),
+        j_lymphoid_dx_age = IF(@j_lymphoid_dx_age IN('NA', ''), NULL, @j_lymphoid_dx_age),
+        j_cll = IF(@j_cll IN('NA', ''), NULL, @j_cll),
+        j_cll_fup_days = IF(@j_cll_fup_days IN('NA', ''), NULL, @j_cll_fup_days),
+        j_cll_fup_age = IF(@j_cll_fup_age IN('NA', ''), NULL, @j_cll_fup_age),
+        j_cll_dx_age = IF(@j_cll_dx_age IN('NA', ''), NULL, @j_cll_dx_age),
+        j_mbreast_cancer = IF(@j_mbreast_cancer IN('NA', ''), NULL, @j_mbreast_cancer),
+        j_mbreast_cancer_fup_days = IF(@j_mbreast_cancer_fup_days IN('NA', ''), NULL, @j_mbreast_cancer_fup_days),
+        j_mbreast_cancer_fup_age = IF(@j_mbreast_cancer_fup_age IN('NA', ''), NULL, @j_mbreast_cancer_fup_age),
+        j_mbreast_cancer_dx_age = IF(@j_mbreast_cancer_dx_age IN('NA', ''), NULL, @j_mbreast_cancer_dx_age),
+        j_mela_cancer = IF(@j_mela_cancer IN('NA', ''), NULL, @j_mela_cancer),
+        j_mela_cancer_fup_days = IF(@j_mela_cancer_fup_days IN('NA', ''), NULL, @j_mela_cancer_fup_days),
+        j_mela_cancer_fup_age = IF(@j_mela_cancer_fup_age IN('NA', ''), NULL, @j_mela_cancer_fup_age),
+        j_mela_cancer_dx_age = IF(@j_mela_cancer_dx_age IN('NA', ''), NULL, @j_mela_cancer_dx_age),
+        j_mesoth = IF(@j_mesoth IN('NA', ''), NULL, @j_mesoth),
+        j_mesoth_fup_days = IF(@j_mesoth_fup_days IN('NA', ''), NULL, @j_mesoth_fup_days),
+        j_mesoth_fup_age = IF(@j_mesoth_fup_age IN('NA', ''), NULL, @j_mesoth_fup_age),
+        j_mesoth_dx_age = IF(@j_mesoth_dx_age IN('NA', ''), NULL, @j_mesoth_dx_age),
+        j_myeloid = IF(@j_myeloid IN('NA', ''), NULL, @j_myeloid),
+        j_myeloid_fup_days = IF(@j_myeloid_fup_days IN('NA', ''), NULL, @j_myeloid_fup_days),
+        j_myeloid_fup_age = IF(@j_myeloid_fup_age IN('NA', ''), NULL, @j_myeloid_fup_age),
+        j_myeloid_dx_age = IF(@j_myeloid_dx_age IN('NA', ''), NULL, @j_myeloid_dx_age),
+        j_obesity_related_dx_age = IF(@j_obesity_related_dx_age IN('NA', ''), NULL, @j_obesity_related_dx_age),
+        j_obesity_related = IF(@j_obesity_related IN('NA', ''), NULL, @j_obesity_related),
+        j_obesity_related_fup_age = IF(@j_obesity_related_fup_age IN('NA', ''), NULL, @j_obesity_related_fup_age),
+        j_obesity_related_fup_days = IF(@j_obesity_related_fup_days IN('NA', ''), NULL, @j_obesity_related_fup_days),
+        j_osumm_cancer = IF(@j_osumm_cancer IN('NA', ''), NULL, @j_osumm_cancer),
+        j_osumm_cancer_fup_days = IF(@j_osumm_cancer_fup_days IN('NA', ''), NULL, @j_osumm_cancer_fup_days),
+        j_osumm_cancer_fup_age = IF(@j_osumm_cancer_fup_age IN('NA', ''), NULL, @j_osumm_cancer_fup_age),
+        j_osumm_cancer_dx_age = IF(@j_osumm_cancer_dx_age IN('NA', ''), NULL, @j_osumm_cancer_dx_age),
+        j_osumm_serous_grade_high = IF(@j_osumm_serous_grade_high IN('NA', ''), NULL, @j_osumm_serous_grade_high),
+        j_panc_cancer = IF(@j_panc_cancer IN('NA', ''), NULL, @j_panc_cancer),
+        j_panc_cancer_fup_days = IF(@j_panc_cancer_fup_days IN('NA', ''), NULL, @j_panc_cancer_fup_days),
+        j_panc_cancer_fup_age = IF(@j_panc_cancer_fup_age IN('NA', ''), NULL, @j_panc_cancer_fup_age),
+        j_panc_cancer_dx_age = IF(@j_panc_cancer_dx_age IN('NA', ''), NULL, @j_panc_cancer_dx_age),
+        j_phys_act_related_dx_age = IF(@j_phys_act_related_dx_age IN('NA', ''), NULL, @j_phys_act_related_dx_age),
+        j_phys_act_related = IF(@j_phys_act_related IN('NA', ''), NULL, @j_phys_act_related),
+        j_phys_act_related_fup_age = IF(@j_phys_act_related_fup_age IN('NA', ''), NULL, @j_phys_act_related_fup_age),
+        j_phys_act_related_fup_days = IF(@j_phys_act_related_fup_days IN('NA', ''), NULL, @j_phys_act_related_fup_days),
+        j_pros_cancer = IF(@j_pros_cancer IN('NA', ''), NULL, @j_pros_cancer),
+        j_pros_cancer_fup_days = IF(@j_pros_cancer_fup_days IN('NA', ''), NULL, @j_pros_cancer_fup_days),
+        j_pros_cancer_fup_age = IF(@j_pros_cancer_fup_age IN('NA', ''), NULL, @j_pros_cancer_fup_age),
+        j_pros_cancer_dx_age = IF(@j_pros_cancer_dx_age IN('NA', ''), NULL, @j_pros_cancer_dx_age),
+        j_pros_non_advanced = IF(@j_pros_non_advanced IN('NA', ''), NULL, @j_pros_non_advanced),
+        j_pros_advanced_including7 = IF(@j_pros_advanced_including7 IN('NA', ''), NULL, @j_pros_advanced_including7),
+        j_pros_advanced_excluding7 = IF(@j_pros_advanced_excluding7 IN('NA', ''), NULL, @j_pros_advanced_excluding7),
+        j_sarcoma = IF(@j_sarcoma IN('NA', ''), NULL, @j_sarcoma),
+        j_sarcoma_fup_days = IF(@j_sarcoma_fup_days IN('NA', ''), NULL, @j_sarcoma_fup_days),
+        j_sarcoma_fup_age = IF(@j_sarcoma_fup_age IN('NA', ''), NULL, @j_sarcoma_fup_age),
+        j_sarcoma_dx_age = IF(@j_sarcoma_dx_age IN('NA', ''), NULL, @j_sarcoma_dx_age),
+        j_smoking_related_dx_age = IF(@j_smoking_related_dx_age IN('NA', ''), NULL, @j_smoking_related_dx_age),
+        j_smoking_related = IF(@j_smoking_related IN('NA', ''), NULL, @j_smoking_related),
+        j_smoking_related_fup_age = IF(@j_smoking_related_fup_age IN('NA', ''), NULL, @j_smoking_related_fup_age),
+        j_smoking_related_fup_days = IF(@j_smoking_related_fup_days IN('NA', ''), NULL, @j_smoking_related_fup_days),
+        j_solid_tumor = IF(@j_solid_tumor IN('NA', ''), NULL, @j_solid_tumor),
+        j_solid_tumor_fup_days = IF(@j_solid_tumor_fup_days IN('NA', ''), NULL, @j_solid_tumor_fup_days),
+        j_solid_tumor_fup_age = IF(@j_solid_tumor_fup_age IN('NA', ''), NULL, @j_solid_tumor_fup_age),
+        j_solid_tumor_dx_age = IF(@j_solid_tumor_dx_age IN('NA', ''), NULL, @j_solid_tumor_dx_age),
+        j_squamous = IF(@j_squamous IN('NA', ''), NULL, @j_squamous),
+        j_squamous_fup_days = IF(@j_squamous_fup_days IN('NA', ''), NULL, @j_squamous_fup_days),
+        j_squamous_fup_age = IF(@j_squamous_fup_age IN('NA', ''), NULL, @j_squamous_fup_age),
+        j_squamous_dx_age = IF(@j_squamous_dx_age IN('NA', ''), NULL, @j_squamous_dx_age),
+        j_thyd_cancer = IF(@j_thyd_cancer IN('NA', ''), NULL, @j_thyd_cancer),
+        j_thyd_cancer_fup_days = IF(@j_thyd_cancer_fup_days IN('NA', ''), NULL, @j_thyd_cancer_fup_days),
+        j_thyd_cancer_fup_age = IF(@j_thyd_cancer_fup_age IN('NA', ''), NULL, @j_thyd_cancer_fup_age),
+        j_thyd_cancer_dx_age = IF(@j_thyd_cancer_dx_age IN('NA', ''), NULL, @j_thyd_cancer_dx_age),
+        j_upgi_cancer = IF(@j_upgi_cancer IN('NA', ''), NULL, @j_upgi_cancer),
+        j_upgi_cancer_fup_days = IF(@j_upgi_cancer_fup_days IN('NA', ''), NULL, @j_upgi_cancer_fup_days),
+        j_upgi_cancer_fup_age = IF(@j_upgi_cancer_fup_age IN('NA', ''), NULL, @j_upgi_cancer_fup_age),
+        j_upgi_cancer_dx_age = IF(@j_upgi_cancer_dx_age IN('NA', ''), NULL, @j_upgi_cancer_dx_age),
+        j_urothelial = IF(@j_urothelial IN('NA', ''), NULL, @j_urothelial),
+        j_urothelial_fup_days = IF(@j_urothelial_fup_days IN('NA', ''), NULL, @j_urothelial_fup_days),
+        j_urothelial_fup_age = IF(@j_urothelial_fup_age IN('NA', ''), NULL, @j_urothelial_fup_age),
+        j_urothelial_dx_age = IF(@j_urothelial_dx_age IN('NA', ''), NULL, @j_urothelial_dx_age),
+        is_dead = IF(@is_dead IN('NA', ''), NULL, @is_dead),
+        mortality_exitage = IF(@mortality_exitage IN('NA', ''), NULL, @mortality_exitage),
+        dth_days = IF(@dth_days IN('NA', ''), NULL, @dth_days),
+        mortality_exitdays_unadj = IF(@mortality_exitdays_unadj IN('NA', ''), NULL, @mortality_exitdays_unadj),
+        f_death_ischemic = IF(@f_death_ischemic IN('NA', ''), NULL, @f_death_ischemic),
+        f_death_cerebrovascular = IF(@f_death_cerebrovascular IN('NA', ''), NULL, @f_death_cerebrovascular),
+        f_death_rheumatic = IF(@f_death_rheumatic IN('NA', ''), NULL, @f_death_rheumatic),
+        f_death_hypertensive = IF(@f_death_hypertensive IN('NA', ''), NULL, @f_death_hypertensive),
+        f_death_peripheral = IF(@f_death_peripheral IN('NA', ''), NULL, @f_death_peripheral),
+        f_death_heart = IF(@f_death_heart IN('NA', ''), NULL, @f_death_heart),
+        f_death_cardiac = IF(@f_death_cardiac IN('NA', ''), NULL, @f_death_cardiac),
+        f_death_arrhythmia = IF(@f_death_arrhythmia IN('NA', ''), NULL, @f_death_arrhythmia),
+        f_death_endocarditis = IF(@f_death_endocarditis IN('NA', ''), NULL, @f_death_endocarditis),
+        f_death_cardiovascular = IF(@f_death_cardiovascular IN('NA', ''), NULL, @f_death_cardiovascular),
+        f_death_cancer = IF(@f_death_cancer IN('NA', ''), NULL, @f_death_cancer),
+        f_death_chronicresp = IF(@f_death_chronicresp IN('NA', ''), NULL, @f_death_chronicresp),
+        f_death_alzheimers = IF(@f_death_alzheimers IN('NA', ''), NULL, @f_death_alzheimers),
+        f_death_diabetes = IF(@f_death_diabetes IN('NA', ''), NULL, @f_death_diabetes),
+        f_death_nephritis = IF(@f_death_nephritis IN('NA', ''), NULL, @f_death_nephritis),
+        f_death_chronicliver = IF(@f_death_chronicliver IN('NA', ''), NULL, @f_death_chronicliver),
+        f_death_parkinsons = IF(@f_death_parkinsons IN('NA', ''), NULL, @f_death_parkinsons),
+        bq_educat_o = IF(@bq_educat_o IN('NA', ''), NULL, @bq_educat_o),
+        bq_marital_co = IF(@bq_marital_co IN('NA', ''), NULL, @bq_marital_co),
+        bq_fmenstr_o = IF(@bq_fmenstr_o IN('NA', ''), NULL, @bq_fmenstr_o),
+        bq_tubal_o = IF(@bq_tubal_o IN('NA', ''), NULL, @bq_tubal_o),
+        bq_bbd_b = IF(@bq_bbd_b IN('NA', ''), NULL, @bq_bbd_b),
+        bq_benign_ovcyst_b = IF(@bq_benign_ovcyst_b IN('NA', ''), NULL, @bq_benign_ovcyst_b),
+        bq_endometriosis_b = IF(@bq_endometriosis_b IN('NA', ''), NULL, @bq_endometriosis_b),
+        bq_uterine_fib_b = IF(@bq_uterine_fib_b IN('NA', ''), NULL, @bq_uterine_fib_b),
+        bq_trypreg_b = IF(@bq_trypreg_b IN('NA', ''), NULL, @bq_trypreg_b),
+        bq_urinatea_o = IF(@bq_urinatea_o IN('NA', ''), NULL, @bq_urinatea_o),
+        bq_infprosa_o = IF(@bq_infprosa_o IN('NA', ''), NULL, @bq_infprosa_o),
+        bq_hearta_f_b = IF(@bq_hearta_f_b IN('NA', ''), NULL, @bq_hearta_f_b),
+        bq_bronchit_f_b = IF(@bq_bronchit_f_b IN('NA', ''), NULL, @bq_bronchit_f_b),
+        bq_polyps_f_b = IF(@bq_polyps_f_b IN('NA', ''), NULL, @bq_polyps_f_b),
+        bq_ulcerative_colitits_b = IF(@bq_ulcerative_colitits_b IN('NA', ''), NULL, @bq_ulcerative_colitits_b),
+        bq_crohns_disease_b = IF(@bq_crohns_disease_b IN('NA', ''), NULL, @bq_crohns_disease_b),
+        bq_familial_polyposis_b = IF(@bq_familial_polyposis_b IN('NA', ''), NULL, @bq_familial_polyposis_b),
+        bq_hepatitis_b = IF(@bq_hepatitis_b IN('NA', ''), NULL, @bq_hepatitis_b),
+        bq_cirrhosis_b = IF(@bq_cirrhosis_b IN('NA', ''), NULL, @bq_cirrhosis_b),
+        bq_divertic_f_b = IF(@bq_divertic_f_b IN('NA', ''), NULL, @bq_divertic_f_b),
+        bq_gallblad_f_b = IF(@bq_gallblad_f_b IN('NA', ''), NULL, @bq_gallblad_f_b),
+        bq_age_co = IF(@bq_age_co IN('NA', ''), NULL, @bq_age_co),
+        bq_race7_ca = IF(@bq_race7_ca IN('NA', ''), NULL, @bq_race7_ca),
+        bq_hispanic_f_b = IF(@bq_hispanic_f_b IN('NA', ''), NULL, @bq_hispanic_f_b),
+        bq_surg_resection_b = IF(@bq_surg_resection_b IN('NA', ''), NULL, @bq_surg_resection_b),
+        bq_surg_prostatectomy_b = IF(@bq_surg_prostatectomy_b IN('NA', ''), NULL, @bq_surg_prostatectomy_b),
+        bq_hyster_f_b = IF(@bq_hyster_f_b IN('NA', ''), NULL, @bq_hyster_f_b),
+        bq_ovariesr_f_ca = IF(@bq_ovariesr_f_ca IN('NA', ''), NULL, @bq_ovariesr_f_ca),
+        bq_infpros_f_b = IF(@bq_infpros_f_b IN('NA', ''), NULL, @bq_infpros_f_b),
+        bq_urinate_f_o = IF(@bq_urinate_f_o IN('NA', ''), NULL, @bq_urinate_f_o),
+        bq_smoked_f_b = IF(@bq_smoked_f_b IN('NA', ''), NULL, @bq_smoked_f_b),
+        bq_smokea_f_co = IF(@bq_smokea_f_co IN('NA', ''), NULL, @bq_smokea_f_co),
+        bq_ssmokea_f_co = IF(@bq_ssmokea_f_co IN('NA', ''), NULL, @bq_ssmokea_f_co),
+        bq_cig_stop_co = IF(@bq_cig_stop_co IN('NA', ''), NULL, @bq_cig_stop_co),
+        bq_bmi_20_co = IF(@bq_bmi_20_co IN('NA', ''), NULL, @bq_bmi_20_co),
+        bq_bmi_50_co = IF(@bq_bmi_50_co IN('NA', ''), NULL, @bq_bmi_50_co),
+        bq_bmi_curr_co = IF(@bq_bmi_curr_co IN('NA', ''), NULL, @bq_bmi_curr_co),
+        bq_weight_f_co = IF(@bq_weight_f_co IN('NA', ''), NULL, @bq_weight_f_co),
+        bq_weight20_f_co = IF(@bq_weight20_f_co IN('NA', ''), NULL, @bq_weight20_f_co),
+        bq_weight50_f_co = IF(@bq_weight50_f_co IN('NA', ''), NULL, @bq_weight50_f_co),
+        bq_height_f_co = IF(@bq_height_f_co IN('NA', ''), NULL, @bq_height_f_co),
+        bq_fh_cancer_b = IF(@bq_fh_cancer_b IN('NA', ''), NULL, @bq_fh_cancer_b),
+        center = IF(@center IN('NA', ''), NULL, @center),
+        arm = IF(@arm IN('NA', ''), NULL, @arm),
+        sex = IF(@sex IN('NA', ''), NULL, @sex),
+        in_GSA_study = IF(@in_GSA_study IN('NA', ''), NULL, @in_GSA_study),
+        dqx_age_co = IF(@dqx_age_co IN('NA', ''), NULL, @dqx_age_co),
+        dqx_qxn_physicact_40_o = IF(@dqx_qxn_physicact_40_o IN('NA', ''), NULL, @dqx_qxn_physicact_40_o),
+        dqx_qxn_physicact_now_o = IF(@dqx_qxn_physicact_now_o IN('NA', ''), NULL, @dqx_qxn_physicact_now_o),
+        sqx_age_co = IF(@sqx_age_co IN('NA', ''), NULL, @sqx_age_co),
+        sqx_sit_ht_o = IF(@sqx_sit_ht_o IN('NA', ''), NULL, @sqx_sit_ht_o),
+        sqx_waist_hip_o = IF(@sqx_waist_hip_o IN('NA', ''), NULL, @sqx_waist_hip_o),
+        sqx_height_co = IF(@sqx_height_co IN('NA', ''), NULL, @sqx_height_co),
+        sqx_wt30s_co = IF(@sqx_wt30s_co IN('NA', ''), NULL, @sqx_wt30s_co),
+        sqx_wt40s_co = IF(@sqx_wt40s_co IN('NA', ''), NULL, @sqx_wt40s_co),
+        sqx_wt50s_co = IF(@sqx_wt50s_co IN('NA', ''), NULL, @sqx_wt50s_co),
+        sqx_wt60s_co = IF(@sqx_wt60s_co IN('NA', ''), NULL, @sqx_wt60s_co),
+        sqx_wt70s_co = IF(@sqx_wt70s_co IN('NA', ''), NULL, @sqx_wt70s_co),
+        sqx_wt_curr_co = IF(@sqx_wt_curr_co IN('NA', ''), NULL, @sqx_wt_curr_co),
+        sqx_bmi30s_co = IF(@sqx_bmi30s_co IN('NA', ''), NULL, @sqx_bmi30s_co),
+        sqx_bmi40s_co = IF(@sqx_bmi40s_co IN('NA', ''), NULL, @sqx_bmi40s_co),
+        sqx_bmi50s_co = IF(@sqx_bmi50s_co IN('NA', ''), NULL, @sqx_bmi50s_co),
+        sqx_bmi60s_co = IF(@sqx_bmi60s_co IN('NA', ''), NULL, @sqx_bmi60s_co),
+        sqx_bmi70s_co = IF(@sqx_bmi70s_co IN('NA', ''), NULL, @sqx_bmi70s_co),
+        sqx_bmi_curr_co = IF(@sqx_bmi_curr_co IN('NA', ''), NULL, @sqx_bmi_curr_co),
+        sqx_cholesterol_b = IF(@sqx_cholesterol_b IN('NA', ''), NULL, @sqx_cholesterol_b),
+        sqx_asthma_b = IF(@sqx_asthma_b IN('NA', ''), NULL, @sqx_asthma_b),
+        sqxbq_hearta_b = IF(@sqxbq_hearta_b IN('NA', ''), NULL, @sqxbq_hearta_b),
+        sqxbq_stroke_b = IF(@sqxbq_stroke_b IN('NA', ''), NULL, @sqxbq_stroke_b),
+        sqxbq_hyperten_b = IF(@sqxbq_hyperten_b IN('NA', ''), NULL, @sqxbq_hyperten_b),
+        sqxbq_diabetes_b = IF(@sqxbq_diabetes_b IN('NA', ''), NULL, @sqxbq_diabetes_b),
+        sqxbq_osteopor_b = IF(@sqxbq_osteopor_b IN('NA', ''), NULL, @sqxbq_osteopor_b),
+        sqxbq_emphysema_b = IF(@sqxbq_emphysema_b IN('NA', ''), NULL, @sqxbq_emphysema_b),
+        sqxbq_arthritis_b = IF(@sqxbq_arthritis_b IN('NA', ''), NULL, @sqxbq_arthritis_b),
+        sqx_broke_hip_b = IF(@sqx_broke_hip_b IN('NA', ''), NULL, @sqx_broke_hip_b),
+        sqx_broke_arm_b = IF(@sqx_broke_arm_b IN('NA', ''), NULL, @sqx_broke_arm_b),
+        sqx_broke_vertebra_b = IF(@sqx_broke_vertebra_b IN('NA', ''), NULL, @sqx_broke_vertebra_b),
+        sqx_broke_none_b = IF(@sqx_broke_none_b IN('NA', ''), NULL, @sqx_broke_none_b),
+        sqx_balding_trend_o = IF(@sqx_balding_trend_o IN('NA', ''), NULL, @sqx_balding_trend_o),
+        sqx_urinate_o = IF(@sqx_urinate_o IN('NA', ''), NULL, @sqx_urinate_o),
+        sqxbq_bpha_o = IF(@sqxbq_bpha_o IN('NA', ''), NULL, @sqxbq_bpha_o),
+        sqxbq_bph_b = IF(@sqxbq_bph_b IN('NA', ''), NULL, @sqxbq_bph_b),
+        sqx_lift_weights_b = IF(@sqx_lift_weights_b IN('NA', ''), NULL, @sqx_lift_weights_b),
+        sqx_lift_weights_lev_o = IF(@sqx_lift_weights_lev_o IN('NA', ''), NULL, @sqx_lift_weights_lev_o),
+        sqx_active_b = IF(@sqx_active_b IN('NA', ''), NULL, @sqx_active_b),
+        sqx_fh_blad_b = IF(@sqx_fh_blad_b IN('NA', ''), NULL, @sqx_fh_blad_b),
+        sqx_fh_breast_b = IF(@sqx_fh_breast_b IN('NA', ''), NULL, @sqx_fh_breast_b),
+        sqx_fh_colo_b = IF(@sqx_fh_colo_b IN('NA', ''), NULL, @sqx_fh_colo_b),
+        sqx_fh_endo_b = IF(@sqx_fh_endo_b IN('NA', ''), NULL, @sqx_fh_endo_b),
+        sqx_fh_leuk_b = IF(@sqx_fh_leuk_b IN('NA', ''), NULL, @sqx_fh_leuk_b),
+        sqx_fh_lung_b = IF(@sqx_fh_lung_b IN('NA', ''), NULL, @sqx_fh_lung_b),
+        sqx_fh_lymph_b = IF(@sqx_fh_lymph_b IN('NA', ''), NULL, @sqx_fh_lymph_b),
+        sqx_fh_ovar_b = IF(@sqx_fh_ovar_b IN('NA', ''), NULL, @sqx_fh_ovar_b),
+        sqx_fh_pros_b = IF(@sqx_fh_pros_b IN('NA', ''), NULL, @sqx_fh_pros_b),
+        sqx_fh_cancer_f_b = IF(@sqx_fh_cancer_f_b IN('NA', ''), NULL, @sqx_fh_cancer_f_b),
+        sqx_twins_b = IF(@sqx_twins_b IN('NA', ''), NULL, @sqx_twins_b),
+        sqx_smk100_b = IF(@sqx_smk100_b IN('NA', ''), NULL, @sqx_smk100_b),
+        sqx_amt_smk_o = IF(@sqx_amt_smk_o IN('NA', ''), NULL, @sqx_amt_smk_o),
+        sqx_smk_crave1_b = IF(@sqx_smk_crave1_b IN('NA', ''), NULL, @sqx_smk_crave1_b),
+        sqx_smk_crave2_b = IF(@sqx_smk_crave2_b IN('NA', ''), NULL, @sqx_smk_crave2_b),
+        sqx_smk_crave3_b = IF(@sqx_smk_crave3_b IN('NA', ''), NULL, @sqx_smk_crave3_b),
+        sqx_smk_crave4_b = IF(@sqx_smk_crave4_b IN('NA', ''), NULL, @sqx_smk_crave4_b),
+        sqx_smk_try_quit_b = IF(@sqx_smk_try_quit_b IN('NA', ''), NULL, @sqx_smk_try_quit_b),
+        sqx_smk_age_quit_co = IF(@sqx_smk_age_quit_co IN('NA', ''), NULL, @sqx_smk_age_quit_co),
+        sqx_worry_lungca_o = IF(@sqx_worry_lungca_o IN('NA', ''), NULL, @sqx_worry_lungca_o),
+        sqx_risk_lungca_o = IF(@sqx_risk_lungca_o IN('NA', ''), NULL, @sqx_risk_lungca_o),
+        sqx_smk_his_co = IF(@sqx_smk_his_co IN('NA', ''), NULL, @sqx_smk_his_co),
+        sqx_smk_behv_co = IF(@sqx_smk_behv_co IN('NA', ''), NULL, @sqx_smk_behv_co),
+        sqx_smk_ftnd_co = IF(@sqx_smk_ftnd_co IN('NA', ''), NULL, @sqx_smk_ftnd_co),
+        sqx_years_quit_co = IF(@sqx_years_quit_co IN('NA', ''), NULL, @sqx_years_quit_co),
+        sqx_cig_years_co = IF(@sqx_cig_years_co IN('NA', ''), NULL, @sqx_cig_years_co),
+        sqx_gain_chest_shoulders_b = IF(@sqx_gain_chest_shoulders_b IN('NA', ''), NULL, @sqx_gain_chest_shoulders_b),
+        sqx_gain_waist_stomach_b = IF(@sqx_gain_waist_stomach_b IN('NA', ''), NULL, @sqx_gain_waist_stomach_b),
+        sqx_gain_hips_thighs_b = IF(@sqx_gain_hips_thighs_b IN('NA', ''), NULL, @sqx_gain_hips_thighs_b),
+        sqx_gain_equally_over_b = IF(@sqx_gain_equally_over_b IN('NA', ''), NULL, @sqx_gain_equally_over_b),
+        sqx_lose_chest_shoulders_b = IF(@sqx_lose_chest_shoulders_b IN('NA', ''), NULL, @sqx_lose_chest_shoulders_b),
+        sqx_lose_waist_stomach_b = IF(@sqx_lose_waist_stomach_b IN('NA', ''), NULL, @sqx_lose_waist_stomach_b),
+        sqx_lose_hips_thighs_b = IF(@sqx_lose_hips_thighs_b IN('NA', ''), NULL, @sqx_lose_hips_thighs_b),
+        sqx_lose_equally_over_b = IF(@sqx_lose_equally_over_b IN('NA', ''), NULL, @sqx_lose_equally_over_b),
+        sqxbq_rheumatoid_arthritis_b = IF(@sqxbq_rheumatoid_arthritis_b IN('NA', ''), NULL, @sqxbq_rheumatoid_arthritis_b),
+        sqxbq_osteoarthritis_b = IF(@sqxbq_osteoarthritis_b IN('NA', ''), NULL, @sqxbq_osteoarthritis_b),
+        sqx_moderate_week_co = IF(@sqx_moderate_week_co IN('NA', ''), NULL, @sqx_moderate_week_co),
+        sqx_strenuous_week_co = IF(@sqx_strenuous_week_co IN('NA', ''), NULL, @sqx_strenuous_week_co),
+        sqx_ever_balding_b = IF(@sqx_ever_balding_b IN('NA', ''), NULL, @sqx_ever_balding_b),
+        sqx_top_bald_b = IF(@sqx_top_bald_b IN('NA', ''), NULL, @sqx_top_bald_b),
+        bq_menstr_natural_o = IF(@bq_menstr_natural_o IN('NA', ''), NULL, @bq_menstr_natural_o),
+        sqx_current_cigarette_b = IF(@sqx_current_cigarette_b IN('NA', ''), NULL, @sqx_current_cigarette_b),
+        sqxbq_relapse_b = IF(@sqxbq_relapse_b IN('NA', ''), NULL, @sqxbq_relapse_b),
+        bq_current_cigarette_b = IF(@bq_current_cigarette_b IN('NA', ''), NULL, @bq_current_cigarette_b),
+        bq_cig_stat_o = IF(@bq_cig_stat_o IN('NA', ''), NULL, @bq_cig_stat_o),
+        bq_cig_years_co = IF(@bq_cig_years_co IN('NA', ''), NULL, @bq_cig_years_co),
+        bq_cigar_o = IF(@bq_cigar_o IN('NA', ''), NULL, @bq_cigar_o),
+        bq_cigpd_f_o = IF(@bq_cigpd_f_o IN('NA', ''), NULL, @bq_cigpd_f_o),
+        bq_filtered_f_b = IF(@bq_filtered_f_b IN('NA', ''), NULL, @bq_filtered_f_b),
+        bq_pack_years_co = IF(@bq_pack_years_co IN('NA', ''), NULL, @bq_pack_years_co),
+        bq_pipe_o = IF(@bq_pipe_o IN('NA', ''), NULL, @bq_pipe_o),
+        sqx_pace_o = IF(@sqx_pace_o IN('NA', ''), NULL, @sqx_pace_o),
+        sqx_stairs_o = IF(@sqx_stairs_o IN('NA', ''), NULL, @sqx_stairs_o),
+        sqx_walk_mi_o = IF(@sqx_walk_mi_o IN('NA', ''), NULL, @sqx_walk_mi_o),
+        pack_years_bqelsesqx_co = IF(@pack_years_bqelsesqx_co IN('NA', ''), NULL, @pack_years_bqelsesqx_co),
+        sqx_smk_exp_adult_o = IF(@sqx_smk_exp_adult_o IN('NA', ''), NULL, @sqx_smk_exp_adult_o),
+        sqx_smk_lgt_ca = IF(@sqx_smk_lgt_ca IN('NA', ''), NULL, @sqx_smk_lgt_ca),
+        sqx_smk_menthol_b = IF(@sqx_smk_menthol_b IN('NA', ''), NULL, @sqx_smk_menthol_b),
+        sqx_smk_plan_quit_o = IF(@sqx_smk_plan_quit_o IN('NA', ''), NULL, @sqx_smk_plan_quit_o),
+        sqx_smk_wake_o = IF(@sqx_smk_wake_o IN('NA', ''), NULL, @sqx_smk_wake_o),
+        sqx_smk30days_b = IF(@sqx_smk30days_b IN('NA', ''), NULL, @sqx_smk30days_b),
+        sqxo_cig_stat_o = IF(@sqxo_cig_stat_o IN('NA', ''), NULL, @sqxo_cig_stat_o),
+        sqx_urinatea_o = IF(@sqx_urinatea_o IN('NA', ''), NULL, @sqx_urinatea_o),
+        SV_COFFEE_REG_NOSUG_DHQ = IF(@SV_COFFEE_REG_NOSUG_DHQ IN('NA', ''), NULL, @SV_COFFEE_REG_NOSUG_DHQ),
+        SV_COFFEE_DECAF_NOSUG_DHQ = IF(@SV_COFFEE_DECAF_NOSUG_DHQ IN('NA', ''), NULL, @SV_COFFEE_DECAF_NOSUG_DHQ),
+        MPED_FRUIT_NOJUICE_DHQ = IF(@MPED_FRUIT_NOJUICE_DHQ IN('NA', ''), NULL, @MPED_FRUIT_NOJUICE_DHQ),
+        DT_ALC_ALC_DRINKS_DHQ = IF(@DT_ALC_ALC_DRINKS_DHQ IN('NA', ''), NULL, @DT_ALC_ALC_DRINKS_DHQ),
+        DRINKER_DHQ = IF(@DRINKER_DHQ IN('NA', ''), NULL, @DRINKER_DHQ),
+        G_CANDY_CHOC_DHQ = IF(@G_CANDY_CHOC_DHQ IN('NA', ''), NULL, @G_CANDY_CHOC_DHQ),
+        G_RED5_DHQ = IF(@G_RED5_DHQ IN('NA', ''), NULL, @G_RED5_DHQ),
+        G_PROCESS_6_DHQ = IF(@G_PROCESS_6_DHQ IN('NA', ''), NULL, @G_PROCESS_6_DHQ),
+        G_FRUIT_DHQ = IF(@G_FRUIT_DHQ IN('NA', ''), NULL, @G_FRUIT_DHQ),
+        G_VEGETABLE_DHQ = IF(@G_VEGETABLE_DHQ IN('NA', ''), NULL, @G_VEGETABLE_DHQ),
+        G_FISH_TOTAL_DHQ = IF(@G_FISH_TOTAL_DHQ IN('NA', ''), NULL, @G_FISH_TOTAL_DHQ),
+        G_SALTY_GRAIN_SNACK_DHQ = IF(@G_SALTY_GRAIN_SNACK_DHQ IN('NA', ''), NULL, @G_SALTY_GRAIN_SNACK_DHQ),
+        G_FRUIT_CITRUS_DHQ = IF(@G_FRUIT_CITRUS_DHQ IN('NA', ''), NULL, @G_FRUIT_CITRUS_DHQ),
+        G_SODA_REG_DHQ = IF(@G_SODA_REG_DHQ IN('NA', ''), NULL, @G_SODA_REG_DHQ),
+        DT_KCAL_DHQ = IF(@DT_KCAL_DHQ IN('NA', ''), NULL, @DT_KCAL_DHQ),
+        DT_PROT_DHQ = IF(@DT_PROT_DHQ IN('NA', ''), NULL, @DT_PROT_DHQ),
+        DT_FAT_DHQ = IF(@DT_FAT_DHQ IN('NA', ''), NULL, @DT_FAT_DHQ),
+        DT_CARB_DHQ = IF(@DT_CARB_DHQ IN('NA', ''), NULL, @DT_CARB_DHQ),
+        DT_FIBER_CSFII_DHQ = IF(@DT_FIBER_CSFII_DHQ IN('NA', ''), NULL, @DT_FIBER_CSFII_DHQ),
+        DT_CAFFEINE_DHQ = IF(@DT_CAFFEINE_DHQ IN('NA', ''), NULL, @DT_CAFFEINE_DHQ),
+        GLY_LOAD_DHQ = IF(@GLY_LOAD_DHQ IN('NA', ''), NULL, @GLY_LOAD_DHQ),
+        MPED_GRAIN_DHQ = IF(@MPED_GRAIN_DHQ IN('NA', ''), NULL, @MPED_GRAIN_DHQ),
+        MPED_GRAIN_WHOLE_DHQ = IF(@MPED_GRAIN_WHOLE_DHQ IN('NA', ''), NULL, @MPED_GRAIN_WHOLE_DHQ),
+        MPED_VEG_DARK_GREEN_DHQ = IF(@MPED_VEG_DARK_GREEN_DHQ IN('NA', ''), NULL, @MPED_VEG_DARK_GREEN_DHQ),
+        MPED_DAIRY_DHQ = IF(@MPED_DAIRY_DHQ IN('NA', ''), NULL, @MPED_DAIRY_DHQ),
+        MPED_DAIRY_MILK_DHQ = IF(@MPED_DAIRY_MILK_DHQ IN('NA', ''), NULL, @MPED_DAIRY_MILK_DHQ),
+        MPED_M_SOY_DHQ = IF(@MPED_M_SOY_DHQ IN('NA', ''), NULL, @MPED_M_SOY_DHQ),
+        MPED_M_NUT_SEED_DHQ = IF(@MPED_M_NUT_SEED_DHQ IN('NA', ''), NULL, @MPED_M_NUT_SEED_DHQ),
+        MPED_LEGUME_DHQ = IF(@MPED_LEGUME_DHQ IN('NA', ''), NULL, @MPED_LEGUME_DHQ),
+        MPED_ADDED_SUGAR_DHQ = IF(@MPED_ADDED_SUGAR_DHQ IN('NA', ''), NULL, @MPED_ADDED_SUGAR_DHQ),
+        PE_FR_PROTEIN_DHQ = IF(@PE_FR_PROTEIN_DHQ IN('NA', ''), NULL, @PE_FR_PROTEIN_DHQ),
+        PE_FR_FAT_DHQ = IF(@PE_FR_FAT_DHQ IN('NA', ''), NULL, @PE_FR_FAT_DHQ),
+        PE_FR_CARB_DHQ = IF(@PE_FR_CARB_DHQ IN('NA', ''), NULL, @PE_FR_CARB_DHQ),
+        PE_FR_ALC_DHQ = IF(@PE_FR_ALC_DHQ IN('NA', ''), NULL, @PE_FR_ALC_DHQ),
+        GLY_INDEX_DHQ = IF(@GLY_INDEX_DHQ IN('NA', ''), NULL, @GLY_INDEX_DHQ),
+        DT_SUGAR_DHQ = IF(@DT_SUGAR_DHQ IN('NA', ''), NULL, @DT_SUGAR_DHQ),
+        AGE_DHQ = IF(@AGE_DHQ IN('NA', ''), NULL, @AGE_DHQ),
+        DHQ_COMPLETEDVALID = IF(@DHQ_COMPLETEDVALID IN('NA', ''), NULL, @DHQ_COMPLETEDVALID),
+        MPED_ALC_BEV_ALC_DRINKS18_DHQ = IF(@MPED_ALC_BEV_ALC_DRINKS18_DHQ IN('NA', ''), NULL, @MPED_ALC_BEV_ALC_DRINKS18_DHQ),
+        MPED_ALC_BEV_ALC_DRINKS25_DHQ = IF(@MPED_ALC_BEV_ALC_DRINKS25_DHQ IN('NA', ''), NULL, @MPED_ALC_BEV_ALC_DRINKS25_DHQ),
+        MPED_ALC_BEV_ALC_DRINKS40_DHQ = IF(@MPED_ALC_BEV_ALC_DRINKS40_DHQ IN('NA', ''), NULL, @MPED_ALC_BEV_ALC_DRINKS40_DHQ),
+        MPED_ALC_BEV_ALC_DRINKS55_DHQ = IF(@MPED_ALC_BEV_ALC_DRINKS55_DHQ IN('NA', ''), NULL, @MPED_ALC_BEV_ALC_DRINKS55_DHQ),
+        QXN_F_COFFEE_DHQ = IF(@QXN_F_COFFEE_DHQ IN('NA', ''), NULL, @QXN_F_COFFEE_DHQ),
+        WHFRDEN_DHQ = IF(@WHFRDEN_DHQ IN('NA', ''), NULL, @WHFRDEN_DHQ),
+        GRNDEN_DHQ = IF(@GRNDEN_DHQ IN('NA', ''), NULL, @GRNDEN_DHQ),
+        WGRNDEN_DHQ = IF(@WGRNDEN_DHQ IN('NA', ''), NULL, @WGRNDEN_DHQ),
+        DAIRYDEN_DHQ = IF(@DAIRYDEN_DHQ IN('NA', ''), NULL, @DAIRYDEN_DHQ),
+        HEI2005_TOTAL_SCORE_DHQ = IF(@HEI2005_TOTAL_SCORE_DHQ IN('NA', ''), NULL, @HEI2005_TOTAL_SCORE_DHQ),
+        HEI2010_TOTAL_SCORE_DHQ = IF(@HEI2010_TOTAL_SCORE_DHQ IN('NA', ''), NULL, @HEI2010_TOTAL_SCORE_DHQ),
+        ADDSUG_PERC2015_DHQ = IF(@ADDSUG_PERC2015_DHQ IN('NA', ''), NULL, @ADDSUG_PERC2015_DHQ),
+        HEI2015_TOTAL_SCORE_DHQ = IF(@HEI2015_TOTAL_SCORE_DHQ IN('NA', ''), NULL, @HEI2015_TOTAL_SCORE_DHQ),
+        SALTSNKDEN_G_DHQ = IF(@SALTSNKDEN_G_DHQ IN('NA', ''), NULL, @SALTSNKDEN_G_DHQ),
+        MILKDEN_DHQ = IF(@MILKDEN_DHQ IN('NA', ''), NULL, @MILKDEN_DHQ),
+        FRTDEN_G_DHQ = IF(@FRTDEN_G_DHQ IN('NA', ''), NULL, @FRTDEN_G_DHQ),
+        CITFRTDEN_G_DHQ = IF(@CITFRTDEN_G_DHQ IN('NA', ''), NULL, @CITFRTDEN_G_DHQ),
+        VEGTOTDEN_G_DHQ = IF(@VEGTOTDEN_G_DHQ IN('NA', ''), NULL, @VEGTOTDEN_G_DHQ),
+        DKGRVEGDEN_DHQ = IF(@DKGRVEGDEN_DHQ IN('NA', ''), NULL, @DKGRVEGDEN_DHQ),
+        LEGUMEDEN_DHQ = IF(@LEGUMEDEN_DHQ IN('NA', ''), NULL, @LEGUMEDEN_DHQ),
+        NUTDEN_DHQ = IF(@NUTDEN_DHQ IN('NA', ''), NULL, @NUTDEN_DHQ),
+        REDMTDEN_G_DHQ = IF(@REDMTDEN_G_DHQ IN('NA', ''), NULL, @REDMTDEN_G_DHQ),
+        PROCMTDEN_G_DHQ = IF(@PROCMTDEN_G_DHQ IN('NA', ''), NULL, @PROCMTDEN_G_DHQ),
+        FISHDEN_G_DHQ = IF(@FISHDEN_G_DHQ IN('NA', ''), NULL, @FISHDEN_G_DHQ),
+        SOYDEN_DHQ = IF(@SOYDEN_DHQ IN('NA', ''), NULL, @SOYDEN_DHQ),
+        current_drinker = IF(@current_drinker IN('NA', ''), NULL, @current_drinker),
+        former_drinker = IF(@former_drinker IN('NA', ''), NULL, @former_drinker),
+        drinker_status_dhq_o = IF(@drinker_status_dhq_o IN('NA', ''), NULL, @drinker_status_dhq_o),
+        ph_status = IF(@ph_status IN('NA', ''), NULL, @ph_status),
+        first_psa_level = IF(@first_psa_level IN('NA', ''), NULL, @first_psa_level),
+        first_psa_year = IF(@first_psa_year IN('NA', ''), NULL, @first_psa_year),
+        first_ca125_level = IF(@first_ca125_level IN('NA', ''), NULL, @first_ca125_level),
+        first_ca125_year = IF(@first_ca125_year IN('NA', ''), NULL, @first_ca125_year),
+        has_adenoma = IF(@has_adenoma IN('NA', ''), NULL, @has_adenoma),
+        has_advanced_adenoma = IF(@has_advanced_adenoma IN('NA', ''), NULL, @has_advanced_adenoma),
+        has_nonadvanced_adenoma = IF(@has_nonadvanced_adenoma IN('NA', ''), NULL, @has_nonadvanced_adenoma);
 
 COMMIT;
