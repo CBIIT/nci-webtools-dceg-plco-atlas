@@ -25,6 +25,7 @@ CREATE TABLE IF NOT EXISTS `$PHENOTYPE_variant` (
 CREATE TABLE IF NOT EXISTS `$PHENOTYPE_aggregate` (
     `id`            BIGINT PRIMARY KEY NOT NULL AUTO_INCREMENT,
     `gender`        ENUM('all', 'female', 'male') NOT NULL,
+    `chromosome`    VARCHAR(2) NOT NULL,
     `position_abs`  BIGINT NOT NULL,
     `p_value_nlog`  DOUBLE NOT NULL
 ) ENGINE=MYISAM;
