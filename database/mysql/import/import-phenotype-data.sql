@@ -500,7 +500,7 @@ CREATE TABLE phenotype_data_stage (
 
 -- load data into staging table
 -- D:/Development/Work/nci-webtools-dceg-plco-atlas/database/mysql/import/raw
-LOAD DATA LOCAL INFILE "D:/Development/Work/nci-webtools-dceg-plco-atlas/database/mysql/import/raw/phenotype_data.tsv" INTO TABLE phenotype_data_stage
+LOAD DATA LOCAL INFILE "raw/phenotype_data.tsv" INTO TABLE phenotype_data_stage
     FIELDS TERMINATED BY '\t'
     IGNORE 1 ROWS (
         plco_id,
