@@ -39,6 +39,7 @@ CREATE TABLE `phenotype_data` (
 );
 
 CREATE TABLE phenotype_data_stage (
+    `id` INTEGER PRIMARY KEY AUTO_INCREMENT,
     `plco_id` TEXT,
     `j_adeno_carcinoma` DOUBLE,
     `j_adeno_carcinoma_fup_days` DOUBLE,
@@ -498,6 +499,7 @@ CREATE TABLE phenotype_data_stage (
 ) ENGINE=MYISAM;
 
 -- load data into staging table
+-- D:/Development/Work/nci-webtools-dceg-plco-atlas/database/mysql/import/raw
 LOAD DATA LOCAL INFILE "raw/phenotype_data.tsv" INTO TABLE phenotype_data_stage
     FIELDS TERMINATED BY '\t'
     IGNORE 1 ROWS (
