@@ -500,7 +500,7 @@ CREATE TABLE phenotype_data_stage (
 
 -- load data into staging table
 -- D:/Development/Work/nci-webtools-dceg-plco-atlas/database/mysql/import/raw
-LOAD DATA LOCAL INFILE "raw/phenotype_data.tsv" INTO TABLE phenotype_data_stage
+LOAD DATA LOCAL INFILE "D:/Development/Work/nci-webtools-dceg-plco-atlas/database/mysql/import/raw/phenotype_data.tsv" INTO TABLE phenotype_data_stage
     FIELDS TERMINATED BY '\t'
     IGNORE 1 ROWS (
         plco_id,
@@ -1429,12 +1429,12 @@ SELECT
         WHEN 5 THEN 'pacific_islander'
         WHEN 6 THEN 'american_indian'
         ELSE NULL
-    END AS race,
+    END AS ancestry,
     CASE sex
       WHEN 1 THEN 'male'
       WHEN 2 THEN 'female'
       ELSE NULL
-    END AS sex
+    END AS gender
 FROM phenotype_data_stage;
 
 
@@ -1442,7 +1442,7 @@ FROM phenotype_data_stage;
 INSERT INTO phenotype_data (`phenotype_id`, `phenotype_sample_id`, `value`)
 -- import Arthritis (binary)
 SELECT
-    (SELECT id FROM phenotype WHERE name = 'arthritis_139' LIMIT 1),
+    (SELECT id FROM phenotype WHERE name = 'arthritis_139' LIMIT 1) AS phenotype_id,
     id AS phenotype_sample_id,
     sqxbq_arthritis_b AS value
 FROM phenotype_data_stage
@@ -1450,7 +1450,7 @@ UNION
 
 -- import Asthma (binary)
 SELECT
-    (SELECT id FROM phenotype WHERE name = 'asthma_140' LIMIT 1),
+    (SELECT id FROM phenotype WHERE name = 'asthma_140' LIMIT 1) AS phenotype_id,
     id AS phenotype_sample_id,
     sqx_asthma_b AS value
 FROM phenotype_data_stage
@@ -1458,7 +1458,7 @@ UNION
 
 -- import BMI (continuous)
 SELECT
-    (SELECT id FROM phenotype WHERE name = 'bmi_10' LIMIT 1),
+    (SELECT id FROM phenotype WHERE name = 'bmi_10' LIMIT 1) AS phenotype_id,
     id AS phenotype_sample_id,
     bq_bmi_curr_co AS value
 FROM phenotype_data_stage
@@ -1466,7 +1466,7 @@ UNION
 
 -- import Weight (continuous)
 SELECT
-    (SELECT id FROM phenotype WHERE name = 'weight_9' LIMIT 1),
+    (SELECT id FROM phenotype WHERE name = 'weight_9' LIMIT 1) AS phenotype_id,
     id AS phenotype_sample_id,
     bq_weight_f_co AS value
 FROM phenotype_data_stage
