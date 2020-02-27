@@ -500,7 +500,7 @@ CREATE TABLE phenotype_data_stage (
 
 -- load data into staging table
 -- D:/Development/Work/nci-webtools-dceg-plco-atlas/database/mysql/import/raw
-LOAD DATA LOCAL INFILE "D:/Development/Work/nci-webtools-dceg-plco-atlas/database/mysql/import/raw/phenotype_data.tsv" INTO TABLE phenotype_data_stage
+LOAD DATA LOCAL INFILE "raw/phenotype_data.tsv" INTO TABLE phenotype_data_stage
     FIELDS TERMINATED BY '\t'
     IGNORE 1 ROWS (
         plco_id,
@@ -1442,7 +1442,7 @@ FROM phenotype_data_stage;
 INSERT INTO phenotype_data (`phenotype_id`, `phenotype_sample_id`, `value`)
 -- import Arthritis (binary)
 SELECT
-    (SELECT id FROM phenotype WHERE name = 'arthritis_139' LIMIT 1) AS phenotype_id,
+    (SELECT id FROM phenotype WHERE name = 'arthritis_139' LIMIT 1),
     id AS phenotype_sample_id,
     sqxbq_arthritis_b AS value
 FROM phenotype_data_stage
@@ -1450,7 +1450,7 @@ UNION
 
 -- import Asthma (binary)
 SELECT
-    (SELECT id FROM phenotype WHERE name = 'asthma_140' LIMIT 1) AS phenotype_id,
+    (SELECT id FROM phenotype WHERE name = 'asthma_140' LIMIT 1),
     id AS phenotype_sample_id,
     sqx_asthma_b AS value
 FROM phenotype_data_stage
@@ -1458,17 +1458,19 @@ UNION
 
 -- import BMI (continuous)
 SELECT
-    (SELECT id FROM phenotype WHERE name = 'bmi_10' LIMIT 1) AS phenotype_id,
+    (SELECT id FROM phenotype WHERE name = 'bmi_10' LIMIT 1),
     id AS phenotype_sample_id,
     bq_bmi_curr_co AS value
 FROM phenotype_data_stage
+UNION
 
 -- import Weight (continuous)
 SELECT
-    (SELECT id FROM phenotype WHERE name = 'weight_9' LIMIT 1) AS phenotype_id,
+    (SELECT id FROM phenotype WHERE name = 'weight_9' LIMIT 1),
     id AS phenotype_sample_id,
     bq_weight_f_co AS value
 FROM phenotype_data_stage
+UNION
 
 -- import Height when standing (continuous)
 SELECT
@@ -1476,6 +1478,7 @@ SELECT
     id AS phenotype_sample_id,
     bq_height_f_co AS value
 FROM phenotype_data_stage
+UNION
 
 -- import Height when sitting (categorical)
 SELECT
@@ -1483,6 +1486,7 @@ SELECT
     id AS phenotype_sample_id,
     sqx_sit_ht_o AS value
 FROM phenotype_data_stage
+UNION
 
 -- import Waist-Hip comparison (categorical)
 SELECT
