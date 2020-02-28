@@ -228,20 +228,32 @@ async function exportVariants(filepath, params) {
  * @returns {any} A specified key and value, or the entire list of
  * metadata properties if the key is not specified
  */
-async function getMetadata(connection, {phenotype_id, gender, chromosome}) {
+async function getMetadata(connection, params) {
     let [results] = await connection.query(
         `
             SELECT
-                *
+                m.id as id,
+                m.phenotype_id as phenotype_id,
+                p.name as phenotype_name,
+                p.display_name as phenotype_display_name,
+                m.gender as gender,
+                m.chromosome as chromosome,
+                m.lambda_gc as lambda_gc,
+                m.count as count
             FROM
-                phenotype_metadata
+                phenotype_metadata m
+            JOIN
+                phenotype p on m.phenotype_id = p.id
             WHERE
-                phenotype_id = :phenotype_id AND
+                ${params.phenotype_name
+                    ? 'p.name = :phenotype_name AND'
+                    : 'm.phenotype_id = :phenotype_id AND'
+                }
                 gender = :gender AND
                 chromosome = :chromosome
             LIMIT 1
         `,
-        {phenotype_id, gender, chromosome}
+        params
     );
     return results[0];
 }

@@ -159,6 +159,17 @@ export function fetchSummaryTable(tableKey, params, existingResults) {
     // fetch variants given parameters
     const response = await query('variants', params);
     if (response.error) return;
+
+    if (params.metadataCount && params.phenotype) {
+      console.log(tableKey, params)
+      let metadata = await query('metadata', {
+        phenotype_name: params.phenotype,
+        gender: params.gender,
+        chromosome: params.chromosome || 'all'
+      })
+      response.count = metadata.count;
+    }
+
     dispatch(
       updateSummaryTable(tableKey, {
         results: response.data,
