@@ -159,7 +159,7 @@ export function SummaryResults() {
     fetchVariantTables(
       phenotype.value,
       manhattanPlotType,
-      {count: true}
+      {metadataCount: true, phenotype: phenotype.value}
     );
 
     setSearchCriteriaSummaryResults({
@@ -267,7 +267,7 @@ export function SummaryResults() {
     fetchVariantTables(
       selectedPhenotype.value,
       selectedManhattanPlotType,
-      {chromosome, count: true}
+      {chromosome, phenotype: selectedPhenotype.value, metadataCount: true}
     );
   };
 
