@@ -387,7 +387,8 @@ async function getPhenotype(connection, params) {
                     WHERE
                         pd.phenotype_id = :id AND
                         pd.value = 1 AND
-                        ps.age IS NOT NULL
+                        ps.age IS NOT NULL AND
+                        ps.age >= 55
                     GROUP BY ps.age
                     ORDER BY ps.age;
                 `, {id: params.id}))[0].reduce(keyValueReducer, {}),
@@ -461,7 +462,8 @@ async function getPhenotype(connection, params) {
                     WHERE
                         pd.phenotype_id = :id AND
                         pd.value IS NOT NULL AND
-                        ps.age IS NOT NULL
+                        ps.age IS NOT NULL AND
+                        ps.age >= 55
                     GROUP BY ps.age, pd.value
                     ORDER BY ps.age, pd.value;
                 `, {id: params.id}))[0].reduce(keyGroupValueReducer, {}),
@@ -542,7 +544,8 @@ async function getPhenotype(connection, params) {
                     WHERE
                         pd.phenotype_id = :id AND
                         pd.value IS NOT NULL AND
-                        ps.age IS NOT NULL
+                        ps.age IS NOT NULL AND
+                        ps.age >= 55
                     GROUP BY ps.age, pd.value
                     ORDER BY ps.age, pd.value;
                 `, {id: params.id}))[0].reduce(keyGroupValueRangeReducer, {}),
