@@ -6,12 +6,6 @@ export const BarChart = ({ data, categories, xTitle, yTitle }) => (
     className="w-100"
     style={{ minHeight: "600px", width: "600px" }}
     data={categories.map((name, i) => {
-      console.log('DRAWING BAR CHART GROUP');
-      console.log('CURRENT CATEGORY', name)
-      console.log('DATA', data)
-      console.log('CATEGORIES', categories)
-
-
       let x = [];
       let y = [];
       for (let key in data) {
@@ -90,8 +84,6 @@ export const HorizontalBarChart = ({ data, categories }) => (
 );
 
 export const AreaChart = ({data, categories, xTitle, yTitle}) => {
-  console.log(data, categories);
-
   let items = categories.map((name, i) => {
     let x = [];
     let y = [];
