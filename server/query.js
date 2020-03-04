@@ -352,11 +352,15 @@ async function getPhenotype(connection, params) {
         FROM phenotype
         WHERE id = :id
     `, {id: params.id});
+    if (!phenotypeRows.length)
+        return null;
+
     let phenotype = phenotypeRows[0];
-    let keyValueReducer = ((obj = {}, curr) => ({...obj, [curr.key]: [...(obj[curr.key] || []), curr.value]}));
 
     switch(phenotype.type) {
         case 'binary':
+            let keyValueReducer = ((obj = {}, curr) => ({...obj, [curr.key]: [...(obj[curr.key] || []), curr.value]}));
+
             phenotype.categories = ["% with", "% without"];
             phenotype.distributionCategories = ["% with"];
             phenotype.frequency = (await connection.execute(

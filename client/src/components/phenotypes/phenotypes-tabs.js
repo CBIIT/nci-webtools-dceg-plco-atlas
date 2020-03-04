@@ -41,9 +41,9 @@ export function PhenotypesTabs() {
         title="Frequency"
         className="p-4 bg-white tab-pane-bordered rounded-0"
         style={{ minHeight: '600px', textAlign: 'center' }}>
-        <PieChart
+        {phenotypeData && phenotypeData.frequency && phenotypeData.categories && <PieChart
                 data={phenotypeData.frequency}
-                categories={phenotypeData.categories} />
+                categories={phenotypeData.categories} />}
       </Tab>
 
       <Tab
@@ -69,24 +69,24 @@ export function PhenotypesTabs() {
             />
           )}</div>
 
+          {phenotypeData && phenotypeData.distribution && <BarChart
+                data={phenotypeData.distribution[selectedDistribution]}
+                categories={phenotypeData.distributionCategories}
+                xTitle={titleCase(selectedDistribution)}
+                yTitle="Number of Cases"
+          />}
 
-          <BarChart
-              data={phenotypeData.distribution[selectedDistribution]}
-              categories={phenotypeData.distributionCategories}
-              xTitle={titleCase(selectedDistribution)}
-              yTitle="Number of Cases"
-          />
       </Tab>
       <Tab
         eventKey="related-phenotypes"
         title="Related Phenotypes"
         className="p-4 bg-white tab-pane-bordered rounded-0"
         style={{ minHeight: '50vh' }}>
-        <PhenotypesRelated
+        {phenotypeData && phenotypeData.related && <PhenotypesRelated
           selectedPhenotype={selectedPhenotype}
           phenotypeType={phenotypeType}
           relatedData={phenotypeData.related}
-        />
+        />}
       </Tab>
 
     </Tabs>
