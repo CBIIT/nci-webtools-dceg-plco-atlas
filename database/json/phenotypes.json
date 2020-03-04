@@ -1,22 +1,30 @@
 [
     {
+        "id": 1,
+        "parent_id": null,
         "title": "Test",
         "value": "test_1",
         "color": "blue",
         "children": [
             {
+                "id": 2,
+                "parent_id": 1,
                 "title": "Ewing's sarcoma",
                 "value": "ewings_sarcoma_2",
                 "count": 200,
                 "color": "blue"
             },
             {
+                "id": 3,
+                "parent_id": 1,
                 "title": "Renal Cell Carcinoma",
                 "value": "renal_cell_carcinoma_4",
                 "count": 300,
                 "color": "blue"
             },
             {
+                "id": 4,
+                "parent_id": 1,
                 "title": "Melanoma",
                 "value": "melanoma_3",
                 "count": 400,
@@ -25,22 +33,30 @@
         ]
     },
     {
+        "id": 5,
+        "parent_id": null,
         "title": "Anthropometric measures",
         "value": "anthropometric_measures_5",
         "color": "green",
         "children": [
             {
+                "id": 6,
+                "parent_id": 5,
                 "title": "Height",
                 "value": "height_6",
                 "color": "green",
                 "children": [
                     {
+                        "id": 7,
+                        "parent_id": 6,
                         "title": "Height when standing",
                         "value": "height_when_standing_7",
                         "color": "green",
                         "count": 200
                     },
                     {
+                        "id": 8,
+                        "parent_id": 6,
                         "title": "Height when sitting",
                         "value": "height_when_sitting_8",
                         "color": "green",
@@ -49,29 +65,39 @@
                 ]
             },
             {
+                "id": 9,
+                "parent_id": 5,
                 "title": "Weight",
                 "value": "weight_9",
                 "color": "green",
                 "children": [
                     {
+                        "id": 10,
+                        "parent_id": 9,
                         "title": "BMI",
                         "value": "bmi_10",
                         "color": "green",
                         "count": 200
                     },
                     {
+                        "id": 11,
+                        "parent_id": 9,
                         "title": "Weight Gain Area",
                         "value": "weight_gain_area_11",
                         "color": "green",
                         "count": 300
                     },
                     {
+                        "id": 12,
+                        "parent_id": 9,
                         "title": "Weight Loss Area",
                         "value": "weight_loss_area_12",
                         "color": "green",
                         "count": 400
                     },
                     {
+                        "id": 13,
+                        "parent_id": 9,
                         "title": "Waist-Hip Comparison",
                         "value": "waist_hip_comparison_13",
                         "color": "green",
@@ -80,6 +106,8 @@
                 ]
             },
             {
+                "id": 14,
+                "parent_id": 5,
                 "title": "Hair pattern at 45",
                 "value": "hair_pattern_at_45_14",
                 "color": "green",
@@ -89,6 +117,8 @@
         ]
     },
     {
+        "id": 15,
+        "parent_id": null,
         "title": "Cancer",
         "value": "cancer_15",
         "color": "red",
@@ -704,6 +734,8 @@
         ]
     },
     {
+        "id": 113,
+        "parent_id": null,
         "title": "Lifestyle factors",
         "value": "lifestyle_factors_113",
         "color": "orange",
@@ -858,17 +890,23 @@
         ]
     },
     {
+        "id": 138,
+        "parent_id": null,
         "title": "Medical conditions",
         "value": "medical_conditions_138",
         "color": "purple",
         "children": [
             {
+                "id": 139,
+                "parent_id": 138,
                 "title": "Arthritis",
                 "value": "arthritis_139",
                 "color": "purple",
                 "count": 200
             },
             {
+                "id": 140,
+                "parent_id": 138,
                 "title": "Asthma",
                 "value": "asthma_140",
                 "color": "purple",
@@ -1034,6 +1072,8 @@
         ]
     },
     {
+        "id": 167,
+        "parent_id": null,
         "title": "Reproductive factors",
         "value": "reproductive_factors_167",
         "color": "magenta",
@@ -1059,6 +1099,8 @@
         ]
     },
     {
+        "id": 171,
+        "parent_id": null,
         "title": "Mortality",
         "value": "mortality_171",
         "color": "brown",
