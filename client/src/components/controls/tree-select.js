@@ -374,7 +374,7 @@ export const TreeSelect = forwardRef(({
                   onClick={e => toggleHideChildren(item.value)}
                   // disabled={submitted}
                   >
-                  <i className={"fas fa-plus-square collapse-button-text-" + item.value}></i>
+                  <i className={"fa fa-plus-square collapse-button-text-" + item.value}></i>
                 </button>
 
                 <div
@@ -623,10 +623,10 @@ export const TreeSelect = forwardRef(({
                 onClick={e => toggleExpandAllParents()}
                 disabled={!data}>
                 {expandAll && (
-                  <i className="fas fa-minus-square" style={{cursor: !data ? 'not-allowed' : 'pointer'}}></i>
+                  <i className="fa fa-minus-square" style={{cursor: !data ? 'not-allowed' : 'pointer'}}></i>
                 )}
                 {!expandAll && (
-                  <i className="fas fa-plus-square" style={{cursor: !data ? 'not-allowed' : 'pointer'}}></i>
+                  <i className="fa fa-plus-square" style={{cursor: !data ? 'not-allowed' : 'pointer'}}></i>
                 )}
               </button>
 
@@ -690,11 +690,11 @@ export const TreeSelect = forwardRef(({
                   }}
                   // disabled={submitted}
                   >
-                  <i className="fas fa-times fa-xs"></i>
+                  <i className="fa fa-times fa-xs"></i>
                 </button>
               ) : (
                 <button className="input-group-text bg-white" disabled>
-                  <i className="fas fa-search fa-xs"></i>
+                  <i className="fa fa-search fa-xs"></i>
                 </button>
               )}
             </div>
