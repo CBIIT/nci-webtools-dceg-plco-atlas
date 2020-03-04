@@ -24,9 +24,9 @@ export const PhenotypeCorrelationsSearchCriteria = props => {
 
   const CollapseCaret = () => {
     if (!collapseCriteria && searchCriteriaPhenotypeCorrelations.phenotypes) {
-      return <i className="fas fa-caret-down fa-lg"></i>;
+      return <i className="fa fa-caret-down fa-lg"></i>;
     } else {
-      return <i className="fas fa-caret-right fa-lg"></i>;
+      return <i className="fa fa-caret-right fa-lg"></i>;
     }
   };
 

@@ -15,7 +15,7 @@ export const CollapseButton = ({collapsed, toggleCollapse}) => (
             color: 'rgb(0, 140, 186)',
         }}>
         <i className={`
-            fas fa-lg
+            fa fa-lg
             fa-caret-${collapsed ? 'right' : 'left'}
         `} />
     </button>

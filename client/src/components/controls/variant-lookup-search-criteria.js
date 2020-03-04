@@ -26,9 +26,9 @@ export const VariantLookupSearchCriteria = props => {
 
   const CollapseCaret = () => {
     if (!collapseCriteria && searchCriteriaVariantLookup.phenotypes) {
-      return <i className="fas fa-caret-down fa-lg"></i>;
+      return <i className="fa fa-caret-down fa-lg"></i>;
     } else {
-      return <i className="fas fa-caret-right fa-lg"></i>;
+      return <i className="fa fa-caret-right fa-lg"></i>;
     }
   };
 
