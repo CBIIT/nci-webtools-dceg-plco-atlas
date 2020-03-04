@@ -4,7 +4,7 @@ import Plot from "react-plotly.js";
 export const BarChart = ({ data, categories, xTitle, yTitle }) => (
 <Plot
     className="w-100"
-    style={{ minHeight: "600px" }}
+    style={{ minHeight: "600px", width: "600px" }}
     data={categories.map((name, i) => {
       let x = [];
       let y = [];
@@ -29,6 +29,7 @@ export const BarChart = ({ data, categories, xTitle, yTitle }) => (
       yaxis: {
           automargin: true,
           title: yTitle,
+          zeroline: true,
       },
       autosize: true
     }}
@@ -54,7 +55,7 @@ export const HorizontalBarChart = ({ data, categories }) => (
     })}
     layout={{
       xaxis: { automargin: true },
-      yaxis: { automargin: true },
+      yaxis: { automargin: true, zeroline: true},
       // barmode: 'stack',
       autosize: true
     }}
@@ -65,6 +66,36 @@ export const HorizontalBarChart = ({ data, categories }) => (
     // onLegendClick={_ => false}
   />
 );
+
+export const AreaChart = ({data, categories, xTitle, yTitle}) => {
+  console.log(data, categories);
+
+  let items = categories.map((name, i) => {
+    let x = [];
+    let y = [];
+    for (let key in data) {
+        x.push(key);
+        y.push(data[key][i]);
+    }
+    return {x, y}
+  });
+
+  return <Plot
+      className="w-100"
+      style={{ minHeight: "600px" }}
+      data={[{
+        x: categories, //data.map((e, i) => i + 1),
+        y: data,
+        text: categories,
+        type: 'scatter',
+        line: {shape: 'spline', smoothing: 100},
+      }]}
+      config={{
+        displayModeBar: false,
+        responsive: true
+      }}
+  />
+}
 
 export const PieChart = ({ data, categories }) => (
   <Plot

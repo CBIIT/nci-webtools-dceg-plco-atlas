@@ -4,7 +4,7 @@ import { Tab, Tabs, Form } from 'react-bootstrap';
 import Plot from 'react-plotly.js';
 import { updateBrowsePhenotypes } from '../../services/actions';
 import { PhenotypesRelated } from './phenotypes-related'
-import { BarChart, PieChart, HorizontalBarChart } from './phenotypes-charts';
+import { BarChart, AreaChart, PieChart, HorizontalBarChart } from './phenotypes-charts';
 
 export function PhenotypesTabs() {
   const dispatch = useDispatch();
@@ -41,9 +41,18 @@ export function PhenotypesTabs() {
         title="Frequency"
         className="p-4 bg-white tab-pane-bordered rounded-0"
         style={{ minHeight: '600px', textAlign: 'center' }}>
-        {phenotypeData && phenotypeData.frequency && phenotypeData.categories && <PieChart
+        {phenotypeData && phenotypeData.frequency && phenotypeData.categories && phenotypeData.type !== 'continuous' && <PieChart
                 data={phenotypeData.frequency}
                 categories={phenotypeData.categories} />}
+
+        {phenotypeData && phenotypeData.frequency && phenotypeData.categories && phenotypeData.type == 'continuous' && <AreaChart
+                data={phenotypeData.frequency}
+                categories={phenotypeData.categories}
+                xTitle={phenotypeData.display_name}
+                yTitle="Frequency" />}
+
+
+
       </Tab>
 
       <Tab
