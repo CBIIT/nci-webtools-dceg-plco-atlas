@@ -1,24 +1,16 @@
-const fs = require('fs');
-const path = require('path');
-const Database = require('better-sqlite3');
+const mysql = require('mysql2');
 const config = require('./config.json');
-const logger = require("./logger");
-const { dbpath } = config;
-const ranges = require(path.resolve(dbpath, 'chromosome_ranges.json'));
-
-/**
- * Executes a statement with the given parameters, returning
- * results as an array of arrays to save space when serializing
- * @param {Statement} stmt - A BetterSqlite3.Statement object
- * @param {any} params - Parameters to pass to the statement
- * @return {{columns: string[], data: any[][]}} SQL query results
- */
-function getRawResults(stmt, params) {
-    return {
-        columns: stmt.columns().map(c => c.name),
-        data: stmt.raw().all(params)
-    };
-}
+const logger = require('./logger');
+const {database} = config;
+const connection = mysql.createPool({
+    host: database.host,
+    database: database.name,
+    user: database.user,
+    password: database.password,
+    waitForConnections: true,
+    connectionLimit: 20,
+    namedPlaceholders: true
+  }).promise();
 
 /**
  * Ensures that identifiers with sql keywords in them do not throw errors
@@ -26,7 +18,7 @@ function getRawResults(stmt, params) {
  * @returns {string} The quoted string
  */
 function quote(str) {
-    return `"${str}"`;
+    return `\`${str}\``;
 }
 
 /**
@@ -50,6 +42,55 @@ function coalesce(condition, value) {
 }
 
 /**
+ * Returns any values that are in all of the arrays provided
+ */
+function intersection(...arrays) {
+    return arrays[0].filter(value =>
+        arrays.every(array => array.includes(value))
+    );
+}
+
+function pluck(rows) {
+    if (!rows) return null;
+    let [firstRow] = rows;
+    let [firstKey] = Object.keys(firstRow);
+    return firstRow[firstKey];
+}
+
+
+function getValidColumns(tableName, columns) {
+    if (!Array.isArray(columns))
+        columns = (columns || '').split(',').filter(e => e.length);
+
+    let validColumns = {
+        variant: ['id', 'gender', 'chromosome', 'position', 'snp', 'allele_reference', 'allele_alternate', 'p_value', 'p_value_nlog', 'p_value_nlog_expected', 'odds_ratio', 'show_qq_plot'],
+        aggregate: ['id', 'gender', 'chromosome', 'position_abs', 'p_value_nlog'],
+        phenotype: ['id', 'parent_id', 'name', 'display_name', 'description', 'color', 'type'],
+    }[tableName];
+
+    return columns.length
+        ? intersection(columns, validColumns)
+        : validColumns;
+}
+
+
+function getValidTable(table) {
+    // todo: validate table name
+
+    // let validTable = {
+    //     ewings_sarcoma_2_variant,
+    //     melanoma_3_variant,
+    //     renal_cell_carcinoma_4_variant
+    // }[tableName];
+
+    // return validTable
+    //     ? validTable
+    //     : '';
+
+    return table;
+}
+
+/**
  * Retrieves aggregate data for variants, filtered by search criteria
  * @param {string} filepath - Path to the sqlite database file
  * @param {{
@@ -64,65 +105,19 @@ function coalesce(condition, value) {
    }} params - Database query criteria
  * @returns Records in the aggregate summary table which match query criteria
  */
-function getSummary(filepath, params) {
-    if (!fs.existsSync(filepath)) return [];
-    const db = new Database(filepath, {readonly: true});
+async function getSummary(connection, params) {
+    const [data, columns] = await connection.query({
+        rowsAsArray: params.raw,
+        values: [params.table, params.gender, params.p_value_nlog_min],
+        sql: `
+        SELECT
+            chromosome, position_abs, p_value_nlog FROM ??
+        WHERE
+            gender = ? AND
+            p_value_nlog > ?`,
+    });
 
-    const validTables = [
-        'aggregate_all',
-        'aggregate_female',
-        'aggregate_male',
-    ];
-
-    const validColumns = [
-        'chr',
-        'bp_abs_1000kb',
-        'nlog_p2',
-    ];
-
-    const table = validTables.includes(params.table)
-        ? params.table
-        : validTables[0];
-
-    const columns = params.columns // given as a comma-separated list
-        ? params.columns.split(',').filter(c => validColumns.includes(c))
-        : validColumns;
-
-    const columnNames = columns
-        .map(quote)
-        .join(',');
-
-    const distinct = params.distinct
-        ? `DISTINCT`
-        : ``;
-
-        // filter by -log10(p) if provided
-    let sql = `
-        SELECT ${distinct} ${columnNames}
-        FROM ${table}
-        WHERE ${[
-            `nlog_p2 IS NOT NULL`,
-            coalesce(params.nlogpMin, `nlog_p2 >= :nlogpMin`),
-            coalesce(params.nlogpMax, `nlog_p2 <= :nlogpMax`),
-        ].filter(Boolean).join(' AND ')}`;
-
-    // adds "order by" statement, if both order and orderBy are provided
-    let { order, orderBy } = params;
-    if (order && orderBy) {
-        // by default, sort by p-value ascending
-        if (!['asc', 'desc'].includes(order))
-            order = 'asc';
-        if (!validColumns.includes(orderBy))
-            orderBy = 'p';
-        sql += ` ORDER BY "${orderBy}" ${order} `;
-    }
-
-    logger.debug(`SQL: ${sql}`);
-
-    const stmt = db.prepare(sql);
-    return params.raw
-        ? getRawResults(stmt, params)
-        : stmt.all(params);
+    return {data, columns: columns.map(c => c.name)};
 }
 
 /**
@@ -152,70 +147,44 @@ function getSummary(filepath, params) {
    }} params - Database search criteria
  * @returns Records in the variant table which match query criteria
  */
-function getVariants(filepath, params) {
-    if (!fs.existsSync(filepath)) return [];
-    const db = new Database(filepath, {readonly: true});
 
-    const validTables = [
-        'variant_all',
-        'variant_female',
-        'variant_male',
-    ];
 
-    const validColumns = [
-        'variant_id', 'chr', 'bp', 'snp','a1','a2', 'n',
-        'p','nlog_p', 'p_r', 'or', 'or_r', 'q', 'i', 'expected_p', 'plot_qq',
-    ];
-
-    const table = validTables.includes(params.table)
-        ? params.table
-        : validTables[0];
-
-    const columns = params.columns // given as a comma-separated list
-        ? params.columns.split(',').filter(c => validColumns.includes(c))
-        : validColumns;
-
-    const columnNames = columns
-        .map(quote)
-        .join(',');
-
+async function getVariants(connection, params) {
+    let tables = params.table.split(',').map(getValidTable);
+    let columnNames = getValidColumns('variant', params.columns).map(quote).join(',')
+    // console.log("params.columns", params.columns);
+    // let columnNames = params.columns.map(quote).join(',');
     const groupby = params.groupby
         ? ` GROUP BY "${params.groupby}" `
         : ``;
 
-    // validate min/max bp for each chromosome if provided
-    if (params.chr) {
-        let validRange = ranges.find(e => e.chr === +params.chr);
-        if (params.bpMin && +params.bpMin < validRange.bp_min)
-            params.bpMin = validRange.bp_min;
-
-        if (params.bpMax && +params.bpMax > validRange.bp_max)
-            params.bpMax = validRange.bp_max;
-    }
+    // const showTableName = (tableName) => {
+    //     params.show_table_name ? `, '` + tableName + `' as table_name ` : ``
+    // };
 
     // filter by id, chr, base position, and -log10(p), if provided
-    let sql = `
-        SELECT ${columnNames}
-        FROM ${table}
+    let sql = tables.map(table => `
+        SELECT ${columnNames} ${[coalesce(params.show_table_name, `, '${table}' as table_name`)]}
+        FROM ${table} as v
         WHERE ${[
-            `p IS NOT NULL`,
-            coalesce(params.id, `variant_id = :id`),
+            coalesce(params.id, `id = :id`),
+            coalesce(params.gender, `gender = :gender`),
             coalesce(params.snp, `snp = :snp`),
-            coalesce(params.chr, `chr = :chr`),
-            coalesce(params.bp, `bp = :bp`),
-            coalesce(params.bpMin, `bp >= :bpMin`),
-            coalesce(params.bpMax, `bp <= :bpMax`),
-            coalesce(params.nlogpMin, `nlog_p >= :nlogpMin`),
-            coalesce(params.nlogpMax, `nlog_p <= :nlogpMax`),
-            coalesce(params.pMin, `p >= :pMin`),
-            coalesce(params.pMax, `p <= :pMax`),
-            coalesce(params.mod, `(variant_id % :mod) = 0`),
-            coalesce(params.plot_qq, `plot_qq = 1`)
+            coalesce(params.chromosome, `chromosome = :chromosome`),
+            coalesce(params.position, `position = :position`),
+            coalesce(params.position_min, `position >= :position_min`),
+            coalesce(params.position_max, `position <= :position_max`),
+            coalesce(params.p_value_nlog_min, `p_value_nlog >= :p_value_nlog_min`),
+            coalesce(params.p_value_nlog_max, `p_value_nlog <= :p_value_nlog_max`),
+            coalesce(params.p_value_min, `p_value >= :p_value_min`),
+            coalesce(params.p_value_max, `p_value <= :p_value_max`),
+            coalesce(params.mod, `(id % :mod) = 0`),
+            coalesce(params.show_qq_plot, `show_qq_plot = 1`)
         ].filter(Boolean).join(' AND ')}
-        ${groupby}`;
+        ${groupby}`).join(' UNION ');
 
     // create count sql based on original query
-    let countSql = `SELECT COUNT(1) FROM (${sql})`;
+    let countSql = `SELECT COUNT(*) as count FROM (${sql}) as c`;
 
     // adds "order by" statement, if both order and orderBy are provided
     let { order, orderBy } = params;
@@ -223,31 +192,36 @@ function getVariants(filepath, params) {
         // by default, sort by p-value ascending
         if (!['asc', 'desc'].includes(order))
             order = 'asc';
-        if (!validColumns.includes(orderBy))
-            orderBy = 'p';
-        sql += ` ORDER BY "${orderBy}" ${order} `;
+        // if (!validColumns.includes(orderBy))
+        //     orderBy = 'p_value';
+        sql += ` ORDER BY ${orderBy} ${order} `;
     }
 
     // adds limit and offset, if provided
-    if (params.limit) sql += ' LIMIT :limit ';
-    if (params.offset) sql += ' OFFSET :offset ';
+    params.limit = params.limit ? Math.min(params.limit, 1e5) : 1e5; // set hard limit to prevent overflow
+    params.offset = +params.offset || 0;
+    if (params.limit) sql += ' LIMIT :offset, :limit ';
 
     logger.debug(`SQL: ${sql}`);
+    console.log(`SQL: ${sql}`);
 
     // query database
-    const stmt = db.prepare(sql);
-    const records = params.raw
-        ? getRawResults(stmt, params)
-        : {data: stmt.all(params)};
+    let [data, columns] = await connection.query({
+        sql, rowsAsArray: params.raw,
+    }, params);
+
+    const records = {data, columns: columns.map(c => c.name)};
 
     // add counts if necessary
-    if (params.count)
-        records.count = db.prepare(countSql).pluck().get(params);
+    if (params.count) {
+        let [results] = await connection.query(countSql, params);
+        records.count = results[0].count;
+    }
 
     return records;
 }
 
-function exportVariants(filepath, params) {
+async function exportVariants(filepath, params) {
     params = {...params, raw: true, count: false};
     const { columns, data } = getVariants(filepath, params);
     // todo: stream csv contents
@@ -261,68 +235,349 @@ function exportVariants(filepath, params) {
  * @returns {any} A specified key and value, or the entire list of
  * metadata properties if the key is not specified
  */
-function getMetadata(filepath, key) {
-    const db = new Database(filepath, {readonly: true});
-    return key
-        ? db.prepare(`SELECT value FROM variant_metadata WHERE key = :key`)
-            .pluck()
-            .get({key})
-        : db.prepare(`SELECT key, value FROM variant_metadata`)
-            .all()
-            .reduce((obj, v) => ({...obj, [v.key]: v.value}), {});
+async function getMetadata(connection, params) {
+    let [results] = await connection.query(
+        `
+            SELECT
+                m.id as id,
+                m.phenotype_id as phenotype_id,
+                p.name as phenotype_name,
+                p.display_name as phenotype_display_name,
+                m.gender as gender,
+                m.chromosome as chromosome,
+                m.lambda_gc as lambda_gc,
+                m.count as count
+            FROM
+                phenotype_metadata m
+            JOIN
+                phenotype p on m.phenotype_id = p.id
+            WHERE
+                ${params.phenotype_name
+                    ? 'p.name = :phenotype_name AND'
+                    : 'm.phenotype_id = :phenotype_id AND'
+                }
+                gender = :gender AND
+                chromosome = :chromosome
+            LIMIT 1
+        `,
+        params
+    );
+    return results[0];
 }
 
 /**
  * Retrieves genes from a specific chromosome, filtered by search criteria
- * @param {string} filepath - Path to the sqlite database file
+ * @param {mysql.Connection} connection - Connection to the database
  * @param {{
-     columns: string,
-     chr: string,
-     txStart: string,
-     txEnd: string
+     chromosome: string,
+     transcription_start: string,
+     transcription_end: string
    }} params - Criteria to filter genes
  * @returns {any[]} Genes matching the search criteria
  */
-function getGenes(filepath, params) {
-    if (!fs.existsSync(filepath)) return [];
-    const db = new Database(filepath, {readonly: true});
-
-    const validColumns = [
-        'gene_id',
-        'name',
-        'chr',
-        'strand',
-        'tx_start',
-        'tx_end',
-        'exon_starts',
-        'exon_ends',
-    ];
-
-    const columns = params.columns
-        ? params.columns.split(',').filter(e => validColumns.includes(e))
-        : ['gene_id', 'name', 'strand', 'tx_start', 'tx_end', 'exon_starts', 'exon_ends'];
-
-    const columnNames = columns
-        .map(quote)
-        .join(',');
-
+async function getGenes(connection, params) {
     const splitNumbers = e => (e || '')
         .split(',')
         .filter(e => e !== '')
         .map(e => +e);
 
-    return db.prepare(`
-        SELECT ${columnNames}
+    const [results] = await connection.query(`
+        SELECT *
         FROM gene
-        WHERE chr = :chr AND (
-            (tx_start BETWEEN :txStart AND :txEnd) OR
-            (tx_end BETWEEN :txStart AND :txEnd))
-    `).all(params).map(e => ({
-        ...e,
-        exon_starts: splitNumbers(e.exon_starts),
-        exon_ends: splitNumbers(e.exon_ends)
+        WHERE chromosome = :chromosome AND (
+            (transcription_start BETWEEN :transcription_start AND :transcription_end) OR
+            (transcription_end BETWEEN :transcription_start AND :transcription_end))
+    `, params);
+
+    return results.map(record => ({
+        ...record,
+        exon_starts: splitNumbers(record.exon_starts),
+        exon_ends: splitNumbers(record.exon_ends)
     }));
 }
+
+/**
+ * Retrieves a specific configuration key
+ * @param {string} key - The key to retrieve
+ * @returns {any} The specified key and its value
+ */
+async function getCorrelations(connection, {a, b}) {
+    let sql = `
+        SELECT
+            phenotype_a, pa.name as phenotype_a_name, pa.display_name as phenotype_a_display_name,
+            phenotype_b, pb.name as phenotype_b_name, pb.display_name as phenotype_b_display_name,
+            value
+        FROM phenotype_correlation pc
+        JOIN phenotype pa on pc.phenotype_a = pa.id
+        JOIN phenotype pb on pc.phenotype_b = pb.id
+    `;
+
+    if (a && b) {
+        // warning: ensure that numbers are properly sanitized
+        let filterNums = e => e.split(',').filter(e => !isNaN(e)).map(Number).join(',');
+        a = filterNums(a);
+        b = filterNums(b);
+        sql += `WHERE
+        (phenotype_a IN (${a}) AND phenotype_b IN (${b})) OR
+        (phenotype_b IN (${a}) AND phenotype_a IN (${b}))`;
+    }
+
+    console.log(sql);
+
+    let [results] = await connection.query(sql);
+    return results;
+}
+
+async function getPhenotypes(connection, params) {
+    let columns = getValidColumns('phenotype', params.columns).map(quote).join(',');
+    let [phenotypes] = await connection.execute(`
+        SELECT ${columns}
+        FROM phenotype
+        ${params.id ? 'WHERE id = :id' : ''}
+    `, params);
+
+    phenotypes.forEach(phenotype => {
+        let parent = phenotypes.find(parent => parent.id === phenotype.parent_id);
+        if (parent) parent.children = [...parent.children || [], phenotype];
+    });
+
+    return params.flat
+        ? phenotypes
+        : phenotypes.filter(phenotype => phenotype.parent_id === null);
+}
+
+async function getPhenotype(connection, params) {
+    let [phenotypeRows] = await connection.execute(`
+        SELECT id, name, display_name, description, type
+        FROM phenotype
+        WHERE id = :id
+    `, {id: params.id});
+    if (!phenotypeRows.length)
+        return null;
+
+    let phenotype = phenotypeRows[0];
+
+    switch(phenotype.type) {
+        case 'binary':
+            let keyValueReducer = ((obj = {}, curr) => ({...obj, [curr.key]: [...(obj[curr.key] || []), curr.value]}));
+
+            phenotype.categories = ["% with", "% without"];
+            phenotype.distributionCategories = ["% with"];
+            phenotype.frequency = (await connection.execute(
+                {
+                    rowsAsArray: true,
+                    sql: `
+                        SELECT count(*) FROM phenotype_data
+                        WHERE
+                            phenotype_id = :id and
+                            value is not null
+                        group by value;`
+                },
+                {id: params.id}
+            ))[0].map(e => e[0]);
+
+            phenotype.distribution = {
+                age: (await connection.execute(`
+                    SELECT
+                        ps.age AS "key",
+                        COUNT(*) AS "value"
+                    FROM phenotype_data pd
+                    JOIN phenotype_sample ps ON ps.id = pd.phenotype_sample_id
+                    WHERE
+                        pd.phenotype_id = :id AND
+                        pd.value = 1 AND
+                        ps.age IS NOT NULL
+                    GROUP BY ps.age
+                    ORDER BY ps.age;
+                `, {id: params.id}))[0].reduce(keyValueReducer, {}),
+                gender: (await connection.execute(`
+                    SELECT
+                        ps.gender AS "key",
+                        COUNT(*) AS "value"
+                    FROM phenotype_data pd
+                    JOIN phenotype_sample ps ON ps.id = pd.phenotype_sample_id
+                    WHERE
+                        pd.phenotype_id = :id AND
+                        pd.value = 1
+                    GROUP BY ps.gender
+                    ORDER BY ps.gender;
+                `, {id: params.id}))[0].reduce(keyValueReducer, {}),
+                ancestry: (await connection.execute(`
+                    SELECT
+                        ps.ancestry AS "key",
+                        COUNT(*) AS "value"
+                    FROM phenotype_data pd
+                    JOIN phenotype_sample ps ON ps.id = pd.phenotype_sample_id
+                    WHERE
+                        pd.phenotype_id = :id AND
+                        pd.value = 1 AND
+                        ps.ancestry IS NOT NULL
+                    GROUP BY ps.ancestry
+                    ORDER BY ps.ancestry;
+                `, {id: params.id}))[0].reduce(keyValueReducer, {})
+            }
+
+            break;
+        case 'categorical':
+            phenotype.categories = (await connection.execute({
+                rowsAsArray: true,
+                sql: `
+                    SELECT label FROM phenotype_category
+                    WHERE phenotype_id = :id
+                    ORDER BY value`,
+            }, {id: params.id}))[0].map(e => e[0]);
+            phenotype.distributionCategories = phenotype.categories;
+
+            let keyGroupValueReducer = (acc, curr) => {
+                if (!acc[curr.key])
+                    acc[curr.key] = new Array(phenotype.categories.length).fill(0);
+                acc[curr.key][curr.group - 1] = curr.value;
+                return acc;
+            };
+
+            phenotype.frequency = (await connection.execute(
+                {
+                    rowsAsArray: true,
+                    sql: `
+                        SELECT count(*) FROM phenotype_data
+                        WHERE
+                            phenotype_id = :id AND
+                            value IS NOT NULL
+                        GROUP BY value
+                        ORDER BY value`
+                },
+                {id: params.id}
+            ))[0].map(e => e[0]);
+
+            phenotype.distribution = {
+                age: (await connection.execute(`
+                    SELECT
+                        ps.age AS "key",
+                        pd.value as "group",
+                        COUNT(*) AS "value"
+                    FROM phenotype_data pd
+                    JOIN phenotype_sample ps ON ps.id = pd.phenotype_sample_id
+                    WHERE
+                        pd.phenotype_id = :id AND
+                        pd.value IS NOT NULL AND
+                        ps.age IS NOT NULL
+                    GROUP BY ps.age, pd.value
+                    ORDER BY ps.age, pd.value;
+                `, {id: params.id}))[0].reduce(keyGroupValueReducer, {}),
+                gender: (await connection.execute(`
+                    SELECT
+                        ps.gender AS "key",
+                        pd.value as "group",
+                        COUNT(*) AS "value"
+                    FROM phenotype_data pd
+                    JOIN phenotype_sample ps ON ps.id = pd.phenotype_sample_id
+                    WHERE
+                        pd.phenotype_id = :id AND
+                        pd.value IS NOT NULL AND
+                        ps.gender IS NOT NULL
+                    GROUP BY ps.gender, pd.value
+                    ORDER BY ps.gender, pd.value;
+                `, {id: params.id}))[0].reduce(keyGroupValueReducer, {}),
+                ancestry: (await connection.execute(`
+                    SELECT
+                        ps.ancestry AS "key",
+                        pd.value as "group",
+                        COUNT(*) AS "value"
+                    FROM phenotype_data pd
+                    JOIN phenotype_sample ps ON ps.id = pd.phenotype_sample_id
+                    WHERE
+                        pd.phenotype_id = :id AND
+                        pd.value IS NOT NULL AND
+                        ps.ancestry IS NOT NULL
+                    GROUP BY ps.ancestry, pd.value
+                    ORDER BY ps.ancestry, pd.value;
+                `, {id: params.id}))[0].reduce(keyGroupValueReducer, {})
+            }
+            break;
+        case 'continuous':
+            phenotype.categories = null;
+            phenotype.distributionCategories = null;
+
+
+
+            break;
+    }
+
+    phenotype.related = [];
+
+    /*
+    phenotype.related = await connection.query(`
+        SELECT
+
+        FROM phenotype_correlation pc
+    `, {id: params.id});
+    {
+    "categories": ["% with", "% without"],
+    "distributionCategories": ["% with"],
+    "frequency": [0.01, 0.09],
+    "distribution": {
+        "age": {
+            "40-44": [100],
+            "45-49": [200],
+            "50-54": [350],
+            "55-59": [450],
+            "60-64": [500],
+            "65-69": [450],
+            "70-74": [200],
+            "80-84": [100]
+        },
+        "gender": {
+            "female": [510],
+            "male": [490]
+        },
+        "ancestry": {
+            "American Indian": [100],
+            "Pacific Islander": [300],
+            "Asian": [150],
+            "Hispanic": [400],
+            "Black": [350],
+            "White": [450]
+        }
+    },
+    "related": [
+        {
+            "name": "Ewing's Sarcoma",
+            "sampleSize": 1000,
+            "correlation": 0.2
+        },
+        {
+            "name": "Melanoma",
+            "sampleSize": 100000,
+            "correlation": 1
+        },
+        {
+            "name": "Renal Cell Carcinoma",
+            "sampleSize": 4000,
+            "correlation": 0.1
+        }
+    ]
+}
+*/
+    return phenotype;
+}
+
+
+async function getRanges(connection) {
+    let [ranges] = await connection.query(`SELECT * FROM chromosome_range`);
+    return ranges;
+}
+
+async function getCounts(connection, params) {
+    let table = getValidTable(params.table);
+    let [countRows] = await connection.execute(`
+        SELECT COUNT(*) as count
+        FROM ${table}
+        WHERE gender = :gender
+        ${params.chromosome ? 'AND chromosome = :chromosome' : ''}
+    `, params);
+    return {count: countRows[0].count};
+}
+
 
 /**
  * Retrieves a specific configuration key
@@ -336,4 +591,16 @@ function getConfig(key) {
         : null;
 }
 
-module.exports = {getSummary, getVariants, getMetadata, getGenes, getConfig};
+module.exports = {
+    connection,
+    getSummary,
+    getVariants,
+    getMetadata,
+    getCorrelations,
+    getPhenotype,
+    getPhenotypes,
+    getRanges,
+    getGenes,
+    getCounts,
+    getConfig
+};

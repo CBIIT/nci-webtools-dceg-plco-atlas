@@ -24,9 +24,9 @@ export const PhenotypeCorrelationsSearchCriteria = props => {
 
   const CollapseCaret = () => {
     if (!collapseCriteria && searchCriteriaPhenotypeCorrelations.phenotypes) {
-      return <i className="fas fa-caret-down fa-lg"></i>;
+      return <i className="fa fa-caret-down fa-lg"></i>;
     } else {
-      return <i className="fas fa-caret-right fa-lg"></i>;
+      return <i className="fa fa-caret-right fa-lg"></i>;
     }
   };
 
@@ -41,7 +41,10 @@ export const PhenotypeCorrelationsSearchCriteria = props => {
 
   return (
     <div className="mb-2">
-      <Tabs className="" defaultActiveKey="search-criteria">
+      <Tabs 
+        transition={false}
+        className="" 
+        defaultActiveKey="search-criteria">
         <Tab
           eventKey="search-criteria"
           className="d-flex justify-content-between px-3 py-2 bg-white tab-pane-bordered rounded-0">
@@ -73,7 +76,7 @@ export const PhenotypeCorrelationsSearchCriteria = props => {
               </span>
             </div>
             <div
-              className="col-md-auto ml-1 px-0"
+              className="col-md-auto ml-1 pl-0"
               style={{ maxHeight: '300px', overflow: 'auto' }}>
               {collapseCriteria && (
                 <>
@@ -131,8 +134,7 @@ export const PhenotypeCorrelationsSearchCriteria = props => {
                 )}
             </div>
 
-            <div className="col-md-auto ml-1 px-0">
-              <span className="mx-3">|</span>
+            <div className="col-md-auto border-left border-secondary">
 
               <span>
                 <b>Gender</b>:{' '}

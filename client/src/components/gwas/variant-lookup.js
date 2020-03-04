@@ -16,7 +16,7 @@ import {
 import paginationFactory from 'react-bootstrap-table2-paginator';
 import filterFactory, { textFilter } from 'react-bootstrap-table2-filter';
 import ToolkitProvider, { CSVExport } from 'react-bootstrap-table2-toolkit';
-import { Alert, Button, Tabs, Tab, Collapse } from 'react-bootstrap';
+import { Alert, Tabs, Tab, Spinner } from 'react-bootstrap';
 import { VariantLookupSearchCriteria } from '../controls/variant-lookup-search-criteria';
 
 
@@ -29,7 +29,6 @@ export function VariantLookup() {
     selectedGender,
     results,
     messages,
-    loading,
     submitted,
   } = variantLookup;
 
@@ -55,8 +54,18 @@ export function VariantLookup() {
       // }
     },
     {
+      dataField: 'variant',
+      text: 'Variant',
+      hidden: true
+    },
+    {
+      dataField: 'gender',
+      text: 'Gender',
+      hidden: true
+    },
+    {
       headerTitle: () => 'Chromosome',
-      dataField: 'chr',
+      dataField: 'chromosome',
       text: 'Chr.',
       // headerAlign: 'center',
       // align: 'center'
@@ -65,23 +74,23 @@ export function VariantLookup() {
       }
     },
     {
-      dataField: 'bp',
+      dataField: 'position',
       text: 'Position',
       headerStyle: {
         width: '100px'
       }
     },
     {
-      dataField: 'a1',
+      dataField: 'allele_reference',
       text: 'Reference Allele'
     },
     {
-      dataField: 'a2',
+      dataField: 'allele_alternate',
       text: 'Alternate Allele'
     },
     {
-      dataField: 'or',
-      text: 'Odds Ratio',
+      dataField: 'odds_ratio',
+      text: 'Odds Ratio/Beta',
       sort: true,
       sortFunc: (a, b, order, dataField, rowA, rowB) => {
         if (order === 'asc') {
@@ -91,7 +100,7 @@ export function VariantLookup() {
       }
     },
     {
-      dataField: 'p',
+      dataField: 'p_value',
       text: 'P-value',
       sort: true,
       sortFunc: (a, b, order, dataField, rowA, rowB) => {
@@ -111,7 +120,7 @@ export function VariantLookup() {
   const placeholder = (
     <div style={{ display: submitted ? 'none' : 'block' }}>
       <p className="h4 text-center text-secondary my-5">
-        Please select phenotype(s) and input variant to view this table
+        Please select phenotypes and input variant to view this table
       </p>
     </div>
   );
@@ -202,7 +211,7 @@ export function VariantLookup() {
       gender: selectedGender
     });
     setSubmitted(new Date());
-    dispatch(lookupVariants(selectedPhenotypes, selectedVariant));
+    dispatch(lookupVariants(selectedPhenotypes, selectedVariant, selectedGender === 'combined' ? 'all' : selectedGender));
   };
 
   const handleReset = params => {
@@ -213,9 +222,8 @@ export function VariantLookup() {
         selectedPhenotypes: [],
         selectedVariant: '',
         selectedGender: 'combined',
-        results: [],
+        results: null,
         messages: [],
-        loading: false,
         submitted: null,
         searchCriteriaVariantLookup: {},
         numResults: null,
@@ -229,7 +237,7 @@ export function VariantLookup() {
       <h1 className="sr-only">Explore GWAS data - Search for variant across phenotypes</h1>
       <SidebarContainer className="mx-3">
         <SidebarPanel className="col-lg-3">
-          <div className="p-2 bg-white border rounded-0">
+          <div className="px-2 pt-2 pb-3 bg-white border rounded-0">
             <VariantLookupForm
               onSubmit={handleSubmit}
               onChange={handleChange}
@@ -250,56 +258,71 @@ export function VariantLookup() {
         <MainPanel className="col-lg-9">
           <VariantLookupSearchCriteria />
 
-          <Tabs defaultActiveKey="variant-lookup">
+          <Tabs 
+            transition={false}
+            defaultActiveKey="variant-lookup">
             <Tab
               eventKey="variant-lookup"
               // title="Table"
-              className="p-2 bg-white tab-pane-bordered rounded-0"
-              style={{ minHeight: '50vh' }}>
-              <div
-                className="mw-100 my-2 px-4"
-                style={{ display: submitted ? 'block' : 'none' }}>
-                <ToolkitProvider
-                  keyField="variant_id"
-                  data={results}
-                  columns={columns}
-                  exportCSV={{
-                    fileName: 'variant_lookup.csv'
-                  }}>
-                  {props => (
-                    <div>
-                      <ExportCSVButton
-                        className="float-right"
-                        style={{
-                          all: 'unset',
-                          textDecoration: 'underline',
-                          cursor: 'pointer',
-                          color: '#008CBA'
-                        }}
-                        {...props.csvProps}>
-                        Export CSV
-                      </ExportCSVButton>
-                      <br />
-                      <Table
-                        {...props.baseProps}
-                        bootstrap4
-                        // keyField="variant_id"
-                        // data={results}
-                        // columns={columns}
-                        filter={filterFactory()}
-                        pagination={paginationFactory({
-                          showTotal: results.length > 0,
-                          sizePerPageList: [25, 50, 100],
-                          paginationTotalRenderer: paginationText,
-                          sizePerPageRenderer: paginationSizeSelector,
-                          pageButtonRenderer: paginationButton
-                        })}
-                        defaultSorted={[{ dataField: 'p', order: 'asc' }]}
-                      />
-                    </div>
-                  )}
-                </ToolkitProvider>
-              </div>
+              className={
+                submitted && results && results.length > 0 ?
+                "p-2 bg-white tab-pane-bordered rounded-0" :
+                "p-2 bg-white tab-pane-bordered rounded-0 d-flex justify-content-center align-items-center"
+              }
+              style={{ minHeight: '474px' }}>
+              {
+                results && results.length > 0 &&
+                  <div
+                    className="mw-100 my-2 px-4"
+                    style={{ display: submitted && results && results.length > 0 ? 'block' : 'none' }}>
+                    <ToolkitProvider
+                      keyField="variant_id"
+                      data={results}
+                      columns={columns}
+                      exportCSV={{
+                        fileName: 'variant_lookup.csv'
+                      }}>
+                      {props => (
+                        <div>
+                          <ExportCSVButton
+                            className="float-right"
+                            style={{
+                              all: 'unset',
+                              textDecoration: 'underline',
+                              cursor: 'pointer',
+                              color: '#008CBA'
+                            }}
+                            {...props.csvProps}>
+                            Export CSV
+                          </ExportCSVButton>
+                          <br />
+                          <Table
+                            {...props.baseProps}
+                            bootstrap4
+                            // keyField="variant_id"
+                            // data={results}
+                            // columns={columns}
+                            filter={filterFactory()}
+                            pagination={paginationFactory({
+                              showTotal: results ? results.length > 0 : false,
+                              sizePerPageList: [25, 50, 100],
+                              paginationTotalRenderer: paginationText,
+                              sizePerPageRenderer: paginationSizeSelector,
+                              pageButtonRenderer: paginationButton
+                            })}
+                            defaultSorted={[{ dataField: 'p', order: 'asc' }]}
+                          />
+                        </div>
+                      )}
+                    </ToolkitProvider>
+                  </div>
+              }
+              {
+                results && results.length <= 0 &&
+                  <Spinner animation="border" variant="primary" role="status">
+                    <span className="sr-only">Loading...</span>
+                  </Spinner>
+              }
               {placeholder}
             </Tab>
           </Tabs>

@@ -1,50 +1,56 @@
-const cluster = require("cluster");
 const path = require("path");
 const server = require("fastify");
 const cors = require("fastify-cors");
 const compress = require("fastify-compress");
 const static = require("fastify-static");
-const { port, dbpath } = require("./config.json");
-const { getSummary, getVariants, getMetadata, getGenes, getConfig } = require("./query");
 const logger = require("./logger");
+const { port, dbpath } = require("./config.json");
+const {
+  connection,
+  getSummary,
+  getVariants,
+  getMetadata,
+  getGenes,
+  getCorrelations,
+  getPhenotype,
+  getPhenotypes,
+  getRanges,
+  getCounts,
+  getConfig
+} = require("./query");
 
-if (cluster.isMaster) {
-  logger.info(`[${process.pid}] Started master process`);
-  const numProcesses = require("os").cpus().length * 2; // two processes per cpu
-  for (let i = 0; i < numProcesses; i++) cluster.fork();
-  cluster.on("exit", worker => {
-    logger.info(`Restarted worker process: ${worker.process.pid}`);
-    cluster.fork();
-  });
-  return;
-}
+logger.info(`[${process.pid}] Started process`);
 
-logger.info(`[${process.pid}] Started worker process`);
-
+// create fastify app and register middleware
 const app = server({ ignoreTrailingSlash: true });
 app.register(compress);
-app.register(static, { root: path.resolve("www") });
+app.register(cors);
+app.register(static, {
+  root: path.resolve("www")
+});
+
+// todo: replace .json files with api routes (if needed)
 app.register(static, {
   root: path.resolve(dbpath),
   prefix: "/data/",
   decorateReply: false
 });
-app.register(cors);
 
-
-// execute code before handling request
+// execute before handling request
 app.addHook("onRequest", (req, res, done) => {
   res.header("Timestamp", new Date().getTime());
   done();
 });
 
-// execute code before sending response
+// execute before sending response
 app.addHook("onSend", (req, res, payload, done) => {
 
   let pathname = req.raw.url.replace(/\?.*$/, "");
   let timestamp = res.getHeader("Timestamp");
 
-  if (timestamp && /summary|variants|metadata|genes|config/.test(pathname)) {
+  // log response time and parameters for the specified routes
+  const loggedRoutes = /summary|variants|metadata|genes|correlations|config/;
+  if (timestamp && loggedRoutes.test(pathname)) {
     let duration = new Date().getTime() - timestamp;
     logger.info(`[${process.pid}] ${pathname}: ${duration/1000}s`, req.query);
 
@@ -55,26 +61,59 @@ app.addHook("onSend", (req, res, payload, done) => {
   done();
 });
 
-app.get("/ping", (req, res) => res.send(true));
+app.get("/ping", async (req, res) => {
+  try {
+    await connection.ping()
+    return true;
+  } catch (error) {
+    logger.error(`[${process.pid}] ${ERROR}: ${error}`, req.query);
+    throw(error);
+  }
+});
 
 // retrieves all variant groups for all chroms. at the lowest granularity (in MBases)
 app.get("/summary", async ({ query }, res) => {
-  return getSummary(dbpath + query.database, query);
+  return getSummary(connection, query);
 });
 
 // retrieves all variants within the specified range
 app.get("/variants", async ({ query }, res) => {
-  return getVariants(dbpath + query.database, query);
+  return getVariants(connection, query);
 });
 
 // retrieves metadata
 app.get("/metadata", async ({ query }, res) => {
-  return getMetadata(dbpath + query.database, query.key);
+  return getMetadata(connection, query);
 });
 
 // retrieves genes
 app.get("/genes", async ({ query }, res) => {
-  return getGenes(dbpath + query.database, query);
+  return getGenes(connection, query);
+});
+
+// retrieves phenotypes
+app.get("/phenotypes", async ({ query }, res) => {
+  return getPhenotypes(connection, query);
+});
+
+// retrieves phenotypes
+app.get("/phenotype", async ({ query }, res) => {
+  return getPhenotype(connection, query);
+});
+
+// retrieves correlations
+app.get("/correlations", async ({ query }, res) => {
+  return getCorrelations(connection, query);
+});
+
+// retrieves chromosome ranges
+app.get("/ranges", async ({ query }, res) => {
+  return getRanges(connection);
+});
+
+// retrieves variant counts
+app.get("/counts", async ({ query }, res) => {
+  return getCounts(connection, query);
 });
 
 // retrieves configuration

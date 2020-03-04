@@ -142,9 +142,9 @@ export function ManhattanPlot({
 
   function getMirroredSummaryPlot(plotData, mirroredPlotData) {
     let columnIndexes = {
-      chr: plotData.columns.indexOf('chr'),
-      bp: plotData.columns.indexOf('bp_abs_1000kb'),
-      nLogP: plotData.columns.indexOf('nlog_p2')
+      chr: plotData.columns.indexOf('chromosome'),
+      bp: plotData.columns.indexOf('position_abs'),
+      nLogP: plotData.columns.indexOf('p_value_nlog')
     };
 
     return {
@@ -162,12 +162,12 @@ export function ManhattanPlot({
         title: null,
         key: columnIndexes.bp,
         tickFormat: tick => (tick / 1e6).toPrecision(3) + ' MB',
-        ticks: ranges.filter(r => r.chr <= 22).map(r => r.max_bp_abs),
-        tickFormat: (tick, i) => ranges[i].chr,
+        ticks: ranges.filter(r => !isNaN(r.chromosome)).map(r => +r.position_abs_max),
+        tickFormat: (tick, i) => +ranges[i].chromosome,
         labelsBetweenTicks: true,
         allowSelection: true,
         onSelected: (range, i) => {
-          onChromosomeSelected(ranges[i].chr);
+          onChromosomeSelected(ranges[i].chromosome);
         }
       },
       yAxis: {
@@ -190,10 +190,10 @@ export function ManhattanPlot({
       point: {
         size: 2,
         opacity: 1,
-        color: (d, i) => (d[columnIndexes.chr] % 2 ? colors.female.light : colors.female.dark)
+        color: (d, i) => (+d[columnIndexes.chr] % 2 ? colors.female.light : colors.female.dark)
       },
       point2: {
-        color: (d, i) => (d[columnIndexes.chr] % 2 ? colors.male.light : colors.male.dark) //#e47833')
+        color: (d, i) => (+d[columnIndexes.chr] % 2 ? colors.male.light : colors.male.dark) //#e47833')
       },
       lines: [{ y: -Math.log10(5e-8), style: 'dashed' }]
     };
@@ -201,10 +201,10 @@ export function ManhattanPlot({
 
   function getMirroredChromosomePlot(plotData, mirroredPlotData) {
     let columnIndexes = {
-      variantId: plotData.columns.indexOf('variant_id'),
-      chr: plotData.columns.indexOf('chr'),
-      bp: plotData.columns.indexOf('bp'),
-      nLogP: plotData.columns.indexOf('nlog_p')
+      variantId: plotData.columns.indexOf('id'),
+      chr: plotData.columns.indexOf('chromosome'),
+      bp: plotData.columns.indexOf('position'),
+      nLogP: plotData.columns.indexOf('p_value_nlog')
     };
 
     let withKeys = data => ({
@@ -216,7 +216,7 @@ export function ManhattanPlot({
 
     let title = `${selectedPhenotype.title} - Chromosome ${selectedChromosome}`;
 
-    let range = ranges.find(r => r.chr === selectedChromosome);
+    let range = ranges.find(r => r.chromosome == selectedChromosome);
 
     return {
       mirrored: true,
@@ -260,10 +260,9 @@ export function ManhattanPlot({
         plot.current.drawGenes([]);
         if (zoomRange <= 2e6) {
           let genes = await query('genes', {
-            database: 'gene.db',
-            chr: selectedChromosome,
-            txStart: xAxis.extent[0],
-            txEnd: xAxis.extent[1]
+            chromosome: selectedChromosome,
+            transcription_start: xAxis.extent[0],
+            transcription_end: xAxis.extent[1]
           });
           plot.current.drawGenes(genes);
           setGenes(genes);
@@ -274,7 +273,7 @@ export function ManhattanPlot({
         title: null,
         key: columnIndexes.bp,
         tickFormat: tick => (tick / 1e6).toPrecision(4) + ' MB',
-        extent: [range.bp_min, range.bp_max]
+        extent: [range.position_min, range.position_max]
       },
       yAxis: {
         title: [
@@ -305,7 +304,7 @@ export function ManhattanPlot({
           content: async data => {
             let point = withKeys(data);
             const response = await query('variants', {
-              database: selectedPhenotype.value + '.db',
+              table: selectedPhenotype.value + '_variant',
               id: point.variantId
             });
             const record = response.data[0];
@@ -313,9 +312,9 @@ export function ManhattanPlot({
               h('div', null, [
                 h('b', null, 'position: '),
                 // `${(record.bp / 1e6).toFixed(4)} MB`
-                `${record.chr}:${record.bp}`
+                `${record.chromosome}:${record.position}`
               ]),
-              h('div', null, [h('b', null, 'p-value: '), `${record.p}`]),
+              h('div', null, [h('b', null, 'p-value: '), `${record.p_value}`]),
               h('div', null, [h('b', null, 'snp: '), `${record.snp}`]),
               h('div', null, [
                 h(
@@ -342,9 +341,9 @@ export function ManhattanPlot({
 
   function getSummaryPlot(plotData) {
     let columnIndexes = {
-      chr: plotData.columns.indexOf('chr'),
-      bp: plotData.columns.indexOf('bp_abs_1000kb'),
-      nLogP: plotData.columns.indexOf('nlog_p2')
+      chr: plotData.columns.indexOf('chromosome'),
+      bp: plotData.columns.indexOf('position_abs'),
+      nLogP: plotData.columns.indexOf('p_value_nlog')
     };
 
     return {
@@ -360,12 +359,12 @@ export function ManhattanPlot({
         title: null,
         key: columnIndexes.bp,
         tickFormat: tick => (tick / 1e6).toPrecision(3) + ' MB',
-        ticks: ranges.filter(r => r.chr <= 22).map(r => r.max_bp_abs),
-        tickFormat: (tick, i) => ranges[i].chr,
+        ticks: ranges.filter(r => !isNaN(r.chromosome)).map(r => r.position_abs_max),
+        tickFormat: (tick, i) => +ranges[i].chromosome,
         labelsBetweenTicks: true,
         allowSelection: true,
         onSelected: (range, i) => {
-          onChromosomeSelected(ranges[i].chr);
+          onChromosomeSelected(ranges[i].chromosome);
         }
       },
       yAxis: {
@@ -394,10 +393,10 @@ export function ManhattanPlot({
 
   function getChromosomePlot(plotData) {
     let columnIndexes = {
-      variantId: plotData.columns.indexOf('variant_id'),
-      chr: plotData.columns.indexOf('chr'),
-      bp: plotData.columns.indexOf('bp'),
-      nLogP: plotData.columns.indexOf('nlog_p')
+      variantId: plotData.columns.indexOf('id'),
+      chr: plotData.columns.indexOf('chromosome'),
+      bp: plotData.columns.indexOf('position'),
+      nLogP: plotData.columns.indexOf('p_value_nlog')
     };
 
     let withKeys = data => ({
@@ -408,7 +407,7 @@ export function ManhattanPlot({
     });
 
     let title = `${selectedPhenotype.title} - Chromosome ${selectedChromosome}`;
-    let range = ranges.find(r => r.chr === selectedChromosome);
+    let range = ranges.find(r => r.chromosome == selectedChromosome);
 
     return {
       data: plotData.data,
@@ -450,10 +449,9 @@ export function ManhattanPlot({
         plot.current.drawGenes([]);
         if (zoomRange <= 2e6) {
           let genes = await query('genes', {
-            database: 'gene.db',
-            chr: selectedChromosome,
-            txStart: xAxis.extent[0],
-            txEnd: xAxis.extent[1]
+            chromosome: selectedChromosome,
+            transcription_start: xAxis.extent[0],
+            transcription_end: xAxis.extent[1]
           });
           setGenes(genes);
           plot.current.drawGenes(genes);
@@ -464,7 +462,7 @@ export function ManhattanPlot({
         title: null,
         key: columnIndexes.bp,
         tickFormat: tick => (tick / 1e6).toPrecision(4) + ' MB',
-        extent: [range.bp_min, range.bp_max]
+        extent: [range.position_min, range.position_max]
       },
       yAxis: {
         title: [
@@ -493,7 +491,7 @@ export function ManhattanPlot({
           content: async data => {
             let point = withKeys(data);
             const response = await query('variants', {
-              database: selectedPhenotype.value + '.db',
+              table: selectedPhenotype.value + '_variant',
               id: point.variantId
             });
             const record = response.data[0];
@@ -501,9 +499,9 @@ export function ManhattanPlot({
               h('div', null, [
                 h('b', null, 'position: '),
                 // `${(record.bp / 1e6).toFixed(4)} MB`
-                `${record.chr}:${record.bp}`
+                `${record.chromosome}:${record.position}`
               ]),
-              h('div', null, [h('b', null, 'p-value: '), `${record.p}`]),
+              h('div', null, [h('b', null, 'p-value: '), `${record.p_value}`]),
               h('div', null, [h('b', null, 'snp: '), `${record.snp}`]),
               h('div', null, [
                 h(
@@ -528,7 +526,7 @@ export function ManhattanPlot({
           ]),
           h('div', null, [
             h('b', null, 'position: '),
-            `chr${selectedChromosome}:${gene.tx_start}-${gene.tx_end}`
+            `chr${selectedChromosome}:${gene.transcription_start}-${gene.transcription_end}`
           ]),
           h('div', null, [
             h('a', {

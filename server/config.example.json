@@ -3,5 +3,12 @@
     "dbpath": "server/data/",
     "logpath": "server/logs/",
     "loglevel": "info",
-    "downloadRoot": "http://hostname:8080/downloads/"
+    "downloadRoot": "http://hostname:8080/downloads/",
+    "database": {
+        "name": "example-database",
+        "host": "host",
+        "port": "port",
+        "user": "username",
+        "password": "password"
+    }
 }
