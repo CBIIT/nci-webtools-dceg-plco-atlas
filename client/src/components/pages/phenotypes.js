@@ -114,12 +114,7 @@ export function Phenotypes() {
     }
 
     // some action here
-
-    const phenotypeEndpoint = {
-      melanoma_3: 'data/phenotype_data_categorical.json',
-      height_when_standing_7: 'data/phenotype_data_continuous.json',
-    }[phenotype.value] || 'data/phenotype_data_binary.json';
-    const data = await query(phenotypeEndpoint);
+    const data = await query('phenotype', {id: phenotype.id});
 
     // update browse phenotypes filters
     dispatch(
@@ -235,13 +230,13 @@ export function Phenotypes() {
         <PhenotypesSearchCriteria />
         {!submitted &&
           <>
-            <div 
+            <div
               className={
-                phenotypes ? 
-                "bg-white border rounded-0 p-3" : 
+                phenotypes ?
+                "bg-white border rounded-0 p-3" :
                 "bg-white border rounded-0 p-3 d-flex justify-content-center align-items-center"
               }
-              style={{ 
+              style={{
                 minHeight: '324px'
               }}>
               <div style={{
@@ -274,9 +269,9 @@ export function Phenotypes() {
                   style={{ minHeight: '50vh' }}
                 />
               </div>
-              
+
               {
-                !phenotypes && 
+                !phenotypes &&
                   <div
                     style={{
                       display: !phenotypes ? 'block' : 'none',
@@ -286,7 +281,7 @@ export function Phenotypes() {
                     </Spinner>
                   </div>
               }
-              
+
             </div>
           </>
         }
