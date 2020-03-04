@@ -25,7 +25,7 @@ export function PhenotypesTabs() {
     dispatch(updateBrowsePhenotypes({ selectedPlot }));
   };
 
-  const titleCase = str => str.split(/\s+/g)
+  const titleCase = str => str.split(/[_\s]+/g)
     .map(word => word[0].toUpperCase() + word.substr(1).toLowerCase())
     .join(' ');
 
@@ -49,9 +49,7 @@ export function PhenotypesTabs() {
                 data={phenotypeData.frequency}
                 categories={phenotypeData.categories}
                 xTitle={phenotypeData.display_name}
-                yTitle="Frequency" />}
-
-
+                yTitle="Number of Participants" />}
 
       </Tab>
 
@@ -80,9 +78,9 @@ export function PhenotypesTabs() {
 
           {phenotypeData && phenotypeData.distribution && <BarChart
                 data={phenotypeData.distribution[selectedDistribution]}
-                categories={phenotypeData.distributionCategories}
+                categories={phenotypeData.distributionCategories.map(titleCase)}
                 xTitle={titleCase(selectedDistribution)}
-                yTitle="Number of Cases"
+                yTitle="Number of Participants"
           />}
 
       </Tab>
