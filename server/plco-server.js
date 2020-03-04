@@ -12,6 +12,7 @@ const {
   getMetadata,
   getGenes,
   getCorrelations,
+  getPhenotype,
   getPhenotypes,
   getRanges,
   getCounts,
@@ -93,6 +94,11 @@ app.get("/genes", async ({ query }, res) => {
 // retrieves phenotypes
 app.get("/phenotypes", async ({ query }, res) => {
   return getPhenotypes(connection, query);
+});
+
+// retrieves phenotypes
+app.get("/phenotype", async ({ query }, res) => {
+  return getPhenotype(connection, query);
 });
 
 // retrieves correlations

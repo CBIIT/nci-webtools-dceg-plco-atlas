@@ -50,6 +50,13 @@ function intersection(...arrays) {
     );
 }
 
+function pluck(rows) {
+    if (!rows) return null;
+    let [firstRow] = rows;
+    let [firstKey] = Object.keys(firstRow);
+    return firstRow[firstKey];
+}
+
 
 function getValidColumns(tableName, columns) {
     if (!Array.isArray(columns))
@@ -339,6 +346,217 @@ async function getPhenotypes(connection, params) {
         : phenotypes.filter(phenotype => phenotype.parent_id === null);
 }
 
+async function getPhenotype(connection, params) {
+    let [phenotypeRows] = await connection.execute(`
+        SELECT id, name, display_name, description, type
+        FROM phenotype
+        WHERE id = :id
+    `, {id: params.id});
+    let phenotype = phenotypeRows[0];
+    let keyValueReducer = ((obj = {}, curr) => ({...obj, [curr.key]: [...(obj[curr.key] || []), curr.value]}));
+
+    switch(phenotype.type) {
+        case 'binary':
+            phenotype.categories = ["% with", "% without"];
+            phenotype.distributionCategories = ["% with"];
+            phenotype.frequency = (await connection.execute(
+                {
+                    rowsAsArray: true,
+                    sql: `
+                        SELECT count(*) FROM phenotype_data
+                        WHERE
+                            phenotype_id = :id and
+                            value is not null
+                        group by value;`
+                },
+                {id: params.id}
+            ))[0].map(e => e[0]);
+
+            phenotype.distribution = {
+                age: (await connection.execute(`
+                    SELECT
+                        ps.age AS "key",
+                        COUNT(*) AS "value"
+                    FROM phenotype_data pd
+                    JOIN phenotype_sample ps ON ps.id = pd.phenotype_sample_id
+                    WHERE
+                        pd.phenotype_id = :id AND
+                        pd.value = 1 AND
+                        ps.age IS NOT NULL
+                    GROUP BY ps.age
+                    ORDER BY ps.age;
+                `, {id: params.id}))[0].reduce(keyValueReducer, {}),
+                gender: (await connection.execute(`
+                    SELECT
+                        ps.gender AS "key",
+                        COUNT(*) AS "value"
+                    FROM phenotype_data pd
+                    JOIN phenotype_sample ps ON ps.id = pd.phenotype_sample_id
+                    WHERE
+                        pd.phenotype_id = :id AND
+                        pd.value = 1
+                    GROUP BY ps.gender
+                    ORDER BY ps.gender;
+                `, {id: params.id}))[0].reduce(keyValueReducer, {}),
+                ancestry: (await connection.execute(`
+                    SELECT
+                        ps.ancestry AS "key",
+                        COUNT(*) AS "value"
+                    FROM phenotype_data pd
+                    JOIN phenotype_sample ps ON ps.id = pd.phenotype_sample_id
+                    WHERE
+                        pd.phenotype_id = :id AND
+                        pd.value = 1 AND
+                        ps.ancestry IS NOT NULL
+                    GROUP BY ps.ancestry
+                    ORDER BY ps.ancestry;
+                `, {id: params.id}))[0].reduce(keyValueReducer, {})
+            }
+
+            break;
+        case 'categorical':
+            phenotype.categories = (await connection.execute({
+                rowsAsArray: true,
+                sql: `
+                    SELECT label FROM phenotype_category
+                    WHERE phenotype_id = :id
+                    ORDER BY value`,
+            }, {id: params.id}))[0].map(e => e[0]);
+            phenotype.distributionCategories = phenotype.categories;
+
+            let keyGroupValueReducer = (acc, curr) => {
+                if (!acc[curr.key])
+                    acc[curr.key] = new Array(phenotype.categories.length).fill(0);
+                acc[curr.key][curr.group - 1] = curr.value;
+                return acc;
+            };
+
+            phenotype.frequency = (await connection.execute(
+                {
+                    rowsAsArray: true,
+                    sql: `
+                        SELECT count(*) FROM phenotype_data
+                        WHERE
+                            phenotype_id = :id AND
+                            value IS NOT NULL
+                        GROUP BY value
+                        ORDER BY value`
+                },
+                {id: params.id}
+            ))[0].map(e => e[0]);
+
+            phenotype.distribution = {
+                age: (await connection.execute(`
+                    SELECT
+                        ps.age AS "key",
+                        pd.value as "group",
+                        COUNT(*) AS "value"
+                    FROM phenotype_data pd
+                    JOIN phenotype_sample ps ON ps.id = pd.phenotype_sample_id
+                    WHERE
+                        pd.phenotype_id = :id AND
+                        pd.value IS NOT NULL AND
+                        ps.age IS NOT NULL
+                    GROUP BY ps.age, pd.value
+                    ORDER BY ps.age, pd.value;
+                `, {id: params.id}))[0].reduce(keyGroupValueReducer, {}),
+                gender: (await connection.execute(`
+                    SELECT
+                        ps.gender AS "key",
+                        pd.value as "group",
+                        COUNT(*) AS "value"
+                    FROM phenotype_data pd
+                    JOIN phenotype_sample ps ON ps.id = pd.phenotype_sample_id
+                    WHERE
+                        pd.phenotype_id = :id AND
+                        pd.value IS NOT NULL AND
+                        ps.gender IS NOT NULL
+                    GROUP BY ps.gender, pd.value
+                    ORDER BY ps.gender, pd.value;
+                `, {id: params.id}))[0].reduce(keyGroupValueReducer, {}),
+                ancestry: (await connection.execute(`
+                    SELECT
+                        ps.ancestry AS "key",
+                        pd.value as "group",
+                        COUNT(*) AS "value"
+                    FROM phenotype_data pd
+                    JOIN phenotype_sample ps ON ps.id = pd.phenotype_sample_id
+                    WHERE
+                        pd.phenotype_id = :id AND
+                        pd.value IS NOT NULL AND
+                        ps.ancestry IS NOT NULL
+                    GROUP BY ps.ancestry, pd.value
+                    ORDER BY ps.ancestry, pd.value;
+                `, {id: params.id}))[0].reduce(keyGroupValueReducer, {})
+            }
+            break;
+        case 'continuous':
+            phenotype.categories = null;
+            phenotype.distributionCategories = null;
+
+
+
+            break;
+    }
+
+    phenotype.related = [];
+
+    /*
+    phenotype.related = await connection.query(`
+        SELECT
+
+        FROM phenotype_correlation pc
+    `, {id: params.id});
+    {
+    "categories": ["% with", "% without"],
+    "distributionCategories": ["% with"],
+    "frequency": [0.01, 0.09],
+    "distribution": {
+        "age": {
+            "40-44": [100],
+            "45-49": [200],
+            "50-54": [350],
+            "55-59": [450],
+            "60-64": [500],
+            "65-69": [450],
+            "70-74": [200],
+            "80-84": [100]
+        },
+        "gender": {
+            "female": [510],
+            "male": [490]
+        },
+        "ancestry": {
+            "American Indian": [100],
+            "Pacific Islander": [300],
+            "Asian": [150],
+            "Hispanic": [400],
+            "Black": [350],
+            "White": [450]
+        }
+    },
+    "related": [
+        {
+            "name": "Ewing's Sarcoma",
+            "sampleSize": 1000,
+            "correlation": 0.2
+        },
+        {
+            "name": "Melanoma",
+            "sampleSize": 100000,
+            "correlation": 1
+        },
+        {
+            "name": "Renal Cell Carcinoma",
+            "sampleSize": 4000,
+            "correlation": 0.1
+        }
+    ]
+}
+*/
+    return phenotype;
+}
+
 
 async function getRanges(connection) {
     let [ranges] = await connection.query(`SELECT * FROM chromosome_range`);
@@ -375,6 +593,7 @@ module.exports = {
     getVariants,
     getMetadata,
     getCorrelations,
+    getPhenotype,
     getPhenotypes,
     getRanges,
     getGenes,
