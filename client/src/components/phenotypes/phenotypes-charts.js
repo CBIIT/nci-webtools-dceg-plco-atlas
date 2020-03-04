@@ -14,7 +14,7 @@ export const BarChart = ({ data, categories, xTitle, yTitle }) => (
       }
       let plotData = { x, y, name, type: "bar"};
 
-      if (x.length <= 2) {
+      if (x.length <= 2 && categories.length <= 2) {
         plotData.width = x.map(e => 0.2);
       }
 
