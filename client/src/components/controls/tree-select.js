@@ -690,11 +690,11 @@ export const TreeSelect = forwardRef(({
                   }}
                   // disabled={submitted}
                   >
-                  <i className="fa fa-times fa-xs"></i>
+                  <i className="fa fa-times" style={{fontSize: '14px'}}></i>
                 </button>
               ) : (
                 <button className="input-group-text bg-white" disabled>
-                  <i className="fa fa-search fa-xs"></i>
+                  <i className="fa fa-search" style={{fontSize: '14px'}}></i>
                 </button>
               )}
             </div>
