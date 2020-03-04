@@ -23,8 +23,8 @@ export function QQPlot({ onVariantLookup }) {
     toImageButtonOptions: {
       format: 'svg', // one of png, svg, jpeg, webp
       filename: 'custom_image',
-      // height: 800,
-      // width: 800,
+      height: 1000,
+      width: 1000,
       scale: 1 // Multiply title/legend/axis/canvas sizes by this factor
     },
     displaylogo: false,
@@ -147,7 +147,6 @@ export function QQPlot({ onVariantLookup }) {
     const ev = e.event;
     // console.log("EVENT", ev);
     const points = e.points;
-    console.log("POINTS hoverinfo", points[0]["data"]["hoverinfo"])
     if (e && ev && points && points[0]) {
       hideTooltip();
       const tooltip = createTooltip();

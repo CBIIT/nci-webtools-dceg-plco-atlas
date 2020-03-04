@@ -1,16 +1,14 @@
-import React from 'react';
+import React, { useState, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Button, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import { updateVariantLookup } from '../../services/actions';
-import { TreeSelectCustom } from '../controls/tree-select-custom';
+import { TreeSelect } from '../controls/tree-select';
 
 export function VariantLookupForm({ onChange, onSubmit, onReset }) {
   const dispatch = useDispatch();
   const phenotypes = useSelector(state => state.phenotypes);
-  const phenotypeCategories = useSelector(state => state.phenotypeCategories);
-  const phenotypesTree = useSelector(state => state.phenotypesTree);
   const variantLookup = useSelector(state => state.variantLookup);
-  const { selectedPhenotypes, selectedVariant, selectedGender } = variantLookup;
+  const { selectedPhenotypes, selectedVariant, selectedGender, submitted } = variantLookup;
 
   const setSelectedPhenotypes = selectedPhenotypes => {
     dispatch(updateVariantLookup({ selectedPhenotypes }));
@@ -24,10 +22,6 @@ export function VariantLookupForm({ onChange, onSubmit, onReset }) {
     dispatch(updateVariantLookup({ selectedGender }));
   };
 
-  const alphabetizedPhenotypes = [...phenotypes].sort((a, b) =>
-    a.title.localeCompare(b.title)
-  );
-
   const handleChangeCustom = items => {
     setSelectedPhenotypes(items);
   };
@@ -38,17 +32,19 @@ export function VariantLookupForm({ onChange, onSubmit, onReset }) {
     }
   };
 
+  const treeRef = useRef();
+
   return (
     <> 
       <div className="mb-2">
         <b>Phenotypes</b>
         <span style={{ color: 'red' }}>*</span>
-        <TreeSelectCustom
-          data={phenotypesTree}
-          dataAlphabetical={alphabetizedPhenotypes}
-          dataCategories={phenotypeCategories}
+        <TreeSelect
+          data={phenotypes}
           value={selectedPhenotypes}
           onChange={handleChangeCustom}
+          ref={treeRef}
+          submitted={submitted}
         />
       </div>
 
@@ -66,6 +62,7 @@ export function VariantLookupForm({ onChange, onSubmit, onReset }) {
           }}
           onKeyPress={e => handleKeyPress(e)}
           type="text"
+          disabled={submitted}
           required
         />
       </div>
@@ -75,7 +72,8 @@ export function VariantLookupForm({ onChange, onSubmit, onReset }) {
         <select
           className="form-control"
           value={selectedGender}
-          onChange={e => setSelectedGender(e.target.value)}>
+          onChange={e => setSelectedGender(e.target.value)}
+          disabled={submitted}>
           <option value="combined">All</option>
           <option value="female">Female</option>
           <option value="male">Male</option>
@@ -86,9 +84,8 @@ export function VariantLookupForm({ onChange, onSubmit, onReset }) {
         <OverlayTrigger overlay={
             <Tooltip id="tooltip-disabled" 
               style={{
-                display: 
-                  (!selectedPhenotypes || selectedPhenotypes.length < 1) ||
-                  (!selectedVariant || selectedVariant.length < 1) 
+                display: (!selectedPhenotypes || selectedPhenotypes.length < 1) ||
+                  (!selectedVariant || selectedVariant.length < 1)
                   ? 'block' 
                   : 'none'
                 }}>
@@ -105,7 +102,7 @@ export function VariantLookupForm({ onChange, onSubmit, onReset }) {
                 )
               }
               {
-                (selectedPhenotypes && selectedPhenotypes.length > 1) &&
+                (selectedPhenotypes && selectedPhenotypes.length >= 1) &&
                 (!selectedVariant || selectedVariant.length < 1) && (
                   <>Please input a search variant.</>
                 )
@@ -124,14 +121,14 @@ export function VariantLookupForm({ onChange, onSubmit, onReset }) {
                   : 'auto' 
                 }}
               variant="silver"
-              // disabled={!canSubmit}
               onClick={e => {
                 e.preventDefault();
                 onSubmit({ selectedPhenotypes, selectedVariant });
               }}
               disabled={
                 (!selectedPhenotypes || selectedPhenotypes.length < 1) ||
-                (!selectedVariant || selectedVariant.length < 1)
+                (!selectedVariant || selectedVariant.length < 1) ||
+                submitted
               }>
               Submit
             </Button>
@@ -145,6 +142,7 @@ export function VariantLookupForm({ onChange, onSubmit, onReset }) {
           onClick={e => {
             e.preventDefault();
             onReset(e);
+            treeRef.current.resetSearchFilter();
           }}>
           Reset
         </Button>

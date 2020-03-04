@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { PhenotypeCorrelationsForm } from '../forms/phenotype-correlations-form';
 import { Heatmap } from '../plots/heatmap-plot';
-import { Alert, Tabs, Tab, Button } from 'react-bootstrap';
+import { Alert, Tabs, Tab, Button, Spinner } from 'react-bootstrap';
 import { PhenotypeCorrelationsSearchCriteria } from '../controls/phenotype-correlations-search-criteria';
 import {
   SidebarContainer,
@@ -20,9 +20,14 @@ export function PhenotypeCorrelations() {
   const phenotypeCorrelations = useSelector(
     state => state.phenotypeCorrelations
   );
-  const { selectedPhenotypes, selectedGender } = phenotypeCorrelations;
+  const { 
+    selectedPhenotypes, 
+    selectedGender, 
+    submitted, 
+    messages 
+  } = phenotypeCorrelations;
 
-  const { submitted, messages } = phenotypeCorrelations;
+  const tooltipRef = useRef();
 
   const setSubmitted = submitted => {
     dispatch(updatePhenotypeCorrelations({ submitted }));
@@ -30,10 +35,6 @@ export function PhenotypeCorrelations() {
 
   const setMessages = messages => {
     dispatch(updatePhenotypeCorrelations({ messages }));
-  };
-
-  const setPopupTooltipData = popupTooltipData => {
-    dispatch(updatePhenotypeCorrelations({ popupTooltipData }));
   };
 
   const clearMessages = e => {
@@ -80,10 +81,10 @@ export function PhenotypeCorrelations() {
     });
 
     setSubmitted(new Date());
-    setPopupTooltipData(null);
     console.log('submit');
 
     dispatch(drawHeatmap(params));
+    tooltipRef.current.resetTooltip();
   };
 
   const handleReset = params => {
@@ -92,18 +93,15 @@ export function PhenotypeCorrelations() {
         selectedListType: 'categorical',
         selectedPhenotypes: [],
         selectedGender: 'combined',
-        heatmapData: [],
+        heatmapData: null,
         heatmapLayout: {},
-        results: [],
-        loading: false,
         submitted: null,
         messages: [],
-        popupTooltipStyle: { display: 'none' },
-        popupTooltipData: null,
         searchCriteriaPhenotypeCorrelations: {},
         collapseCriteria: true
       })
     );
+    tooltipRef.current.resetTooltip();
   };
 
   const [openSidebar, setOpenSidebar] = useState(true);
@@ -114,7 +112,7 @@ export function PhenotypeCorrelations() {
 
       <SidebarContainer className="mx-3">
         <SidebarPanel className="col-lg-3">
-          <div className="p-2 bg-white border rounded-0">
+          <div className="px-2 pt-2 pb-3 bg-white border rounded-0">
             <PhenotypeCorrelationsForm
               onSubmit={handleSubmit}
               onChange={handleChange}
@@ -132,16 +130,20 @@ export function PhenotypeCorrelations() {
 
         <MainPanel className="col-lg-9">
           <PhenotypeCorrelationsSearchCriteria />
-          <Tabs defaultActiveKey="phenotype-correlations">
+          <Tabs 
+            transition={false}
+            defaultActiveKey="phenotype-correlations">
             <Tab
               eventKey="phenotype-correlations"
               // title="Heatmap"
-              className="p-2 bg-white tab-pane-bordered rounded-0"
-              style={{ minHeight: '50vh' }}>
+              className={
+                "bg-white border rounded-0 p-3 d-flex justify-content-center align-items-center"
+              }
+              style={{ minHeight: '404px' }}>
               <div
                 className="mw-100 my-4"
                 style={{ display: submitted ? 'block' : 'none' }}>
-                <Heatmap />
+                <Heatmap ref={tooltipRef} />
               </div>
               {placeholder}
             </Tab>

@@ -1,19 +1,19 @@
-import React from 'react';
+import React, { useState, useRef } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { Button, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import { updatePhenotypeCorrelations } from '../../services/actions';
-import { TreeSelectCustom } from '../controls/tree-select-custom';
+import { TreeSelect } from '../controls/tree-select';
 
 export function PhenotypeCorrelationsForm({ onChange, onSubmit, onReset }) {
   const dispatch = useDispatch();
   const phenotypes = useSelector(state => state.phenotypes);
-  const phenotypeCategories = useSelector(state => state.phenotypeCategories);
-  const phenotypesTree = useSelector(state => state.phenotypesTree);
 
   const phenotypeCorrelations = useSelector(
     state => state.phenotypeCorrelations
   );
-  const { selectedPhenotypes, selectedGender } = phenotypeCorrelations;
+  const { selectedPhenotypes, selectedGender, submitted } = phenotypeCorrelations;
+
+  const treeRef = useRef();
 
   const setSelectedPhenotypes = selectedPhenotypes => {
     dispatch(updatePhenotypeCorrelations({ selectedPhenotypes }));
@@ -27,40 +27,17 @@ export function PhenotypeCorrelationsForm({ onChange, onSubmit, onReset }) {
     setSelectedPhenotypes(items);
   };
 
-  // const removeTreeDisabled = phenoTree => {
-  //   let phenoTreeAllEnabled = [...phenoTree];
-  //   let phenoTreeAllEnabledString = JSON.stringify(phenoTreeAllEnabled);
-  //   phenoTreeAllEnabledString = phenoTreeAllEnabledString.replace(
-  //     /\"disabled\":true/g,
-  //     `\"disabled\":false`
-  //   );
-  //   phenoTreeAllEnabled = JSON.parse(phenoTreeAllEnabledString);
-  //   return phenoTreeAllEnabled;
-  // };
-
-  // const removeFlatDisabled = phenoList =>
-  //   phenoList.map(node => {
-  //     return {
-  //       value: node.value,
-  //       title: node.title
-  //     };
-  //   });
-
-  const alphabetizedPhenotypes = [...phenotypes].sort((a, b) =>
-    a.title.localeCompare(b.title)
-  );
-
   return (
     <>
       <div className="mb-2">
         <b>Phenotypes</b>
         <span style={{ color: 'red' }}>*</span>
-        <TreeSelectCustom
-          data={phenotypesTree}
-          dataAlphabetical={alphabetizedPhenotypes}
-          dataCategories={phenotypeCategories}
+        <TreeSelect
+          data={phenotypes}
           value={selectedPhenotypes}
           onChange={handleChangeCustom}
+          ref={treeRef}
+          submitted={submitted}
         />
       </div>
       
@@ -69,7 +46,8 @@ export function PhenotypeCorrelationsForm({ onChange, onSubmit, onReset }) {
         <select
           className="form-control"
           value={selectedGender}
-          onChange={e => setSelectedGender(e.target.value)}>
+          onChange={e => setSelectedGender(e.target.value)}
+          disabled={submitted}>
           <option value="combined">All</option>
           <option value="female">Female</option>
           <option value="male">Male</option>
@@ -78,7 +56,13 @@ export function PhenotypeCorrelationsForm({ onChange, onSubmit, onReset }) {
       
       <div>
         <OverlayTrigger overlay={
-            <Tooltip id="tooltip-disabled" style={{display: (!selectedPhenotypes || selectedPhenotypes.length < 2) ? 'block' : 'none'}}>
+            <Tooltip 
+              id="tooltip-disabled" 
+              style={{
+                display: (!selectedPhenotypes || selectedPhenotypes.length < 2) ? 
+                  'block' : 
+                  'none'
+              }}>
               Please select two or more phenotypes.
             </Tooltip>
           }>
@@ -92,7 +76,7 @@ export function PhenotypeCorrelationsForm({ onChange, onSubmit, onReset }) {
                 e.preventDefault();
                 onSubmit(selectedPhenotypes);
               }}
-              disabled={(!selectedPhenotypes || selectedPhenotypes.length < 2)}
+              disabled={(!selectedPhenotypes || selectedPhenotypes.length < 2) || submitted}
               >
               Submit
             </Button>
@@ -106,6 +90,7 @@ export function PhenotypeCorrelationsForm({ onChange, onSubmit, onReset }) {
           onClick={e => {
             e.preventDefault();
             onReset(e);
+            treeRef.current.resetSearchFilter();
           }}>
           Reset
         </Button>

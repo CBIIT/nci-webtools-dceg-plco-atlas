@@ -4,9 +4,8 @@ import { initialize } from './actions';
 import ReduxThunk from 'redux-thunk';
 
 export const getInitialState = () => ({
-  phenotypes: [],
-  phenotypeCategories: [],
-  phenotypesTree: [],
+  tmp_phenotypes: null,
+  phenotypes: null,
   summaryResults: {
     selectedListType: 'categorical',
     selectedPhenotype: null,
@@ -95,9 +94,8 @@ export const getInitialState = () => ({
     selectedPhenotypes: [],
     selectedVariant: '',
     selectedGender: 'combined',
-    results: [],
+    results: null,
     messages: [],
-    loading: false,
     submitted: null,
     searchCriteriaVariantLookup: {},
     numResults: null,
@@ -107,15 +105,24 @@ export const getInitialState = () => ({
     selectedListType: 'categorical',
     selectedPhenotypes: [],
     selectedGender: 'combined',
-    heatmapData: [],
+    heatmapData: null,
     heatmapLayout: {},
-    results: [],
-    loading: false,
     submitted: null,
     messages: [],
     searchCriteriaPhenotypeCorrelations: {},
     collapseCriteria: true
-    // tooltipData: null
+  },
+  browsePhenotypes: {
+    selectedPhenotype: null,
+    displayTreeParent: null,
+    submitted: null,
+    messages: [],
+    searchCriteriaPhenotypes: {},
+    selectedPlot: 'frequency',
+    phenotypeType: 'binary',
+    breadcrumb: [],
+    currentBubbleData: null,
+    phenotypeData: null,
   },
   downloads: {
     selectedPhenotypes: [],

@@ -1,6 +1,5 @@
-import React from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { updatePhenotypeCorrelations } from '../../services/actions';
+import React, { forwardRef, useImperativeHandle } from 'react';
+import { useSelector } from 'react-redux';
 import { Spinner } from 'react-bootstrap';
 import Plot from 'react-plotly.js';
 import {
@@ -8,14 +7,17 @@ import {
   createElement as h
 } from '../../services/plots/utils';
 
-export function Heatmap() {
-  const dispatch = useDispatch();
+export const Heatmap = forwardRef(({}, ref) => {
+
+  useImperativeHandle(ref, () => ({
+    resetTooltip() {
+      hideTooltip();
+    }
+  }));
 
   const {
     heatmapData,
-    heatmapLayout,
-    // tooltipData,
-    loading
+    heatmapLayout
   } = useSelector(state => state.phenotypeCorrelations);
 
   const createTooltip = () => {
@@ -76,9 +78,9 @@ export function Heatmap() {
       }
       heatmapContainer.appendChild(tooltip);
       // show tooltip
-      const tooltipX = points[0].x;
-      const tooltipY = points[0].y;
-      const tooltipCorrelation = points[0].text;
+      const tooltipX = points[0].text.x;
+      const tooltipY = points[0].text.y;
+      const tooltipCorrelation = points[0].text.z;
       const html = h('div', { className: '' }, [
         h('div', null, [
           h(
@@ -113,8 +115,8 @@ export function Heatmap() {
     toImageButtonOptions: {
       format: 'svg', // one of png, svg, jpeg, webp
       filename: 'custom_image',
-      // height: 800,
-      // width: 800,
+      height: 1000,
+      width: 1000,
       scale: 1 // Multiply title/legend/axis/canvas sizes by this factor
     },
     displaylogo: false,
@@ -126,45 +128,40 @@ export function Heatmap() {
   };
 
   return (
-    <>
-      <div className="row">
+    <div className="row">
+      <div
+        className="col-md-12"
+        style={{
+          display: heatmapData && heatmapData.length > 0 ? 'block' : 'none'
+        }}>
         <div
-          className="col-md-12"
           style={{
-            display: heatmapData.length > 0 && !loading ? 'block' : 'none'
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            textAlign: 'left'
           }}>
-          <div style={{ display: loading ? 'none' : 'block' }}>
-            <div
-              style={{
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-                textAlign: 'left'
-              }}>
-              <Plot
-                className="heatmap"
-                style={{ position: 'relative', height: '1000px', width: '1000px' }}
-                data={heatmapData}
-                layout={heatmapLayout}
-                config={config}
-                onClick={e => popupMarkerClick(e)}
-                onRelayout={relayout => {
-                  hideTooltip();
-                }}
-              />
-            </div>
-          </div>
-        </div>
-        <div className="col-md-12">
-          <div
-            className="text-center"
-            style={{ display: loading ? 'block' : 'none' }}>
-            <Spinner animation="border" variant="primary" role="status">
-              <span className="sr-only">Loading...</span>
-            </Spinner>
-          </div>
+          <Plot
+            className="heatmap"
+            style={{ position: 'relative', height: '1000px', width: '1000px' }}
+            data={heatmapData}
+            layout={heatmapLayout}
+            config={config}
+            onClick={e => popupMarkerClick(e)}
+            onRelayout={relayout => {
+              hideTooltip();
+            }}
+          />
         </div>
       </div>
-    </>
+      {
+        heatmapData && heatmapData.length <= 0 && 
+        <div className="col-md-12">
+          <Spinner animation="border" variant="primary" role="status">
+            <span className="sr-only">Loading...</span>
+          </Spinner>
+        </div>
+      }
+    </div>
   );
-}
+});

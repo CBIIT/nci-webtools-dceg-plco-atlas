@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import { Button, OverlayTrigger, Tooltip } from 'react-bootstrap';
-import { TreeSelectCustom } from '../controls/tree-select-custom';
+import { TreeSelect } from '../controls/tree-select';
 
 export function SummaryResultsForm({
   phenotype = null,
@@ -13,7 +13,7 @@ export function SummaryResultsForm({
   // private members prefixed with _
   const [_phenotype, _setPhenotype] = useState(null);
   const [_gender, _setGender] = useState('all');
-  const submitRef = useRef(null);
+  // const submitRef = useRef(null);
 
   // update state when props change
   useEffect(() => _setPhenotype(phenotype), [phenotype]);
@@ -21,24 +21,22 @@ export function SummaryResultsForm({
 
   // select store members
   const phenotypes = useSelector(state => state.phenotypes);
-  const phenotypeCategories = useSelector(state => state.phenotypeCategories);
-  const phenotypesTree = useSelector(state => state.phenotypesTree);
-  const alphabetizedPhenotypes = [...phenotypes].sort((a, b) =>
-    a.title.localeCompare(b.title)
-  );
+  const { submitted } = useSelector(state => state.summaryResults);
+
+  const treeRef = useRef();
 
   return (
     <>
       {/* <pre>{JSON.stringify({_phenotype, _gender}, null, 2)}</pre> */}
       <div className="mb-2">
         <label className="required">Phenotypes</label>
-        <TreeSelectCustom
-          data={phenotypesTree}
-          dataAlphabetical={alphabetizedPhenotypes}
-          dataCategories={phenotypeCategories}
+        <TreeSelect
+          data={phenotypes}
           value={_phenotype}
           onChange={val => _setPhenotype((val && val.length) ? val[0] : null)}
           singleSelect
+          ref={treeRef}
+          submitted={submitted}
         />
       </div>
 
@@ -49,7 +47,8 @@ export function SummaryResultsForm({
           className="form-control"
           value={_gender}
           onChange={e => _setGender(e.target.value)}
-          aria-label="Select the type of data you wish to plot">
+          aria-label="Select the type of data you wish to plot"
+          disabled={submitted}>
           <option value="all">All</option>
           <option value="stacked">Female/Male (Stacked)</option>
           <option value="female">Female</option>
@@ -70,7 +69,7 @@ export function SummaryResultsForm({
               type="submit"
               variant="silver"
               className={!_phenotype && 'pointer-events-none'}
-              disabled={!_phenotype}
+              disabled={!_phenotype || submitted}
               onClick={e => {
                 e.preventDefault();
                 onSubmit(_phenotype, _gender);
@@ -88,6 +87,7 @@ export function SummaryResultsForm({
             _setPhenotype(null);
             _setGender('all');
             onReset();
+            treeRef.current.resetSearchFilter();
           }}>
           Reset
         </Button>
