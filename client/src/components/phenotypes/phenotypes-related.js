@@ -38,12 +38,11 @@ export function PhenotypesRelated({
     showlegend: false,
     xaxis: {
       showticklabels: false,
-      showline: false,
-      zeroline: false
+      zeroline: true
     },
     yaxis: {
       title: "Correlation",
-      zeroline: false
+      showline: true,
     },
     autosize: true
   };
