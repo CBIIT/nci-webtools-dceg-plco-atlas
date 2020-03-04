@@ -9,7 +9,8 @@ const connection = mysql.createPool({
     password: database.password,
     waitForConnections: true,
     connectionLimit: 20,
-    namedPlaceholders: true
+    namedPlaceholders: true,
+    multipleStatements: true,
   }).promise();
 
 /**
@@ -495,51 +496,90 @@ async function getPhenotype(connection, params) {
             }
             break;
         case 'continuous':
-            phenotype.categories = null;
-            phenotype.distributionCategories = null;
+            let frequencies = (await connection.query(`
+                SELECT MIN(value), MAX(value)
+                    INTO @min, @max
+                    FROM phenotype_data WHERE phenotype_id = :id;
+                set @factor = power(10, floor(log10(@max - @min)));
+                set @floor_min = @factor * floor(@min / @factor);
+                set @ceil_max = @factor * ceil(@max / @factor);
+                set @count = 1 + (@ceil_max - @floor_min) / @factor;
 
+                WITH bins AS (SELECT id as bin from phenotype_data where id <= (SELECT @count))
+                    SELECT
+                        bin,
+                        @floor_min + (bin - 1) * @factor AS min,
+                        @floor_min + bin * @factor AS max,
+                        CONCAT((SELECT min), ' - ', (SELECT max)) as type,
+                        (SELECT count(*) FROM phenotype_data
+                            WHERE phenotype_id = :id
+                            and value BETWEEN (select min) AND (select max)
+                        ) AS value
+                    FROM bins;
+            `, {id: params.id}))[0].pop();
 
+            let keyGroupValueRangeReducer = (acc, curr) => {
+                if (!acc[curr.key])
+                    acc[curr.key] = new Array(phenotype.categories.length).fill(0);
+                let groupIndex = frequencies.findIndex(({min, max}) =>
+                    curr.group >= min && curr.group < max)
+                acc[curr.key][groupIndex] += curr.value;
+                return acc;
+            };
+
+            phenotype.metadata = frequencies;
+            phenotype.categories = frequencies.map(e => e.type);
+            phenotype.distributionCategories = phenotype.categories;
+            phenotype.frequency = frequencies.map(e => e.value);
+            phenotype.distribution = {
+                age: (await connection.execute(`
+                    SELECT
+                        ps.age AS "key",
+                        pd.value as "group",
+                        COUNT(*) AS "value"
+                    FROM phenotype_data pd
+                    JOIN phenotype_sample ps ON ps.id = pd.phenotype_sample_id
+                    WHERE
+                        pd.phenotype_id = :id AND
+                        pd.value IS NOT NULL AND
+                        ps.age IS NOT NULL
+                    GROUP BY ps.age, pd.value
+                    ORDER BY ps.age, pd.value;
+                `, {id: params.id}))[0].reduce(keyGroupValueRangeReducer, {}),
+                gender: (await connection.execute(`
+                    SELECT
+                        ps.gender AS "key",
+                        pd.value as "group",
+                        COUNT(*) AS "value"
+                    FROM phenotype_data pd
+                    JOIN phenotype_sample ps ON ps.id = pd.phenotype_sample_id
+                    WHERE
+                        pd.phenotype_id = :id AND
+                        pd.value IS NOT NULL AND
+                        ps.gender IS NOT NULL
+                    GROUP BY ps.gender, pd.value
+                    ORDER BY ps.gender, pd.value;
+                `, {id: params.id}))[0].reduce(keyGroupValueRangeReducer, {}),
+                ancestry: (await connection.execute(`
+                    SELECT
+                        ps.ancestry AS "key",
+                        pd.value as "group",
+                        COUNT(*) AS "value"
+                    FROM phenotype_data pd
+                    JOIN phenotype_sample ps ON ps.id = pd.phenotype_sample_id
+                    WHERE
+                        pd.phenotype_id = :id AND
+                        pd.value IS NOT NULL AND
+                        ps.ancestry IS NOT NULL
+                    GROUP BY ps.ancestry, pd.value
+                    ORDER BY ps.ancestry, pd.value;
+                `, {id: params.id}))[0].reduce(keyGroupValueRangeReducer, {})
+            }
 
             break;
     }
 
-    phenotype.related = [];
-
-    /*
-    phenotype.related = await connection.query(`
-        SELECT
-
-        FROM phenotype_correlation pc
-    `, {id: params.id});
-    {
-    "categories": ["% with", "% without"],
-    "distributionCategories": ["% with"],
-    "frequency": [0.01, 0.09],
-    "distribution": {
-        "age": {
-            "40-44": [100],
-            "45-49": [200],
-            "50-54": [350],
-            "55-59": [450],
-            "60-64": [500],
-            "65-69": [450],
-            "70-74": [200],
-            "80-84": [100]
-        },
-        "gender": {
-            "female": [510],
-            "male": [490]
-        },
-        "ancestry": {
-            "American Indian": [100],
-            "Pacific Islander": [300],
-            "Asian": [150],
-            "Hispanic": [400],
-            "Black": [350],
-            "White": [450]
-        }
-    },
-    "related": [
+    phenotype.related = [
         {
             "name": "Ewing's Sarcoma",
             "sampleSize": 1000,
@@ -555,9 +595,8 @@ async function getPhenotype(connection, params) {
             "sampleSize": 4000,
             "correlation": 0.1
         }
-    ]
-}
-*/
+    ];
+
     return phenotype;
 }
 
