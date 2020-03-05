@@ -536,3 +536,15 @@ footer {
   font-weight: 400 !important;
   line-height: 1.333em !important;
 }
+
+
+.js-plotly-plot.disable-x-axis-tooltip {
+  .main-svg .hoverlayer .axistext {
+    display: none;
+  }
+}
+
+
+.js-plotly-plot.override-cursor .plotly .cursor-pointer {
+  cursor: default;
+}

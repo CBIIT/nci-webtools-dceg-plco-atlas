@@ -1,9 +1,22 @@
 import React from "react";
 import Plot from "react-plotly.js";
+import { systemFont } from '../../services/plots/text';
+
+export const hoverLayout = {
+  hoverlabel: {
+    bgcolor: "#fff",
+    bordercolor: '#bbb',
+    font: {
+      size: 14,
+      color: '#212529',
+      family: systemFont
+    },
+  },
+}
 
 export const BarChart = ({ data, categories, xTitle, yTitle }) => (
 <Plot
-    className="w-100"
+    className="w-100 disable-x-axis-tooltip override-cursor"
     style={{ minHeight: "600px", width: "600px" }}
     data={categories.map((name, i) => {
       let x = [];
@@ -34,15 +47,21 @@ export const BarChart = ({ data, categories, xTitle, yTitle }) => (
       return plotData;
     })}
     layout={{
+      ...hoverLayout,
       hovermode: 'x',
       xaxis: {
+          fixedrange: true,
           automargin: true,
           title: xTitle,
           separatethousands: true,
       },
       yaxis: {
+          fixedrange: true,
           automargin: true,
-          title: yTitle,
+          title: {
+            text: yTitle,
+            standoff: 20,
+          },
           zeroline: true,
           showline: true,
           separatethousands: true,
@@ -58,7 +77,7 @@ export const BarChart = ({ data, categories, xTitle, yTitle }) => (
 
 export const HorizontalBarChart = ({ data, categories }) => (
   <Plot
-    className="w-100"
+    className="w-100  disable-x-axis-tooltip"
     style={{ minHeight: "600px" }}
     data={categories.map((name, i) => {
       let x = [],
@@ -95,7 +114,7 @@ export const AreaChart = ({data, categories, xTitle, yTitle}) => {
   });
 
   return <Plot
-      className="w-100"
+      className="w-100 disable-x-axis-tooltip override-cursor"
       style={{ minHeight: "600px" }}
       data={[{
         x: categories, //data.map((e, i) => i + 1),
@@ -106,16 +125,23 @@ export const AreaChart = ({data, categories, xTitle, yTitle}) => {
           `${yTitle}: <b>${data[i].toLocaleString()}</b>`
         ].join('<br>')),
         type: 'scatter',
+        fill: 'tonexty',
         line: {shape: 'spline', smoothing: 100},
       }]}
       layout={{
+        ...hoverLayout,
         xaxis: {
+            fixedrange: true,
             automargin: true,
             title: xTitle,
         },
         yaxis: {
+            fixedrange: true,
             automargin: true,
-            title: yTitle,
+            title: {
+              text: yTitle,
+              standoff: 20,
+            },
             zeroline: true,
             showline: true,
         },
@@ -123,7 +149,7 @@ export const AreaChart = ({data, categories, xTitle, yTitle}) => {
       }}
       config={{
         displayModeBar: false,
-        responsive: true
+        responsive: true,
       }}
   />
 }
@@ -141,6 +167,7 @@ export const PieChart = ({ data, categories }) => (
       }
     ]}
     layout={{
+      ...hoverLayout,
       showlegend: true,
       autosize: true
     }}
