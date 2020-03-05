@@ -1,5 +1,6 @@
 import React from "react";
 import Plot from "react-plotly.js";
+import { hoverLayout } from './phenotypes-charts';
 
 export function PhenotypesRelated({
   selectedPhenotype,
@@ -34,6 +35,7 @@ export function PhenotypesRelated({
   ];
 
   const layout = {
+    ...hoverLayout,
     // title: `Phenotypes Related to ${selectedPhenotype.title}`,
     showlegend: false,
     xaxis: {

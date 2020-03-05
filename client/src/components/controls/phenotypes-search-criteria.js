@@ -9,7 +9,8 @@ export const PhenotypesSearchCriteria = () => {
   const dispatch = useDispatch();
   const {
     searchCriteriaPhenotypes,
-    submitted
+    submitted,
+    phenotypeData
   } = useSelector(
     state => state.browsePhenotypes
   );
@@ -23,16 +24,16 @@ export const PhenotypesSearchCriteria = () => {
   );
 
   const setSubmitted = () => {
-    dispatch(updateBrowsePhenotypes({ 
+    dispatch(updateBrowsePhenotypes({
       submitted: null,
      }));
   }
 
   return (
     <div className="mb-2">
-      <Tabs 
+      <Tabs
         transition={false}
-        className="" 
+        className=""
         defaultActiveKey="phenotypes-search-criteria">
         <Tab
           eventKey="phenotypes-search-criteria"
@@ -43,7 +44,7 @@ export const PhenotypesSearchCriteria = () => {
 
             {/* <div
               className="left">
-              <a 
+              <a
                 href="javascript:void(0)"
                 onClick={setSubmitted}>
                 Go back
@@ -54,12 +55,12 @@ export const PhenotypesSearchCriteria = () => {
                 width="10"
               />
             </div> */}
-            
+
             <p className="h4 my-1">
-              {searchCriteriaPhenotypes.phenotype}
+              {phenotypeData && phenotypeData.display_name || ''}
 
               <span className="text-muted ml-3" style={{fontSize: '13px'}}>
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed et venenatis mauris. Etiam aliquam accumsan enim, in sodales urna ultrices sed. Duis et vehicula ante, tempor semper nisl. Suspendisse in tempor erat, at tincidunt elit. Etiam scelerisque venenatis nulla eu maximus. Ut sit amet ipsum odio.
+                {phenotypeData && phenotypeData.description || ''}
               </span>
             </p>
 
