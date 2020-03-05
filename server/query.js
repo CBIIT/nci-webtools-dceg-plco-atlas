@@ -498,7 +498,20 @@ async function getPhenotype(connection, params) {
             }
             break;
         case 'continuous':
+
             let frequencies = (await connection.query(`
+                SELECT
+                    FLOOR(value) AS value_group,
+                    COUNT(*) as value
+                FROM phenotype_data
+                WHERE
+                    phenotype_id = :id AND
+                    value IS NOT NULL
+                GROUP BY value_group
+                ORDER BY value_group
+            `, {id: params.id}))[0];
+
+            let histogramFrequencies = (await connection.query(`
                 SELECT MIN(value), MAX(value)
                     INTO @min, @max
                     FROM phenotype_data WHERE phenotype_id = :id;
@@ -517,21 +530,22 @@ async function getPhenotype(connection, params) {
                             WHERE phenotype_id = :id
                             and value BETWEEN (select min) AND (select max)
                         ) AS value
-                    FROM bins;
+                    FROM bins
+                    ORDER BY bin;
             `, {id: params.id}))[0].pop();
 
             let keyGroupValueRangeReducer = (acc, curr) => {
                 if (!acc[curr.key])
                     acc[curr.key] = new Array(phenotype.categories.length).fill(0);
-                let groupIndex = frequencies.findIndex(({min, max}) =>
+                let groupIndex = histogramFrequencies.findIndex(({min, max}) =>
                     curr.group >= min && curr.group < max)
                 acc[curr.key][groupIndex] += curr.value;
                 return acc;
             };
 
             phenotype.metadata = frequencies;
-            phenotype.categories = frequencies.map(e => e.type);
-            phenotype.distributionCategories = phenotype.categories;
+            phenotype.categories = frequencies.map(e => e.value_group);
+            phenotype.distributionCategories = histogramFrequencies.map(e => e.type);
             phenotype.frequency = frequencies.map(e => e.value);
             phenotype.distribution = {
                 age: (await connection.execute(`
