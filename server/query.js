@@ -536,7 +536,7 @@ async function getPhenotype(connection, params) {
 
             let keyGroupValueRangeReducer = (acc, curr) => {
                 if (!acc[curr.key])
-                    acc[curr.key] = new Array(phenotype.categories.length).fill(0);
+                    acc[curr.key] = new Array(histogramFrequencies.length).fill(0);
                 let groupIndex = histogramFrequencies.findIndex(({min, max}) =>
                     curr.group >= min && curr.group < max)
                 acc[curr.key][groupIndex] += curr.value;
