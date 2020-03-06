@@ -4,7 +4,7 @@ import { Tab, Tabs, Form } from 'react-bootstrap';
 import Plot from 'react-plotly.js';
 import { updateBrowsePhenotypes } from '../../services/actions';
 import { PhenotypesRelated } from './phenotypes-related'
-import { BarChart, AreaChart, PieChart, HorizontalBarChart } from './phenotypes-charts';
+import { BarChart, AreaChart, GroupedAreaChart, PieChart, HorizontalBarChart } from './phenotypes-charts';
 
 export function PhenotypesTabs() {
   const dispatch = useDispatch();
@@ -76,11 +76,19 @@ export function PhenotypesTabs() {
             />
           )}</div>
 
-          {phenotypeData && phenotypeData.distribution && <BarChart
+          {phenotypeData && phenotypeData.distribution && selectedDistribution != 'age' && <BarChart
                 data={phenotypeData.distribution[selectedDistribution]}
                 categories={phenotypeData.distributionCategories.map(titleCase)}
                 xTitle={titleCase(selectedDistribution)}
                 yTitle="Number of Participants"
+          />}
+
+          {phenotypeData && phenotypeData.distribution && selectedDistribution == 'age'  && <GroupedAreaChart
+            data={phenotypeData.distribution[selectedDistribution]}
+            categories={phenotypeData.distributionCategories.map(titleCase)}
+            xTitle={titleCase(selectedDistribution)}
+            yTitle="Number of Participants"
+            fill={true}
           />}
 
       </Tab>
