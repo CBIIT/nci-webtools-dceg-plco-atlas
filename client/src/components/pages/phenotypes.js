@@ -86,17 +86,19 @@ export function Phenotypes() {
         children: phenotypes.tree
     };
     const parent = getParent(phenotypesTreeFull, phenotype, null)[0];
-    setCurrentBubbleData(parent.children);
-    setBreadcrumb([{
-      data: {
-        title: parent.title
-      },
-      parent: {
-        data:  {
-          children: phenotypes.tree
+    if (parent) {
+      setCurrentBubbleData(parent.children);
+      setBreadcrumb([{
+        data: {
+          title: parent.title
+        },
+        parent: {
+          data:  {
+            children: phenotypes.tree
+          }
         }
-      }
-    }]);
+      }]);
+    }
     setSelectedPhenotype(phenotype);
   }
 
