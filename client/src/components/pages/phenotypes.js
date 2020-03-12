@@ -29,7 +29,9 @@ export function Phenotypes() {
   const plotContainer = useRef(null);
   // const plot = useRef(null);
 
-  const phenotypes = useSelector(state => state.tmp_phenotypes);
+  // const phenotypes = useSelector(state => state.tmp_phenotypes);
+  const phenotypes = useSelector(state => state.phenotypes);
+
 
   const [openSidebar, setOpenSidebar] = useState(true);
 
