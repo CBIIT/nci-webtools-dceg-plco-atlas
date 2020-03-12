@@ -69,7 +69,7 @@ export class BubbleChart {
 
         var nodes = d3.hierarchy(data)
             .sum(function (d) {
-                return d.count ? d.count : 0; 
+                return d.count ? d.count : 1; 
             });
 
         var bubbleNodes = bubble(nodes).descendants();
@@ -130,6 +130,7 @@ export class BubbleChart {
             .attr("dy", "0em")
             .style("text-anchor", "middle")
             .text(function (d) {
+                console.log("d", d);
                 return [d.data.title, d.value];
             })
             .attr("font-family", "sans-serif")
@@ -206,6 +207,7 @@ function wrap(text, width) {
             y = text.attr("y"),
             dy = parseFloat(text.attr("dy")),
             tspan = text.text(null).append("tspan").attr("x", 0).attr("y", y).attr("dy", dy + "em");
+        console.log("value", value);
         while (words.length > 0) {
             word = words.pop()
             line.push(word);
