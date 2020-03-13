@@ -1,6 +1,6 @@
 -- Phenotype name is used as prefix
 -- eg: melanoma_variant
-CREATE TABLE IF NOT EXISTS `$PHENOTYPE_variant` (
+CREATE TABLE IF NOT EXISTS `variant_$PHENOTYPE` (
     `id`                    BIGINT PRIMARY KEY NOT NULL AUTO_INCREMENT,
     `gender`                ENUM('all', 'female', 'male') NOT NULL,
     `chromosome`            VARCHAR(2) NOT NULL,
@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS `$PHENOTYPE_variant` (
 
 -- Phenotype name is used as prefix
 -- eg: melanoma_aggregate
-CREATE TABLE IF NOT EXISTS `$PHENOTYPE_aggregate` (
+CREATE TABLE IF NOT EXISTS `aggregate_$PHENOTYPE` (
     `id`            BIGINT PRIMARY KEY NOT NULL AUTO_INCREMENT,
     `gender`        ENUM('all', 'female', 'male') NOT NULL,
     `chromosome`    VARCHAR(2) NOT NULL,

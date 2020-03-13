@@ -11,31 +11,6 @@ CREATE TABLE `phenotype` (
     FOREIGN KEY (parent_id) REFERENCES phenotype(id)
 );
 
-CREATE TABLE `phenotype_sample` (
-    `id`            INTEGER PRIMARY KEY NOT NULL AUTO_INCREMENT,
-    `age`           INTEGER,
-    `gender`        ENUM('female', 'male', 'other'),
-    `ancestry`      ENUM('american_indian', 'asian', 'black', 'hispanic', 'pacific_islander', 'white', 'other')
-);
-
-CREATE TABLE `phenotype_category` (
-    `id`                    INTEGER PRIMARY KEY NOT NULL AUTO_INCREMENT,
-    `phenotype_id`          INTEGER NOT NULL,
-    `value`                 INTEGER,
-    `label`                 VARCHAR(200),
-    `display_distribution`  BOOLEAN,
-    FOREIGN KEY (phenotype_id) REFERENCES phenotype(id)
-)
-
-CREATE TABLE `phenotype_data` (
-    `id`                    BIGINT PRIMARY KEY NOT NULL AUTO_INCREMENT,
-    `phenotype_id`          INTEGER NOT NULL,
-    `phenotype_sample_id`   INTEGER,
-    `value`                 DOUBLE,
-    FOREIGN KEY (phenotype_id) REFERENCES phenotype(id),
-    FOREIGN KEY (phenotype_sample_id) REFERENCES phenotype_sample(id)
-);
-
 CREATE TABLE `phenotype_metadata` (
     `id`            INTEGER PRIMARY KEY NOT NULL AUTO_INCREMENT,
     `phenotype_id`  INTEGER,
@@ -54,6 +29,30 @@ CREATE TABLE `phenotype_correlation` (
     `value`         DOUBLE NOT NULL,
     FOREIGN KEY (phenotype_a) REFERENCES phenotype(id),
     FOREIGN KEY (phenotype_b) REFERENCES phenotype(id)
+);
+
+CREATE TABLE `participant` (
+    `id`            INTEGER PRIMARY KEY NOT NULL AUTO_INCREMENT,
+    `age`           INTEGER,
+    `gender`        ENUM('male', 'female'),
+    `ancestry`      ENUM('white', 'black', 'hispanic', 'asian', 'pacific_islander', 'american_indian')
+);
+
+CREATE TABLE `participant_data` (
+    `id`                BIGINT PRIMARY KEY NOT NULL AUTO_INCREMENT,
+    `phenotype_id`      INTEGER NOT NULL,
+    `participant_id`    INTEGER,
+    `value`             DOUBLE,
+    FOREIGN KEY (phenotype_id) REFERENCES phenotype(id),
+    FOREIGN KEY (participant_id) REFERENCES participant(id)
+);
+
+CREATE TABLE `participant_data_category` (
+    `id`                    INTEGER PRIMARY KEY NOT NULL AUTO_INCREMENT,
+    `phenotype_id`          INTEGER NOT NULL,
+    `value`                 INTEGER,
+    `label`                 TEXT
+    FOREIGN KEY (phenotype_id) REFERENCES phenotype(id)
 );
 
 CREATE TABLE `chromosome_range` (
