@@ -286,7 +286,6 @@ export function Phenotypes() {
       </SidebarPanel>
 
       <MainPanel className="col-lg-9">
-        <LoadingOverlay active={!phenotypes || loading} />
         <PhenotypesSearchCriteria />
         {submitted 
           ? <PhenotypesTabs /> 
@@ -297,8 +296,10 @@ export function Phenotypes() {
                 "bg-white border rounded-0 p-3 d-flex justify-content-center align-items-center"
               }
               style={{
+                position: 'relative',
                 minHeight: '324px'
               }}>
+              <LoadingOverlay active={!phenotypes || loading} />
               <div style={{
                   display: phenotypes ? 'block' : 'none'
                 }}>
