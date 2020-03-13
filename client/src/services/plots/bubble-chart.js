@@ -70,7 +70,7 @@ export class BubbleChart {
 
         var nodes = d3.hierarchy(data)
             .sum(function (d) {
-                return d.count ? d.count : 1; 
+                return d.participant_count ? d.participant_count : 100000; 
             });
 
         var bubbleNodes = bubble(nodes).descendants();
@@ -90,9 +90,9 @@ export class BubbleChart {
         node.append("title")
             .text(function (d) {
                 if (d.children) {
-                    return "Category: " + d.data.title + "\n" + "Sample size: " + d.value.toLocaleString();
+                    return "Category: " + d.data.title + "\n" + "Participants: " + d.data.participant_count.toLocaleString();
                 } else {
-                    return "Phenotype: " + d.data.title + "\n" + "Sample size: " + d.value.toLocaleString();
+                    return "Phenotype: " + d.data.title + "\n" + "Participants: " + d.data.participant_count.toLocaleString();
                 }
             });
 
@@ -131,7 +131,7 @@ export class BubbleChart {
             .attr("dy", "0em")
             .style("text-anchor", "middle")
             .text(function (d) {
-                return [d.data.title, d.value];
+                return [d.data.title, d.data.participant_count];
             })
             .attr("font-family", "sans-serif")
             .attr("font-size", function (d) {
