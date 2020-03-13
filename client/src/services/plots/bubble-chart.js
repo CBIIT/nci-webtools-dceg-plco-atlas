@@ -131,7 +131,7 @@ export class BubbleChart {
             .attr("dy", "0em")
             .style("text-anchor", "middle")
             .text(function (d) {
-                return [d.data.title, d.data.participant_count];
+                return d.data.title + "<br>" + d.data.participant_count;
             })
             .attr("font-family", "sans-serif")
             .attr("font-size", function (d) {
@@ -196,27 +196,27 @@ export class BubbleChart {
 
 function wrap(text, width) {
     text.each(function() {
-        var text = d3.select(this),
-            label = text.text().split(',')[0],
-            value = text.text().split(',')[1],
+        var text = d3.select(this);
+        var label = text.text().split('<br>')[0],
+            value = text.text().split('<br>')[1],
             words = label.split(/[/\s+]/).reverse(),
             word,
             line = [],
-            // lineNumber = 0,
-            // lineHeight = 1, // ems
+            lineNumber = 1,
             y = text.attr("y"),
             dy = parseFloat(text.attr("dy")),
             tspan = text.text(null).append("tspan").attr("x", 0).attr("y", y).attr("dy", dy + "em");
-        while (words.length > 0) {
+        while (words.length > 0 && lineNumber < 3) {
             word = words.pop()
             line.push(word);
             tspan.text(line.join(" "));
-            if (line.join(" ").length > width) {
+            if ((line.join(" ").length > width)) {
+                lineNumber += 1;
                 line.pop();
                 tspan.text(line.join(" "));
                 line = [word];
-                tspan = text.append("tspan").attr("x", 0).attr("y", y).attr("dy", "1em").text(word);
-            }
+                tspan = text.append("tspan").attr("x", 0).attr("y", y).attr("dy", "1em").text(lineNumber === 3 && words.length > 0 ? word + " ..." : word);
+            } 
         }
         tspan = text.append("tspan").attr("x", 0).attr("y", y).attr("dy", "1.2em").text(Number(value).toLocaleString());
     });
