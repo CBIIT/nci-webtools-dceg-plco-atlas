@@ -79,22 +79,49 @@ export function Downloads() {
               ref={treeRef}
               submitted={submitted}
             />
-            <small className="text-muted"><i>Up to five phenotypes may be selected for download.</i></small>
+            <small className="text-muted"><i>Up to 5 phenotypes may be selected for download.</i></small>
           </div>
 
           <div>
-            <Button
-              variant="silver"
-              onClick={handleSubmit}
-              disabled={!selectedPhenotypes.length || selectedPhenotypes.length > 5 || submitted}
-              title={
-                selectedPhenotypes.length == 0
-                  ? 'Please select phenotype(s) to download.'
-                  : selectedPhenotypes.length > 5
-                  ? 'A maximum of five phenotypes may be selected to download.'
-                  : ''}>
-              Download
-            </Button>
+            <OverlayTrigger overlay={
+              <Tooltip 
+                id="tooltip-disabled" 
+                style={{
+                  display: !selectedPhenotypes || selectedPhenotypes.length < 1 || selectedPhenotypes.length > 5 ? 
+                    'block' : 
+                    'none'
+                }}>
+                {
+                  (!selectedPhenotypes || selectedPhenotypes.length < 1) &&
+                    <>Please select a phenotype.</>
+                }
+                {
+                  (selectedPhenotypes && selectedPhenotypes.length > 5) &&
+                    <>Please select 5 or less phenotypes.</>
+                }
+                
+              </Tooltip>
+            }>
+            <span className="d-inline-block">
+                <Button
+                  variant="silver"
+                  onClick={e => {
+                    e.preventDefault();
+                    handleSubmit();
+                  }}
+                  style={{ pointerEvents: (!selectedPhenotypes || selectedPhenotypes.length < 1 || selectedPhenotypes.length > 5) ? 'none' : 'auto' }}
+                  disabled={!selectedPhenotypes.length || selectedPhenotypes.length > 5 || submitted}
+                  title={
+                    selectedPhenotypes.length == 0
+                      ? 'Please select a phenotype.'
+                      : selectedPhenotypes.length > 5
+                      ? 'A maximum of five phenotypes may be selected to download.'
+                      : ''}>
+                  Download
+                </Button>
+              </span>
+            </OverlayTrigger>
+
             <Button
               className="ml-2"
               variant="silver"
