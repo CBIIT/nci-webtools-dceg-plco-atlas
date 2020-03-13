@@ -57,13 +57,6 @@ async function updateCounts() {
         if (parent) parent.children = [...parent.children || [], phenotype];
     });
 
-    // after populating children, append child_ids property to each phenotype
-    // each child needs to have a defined type (binary, categorical, or continuous)
-    phenotypes.forEach(child => child.child_ids = findChildren(child)
-        .filter(c => c.type)
-        .map(c => c.id)
-    );
-
     for (let p of phenotypes) {
 
         console.log(`[${duration()} s] ${p.name} (${p.display_name}): ${p.child_ids.length} child node(s)`);
