@@ -39,6 +39,7 @@ export function PhenotypeCorrelationsForm({ onChange, onSubmit, onReset }) {
           ref={treeRef}
           submitted={submitted}
         />
+        <small className="text-muted"><i>Up to 120 phenotypes may be selected.</i></small>
       </div>
       
       <div className="mb-3">
@@ -59,24 +60,32 @@ export function PhenotypeCorrelationsForm({ onChange, onSubmit, onReset }) {
             <Tooltip 
               id="tooltip-disabled" 
               style={{
-                display: (!selectedPhenotypes || selectedPhenotypes.length < 2) ? 
+                display: !selectedPhenotypes || selectedPhenotypes.length < 2 || selectedPhenotypes.length > 120 ? 
                   'block' : 
                   'none'
               }}>
-              Please select two or more phenotypes.
+              {
+                (!selectedPhenotypes || selectedPhenotypes.length < 2) &&
+                  <>Please select 2 or more phenotypes.</>
+              }
+              {
+                (selectedPhenotypes && selectedPhenotypes.length > 120) &&
+                  <>Please select 120 or less phenotypes.</>
+              }
+              
             </Tooltip>
           }>
           <span className="d-inline-block">
             <Button
               // ref={target}
               className=""
-              style={{ maxHeight: '38px', pointerEvents: (!selectedPhenotypes || selectedPhenotypes.length < 2) ? 'none' : 'auto' }}
+              style={{ maxHeight: '38px', pointerEvents: (!selectedPhenotypes || selectedPhenotypes.length < 2 || selectedPhenotypes.length > 120) ? 'none' : 'auto' }}
               variant="silver"
               onClick={e => {
                 e.preventDefault();
                 onSubmit(selectedPhenotypes);
               }}
-              disabled={(!selectedPhenotypes || selectedPhenotypes.length < 2) || submitted}
+              disabled={(!selectedPhenotypes || selectedPhenotypes.length < 2 || selectedPhenotypes.length > 120) || submitted}
               >
               Submit
             </Button>

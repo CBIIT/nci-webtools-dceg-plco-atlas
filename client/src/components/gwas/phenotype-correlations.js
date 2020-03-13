@@ -65,7 +65,7 @@ export function PhenotypeCorrelations() {
       setMessages([
         {
           type: 'danger',
-          content: 'Please select two or more phenotypes.'
+          content: 'Please select 2 or more phenotypes.'
         }
       ]);
       return;
