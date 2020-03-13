@@ -304,7 +304,7 @@ export function ManhattanPlot({
           content: async data => {
             let point = withKeys(data);
             const response = await query('variants', {
-              table: selectedPhenotype.value + '_variant',
+              table: 'variant_' + selectedPhenotype.value,
               id: point.variantId
             });
             const record = response.data[0];
@@ -491,7 +491,7 @@ export function ManhattanPlot({
           content: async data => {
             let point = withKeys(data);
             const response = await query('variants', {
-              table: selectedPhenotype.value + '_variant',
+              table: 'variant_' + selectedPhenotype.value,
               id: point.variantId
             });
             const record = response.data[0];
