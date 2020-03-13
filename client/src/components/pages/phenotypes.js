@@ -23,13 +23,16 @@ export function Phenotypes() {
     breadcrumb,
     currentBubbleData,
     data,
-    displayTreeParent
+    displayTreeParent,
+    categoryColor
   } = useSelector(state => state.browsePhenotypes);
 
   const plotContainer = useRef(null);
   // const plot = useRef(null);
 
-  const phenotypes = useSelector(state => state.tmp_phenotypes);
+  // const phenotypes = useSelector(state => state.tmp_phenotypes);
+  const phenotypes = useSelector(state => state.phenotypes);
+
 
   const [openSidebar, setOpenSidebar] = useState(true);
 
@@ -60,6 +63,10 @@ export function Phenotypes() {
     dispatch(updateBrowsePhenotypes({ displayTreeParent }));
   };
 
+  const setCategoryColor = categoryColor => {
+    dispatch(updateBrowsePhenotypes({ categoryColor}));
+  }
+
   const clearMessages = e => {
     setMessages([]);
   };
@@ -80,8 +87,49 @@ export function Phenotypes() {
     return found;
   };
 
+
+  const getParents = (node, parents = []) => {
+    console.log(phenotypes.categories);
+    phenotypes && phenotypes.categories.map((item) => {
+      item.children.map((child) => {
+        if (child.title === node.title && child.id === node.id) {
+          parents.push(item)
+          getParents(item, parents);
+        }
+      })
+    });
+    return parents;
+  }
+
+  const getColor = (node) => {
+    var color = null;
+    if (node.color) {
+      // if node has color already, no need to search for it
+      return node.color;
+    } else {
+      const parents = getParents(node);
+      console.log("parents", parents);
+      if (parents && parents.length > 0) {
+        parents.map((item) => {
+          console.log("item", item);
+          if (item.color) {
+            color = item.color
+          }
+        });
+        return color;
+      } else {
+        return color;
+      }
+    }
+  }
+
+
   const handleChange = (phenotype) => {
     // console.log("handleChange", phenotype);
+
+    const color = getColor(phenotype);
+    setCategoryColor(color);
+
     let phenotypesTreeFull = {
         children: phenotypes.tree
     };
@@ -144,6 +192,7 @@ export function Phenotypes() {
       currentBubbleData: null,
       displayTreeParent: null,
       phenotypeData: null,
+      categoryColor: null
     }));
   }
 
@@ -156,7 +205,7 @@ export function Phenotypes() {
   }, [phenotypes, breadcrumb, currentBubbleData, selectedPhenotype, submitted])
 
   const drawBubbleChart = (data) => {
-    new Plot(plotContainer.current, data, handleSingleClick, handleDoubleClick, handleBackgroundDoubleClick, selectedPhenotype);
+    new Plot(plotContainer.current, data, handleSingleClick, handleDoubleClick, handleBackgroundDoubleClick, selectedPhenotype, categoryColor);
   }
 
   const handleSingleClick = (e) => {
@@ -180,6 +229,9 @@ export function Phenotypes() {
   const handleDoubleClick = (e) => {
     if (e.data.children && e.data.children.length > 0) {
       // parent
+      console.log(e)
+      const color = getColor(e.data);
+      setCategoryColor(color);
       setCurrentBubbleData(e.data.children);
       setBreadcrumb([...breadcrumb, e]);
       setDisplayTreeParent(e);
@@ -193,6 +245,9 @@ export function Phenotypes() {
 
   const handleBackgroundDoubleClick = () => {
     if (breadcrumb.length >= 1) {
+      if (breadcrumb.length === 1) {
+        setCategoryColor(null);
+      }
       setCurrentBubbleData(breadcrumb[breadcrumb.length - 1].parent.data.children);
       setBreadcrumb([...breadcrumb.splice(0, breadcrumb.length -  1)]);
     }
@@ -200,6 +255,9 @@ export function Phenotypes() {
 
   const crumbClick = (item, idx) => {
     // console.log("CRUMB ITEM", item);
+    if (idx === 0) {
+      setCategoryColor(null);
+    }
     let newBreadcrumb = breadcrumb.splice(0, idx);
     setBreadcrumb(newBreadcrumb);
     setCurrentBubbleData(item.parent.data.children);
