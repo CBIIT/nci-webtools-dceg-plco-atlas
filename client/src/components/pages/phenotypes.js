@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Alert, Spinner } from 'react-bootstrap';
 import { PhenotypesForm } from '../forms/phenotypes-form';
 import { PhenotypesTabs } from '../phenotypes/phenotypes-tabs';
-import { PhenotypesSearchCriteria } from '../controls/phenotypes-search-criteria';
+import { PhenotypesSearchCriteria } from '../search-criteria/phenotypes-search-criteria';
 import {
   SidebarContainer,
   SidebarPanel,
@@ -296,7 +296,7 @@ export function Phenotypes() {
                 "bg-white border rounded-0 p-3 d-flex justify-content-center align-items-center"
               }
               style={{
-                position: 'relative',
+                position: 'static',
                 minHeight: '324px'
               }}>
               <LoadingOverlay active={!phenotypes || loading} />

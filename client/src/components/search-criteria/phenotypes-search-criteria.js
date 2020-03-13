@@ -2,7 +2,7 @@ import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { updateBrowsePhenotypes } from '../../services/actions';
 import { Tab, Tabs } from 'react-bootstrap';
-import { Icon } from './icon';
+import { Icon } from '../controls/icon';
 
 
 export const PhenotypesSearchCriteria = () => {

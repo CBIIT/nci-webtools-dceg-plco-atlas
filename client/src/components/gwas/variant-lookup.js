@@ -17,7 +17,7 @@ import paginationFactory from 'react-bootstrap-table2-paginator';
 import filterFactory, { textFilter } from 'react-bootstrap-table2-filter';
 import ToolkitProvider, { CSVExport } from 'react-bootstrap-table2-toolkit';
 import { Alert, Tabs, Tab, Spinner } from 'react-bootstrap';
-import { VariantLookupSearchCriteria } from '../controls/variant-lookup-search-criteria';
+import { VariantLookupSearchCriteria } from '../search-criteria/variant-lookup-search-criteria';
 
 
 export function VariantLookup() {
