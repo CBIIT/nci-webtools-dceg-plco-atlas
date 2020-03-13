@@ -97,7 +97,7 @@ export function SummaryResultsTable() {
     dispatch(
       fetchSummaryTable(key, {
           offset: limit * (page - 1),
-          table: selectedPhenotype.value + '_variant',
+          table: 'variant_' + selectedPhenotype.value,
           gender: selectedManhattanPlotType == 'stacked' ? gender : selectedManhattanPlotType,
           chromosome: selectedChromosome,
           count: shouldCount,
@@ -132,7 +132,7 @@ export function SummaryResultsTable() {
 
     genders.forEach(gender => {
       dispatch(fetchSummarySnpTable(gender, {
-        table: selectedPhenotype.value + '_variant',
+        table: 'variant_' + selectedPhenotype.value,
         snp: summarySnpTables.snp,
         gender: gender,
       }))

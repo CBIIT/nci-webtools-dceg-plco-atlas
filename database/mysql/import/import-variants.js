@@ -76,9 +76,9 @@ async function importVariants() {
 
     const phenotypeName = phenotypes[0].name;
     const phenotypeId = phenotypes[0].id;
-    const variantTable = `${phenotypeName}_variant`;
-    const aggregateTable = `${phenotypeName}_aggregate`;
-    const stageTable = `${phenotypeName}_stage`;
+    const variantTable = `variant_${phenotypeName}`;
+    const aggregateTable = `aggregate_${phenotypeName}`;
+    const stageTable = `stage_${phenotypeName}`;
 
     const schemaSql = readFile('../../schema/tables/variant.sql').replace(/\$PHENOTYPE/g, phenotypeName);
     const indexSql = readFile('../../schema/indexes/variant.sql').replace(/\$PHENOTYPE/g, phenotypeName);
@@ -209,7 +209,7 @@ async function importVariants() {
             show_qq_plot
         ) SELECT
             "${gender}",
-            LPAD(chromosome, 2, '0'),
+            chromosome,
             position,
             snp,
             allele_reference,
@@ -249,7 +249,7 @@ async function importVariants() {
     console.log(`[${duration()} s] Storing lambdaGC and counts...`);
     await connection.execute(`
         INSERT INTO phenotype_metadata (phenotype_id, gender, chromosome, lambda_gc, count)
-        VALUES (:phenotypeId, :gender, :chromosome, :lambdaGC, (SELECT COUNT(*) AS count FROM ${variantTable}))
+        VALUES (:phenotypeId, :gender, :chromosome, :lambdaGC, (SELECT COUNT(*) AS count FROM ${stageTable}))
         ON DUPLICATE KEY UPDATE
             lambda_gc = VALUES(lambda_gc),
             count = VALUES(count);
