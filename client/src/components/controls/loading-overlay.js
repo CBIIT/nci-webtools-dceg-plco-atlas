@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useRef, useEffect } from 'react';
 import { Spinner } from 'react-bootstrap';
+import { useNonStaticParent } from './hooks';
 
 const overlayStyle = {
     position: 'absolute',
@@ -25,9 +26,10 @@ const DefaultLoader = props => (
     </div>
 );
 
-export const LoadingOverlay = props => props.active && (
-    <div style={overlayStyle} {...props.overlayProps}>
+export const LoadingOverlay = props => {
+    const node = useRef(null);
+    useNonStaticParent(node);
+    return props.active && <div ref={node} style={overlayStyle} {...props.overlayProps}>
         {(props.loader || DefaultLoader)(props)}
     </div>
-);
-
+};
