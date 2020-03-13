@@ -50,7 +50,7 @@ export function PhenotypesForm({
             <Tooltip
               style={{display: _phenotype ? 'none' : 'block'}}
               id="submit-summary-results">
-              Please select a phenotype
+              Please select a phenotype.
           </Tooltip>}>
           <span className={`d-inline-block ${!_phenotype && 'c-not-allowed'}`}>
             <Button
