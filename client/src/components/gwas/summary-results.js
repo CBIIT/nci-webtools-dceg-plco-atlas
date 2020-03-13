@@ -86,7 +86,7 @@ export function SummaryResults() {
       dispatch(
         fetchSummaryTable(gender, {
           ...params,
-          table: phenotype + '_variant',
+          table: 'variant_' + phenotype,
           gender: gender,
           offset: 0,
           limit: 10,
@@ -134,7 +134,7 @@ export function SummaryResults() {
         selectedPhenotype: phenotype,
         selectedManhattanPlotType: manhattanPlotType,
         manhattanPlotView: 'summary',
-        selectedTable: phenotype.value + '_aggregate',
+        selectedTable: 'aggregate_' + phenotype.value,
         selectedChromosome: null,
         selectedManhattanPlotType: manhattanPlotType,
         nlogpMin: null,
@@ -149,7 +149,7 @@ export function SummaryResults() {
     // draw summary plot using aggregate data
     dispatch(
       drawManhattanPlot('summary', {
-        table: phenotype.value + '_aggregate',
+        table: 'aggregate_' + phenotype.value,
         gender: genders,
         p_value_nlog_min: 3,
       })
@@ -240,7 +240,7 @@ export function SummaryResults() {
     dispatch(
       updateSummaryResults({
         manhattanPlotView: 'variants',
-        selectedTable: selectedPhenotype.value + '_variant',
+        selectedTable: 'variant_' + selectedPhenotype.value,
         selectedChromosome: chromosome,
         selectedManhattanPlotType,
         bpMin: range.position_min,
@@ -252,7 +252,7 @@ export function SummaryResults() {
 
     dispatch(
       drawManhattanPlot('variants', {
-        table: selectedPhenotype.value + '_variant',
+        table: 'variant_' + selectedPhenotype.value,
         gender: genders,
         chromosome: chromosome,
         position_min: range.position_min,
