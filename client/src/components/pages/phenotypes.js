@@ -89,7 +89,6 @@ export function Phenotypes() {
 
 
   const getParents = (node, parents = []) => {
-    console.log(phenotypes.categories);
     phenotypes && phenotypes.categories.map((item) => {
       item.children.map((child) => {
         if (child.title === node.title && child.id === node.id) {
@@ -108,10 +107,8 @@ export function Phenotypes() {
       return node.color;
     } else {
       const parents = getParents(node);
-      console.log("parents", parents);
       if (parents && parents.length > 0) {
         parents.map((item) => {
-          console.log("item", item);
           if (item.color) {
             color = item.color
           }
@@ -217,7 +214,6 @@ export function Phenotypes() {
         //leaf
         // console.log("LEAF!", e.data);
         setSelectedPhenotype(e.data);
-        console.log("single click", e);
         setDisplayTreeParent(e);
       }
     } else {
@@ -229,7 +225,6 @@ export function Phenotypes() {
   const handleDoubleClick = (e) => {
     if (e.data.children && e.data.children.length > 0) {
       // parent
-      console.log(e)
       const color = getColor(e.data);
       setCategoryColor(color);
       setCurrentBubbleData(e.data.children);
