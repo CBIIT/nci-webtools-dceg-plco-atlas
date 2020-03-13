@@ -362,17 +362,18 @@ async function getPhenotype(connection, params) {
         case 'binary':
             let keyValueReducer = ((obj = {}, curr) => ({...obj, [curr.key]: [...(obj[curr.key] || []), curr.value]}));
 
-            phenotype.categories = ["% with", "% without"];
+            phenotype.categories = ["% without", "% with"];
             phenotype.distributionCategories = ["% with"];
             phenotype.frequency = (await connection.execute(
                 {
                     rowsAsArray: true,
                     sql: `
-                        SELECT count(*) FROM phenotype_data
+                        SELECT count(*) FROM participant_data
                         WHERE
                             phenotype_id = :id and
                             value is not null
-                        group by value;`
+                        group by value
+                        order by value;`
                 },
                 {id: params.id}
             ))[0].map(e => e[0]);
@@ -380,42 +381,42 @@ async function getPhenotype(connection, params) {
             phenotype.distribution = {
                 age: (await connection.execute(`
                     SELECT
-                        ps.age AS "key",
+                        p.age AS "key",
                         COUNT(*) AS "value"
-                    FROM phenotype_data pd
-                    JOIN phenotype_sample ps ON ps.id = pd.phenotype_sample_id
+                    FROM participant_data pd
+                    JOIN participant p ON p.id = pd.participant_id
                     WHERE
                         pd.phenotype_id = :id AND
                         pd.value = 1 AND
-                        ps.age IS NOT NULL AND
-                        ps.age >= 55
-                    GROUP BY ps.age
-                    ORDER BY ps.age;
+                        p.age IS NOT NULL AND
+                        p.age >= 55
+                    GROUP BY p.age
+                    ORDER BY p.age;
                 `, {id: params.id}))[0].reduce(keyValueReducer, {}),
                 gender: (await connection.execute(`
                     SELECT
-                        ps.gender AS "key",
+                        p.gender AS "key",
                         COUNT(*) AS "value"
-                    FROM phenotype_data pd
-                    JOIN phenotype_sample ps ON ps.id = pd.phenotype_sample_id
+                    FROM participant_data pd
+                    JOIN participant p ON p.id = pd.participant_id
                     WHERE
                         pd.phenotype_id = :id AND
                         pd.value = 1
-                    GROUP BY ps.gender
-                    ORDER BY ps.gender;
+                    GROUP BY p.gender
+                    ORDER BY p.gender;
                 `, {id: params.id}))[0].reduce(keyValueReducer, {}),
                 ancestry: (await connection.execute(`
                     SELECT
-                        ps.ancestry AS "key",
+                        p.ancestry AS "key",
                         COUNT(*) AS "value"
-                    FROM phenotype_data pd
-                    JOIN phenotype_sample ps ON ps.id = pd.phenotype_sample_id
+                    FROM participant_data pd
+                    JOIN participant p ON p.id = pd.participant_id
                     WHERE
                         pd.phenotype_id = :id AND
                         pd.value = 1 AND
-                        ps.ancestry IS NOT NULL
-                    GROUP BY ps.ancestry
-                    ORDER BY ps.ancestry;
+                        p.ancestry IS NOT NULL
+                    GROUP BY p.ancestry
+                    ORDER BY p.ancestry;
                 `, {id: params.id}))[0].reduce(keyValueReducer, {})
             }
 
@@ -441,7 +442,7 @@ async function getPhenotype(connection, params) {
                 {
                     rowsAsArray: true,
                     sql: `
-                        SELECT count(*) FROM phenotype_data
+                        SELECT count(*) FROM participant_data
                         WHERE
                             phenotype_id = :id AND
                             value IS NOT NULL
@@ -454,46 +455,46 @@ async function getPhenotype(connection, params) {
             phenotype.distribution = {
                 age: (await connection.execute(`
                     SELECT
-                        ps.age AS "key",
+                        p.age AS "key",
                         pd.value as "group",
                         COUNT(*) AS "value"
-                    FROM phenotype_data pd
-                    JOIN phenotype_sample ps ON ps.id = pd.phenotype_sample_id
+                    FROM participant_data pd
+                    JOIN participant p ON p.id = pd.participant_id
                     WHERE
                         pd.phenotype_id = :id AND
                         pd.value IS NOT NULL AND
-                        ps.age IS NOT NULL AND
-                        ps.age >= 55
-                    GROUP BY ps.age, pd.value
-                    ORDER BY ps.age, pd.value;
+                        p.age IS NOT NULL AND
+                        p.age >= 55
+                    GROUP BY p.age, pd.value
+                    ORDER BY p.age, pd.value;
                 `, {id: params.id}))[0].reduce(keyGroupValueReducer, {}),
                 gender: (await connection.execute(`
                     SELECT
-                        ps.gender AS "key",
+                        p.gender AS "key",
                         pd.value as "group",
                         COUNT(*) AS "value"
-                    FROM phenotype_data pd
-                    JOIN phenotype_sample ps ON ps.id = pd.phenotype_sample_id
+                    FROM participant_data pd
+                    JOIN participant p ON p.id = pd.participant_id
                     WHERE
                         pd.phenotype_id = :id AND
                         pd.value IS NOT NULL AND
-                        ps.gender IS NOT NULL
-                    GROUP BY ps.gender, pd.value
-                    ORDER BY ps.gender, pd.value;
+                        p.gender IS NOT NULL
+                    GROUP BY p.gender, pd.value
+                    ORDER BY p.gender, pd.value;
                 `, {id: params.id}))[0].reduce(keyGroupValueReducer, {}),
                 ancestry: (await connection.execute(`
                     SELECT
-                        ps.ancestry AS "key",
+                        p.ancestry AS "key",
                         pd.value as "group",
                         COUNT(*) AS "value"
-                    FROM phenotype_data pd
-                    JOIN phenotype_sample ps ON ps.id = pd.phenotype_sample_id
+                    FROM participant_data pd
+                    JOIN participant p ON p.id = pd.participant_id
                     WHERE
                         pd.phenotype_id = :id AND
                         pd.value IS NOT NULL AND
-                        ps.ancestry IS NOT NULL
-                    GROUP BY ps.ancestry, pd.value
-                    ORDER BY ps.ancestry, pd.value;
+                        p.ancestry IS NOT NULL
+                    GROUP BY p.ancestry, pd.value
+                    ORDER BY p.ancestry, pd.value;
                 `, {id: params.id}))[0].reduce(keyGroupValueReducer, {})
             }
             break;
@@ -503,7 +504,7 @@ async function getPhenotype(connection, params) {
                 SELECT
                     FLOOR(value) AS value_group,
                     COUNT(*) as value
-                FROM phenotype_data
+                FROM participant_data
                 WHERE
                     phenotype_id = :id AND
                     value IS NOT NULL
@@ -514,19 +515,19 @@ async function getPhenotype(connection, params) {
             let histogramFrequencies = (await connection.query(`
                 SELECT MIN(value), MAX(value)
                     INTO @min, @max
-                    FROM phenotype_data WHERE phenotype_id = :id;
+                    FROM participant_data WHERE phenotype_id = :id;
                 set @factor = power(10, floor(log10(@max - @min)));
                 set @floor_min = @factor * floor(@min / @factor);
                 set @ceil_max = @factor * ceil(@max / @factor);
                 set @count = 1 + (@ceil_max - @floor_min) / @factor;
 
-                WITH bins AS (SELECT id as bin from phenotype_data where id <= (SELECT @count))
+                WITH bins AS (SELECT id as bin from participant_data where id <= (SELECT @count))
                     SELECT
                         bin,
                         @floor_min + (bin - 1) * @factor AS min,
                         @floor_min + bin * @factor AS max,
                         CONCAT((SELECT min), ' - ', (SELECT max)) as type,
-                        (SELECT count(*) FROM phenotype_data
+                        (SELECT count(*) FROM participant_data
                             WHERE phenotype_id = :id
                             and value BETWEEN (select min) AND (select max)
                         ) AS value
@@ -550,46 +551,46 @@ async function getPhenotype(connection, params) {
             phenotype.distribution = {
                 age: (await connection.execute(`
                     SELECT
-                        ps.age AS "key",
+                        p.age AS "key",
                         pd.value as "group",
                         COUNT(*) AS "value"
-                    FROM phenotype_data pd
-                    JOIN phenotype_sample ps ON ps.id = pd.phenotype_sample_id
+                    FROM participant_data pd
+                    JOIN participant p ON p.id = pd.participant_id
                     WHERE
                         pd.phenotype_id = :id AND
                         pd.value IS NOT NULL AND
-                        ps.age IS NOT NULL AND
-                        ps.age >= 55
-                    GROUP BY ps.age, pd.value
-                    ORDER BY ps.age, pd.value;
+                        p.age IS NOT NULL AND
+                        p.age >= 55
+                    GROUP BY p.age, pd.value
+                    ORDER BY p.age, pd.value;
                 `, {id: params.id}))[0].reduce(keyGroupValueRangeReducer, {}),
                 gender: (await connection.execute(`
                     SELECT
-                        ps.gender AS "key",
+                        p.gender AS "key",
                         pd.value as "group",
                         COUNT(*) AS "value"
-                    FROM phenotype_data pd
-                    JOIN phenotype_sample ps ON ps.id = pd.phenotype_sample_id
+                    FROM participant_data pd
+                    JOIN participant p ON p.id = pd.participant_id
                     WHERE
                         pd.phenotype_id = :id AND
                         pd.value IS NOT NULL AND
-                        ps.gender IS NOT NULL
-                    GROUP BY ps.gender, pd.value
-                    ORDER BY ps.gender, pd.value;
+                        p.gender IS NOT NULL
+                    GROUP BY p.gender, pd.value
+                    ORDER BY p.gender, pd.value;
                 `, {id: params.id}))[0].reduce(keyGroupValueRangeReducer, {}),
                 ancestry: (await connection.execute(`
                     SELECT
-                        ps.ancestry AS "key",
+                        p.ancestry AS "key",
                         pd.value as "group",
                         COUNT(*) AS "value"
-                    FROM phenotype_data pd
-                    JOIN phenotype_sample ps ON ps.id = pd.phenotype_sample_id
+                    FROM participant_data pd
+                    JOIN participant p ON p.id = pd.participant_id
                     WHERE
                         pd.phenotype_id = :id AND
                         pd.value IS NOT NULL AND
-                        ps.ancestry IS NOT NULL
-                    GROUP BY ps.ancestry, pd.value
-                    ORDER BY ps.ancestry, pd.value;
+                        p.ancestry IS NOT NULL
+                    GROUP BY p.ancestry, pd.value
+                    ORDER BY p.ancestry, pd.value;
                 `, {id: params.id}))[0].reduce(keyGroupValueRangeReducer, {})
             }
 
