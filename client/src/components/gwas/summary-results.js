@@ -5,7 +5,7 @@ import { SummaryResultsForm } from '../forms/summary-results-form';
 import { ManhattanPlot } from '../plots/manhattan-plot';
 import { QQPlot } from '../plots/qq-plot';
 import { SummaryResultsTable } from './summary-results-table';
-import { SummaryResultsSearchCriteria } from '../controls/summary-results-search-criteria';
+import { SummaryResultsSearchCriteria } from '../search-criteria/summary-results-search-criteria';
 import {
   SidebarContainer,
   SidebarPanel,

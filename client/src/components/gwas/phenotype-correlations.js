@@ -3,7 +3,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { PhenotypeCorrelationsForm } from '../forms/phenotype-correlations-form';
 import { Heatmap } from '../plots/heatmap-plot';
 import { Alert, Tabs, Tab, Button, Spinner } from 'react-bootstrap';
-import { PhenotypeCorrelationsSearchCriteria } from '../controls/phenotype-correlations-search-criteria';
+import { PhenotypeCorrelationsSearchCriteria } from '../search-criteria/phenotype-correlations-search-criteria';
 import {
   SidebarContainer,
   SidebarPanel,
