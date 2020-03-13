@@ -670,8 +670,8 @@ export const TreeSelect = forwardRef(({
               aria-label="Search Phenotype"
               value={searchInput}
               onChange={e => {
-                setSearchInput(e.target.id);
-                if (e.target.id && e.target.id.length > 0) {
+                setSearchInput(e.target.value);
+                if (e.target.value && e.target.value.length > 0) {
                   setListType('alphabetical');
                 } else {
                   setListType('categorical');
