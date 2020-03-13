@@ -357,6 +357,16 @@ async function getPhenotype(connection, params) {
         return null;
 
     let phenotype = phenotypeRows[0];
+    phenotype.ageCategories = ["55-59", "60-64", "65-69", "70-74", "75-79"];
+    phenotype.genderCategories = ["male", "female"];
+    phenotype.ancestryCategories = [
+        "white",
+        "black",
+        "hispanic",
+        "asian",
+        "pacific_islander",
+        "american_indian",
+    ];
 
     switch(phenotype.type) {
         case 'binary':
@@ -425,7 +435,7 @@ async function getPhenotype(connection, params) {
             phenotype.categories = (await connection.execute({
                 rowsAsArray: true,
                 sql: `
-                    SELECT label FROM phenotype_category
+                    SELECT label FROM participant_data_category
                     WHERE phenotype_id = :id
                     ORDER BY value`,
             }, {id: params.id}))[0].map(e => e[0]);
