@@ -7,7 +7,7 @@ BEGIN
     PREPARE stmt from @sql;
     EXECUTE stmt;
     DEALLOCATE PREPARE stmt;
-END $$;
+END $$
 
 DROP PROCEDURE IF EXISTS drop_index_if_exists $$
 CREATE PROCEDURE drop_index_if_exists(
@@ -53,8 +53,8 @@ create procedure insert_participant_data()
     EXECUTE dynamic_statement;
     DEALLOCATE PREPARE dynamic_statement;
   UNTIL done END REPEAT;
-  CLOSE phenotype_cursor;
-END;
+  CLOSE phenotype_name_cursor;
+END $$
 
 
 DELIMITER ;
