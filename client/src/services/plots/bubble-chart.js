@@ -1,22 +1,23 @@
 import * as d3 from 'd3'
 
 export class BubbleChart {
-    constructor(container, currentData, handleSingleClick, handleDoubleClick, handleBackgroundDoubleClick, selectedPhenotype) {
+    constructor(container, currentData, handleSingleClick, handleDoubleClick, handleBackgroundDoubleClick, selectedPhenotype, categoryColor) {
         // console.log("bubble-chart service reached!", realData);
         this.container = container;
         this.handleSingleClick = handleSingleClick;
         this.handleDoubleClick = handleDoubleClick;
         this.handleBackgroundDoubleClick = handleBackgroundDoubleClick;
         this.selectedPhenotype = selectedPhenotype;
+        this.categoryColor = categoryColor;
         if (currentData && currentData.length > 0) {
             this.currentData = {
                 children: currentData
             };
-            this.drawBubbleChart(this.container, this.currentData, this.handleSingleClick, this.handleDoubleClick, this.handleBackgroundDoubleClick, this.selectedPhenotype);
+            this.drawBubbleChart(this.container, this.currentData, this.handleSingleClick, this.handleDoubleClick, this.handleBackgroundDoubleClick, this.selectedPhenotype, this.categoryColor);
         }
     }
 
-    drawBubbleChart(container, data, handleSingleClick, handleDoubleClick, handleBackgroundDoubleClick, selectedPhenotype) {
+    drawBubbleChart(container, data, handleSingleClick, handleDoubleClick, handleBackgroundDoubleClick, selectedPhenotype, categoryColor) {
         // console.log("data reached drawBubbleChart() d3", dataset);
 
         d3.selectAll(".bubble")
@@ -100,7 +101,7 @@ export class BubbleChart {
                 return d.r;
             })
             .style("fill", function (d) {
-                return d.data.color ? d.data.color : "pink";
+                return d.data.color ? d.data.color : categoryColor ? categoryColor : "pink";
             })
             .style("opacity", function (d) {
                 return d.children ? "100%" : "50%";
@@ -119,7 +120,7 @@ export class BubbleChart {
                 return d.children ? d.r - 5 : 0;
             })
             .style("fill", function (d) {
-                return d.data.color ? d.data.color : "pink";
+                return d.data.color ? d.data.color : categoryColor ? categoryColor : "pink";
             })
             .style("opacity", function (d) {
                 return "75%";
@@ -130,7 +131,6 @@ export class BubbleChart {
             .attr("dy", "0em")
             .style("text-anchor", "middle")
             .text(function (d) {
-                console.log("d", d);
                 return [d.data.title, d.value];
             })
             .attr("font-family", "sans-serif")
@@ -207,7 +207,6 @@ function wrap(text, width) {
             y = text.attr("y"),
             dy = parseFloat(text.attr("dy")),
             tspan = text.text(null).append("tspan").attr("x", 0).attr("y", y).attr("dy", dy + "em");
-        console.log("value", value);
         while (words.length > 0) {
             word = words.pop()
             line.push(word);
