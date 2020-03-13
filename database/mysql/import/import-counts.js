@@ -76,7 +76,7 @@ async function importVariants() {
 
     const phenotypeName = phenotypes[0].name;
     const phenotypeId = phenotypes[0].id;
-    const variantTable = `${phenotypeName}_variant`;
+    const variantTable = `variant_${phenotypeName}`;
 
     console.log(`[${duration()} s] Storing lambdaGC and counts...`);
     await connection.execute(`
