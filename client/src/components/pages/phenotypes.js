@@ -12,6 +12,7 @@ import {
 import { updateBrowsePhenotypes } from '../../services/actions';
 import { query } from '../../services/query';
 import { BubbleChart as Plot } from '../../services/plots/bubble-chart';
+import { LoadingOverlay } from '../controls/loading-overlay';
 import { Icon } from '../controls/icon';
 
 export function Phenotypes() {
@@ -23,7 +24,7 @@ export function Phenotypes() {
     breadcrumb,
     currentBubbleData,
     data,
-    displayTreeParent
+    displayTreeParent,
   } = useSelector(state => state.browsePhenotypes);
 
   const plotContainer = useRef(null);
@@ -32,6 +33,7 @@ export function Phenotypes() {
   const phenotypes = useSelector(state => state.tmp_phenotypes);
 
   const [openSidebar, setOpenSidebar] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   const setMessages = messages => {
     dispatch(updateBrowsePhenotypes({ messages }));
@@ -116,7 +118,9 @@ export function Phenotypes() {
     }
 
     // some action here
+    setLoading(true);
     const data = await query('phenotype', {id: phenotype.id});
+    setLoading(false);
 
     // update browse phenotypes filters
     dispatch(
@@ -229,10 +233,11 @@ export function Phenotypes() {
       </SidebarPanel>
 
       <MainPanel className="col-lg-9">
+        <LoadingOverlay active={!phenotypes || loading} />
         <PhenotypesSearchCriteria />
-        {!submitted &&
-          <>
-            <div
+        {submitted 
+          ? <PhenotypesTabs /> 
+          : <div
               className={
                 phenotypes ?
                 "bg-white border rounded-0 p-3" :
@@ -271,25 +276,7 @@ export function Phenotypes() {
                   style={{ minHeight: '50vh' }}
                 />
               </div>
-
-              {
-                !phenotypes &&
-                  <div
-                    style={{
-                      display: !phenotypes ? 'block' : 'none',
-                    }}>
-                    <Spinner animation="border" variant="primary" role="status">
-                      <span className="sr-only">Loading...</span>
-                    </Spinner>
-                  </div>
-              }
-
             </div>
-          </>
-        }
-        {
-          submitted &&
-          <PhenotypesTabs />
         }
       </MainPanel>
     </SidebarContainer>
