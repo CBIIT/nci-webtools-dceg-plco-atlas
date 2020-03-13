@@ -1,7 +1,6 @@
 import React, {useState} from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Tab, Tabs, Form } from 'react-bootstrap';
-import Plot from 'react-plotly.js';
 import { updateBrowsePhenotypes } from '../../services/actions';
 import { PhenotypesRelated } from './phenotypes-related'
 import { BarChart, AreaChart, GroupedAreaChart, PieChart, HorizontalBarChart } from './phenotypes-charts';
@@ -60,9 +59,12 @@ export function PhenotypesTabs() {
         style={{ minHeight: '50vh' }}>
           <div className="m-2">{[
             {label: 'Age', value: 'age'},
+            {label: 'Age (Inverted)', value: 'ageInverted'},
             {label: 'Gender', value: 'gender'},
+            {label: 'Gender (Inverted)', value: 'genderInverted'},
             {label: 'Ancestry', value: 'ancestry'},
-          ].map((e, i) =>
+            {label: 'Ancestry (Inverted)', value: 'ancestryInverted'},
+          ].filter(Boolean).map((e, i) =>
             <Form.Check
               custom
               inline
@@ -76,14 +78,15 @@ export function PhenotypesTabs() {
             />
           )}</div>
 
-          {phenotypeData && phenotypeData.distribution && selectedDistribution != 'age' && <BarChart
+          {phenotypeData && phenotypeData.distribution && /^(gender|ancestry)$/.test(selectedDistribution) && <BarChart
                 data={phenotypeData.distribution[selectedDistribution]}
                 categories={phenotypeData.distributionCategories.map(titleCase)}
                 xTitle={titleCase(selectedDistribution)}
                 yTitle="Number of Participants"
           />}
 
-          {phenotypeData && phenotypeData.distribution && selectedDistribution == 'age'  && <GroupedAreaChart
+
+          {phenotypeData && phenotypeData.distribution && /^(age)$/.test(selectedDistribution)  && <GroupedAreaChart
             data={phenotypeData.distribution[selectedDistribution]}
             categories={phenotypeData.distributionCategories.map(titleCase)}
             xTitle={titleCase(selectedDistribution)}
