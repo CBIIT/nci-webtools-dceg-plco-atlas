@@ -209,7 +209,7 @@ async function importVariants() {
             show_qq_plot
         ) SELECT
             "${gender}",
-            LPAD(chromosome, 2, '0'),
+            chromosome,
             position,
             snp,
             allele_reference,

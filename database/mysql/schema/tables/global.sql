@@ -6,6 +6,7 @@ CREATE TABLE `phenotype` (
     `description`           MEDIUMTEXT,
     `color`                 VARCHAR(40) NULL,
     `type`                  ENUM('binary', 'categorical', 'continuous'),
+    `participant_count`     BIGINT,
     `import_count`          BIGINT,
     `import_date`          DATETIME,
     FOREIGN KEY (parent_id) REFERENCES phenotype(id)
@@ -15,7 +16,7 @@ CREATE TABLE `phenotype_metadata` (
     `id`            INTEGER PRIMARY KEY NOT NULL AUTO_INCREMENT,
     `phenotype_id`  INTEGER,
     `gender`        ENUM('all', 'female', 'male'),
-    `chromosome`    VARCHAR(3),
+    `chromosome`    ENUM('1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', 'X', 'Y') NOT NULL,
     `lambda_gc`     DOUBLE,
     `count`         BIGINT,
     FOREIGN KEY (phenotype_id) REFERENCES phenotype(id),
@@ -57,7 +58,7 @@ CREATE TABLE `participant_data_category` (
 
 CREATE TABLE `chromosome_range` (
     `id`                    INTEGER PRIMARY KEY NOT NULL AUTO_INCREMENT,
-    `chromosome`            VARCHAR(2) NOT NULL,
+    `chromosome`            ENUM('1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', 'X', 'Y') NOT NULL,
     `position_min`          BIGINT NOT NULL,
     `position_max`          BIGINT NOT NULL,
     `position_abs_min`      BIGINT NOT NULL,
@@ -67,7 +68,7 @@ CREATE TABLE `chromosome_range` (
 CREATE TABLE `gene` (
     `id`                    INTEGER PRIMARY KEY NOT NULL AUTO_INCREMENT,
     `name`                  VARCHAR(200) NOT NULL,
-    `chromosome`            VARCHAR(2) NOT NULL,
+    `chromosome`            ENUM('1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', 'X', 'Y') NOT NULL,
     `strand`                CHAR NOT NULL,
     `transcription_start`   INTEGER NOT NULL,
     `transcription_end`     INTEGER NOT NULL,
