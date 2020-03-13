@@ -33,7 +33,7 @@ CREATE TABLE `participant_data_category` (
     `id`                    INTEGER PRIMARY KEY NOT NULL AUTO_INCREMENT,
     `phenotype_id`          INTEGER NOT NULL,
     `value`                 INTEGER,
-    `label`                 TEXT
+    `label`                 TEXT,
     FOREIGN KEY (phenotype_id) REFERENCES phenotype(id)
 );
 
