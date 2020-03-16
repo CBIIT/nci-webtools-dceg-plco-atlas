@@ -218,10 +218,6 @@ export const GroupedAreaChart = ({data, categories, xTitle, yTitle, fill}) => {
         })
       };
 
-      if (x.length <= 2 && categories.length <= 2) {
-        plotData.width = x.map(e => 0.2);
-      }
-
       return plotData;
     })}
     layout={{
