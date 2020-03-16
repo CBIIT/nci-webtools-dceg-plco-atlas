@@ -20,7 +20,7 @@ const loaderStyle = {
 };
 
 const DefaultLoader = props => (
-    <div style={loaderStyle} {...props.loaderProps}>
+    <div style={{...loaderStyle, ...props.loaderStyle}} {...props.loaderProps}>
         <Spinner animation="border" variant="primary" role="status"></Spinner>
         <div>{props.children || <span className="sr-only">Loading</span>}</div>
     </div>
@@ -29,7 +29,7 @@ const DefaultLoader = props => (
 export const LoadingOverlay = props => {
     const node = useRef(null);
     useNonStaticParent(node);
-    return props.active && <div ref={node} style={overlayStyle} {...props.overlayProps}>
+    return props.active && <div ref={node} style={{...overlayStyle, ...props.overlayStyle}} {...props.overlayProps}>
         {(props.loader || DefaultLoader)(props)}
     </div>
 };

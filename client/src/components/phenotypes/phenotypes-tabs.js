@@ -59,11 +59,11 @@ export function PhenotypesTabs() {
         style={{ minHeight: '50vh' }}>
           <div className="m-2">{[
             {label: 'Age', value: 'age'},
-            {label: 'Age (Inverted)', value: 'ageInverted'},
+            phenotypeData.type !== 'binary' && {label: 'Age (Inverted)', value: 'ageInverted'},
             {label: 'Gender', value: 'gender'},
-            {label: 'Gender (Inverted)', value: 'genderInverted'},
+            phenotypeData.type !== 'binary' && {label: 'Gender (Inverted)', value: 'genderInverted'},
             {label: 'Ancestry', value: 'ancestry'},
-            {label: 'Ancestry (Inverted)', value: 'ancestryInverted'},
+            phenotypeData.type !== 'binary' && {label: 'Ancestry (Inverted)', value: 'ancestryInverted'},
           ].filter(Boolean).map((e, i) =>
             <Form.Check
               custom
@@ -85,6 +85,29 @@ export function PhenotypesTabs() {
                 yTitle="Number of Participants"
           />}
 
+          {phenotypeData && phenotypeData.distribution && phenotypeData.type === 'categorical' && /^(age|gender|ancestry)Inverted$/.test(selectedDistribution) && <BarChart
+                data={phenotypeData.distribution[selectedDistribution]}
+                categories={phenotypeData[{
+                  ageInverted: 'ageCategories',
+                  genderInverted: 'genderCategories',
+                  ancestryInverted: 'ancestryCategories'
+                }[selectedDistribution]]}
+                xTitle={phenotypeData.display_name}
+                yTitle="Number of Participants"
+          />}
+
+
+          {phenotypeData && phenotypeData.distribution && phenotypeData.type === 'continuous' && /^(age|gender|ancestry)Inverted$/.test(selectedDistribution) && <GroupedAreaChart
+                data={phenotypeData.distribution[selectedDistribution]}
+                categories={phenotypeData[{
+                  ageInverted: 'ageCategories',
+                  genderInverted: 'genderCategories',
+                  ancestryInverted: 'ancestryCategories'
+                }[selectedDistribution]]}
+                xTitle={phenotypeData.display_name}
+                yTitle="Number of Participants"
+                fill={true}
+          />}
 
           {phenotypeData && phenotypeData.distribution && /^(age)$/.test(selectedDistribution)  && <GroupedAreaChart
             data={phenotypeData.distribution[selectedDistribution]}
