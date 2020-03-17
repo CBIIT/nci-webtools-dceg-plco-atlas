@@ -25,7 +25,8 @@ export function Phenotypes() {
     currentBubbleData,
     data,
     displayTreeParent,
-    categoryColor
+    categoryColor,
+    selectedPlot
   } = useSelector(state => state.browsePhenotypes);
 
   const plotContainer = useRef(null);
@@ -162,9 +163,22 @@ export function Phenotypes() {
       ]);
     }
 
-    // some action here
+    dispatch(
+      updateBrowsePhenotypes({
+        phenotypeData: null,
+      })
+    );
+
     setLoading(true);
-    const data = await query('phenotype', {id: phenotype.id});
+    const data = await query('phenotype', {
+      id: phenotype.id,
+      type: {
+        'frequency': 'frequency',
+        'distribution': 'distribution',
+        'distribution-inverted': 'distributionInverted',
+        'related-phenotypes': 'related',
+      }[selectedPlot] || 'all'
+    });
     setLoading(false);
 
     // update browse phenotypes filters
@@ -287,8 +301,8 @@ export function Phenotypes() {
 
       <MainPanel className="col-lg-9">
         <PhenotypesSearchCriteria />
-        {submitted 
-          ? <PhenotypesTabs /> 
+        {submitted
+          ? <PhenotypesTabs />
           : <div
               className={
                 phenotypes ?

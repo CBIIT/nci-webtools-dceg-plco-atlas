@@ -10,6 +10,7 @@ const overlayStyle = {
     height: '100%',
     backgroundColor: '#fff',
     opacity: '0.8',
+    zIndex: 9999,
 };
 
 const loaderStyle = {

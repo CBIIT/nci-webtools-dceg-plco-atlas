@@ -49,7 +49,7 @@ app.addHook("onSend", (req, res, payload, done) => {
   let timestamp = res.getHeader("Timestamp");
 
   // log response time and parameters for the specified routes
-  const loggedRoutes = /summary|variants|metadata|genes|correlations|config/;
+  const loggedRoutes = /summary|variants|metadata|genes|correlations|config|phenotype/;
   if (timestamp && loggedRoutes.test(pathname)) {
     let duration = new Date().getTime() - timestamp;
     logger.info(`[${process.pid}] ${pathname}: ${duration/1000}s`, req.query);
