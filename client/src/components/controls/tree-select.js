@@ -678,7 +678,7 @@ export const TreeSelect = forwardRef(({
                 }
               }}
               type="text"
-              disabled={!data || submitted}
+              disabled={!data}
             />
             <div className="input-group-append">
               {searchInput.length > 0 ? (

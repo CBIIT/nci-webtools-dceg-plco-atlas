@@ -26,7 +26,8 @@ export function Phenotypes() {
     data,
     displayTreeParent,
     categoryColor,
-    selectedPlot
+    selectedPlot,
+    loading
   } = useSelector(state => state.browsePhenotypes);
 
   const plotContainer = useRef(null);
@@ -37,7 +38,11 @@ export function Phenotypes() {
 
 
   const [openSidebar, setOpenSidebar] = useState(true);
-  const [loading, setLoading] = useState(false);
+  // const [loading, setLoading] = useState(false);
+
+  const setLoading = loading =>  {
+    dispatch(updateBrowsePhenotypes({ loading }));
+  }
 
   const setMessages = messages => {
     dispatch(updateBrowsePhenotypes({ messages }));
@@ -166,6 +171,7 @@ export function Phenotypes() {
     dispatch(
       updateBrowsePhenotypes({
         phenotypeData: null,
+        submitted: false
       })
     );
 
@@ -207,7 +213,8 @@ export function Phenotypes() {
       currentBubbleData: null,
       displayTreeParent: null,
       phenotypeData: null,
-      categoryColor: null
+      categoryColor: null,
+      loading: false
     }));
   }
 
