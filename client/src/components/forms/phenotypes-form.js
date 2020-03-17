@@ -26,7 +26,7 @@ export function PhenotypesForm({
 
   // select store members
   const phenotypes = useSelector(state => state.phenotypes);
-  const { submitted }  = useSelector(state => state.browsePhenotypes);
+  const { submitted, loading }  = useSelector(state => state.browsePhenotypes);
 
   return (
     <>
@@ -57,7 +57,7 @@ export function PhenotypesForm({
               type="submit"
               variant="silver"
               className={!_phenotype && 'pointer-events-none'}
-              disabled={!_phenotype || submitted}
+              disabled={!_phenotype || submitted || loading}
               onClick={e => {
                 e.preventDefault();
                 onSubmit(_phenotype);

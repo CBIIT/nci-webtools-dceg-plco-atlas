@@ -123,7 +123,8 @@ export const getInitialState = () => ({
     breadcrumb: [],
     currentBubbleData: null,
     phenotypeData: null,
-    categoryColor: null
+    categoryColor: null,
+    loading: false
   },
   downloads: {
     selectedPhenotypes: [],
