@@ -68,16 +68,18 @@ export const PhenotypeCorrelationsSearchCriteria = props => {
                 </Button>
               </span>
               <span>
-                <b>Phenotypes(</b>
+                {/* <b>Phenotypes(</b>
                 {searchCriteriaPhenotypeCorrelations.phenotypes
                   ? searchCriteriaPhenotypeCorrelations.phenotypes.length
                   : 0}
-                <b>)</b>:
+                <b>)</b>: */}
+                <b>Phenotypes:</b>
               </span>
             </div>
             <div
               className="col-md-auto ml-1 pl-0"
-              style={{ maxHeight: '300px', overflow: 'auto' }}>
+              // style={{ maxHeight: '300px', overflow: 'auto' }}
+              >
               {collapseCriteria && (
                 <>
                   <span>
@@ -129,9 +131,11 @@ export const PhenotypeCorrelationsSearchCriteria = props => {
               {!collapseCriteria &&
                 searchCriteriaPhenotypeCorrelations &&
                 searchCriteriaPhenotypeCorrelations.phenotypes &&
-                searchCriteriaPhenotypeCorrelations.phenotypes.map(
-                  phenotype => <div>{phenotype}</div>
-                )}
+                searchCriteriaPhenotypeCorrelations.phenotypes.map(phenotype => (
+                  <div title={phenotype}>
+                    {phenotype.length < 50 ? phenotype : phenotype.substring(0, 47) + "..." }
+                  </div>
+                ))}
             </div>
 
             <div className="col-md-auto border-left border-secondary">
@@ -147,7 +151,7 @@ export const PhenotypeCorrelationsSearchCriteria = props => {
           </div>
 
           <div className="right py-1">
-            <span>Total Phenotypes: </span>
+            <b><span>Total Phenotypes: </span></b>
             {searchCriteriaPhenotypeCorrelations &&
             searchCriteriaPhenotypeCorrelations.totalPhenotypes
               ? searchCriteriaPhenotypeCorrelations.totalPhenotypes

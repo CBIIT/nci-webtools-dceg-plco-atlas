@@ -131,7 +131,12 @@ export class BubbleChart {
             .attr("dy", "0em")
             .style("text-anchor", "middle")
             .text(function (d) {
-                return d.data.title + "<br>" + d.data.participant_count;
+                console.log("D", d);
+                if (d.r < 15) {
+                    return ""+ "<br>" + "";
+                } else {
+                    return d.data.title + "<br>" + d.data.participant_count;
+                }
             })
             .attr("font-family", "sans-serif")
             .attr("font-size", function (d) {
@@ -218,6 +223,6 @@ function wrap(text, width) {
                 tspan = text.append("tspan").attr("x", 0).attr("y", y).attr("dy", "1em").text(lineNumber === 3 && words.length > 0 ? word + " ..." : word);
             } 
         }
-        tspan = text.append("tspan").attr("x", 0).attr("y", y).attr("dy", "1.2em").text(Number(value).toLocaleString());
+        tspan = text.append("tspan").attr("x", 0).attr("y", y).attr("dy", "1.2em").text(value.length > 0 ? Number(value).toLocaleString() : "");
     });
   }
