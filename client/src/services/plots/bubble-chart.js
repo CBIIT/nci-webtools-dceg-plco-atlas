@@ -132,7 +132,7 @@ export class BubbleChart {
             .style("text-anchor", "middle")
             .text(function (d) {
                 console.log("D", d);
-                if (d.r < 15) {
+                if (d.r < 16) {
                     return ""+ "<br>" + "";
                 } else {
                     return d.data.title + "<br>" + d.data.participant_count;
