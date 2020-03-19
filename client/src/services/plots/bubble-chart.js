@@ -18,24 +18,22 @@ export class BubbleChart {
     }
 
     drawBubbleChart(container, data, handleSingleClick, handleDoubleClick, handleBackgroundDoubleClick, selectedPhenotype, categoryColor) {
-        // console.log("data reached drawBubbleChart() d3", dataset);
+        var dataCopy = [];
+        data.children.forEach((obj) => {
+                dataCopy.push({
+                    ...obj,
+                    children: null
+                })
+            }
+        );
+        var childlessData = {
+            children: dataCopy
+        }
 
         d3.selectAll(".bubble")
             .remove()
 
         var diameter = 750;
-        // var linearScale = d3.scaleLinear()
-        //     .domain([500, 19200])
-        //     .range([25, 250]);
-
-        var bubble = d3.pack(data)
-            .size([diameter, diameter])
-            // .radius(function (d) {
-            //     // return sizeScale(d.value);
-            //     // return normalize(d.count, 20, 50);
-            //     return linearScale(d.value);
-            // })
-            .padding(1.5);
 
         var svg = d3.select(container)
             .append("svg")
@@ -53,7 +51,7 @@ export class BubbleChart {
                 d3.selectAll(".node")
                     .select(".circle")
                     .style("opacity", function (d) {
-                        return d.children ? "100%" : "50%";
+                        return getChildren(d, data) ? "100%" : "50%";
                     });
                 d3.selectAll(".node")
                     .select(".inner-circle")
@@ -68,10 +66,15 @@ export class BubbleChart {
             .append("title")
             .text("Double-click to navigate phenotype categories.\nSingle-click to select a phenotype.");
 
-        var nodes = d3.hierarchy(data)
-            .sum(function (d) {
-                return d.participant_count ? d.participant_count : 100000; 
-            });
+        var nodes = d3.hierarchy(childlessData)
+            .each(function (d) {
+                d.value = d.data.participant_count;
+            })
+            .sort(function(a, b) { return b.value - a.value; })
+
+        var bubble = d3.pack()
+            .size([diameter, diameter])
+            .padding(1.5);
 
         var bubbleNodes = bubble(nodes).descendants();
 
@@ -89,7 +92,8 @@ export class BubbleChart {
 
         node.append("title")
             .text(function (d) {
-                if (d.children) {
+                
+                if (getChildren(d, data)) {
                     return "Category: " + d.data.title + "\n" + "Participants: " + d.data.participant_count.toLocaleString();
                 } else {
                     return "Phenotype: " + d.data.title + "\n" + "Participants: " + d.data.participant_count.toLocaleString();
@@ -104,20 +108,20 @@ export class BubbleChart {
                 return d.data.color ? d.data.color : categoryColor ? categoryColor : "pink";
             })
             .style("opacity", function (d) {
-                return d.children ? "100%" : "50%";
+                return getChildren(d, data) ? "100%" : "50%";
             })
             .attr("class", "circle");
 
         node.append("circle")
             .attr("r", function (d) {
-                return d.children ? d.r - 5 : 0;
+                return getChildren(d, data) && d.r >= 5? d.r - 5 : 0;
             })
             .style("fill", "#FFFFFF")
             .attr("class", "inner-circle-background");
         
         node.append("circle")
             .attr("r", function (d) {
-                return d.children ? d.r - 5 : 0;
+                return getChildren(d, data) && d.r >= 5 ? d.r - 5 : 0;
             })
             .style("fill", function (d) {
                 return d.data.color ? d.data.color : categoryColor ? categoryColor : "pink";
@@ -131,7 +135,6 @@ export class BubbleChart {
             .attr("dy", "0em")
             .style("text-anchor", "middle")
             .text(function (d) {
-                console.log("D", d);
                 if (d.r < 16) {
                     return ""+ "<br>" + "";
                 } else {
@@ -143,15 +146,15 @@ export class BubbleChart {
                 return d.r / 6 < 10 ? 10 : d.r / 6;
             })
             .attr("fill", function(d) {
-                return d.children ? "white" : "black";
+                return getChildren(d, data) ? "white" : "black";
             })
             .call(wrap, 18);
 
         node.on("click", function (e) {
-            if (!e.children) {
+            if (!getChildren(e, data)) {
                 d3.selectAll(".circle")
                     .style("opacity", function (d) {
-                        return d.children ? "75%" : "25%";
+                        return getChildren(d, data) ? "75%" : "25%";
                     });
                 d3.selectAll(".inner-circle")
                     .style("opacity", function (d) {
@@ -166,11 +169,11 @@ export class BubbleChart {
                         return "75%";
                     });
             }
-            handleSingleClick(e);
+            handleSingleClick(getNode(e, data));
         });
 
         node.on("dblclick", function (e) {
-            handleDoubleClick(e);
+            handleDoubleClick(getNode(e, data));
         });
 
         d3.select(container)
@@ -179,7 +182,7 @@ export class BubbleChart {
         if (selectedPhenotype) {
             d3.selectAll(".circle")
                 .style("opacity", function (d) {
-                    return d.children ? "75%" : "25%";
+                    return getChildren(d, data) ? "75%" : "25%";
                 });
             d3.selectAll(".inner-circle")
                 .style("opacity", function (d) {
@@ -187,7 +190,7 @@ export class BubbleChart {
                 });
             d3.selectAll(".node")
                 .filter(function (d) {
-                    return d.data.title === selectedPhenotype.title && d.data.value === selectedPhenotype.value;
+                    return d.data.id === selectedPhenotype.id;
                 })
                 .select(".circle")
                 .style("opacity", function (d) {
@@ -197,6 +200,33 @@ export class BubbleChart {
 
     }
 
+}
+
+function getChildren(node, data) {
+    // console.log("getChildren", node, data);
+    var results = data.children.filter((child) => {
+        return child.id === node.data.id;
+    });
+    if (results.length > 0) {
+        var children = results[0].children;
+        return children;
+    } else {
+        return null;
+    }
+}
+
+function getNode(node, data) {
+    var results = data.children.filter((child) => {
+        return child.id === node.data.id;
+    });
+    console.log("getNode", results);
+    if (results.length > 0) {
+        return {
+            data: results[0]
+        };
+    } else {
+        return null;
+    }
 }
 
 function wrap(text, width) {
