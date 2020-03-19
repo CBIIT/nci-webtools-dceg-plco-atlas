@@ -158,7 +158,7 @@ export const VariantLookupSearchCriteria = props => {
             </div>
             <div className="col-md-auto border-left border-secondary">
               <span>
-                <b>Gender</b>:{' '}
+                <b>Sex</b>:{' '}
               </span>
               {searchCriteriaVariantLookup && searchCriteriaVariantLookup.gender
                 ? displayGender(searchCriteriaVariantLookup.gender)
