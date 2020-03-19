@@ -45,7 +45,7 @@ export const SummaryResultsSearchCriteria = () => {
           </div>
 
           <div className="right py-1">
-            <span>Total Variants: </span>
+            <b><span>Total Variants: </span></b>
             {sampleSize ? sampleSize.toLocaleString() : 'None'}
           </div>
         </Tab>
