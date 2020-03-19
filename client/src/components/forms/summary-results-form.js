@@ -41,7 +41,7 @@ export function SummaryResultsForm({
       </div>
 
       <div className="mb-3">
-        <label htmlFor="summary-results-gender" className="required">Gender</label>
+        <label htmlFor="summary-results-gender" className="required">Sex</label>
         <select
           id="summary-results-gender"
           className="form-control"

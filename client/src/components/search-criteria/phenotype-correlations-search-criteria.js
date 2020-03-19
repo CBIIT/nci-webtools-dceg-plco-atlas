@@ -141,7 +141,7 @@ export const PhenotypeCorrelationsSearchCriteria = props => {
             <div className="col-md-auto border-left border-secondary">
 
               <span>
-                <b>Gender</b>:{' '}
+                <b>Sex</b>:{' '}
               </span>
               {searchCriteriaPhenotypeCorrelations &&
               searchCriteriaPhenotypeCorrelations.gender
