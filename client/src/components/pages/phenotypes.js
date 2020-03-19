@@ -88,7 +88,7 @@ export function Phenotypes() {
     }
     else {
       // no children = LEAF
-      if (item.title === node.title && item.value === node.value) {
+      if (item.id === node.id) {
         found.push(parent);
       }
     }
@@ -99,7 +99,7 @@ export function Phenotypes() {
   const getParents = (node, parents = []) => {
     phenotypes && phenotypes.categories.map((item) => {
       item.children.map((child) => {
-        if (child.title === node.title && child.id === node.id) {
+        if (child.id === node.id) {
           parents.push(item)
           getParents(item, parents);
         }
@@ -257,8 +257,6 @@ export function Phenotypes() {
       setDisplayTreeParent(e);
     } else {
       // leaf
-      // console.log("leaf!", e.parent.data.children);
-      // setCurrentBubbleData(e.parent.data.children);
       handleSubmit(e.data);
     }
   }
@@ -268,19 +266,20 @@ export function Phenotypes() {
       if (breadcrumb.length === 1) {
         setCategoryColor(null);
       }
-      setCurrentBubbleData(breadcrumb[breadcrumb.length - 1].parent.data.children);
+      const crumbParents = getParents(breadcrumb[breadcrumb.length - 1].data);
+      setCurrentBubbleData(crumbParents.length > 0 ? crumbParents[0].children : phenotypes.tree);
       setBreadcrumb([...breadcrumb.splice(0, breadcrumb.length -  1)]);
     }
   }
 
   const crumbClick = (item, idx) => {
-    // console.log("CRUMB ITEM", item);
+    const crumbParents = getParents(item.data);
     if (idx === 0) {
       setCategoryColor(null);
     }
     let newBreadcrumb = breadcrumb.splice(0, idx);
     setBreadcrumb(newBreadcrumb);
-    setCurrentBubbleData(item.parent.data.children);
+    setCurrentBubbleData(crumbParents.length > 0 ? crumbParents[0].children : phenotypes.tree);
   }
 
   return (
