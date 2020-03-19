@@ -17,7 +17,7 @@ export const PhenotypesSearchCriteria = () => {
 
   const placeholder = (
     <div style={{ display: submitted ? 'none' : 'block' }}>
-      <p className="h4 text-center text-secondary my-1">
+      <p className="h5 text-center text-secondary my-1">
         Please select a phenotype
       </p>
     </div>
@@ -56,7 +56,7 @@ export const PhenotypesSearchCriteria = () => {
               />
             </div> */}
 
-            <p className="h4 my-1">
+            <p className="h5 my-1">
               {phenotypeData && phenotypeData.display_name || ''}
 
               <span className="text-muted ml-3" style={{fontSize: '13px'}}>

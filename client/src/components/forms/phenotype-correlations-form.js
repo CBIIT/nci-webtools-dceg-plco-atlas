@@ -30,8 +30,7 @@ export function PhenotypeCorrelationsForm({ onChange, onSubmit, onReset }) {
   return (
     <>
       <div className="mb-2">
-        <b>Phenotypes</b>
-        <span style={{ color: 'red' }}>*</span>
+        <label className="required">Phenotypes</label>
         <TreeSelect
           data={phenotypes}
           value={selectedPhenotypes}
@@ -43,7 +42,7 @@ export function PhenotypeCorrelationsForm({ onChange, onSubmit, onReset }) {
       </div>
       
       <div className="mb-3">
-        <b>Gender</b>
+        <label className="required">Sex</label>
         <select
           className="form-control"
           value={selectedGender}
