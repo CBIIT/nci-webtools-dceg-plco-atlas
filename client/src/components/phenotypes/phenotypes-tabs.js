@@ -99,7 +99,7 @@ export function PhenotypesTabs() {
           style={{ minHeight: '50vh' }}>
             <div className="m-2">{[
               {label: 'Age', value: 'age'},
-              {label: 'Gender', value: 'gender'},
+              {label: 'Sex', value: 'gender'},
               {label: 'Ancestry', value: 'ancestry'},
             ].filter(Boolean).map((e, i) =>
               <Form.Check
@@ -140,7 +140,7 @@ export function PhenotypesTabs() {
           style={{ minHeight: '50vh' }}>
             <div className="m-2">{[
               {label: 'Age', value: 'ageInverted'},
-              {label: 'Gender', value: 'genderInverted'},
+              {label: 'Sex', value: 'genderInverted'},
               {label: 'Ancestry', value: 'ancestryInverted'},
             ].filter(Boolean).map((e, i) =>
               <Form.Check

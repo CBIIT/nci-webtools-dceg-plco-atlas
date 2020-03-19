@@ -60,7 +60,7 @@ export function VariantLookup() {
     },
     {
       dataField: 'gender',
-      text: 'Gender',
+      text: 'Sex',
       hidden: true
     },
     {

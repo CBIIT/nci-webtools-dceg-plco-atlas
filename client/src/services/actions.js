@@ -943,7 +943,7 @@ export function lookupVariants(phenotypes, variant, gender) {
             ? phenotypes[i].title
             : phenotypes[i].label,
           allele_reference: '-',
-          allele_effect: '-',
+          allele_alternate: '-',
           position: '-',
           chromosome: '-',
           odds_ratio: '-',
