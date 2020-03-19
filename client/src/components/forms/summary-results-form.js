@@ -41,7 +41,7 @@ export function SummaryResultsForm({
       </div>
 
       <div className="mb-3">
-        <label htmlFor="summary-results-gender" className="required">Gender</label>
+        <label htmlFor="summary-results-gender" className="required">Sex</label>
         <select
           id="summary-results-gender"
           className="form-control"
@@ -62,7 +62,7 @@ export function SummaryResultsForm({
             <Tooltip
               style={{display: _phenotype ? 'none' : 'block'}}
               id="submit-summary-results">
-              Please select a phenotype
+              Please select a phenotype.
           </Tooltip>}>
           <span className={`d-inline-block ${!_phenotype && 'c-not-allowed'}`}>
             <Button

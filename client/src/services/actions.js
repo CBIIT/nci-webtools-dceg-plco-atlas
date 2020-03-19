@@ -267,7 +267,7 @@ export function drawQQPlot(phenotype, gender) {
     setQQPlotData([]);
     setSampleSize(null);
 
-    const table = phenotype.value + '_variant';
+    const table = 'variant_' + phenotype.value;
 
     if (gender !== 'stacked') {
       const metadata = await query('metadata', {
@@ -920,7 +920,7 @@ export function lookupVariants(phenotypes, variant, gender) {
       bp = coord[1];
     }
 
-    const tables = phenotypes.map(phenotype => phenotype.value + '_variant').join(',');
+    const tables = phenotypes.map(phenotype => 'variant_' + phenotype.value).join(',');
     var allData = await query('variants', {
       table: tables,
       gender: genderSanitized,
@@ -933,7 +933,7 @@ export function lookupVariants(phenotypes, variant, gender) {
     console.log("allData", allData);
 
     for (let i = 0; i < phenotypes.length; i++) {
-      const table = phenotypes[i].value + '_variant';
+      const table = 'variant_' + phenotypes[i].value;
       var data = allData && allData.data ? allData.data.filter((item) => {
         return item.table_name === table
       }) : [];
@@ -943,7 +943,7 @@ export function lookupVariants(phenotypes, variant, gender) {
             ? phenotypes[i].title
             : phenotypes[i].label,
           allele_reference: '-',
-          allele_effect: '-',
+          allele_alternate: '-',
           position: '-',
           chromosome: '-',
           odds_ratio: '-',

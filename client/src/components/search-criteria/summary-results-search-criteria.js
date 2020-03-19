@@ -36,7 +36,7 @@ export const SummaryResultsSearchCriteria = () => {
             </div>
             <div className="col-md-auto border-left border-secondary">
               <span>
-                <b>Gender</b>:{' '}
+                <b>Sex</b>:{' '}
               </span>
               {searchCriteriaSummaryResults && searchCriteriaSummaryResults.gender
                 ? displayGender(searchCriteriaSummaryResults.gender)

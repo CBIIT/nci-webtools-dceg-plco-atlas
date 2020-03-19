@@ -1,10 +1,35 @@
 import React from "react";
 import Plot from "react-plotly.js";
+import { systemFont } from '../../services/plots/text';
+
+export const hoverLayout = {
+  hoverlabel: {
+    bgcolor: "#fff",
+    bordercolor: '#bbb',
+    font: {
+      size: 14,
+      color: '#212529',
+      family: systemFont
+    },
+  },
+}
+
+export const colors = [
+  `rgba(23, 118, 182, 0.2)`,
+  `rgba(36, 162, 33, 0.2)`,
+  `rgba(216, 36, 31, 0.2)`,
+  `rgba(149, 100, 191, 0.2)`,
+  `rgba(141, 86, 73, 0.2)`,
+  `rgba(229, 116, 195, 0.2)`,
+  `rgba(127, 127, 127, 0.2)`,
+  `rgba(188, 191, 0, 0.2)`,
+  `rgba(0, 190, 209, 0.2)`,
+];
 
 export const BarChart = ({ data, categories, xTitle, yTitle }) => (
 <Plot
-    className="w-100"
-    style={{ minHeight: "600px" }}
+    className="w-100 disable-x-axis-tooltip override-cursor"
+    style={{ minHeight: "600px", width: "600px" }}
     data={categories.map((name, i) => {
       let x = [];
       let y = [];
@@ -12,7 +37,24 @@ export const BarChart = ({ data, categories, xTitle, yTitle }) => (
           x.push(key);
           y.push(data[key][i]);
       }
-      let plotData = { x, y, name, type: "bar"};
+      let plotData = {
+        x,
+        y,
+        name,
+        type: "bar",
+        fillcolor: colors[colors.length % i],
+        line: {
+          color: colors[colors.length % i]
+        },
+        hoverinfo: i === 0 ? 'y' : 'skip',
+        hovertemplate: i === 0 ? '%{text}<extra></extra>' : null,
+        text: i > 0 ? '' : Object.entries(data).map(([key, value]) => {
+          return [
+            xTitle + `: <b>${key}</b>`,
+            categories.map((name, i) => `${name}: <b>${value[i].toLocaleString()}</b>`).join('<br>')
+          ].join('<br>');
+        })
+      };
 
       if (x.length <= 2 && categories.length <= 2) {
         plotData.width = x.map(e => 0.2);
@@ -20,15 +62,25 @@ export const BarChart = ({ data, categories, xTitle, yTitle }) => (
 
       return plotData;
     })}
-
     layout={{
+      ...hoverLayout,
+      hovermode: 'x',
       xaxis: {
+          fixedrange: true,
           automargin: true,
           title: xTitle,
+          separatethousands: true,
       },
       yaxis: {
+          fixedrange: true,
           automargin: true,
-          title: yTitle,
+          title: {
+            text: yTitle,
+            standoff: 20,
+          },
+          zeroline: true,
+          showline: true,
+          separatethousands: true,
       },
       autosize: true
     }}
@@ -41,7 +93,7 @@ export const BarChart = ({ data, categories, xTitle, yTitle }) => (
 
 export const HorizontalBarChart = ({ data, categories }) => (
   <Plot
-    className="w-100"
+    className="w-100  disable-x-axis-tooltip"
     style={{ minHeight: "600px" }}
     data={categories.map((name, i) => {
       let x = [],
@@ -54,7 +106,7 @@ export const HorizontalBarChart = ({ data, categories }) => (
     })}
     layout={{
       xaxis: { automargin: true },
-      yaxis: { automargin: true },
+      yaxis: { automargin: true, zeroline: true},
       // barmode: 'stack',
       autosize: true
     }}
@@ -66,10 +118,143 @@ export const HorizontalBarChart = ({ data, categories }) => (
   />
 );
 
+export const AreaChart = ({data, categories, xTitle, yTitle}) => {
+  let items = categories.map((name, i) => {
+    let x = [];
+    let y = [];
+    for (let key in data) {
+        x.push(key);
+        y.push(data[key][i]);
+    }
+    return {x, y}
+  });
+
+  return <Plot
+      className="w-100 disable-x-axis-tooltip override-cursor"
+      style={{ minHeight: "600px" }}
+      data={[{
+        x: categories, //data.map((e, i) => i + 1),
+        y: data,
+        hovertemplate: '%{text}<extra></extra>',
+        text: categories.map((name, i) => [
+          `${xTitle}: <b>${name}</b>`,
+          `${yTitle}: <b>${data[i].toLocaleString()}</b>`
+        ].join('<br>')),
+        type: 'scatter',
+        fill: 'tonexty',
+        line: {shape: 'spline'},
+      }]}
+      layout={{
+        ...hoverLayout,
+        xaxis: {
+            fixedrange: true,
+            automargin: true,
+            title: xTitle,
+        },
+        yaxis: {
+            fixedrange: true,
+            automargin: true,
+            title: {
+              text: yTitle,
+              standoff: 20,
+            },
+            zeroline: true,
+            showline: true,
+        },
+        autosize: true
+      }}
+      config={{
+        displayModeBar: false,
+        responsive: true,
+      }}
+  />
+}
+
+export const GroupedAreaChart = ({data, categories, xTitle, yTitle, fill}) => {
+  let items = categories.map((name, i) => {
+    let x = [];
+    let y = [];
+    for (let key in data) {
+        x.push(key);
+        y.push(data[key][i]);
+    }
+    return {x, y}
+  });
+
+  let yMax = 0;
+  for (let key in data) {
+    yMax = Math.max(
+      yMax,
+      data[key].reduce((acc, curr) => acc > curr ? acc : curr)
+    );
+  }
+
+  return <Plot
+    className="w-100 disable-x-axis-tooltip override-cursor"
+    style={{ minHeight: "600px", width: "600px" }}
+    data={categories.map((name, i) => {
+      let x = [];
+      let y = [];
+      for (let key in data) {
+          x.push(key);
+          y.push(data[key][i]);
+      }
+      let plotData = {
+        x,
+        y,
+        name,
+        type: 'scatter',
+        mode: 'none',
+        fill: fill ? 'tozeroy' : '',
+        fillcolor: colors[i],
+        line: {shape: 'spline'},
+        hoverinfo: i === 0 ? 'y' : 'skip',
+        hovertemplate: i === 0 ? '%{text}<extra></extra>' : null,
+        text: i > 0 ? '' : Object.entries(data).map(([key, value]) => {
+          return [
+            xTitle + `: <b>${key}</b>`,
+            categories.map((name, i) => `${name}: <b>${value[i].toLocaleString()}</b>`).join('<br>')
+          ].join('<br>');
+        })
+      };
+
+      return plotData;
+    })}
+    layout={{
+      ...hoverLayout,
+      hovermode: 'x',
+      xaxis: {
+          fixedrange: true,
+          automargin: true,
+          title: xTitle,
+          separatethousands: true,
+      },
+      yaxis: {
+          range: [0, yMax],
+          fixedrange: true,
+          automargin: true,
+          title: {
+            text: yTitle,
+            standoff: 20,
+          },
+          zeroline: true,
+          showline: true,
+          separatethousands: true,
+      },
+      autosize: true
+    }}
+    config={{
+      displayModeBar: false,
+      responsive: true
+    }}
+/>
+
+}
+
+
 export const PieChart = ({ data, categories }) => (
   <Plot
-    className="w-100"
-    style={{minHeight: "600px"}}
+    style={{minHeight: "600px", maxWidth: "600px", margin: "0 auto"}}
     data={[
       {
         values: data,
@@ -80,6 +265,7 @@ export const PieChart = ({ data, categories }) => (
       }
     ]}
     layout={{
+      ...hoverLayout,
       showlegend: true,
       autosize: true
     }}

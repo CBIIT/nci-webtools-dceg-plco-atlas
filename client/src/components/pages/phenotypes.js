@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Alert, Spinner } from 'react-bootstrap';
 import { PhenotypesForm } from '../forms/phenotypes-form';
 import { PhenotypesTabs } from '../phenotypes/phenotypes-tabs';
-import { PhenotypesSearchCriteria } from '../controls/phenotypes-search-criteria';
+import { PhenotypesSearchCriteria } from '../search-criteria/phenotypes-search-criteria';
 import {
   SidebarContainer,
   SidebarPanel,
@@ -12,6 +12,7 @@ import {
 import { updateBrowsePhenotypes } from '../../services/actions';
 import { query } from '../../services/query';
 import { BubbleChart as Plot } from '../../services/plots/bubble-chart';
+import { LoadingOverlay } from '../controls/loading-overlay';
 import { Icon } from '../controls/icon';
 
 export function Phenotypes() {
@@ -23,15 +24,25 @@ export function Phenotypes() {
     breadcrumb,
     currentBubbleData,
     data,
-    displayTreeParent
+    displayTreeParent,
+    categoryColor,
+    selectedPlot,
+    loading
   } = useSelector(state => state.browsePhenotypes);
 
   const plotContainer = useRef(null);
   // const plot = useRef(null);
 
-  const phenotypes = useSelector(state => state.tmp_phenotypes);
+  // const phenotypes = useSelector(state => state.tmp_phenotypes);
+  const phenotypes = useSelector(state => state.phenotypes);
+
 
   const [openSidebar, setOpenSidebar] = useState(true);
+  // const [loading, setLoading] = useState(false);
+
+  const setLoading = loading =>  {
+    dispatch(updateBrowsePhenotypes({ loading }));
+  }
 
   const setMessages = messages => {
     dispatch(updateBrowsePhenotypes({ messages }));
@@ -60,6 +71,10 @@ export function Phenotypes() {
     dispatch(updateBrowsePhenotypes({ displayTreeParent }));
   };
 
+  const setCategoryColor = categoryColor => {
+    dispatch(updateBrowsePhenotypes({ categoryColor}));
+  }
+
   const clearMessages = e => {
     setMessages([]);
   };
@@ -80,8 +95,46 @@ export function Phenotypes() {
     return found;
   };
 
+
+  const getParents = (node, parents = []) => {
+    phenotypes && phenotypes.categories.map((item) => {
+      item.children.map((child) => {
+        if (child.title === node.title && child.id === node.id) {
+          parents.push(item)
+          getParents(item, parents);
+        }
+      })
+    });
+    return parents;
+  }
+
+  const getColor = (node) => {
+    var color = null;
+    if (node.color) {
+      // if node has color already, no need to search for it
+      return node.color;
+    } else {
+      const parents = getParents(node);
+      if (parents && parents.length > 0) {
+        parents.map((item) => {
+          if (item.color) {
+            color = item.color
+          }
+        });
+        return color;
+      } else {
+        return color;
+      }
+    }
+  }
+
+
   const handleChange = (phenotype) => {
     // console.log("handleChange", phenotype);
+
+    const color = getColor(phenotype);
+    setCategoryColor(color);
+
     let phenotypesTreeFull = {
         children: phenotypes.tree
     };
@@ -115,8 +168,24 @@ export function Phenotypes() {
       ]);
     }
 
-    // some action here
-    const data = await query('phenotype', {id: phenotype.id});
+    dispatch(
+      updateBrowsePhenotypes({
+        phenotypeData: null,
+        submitted: false
+      })
+    );
+
+    setLoading(true);
+    const data = await query('phenotype', {
+      id: phenotype.id,
+      type: {
+        'frequency': 'frequency',
+        'distribution': 'distribution',
+        'distribution-inverted': 'distributionInverted',
+        'related-phenotypes': 'related',
+      }[selectedPlot] || 'all'
+    });
+    setLoading(false);
 
     // update browse phenotypes filters
     dispatch(
@@ -144,6 +213,8 @@ export function Phenotypes() {
       currentBubbleData: null,
       displayTreeParent: null,
       phenotypeData: null,
+      categoryColor: null,
+      loading: false
     }));
   }
 
@@ -156,7 +227,7 @@ export function Phenotypes() {
   }, [phenotypes, breadcrumb, currentBubbleData, selectedPhenotype, submitted])
 
   const drawBubbleChart = (data) => {
-    new Plot(plotContainer.current, data, handleSingleClick, handleDoubleClick, handleBackgroundDoubleClick, selectedPhenotype);
+    new Plot(plotContainer.current, data, handleSingleClick, handleDoubleClick, handleBackgroundDoubleClick, selectedPhenotype, categoryColor);
   }
 
   const handleSingleClick = (e) => {
@@ -168,7 +239,6 @@ export function Phenotypes() {
         //leaf
         // console.log("LEAF!", e.data);
         setSelectedPhenotype(e.data);
-        console.log("single click", e);
         setDisplayTreeParent(e);
       }
     } else {
@@ -180,6 +250,8 @@ export function Phenotypes() {
   const handleDoubleClick = (e) => {
     if (e.data.children && e.data.children.length > 0) {
       // parent
+      const color = getColor(e.data);
+      setCategoryColor(color);
       setCurrentBubbleData(e.data.children);
       setBreadcrumb([...breadcrumb, e]);
       setDisplayTreeParent(e);
@@ -193,6 +265,9 @@ export function Phenotypes() {
 
   const handleBackgroundDoubleClick = () => {
     if (breadcrumb.length >= 1) {
+      if (breadcrumb.length === 1) {
+        setCategoryColor(null);
+      }
       setCurrentBubbleData(breadcrumb[breadcrumb.length - 1].parent.data.children);
       setBreadcrumb([...breadcrumb.splice(0, breadcrumb.length -  1)]);
     }
@@ -200,6 +275,9 @@ export function Phenotypes() {
 
   const crumbClick = (item, idx) => {
     // console.log("CRUMB ITEM", item);
+    if (idx === 0) {
+      setCategoryColor(null);
+    }
     let newBreadcrumb = breadcrumb.splice(0, idx);
     setBreadcrumb(newBreadcrumb);
     setCurrentBubbleData(item.parent.data.children);
@@ -230,17 +308,19 @@ export function Phenotypes() {
 
       <MainPanel className="col-lg-9">
         <PhenotypesSearchCriteria />
-        {!submitted &&
-          <>
-            <div
+        {submitted
+          ? <PhenotypesTabs />
+          : <div
               className={
                 phenotypes ?
                 "bg-white border rounded-0 p-3" :
                 "bg-white border rounded-0 p-3 d-flex justify-content-center align-items-center"
               }
               style={{
+                position: 'static',
                 minHeight: '324px'
               }}>
+              <LoadingOverlay active={!phenotypes || loading} />
               <div style={{
                   display: phenotypes ? 'block' : 'none'
                 }}>
@@ -271,25 +351,7 @@ export function Phenotypes() {
                   style={{ minHeight: '50vh' }}
                 />
               </div>
-
-              {
-                !phenotypes &&
-                  <div
-                    style={{
-                      display: !phenotypes ? 'block' : 'none',
-                    }}>
-                    <Spinner animation="border" variant="primary" role="status">
-                      <span className="sr-only">Loading...</span>
-                    </Spinner>
-                  </div>
-              }
-
             </div>
-          </>
-        }
-        {
-          submitted &&
-          <PhenotypesTabs />
         }
       </MainPanel>
     </SidebarContainer>

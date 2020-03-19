@@ -70,16 +70,18 @@ export const VariantLookupSearchCriteria = props => {
                 </Button>
               </span>
               <span>
-                <b>Phenotypes(</b>
+                {/* <b>Phenotypes(</b>
                 {searchCriteriaVariantLookup.phenotypes
                   ? searchCriteriaVariantLookup.phenotypes.length
                   : 0}
-                <b>)</b>:
+                <b>)</b>: */}
+                <b>Phenotypes:</b>
               </span>
             </div>
             <div
               className="col-md-auto ml-1 pl-0"
-              style={{ maxHeight: '300px', overflow: 'auto' }}>
+              // style={{ maxHeight: '300px', overflow: 'none' }}
+              >
               {collapseCriteria && (
                 <>
                   <span>
@@ -130,7 +132,9 @@ export const VariantLookupSearchCriteria = props => {
                 searchCriteriaVariantLookup &&
                 searchCriteriaVariantLookup.phenotypes &&
                 searchCriteriaVariantLookup.phenotypes.map(phenotype => (
-                  <div>{phenotype}</div>
+                  <div title={phenotype}>
+                    {phenotype.length < 50 ? phenotype : phenotype.substring(0, 47) + "..." }
+                  </div>
                 ))}
             </div>
 
@@ -154,7 +158,7 @@ export const VariantLookupSearchCriteria = props => {
             </div>
             <div className="col-md-auto border-left border-secondary">
               <span>
-                <b>Gender</b>:{' '}
+                <b>Sex</b>:{' '}
               </span>
               {searchCriteriaVariantLookup && searchCriteriaVariantLookup.gender
                 ? displayGender(searchCriteriaVariantLookup.gender)
@@ -163,8 +167,16 @@ export const VariantLookupSearchCriteria = props => {
           </div>
 
           <div className="right py-1">
-            <span>Total Results: </span>
+            <b><span>Total Phenotypes: </span></b>
+            {
+              searchCriteriaVariantLookup.phenotypes
+              ? searchCriteriaVariantLookup.phenotypes.length
+              : "None"
+            }
+
+            <b><span className="ml-3">Total Results: </span></b>
             {searchCriteriaVariantLookup && numResults ? numResults : 'None'}
+            
           </div>
         </Tab>
       </Tabs>

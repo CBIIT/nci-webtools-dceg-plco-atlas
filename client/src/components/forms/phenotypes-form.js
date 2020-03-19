@@ -26,7 +26,7 @@ export function PhenotypesForm({
 
   // select store members
   const phenotypes = useSelector(state => state.phenotypes);
-  const { submitted }  = useSelector(state => state.browsePhenotypes);
+  const { submitted, loading }  = useSelector(state => state.browsePhenotypes);
 
   return (
     <>
@@ -50,14 +50,14 @@ export function PhenotypesForm({
             <Tooltip
               style={{display: _phenotype ? 'none' : 'block'}}
               id="submit-summary-results">
-              Please select a phenotype
+              Please select a phenotype.
           </Tooltip>}>
           <span className={`d-inline-block ${!_phenotype && 'c-not-allowed'}`}>
             <Button
               type="submit"
               variant="silver"
               className={!_phenotype && 'pointer-events-none'}
-              disabled={!_phenotype || submitted}
+              disabled={!_phenotype || submitted || loading}
               onClick={e => {
                 e.preventDefault();
                 onSubmit(_phenotype);

@@ -32,7 +32,7 @@ export const TreeSelect = forwardRef(({
   const containsVal = (arr, val) => {
     let result = false;
     for (var i = 0; i < arr.length; i++) {
-      if (arr[i].value === val) {
+      if (arr[i].id === val) {
         result = true;
       }
     }
@@ -42,7 +42,7 @@ export const TreeSelect = forwardRef(({
   const containsAllVals = (arr, vals) => {
     let result = true;
     for (var i = 0; i < vals.length; i++) {
-      if (!containsVal(arr, vals[i].value)) {
+      if (!containsVal(arr, vals[i].id)) {
         result = false;
       }
     }
@@ -51,7 +51,7 @@ export const TreeSelect = forwardRef(({
 
   const removeVal = (arr, val) => {
     for (var i = 0; i < arr.length; i++) {
-      if (arr[i].value === val) {
+      if (arr[i].id === val) {
         arr.splice(i, 1);
       }
     }
@@ -60,7 +60,7 @@ export const TreeSelect = forwardRef(({
 
   const removeAllVals = (arr, vals) => {
     for (var i = 0; i < vals.length; i++) {
-      removeVal(arr, vals[i].value);
+      removeVal(arr, vals[i].id);
     }
     return arr;
   };
@@ -69,8 +69,8 @@ export const TreeSelect = forwardRef(({
     var parents = getParents(displayTreeParent.data);
     parents.push(displayTreeParent.data);
     parents.map((item) => {
-      if (document.getElementsByClassName('collapse-button-text-' + item.value)[0]) {
-        document.getElementsByClassName('collapse-button-text-' + item.value)[0].click();
+      if (document.getElementsByClassName('collapse-button-text-' + item.id)[0]) {
+        document.getElementsByClassName('collapse-button-text-' + item.id)[0].click();
       }
     });
   }
@@ -78,7 +78,7 @@ export const TreeSelect = forwardRef(({
   const getParents = (node, parents = []) => {
     data && data.categories.map((item) => {
       item.children.map((child) => {
-        if (child.title === node.title && child.value === node.value) {
+        if (child.title === node.title && child.id === node.id) {
           parents.push(item)
           getParents(item, parents);
         }
@@ -91,9 +91,9 @@ export const TreeSelect = forwardRef(({
     if (!node.children || node.children.length === 0) {
       allLeafs.push(node);
     } else {
-      if (document.getElementsByClassName('parent-checkbox-' + node.value)[0]) {
+      if (document.getElementsByClassName('parent-checkbox-' + node.id)[0]) {
         document.getElementsByClassName(
-          'parent-checkbox-' + node.value
+          'parent-checkbox-' + node.id
         )[0].checked = true;
       }
       for (var i = 0; i < node.children.length; i++) {
@@ -123,14 +123,14 @@ export const TreeSelect = forwardRef(({
   const toggleExpandAllParents = () => {
     if (!expandAll) {
       for (let i = 0; i < data.categories.length; i++) {
-        const className = 'children-of-' + data.categories[i].value;
+        const className = 'children-of-' + data.categories[i].id;
         if (
           document.getElementsByClassName(className)[0].style.display &&
           document.getElementsByClassName(className)[0].style.display === 'none'
         ) {
           document.getElementsByClassName(className)[0].style.display = 'block';
           const collapseButton = document.getElementsByClassName(
-            'collapse-button-text-' + data.categories[i].value
+            'collapse-button-text-' + data.categories[i].id
           )[0];
           collapseButton.classList.toggle('fa-plus-square', false);
           collapseButton.classList.toggle('fa-minus-square', true);
@@ -139,7 +139,7 @@ export const TreeSelect = forwardRef(({
       setExpandAll(true);
     } else {
       for (let i = 0; i < data.categories.length; i++) {
-        const className = 'children-of-' + data.categories[i].value;
+        const className = 'children-of-' + data.categories[i].id;
         if (
           document.getElementsByClassName(className)[0].style.display &&
           document.getElementsByClassName(className)[0].style.display ===
@@ -147,7 +147,7 @@ export const TreeSelect = forwardRef(({
         ) {
           document.getElementsByClassName(className)[0].style.display = 'none';
           const collapseButton = document.getElementsByClassName(
-            'collapse-button-text-' + data.categories[i].value
+            'collapse-button-text-' + data.categories[i].id
           )[0];
           collapseButton.classList.toggle('fa-plus-square', true);
           collapseButton.classList.toggle('fa-minus-square', false);
@@ -160,7 +160,7 @@ export const TreeSelect = forwardRef(({
   const collapseAllParents = () => {
     if (!data) return;
     for (let i = 0; i < data.categories.length; i++) {
-      const className = 'children-of-' + data.categories[i].value;
+      const className = 'children-of-' + data.categories[i].id;
       if (
         document.getElementsByClassName(className)[0].style.display &&
         document.getElementsByClassName(className)[0].style.display ===
@@ -168,7 +168,7 @@ export const TreeSelect = forwardRef(({
       ) {
         document.getElementsByClassName(className)[0].style.display = 'none';
         const collapseButton = document.getElementsByClassName(
-          'collapse-button-text-' + data.categories[i].value
+          'collapse-button-text-' + data.categories[i].id
         )[0];
         collapseButton.classList.toggle('fa-plus-square', true);
         collapseButton.classList.toggle('fa-minus-square', false);
@@ -218,12 +218,12 @@ export const TreeSelect = forwardRef(({
     if (!singleSelect) {
       // multi-select
       const checkAllLeafsSelectedResult = checkAllChildrenLeafsSelected(
-        itemAllLeafs.map(obj => obj.value),
-        value.map(obj => obj.value)
+        itemAllLeafs.map(obj => obj.id),
+        value.map(obj => obj.id)
       );
       if (checkAllLeafsSelectedResult) {
         let checkbox = document.getElementsByClassName(
-          'parent-checkbox-' + item.value
+          'parent-checkbox-' + item.id
         )[0];
         if (checkbox) {
           checkbox.indeterminate = false;
@@ -231,13 +231,13 @@ export const TreeSelect = forwardRef(({
         return true;
       } else {
         const checkSomeLeafsSelectedResult = checkSomeChildrenLeafsSelected(
-          itemAllLeafs.map(obj => obj.value),
-          value.map(obj => obj.value)
+          itemAllLeafs.map(obj => obj.id),
+          value.map(obj => obj.id)
         );
         if (checkSomeLeafsSelectedResult) {
           // show indeterminate checkbox if some (at least one) leaf is selected
           let checkbox = document.getElementsByClassName(
-            'parent-checkbox-' + item.value
+            'parent-checkbox-' + item.id
           )[0];
           if (checkbox) {
             checkbox.indeterminate = true;
@@ -245,7 +245,7 @@ export const TreeSelect = forwardRef(({
           return true;
         } else {
           let checkbox = document.getElementsByClassName(
-            'parent-checkbox-' + item.value
+            'parent-checkbox-' + item.id
           )[0];
           if (checkbox) {
             checkbox.indeterminate = false;
@@ -257,13 +257,13 @@ export const TreeSelect = forwardRef(({
       // single-select
       if (itemAllLeafs && value) {
         const checkSomeLeafsSelectedResult = checkSomeChildrenLeafsSelected(
-          itemAllLeafs.map(obj => obj.value),
-          [value].map(obj => obj.value)
+          itemAllLeafs.map(obj => obj.id),
+          [value].map(obj => obj.id)
         );
         if (checkSomeLeafsSelectedResult) {
           // show indeterminate checkbox if some (at least one) leaf is selected
           let checkbox = document.getElementsByClassName(
-            'parent-checkbox-' + item.value
+            'parent-checkbox-' + item.id
           )[0];
           if (checkbox) {
             checkbox.indeterminate = true;
@@ -271,7 +271,7 @@ export const TreeSelect = forwardRef(({
           return false;
         } else {
           let checkbox = document.getElementsByClassName(
-            'parent-checkbox-' + item.value
+            'parent-checkbox-' + item.id
           )[0];
           if (checkbox) {
             checkbox.indeterminate = false;
@@ -280,7 +280,7 @@ export const TreeSelect = forwardRef(({
         }
       } else {
         let checkbox = document.getElementsByClassName(
-          'parent-checkbox-' + item.value
+          'parent-checkbox-' + item.id
         )[0];
         if (checkbox) {
           checkbox.indeterminate = false;
@@ -294,8 +294,8 @@ export const TreeSelect = forwardRef(({
     if (singleSelect) {
       onChange([item]);
     } else {
-      const parentCheckboxClassName = 'parent-checkbox-' + item.value;
-      // const leafCheckboxClassName = "leaf-checkbox-" + item.value;
+      const parentCheckboxClassName = 'parent-checkbox-' + item.id;
+      // const leafCheckboxClassName = "leaf-checkbox-" + item.id;
       let values = [...value];
       let newValues = getAllLeafs(item);
       if (containsAllVals(values, newValues)) {
@@ -310,25 +310,25 @@ export const TreeSelect = forwardRef(({
         for (let i = 0; i < newValues.length; i++) {
           if (
             document.getElementsByClassName(
-              'leaf-checkbox-' + newValues[i].value
+              'leaf-checkbox-' + newValues[i].id
             )[0]
           ) {
             document.getElementsByClassName(
-              'leaf-checkbox-' + newValues[i].value
+              'leaf-checkbox-' + newValues[i].id
             )[0].checked = false;
           }
         }
       } else {
         if (
-          document.getElementsByClassName('children-of-' + item.value) &&
-          document.getElementsByClassName('children-of-' + item.value)[0] &&
-          document.getElementsByClassName('children-of-' + item.value)[0].style.display &&
-          document.getElementsByClassName('children-of-' + item.value)[0].style.display === 'none'
+          document.getElementsByClassName('children-of-' + item.id) &&
+          document.getElementsByClassName('children-of-' + item.id)[0] &&
+          document.getElementsByClassName('children-of-' + item.id)[0].style.display &&
+          document.getElementsByClassName('children-of-' + item.id)[0].style.display === 'none'
         ) {
-          toggleHideChildren(item.value);
+          toggleHideChildren(item.id);
         }
         for (let i = 0; i < newValues.length; i++) {
-          if (!containsVal(values, newValues[i].value)) {
+          if (!containsVal(values, newValues[i].id)) {
             // only add if value did not exist before
             values.push(newValues[i]);
             if (document.getElementsByClassName(parentCheckboxClassName)[0]) {
@@ -339,17 +339,17 @@ export const TreeSelect = forwardRef(({
             }
             if (
               document.getElementsByClassName(
-                'leaf-checkbox-' + newValues[i].value
+                'leaf-checkbox-' + newValues[i].id
               )[0]
             ) {
               document.getElementsByClassName(
-                'leaf-checkbox-' + newValues[i].value
+                'leaf-checkbox-' + newValues[i].id
               )[0].checked = true;
             }
           } else {
             // remove if new selected leaf was already selected
             if (newValues.length === 1) {
-              values = removeVal(values, newValues[i].value);
+              values = removeVal(values, newValues[i].id);
             }
           }
         }
@@ -364,17 +364,17 @@ export const TreeSelect = forwardRef(({
       if (item.children && item.children.length > 0) {
         return (
           // PARENT
-          <div key={'categorical-parent-' + item.value}>
+          <div key={'categorical-parent-' + item.id}>
             <li className="my-1" style={{ display: 'block' }}>
               <div className="d-flex align-items-center">
                 <button
                   title={"Show/hide " + item.title + " phenotypes"}
                   style={{ all: 'unset' }}
                   className="collapse-button text-secondary"
-                  onClick={e => toggleHideChildren(item.value)}
+                  onClick={e => toggleHideChildren(item.id)}
                   // disabled={submitted}
                   >
-                  <i className={"fa fa-plus-square collapse-button-text-" + item.value}></i>
+                  <i className={"fa fa-plus-square collapse-button-text-" + item.id}></i>
                 </button>
 
                 <div
@@ -397,8 +397,8 @@ export const TreeSelect = forwardRef(({
                     alignSelf: 'center',
                     cursor: submitted || singleSelect ? 'not-allowed' : 'pointer'
                   }}
-                  className={'parent-checkbox-' + item.value}
-                  name={'parent-checkbox-' + item.value}
+                  className={'parent-checkbox-' + item.id}
+                  name={'parent-checkbox-' + item.id}
                   type="checkbox"
                   // checked={ !singleSelect && value && value.length > 0 && containsAllVals(getAllLeafs(item), value)}
                   checked={checkParents(item)}
@@ -426,7 +426,7 @@ export const TreeSelect = forwardRef(({
                     whiteSpace: 'nowrap',
                     overflow: 'hidden'
                   }}
-                  onClick={e => singleSelect ? toggleHideChildren(item.value) : handleSelect(item)}
+                  onClick={e => singleSelect ? toggleHideChildren(item.id) : handleSelect(item)}
                   // disabled={singleSelect}
                   disabled={submitted}
                   >
@@ -435,7 +435,7 @@ export const TreeSelect = forwardRef(({
               </div>
 
               <ul
-                className={'ml-3 pl-1 children-of-' + item.value}
+                className={'ml-3 pl-1 children-of-' + item.id}
                 style={{ listStyleType: 'none', display: 'none' }}>
                 {selectTreeCategorical(item.children)}
               </ul>
@@ -446,7 +446,7 @@ export const TreeSelect = forwardRef(({
         return (
           // LEAF
           <li
-            key={'categorical-leaf-' + item.value}
+            key={'categorical-leaf-' + item.id}
             style={{
               textOverflow: 'ellipsis',
               whiteSpace: 'nowrap',
@@ -463,14 +463,14 @@ export const TreeSelect = forwardRef(({
             <input
               title={singleSelect ? "Select phenotype" : "Select/deselect phenotype"}
               style={{ cursor: submitted ? 'not-allowed' : 'pointer' }}
-              className={'ml-1 leaf-checkbox-' + item.value}
-              name={'leaf-checkbox-' + item.value}
+              className={'ml-1 leaf-checkbox-' + item.id}
+              name={'leaf-checkbox-' + item.id}
               type="checkbox"
               // type={singleSelect ? 'radio' : 'checkbox'}
               checked={
-                (singleSelect && value && value.value === item.value) ||
+                (singleSelect && value && value.id === item.id) ||
                 (!singleSelect &&
-                  value.map(item => item.value).includes(item.value))
+                  value.map(item => item.id).includes(item.id))
               }
               onChange={e => handleSelect(item)}
               disabled={submitted}
@@ -518,7 +518,7 @@ export const TreeSelect = forwardRef(({
     if (dataAlphabeticalFiltered && dataAlphabeticalFiltered.length > 0) {
       return dataAlphabeticalFiltered.map(item => (
         <div
-          key={'alpha-' + item.value}
+          key={'alpha-' + item.id}
           className="my-1"
           style={{
             textOverflow: 'ellipsis',
@@ -528,13 +528,13 @@ export const TreeSelect = forwardRef(({
           <input
             title="Select phenotype"
             style={{ cursor: 'pointer' }}
-            className={'ml-0 leaf-checkbox-' + item.value}
-            name={'leaf-checkbox-' + item.value}
+            className={'ml-0 leaf-checkbox-' + item.id}
+            name={'leaf-checkbox-' + item.id}
             type="checkbox"
             checked={
-              (singleSelect && value && value.value === item.value) ||
+              (singleSelect && value && value.id === item.id) ||
               (!singleSelect &&
-                value.map(item => item.value).includes(item.value))
+                value.map(item => item.id).includes(item.id))
             }
             onChange={e => handleSelect(item)}
             disabled={submitted}
@@ -592,9 +592,9 @@ export const TreeSelect = forwardRef(({
     if (!data) return;
     let allLeafs = [];
     data.tree.map(item => allLeafs.push(getAllLeafs(item)));
-    allLeafs = allLeafs.flat().map(item => item.value);
+    allLeafs = allLeafs.flat().map(item => item.id);
     for (var i = 0; i < allLeafs.length; i++) {
-      if (value.map(item => item.value).indexOf(allLeafs[i]) === -1)
+      if (value.map(item => item.id).indexOf(allLeafs[i]) === -1)
         return false;
     }
     return true;
@@ -678,7 +678,7 @@ export const TreeSelect = forwardRef(({
                 }
               }}
               type="text"
-              disabled={!data || submitted}
+              disabled={!data}
             />
             <div className="input-group-append">
               {searchInput.length > 0 ? (
