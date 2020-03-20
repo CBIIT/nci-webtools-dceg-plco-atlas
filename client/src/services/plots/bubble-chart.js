@@ -135,7 +135,7 @@ export class BubbleChart {
             .attr("dy", "0em")
             .style("text-anchor", "middle")
             .text(function (d) {
-                if (d.r < 16) {
+                if (d.r < 20) {
                     return ""+ "<br>" + "";
                 } else {
                     return d.data.title + "<br>" + d.data.participant_count;
