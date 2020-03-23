@@ -50,7 +50,7 @@ export function Downloads() {
   }
 
   function generateLink(resource) {
-    return `${downloadRoot}${resource}.txt`;
+    return `${downloadRoot}${resource}.txt.gz`;
   }
 
   function download(url, newWindow) {
@@ -84,11 +84,11 @@ export function Downloads() {
 
           <div>
             <OverlayTrigger overlay={
-              <Tooltip 
-                id="tooltip-disabled" 
+              <Tooltip
+                id="tooltip-disabled"
                 style={{
-                  display: !selectedPhenotypes || selectedPhenotypes.length < 1 || selectedPhenotypes.length > 5 ? 
-                    'block' : 
+                  display: !selectedPhenotypes || selectedPhenotypes.length < 1 || selectedPhenotypes.length > 5 ?
+                    'block' :
                     'none'
                 }}>
                 {
@@ -99,7 +99,7 @@ export function Downloads() {
                   (selectedPhenotypes && selectedPhenotypes.length > 5) &&
                     <>Please select 5 or less phenotypes.</>
                 }
-                
+
               </Tooltip>
             }>
             <span className="d-inline-block">
@@ -137,7 +137,7 @@ export function Downloads() {
       </SidebarPanel>
 
       <MainPanel className="col-lg-9">
-        <div 
+        <div
           className={
             submitted ?
             "bg-white border rounded-0 p-4" :
