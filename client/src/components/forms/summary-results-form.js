@@ -5,19 +5,19 @@ import { TreeSelect } from '../controls/tree-select';
 
 export function SummaryResultsForm({
   phenotype = null,
-  gender = 'all',
+  sex = 'all',
   onSubmit,
   onReset
 }) {
 
   // private members prefixed with _
   const [_phenotype, _setPhenotype] = useState(null);
-  const [_gender, _setGender] = useState('all');
+  const [_sex, _setSex] = useState('all');
   // const submitRef = useRef(null);
 
   // update state when props change
   useEffect(() => _setPhenotype(phenotype), [phenotype]);
-  useEffect(() => _setGender(gender), [gender]);
+  useEffect(() => _setSex(sex), [sex]);
 
   // select store members
   const phenotypes = useSelector(state => state.phenotypes);
@@ -27,7 +27,7 @@ export function SummaryResultsForm({
 
   return (
     <>
-      {/* <pre>{JSON.stringify({_phenotype, _gender}, null, 2)}</pre> */}
+      {/* <pre>{JSON.stringify({_phenotype, _sex}, null, 2)}</pre> */}
       <div className="mb-2">
         <label className="required">Phenotypes</label>
         <TreeSelect
@@ -41,12 +41,12 @@ export function SummaryResultsForm({
       </div>
 
       <div className="mb-3">
-        <label htmlFor="summary-results-gender" className="required">Sex</label>
+        <label htmlFor="summary-results-sex" className="required">Sex</label>
         <select
-          id="summary-results-gender"
+          id="summary-results-sex"
           className="form-control"
-          value={_gender}
-          onChange={e => _setGender(e.target.value)}
+          value={_sex}
+          onChange={e => _setSex(e.target.value)}
           aria-label="Select the type of data you wish to plot"
           disabled={submitted}>
           <option value="all">All</option>
@@ -72,7 +72,7 @@ export function SummaryResultsForm({
               disabled={!_phenotype || submitted}
               onClick={e => {
                 e.preventDefault();
-                onSubmit(_phenotype, _gender);
+                onSubmit(_phenotype, _sex);
               }}>
               Submit
             </Button>
@@ -85,7 +85,7 @@ export function SummaryResultsForm({
           onClick={e => {
             e.preventDefault();
             _setPhenotype(null);
-            _setGender('all');
+            _setSex('all');
             onReset();
             treeRef.current.resetSearchFilter();
           }}>

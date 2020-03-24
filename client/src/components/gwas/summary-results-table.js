@@ -34,7 +34,7 @@ export function SummaryResultsTable() {
     snp,
   } = useSelector(state => state.summaryResults);
 
-  let [gender, setGender] = useState('female');
+  let [sex, setSex] = useState('female');
 
   const defaultSorted = [{
     dataField: 'p',
@@ -98,7 +98,7 @@ export function SummaryResultsTable() {
       fetchSummaryTable(key, {
           offset: limit * (page - 1),
           table: 'variant_' + selectedPhenotype.value,
-          gender: selectedManhattanPlotType == 'stacked' ? gender : selectedManhattanPlotType,
+          sex: selectedManhattanPlotType == 'stacked' ? sex : selectedManhattanPlotType,
           chromosome: selectedChromosome,
           count: shouldCount,
           // key: shouldCount ? null : countKey,
@@ -123,18 +123,18 @@ export function SummaryResultsTable() {
     if (!summarySnpTables.snp) return;
     dispatch(updateSummarySnp('visible', true));
 
-    const genders = {
+    const sexs = {
       all: ['all'],
       stacked: ['female', 'male'],
       female: ['female'],
       male: ['male']
     }[selectedManhattanPlotType];
 
-    genders.forEach(gender => {
-      dispatch(fetchSummarySnpTable(gender, {
+    sexs.forEach(sex => {
+      dispatch(fetchSummarySnpTable(sex, {
         table: 'variant_' + selectedPhenotype.value,
         snp: summarySnpTables.snp,
-        gender: gender,
+        sex: sex,
       }))
     })
   };
@@ -175,13 +175,13 @@ export function SummaryResultsTable() {
           {selectedManhattanPlotType === 'stacked' &&
             <div className="btn-group" role="group">
               <button
-                className={`btn btn-sm ${gender === 'female' ? 'btn-primary btn-primary-gradient active' : 'btn-silver'}`}
-                onClick={e => setGender('female')}>
+                className={`btn btn-sm ${sex === 'female' ? 'btn-primary btn-primary-gradient active' : 'btn-silver'}`}
+                onClick={e => setSex('female')}>
                 Female
               </button>
               <button
-                className={`btn btn-sm ${gender === 'male' ? 'btn-primary btn-primary-gradient active' : 'btn-silver'}`}
-                onClick={e => setGender('male')}>
+                className={`btn btn-sm ${sex === 'male' ? 'btn-primary btn-primary-gradient active' : 'btn-silver'}`}
+                onClick={e => setSex('male')}>
                 Male
               </button>
             </div>}
@@ -214,7 +214,7 @@ export function SummaryResultsTable() {
           <Table {...getVariantTableProps(selectedManhattanPlotType)} />}
 
         {/^stacked$/.test(selectedManhattanPlotType) &&
-          <Table {...getVariantTableProps(gender)} />}
+          <Table {...getVariantTableProps(sex)} />}
       </>}
 
       {summarySnpTables.visible && <>
@@ -227,7 +227,7 @@ export function SummaryResultsTable() {
         {/^stacked$/.test(selectedManhattanPlotType) &&
           <Table
             keyField="variant_id"
-            data={summarySnpTables[gender].results}
+            data={summarySnpTables[sex].results}
             columns={columns} />}
 
       </>}

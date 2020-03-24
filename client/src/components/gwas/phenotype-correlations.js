@@ -20,11 +20,11 @@ export function PhenotypeCorrelations() {
   const phenotypeCorrelations = useSelector(
     state => state.phenotypeCorrelations
   );
-  const { 
-    selectedPhenotypes, 
-    selectedGender, 
-    submitted, 
-    messages 
+  const {
+    selectedPhenotypes,
+    selectedSex,
+    submitted,
+    messages
   } = phenotypeCorrelations;
 
   const tooltipRef = useRef();
@@ -76,7 +76,7 @@ export function PhenotypeCorrelations() {
       phenotypes: selectedPhenotypes.map(item =>
         item.title ? item.title : item.label
       ),
-      gender: selectedGender,
+      sex: selectedSex,
       totalPhenotypes: selectedPhenotypes.length
     });
 
@@ -92,7 +92,7 @@ export function PhenotypeCorrelations() {
       updatePhenotypeCorrelations({
         selectedListType: 'categorical',
         selectedPhenotypes: [],
-        selectedGender: 'combined',
+        selectedSex: 'combined',
         heatmapData: null,
         heatmapLayout: {},
         submitted: null,
@@ -130,7 +130,7 @@ export function PhenotypeCorrelations() {
 
         <MainPanel className="col-lg-9">
           <PhenotypeCorrelationsSearchCriteria />
-          <Tabs 
+          <Tabs
             transition={false}
             defaultActiveKey="phenotype-correlations">
             <Tab

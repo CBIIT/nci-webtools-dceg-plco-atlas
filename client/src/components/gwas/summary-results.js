@@ -72,7 +72,7 @@ export function SummaryResults() {
   // plotType is all, stacked, female, or male
   const fetchVariantTables = (phenotype, plotType, params) => {
     params = params || {};
-    let genders = {
+    let sexs = {
       all: ['all'],
       stacked: ['female', 'male'],
       female: ['female'],
@@ -80,14 +80,14 @@ export function SummaryResults() {
     }[plotType];
 
     // fetch variant results tables
-    genders.forEach((gender, i) => {
-      let key = gender;
+    sexs.forEach((sex, i) => {
+      let key = sex;
 
       dispatch(
-        fetchSummaryTable(gender, {
+        fetchSummaryTable(sex, {
           ...params,
           table: 'variant_' + phenotype,
-          gender: gender,
+          sex: sex,
           offset: 0,
           limit: 10,
           columns: ['chromosome', 'position', 'snp', 'allele_reference', 'allele_alternate', 'odds_ratio', 'p_value'],
@@ -103,7 +103,7 @@ export function SummaryResults() {
 
   // when submitting:
   // 1. Fetch aggregate data for displaying manhattan plot(s)
-  // 2. Fetch variant data for each selected gender
+  // 2. Fetch variant data for each selected sex
   const handleSubmit = (phenotype, manhattanPlotType) => {
     if (!phenotype) {
       return setMessages([
@@ -113,7 +113,7 @@ export function SummaryResults() {
         }
       ]);
     }
-    let genders = {
+    let sexs = {
       all: ['all'],
       stacked: ['female', 'male'],
       female: ['female'],
@@ -150,7 +150,7 @@ export function SummaryResults() {
     dispatch(
       drawManhattanPlot('summary', {
         table: 'aggregate_' + phenotype.value,
-        gender: genders,
+        sex: sexs,
         p_value_nlog_min: 3,
       })
     );
@@ -164,7 +164,7 @@ export function SummaryResults() {
 
     setSearchCriteriaSummaryResults({
       phenotype: [...phenotype.title],
-      gender: manhattanPlotType
+      sex: manhattanPlotType
     });
     // if any Q-Q plot tooltips exist, destory
     hideQQTooltips();
@@ -229,7 +229,7 @@ export function SummaryResults() {
   const onChromosomeSelected = chromosome => {
     const database = selectedPhenotype.value + '.db';
     const range = ranges.find(r => r.chromosome === chromosome);
-    const genders = {
+    const sexs = {
       all: ['all'],
       stacked: ['female', 'male'],
       female: ['female'],
@@ -253,7 +253,7 @@ export function SummaryResults() {
     dispatch(
       drawManhattanPlot('variants', {
         table: 'variant_' + selectedPhenotype.value,
-        gender: genders,
+        sex: sexs,
         chromosome: chromosome,
         position_min: range.position_min,
         position_max: range.position_max,
@@ -301,22 +301,22 @@ export function SummaryResults() {
     );
   };
 
-  const handleVariantLookup = ({ snp }, gender) => {
-    const genderSanitized = gender ? (gender.includes('Male') ? 'male' : 'female') : selectedManhattanPlotType === 'male' || selectedManhattanPlotType === 'female' ? selectedManhattanPlotType : 'all';
-    console.log("genderSanitized", genderSanitized);
+  const handleVariantLookup = ({ snp }, sex) => {
+    const sexSanitized = sex ? (sex.includes('Male') ? 'male' : 'female') : selectedManhattanPlotType === 'male' || selectedManhattanPlotType === 'female' ? selectedManhattanPlotType : 'all';
+    console.log("sexSanitized", sexSanitized);
     dispatch(
       updateVariantLookup({
         selectedPhenotypes: [selectedPhenotype],
         selectedVariant: snp,
-        selectedGender: genderSanitized,
+        selectedSex: sexSanitized,
         searchCriteriaVariantLookup: {
           phenotypes: [selectedPhenotype].map(item => item.title),
           variant: snp,
-          gender: genderSanitized
+          sex: sexSanitized
         }
       })
     );
-    dispatch(lookupVariants([selectedPhenotype], snp, genderSanitized));
+    dispatch(lookupVariants([selectedPhenotype], snp, sexSanitized));
   };
 
   const placeholder = (
@@ -339,7 +339,7 @@ export function SummaryResults() {
           <div className="px-2 pt-2 pb-3 bg-white border rounded-0">
             <SummaryResultsForm
               phenotype={selectedPhenotype}
-              gender={selectedManhattanPlotType}
+              sex={selectedManhattanPlotType}
               onSubmit={handleSubmit}
               onReset={handleReset}
             />

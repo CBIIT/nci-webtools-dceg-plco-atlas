@@ -15,7 +15,7 @@ export function QQPlot({ onVariantLookup }) {
   } = useSelector(state => state.summaryResults);
 
   const [selectedVariant, setSelectedVariant] = useState(null);
-  const [selectedGender, setSelectedGender] = useState(null);
+  const [selectedSex, setSelectedSex] = useState(null);
 
 
   const config = {
@@ -101,7 +101,7 @@ export function QQPlot({ onVariantLookup }) {
   function getHTML(tooltipData) {
     if (tooltipData.display) {
       setSelectedVariant(tooltipData);
-      setSelectedGender(tooltipData.gender);
+      setSelectedSex(tooltipData.sex);
       return h('div', { className: '' }, [
         h('div', null, [
           h('b', null, 'position: '),
@@ -163,7 +163,7 @@ export function QQPlot({ onVariantLookup }) {
       if (points[0]["data"]["hoverinfo"] === "text") {
         tooltipData = {
           ...points[0].text,
-          gender: points[0].data.name,
+          sex: points[0].data.name,
           display: true
         };
       } else {
@@ -194,8 +194,8 @@ export function QQPlot({ onVariantLookup }) {
               className="qq-plot"
               style={{
                 display: !loadingQQPlot ? 'block' : 'none',
-                position: 'relative', 
-                height: '800px', 
+                position: 'relative',
+                height: '800px',
                 width: '800px'
               }}
               data={qqplotData}
@@ -216,7 +216,7 @@ export function QQPlot({ onVariantLookup }) {
               style={{ display: 'none' }}
               href="#/gwas/lookup"
               onClick={e => {
-                onVariantLookup && onVariantLookup(selectedVariant, selectedGender);
+                onVariantLookup && onVariantLookup(selectedVariant, selectedSex);
               }}>
               Go to Variant Lookup
             </a>

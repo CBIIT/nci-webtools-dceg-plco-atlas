@@ -57,7 +57,7 @@ export const PhenotypesSearchCriteria = () => {
             </div> */}
 
             <p className="h5 my-1">
-              {phenotypeData && phenotypeData.display_name || ''}
+              {phenotypeData && phenotypeData.displayName || ''}
 
               <span className="text-muted ml-3" style={{fontSize: '13px'}}>
                 {phenotypeData && phenotypeData.description || ''}

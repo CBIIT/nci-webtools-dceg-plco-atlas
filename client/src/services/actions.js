@@ -164,7 +164,7 @@ export function fetchSummaryTable(tableKey, params, existingResults) {
       console.log(tableKey, params)
       let metadata = await query('metadata', {
         phenotype_name: params.phenotype,
-        gender: params.gender,
+        sex: params.sex,
         chromosome: params.chromosome || 'all'
       })
       response.count = metadata.count;
@@ -213,16 +213,16 @@ export function drawManhattanPlot(plotType, params) {
   console.log('drawing plot', plotType, params);
   return async function(dispatch) {
     dispatch(updateSummaryResults({ loadingManhattanPlot: true }));
-    if (params.gender.length === 2) {
+    if (params.sex.length === 2) {
       // if 2 tables are provided, this is a mirrored plot
       const manhattanPlotData = await rawQuery(plotType, {
         ...params,
-        gender: params.gender[0]
+        sex: params.sex[0]
       });
 
       const manhattanPlotMirroredData = await rawQuery(plotType, {
         ...params,
-        gender: params.gender[1]
+        sex: params.sex[1]
       });
 
       dispatch(
@@ -245,10 +245,10 @@ export function drawManhattanPlot(plotType, params) {
   };
 }
 
-export function drawQQPlot(phenotype, gender) {
+export function drawQQPlot(phenotype, sex) {
   return async function(dispatch) {
     console.log('drawQQPlot', phenotype);
-    console.log('gender', gender); // all, stacked, female, male
+    console.log('sex', sex); // all, stacked, female, male
 
     const setQQPlotLoading = loadingQQPlot => {
       dispatch(updateSummaryResults({ loadingQQPlot }));
@@ -269,10 +269,10 @@ export function drawQQPlot(phenotype, gender) {
 
     const table = 'variant_' + phenotype.value;
 
-    if (gender !== 'stacked') {
+    if (sex !== 'stacked') {
       const metadata = await query('metadata', {
         phenotype_id: phenotype.id,
-        gender: gender,
+        sex: sex,
         chromosome: 'all'
       });
       console.log("metadata", metadata);
@@ -282,7 +282,7 @@ export function drawQQPlot(phenotype, gender) {
 
       const topVariantData = await query('variants', {
         table,
-        gender,
+        sex,
         columns: ['chromosome', 'position', 'snp', 'p_value', 'p_value_nlog', 'p_value_nlog_expected'],
         p_value_nlog_min: 3.0,
         // orderBy: 'p_value_nlog',
@@ -308,7 +308,7 @@ export function drawQQPlot(phenotype, gender) {
 
       const subsetVariantData = await query('variants', {
         table,
-        gender,
+        sex,
         columns: ['p_value_nlog', 'p_value_nlog_expected'],
         p_value_nlog_max: 3.0,
         // orderBy: 'p_value_nlog',
@@ -328,7 +328,7 @@ export function drawQQPlot(phenotype, gender) {
         all: '#F2990D',
         female: '#f41c52',
         male: '#006bb8'
-      }[gender];
+      }[sex];
 
       let qqplotTopData = {
         x: topExpectedVariants,
@@ -448,24 +448,24 @@ export function drawQQPlot(phenotype, gender) {
     else {
       const metadata_female = await query('metadata', {
         phenotype_id: phenotype.id,
-        gender: 'female',
+        sex: 'female',
         chromosome: 'all'
       });
       const metadata_male = await query('metadata', {
         phenotype_id: phenotype.id,
-        gender: 'male',
+        sex: 'male',
         chromosome: 'all'
       });
       const metadata_count_female = metadata_female.count;
       const metadata_count_male = metadata_male.count;
-      // set sampleSize to whichever gender has more variants
+      // set sampleSize to whichever sex has more variants
       setSampleSize(Math.max(metadata_count_female, metadata_count_male));
       const metadata_lambdaGC_female = metadata_female.lambda_gc;
       const metadata_lambdaGC_male = metadata_male.lambda_gc;
 
       const topVariantDataFemale = await query('variants', {
         table,
-        gender: 'female',
+        sex: 'female',
         columns: ['chromosome', 'position', 'snp', 'p_value', 'p_value_nlog', 'p_value_nlog_expected'],
         p_value_nlog_min: 3.0,
         orderBy: 'p_value_nlog',
@@ -494,7 +494,7 @@ export function drawQQPlot(phenotype, gender) {
 
       const subsetVariantDataFemale = await query('variants', {
         table,
-        gender: 'female',
+        sex: 'female',
         columns: ['p_value_nlog', 'p_value_nlog_expected'],
         p_value_nlog_max: 3.0,
         orderBy: 'p_value_nlog',
@@ -515,7 +515,7 @@ export function drawQQPlot(phenotype, gender) {
 
       const topVariantDataMale = await query('variants', {
         table,
-        gender: 'male',
+        sex: 'male',
         columns: ['chromosome', 'position', 'snp', 'p_value', 'p_value_nlog', 'p_value_nlog_expected'],
         p_value_nlog_min: 3.0,
         orderBy: 'p_value_nlog',
@@ -544,7 +544,7 @@ export function drawQQPlot(phenotype, gender) {
 
       const subsetVariantDataMale = await query('variants', {
         table,
-        gender: 'male',
+        sex: 'male',
         columns: ['p_value_nlog', 'p_value_nlog_expected'],
         p_value_nlog_max: 3.0,
         orderBy: 'p_value_nlog',
@@ -892,7 +892,7 @@ export function drawHeatmap(phenotypes) {
   };
 }
 
-export function lookupVariants(phenotypes, variant, gender) {
+export function lookupVariants(phenotypes, variant, sex) {
   return async function(dispatch) {
     dispatch(
       updateVariantLookup({
@@ -901,13 +901,13 @@ export function lookupVariants(phenotypes, variant, gender) {
       })
     );
 
-    const genderSanitized = {
+    const sexSanitized = {
       all: 'all',
       combined: 'all',
       female: 'female',
       male: 'male',
       undefined: 'alll'
-    }[gender];
+    }[sex];
 
     var tableList = [];
     var tableListNull = [];
@@ -923,7 +923,7 @@ export function lookupVariants(phenotypes, variant, gender) {
     const tables = phenotypes.map(phenotype => 'variant_' + phenotype.value).join(',');
     var allData = await query('variants', {
       table: tables,
-      gender: genderSanitized,
+      sex: sexSanitized,
       snp: chr && bp ? null : variant,
       chromosome: chr ? chr : null,
       position: bp ? bp : null,
@@ -949,7 +949,7 @@ export function lookupVariants(phenotypes, variant, gender) {
           odds_ratio: '-',
           p_value: '-',
           variant_id: 'not-found-' + phenotypes[i].title ? phenotypes[i].title : phenotypes[i].label,
-          gender: gender,
+          sex: sex,
           variant
         });
       } else {
@@ -957,7 +957,7 @@ export function lookupVariants(phenotypes, variant, gender) {
           data[j]['phenotype'] = phenotypes[i].title
             ? phenotypes[i].title
             : phenotypes[i].label;
-          data[j]['gender'] = gender;
+          data[j]['sex'] = sex;
           data[j]['variant'] = variant;
           tableList.push(data[j]);
         }

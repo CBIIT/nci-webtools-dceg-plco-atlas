@@ -93,7 +93,7 @@ export const getInitialState = () => ({
     selectedPhenotype: null,
     selectedPhenotypes: [],
     selectedVariant: '',
-    selectedGender: 'combined',
+    selectedSex: 'combined',
     results: null,
     messages: [],
     submitted: null,
@@ -104,7 +104,7 @@ export const getInitialState = () => ({
   phenotypeCorrelations: {
     selectedListType: 'categorical',
     selectedPhenotypes: [],
-    selectedGender: 'combined',
+    selectedSex: 'combined',
     heatmapData: null,
     heatmapLayout: {},
     submitted: null,

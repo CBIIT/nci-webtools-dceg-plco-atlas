@@ -7,19 +7,19 @@ export const SummaryResultsSearchCriteria = () => {
     state => state.summaryResults
   );
 
-  const displayGender = gender =>
+  const displaySex = sex =>
     ({
       all: 'All',
       stacked: 'Female/Male (Stacked)',
       female: 'Female',
       male: 'Male'
-    }[gender]);
+    }[sex]);
 
   return (
     <div className="mb-2">
-      <Tabs 
+      <Tabs
         transition={false}
-        className="" 
+        className=""
         defaultActiveKey="summary-results-search-criteria">
         <Tab
           eventKey="summary-results-search-criteria"
@@ -38,8 +38,8 @@ export const SummaryResultsSearchCriteria = () => {
               <span>
                 <b>Sex</b>:{' '}
               </span>
-              {searchCriteriaSummaryResults && searchCriteriaSummaryResults.gender
-                ? displayGender(searchCriteriaSummaryResults.gender)
+              {searchCriteriaSummaryResults && searchCriteriaSummaryResults.sex
+                ? displaySex(searchCriteriaSummaryResults.sex)
                 : 'None'}
             </div>
           </div>

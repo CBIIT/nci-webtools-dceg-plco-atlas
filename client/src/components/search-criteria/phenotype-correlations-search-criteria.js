@@ -5,7 +5,7 @@ import { Tab, Tabs, Button } from 'react-bootstrap';
 
 export const PhenotypeCorrelationsSearchCriteria = props => {
   const dispatch = useDispatch();
-  const { 
+  const {
     searchCriteriaPhenotypeCorrelations,
     collapseCriteria
   } = useSelector(state => state.phenotypeCorrelations);
@@ -30,20 +30,20 @@ export const PhenotypeCorrelationsSearchCriteria = props => {
     }
   };
 
-  const displayGender = gender =>
+  const displaySex = sex =>
     ({
       all: 'All',
       combined: 'All',
       stacked: 'Female/Male (Stacked)',
       female: 'Female',
       male: 'Male'
-    }[gender]);
+    }[sex]);
 
   return (
     <div className="mb-2">
-      <Tabs 
+      <Tabs
         transition={false}
-        className="" 
+        className=""
         defaultActiveKey="search-criteria">
         <Tab
           eventKey="search-criteria"
@@ -144,8 +144,8 @@ export const PhenotypeCorrelationsSearchCriteria = props => {
                 <b>Sex</b>:{' '}
               </span>
               {searchCriteriaPhenotypeCorrelations &&
-              searchCriteriaPhenotypeCorrelations.gender
-                ? displayGender(searchCriteriaPhenotypeCorrelations.gender)
+              searchCriteriaPhenotypeCorrelations.sex
+                ? displaySex(searchCriteriaPhenotypeCorrelations.sex)
                 : 'None'}
             </div>
           </div>

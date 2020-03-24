@@ -30,7 +30,7 @@ export function PhenotypesForm({
 
   return (
     <>
-      {/* <pre>{JSON.stringify({_phenotype, _gender}, null, 2)}</pre> */}
+      {/* <pre>{JSON.stringify({_phenotype, _sex}, null, 2)}</pre> */}
       <div className="mb-2">
         <label className="required">Phenotypes</label>
         <TreeSelect
