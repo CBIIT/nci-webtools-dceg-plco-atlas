@@ -1,6 +1,7 @@
 START TRANSACTION;
 
-FLUSH TABLES;
+-- if this script hangs, we should flush all tables
+-- FLUSH TABLES;
 
 -- needed if local_infile is disabled, need root privileges
 -- SET GLOBAL local_infile = 'ON';
@@ -10,31 +11,22 @@ SET autocommit = 0;
 -- recreate tables
 DROP TABLE IF EXISTS participant_data_stage;
 DROP TABLE IF EXISTS participant_data;
-DROP TABLE IF EXISTS participant_data_category;
 DROP TABLE IF EXISTS participant;
 
-CREATE TABLE `participant` (
+CREATE TABLE IF NOT EXISTS `participant` (
     `id`            INTEGER PRIMARY KEY NOT NULL AUTO_INCREMENT,
     `age`           INTEGER,
-    `gender`        ENUM('male', 'female'),
+    `sex`           ENUM('female', 'male'),
     `ancestry`      ENUM('white', 'black', 'hispanic', 'asian', 'pacific_islander', 'american_indian')
 );
 
-CREATE TABLE `participant_data` (
+CREATE TABLE IF NOT EXISTS `participant_data` (
     `id`                BIGINT PRIMARY KEY NOT NULL AUTO_INCREMENT,
     `phenotype_id`      INTEGER NOT NULL,
     `participant_id`    INTEGER,
     `value`             DOUBLE,
     FOREIGN KEY (phenotype_id) REFERENCES phenotype(id),
     FOREIGN KEY (participant_id) REFERENCES participant(id)
-);
-
-CREATE TABLE `participant_data_category` (
-    `id`                    INTEGER PRIMARY KEY NOT NULL AUTO_INCREMENT,
-    `phenotype_id`          INTEGER NOT NULL,
-    `value`                 INTEGER,
-    `label`                 TEXT,
-    FOREIGN KEY (phenotype_id) REFERENCES phenotype(id)
 );
 
 CREATE TABLE `participant_data_stage` (
@@ -1416,7 +1408,7 @@ LOAD DATA LOCAL INFILE "D:/Development/Work/nci-webtools-dceg-plco-atlas/databas
         has_nonadvanced_adenoma = IF(@has_nonadvanced_adenoma IN('NA', ''), NULL, @has_nonadvanced_adenoma);
 
 -- import phenotype_sample values
-INSERT INTO participant (id, age, ancestry, gender)
+INSERT INTO participant (id, age, ancestry, sex)
 SELECT
     id,
     bq_age_co as age,
@@ -1433,7 +1425,7 @@ SELECT
       WHEN 1 THEN 'male'
       WHEN 2 THEN 'female'
       ELSE NULL
-    END AS gender
+    END AS sex
 FROM participant_data_stage;
 
 -- import participant_data values

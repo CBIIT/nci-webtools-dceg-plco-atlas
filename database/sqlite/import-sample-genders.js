@@ -92,7 +92,7 @@ assert.deepStrictEqual(firstLineEWING, headersEWING, `Headers do not match expec
 // create variant_stage (temp), variant, variant_summary, and variant_lookup
 const db = new sqlite(databaseFilePath);
 
-// db.exec(readFile('schema-sample-genders.sql'));
+// db.exec(readFile('schema-sample-sexs.sql'));
 
 
 
@@ -152,7 +152,7 @@ const db = new sqlite(databaseFilePath);
 //         let chr_strip = params.chr.toString();
 //         params.chr = +chr_strip.replace(/chr/i, "");
 //     }
-    
+
 //     // group base pairs
 //     params.bp_1000kb = groupFunc(params.loc, 10**6);
 
@@ -205,7 +205,7 @@ const db = new sqlite(databaseFilePath);
 
 //     // create indexes
 //     // console.log(`[${duration()} s] Indexing...`);
-//     // db.exec(readFile('indexes-sample-genders.sql'));
+//     // db.exec(readFile('indexes-sample-sexs.sql'));
 
 //     // close database
 //     console.log(`[${duration()} s] Finalizing database...`);
@@ -317,7 +317,7 @@ const db = new sqlite(databaseFilePath);
 
 //     // create indexes
 //     // console.log(`[${duration()} s] Indexing...`);
-//     // db.exec(readFile('indexes-sample-genders.sql'));
+//     // db.exec(readFile('indexes-sample-sexs.sql'));
 
 //     // close database
 //     console.log(`[${duration()} s] Finalizing database...`);
@@ -423,7 +423,7 @@ const db = new sqlite(databaseFilePath);
 
 //     // create indexes
 //     // console.log(`[${duration()} s] Indexing...`);
-//     // db.exec(readFile('indexes-sample-genders.sql'));
+//     // db.exec(readFile('indexes-sample-sexs.sql'));
 
 //     // close database
 //     console.log(`[${duration()} s] Finalizing database...`);
@@ -436,12 +436,12 @@ const db = new sqlite(databaseFilePath);
 
 // create indexes
 // console.log(`[${duration()} s] Indexing...`);
-// db.exec(readFile('indexes-sample-genders.sql'));
+// db.exec(readFile('indexes-sample-sexs.sql'));
 
 // rename all tables
 db.exec(`
     ALTER TABLE 'variant_MEL' RENAME TO 'variant_all';
-    ALTER TABLE 'aggregate_MEL' RENAME TO 'aggregate_all';   
+    ALTER TABLE 'aggregate_MEL' RENAME TO 'aggregate_all';
     ALTER TABLE 'variant_EWING' RENAME TO 'variant_female';
     ALTER TABLE 'aggregate_EWING' RENAME TO 'aggregate_female';
     ALTER TABLE 'variant_RCC' RENAME TO 'variant_male';

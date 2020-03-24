@@ -1,29 +1,29 @@
-CREATE TABLE `phenotype` (
+CREATE TABLE IF NOT EXISTS `phenotype` (
     `id`                    INTEGER PRIMARY KEY NOT NULL AUTO_INCREMENT,
     `parent_id`             INTEGER NULL,
-    `name`                  VARCHAR(200) NOT NULL,
-    `display_name`          VARCHAR(200) NOT NULL,
+    `name`                  VARCHAR(200),
+    `display_name`          VARCHAR(200),
     `description`           MEDIUMTEXT,
-    `color`                 VARCHAR(40) NULL,
-    `type`                  ENUM('binary', 'categorical', 'continuous'),
+    `color`                 VARCHAR(40),
+    `type`                  ENUM('binary', 'categorical', 'continuous') NULL,
     `participant_count`     BIGINT,
     `import_count`          BIGINT,
-    `import_date`          DATETIME,
+    `import_date`           DATETIME,
     FOREIGN KEY (parent_id) REFERENCES phenotype(id)
 );
 
-CREATE TABLE `phenotype_metadata` (
+CREATE TABLE IF NOT EXISTS `phenotype_metadata` (
     `id`            INTEGER PRIMARY KEY NOT NULL AUTO_INCREMENT,
     `phenotype_id`  INTEGER,
-    `gender`        ENUM('all', 'female', 'male'),
-    `chromosome`    ENUM('1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', 'X', 'Y') NOT NULL,
+    `sex`           ENUM('all', 'female', 'male'),
+    `chromosome`    ENUM('all', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', 'X', 'Y'),
     `lambda_gc`     DOUBLE,
     `count`         BIGINT,
     FOREIGN KEY (phenotype_id) REFERENCES phenotype(id),
-    UNIQUE KEY (`phenotype_id`, `gender`, `chromosome`)
+    UNIQUE KEY (`phenotype_id`, `sex`, `chromosome`)
 );
 
-CREATE TABLE `phenotype_correlation` (
+CREATE TABLE IF NOT EXISTS `phenotype_correlation` (
     `id`            INTEGER PRIMARY KEY NOT NULL AUTO_INCREMENT,
     `phenotype_a`   INTEGER NOT NULL,
     `phenotype_b`   INTEGER NOT NULL,
@@ -32,14 +32,14 @@ CREATE TABLE `phenotype_correlation` (
     FOREIGN KEY (phenotype_b) REFERENCES phenotype(id)
 );
 
-CREATE TABLE `participant` (
+CREATE TABLE IF NOT EXISTS `participant` (
     `id`            INTEGER PRIMARY KEY NOT NULL AUTO_INCREMENT,
     `age`           INTEGER,
-    `gender`        ENUM('male', 'female'),
+    `sex`           ENUM('female', 'male'),
     `ancestry`      ENUM('white', 'black', 'hispanic', 'asian', 'pacific_islander', 'american_indian')
 );
 
-CREATE TABLE `participant_data` (
+CREATE TABLE IF NOT EXISTS `participant_data` (
     `id`                BIGINT PRIMARY KEY NOT NULL AUTO_INCREMENT,
     `phenotype_id`      INTEGER NOT NULL,
     `participant_id`    INTEGER,
@@ -48,15 +48,17 @@ CREATE TABLE `participant_data` (
     FOREIGN KEY (participant_id) REFERENCES participant(id)
 );
 
-CREATE TABLE `participant_data_category` (
+CREATE TABLE IF NOT EXISTS `participant_data_category` (
     `id`                    INTEGER PRIMARY KEY NOT NULL AUTO_INCREMENT,
     `phenotype_id`          INTEGER NOT NULL,
     `value`                 INTEGER,
-    `label`                 TEXT
+    `label`                 TEXT,
+    `display_distribution`  BOOLEAN,
+    `order`                 INTEGER,
     FOREIGN KEY (phenotype_id) REFERENCES phenotype(id)
 );
 
-CREATE TABLE `chromosome_range` (
+CREATE TABLE IF NOT EXISTS `chromosome_range` (
     `id`                    INTEGER PRIMARY KEY NOT NULL AUTO_INCREMENT,
     `chromosome`            ENUM('1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', 'X', 'Y') NOT NULL,
     `position_min`          BIGINT NOT NULL,
@@ -65,7 +67,7 @@ CREATE TABLE `chromosome_range` (
     `position_abs_max`      BIGINT NOT NULL
 );
 
-CREATE TABLE `gene` (
+CREATE TABLE IF NOT EXISTS `gene` (
     `id`                    INTEGER PRIMARY KEY NOT NULL AUTO_INCREMENT,
     `name`                  VARCHAR(200) NOT NULL,
     `chromosome`            ENUM('1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', 'X', 'Y') NOT NULL,

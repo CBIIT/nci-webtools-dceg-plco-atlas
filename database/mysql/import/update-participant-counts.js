@@ -58,8 +58,7 @@ async function updateCounts() {
     });
 
     for (let p of phenotypes) {
-
-        console.log(`[${duration()} s] ${p.name} (${p.display_name}): ${p.child_ids.length} child node(s)`);
+        console.log(`[${duration()} s] ${p.name} (${p.display_name}): Counting child node(s)`);
 
         let tableName = `participant_id`;
         await connection.query(`

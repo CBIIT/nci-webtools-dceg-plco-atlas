@@ -1,17 +1,50 @@
-TRUNCATE phenotype_category;
-ALTER TABLE phenotype_category AUTO_INCREMENT = 1;
+START TRANSACTION;
 
-INSERT INTO participant_data_category (`phenotype_id`, `value`, `label`) VALUES
-    -- height when sitting
-    (196, 1, 'Especially Tall'),
-    (196, 2, 'Somewhat Tall'),
-    (196, 3, 'Typical'),
-    (196, 4, 'Somewhat Short'),
-    (196, 5, 'Especially Short'),
+FLUSH TABLES;
 
-    -- waist hip comparison
-    (14, 1, 'Waist much Smaller than Hips'),
-    (14, 2, 'Waist Somewhat Smaller than Hips'),
-    (14, 3, 'Waist Similar to Hips'),
-    (14, 4, 'Waist Somewhat Larger than Hips'),
-    (14, 5, 'Waist much Larger than Hips');
+-- needed if local_infile is disabled, need root privileges
+-- SET GLOBAL local_infile = 'ON';
+
+SET autocommit = 0;
+
+
+DROP TABLE IF EXISTS participant_data_category;
+DROP TABLE IF EXISTS participant_data_category_stage;
+
+CREATE TABLE participant_data_category_stage (
+    `id`                    TEXT,
+    `phenotype_id`          TEXT,
+    `phenotype_name`        TEXT,
+    `value`                 TEXT,
+    `label`                 TEXT,
+    `display_distribution`  TEXT,
+    `order`                 TEXT
+);
+
+CREATE TABLE participant_data_category (
+    `id`                    INTEGER PRIMARY KEY NOT NULL AUTO_INCREMENT,
+    `phenotype_id`          INTEGER NOT NULL,
+    `value`                 INTEGER,
+    `label`                 TEXT,
+    `display_distribution`  BOOLEAN,
+    `order`                 INTEGER,
+    FOREIGN KEY (phenotype_id) REFERENCES phenotype(id)
+);
+
+-- D:/Development/Work/nci-webtools-dceg-plco-atlas/database/mysql/import/raw/participant_data_category.csv
+LOAD DATA LOCAL INFILE "D:/Development/Work/nci-webtools-dceg-plco-atlas/database/mysql/import/raw/participant_data_category.csv" INTO TABLE participant_data_category_stage
+    FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"'
+    IGNORE 1 ROWS (phenotype_name, value, label, display_distribution);
+
+INSERT INTO participant_data_category (`phenotype_id`, `value`, `label`, `display_distribution`, `order`)
+SELECT
+       p.id,
+       stage.value,
+       stage.label,
+       IF(stage.display_distribution REGEXP 'TRUE', 1, 0),
+       stage.order
+FROM participant_data_category_stage stage
+INNER JOIN phenotype p ON p.name = stage.phenotype_name
+ORDER BY p.id, stage.value;
+
+COMMIT;

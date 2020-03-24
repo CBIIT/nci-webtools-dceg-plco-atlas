@@ -15,16 +15,16 @@ lambdagc_mel|0.83
  */
 
 // display help if needed
-if (!(args.phenotype && args.gender)) {
+if (!(args.phenotype && args.sex)) {
     console.log(`USAGE: node import-variants.js
-            --file "filename"
             --phenotype "phenotype name or id"
-            --gender "all" | "female" | "male"`);
+            --sex "all" | "female" | "male"
+            --lambdagc`);
     process.exit(0);
 }
 
 // parse arguments and set defaults
-const { phenotype, gender } = args;
+const { phenotype, sex } = args;
 //const errorLog = getLogStream(`./failed-variants-${new Date().toISOString()}.txt`);
 const errorLog = {write: e => console.log(e)};
 const duration = timestamp();
@@ -38,9 +38,9 @@ const connection = mysql.createConnection({
     // debug: true,
   }).promise();
 
-// gender should be male, female, or all
-if (!/^(all|female|male)$/.test(gender)) {
-    console.error(`ERROR: Gender must be all, female, or male`);
+// sex should be male, female, or all
+if (!/^(all|female|male)$/.test(sex)) {
+    console.error(`ERROR: Sex must be all, female, or male`);
     process.exit(1);
 }
 
@@ -72,25 +72,25 @@ async function importVariants() {
 
     console.log(`[${duration()} s] Storing lambdaGC and counts...`);
     await connection.execute(`
-        INSERT INTO phenotype_metadata (phenotype_id, gender, chromosome, count)
+        INSERT INTO phenotype_metadata (phenotype_id, sex, chromosome, count)
         VALUES (
             :phenotypeId,
-            :gender,
+            :sex,
             :chromosome,
-            (SELECT COUNT(*) AS count FROM ${variantTable} WHERE gender = :gender)
+            (SELECT COUNT(*) AS count FROM ${variantTable} WHERE sex = :sex)
         ) ON DUPLICATE KEY UPDATE
             count = VALUES(count);
-    `, {phenotypeId, gender, chromosome: 'all'});
+    `, {phenotypeId, sex, chromosome: 'all'});
 
     await connection.query(`
-        INSERT INTO phenotype_metadata (phenotype_id, gender, chromosome, count)
+        INSERT INTO phenotype_metadata (phenotype_id, sex, chromosome, count)
         SELECT
             ${phenotypeId} as phenotype_id,
-            "${gender}" as gender,
+            "${sex}" as sex,
             chromosome,
             count(*) as count
         FROM ${variantTable}
-        WHERE gender = "${gender}",
+        WHERE sex = "${sex}"
         GROUP BY chromosome
         ON DUPLICATE KEY UPDATE
             count = VALUES(count);
@@ -104,13 +104,13 @@ async function importVariants() {
                 SELECT count from phenotype_metadata
                 WHERE
                     phenotype_id = :phenotypeId AND
-                    gender = :gender AND
+                    sex = :sex AND
                     chromosome = :chromosome
             ),
             import_date = NOW()
         WHERE
             id = :phenotypeId`,
-        {phenotypeId, gender, chromosome: 'all'}
+        {phenotypeId, sex, chromosome: 'all'}
     );
 
     await connection.query(`COMMIT`);
