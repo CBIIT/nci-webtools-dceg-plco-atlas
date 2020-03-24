@@ -15,18 +15,18 @@ lambdagc_mel|0.83
  */
 
 // display help if needed
-if (!(args.file && args.phenotype && args.gender)) {
+if (!(args.file && args.phenotype && args.sex)) {
     console.log(`USAGE: node import-variants.js
             --file "filename"
             --phenotype "phenotype name or id"
-            --gender "all" | "female" | "male"
+            --sex "all" | "female" | "male"
             --reset (if specified, drop the variant/summary tables before importing)
             --index (if specified, build indexes on variant/summary tables after importing)`);
     process.exit(0);
 }
 
 // parse arguments and set defaults
-const { file: inputFilePath, phenotype, gender, reset: shouldReset, index: shouldIndex } = args;
+const { file: inputFilePath, phenotype, sex, reset: shouldReset, index: shouldIndex } = args;
 //const errorLog = getLogStream(`./failed-variants-${new Date().toISOString()}.txt`);
 const errorLog = {write: e => console.log(e)};
 const duration = timestamp();
@@ -46,9 +46,9 @@ if (!fs.existsSync(inputFilePath)) {
     process.exit(1);
 }
 
-// gender should be male, female, or all
-if (!/^(all|female|male)$/.test(gender)) {
-    console.error(`ERROR: Gender must be all, female, or male`);
+// sex should be male, female, or all
+if (!/^(all|female|male)$/.test(sex)) {
+    console.error(`ERROR: Sex must be all, female, or male`);
     process.exit(1);
 }
 
@@ -191,7 +191,7 @@ async function importVariants() {
     console.log(`[${duration()} s] Inserting values into variant table...`);
     await connection.execute(`
         INSERT INTO ${variantTable} (
-            gender,
+            sex,
             chromosome,
             position,
             snp,
@@ -208,7 +208,7 @@ async function importVariants() {
             i,
             show_qq_plot
         ) SELECT
-            "${gender}",
+            "${sex}",
             chromosome,
             position,
             snp,
@@ -231,9 +231,9 @@ async function importVariants() {
     console.log(`[${duration()} s] Storing aggregated variants...`);
     await connection.execute(`
         INSERT INTO ${aggregateTable}
-            (gender, chromosome, position_abs, p_value_nlog)
+            (sex, chromosome, position_abs, p_value_nlog)
         SELECT DISTINCT
-            "${gender}",
+            "${sex}",
             chromosome,
             position_abs_aggregate as position_abs,
             p_value_nlog_aggregate as p_value_nlog
@@ -248,18 +248,18 @@ async function importVariants() {
 
     console.log(`[${duration()} s] Storing lambdaGC and counts...`);
     await connection.execute(`
-        INSERT INTO phenotype_metadata (phenotype_id, gender, chromosome, lambda_gc, count)
-        VALUES (:phenotypeId, :gender, :chromosome, :lambdaGC, (SELECT COUNT(*) AS count FROM ${stageTable}))
+        INSERT INTO phenotype_metadata (phenotype_id, sex, chromosome, lambda_gc, count)
+        VALUES (:phenotypeId, :sex, :chromosome, :lambdaGC, (SELECT COUNT(*) AS count FROM ${stageTable}))
         ON DUPLICATE KEY UPDATE
             lambda_gc = VALUES(lambda_gc),
             count = VALUES(count);
-    `, {phenotypeId, gender, chromosome: 'all', lambdaGC});
+    `, {phenotypeId, sex, chromosome: 'all', lambdaGC});
 
     await connection.query(`
-        INSERT INTO phenotype_metadata (phenotype_id, gender, chromosome, count)
+        INSERT INTO phenotype_metadata (phenotype_id, sex, chromosome, count)
         SELECT
             ${phenotypeId} as phenotype_id,
-            "${gender}" as gender,
+            "${sex}" as sex,
             chromosome,
             count(*) as count
         FROM ${stageTable}
@@ -276,13 +276,13 @@ async function importVariants() {
                 SELECT count from phenotype_metadata
                 WHERE
                     phenotype_id = :phenotypeId AND
-                    gender = :gender AND
+                    sex = :sex AND
                     chromosome = :chromosome
             ),
             import_date = NOW()
         WHERE
             id = :phenotypeId`,
-        {phenotypeId, gender, chromosome: 'all'}
+        {phenotypeId, sex, chromosome: 'all'}
     );
 
     await connection.query(`COMMIT`);

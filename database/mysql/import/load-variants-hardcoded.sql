@@ -78,7 +78,7 @@ CREATE TABLE renal_cell_carcinoma_4_stage (
 -- create variant tables
 CREATE TABLE ewings_sarcoma_2_variant (
     `id`                BIGINT PRIMARY KEY NOT NULL AUTO_INCREMENT,
-    `gender`            ENUM('all', 'female', 'male') NOT NULL,
+    `sex`            ENUM('all', 'female', 'male') NOT NULL,
     `chromosome`        VARCHAR(2) NOT NULL,
     `position`          BIGINT NOT NULL,
     `snp`               VARCHAR(200) NOT NULL,
@@ -97,7 +97,7 @@ CREATE TABLE ewings_sarcoma_2_variant (
 
 CREATE TABLE melanoma_3_variant (
     `id`                BIGINT PRIMARY KEY NOT NULL AUTO_INCREMENT,
-    `gender`            ENUM('all', 'female', 'male') NOT NULL,
+    `sex`            ENUM('all', 'female', 'male') NOT NULL,
     `chromosome`        VARCHAR(2) NOT NULL,
     `position`          BIGINT NOT NULL,
     `snp`               VARCHAR(200) NOT NULL,
@@ -116,7 +116,7 @@ CREATE TABLE melanoma_3_variant (
 
 CREATE TABLE renal_cell_carcinoma_4_variant (
     `id`                BIGINT PRIMARY KEY NOT NULL AUTO_INCREMENT,
-    `gender`            ENUM('all', 'female', 'male') NOT NULL,
+    `sex`            ENUM('all', 'female', 'male') NOT NULL,
     `chromosome`        VARCHAR(2) NOT NULL,
     `position`          BIGINT NOT NULL,
     `snp`               VARCHAR(200) NOT NULL,
@@ -137,21 +137,21 @@ CREATE TABLE renal_cell_carcinoma_4_variant (
 -- create aggregate tables
 CREATE TABLE ewings_sarcoma_2_aggregate (
     `id`            BIGINT PRIMARY KEY NOT NULL AUTO_INCREMENT,
-    `gender`        ENUM('all', 'female', 'male') NOT NULL,
+    `sex`        ENUM('all', 'female', 'male') NOT NULL,
     `position_abs`  BIGINT NOT NULL,
     `p_value_nlog`  DOUBLE NOT NULL
 );
 
 CREATE TABLE melanoma_3_aggregate (
     `id`            BIGINT PRIMARY KEY NOT NULL AUTO_INCREMENT,
-    `gender`        ENUM('all', 'female', 'male') NOT NULL,
+    `sex`        ENUM('all', 'female', 'male') NOT NULL,
     `position_abs`  BIGINT NOT NULL,
     `p_value_nlog`  DOUBLE NOT NULL
 );
 
 CREATE TABLE renal_cell_carcinoma_4_aggregate (
     `id`            BIGINT PRIMARY KEY NOT NULL AUTO_INCREMENT,
-    `gender`        ENUM('all', 'female', 'male') NOT NULL,
+    `sex`        ENUM('all', 'female', 'male') NOT NULL,
     `position_abs`  BIGINT NOT NULL,
     `p_value_nlog`  DOUBLE NOT NULL
 );
@@ -215,7 +215,7 @@ alter table renal_cell_carcinoma_4_stage
 -- insert variants into ewings_sarcoma_2 tables
 -- all (ewings_sarcoma)
 INSERT INTO ewings_sarcoma_2_variant (
-    gender,
+    sex,
     chromosome,
     position,
     snp,
@@ -252,7 +252,7 @@ ORDER BY chromosome ASC, p_value ASC;
 
 -- female (renal_cell_carcinoma)
 INSERT INTO ewings_sarcoma_2_variant (
-    gender,
+    sex,
     chromosome,
     position,
     snp,
@@ -289,7 +289,7 @@ ORDER BY chromosome ASC, p_value ASC;
 
 -- male (melanoma)
 INSERT INTO ewings_sarcoma_2_variant (
-    gender,
+    sex,
     chromosome,
     position,
     snp,
@@ -329,7 +329,7 @@ ORDER BY chromosome ASC, p_value ASC;
 
 -- all (ewings_sarcoma)
 INSERT INTO ewings_sarcoma_2_aggregate
-    (gender, position_abs, p_value_nlog)
+    (sex, position_abs, p_value_nlog)
 SELECT DISTINCT
     "all",
     position_abs_aggregate as position_abs,
@@ -339,7 +339,7 @@ WHERE p_value BETWEEN 0 AND 1 AND chromosome IS NOT NULL;
 
 -- female (renal_cell_carcinoma)
 INSERT INTO ewings_sarcoma_2_aggregate
-    (gender, position_abs, p_value_nlog)
+    (sex, position_abs, p_value_nlog)
 SELECT DISTINCT
     "female",
     position_abs_aggregate as position_abs,
@@ -349,7 +349,7 @@ WHERE p_value BETWEEN 0 AND 1 AND chromosome IS NOT NULL;
 
 -- male (melanoma)
 INSERT INTO ewings_sarcoma_2_aggregate
-    (gender, position_abs, p_value_nlog)
+    (sex, position_abs, p_value_nlog)
 SELECT DISTINCT
     "male",
     position_abs_aggregate as position_abs,
@@ -360,7 +360,7 @@ WHERE p_value BETWEEN 0 AND 1 AND chromosome IS NOT NULL;
 
 -- index ewings_sarcoma tables
 ALTER TABLE ewings_sarcoma_2_variant
-    ADD INDEX (gender),
+    ADD INDEX (sex),
     ADD INDEX (chromosome),
     ADD INDEX (position),
     ADD INDEX (p_value),
@@ -369,7 +369,7 @@ ALTER TABLE ewings_sarcoma_2_variant
     ADD INDEX (show_qq_plot);
 
 ALTER TABLE ewings_sarcoma_2_aggregate
-    ADD INDEX (gender),
+    ADD INDEX (sex),
     ADD INDEX (position_abs),
     ADD INDEX (p_value_nlog);
 
@@ -381,7 +381,7 @@ ALTER TABLE ewings_sarcoma_2_aggregate
 -- insert variants into melanoma_3 tables
 -- all (melanoma)
 INSERT INTO melanoma_3_variant (
-    gender,
+    sex,
     chromosome,
     position,
     snp,
@@ -418,7 +418,7 @@ ORDER BY chromosome ASC, p_value ASC;
 
 -- female (renal_cell_carcinoma)
 INSERT INTO melanoma_3_variant (
-    gender,
+    sex,
     chromosome,
     position,
     snp,
@@ -455,7 +455,7 @@ ORDER BY chromosome ASC, p_value ASC;
 
 -- male (ewings_sarcoma_2_stage)
 INSERT INTO melanoma_3_variant (
-    gender,
+    sex,
     chromosome,
     position,
     snp,
@@ -495,7 +495,7 @@ ORDER BY chromosome ASC, p_value ASC;
 
 -- all (melanoma_3_stage)
 INSERT INTO melanoma_3_aggregate
-    (gender, position_abs, p_value_nlog)
+    (sex, position_abs, p_value_nlog)
 SELECT DISTINCT
     "all",
     position_abs_aggregate as position_abs,
@@ -505,7 +505,7 @@ WHERE p_value BETWEEN 0 AND 1 AND chromosome IS NOT NULL;
 
 -- female (renal_cell_carcinoma)
 INSERT INTO melanoma_3_aggregate
-    (gender, position_abs, p_value_nlog)
+    (sex, position_abs, p_value_nlog)
 SELECT DISTINCT
     "female",
     position_abs_aggregate as position_abs,
@@ -515,7 +515,7 @@ WHERE p_value BETWEEN 0 AND 1 AND chromosome IS NOT NULL;
 
 -- male (ewings_sarcoma_2_stage)
 INSERT INTO melanoma_3_aggregate
-    (gender, position_abs, p_value_nlog)
+    (sex, position_abs, p_value_nlog)
 SELECT DISTINCT
     "male",
     position_abs_aggregate as position_abs,
@@ -526,7 +526,7 @@ WHERE p_value BETWEEN 0 AND 1 AND chromosome IS NOT NULL;
 
 -- index melanoma_3 tables
 ALTER TABLE melanoma_3_variant
-    ADD INDEX (gender),
+    ADD INDEX (sex),
     ADD INDEX (chromosome),
     ADD INDEX (position),
     ADD INDEX (p_value),
@@ -535,7 +535,7 @@ ALTER TABLE melanoma_3_variant
     ADD INDEX (show_qq_plot);
 
 ALTER TABLE melanoma_3_aggregate
-    ADD INDEX (gender),
+    ADD INDEX (sex),
     ADD INDEX (position_abs),
     ADD INDEX (p_value_nlog);
 
@@ -548,7 +548,7 @@ ALTER TABLE melanoma_3_aggregate
 -- insert variants into renal_cell_carcinoma_4 tables
 -- all (renal_cell_carcinoma_4_stage)
 INSERT INTO renal_cell_carcinoma_4_variant (
-    gender,
+    sex,
     chromosome,
     position,
     snp,
@@ -585,7 +585,7 @@ ORDER BY chromosome ASC, p_value ASC;
 
 -- female (ewings_sarcoma)
 INSERT INTO renal_cell_carcinoma_4_variant (
-    gender,
+    sex,
     chromosome,
     position,
     snp,
@@ -622,7 +622,7 @@ ORDER BY chromosome ASC, p_value ASC;
 
 -- male (melanoma)
 INSERT INTO renal_cell_carcinoma_4_variant (
-    gender,
+    sex,
     chromosome,
     position,
     snp,
@@ -662,7 +662,7 @@ ORDER BY chromosome ASC, p_value ASC;
 
 -- all (renal_cell_carcinoma_4_stage)
 INSERT INTO renal_cell_carcinoma_4_aggregate
-    (gender, position_abs, p_value_nlog)
+    (sex, position_abs, p_value_nlog)
 SELECT DISTINCT
     "all",
     position_abs_aggregate as position_abs,
@@ -672,7 +672,7 @@ WHERE p_value BETWEEN 0 AND 1 AND chromosome IS NOT NULL;
 
 -- female (ewings_sarcoma_2_stage)
 INSERT INTO renal_cell_carcinoma_4_aggregate
-    (gender, position_abs, p_value_nlog)
+    (sex, position_abs, p_value_nlog)
 SELECT DISTINCT
     "female",
     position_abs_aggregate as position_abs,
@@ -682,7 +682,7 @@ WHERE p_value BETWEEN 0 AND 1 AND chromosome IS NOT NULL;
 
 -- male (melanoma_3_stage)
 INSERT INTO renal_cell_carcinoma_4_aggregate
-    (gender, position_abs, p_value_nlog)
+    (sex, position_abs, p_value_nlog)
 SELECT DISTINCT
     "male",
     position_abs_aggregate as position_abs,
@@ -693,7 +693,7 @@ WHERE p_value BETWEEN 0 AND 1 AND chromosome IS NOT NULL;
 
 -- index renal_cell_carcinoma_4 tables
 ALTER TABLE renal_cell_carcinoma_4_variant
-    ADD INDEX (gender),
+    ADD INDEX (sex),
     ADD INDEX (chromosome),
     ADD INDEX (position),
     ADD INDEX (p_value),
@@ -702,7 +702,7 @@ ALTER TABLE renal_cell_carcinoma_4_variant
     ADD INDEX (show_qq_plot);
 
 ALTER TABLE renal_cell_carcinoma_4_aggregate
-    ADD INDEX (gender),
+    ADD INDEX (sex),
     ADD INDEX (position_abs),
     ADD INDEX (p_value_nlog);
 

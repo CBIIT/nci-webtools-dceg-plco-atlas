@@ -6,7 +6,7 @@ ALTER TABLE phenotype_correlation
 -- phenotype metadata
 ALTER TABLE phenotype_metadata
     ADD INDEX idx_phenotype_metadata__phenotype_id  (phenotype_id),
-    ADD INDEX idx_phenotype_metadata__gender        (gender);
+    ADD INDEX idx_phenotype_metadata__sex        (sex);
 
 -- gene
 ALTER TABLE gene

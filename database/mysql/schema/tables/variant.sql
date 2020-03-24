@@ -2,7 +2,7 @@
 -- eg: melanoma_variant
 CREATE TABLE IF NOT EXISTS `variant_$PHENOTYPE` (
     `id`                    BIGINT PRIMARY KEY NOT NULL AUTO_INCREMENT,
-    `gender`                ENUM('all', 'female', 'male') NOT NULL,
+    `sex`                   ENUM('all', 'female', 'male') NOT NULL,
     `chromosome`            ENUM('1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', 'X', 'Y') NOT NULL,
     `position`              BIGINT NOT NULL,
     `snp`                   VARCHAR(200) NOT NULL,
@@ -24,7 +24,7 @@ CREATE TABLE IF NOT EXISTS `variant_$PHENOTYPE` (
 -- eg: melanoma_aggregate
 CREATE TABLE IF NOT EXISTS `aggregate_$PHENOTYPE` (
     `id`            BIGINT PRIMARY KEY NOT NULL AUTO_INCREMENT,
-    `gender`        ENUM('all', 'female', 'male') NOT NULL,
+    `sex`           ENUM('all', 'female', 'male') NOT NULL,
     `chromosome`    ENUM('1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', 'X', 'Y') NOT NULL,
     `position_abs`  BIGINT NOT NULL,
     `p_value_nlog`  DOUBLE NOT NULL
