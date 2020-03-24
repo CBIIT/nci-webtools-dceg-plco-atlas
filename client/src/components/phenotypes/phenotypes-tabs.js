@@ -17,48 +17,32 @@ export function PhenotypesTabs() {
     selectedPlot,
     phenotypeType,
     phenotypeData,
+    loading,
   } = useSelector(state => state.browsePhenotypes);
 
-  const [
-    selectedDistribution,
-    setSelectedDistribution
-  ] = useState('age');
-
-  const [
-    selectedDistributionInverted,
-    setSelectedDistributionInverted
-  ] = useState('ageInverted');
-
-  const [
-    loading,
-    setLoading
-  ] = useState(false);
-
-
+  const [frequencyType, setFrequencyType] = useState({
+    frequencyByAge: 'counts',
+    frequencyBySex: 'counts',
+    frequencyByAncestry: 'counts',
+  })
 
   const setSelectedPlot = async (selectedPlot) => {
     dispatch(updateBrowsePhenotypes({ selectedPlot }));
 
     // fetch items if they do not exist yet
-    if (
-      (selectedPlot === 'frequency' && !phenotypeData.frequency) ||
-      (selectedPlot === 'distribution' && (!phenotypeData.distribution || !phenotypeData.distribution.age)) ||
-      (selectedPlot === 'distribution-inverted' && (!phenotypeData.distribution || !phenotypeData.distribution.ageInverted)) ||
-      (selectedPlot === 'related-phenotypes' && !phenotypeData.related)
-    ) {
-      setLoading(true);
-      const data = await query('phenotype', {
-        id: phenotypeData.id,
-        type: {
-          'frequency': 'frequency',
-          'distribution': 'distribution',
-          'distribution-inverted': 'distributionInverted',
-          'related-phenotypes': 'related',
-        }[selectedPlot] || 'all'
-      });
-      setLoading(false);
+    if (!phenotypeData[selectedPlot]) {
       dispatch(updateBrowsePhenotypes({
-        phenotypeData: clone(merge(phenotypeData, data)),
+        loading: true,
+      }));
+      dispatch(updateBrowsePhenotypes({
+        loading: false,
+        phenotypeData: {
+          ...phenotypeData,
+          ...await query('phenotype', {
+            id: phenotypeData.id,
+            type: selectedPlot || 'all'
+          })
+        }
       }));
     }
   };
@@ -66,6 +50,13 @@ export function PhenotypesTabs() {
   const titleCase = str => str.split(/[_\s]+/g)
     .map(word => word[0].toUpperCase() + word.substr(1).toLowerCase())
     .join(' ');
+
+  const getPlotComponent = (phenotypeDataType, plotKey) => {
+    if (/continuous/.test(phenotypeDataType) || (/binary/.test(phenotypeDataType) && plotKey === 'frequencyByAge'))
+      return GroupedAreaChart;
+    else if (/categorical|binary/.test(phenotypeData.type))
+      return BarChart;
+  }
 
   return (
     <div style={{ minHeight: '600px'}}>
@@ -78,107 +69,65 @@ export function PhenotypesTabs() {
 
         <Tab
           eventKey="frequency"
-          title="Frequency"
+          title="Frequency (All)"
           className="p-4 bg-white tab-pane-bordered rounded-0"
           style={{ minHeight: '600px', textAlign: 'center' }}>
-          {phenotypeData  && selectedPlot === 'frequency' && phenotypeData.frequency && phenotypeData.categories && phenotypeData.type !== 'continuous' && <PieChart
+          {phenotypeData && phenotypeData.frequency && phenotypeData.categories && <>
+            {phenotypeData.type !== 'continuous' && <PieChart
                   data={phenotypeData.frequency}
                   categories={phenotypeData.categories} />}
 
-          {phenotypeData   && selectedPlot === 'frequency' && phenotypeData.frequency && phenotypeData.categories && phenotypeData.type == 'continuous' && <AreaChart
+            {phenotypeData.type === 'continuous' && <AreaChart
                   data={phenotypeData.frequency}
                   categories={phenotypeData.categories}
-                  xTitle={phenotypeData.display_name}
+                  xTitle={phenotypeData.displayName}
                   yTitle="Number of Participants" />}
+          </>}
         </Tab>
 
-        <Tab
-          eventKey="distribution"
-          title="Distribution"
-          className="p-4 bg-white tab-pane-bordered rounded-0"
-          style={{ minHeight: '50vh' }}>
+        {[
+          {key: 'frequencyByAge', title: 'Frequency By Age'},
+          {key: 'frequencyBySex', title: 'Frequency By Sex'},
+          {key: 'frequencyByAncestry', title: 'Frequency By Ancestry'},
+        ].map(t =>
+          <Tab
+            key={t.key}
+            eventKey={t.key}
+            title={t.title}
+            className="p-4 bg-white tab-pane-bordered rounded-0"
+            style={{ minHeight: '600px', textAlign: 'center' }}>
+
             <div className="m-2">{[
-              {label: 'Age', value: 'age'},
-              {label: 'Sex', value: 'gender'},
-              {label: 'Ancestry', value: 'ancestry'},
+              false && {label: 'Counts', value: 'counts'},
+              false && {label: 'Percentage', value: 'percentage'},
             ].filter(Boolean).map((e, i) =>
               <Form.Check
                 custom
                 inline
                 label={e.label}
                 className="font-weight-normal cursor-pointer mr-4"
-                onChange={e => setSelectedDistribution(e.target.value)}
-                checked={selectedDistribution == e.value}
+                onChange={e => setFrequencyType({...frequencyType, [t.key]: e.target.value})}
+                checked={frequencyType[t.key] == e.value}
                 value={e.value}
                 type="radio"
-                id={`select-distribution-${e.value}`}
+                id={`select-${t.key}-${e.value}`}
+                key={`${t.key}-${e.value}-${e.id}`}
               />
             )}</div>
 
-            {!loading && selectedPlot === 'distribution'  && phenotypeData && phenotypeData.distribution && phenotypeData.distribution.age &&
-            <div>
-              {/^(age)$/.test(selectedDistribution)  && <GroupedAreaChart
-                data={phenotypeData.distribution[selectedDistribution]}
-                categories={phenotypeData.distributionCategories.map(titleCase)}
-                xTitle={titleCase(selectedDistribution)}
-                yTitle="Number of Participants"
-                fill={true}
-              />}
-              {/^(gender|ancestry)$/.test(selectedDistribution) && <BarChart
-                  data={phenotypeData.distribution[selectedDistribution]}
-                  categories={phenotypeData.distributionCategories.map(titleCase)}
-                  xTitle={titleCase(selectedDistribution)}
-                  yTitle="Number of Participants"
-              />}
-            </div>}
-        </Tab>
-
-        {phenotypeData.type !== 'binary' && <Tab
-          eventKey="distribution-inverted"
-          title="Distribution (Inverted)"
-          className="p-4 bg-white tab-pane-bordered rounded-0"
-          style={{ minHeight: '50vh' }}>
-            <div className="m-2">{[
-              {label: 'Age', value: 'ageInverted'},
-              {label: 'Sex', value: 'genderInverted'},
-              {label: 'Ancestry', value: 'ancestryInverted'},
-            ].filter(Boolean).map((e, i) =>
-              <Form.Check
-                custom
-                inline
-                label={e.label}
-                className="font-weight-normal cursor-pointer mr-4"
-                onChange={e => setSelectedDistributionInverted(e.target.value)}
-                checked={selectedDistributionInverted == e.value}
-                value={e.value}
-                type="radio"
-                id={`select-distribution-${e.value}`}
-              />
-            )}</div>
-
-            {!loading && selectedPlot === 'distribution-inverted' && phenotypeData && phenotypeData.distribution && phenotypeData.distribution.ageInverted && phenotypeData.type === 'categorical' && /^(age|gender|ancestry)Inverted$/.test(selectedDistributionInverted) && <BarChart
-                  data={phenotypeData.distribution[selectedDistributionInverted]}
-                  categories={phenotypeData[{
-                    ageInverted: 'ageCategories',
-                    genderInverted: 'genderCategories',
-                    ancestryInverted: 'ancestryCategories'
-                  }[selectedDistributionInverted]]}
-                  xTitle={phenotypeData.display_name}
-                  yTitle="Number of Participants"
-            />}
-
-            {!loading && selectedPlot === 'distribution-inverted'  && phenotypeData && phenotypeData.distribution && phenotypeData.distribution.ageInverted && phenotypeData.type === 'continuous' && /^(age|gender|ancestry)Inverted$/.test(selectedDistributionInverted) && <GroupedAreaChart
-                  data={phenotypeData.distribution[selectedDistributionInverted]}
-                  categories={phenotypeData[{
-                    ageInverted: 'ageCategories',
-                    genderInverted: 'genderCategories',
-                    ancestryInverted: 'ancestryCategories'
-                  }[selectedDistributionInverted]]}
-                  xTitle={phenotypeData.display_name}
-                  yTitle="Number of Participants"
-                  fill={true}
-            />}
-        </Tab>}
+            {phenotypeData && phenotypeData[t.key] && <>
+              {((/continuous/.test(phenotypeData.type) || (/binary/.test(phenotypeData.type) && t.key === 'frequencyByAge')) ? GroupedAreaChart : BarChart)({
+                data: phenotypeData[t.key][frequencyType[t.key]],
+                categories: (phenotypeData.type === 'binary')
+                  ? phenotypeData.distributionCategories
+                  : phenotypeData.categoryTypes[t.key],
+                xTitle: phenotypeData.displayName,
+                yTitle: frequencyType[t.key] === 'counts' ? 'Number of Participants' : '% of Participants',
+                fill: true,
+              })}
+            </>}
+          </Tab>
+        )}
 
         <Tab
           eventKey="related-phenotypes"
@@ -191,7 +140,6 @@ export function PhenotypesTabs() {
             relatedData={phenotypeData.related}
           />}
         </Tab>
-
       </Tabs>
 
 
