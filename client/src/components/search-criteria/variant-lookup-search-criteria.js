@@ -6,8 +6,8 @@ import { Tab, Tabs, Button } from 'react-bootstrap';
 
 export const VariantLookupSearchCriteria = props => {
   const dispatch = useDispatch();
-  const { 
-    searchCriteriaVariantLookup, 
+  const {
+    searchCriteriaVariantLookup,
     numResults,
     collapseCriteria
   } = useSelector(state => state.variantLookup);
@@ -32,20 +32,20 @@ export const VariantLookupSearchCriteria = props => {
     }
   };
 
-  const displayGender = gender =>
+  const displaySex = sex =>
     ({
       all: 'All',
       combined: 'All',
       stacked: 'Female/Male (Stacked)',
       female: 'Female',
       male: 'Male'
-    }[gender]);
+    }[sex]);
 
   return (
     <div className="mb-2">
-      <Tabs 
+      <Tabs
         transition={false}
-        className="" 
+        className=""
         defaultActiveKey="variant-lookup-search-criteria">
         <Tab
           eventKey="variant-lookup-search-criteria"
@@ -144,15 +144,15 @@ export const VariantLookupSearchCriteria = props => {
               </span>
               {searchCriteriaVariantLookup &&
               searchCriteriaVariantLookup.variant
-                ? searchCriteriaVariantLookup.variant.includes('rs') 
-                  ? <a 
-                    href={'https://www.ncbi.nlm.nih.gov/snp/' + searchCriteriaVariantLookup.variant} 
-                    target="_blank" 
+                ? searchCriteriaVariantLookup.variant.includes('rs')
+                  ? <a
+                    href={'https://www.ncbi.nlm.nih.gov/snp/' + searchCriteriaVariantLookup.variant}
+                    target="_blank"
                     style={{
                       textDecoration: 'underline',
                     }}>
                       {searchCriteriaVariantLookup.variant}
-                    </a> 
+                    </a>
                   : <span>{searchCriteriaVariantLookup.variant}</span>
                 : 'None'}
             </div>
@@ -160,8 +160,8 @@ export const VariantLookupSearchCriteria = props => {
               <span>
                 <b>Sex</b>:{' '}
               </span>
-              {searchCriteriaVariantLookup && searchCriteriaVariantLookup.gender
-                ? displayGender(searchCriteriaVariantLookup.gender)
+              {searchCriteriaVariantLookup && searchCriteriaVariantLookup.sex
+                ? displaySex(searchCriteriaVariantLookup.sex)
                 : 'None'}
             </div>
           </div>
@@ -176,7 +176,7 @@ export const VariantLookupSearchCriteria = props => {
 
             <b><span className="ml-3">Total Results: </span></b>
             {searchCriteriaVariantLookup && numResults ? numResults : 'None'}
-            
+
           </div>
         </Tab>
       </Tabs>

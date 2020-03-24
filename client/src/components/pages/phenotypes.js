@@ -157,7 +157,7 @@ export function Phenotypes() {
 
   // when submitting:
   // 1. Fetch aggregate data for displaying manhattan plot(s)
-  // 2. Fetch variant data for each selected gender
+  // 2. Fetch variant data for each selected sex
   const handleSubmit = async (phenotype) => {
     if (!phenotype) {
       return setMessages([

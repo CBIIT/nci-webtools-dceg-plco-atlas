@@ -11,7 +11,7 @@ export function PhenotypeCorrelationsForm({ onChange, onSubmit, onReset }) {
   const phenotypeCorrelations = useSelector(
     state => state.phenotypeCorrelations
   );
-  const { selectedPhenotypes, selectedGender, submitted } = phenotypeCorrelations;
+  const { selectedPhenotypes, selectedSex, submitted } = phenotypeCorrelations;
 
   const treeRef = useRef();
 
@@ -19,8 +19,8 @@ export function PhenotypeCorrelationsForm({ onChange, onSubmit, onReset }) {
     dispatch(updatePhenotypeCorrelations({ selectedPhenotypes }));
   };
 
-  const setSelectedGender = selectedGender => {
-    dispatch(updatePhenotypeCorrelations({ selectedGender }));
+  const setSelectedSex = selectedSex => {
+    dispatch(updatePhenotypeCorrelations({ selectedSex }));
   };
 
   const handleChangeCustom = items => {
@@ -40,27 +40,27 @@ export function PhenotypeCorrelationsForm({ onChange, onSubmit, onReset }) {
         />
         <small className="text-muted"><i>Up to 120 phenotypes may be selected.</i></small>
       </div>
-      
+
       <div className="mb-3">
         <label className="required">Sex</label>
         <select
           className="form-control"
-          value={selectedGender}
-          onChange={e => setSelectedGender(e.target.value)}
+          value={selectedSex}
+          onChange={e => setSelectedSex(e.target.value)}
           disabled={submitted}>
           <option value="combined">All</option>
           <option value="female">Female</option>
           <option value="male">Male</option>
         </select>
       </div>
-      
+
       <div>
         <OverlayTrigger overlay={
-            <Tooltip 
-              id="tooltip-disabled" 
+            <Tooltip
+              id="tooltip-disabled"
               style={{
-                display: !selectedPhenotypes || selectedPhenotypes.length < 2 || selectedPhenotypes.length > 120 ? 
-                  'block' : 
+                display: !selectedPhenotypes || selectedPhenotypes.length < 2 || selectedPhenotypes.length > 120 ?
+                  'block' :
                   'none'
               }}>
               {
@@ -71,7 +71,7 @@ export function PhenotypeCorrelationsForm({ onChange, onSubmit, onReset }) {
                 (selectedPhenotypes && selectedPhenotypes.length > 120) &&
                   <>Please select 120 or less phenotypes.</>
               }
-              
+
             </Tooltip>
           }>
           <span className="d-inline-block">

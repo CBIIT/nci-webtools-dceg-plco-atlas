@@ -8,7 +8,7 @@ export function VariantLookupForm({ onChange, onSubmit, onReset }) {
   const dispatch = useDispatch();
   const phenotypes = useSelector(state => state.phenotypes);
   const variantLookup = useSelector(state => state.variantLookup);
-  const { selectedPhenotypes, selectedVariant, selectedGender, submitted } = variantLookup;
+  const { selectedPhenotypes, selectedVariant, selectedSex, submitted } = variantLookup;
 
   const setSelectedPhenotypes = selectedPhenotypes => {
     dispatch(updateVariantLookup({ selectedPhenotypes }));
@@ -18,8 +18,8 @@ export function VariantLookupForm({ onChange, onSubmit, onReset }) {
     dispatch(updateVariantLookup({ selectedVariant }));
   };
 
-  const setSelectedGender = selectedGender => {
-    dispatch(updateVariantLookup({ selectedGender }));
+  const setSelectedSex = selectedSex => {
+    dispatch(updateVariantLookup({ selectedSex }));
   };
 
   const handleChangeCustom = items => {
@@ -35,7 +35,7 @@ export function VariantLookupForm({ onChange, onSubmit, onReset }) {
   const treeRef = useRef();
 
   return (
-    <> 
+    <>
       <div className="mb-2">
         <label className="required">Phenotypes</label>
         <TreeSelect
@@ -69,8 +69,8 @@ export function VariantLookupForm({ onChange, onSubmit, onReset }) {
         <label className="required">Sex</label>
         <select
           className="form-control"
-          value={selectedGender}
-          onChange={e => setSelectedGender(e.target.value)}
+          value={selectedSex}
+          onChange={e => setSelectedSex(e.target.value)}
           disabled={submitted}>
           <option value="combined">All</option>
           <option value="female">Female</option>
@@ -80,11 +80,11 @@ export function VariantLookupForm({ onChange, onSubmit, onReset }) {
 
       <div>
         <OverlayTrigger overlay={
-            <Tooltip id="tooltip-disabled" 
+            <Tooltip id="tooltip-disabled"
               style={{
                 display: (!selectedPhenotypes || selectedPhenotypes.length < 1) ||
                   (!selectedVariant || selectedVariant.length < 1)
-                  ? 'block' 
+                  ? 'block'
                   : 'none'
                 }}>
               {
@@ -110,13 +110,13 @@ export function VariantLookupForm({ onChange, onSubmit, onReset }) {
           <span className="d-inline-block">
             <Button
               className=""
-              style={{ 
-                maxHeight: '38px', 
-                pointerEvents: 
+              style={{
+                maxHeight: '38px',
+                pointerEvents:
                   (!selectedPhenotypes || selectedPhenotypes.length < 1) ||
                   (!selectedVariant || selectedVariant.length < 1)
-                  ? 'none' 
-                  : 'auto' 
+                  ? 'none'
+                  : 'auto'
                 }}
               variant="silver"
               onClick={e => {

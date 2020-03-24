@@ -26,7 +26,7 @@ export function VariantLookup() {
   const {
     selectedPhenotypes,
     selectedVariant,
-    selectedGender,
+    selectedSex,
     results,
     messages,
     submitted,
@@ -59,7 +59,7 @@ export function VariantLookup() {
       hidden: true
     },
     {
-      dataField: 'gender',
+      dataField: 'sex',
       text: 'Sex',
       hidden: true
     },
@@ -208,10 +208,10 @@ export function VariantLookup() {
     setSearchCriteriaVariantLookup({
       phenotypes: selectedPhenotypes.map(item => item.title),
       variant: selectedVariant,
-      gender: selectedGender
+      sex: selectedSex
     });
     setSubmitted(new Date());
-    dispatch(lookupVariants(selectedPhenotypes, selectedVariant, selectedGender === 'combined' ? 'all' : selectedGender));
+    dispatch(lookupVariants(selectedPhenotypes, selectedVariant, selectedSex === 'combined' ? 'all' : selectedSex));
   };
 
   const handleReset = params => {
@@ -221,7 +221,7 @@ export function VariantLookup() {
         selectedPhenotype: null,
         selectedPhenotypes: [],
         selectedVariant: '',
-        selectedGender: 'combined',
+        selectedSex: 'combined',
         results: null,
         messages: [],
         submitted: null,
@@ -258,7 +258,7 @@ export function VariantLookup() {
         <MainPanel className="col-lg-9">
           <VariantLookupSearchCriteria />
 
-          <Tabs 
+          <Tabs
             transition={false}
             defaultActiveKey="variant-lookup">
             <Tab
