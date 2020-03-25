@@ -549,3 +549,10 @@ footer {
 .js-plotly-plot.override-cursor .plotly .cursor-pointer {
   cursor: default;
 }
+
+// bubble chart
+
+.circle {
+  stroke-width: 2px;
+  stroke: transparent;
+}
