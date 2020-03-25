@@ -41,6 +41,7 @@ importPhenotypes().then(numRows => {
     console.log(`[${duration()} s] Imported ${numRows} phenotypes, please run the following scripts:
         import-participant-data.sql
         import-participant-data-categories.sql
+        import-phenotype-correlations.sql
         update-participant-counts.js
         update-variants-counts.js
     `);

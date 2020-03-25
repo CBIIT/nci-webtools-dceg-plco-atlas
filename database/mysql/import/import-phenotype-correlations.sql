@@ -1,6 +1,6 @@
 START TRANSACTION;
 
-FLUSH TABLES;
+-- FLUSH TABLES;
 
 -- needed if local_infile is disabled, need root privileges
 -- SET GLOBAL local_infile = 'ON';

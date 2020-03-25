@@ -38,7 +38,9 @@ app.register(static, {
 
 // execute before handling request
 app.addHook("onRequest", (req, res, done) => {
+  let pathname = req.raw.url.replace(/\?.*$/, "");
   res.header("Timestamp", new Date().getTime());
+  logger.info(`[${process.pid}] ${pathname}: Started Request`, req.query);
   done();
 });
 
