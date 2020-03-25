@@ -14,6 +14,15 @@ const connection = mysql.createPool({
   }).promise();
 
 /**
+ * Returns a function which can be used to get the elapseed
+ * duration (in seconds) since the initial function call
+ */
+function getTimestamp() {
+    const startTime = new Date();
+    return () => (new Date() - startTime) / 1000;
+}
+
+/**
  * Ensures that identifiers with sql keywords in them do not throw errors
  * @param {string} str - A string which needs to be quoted
  * @returns {string} The quoted string
@@ -107,6 +116,7 @@ function getValidTable(table) {
  * @returns Records in the aggregate summary table which match query criteria
  */
 async function getSummary(connection, params) {
+    let timestamp = getTimestamp();
     const [data, columns] = await connection.query({
         rowsAsArray: params.raw,
         values: [params.table, params.sex, params.p_value_nlog_min],
@@ -117,6 +127,7 @@ async function getSummary(connection, params) {
             sex = ? AND
             p_value_nlog > ?`,
     });
+    logger.info(`[${process.pid}] /summary: ${timestamp()}s in database`, params);
 
     return {data, columns: columns.map(c => c.name)};
 }
@@ -151,6 +162,7 @@ async function getSummary(connection, params) {
 
 
 async function getVariants(connection, params) {
+    let timestamp = getTimestamp();
     let tables = params.table.split(',').map(getValidTable);
     let columnNames = getValidColumns('variant', params.columns).map(quote).join(',')
     // console.log("params.columns", params.columns);
@@ -218,6 +230,8 @@ async function getVariants(connection, params) {
         let [results] = await connection.query(countSql, params);
         records.count = results[0].count;
     }
+
+    logger.info(`[${process.pid}] /variants: ${timestamp()}s in database`, params);
 
     return records;
 }
