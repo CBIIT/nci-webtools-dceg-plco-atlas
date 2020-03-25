@@ -105,7 +105,7 @@ export class BubbleChart {
                 return d.r;
             })
             .style("fill", function (d) {
-                return d.data.color ? d.data.color : categoryColor ? categoryColor : "pink";
+                return d.data.color ? d.data.color : categoryColor ? categoryColor : "#fd79a8";
             })
             .style("opacity", function (d) {
                 return getChildren(d, data) ? "100%" : "50%";
@@ -124,7 +124,7 @@ export class BubbleChart {
                 return getChildren(d, data) && d.r >= 5 ? d.r - 5 : 0;
             })
             .style("fill", function (d) {
-                return d.data.color ? d.data.color : categoryColor ? categoryColor : "pink";
+                return d.data.color ? d.data.color : categoryColor ? categoryColor : "#fd79a8";
             })
             .style("opacity", function (d) {
                 return "75%";
