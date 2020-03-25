@@ -321,8 +321,10 @@ export function Phenotypes() {
               }}>
               <LoadingOverlay active={!phenotypes || loading} />
               <div style={{
-                  display: phenotypes ? 'block' : 'none'
-                }}>
+                  display: phenotypes ? 'block' : 'none',
+                  position: 'relative'
+                }}
+                id="browse-phenotypes-container">
                 {
                   breadcrumb.length > 0 && breadcrumb.map((item, idx) =>
                     <span className="" key={"crumb-" + item.data.title}>
@@ -347,7 +349,10 @@ export function Phenotypes() {
                 <div
                   ref={plotContainer}
                   className="mt-5 bubble-chart text-center"
-                  style={{ minHeight: '50vh' }}
+                  id="bubble-chart-div"
+                  style={{ minHeight: '50vh', 
+                  position: 'relative'
+                }}
                 />
               </div>
             </div>

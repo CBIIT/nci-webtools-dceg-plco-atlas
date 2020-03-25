@@ -137,8 +137,8 @@ export const VariantLookupSearchCriteria = props => {
                   </div>
                 ))}
             </div>
-
-            <div className="col-md-auto border-left border-secondary">
+            <div className="border-left border-secondary" style={{maxHeight: '1.6em'}}></div>
+            <div className="col-md-auto">
               <span>
                 <b>Variant</b>:{' '}
               </span>
@@ -156,7 +156,8 @@ export const VariantLookupSearchCriteria = props => {
                   : <span>{searchCriteriaVariantLookup.variant}</span>
                 : 'None'}
             </div>
-            <div className="col-md-auto border-left border-secondary">
+            <div className="border-left border-secondary" style={{maxHeight: '1.6em'}}></div>
+            <div className="col-md-auto">
               <span>
                 <b>Sex</b>:{' '}
               </span>
@@ -167,16 +168,15 @@ export const VariantLookupSearchCriteria = props => {
           </div>
 
           <div className="right py-1">
-            <b><span>Total Phenotypes: </span></b>
-            {
-              searchCriteriaVariantLookup.phenotypes
-              ? searchCriteriaVariantLookup.phenotypes.length
-              : "None"
-            }
-
             <b><span className="ml-3">Total Results: </span></b>
-            {searchCriteriaVariantLookup && numResults ? numResults : 'None'}
-
+            {searchCriteriaVariantLookup && numResults ? 
+              numResults.toString() + (searchCriteriaVariantLookup.phenotypes
+              ? " of " + searchCriteriaVariantLookup.phenotypes.length + " phenotypes"
+              : "")
+              : 'None' + (searchCriteriaVariantLookup.phenotypes
+              ? " of " + searchCriteriaVariantLookup.phenotypes.length + " phenotypes"
+              : "")
+            }
           </div>
         </Tab>
       </Tabs>

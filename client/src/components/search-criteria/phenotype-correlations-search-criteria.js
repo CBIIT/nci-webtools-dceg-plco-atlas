@@ -137,8 +137,8 @@ export const PhenotypeCorrelationsSearchCriteria = props => {
                   </div>
                 ))}
             </div>
-
-            <div className="col-md-auto border-left border-secondary">
+            <div className="border-left border-secondary" style={{maxHeight: '1.6em'}}></div>
+            <div className="col-md-auto">
 
               <span>
                 <b>Sex</b>:{' '}
