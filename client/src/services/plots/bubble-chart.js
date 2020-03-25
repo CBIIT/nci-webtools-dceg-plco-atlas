@@ -39,7 +39,8 @@ export class BubbleChart {
             .append("svg")
             .attr("width", diameter)
             .attr("height", diameter)
-            .attr("class", "bubble");
+            .attr("class", "bubble")
+            .attr("id", "bubble-chart-svg");
 
         svg.append("rect")
             .attr("class", "overlay")
@@ -176,6 +177,73 @@ export class BubbleChart {
             handleDoubleClick(getNode(e, data));
         });
 
+        var tooltip = d3.select(container)
+            .append("div")
+            .style("opacity", 0)
+            .attr("class", "tooltip")
+            .style("position", "absolute")
+            .style("background-color", "black")
+            .style("border-radius", "5px")
+            .style("padding", "10px")
+            .style("color", "white");
+
+        var showTooltip = function(d) {
+            console.log("d", d);
+            // var coordinates= d3.mouse(this);
+            // var x = coordinates[0];
+            // var y = coordinates[1];
+            // var x = d3.event.pageX - document.getElementById("bubble-chart-svg").getBoundingClientRect().x + 10;
+            // var y = d3.event.pageY - document.getElementById("bubble-chart-svg").getBoundingClientRect().y + 10;
+            
+            tooltip
+                .transition()
+                .duration(200);
+            tooltip
+                .style("opacity", 1)
+                .html("Phenotype: " + d.data.title + "<br>" + "Participants: " + Number(d.data.participant_count).toLocaleString())
+                // .style("left", (d3.mouse(this)[0]+30) + "px")
+                // .style("top", (d3.mouse(this)[1]+30) + "px");
+                // .style("left", (x + 80) + "px")
+                // .style("top", (y + 80) + "px");
+            d3.select(this)
+                .select(".circle")
+                .style("stroke", function (d) {
+                    return "black";
+                });
+        }
+
+        var moveTooltip = function(d) {
+            // var coordinates= d3.mouse(this);
+            // var x = coordinates[0];
+            // var y = coordinates[1];
+            // var x = d3.event.pageX;
+            // var y = d3.event.pageY;
+            var x = d3.event.pageX - document.getElementById("bubble-chart-svg").getBoundingClientRect().left + 10;
+            var y = d3.event.pageY - document.getElementById("bubble-chart-svg").getBoundingClientRect().top + 10;
+
+            tooltip
+                // .style("left", (d3.mouse(this)[0]+30) + "px")
+                // .style("top", (d3.mouse(this)[1]+30) + "px");
+                .style("left", (x) + "px")
+                .style("top", (y) + "px");
+        }
+
+        var hideTooltip = function(d) {
+            tooltip
+                .transition()
+                .duration(200)
+                .style("opacity", 0);
+            d3.select(this)
+                .select(".circle")
+                .style("stroke", function (d) {
+                    return "transparent";
+                });
+        }
+
+        node.on("mouseover", showTooltip)
+            .on("mousemove", moveTooltip)
+            .on("mouseleave", hideTooltip);
+
         d3.select(container)
             .style("height", diameter + "px");
 
@@ -219,7 +287,6 @@ function getNode(node, data) {
     var results = data.children.filter((child) => {
         return child.id === node.data.id;
     });
-    console.log("getNode", results);
     if (results.length > 0) {
         return {
             data: results[0]
