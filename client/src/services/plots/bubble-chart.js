@@ -91,15 +91,15 @@ export class BubbleChart {
                 return "translate(" + d.x + ", " + d.y + ")";
             });
 
-        node.append("title")
-            .text(function (d) {
+        // node.append("title")
+        //     .text(function (d) {
                 
-                if (getChildren(d, data)) {
-                    return "Category: " + d.data.title + "\n" + "Participants: " + d.data.participant_count.toLocaleString();
-                } else {
-                    return "Phenotype: " + d.data.title + "\n" + "Participants: " + d.data.participant_count.toLocaleString();
-                }
-            });
+        //         if (getChildren(d, data)) {
+        //             return "Category: " + d.data.title + "\n" + "Participants: " + d.data.participant_count.toLocaleString();
+        //         } else {
+        //             return "Phenotype: " + d.data.title + "\n" + "Participants: " + d.data.participant_count.toLocaleString();
+        //         }
+        //     });
 
         node.append("circle")
             .attr("r", function (d) {
@@ -180,52 +180,25 @@ export class BubbleChart {
         var tooltip = d3.select(container)
             .append("div")
             .style("opacity", 0)
-            .attr("class", "tooltip")
+            .attr("class", "tooltip border")
             .style("position", "absolute")
-            .style("background-color", "black")
-            .style("border-radius", "5px")
-            .style("padding", "10px")
-            .style("color", "white");
+            .style("background-color", "white")
+            .style("padding", "2px");
 
-        var showTooltip = function(d) {
-            console.log("d", d);
-            // var coordinates= d3.mouse(this);
-            // var x = coordinates[0];
-            // var y = coordinates[1];
-            // var x = d3.event.pageX - document.getElementById("bubble-chart-svg").getBoundingClientRect().x + 10;
-            // var y = d3.event.pageY - document.getElementById("bubble-chart-svg").getBoundingClientRect().y + 10;
-            
+        var showTooltip = function(d) {    
             tooltip
                 .transition()
                 .duration(200);
             tooltip
                 .style("opacity", 1)
-                .html("Phenotype: " + d.data.title + "<br>" + "Participants: " + Number(d.data.participant_count).toLocaleString())
-                // .style("left", (d3.mouse(this)[0]+30) + "px")
-                // .style("top", (d3.mouse(this)[1]+30) + "px");
-                // .style("left", (x + 80) + "px")
-                // .style("top", (y + 80) + "px");
+                .html("Phenotype: <b>" + d.data.title + "</b><br>" + "Participants: <b>" + Number(d.data.participant_count).toLocaleString() + "</b>") 
+                .style("left", (d.x + 250) + "px")
+                .style("top", (d.y) + "px");
             d3.select(this)
                 .select(".circle")
                 .style("stroke", function (d) {
                     return "black";
                 });
-        }
-
-        var moveTooltip = function(d) {
-            // var coordinates= d3.mouse(this);
-            // var x = coordinates[0];
-            // var y = coordinates[1];
-            // var x = d3.event.pageX;
-            // var y = d3.event.pageY;
-            var x = d3.event.pageX - document.getElementById("bubble-chart-svg").getBoundingClientRect().left + 10;
-            var y = d3.event.pageY - document.getElementById("bubble-chart-svg").getBoundingClientRect().top + 10;
-
-            tooltip
-                // .style("left", (d3.mouse(this)[0]+30) + "px")
-                // .style("top", (d3.mouse(this)[1]+30) + "px");
-                .style("left", (x) + "px")
-                .style("top", (y) + "px");
         }
 
         var hideTooltip = function(d) {
@@ -241,7 +214,6 @@ export class BubbleChart {
         }
 
         node.on("mouseover", showTooltip)
-            .on("mousemove", moveTooltip)
             .on("mouseleave", hideTooltip);
 
         d3.select(container)
