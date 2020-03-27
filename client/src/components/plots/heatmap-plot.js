@@ -76,7 +76,8 @@ export const Heatmap = forwardRef(({}, ref) => {
     dispatch(
       updateBrowsePhenotypes({
         phenotypeData: null,
-        submitted: false
+        submitted: false,
+        displayTreeParent: null
       })
     );
       
@@ -96,6 +97,9 @@ export const Heatmap = forwardRef(({}, ref) => {
     dispatch(
       updateBrowsePhenotypes({
         selectedPhenotype: phenotype,
+        displayTreeParent: {
+          data: phenotype
+        },
         submitted: true,
         phenotypeData: data,
       })
