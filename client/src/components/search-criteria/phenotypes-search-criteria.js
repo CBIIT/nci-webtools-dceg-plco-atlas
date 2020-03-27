@@ -8,7 +8,6 @@ import { Icon } from '../controls/icon';
 export const PhenotypesSearchCriteria = () => {
   const dispatch = useDispatch();
   const {
-    searchCriteriaPhenotypes,
     submitted,
     phenotypeData
   } = useSelector(

@@ -117,7 +117,6 @@ export const getInitialState = () => ({
     displayTreeParent: null,
     submitted: null,
     messages: [],
-    searchCriteriaPhenotypes: {},
     selectedPlot: 'frequency',
     phenotypeType: 'binary',
     breadcrumb: [],
