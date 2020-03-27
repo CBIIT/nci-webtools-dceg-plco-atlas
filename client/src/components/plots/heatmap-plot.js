@@ -66,10 +66,6 @@ export const Heatmap = forwardRef(({}, ref) => {
     dispatch(updateBrowsePhenotypes({ loading }));
   }
 
-  const setSearchCriteriaPhenotypes = searchCriteriaPhenotypes => {
-    dispatch(updateBrowsePhenotypes({ searchCriteriaPhenotypes }));
-  };
-
   const handlePhenotypeLookup = async (pointData) => {
     var phenotype = JSON.parse(pointData)
     
@@ -104,10 +100,6 @@ export const Heatmap = forwardRef(({}, ref) => {
         phenotypeData: data,
       })
     );
-
-    setSearchCriteriaPhenotypes({
-      phenotype: [...phenotype.title]
-    });
   };
 
   const popupMarkerClick = e => {
