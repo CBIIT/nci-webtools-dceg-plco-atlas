@@ -738,9 +738,7 @@ export function drawQQPlot(phenotype, sex) {
 
 export function drawHeatmap(phenotypes) {
   return async function(dispatch) {
-
     const filterCorrelationData = (phenotype1, phenotype2, correlationData) => {
-      // console.log("filterCorrelationData", phenotype1, phenotype2);
       return correlationData.filter((data) => {
         return (data.phenotype_a === phenotype1.id && data.phenotype_b === phenotype2.id) ||
           (data.phenotype_a === phenotype2.id && data.phenotype_b === phenotype1.id);
@@ -791,8 +789,6 @@ export function drawHeatmap(phenotypes) {
       b: phenotypesID
     });
 
-    // const correlationData = await query('correlations');
-
     let n = phenotypes.length;
     let x = phenotypes;
     let y = phenotypes;
@@ -814,8 +810,8 @@ export function drawHeatmap(phenotypes) {
     }
 
     let heatmapData = {
-      x: phenotypes.map(phenotype => phenotype.name),
-      y: phenotypes.map(phenotype => phenotype.name),
+      x: phenotypes.map(phenotype => JSON.stringify(phenotype)),
+      y: phenotypes.map(phenotype => JSON.stringify(phenotype)),
       z: z.zColor,
       zmin: -1.0,
       zmax: 1.0,
@@ -865,7 +861,7 @@ export function drawHeatmap(phenotypes) {
           size: 10,
           color: 'black'
         },
-        tickvals: phenotypes.map(phenotype => phenotype.name),
+        tickvals: phenotypes.map(phenotype => JSON.stringify(phenotype)),
         ticktext: phenotypes.map(phenotype =>
           phenotype.display_name.length > 20 ? phenotype.display_name.substring(0, 20) + '...' : phenotype.display_name
         )
@@ -880,7 +876,7 @@ export function drawHeatmap(phenotypes) {
           size: 10,
           color: 'black'
         },
-        tickvals: phenotypes.map(phenotype => phenotype.name),
+        tickvals: phenotypes.map(phenotype => JSON.stringify(phenotype)),
         ticktext: phenotypes.map(phenotype =>
           phenotype.display_name.length > 20 ? phenotype.display_name.substring(0, 20) + '...' : phenotype.display_name
         )

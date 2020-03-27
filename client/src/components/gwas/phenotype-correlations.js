@@ -70,6 +70,7 @@ export function PhenotypeCorrelations() {
       ]);
       return;
     }
+
     // close sidebar on submit
     // setOpenSidebar(false);
     setSearchCriteriaPhenotypeCorrelations({
