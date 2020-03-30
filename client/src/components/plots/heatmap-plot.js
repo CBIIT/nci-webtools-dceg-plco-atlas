@@ -99,11 +99,8 @@ export const Heatmap = forwardRef(({}, ref) => {
   };
 
   const popupMarkerClick = e => {
-    console.log('E', e);
     const ev = e.event;
-    console.log('EVENT', ev);
     const points = e.points;
-    console.log('POINTS', points);
     if (e && ev && points && points[0]) {
       hideTooltip();
       const tooltip = createTooltip();
@@ -179,7 +176,7 @@ export const Heatmap = forwardRef(({}, ref) => {
             textAlign: 'left'
           }}>
           <Plot
-            className="heatmap"
+            className="heatmap override-cursor-heatmap"
             style={{ position: 'relative', height: '1000px', width: '1000px' }}
             data={heatmapData}
             layout={heatmapLayout}

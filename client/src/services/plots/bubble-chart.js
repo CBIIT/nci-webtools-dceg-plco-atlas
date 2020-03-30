@@ -40,7 +40,8 @@ export class BubbleChart {
             .attr("width", diameter)
             .attr("height", diameter)
             .attr("class", "bubble")
-            .attr("id", "bubble-chart-svg");
+            .attr("id", "bubble-chart-svg")
+            .style("cursor", "pointer");
 
         svg.append("rect")
             .attr("class", "overlay")
