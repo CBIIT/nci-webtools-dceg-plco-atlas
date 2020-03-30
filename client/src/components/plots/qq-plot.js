@@ -128,6 +128,17 @@ export function QQPlot({ onVariantLookup }) {
             },
             'Go to Variant Lookup'
           )
+        ]),
+        h('div', {
+          className: 'tooltip-close',
+          style: 'position: absolute; cursor: pointer; top: 0px; right: 5px;'
+        }, [
+          h(
+            'i', {
+              className: 'fa fa-times',
+              onclick: () => hideTooltip()
+            }, ``), 
+            ``
         ])
       ]);
     } else  {
@@ -136,16 +147,25 @@ export function QQPlot({ onVariantLookup }) {
         h('br', null, []),
         h('span', null, 'for variants with -log'),
         h('sub', null, '10'),
-        h('span', null, '(p) < 3.')
+        h('span', null, '(p) < 3.'),
+        h('div', {
+          className: 'tooltip-close',
+          style: 'position: absolute; cursor: pointer; top: 0px; right: 5px;'
+        }, [
+          h(
+            'i', {
+              className: 'fa fa-times',
+              onclick: () => hideTooltip()
+            }, ``), 
+            ``
+        ])
       ]);
     }
   }
 
   function popupMarkerClick(e) {
     e.event.preventDefault();
-    // console.log("E", e);
     const ev = e.event;
-    // console.log("EVENT", ev);
     const points = e.points;
     if (e && ev && points && points[0]) {
       hideTooltip();
@@ -206,7 +226,6 @@ export function QQPlot({ onVariantLookup }) {
                 popupMarkerClick(e);
               }}
               onRelayout={relayout => {
-                console.log('RELAYOUT');
                 hideTooltip();
               }}
             />
