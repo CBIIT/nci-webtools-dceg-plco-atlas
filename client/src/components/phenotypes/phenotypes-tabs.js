@@ -95,11 +95,11 @@ export function PhenotypesTabs() {
             eventKey={t.key}
             title={t.title}
             className="p-4 bg-white tab-pane-bordered rounded-0"
-            style={{ minHeight: '600px', textAlign: 'center' }}>
+            style={{ minHeight: '600px'}}>
 
-            <div className="m-2">{[
-              false && {label: 'Counts', value: 'counts'},
-              false && {label: 'Percentage', value: 'percentage'},
+            <div className="m-2 text-left">{[
+              {label: 'Counts', value: 'counts'},
+              {label: 'Percentage', value: 'percentage'},
             ].filter(Boolean).map((e, i) =>
               <Form.Check
                 custom
@@ -115,6 +115,8 @@ export function PhenotypesTabs() {
               />
             )}</div>
 
+            <div className="text-center">
+
             {phenotypeData && phenotypeData[t.key] && <>
               {((/continuous/.test(phenotypeData.type) || (/binary/.test(phenotypeData.type) && t.key === 'frequencyByAge')) ? GroupedAreaChart : BarChart)({
                 data: phenotypeData[t.key][frequencyType[t.key]],
@@ -124,8 +126,10 @@ export function PhenotypesTabs() {
                 xTitle: phenotypeData.displayName,
                 yTitle: frequencyType[t.key] === 'counts' ? 'Number of Participants' : '% of Participants',
                 fill: true,
+                yMax: frequencyType[t.key] === 'counts' ? null : 100,
               })}
             </>}
+            </div>
           </Tab>
         )}
 

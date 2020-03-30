@@ -26,7 +26,7 @@ export const colors = [
   `rgba(0, 190, 209, 0.2)`,
 ];
 
-export const BarChart = ({ data, categories, xTitle, yTitle }) => (
+export const BarChart = ({ data, categories, xTitle, yTitle, yMax }) => (
 <Plot
     className="w-100 disable-x-axis-tooltip override-cursor"
     style={{ minHeight: "600px", width: "600px" }}
@@ -50,8 +50,8 @@ export const BarChart = ({ data, categories, xTitle, yTitle }) => (
         hovertemplate: i === 0 ? '%{text}<extra></extra>' : null,
         text: i > 0 ? '' : Object.entries(data).map(([key, value]) => {
           return [
-            xTitle + `: <b>${key}</b>`,
-            categories.map((name, i) => `${name}: <b>${value[i].toLocaleString()}</b>`).join('<br>')
+            `<b>${xTitle}</b>: ${key}`,
+            categories.map((name, i) => `<b>${name}</b>: ${value[i].toLocaleString()}`).join('<br>')
           ].join('<br>');
         })
       };
@@ -72,6 +72,7 @@ export const BarChart = ({ data, categories, xTitle, yTitle }) => (
           separatethousands: true,
       },
       yaxis: {
+          [yMax ? 'range' : '']: [0, yMax],
           fixedrange: true,
           automargin: true,
           title: {
@@ -170,7 +171,7 @@ export const AreaChart = ({data, categories, xTitle, yTitle}) => {
   />
 }
 
-export const GroupedAreaChart = ({data, categories, xTitle, yTitle, fill}) => {
+export const GroupedAreaChart = ({data, categories, xTitle, yTitle, fill, yMax}) => {
   let items = categories.map((name, i) => {
     let x = [];
     let y = [];
@@ -181,12 +182,13 @@ export const GroupedAreaChart = ({data, categories, xTitle, yTitle, fill}) => {
     return {x, y}
   });
 
-  let yMax = 0;
-  for (let key in data) {
-    yMax = Math.max(
-      yMax,
-      data[key].reduce((acc, curr) => acc > curr ? acc : curr)
-    );
+  if (!yMax) {
+    for (let key in data) {
+      yMax = Math.max(
+        yMax,
+        data[key].reduce((acc, curr) => acc > curr ? acc : curr)
+      );
+    }
   }
 
   return <Plot
@@ -212,7 +214,7 @@ export const GroupedAreaChart = ({data, categories, xTitle, yTitle, fill}) => {
         hovertemplate: i === 0 ? '%{text}<extra></extra>' : null,
         text: i > 0 ? '' : Object.entries(data).map(([key, value]) => {
           return [
-            xTitle + `: <b>${key}</b>`,
+            `<b>${xTitle}</b>: ${key}`,
             categories.map((name, i) => `${name}: <b>${value[i].toLocaleString()}</b>`).join('<br>')
           ].join('<br>');
         })
