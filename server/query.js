@@ -761,6 +761,36 @@ function getConfig(key) {
         : null;
 }
 
+async function getShareLink(connection, params) {
+    let [shareLinkRows] = await connection.execute(
+        `SELECT parameters
+        FROM share_link
+        WHERE share_id = :id`,
+        {id: params.id}
+    );
+
+    return shareLinkRows[0].parameters;
+}
+
+async function setShareLink(pool, params) {
+    const connection = await pool.getConnection();
+
+    await connection.execute(
+        `INSERT INTO share_link (share_id, parameters, created_date)
+        VALUES (UUID(), :parameters, NOW());`,
+        {parameters: params}
+    );
+
+    let shareLinkRows = await connection.query(
+        `SELECT share_id
+        FROM share_link
+        WHERE id = LAST_INSERT_ID();`
+    );
+
+    await connection.release();
+    return pluck(shareLinkRows);
+}
+
 module.exports = {
     connection,
     getSummary,
@@ -772,5 +802,7 @@ module.exports = {
     getRanges,
     getGenes,
     getCounts,
-    getConfig
+    getConfig,
+    getShareLink,
+    setShareLink
 };
