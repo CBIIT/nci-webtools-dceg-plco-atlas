@@ -1,13 +1,16 @@
 import React, { forwardRef, useImperativeHandle } from 'react';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { query } from '../../services/query';
 import { Spinner } from 'react-bootstrap';
 import Plot from 'react-plotly.js';
 import {
   viewportToLocalCoordinates,
   createElement as h
 } from '../../services/plots/utils';
+import { updateBrowsePhenotypes } from '../../services/actions';
 
 export const Heatmap = forwardRef(({}, ref) => {
+  const dispatch = useDispatch();
 
   useImperativeHandle(ref, () => ({
     resetTooltip() {
@@ -38,10 +41,8 @@ export const Heatmap = forwardRef(({}, ref) => {
     tooltip.innerHTML = '';
     tooltip.style.display = 'inline-block';
     if (html instanceof Element) {
-      console.log('ELEMENT');
       tooltip.insertAdjacentElement('beforeend', html);
     } else {
-      console.log('HTML');
       tooltip.insertAdjacentHTML('beforeend', html);
     }
 
@@ -59,6 +60,46 @@ export const Heatmap = forwardRef(({}, ref) => {
       elem[0].remove();
     }
     // tooltip.style.display = 'none';
+  };
+
+  const setBrowsePhenotypesLoading = loading =>  {
+    dispatch(updateBrowsePhenotypes({ loading }));
+  }
+
+  const handlePhenotypeLookup = async (pointData) => {
+    var phenotype = JSON.parse(pointData)
+    
+    dispatch(
+      updateBrowsePhenotypes({
+        phenotypeData: null,
+        submitted: false,
+        displayTreeParent: null
+      })
+    );
+      
+    setBrowsePhenotypesLoading(true);
+    const data = await query('phenotype', {
+      id: phenotype.id,
+      type: {
+        'frequency': 'frequency',
+        'distribution': 'distribution',
+        'distribution-inverted': 'distributionInverted',
+        'related-phenotypes': 'related',
+      }['frequency'] || 'all'
+    });
+    setBrowsePhenotypesLoading(false);
+
+    // update browse phenotypes filters
+    dispatch(
+      updateBrowsePhenotypes({
+        selectedPhenotype: phenotype,
+        displayTreeParent: {
+          data: phenotype
+        },
+        submitted: true,
+        phenotypeData: data,
+      })
+    );
   };
 
   const popupMarkerClick = e => {
@@ -87,8 +128,8 @@ export const Heatmap = forwardRef(({}, ref) => {
             'a',
             {
               className: '',
-              href: 'javascript:void(0)',
-              onclick: () => console.log(tooltipX)
+              href: '#/phenotypes',
+              onclick: () => handlePhenotypeLookup(points[0].x)
             },
             `${tooltipX}`
           )
@@ -98,8 +139,8 @@ export const Heatmap = forwardRef(({}, ref) => {
             'a',
             {
               className: '',
-              href: 'javascript:void(0)',
-              onclick: () => console.log(tooltipY)
+              href: '#/phenotypes',
+              onclick: () => handlePhenotypeLookup(points[0].y)
             },
             `${tooltipY}`
           )
