@@ -138,7 +138,22 @@ export const Heatmap = forwardRef(({}, ref) => {
             `${tooltipY}`
           )
         ]),
-        h('div', null, [h('b', null, 'Correlation: '), `${tooltipCorrelation}`])
+        h('div', null, [
+          h(
+            'b', null, 'Correlation: '), 
+            `${tooltipCorrelation}`
+        ]),
+        h('div', {
+          className: 'tooltip-close',
+          style: 'position: absolute; cursor: pointer; top: 0px; right: 5px;'
+        }, [
+          h(
+            'i', {
+              className: 'fa fa-times',
+              onclick: () => hideTooltip()
+            }, ``), 
+            ``
+        ])
       ]);
       showTooltip(ev, tooltip, html);
     }
