@@ -273,7 +273,7 @@ function wrap(text, width) {
         var text = d3.select(this);
         var label = text.text().split('<br>')[0],
             value = text.text().split('<br>')[1],
-            words = label.split(/[/\s+]/).reverse(),
+            words = label.split(/[/\s]/).reverse(),
             word,
             line = [],
             lineNumber = 1,
