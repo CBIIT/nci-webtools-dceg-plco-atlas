@@ -80,12 +80,7 @@ export const Heatmap = forwardRef(({}, ref) => {
     setBrowsePhenotypesLoading(true);
     const data = await query('phenotype', {
       id: phenotype.id,
-      type: {
-        'frequency': 'frequency',
-        'distribution': 'distribution',
-        'distribution-inverted': 'distributionInverted',
-        'related-phenotypes': 'related',
-      }['frequency'] || 'all'
+      type: 'frequency'
     });
     setBrowsePhenotypesLoading(false);
 
@@ -98,6 +93,7 @@ export const Heatmap = forwardRef(({}, ref) => {
         },
         submitted: true,
         phenotypeData: data,
+        selectedPlot: 'frequency'
       })
     );
   };
