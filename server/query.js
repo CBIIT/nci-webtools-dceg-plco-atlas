@@ -772,22 +772,20 @@ async function getShareLink(connection, params) {
     return shareLinkRows[0].parameters;
 }
 
-async function setShareLink(pool, params) {
-    const connection = await pool.getConnection();
-
-    await connection.execute(
+async function setShareLink(connection, params) {
+    let [results] = await connection.execute(
         `INSERT INTO share_link (share_id, parameters, created_date)
         VALUES (UUID(), :parameters, NOW());`,
         {parameters: params}
     );
 
-    let shareLinkRows = await connection.query(
+    let shareLinkRows = await connection.execute(
         `SELECT share_id
         FROM share_link
-        WHERE id = LAST_INSERT_ID();`
+        WHERE id = :id`,
+        {id: results.insertId}
     );
 
-    await connection.release();
     return pluck(shareLinkRows);
 }
 
