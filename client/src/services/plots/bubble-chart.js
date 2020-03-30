@@ -191,7 +191,7 @@ export class BubbleChart {
                 .duration(200);
             tooltip
                 .style("opacity", 1)
-                .html((getChildren(d, data) ? "Category: " : "Phenotype: ") + "<b>" + d.data.title + "</b><br>" + "Participants: <b>" + Number(d.data.participant_count).toLocaleString() + "</b>") 
+                .html((getChildren(d, data) ? "Category: " : "Phenotype: ") + "<b>" + d.data.title + "</b><br>" + "Participants: <b>" + Number(d.data.participant_count).toLocaleString() + "</b>")
                 .style("left", (d.x + 250) + "px")
                 .style("top", (d.y) + "px");
             d3.select(this)
