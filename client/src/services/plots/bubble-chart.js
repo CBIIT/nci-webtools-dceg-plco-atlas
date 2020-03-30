@@ -112,7 +112,9 @@ export class BubbleChart {
             .style("opacity", function (d) {
                 return getChildren(d, data) ? "100%" : "50%";
             })
-            .attr("class", "circle");
+            .attr("class", "circle")
+            .style("stroke-width", "2px")
+            .style("stroke", "transparent");
 
         node.append("circle")
             .attr("r", function (d) {
