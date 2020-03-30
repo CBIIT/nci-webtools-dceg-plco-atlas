@@ -273,7 +273,7 @@ function wrap(text, width) {
         var text = d3.select(this);
         var label = text.text().split('<br>')[0],
             value = text.text().split('<br>')[1],
-            words = label.split(/[/\s]/).reverse(),
+            words = label.split(/[\s]/).reverse(),
             word,
             line = [],
             lineNumber = 1,
@@ -289,7 +289,7 @@ function wrap(text, width) {
                 line.pop();
                 tspan.text(line.join(" "));
                 line = [word];
-                tspan = text.append("tspan").attr("x", 0).attr("y", y).attr("dy", "1em").text(lineNumber === 3 && words.length > 0 ? word + " ..." : word);
+                tspan = text.append("tspan").attr("x", 0).attr("y", y).attr("dy", "1em").text(lineNumber === 3 && words.length > 0 ? word + "..." : word);
             } 
         }
         tspan = text.append("tspan").attr("x", 0).attr("y", y).attr("dy", "1.2em").text(value.length > 0 ? Number(value).toLocaleString() : "");
