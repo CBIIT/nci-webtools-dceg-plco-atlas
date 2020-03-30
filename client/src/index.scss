@@ -550,6 +550,10 @@ footer {
   cursor: default;
 }
 
+.js-plotly-plot.override-cursor-heatmap .plotly .cursor-crosshair {
+  cursor: pointer;
+}
+
 // bubble chart
 
 .circle {
