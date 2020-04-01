@@ -599,7 +599,7 @@ export function drawQQPlot(phenotype, sex) {
           size: 8
         },
       };
-
+      // console.log("qqplotTopDataFemale.x[qqplotTopDataFemale.x.length - 1]", qqplotTopDataFemale.x[qqplotTopDataFemale.x.length - 1]);
       let qqplotLineDataFemale = {
         x: [0.0, qqplotTopDataFemale.x[qqplotTopDataFemale.x.length - 1]],
         y: [0.0, qqplotTopDataFemale.x[qqplotTopDataFemale.x.length - 1]],
@@ -647,7 +647,7 @@ export function drawQQPlot(phenotype, sex) {
           size: 8
         },
       };
-
+      // console.log("qqplotTopDataMale.x[qqplotTopDataMale.x.length - 1]", qqplotTopDataMale.x[qqplotTopDataMale.x.length - 1]);
       let qqplotLineDataMale = {
         x: [0.0, qqplotTopDataMale.x[qqplotTopDataMale.x.length - 1]],
         y: [0.0, qqplotTopDataMale.x[qqplotTopDataMale.x.length - 1]],
