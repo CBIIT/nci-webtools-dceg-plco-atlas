@@ -5,9 +5,13 @@ import { ShareLink } from '../controls/share-link';
 
 
 export const SummaryResultsSearchCriteria = () => {
-  const { searchCriteriaSummaryResults, sampleSize } = useSelector(
-    state => state.summaryResults
-  );
+  const { 
+    searchCriteriaSummaryResults, 
+    sampleSize,
+    selectedPhenotype,
+    selectedChromosome,
+    selectedPlot
+  } = useSelector(state => state.summaryResults);
 
   const displaySex = sex =>
     ({
@@ -44,25 +48,32 @@ export const SummaryResultsSearchCriteria = () => {
                 {searchCriteriaSummaryResults && searchCriteriaSummaryResults.sex
                   ? displaySex(searchCriteriaSummaryResults.sex)
                   : 'None'}
-              </div>
+
+                <span className="border-left border-secondary mx-3" style={{maxHeight: '1.6em'}}></span>
             
-            <div className="py-1">
-              <b><span>Total Variants: </span></b>
-              {sampleSize ? sampleSize.toLocaleString() : 'None'}
-            </div>
-          </div>
-
-          {/* <div className="right py-1">
-            <b><span>Total Variants: </span></b>
-            {sampleSize ? sampleSize.toLocaleString() : 'None'}
-          </div> */}
-          {
-            searchCriteriaSummaryResults &&
-              <div className="d-flex justify-content-end">
-                <ShareLink />
+                <span>
+                  <b>Total Variants:</b> {' '}
+                </span>
+                {sampleSize 
+                  ? sampleSize.toLocaleString() :
+                  'None'}
               </div>
-          }
 
+              <div>
+                {
+                  searchCriteriaSummaryResults &&
+                    <div className="d-flex justify-content-end">
+                      <ShareLink 
+                        params={{
+                          selectedPhenotype,
+                          selectedChromosome,
+                          selectedPlot
+                        }}
+                      />
+                    </div>
+                }
+              </div>
+          </div>
         </Tab>
       </Tabs>
     </div>

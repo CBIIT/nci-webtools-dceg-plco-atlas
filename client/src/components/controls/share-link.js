@@ -1,21 +1,8 @@
-import React, { forwardRef, useState, useEffect, useImperativeHandle } from 'react';
+import React, { useState } from 'react';
 import { Button, OverlayTrigger, Popover, Spinner } from 'react-bootstrap';
 import { LoadingOverlay } from './loading-overlay';
 
-export const ShareLink = forwardRef(({
-    // submitted
-  }, ref) => {
-
-  useImperativeHandle(ref, () => ({
-    // resetSearchFilter() {
-    //   clearSearchFilter();
-    //   collapseAllParents();
-    // },
-    // expandSelectedPhenotype(displayTreeParent) {
-    //   collapseAllParents();
-    //   expandParents(displayTreeParent)
-    // }
-  }));
+export const ShareLink = props => {
 
   const [loading, setLoading] = useState(true);
 
@@ -33,7 +20,8 @@ export const ShareLink = forwardRef(({
   }
 
   const shareLink = () => {
-    console.log("do something!");
+    setLoading(true);
+    console.log("do something!", props);
     setTimeout(function() {
       setLoading(false);
     }, 1000);
@@ -43,7 +31,7 @@ export const ShareLink = forwardRef(({
     return (
       <Popover id="share-link-popover">
         <LoadingOverlay active={displayCopied} content={"Copied!"}/>
-        <Popover.Title as="h3">Copy this URL</Popover.Title>
+        {/* <Popover.Title as="h3">Copy this URL</Popover.Title> */}
         <Popover.Content>
           <div 
             className="text-center"
@@ -93,26 +81,23 @@ export const ShareLink = forwardRef(({
   }
 
   return (
-    <div style={{position: 'relative'}}>
-      <OverlayTrigger
-        trigger="click"
-        placement="bottom"
-        rootClose
-        shouldUpdatePosition
-        overlay={sharePopover()}>
-      <div>
-        <Button 
-          variant="silver"
-          size="sm"
-          onClick={e => {
-            e.preventDefault();
-            shareLink();
-          }}>
-          Share <i className="fa fa-caret-down"></i>
-        </Button>
-      </div>
-    </OverlayTrigger>
+    <OverlayTrigger
+      trigger="click"
+      placement="bottom"
+      rootClose
+      shouldUpdatePosition
+      overlay={sharePopover()}>
+    <div>
+      <Button 
+        variant="silver"
+        size="sm"
+        onClick={e => {
+          e.preventDefault();
+          shareLink();
+        }}>
+        Share Link <i className="fa fa-caret-down"></i>
+      </Button>
     </div>
-    
+  </OverlayTrigger>    
   );
-});
+}
