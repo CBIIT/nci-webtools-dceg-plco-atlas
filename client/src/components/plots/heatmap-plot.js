@@ -126,7 +126,7 @@ export const Heatmap = forwardRef(({}, ref) => {
           h(
             'a',
             {
-              className: '',
+              className: 'font-weight-bold',
               href: '#/phenotypes',
               onclick: () => handlePhenotypeLookup(points[0].x)
             },
@@ -137,7 +137,7 @@ export const Heatmap = forwardRef(({}, ref) => {
           h(
             'a',
             {
-              className: '',
+              className: 'font-weight-bold',
               href: '#/phenotypes',
               onclick: () => handlePhenotypeLookup(points[0].y)
             },
