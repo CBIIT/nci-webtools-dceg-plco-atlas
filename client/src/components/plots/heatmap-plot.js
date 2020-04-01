@@ -80,12 +80,7 @@ export const Heatmap = forwardRef(({}, ref) => {
     setBrowsePhenotypesLoading(true);
     const data = await query('phenotype', {
       id: phenotype.id,
-      type: {
-        'frequency': 'frequency',
-        'distribution': 'distribution',
-        'distribution-inverted': 'distributionInverted',
-        'related-phenotypes': 'related',
-      }['frequency'] || 'all'
+      type: 'frequency'
     });
     setBrowsePhenotypesLoading(false);
 
@@ -98,16 +93,14 @@ export const Heatmap = forwardRef(({}, ref) => {
         },
         submitted: true,
         phenotypeData: data,
+        selectedPlot: 'frequency'
       })
     );
   };
 
   const popupMarkerClick = e => {
-    console.log('E', e);
     const ev = e.event;
-    console.log('EVENT', ev);
     const points = e.points;
-    console.log('POINTS', points);
     if (e && ev && points && points[0]) {
       hideTooltip();
       const tooltip = createTooltip();
@@ -145,7 +138,22 @@ export const Heatmap = forwardRef(({}, ref) => {
             `${tooltipY}`
           )
         ]),
-        h('div', null, [h('b', null, 'Correlation: '), `${tooltipCorrelation}`])
+        h('div', null, [
+          h(
+            'b', null, 'Correlation: '), 
+            `${tooltipCorrelation}`
+        ]),
+        h('div', {
+          className: 'tooltip-close',
+          style: 'position: absolute; cursor: pointer; top: 0px; right: 5px;'
+        }, [
+          h(
+            'i', {
+              className: 'fa fa-times',
+              onclick: () => hideTooltip()
+            }, ``), 
+            ``
+        ])
       ]);
       showTooltip(ev, tooltip, html);
     }
@@ -183,7 +191,7 @@ export const Heatmap = forwardRef(({}, ref) => {
             textAlign: 'left'
           }}>
           <Plot
-            className="heatmap"
+            className="heatmap override-cursor-heatmap"
             style={{ position: 'relative', height: '1000px', width: '1000px' }}
             data={heatmapData}
             layout={heatmapLayout}
