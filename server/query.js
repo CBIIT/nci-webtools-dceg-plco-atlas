@@ -133,11 +133,12 @@ function getValidTable(table) {
    }} params - Database query criteria
  * @returns Records in the aggregate summary table which match query criteria
  */
-async function getSummary(connection, {id, table, sex, p_value_nlog_min, raw}) {
+async function getSummary(connection, {phenotype_id, table, sex, p_value_nlog_min, raw}) {
     let timestamp = getTimestamp();
 
     // validate parameters
-    if (!/^(all|female|male)$/.test(sex) || (id && !await hasRecord(connection, 'phenotype', {id})))
+    if (!/^(all|female|male)$/.test(sex) ||
+        (phenotype_id && !await hasRecord(connection, 'phenotype', {id: phenotype_id})))
         return null;
 
     // determine id if table name was supplied (remove once table parameter is no longer used)
@@ -145,10 +146,10 @@ async function getSummary(connection, {id, table, sex, p_value_nlog_min, raw}) {
         const name = table.replace('aggregate_', '');
         const [phenotypeRows] = await query(connection, 'phenotype', {name});
         if (!phenotypeRows.length) return null;
-        id = phenotypeRows[0].id;
+        phenotype_id = phenotypeRows[0].id;
     }
 
-    const partition = quote(`${id}_${sex}`);
+    const partition = quote(`${phenotype_id}_${sex}`);
     const [data, columns] = await connection.query({
         rowsAsArray: raw,
         values: {p_value_nlog_min},//[params.table, params.sex, params.p_value_nlog_min],
@@ -201,10 +202,10 @@ async function getVariants(connection, params) {
         );
     }
 
-    if (params.id) {
+    if (params.phenotype_id) {
         [phenotypes] = await connection.query(
             `SELECT * FROM phenotype WHERE id in (?)`,
-            [params.id.split(',').filter(e => /^\d+$/.test(e))]
+            [params.phenotype_id.split(',').filter(e => /^\d+$/.test(e))]
         );
     }
 
