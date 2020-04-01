@@ -473,6 +473,7 @@ async function getPhenotype(connection, params) {
                     counts: distribution.reduce(keyValueArrayReducer('key', 'counts'), {}),
                     percentage: distribution.reduce(keyValueArrayReducer('key', 'percentage'), {})
                 };
+                getPercentage(phenotype[type].counts);
             }
         break;
 
@@ -512,6 +513,7 @@ async function getPhenotype(connection, params) {
                     {id: params.id}
                 );
                phenotype.frequency = frequencyRows.map(e => e.count);
+               phenotype.totalCount = frequencyRows.reduce((a, b) => a + b.count, 0);
             }
 
             if (type === 'all' || type === 'frequencyByAge') {
@@ -623,6 +625,7 @@ async function getPhenotype(connection, params) {
                 );
                 phenotype.frequency = frequencies.map(e => e.value);
                 phenotype.categories = frequencies.map(e => e.value_group);
+                phenotype.totalCount = frequencies.reduce((a, b) => a + b.value, 0);
             }
 
             if (type === 'all' || type === 'frequencyByAge') {

@@ -51,10 +51,9 @@ export const BarChart = ({ data, categories, xTitle, yTitle, yMax, percentageTot
         text: i > 0 ? '' : Object.entries(data).map(([key, value]) => {
           return [
             `<b>${xTitle}</b>: ${key}`,
-            categories.map((name, i) => `<b>${name}</b>:
-              ${value[i].toLocaleString()}
-              ${percentageTotal ? `(${(value[i] * 100 / percentageTotal).toLocaleString()})` : ''}
-            }`).join('<br>')
+            categories
+              .map((name, i) => `<b>${name}</b>: ${value[i].toLocaleString()} ${percentageTotal ? `(${(value[i] * 100 / percentageTotal).toLocaleString()}%)` : ''}`)
+              .join('<br>')
           ].join('<br>');
         })
       };
@@ -122,7 +121,7 @@ export const HorizontalBarChart = ({ data, categories }) => (
   />
 );
 
-export const AreaChart = ({data, categories, xTitle, yTitle}) => {
+export const AreaChart = ({data, categories, xTitle, yTitle, percentageTotal}) => {
   let items = categories.map((name, i) => {
     let x = [];
     let y = [];
@@ -141,8 +140,8 @@ export const AreaChart = ({data, categories, xTitle, yTitle}) => {
         y: data,
         hovertemplate: '%{text}<extra></extra>',
         text: categories.map((name, i) => [
-          `${xTitle}: <b>${name}</b>`,
-          `${yTitle}: <b>${data[i].toLocaleString()}</b>`
+          `<b>${xTitle}</b>: ${name}`,
+          `<b>${yTitle}</b>: ${data[i].toLocaleString()} ${percentageTotal ? `(${(data[i] * 100 / percentageTotal).toLocaleString()}%)` : ''}`
         ].join('<br>')),
         type: 'scatter',
         fill: 'tonexty',
@@ -174,7 +173,7 @@ export const AreaChart = ({data, categories, xTitle, yTitle}) => {
   />
 }
 
-export const GroupedAreaChart = ({data, categories, xTitle, yTitle, fill, yMax}) => {
+export const GroupedAreaChart = ({data, categories, xTitle, yTitle, fill, yMax, percentageTotal}) => {
   let items = categories.map((name, i) => {
     let x = [];
     let y = [];
@@ -218,9 +217,9 @@ export const GroupedAreaChart = ({data, categories, xTitle, yTitle, fill, yMax})
         text: i > 0 ? '' : Object.entries(data).map(([key, value]) => {
           return [
             `<b>${xTitle}</b>: ${key}`,
-            categories.map((name, i) => `${name}: <b>${value[i].toLocaleString()}
-            ${percentageTotal ? `(${(value[i] * 100 / percentageTotal).toLocaleString()})` : ''}
-            </b>`).join('<br>')
+            categories
+              .map((name, i) => `<b>${name}</b>: ${value[i].toLocaleString()} ${percentageTotal ? `(${(value[i] * 100 / percentageTotal).toLocaleString()}%)` : ''}`)
+              .join('<br>')
           ].join('<br>');
         })
       };

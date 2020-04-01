@@ -81,7 +81,8 @@ export function PhenotypesTabs() {
                   data={phenotypeData.frequency}
                   categories={phenotypeData.categories}
                   xTitle={phenotypeData.displayName}
-                  yTitle="Number of Participants" />}
+                  yTitle="Number of Participants"
+                  percentageTotal={phenotypeData.totalCount} />}
           </>}
         </Tab>
 
@@ -126,8 +127,7 @@ export function PhenotypesTabs() {
                 xTitle: phenotypeData.displayName,
                 yTitle: frequencyType[t.key] === 'counts' ? 'Number of Participants' : '% of Participants',
                 fill: true,
-                yMax: frequencyType[t.key] === 'counts' ? null : 100,
-                percentageTotal: frequencyType[t.key] === 'counts' ? phenodtypeData.totalCount : null,
+                percentageTotal: frequencyType[t.key] === 'counts' ? phenotypeData.totalCount : null,
               })}
             </>}
             </div>
