@@ -48,7 +48,7 @@ export const ShareLink = props => {
               display: loading ? 'none' : 'block'
             }}>
             <div 
-              className="input-group" 
+              className="input-group my-1" 
               style={{ 
                 width: '100%',
                 width: '250px' 
@@ -86,7 +86,8 @@ export const ShareLink = props => {
       placement="bottom"
       rootClose
       shouldUpdatePosition
-      overlay={sharePopover()}>
+      overlay={sharePopover()}
+      transition={false}>
     <div>
       <Button 
         variant="silver"
