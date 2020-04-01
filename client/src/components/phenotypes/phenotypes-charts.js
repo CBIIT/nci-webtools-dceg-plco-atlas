@@ -51,9 +51,16 @@ export const BarChart = ({ data, categories, xTitle, yTitle, yMax, percentageTot
         text: i > 0 ? '' : Object.entries(data).map(([key, value]) => {
           return [
             `<b>${xTitle}</b>: ${key}`,
-            categories
-              .map((name, i) => `<b>${name}</b>: ${value[i].toLocaleString()} ${percentageTotal ? `(${(value[i] * 100 / percentageTotal).toLocaleString()}%)` : ''}`)
-              .join('<br>')
+            categories.map((name, i) => {
+                let percentLabel = '';
+                if (percentageTotal) {
+                  let percent = (value[i] * 100 / percentageTotal);
+                  percentLabel = '(' + (percent >= 0.01
+                    ? percent.toFixed(2).toLocaleString()
+                    : '<0.01') + '%)'
+                }
+                return `<b>${name}</b>: ${value[i].toLocaleString()} ${percentLabel}`
+              }).join('<br>')
           ].join('<br>');
         })
       };
@@ -139,10 +146,19 @@ export const AreaChart = ({data, categories, xTitle, yTitle, percentageTotal}) =
         x: categories, //data.map((e, i) => i + 1),
         y: data,
         hovertemplate: '%{text}<extra></extra>',
-        text: categories.map((name, i) => [
-          `<b>${xTitle}</b>: ${name}`,
-          `<b>${yTitle}</b>: ${data[i].toLocaleString()} ${percentageTotal ? `(${(data[i] * 100 / percentageTotal).toLocaleString()}%)` : ''}`
-        ].join('<br>')),
+        text: categories.map((name, i) => {
+          let percentLabel = '';
+          if (percentageTotal) {
+            let percent = (data[i] * 100 / percentageTotal);
+            percentLabel = '(' + (percent >= 0.01
+              ? percent.toFixed(2).toLocaleString()
+              : '<0.01') + '%)'
+          }
+          return [
+            `<b>${xTitle}</b>: ${name}`,
+            `<b>${yTitle}</b>: ${data[i].toLocaleString()} ${percentLabel}`
+          ].join('<br>')
+        }),
         type: 'scatter',
         fill: 'tonexty',
         line: {shape: 'spline'},
@@ -217,9 +233,16 @@ export const GroupedAreaChart = ({data, categories, xTitle, yTitle, fill, yMax, 
         text: i > 0 ? '' : Object.entries(data).map(([key, value]) => {
           return [
             `<b>${xTitle}</b>: ${key}`,
-            categories
-              .map((name, i) => `<b>${name}</b>: ${value[i].toLocaleString()} ${percentageTotal ? `(${(value[i] * 100 / percentageTotal).toLocaleString()}%)` : ''}`)
-              .join('<br>')
+            categories.map((name, i) => {
+                let percentLabel = '';
+                if (percentageTotal) {
+                  let percent = (value[i] * 100 / percentageTotal);
+                  percentLabel = '(' + (percent >= 0.01
+                    ? percent.toFixed(2).toLocaleString()
+                    : '<0.01') + '%)'
+                }
+                return `<b>${name}</b>: ${value[i].toLocaleString()} ${percentLabel}`
+            }).join('<br>')
           ].join('<br>');
         })
       };
