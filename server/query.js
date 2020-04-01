@@ -71,11 +71,11 @@ function pluck(rows) {
 
 function getValidColumns(tableName, columns) {
     if (!Array.isArray(columns))
-        columns = (columns || '').split(',').filter(e => e.length);
+        columns = (columns || '').split(',').filter(e => /^\w+$/.test(e));
 
     let validColumns = {
-        variant: ['id', 'sex', 'chromosome', 'position', 'snp', 'allele_reference', 'allele_alternate', 'p_value', 'p_value_nlog', 'p_value_nlog_expected', 'odds_ratio', 'show_qq_plot'],
-        aggregate: ['id', 'sex', 'chromosome', 'position_abs', 'p_value_nlog'],
+        variant: ['id', 'phenotype_id', 'sex', 'chromosome', 'position', 'snp', 'allele_reference', 'allele_alternate', 'p_value', 'p_value_nlog', 'p_value_nlog_expected', 'odds_ratio', 'show_qq_plot'],
+        aggregate: ['id', 'phenotype_id', 'sex', 'chromosome', 'position_abs', 'p_value_nlog'],
         phenotype: ['id', 'parent_id', 'name', 'display_name', 'description', 'color', 'type', 'participant_count'],
     }[tableName];
 
@@ -84,6 +84,23 @@ function getValidColumns(tableName, columns) {
         : validColumns;
 }
 
+async function query(connection, tableName, conditions, conditionJoiner) {
+    let conditionSql = Object.keys(conditions)
+        .filter(key => /^\w+$/.test(key))
+        .map(key => `${quote(key)} = :${key}`)
+        .join(` ${conditionJoiner || 'AND'} `);
+
+    return await connection.execute(
+        `SELECT * FROM ${tableName}
+            ${conditionSql.length ? `WHERE ${conditionSql}` : ''}`,
+        conditions
+    );
+}
+
+async function hasRecord(connection, tableName, conditions, conditionJoiner) {
+    const [data] = await query(connection, tableName, conditions, conditionJoiner);
+    return data.length > 0;
+}
 
 function getValidTable(table) {
     // todo: validate table name
@@ -116,20 +133,31 @@ function getValidTable(table) {
    }} params - Database query criteria
  * @returns Records in the aggregate summary table which match query criteria
  */
-async function getSummary(connection, params) {
+async function getSummary(connection, {id, table, sex, p_value_nlog_min, raw}) {
     let timestamp = getTimestamp();
-    const [data, columns] = await connection.query({
-        rowsAsArray: params.raw,
-        values: [params.table, params.sex, params.p_value_nlog_min],
-        sql: `
-        SELECT
-            chromosome, position_abs, p_value_nlog FROM ??
-        WHERE
-            sex = ? AND
-            p_value_nlog > ?`,
-    });
-    logger.info(`[${process.pid}] /summary: ${timestamp()}s in database`, params);
 
+    // validate parameters
+    if (!/^(all|female|male)$/.test(sex) || (id && !await hasRecord(connection, 'phenotype', {id})))
+        return null;
+
+    // determine id if table name was supplied (remove once table parameter is no longer used)
+    if (table) {
+        const name = table.replace('aggregate_', '');
+        const [phenotypeRows] = await query(connection, 'phenotype', {name});
+        if (!phenotypeRows.length) return null;
+        id = phenotypeRows[0].id;
+    }
+
+    const partition = quote(`${id}_${sex}`);
+    const [data, columns] = await connection.query({
+        rowsAsArray: raw,
+        values: {p_value_nlog_min},//[params.table, params.sex, params.p_value_nlog_min],
+        sql: `SELECT chromosome, position_abs, p_value_nlog
+            FROM phenotype_aggregate partition(${partition})
+            WHERE p_value_nlog > :p_value_nlog_min`,
+    });
+
+    logger.info(`[${process.pid}] /summary: ${timestamp()}s in database`);
     return {data, columns: columns.map(c => c.name)};
 }
 
@@ -164,7 +192,14 @@ async function getSummary(connection, params) {
 
 async function getVariants(connection, params) {
     let timestamp = getTimestamp();
-    let tables = params.table.split(',').map(getValidTable);
+
+    let tables = params.table.split(',').filter(e => /^\w+$/.test(e));
+    let tableIds = await Promise.all(tables.map(async table => {
+        const name = table.replace('variant_', '');//.replace(/^\w/g, '');
+        const [phenotypeRows] = await query(connection, 'phenotype', {name})
+        return phenotypeRows[0].id;
+    }));
+
     let columnNames = getValidColumns('variant', params.columns).map(quote).join(',')
     // console.log("params.columns", params.columns);
     // let columnNames = params.columns.map(quote).join(',');
@@ -177,12 +212,10 @@ async function getVariants(connection, params) {
     // };
 
     // filter by id, chr, base position, and -log10(p), if provided
-    let sql = tables.map(table => `
-        SELECT ${columnNames} ${[coalesce(params.show_table_name, `, '${table}' as table_name`)]}
-        FROM ${table} as v
-        WHERE ${[
+    let sql = tables.map((table, index) => {
+        const conditions = [
             coalesce(params.id, `id = :id`),
-            coalesce(params.sex, `sex = :sex`),
+            // coalesce(params.sex, `sex = :sex`),
             coalesce(params.snp, `snp = :snp`),
             coalesce(params.chromosome, `chromosome = :chromosome`),
             coalesce(params.position, `position = :position`),
@@ -194,8 +227,14 @@ async function getVariants(connection, params) {
             coalesce(params.p_value_max, `p_value <= :p_value_max`),
             coalesce(params.mod, `(id % :mod) = 0`),
             coalesce(params.show_qq_plot, `show_qq_plot = 1`)
-        ].filter(Boolean).join(' AND ')}
-        ${groupby}`).join(' UNION ');
+        ].filter(Boolean).join(' AND ');
+
+        return `
+            SELECT ${columnNames} ${[coalesce(params.show_table_name, `, '${table}' as table_name`)]}
+            FROM phenotype_variant partition(${quote(`${tableIds[index]}_${params.sex}`)}) as v
+            ${conditions.length ? `WHERE ${conditions}` : ''}
+            ${groupby}`
+    }).join(' UNION ');
 
     // create count sql based on original query
     let countSql = `SELECT COUNT(*) as count FROM (${sql}) as c`;
