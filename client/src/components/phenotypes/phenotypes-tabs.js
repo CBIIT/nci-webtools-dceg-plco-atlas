@@ -127,6 +127,7 @@ export function PhenotypesTabs() {
                 yTitle: frequencyType[t.key] === 'counts' ? 'Number of Participants' : '% of Participants',
                 fill: true,
                 yMax: frequencyType[t.key] === 'counts' ? null : 100,
+                percentageTotal: frequencyType[t.key] === 'counts' ? phenodtypeData.totalCount : null,
               })}
             </>}
             </div>

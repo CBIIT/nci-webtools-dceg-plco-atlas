@@ -26,7 +26,7 @@ export const colors = [
   `rgba(0, 190, 209, 0.2)`,
 ];
 
-export const BarChart = ({ data, categories, xTitle, yTitle, yMax }) => (
+export const BarChart = ({ data, categories, xTitle, yTitle, yMax, percentageTotal }) => (
 <Plot
     className="w-100 disable-x-axis-tooltip override-cursor"
     style={{ minHeight: "600px", width: "600px" }}
@@ -51,7 +51,10 @@ export const BarChart = ({ data, categories, xTitle, yTitle, yMax }) => (
         text: i > 0 ? '' : Object.entries(data).map(([key, value]) => {
           return [
             `<b>${xTitle}</b>: ${key}`,
-            categories.map((name, i) => `<b>${name}</b>: ${value[i].toLocaleString()}`).join('<br>')
+            categories.map((name, i) => `<b>${name}</b>:
+              ${value[i].toLocaleString()}
+              ${percentageTotal ? `(${(value[i] * 100 / percentageTotal).toLocaleString()})` : ''}
+            }`).join('<br>')
           ].join('<br>');
         })
       };
@@ -215,7 +218,9 @@ export const GroupedAreaChart = ({data, categories, xTitle, yTitle, fill, yMax})
         text: i > 0 ? '' : Object.entries(data).map(([key, value]) => {
           return [
             `<b>${xTitle}</b>: ${key}`,
-            categories.map((name, i) => `${name}: <b>${value[i].toLocaleString()}</b>`).join('<br>')
+            categories.map((name, i) => `${name}: <b>${value[i].toLocaleString()}
+            ${percentageTotal ? `(${(value[i] * 100 / percentageTotal).toLocaleString()})` : ''}
+            </b>`).join('<br>')
           ].join('<br>');
         })
       };
