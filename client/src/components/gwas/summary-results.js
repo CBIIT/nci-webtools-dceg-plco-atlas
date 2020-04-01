@@ -182,7 +182,6 @@ export function SummaryResults() {
         manhattanPlotMirroredData: {},
         manhattanPlotView: '',
         messages: [],
-        qqplotSrc: '',
         areaItems: [],
         lambdaGC: '',
         submitted: null,

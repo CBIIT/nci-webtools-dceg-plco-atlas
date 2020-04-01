@@ -21,7 +21,6 @@ export const getInitialState = () => ({
     bpMin: null,
     bpMax: null,
     messages: [],
-    qqplotSrc: '',
     areaItems: [],
     lambdaGC: '',
     submitted: null,
