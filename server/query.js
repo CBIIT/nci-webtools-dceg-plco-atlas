@@ -402,9 +402,12 @@ async function getPhenotype(connection, params) {
         for (let key in counts)
             sum += counts[key].reduce((a, b) => a + b)
 
+        phenotype.totalCount = sum;
+
         // then, divide by sum
         for (let key in counts)
             percentage[key] = counts[key].map(a => 100 * a / sum);
+
         return percentage;
     }
 
