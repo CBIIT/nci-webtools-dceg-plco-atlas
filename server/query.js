@@ -192,13 +192,21 @@ async function getSummary(connection, {id, table, sex, p_value_nlog_min, raw}) {
 
 async function getVariants(connection, params) {
     let timestamp = getTimestamp();
+    let phenotypes = [];
 
-    let tables = params.table.split(',').filter(e => /^\w+$/.test(e));
-    let tableIds = await Promise.all(tables.map(async table => {
-        const name = table.replace('variant_', '');//.replace(/^\w/g, '');
-        const [phenotypeRows] = await query(connection, 'phenotype', {name})
-        return phenotypeRows[0].id;
-    }));
+    if (params.table) {
+        [phenotypes] = await connection.query(
+            `SELECT * FROM phenotype WHERE name in (?)`,
+            [params.table.split(',').map(e => e.replace('variant_', '')).filter(e => /^\w+$/.test(e))]
+        );
+    }
+
+    if (params.id) {
+        [phenotypes] = await connection.query(
+            `SELECT * FROM phenotype WHERE id in (?)`,
+            [params.id.split(',').filter(e => /^\d+$/.test(e))]
+        );
+    }
 
     let columnNames = getValidColumns('variant', params.columns).map(quote).join(',')
     // console.log("params.columns", params.columns);
@@ -212,7 +220,7 @@ async function getVariants(connection, params) {
     // };
 
     // filter by id, chr, base position, and -log10(p), if provided
-    let sql = tables.map((table, index) => {
+    let sql = phenotypes.map(phenotype => {
         const conditions = [
             coalesce(params.id, `id = :id`),
             // coalesce(params.sex, `sex = :sex`),
@@ -230,11 +238,13 @@ async function getVariants(connection, params) {
         ].filter(Boolean).join(' AND ');
 
         return `
-            SELECT ${columnNames} ${[coalesce(params.show_table_name, `, '${table}' as table_name`)]}
-            FROM phenotype_variant partition(${quote(`${tableIds[index]}_${params.sex}`)}) as v
+            SELECT ${columnNames} ${[coalesce(params.show_table_name, `, 'variant_${phenotype.name}' as table_name`)]}
+            FROM phenotype_variant partition(${quote(`${phenotype.id}_${params.sex}`)}) as v
             ${conditions.length ? `WHERE ${conditions}` : ''}
             ${groupby}`
     }).join(' UNION ');
+
+    console.log(sql);
 
     // create count sql based on original query
     let countSql = `SELECT COUNT(*) as count FROM (${sql}) as c`;
