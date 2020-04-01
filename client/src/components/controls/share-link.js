@@ -42,9 +42,9 @@ export const ShareLink = forwardRef(({
   const sharePopover = () => {
     return (
       <Popover id="share-link-popover">
+        <LoadingOverlay active={displayCopied} content={"Copied!"}/>
         <Popover.Title as="h3">Copy this URL</Popover.Title>
         <Popover.Content>
-          <LoadingOverlay active={displayCopied} content={"Copied!"}/>
           <div 
             className="text-center"
             style={{
