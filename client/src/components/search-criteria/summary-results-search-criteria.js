@@ -34,44 +34,46 @@ export const SummaryResultsSearchCriteria = () => {
               <div className="py-1">
                 <span>
                   <b>Phenotype</b>:{' '}
+                  {searchCriteriaSummaryResults &&
+                  searchCriteriaSummaryResults.phenotype
+                    ? searchCriteriaSummaryResults.phenotype
+                    : 'None'}
                 </span>
-                {searchCriteriaSummaryResults &&
-                searchCriteriaSummaryResults.phenotype
-                  ? searchCriteriaSummaryResults.phenotype
-                  : 'None'}
 
                 <span className="border-left border-secondary mx-3" style={{maxHeight: '1.6em'}}></span>
                 
                 <span>
                   <b>Sex</b>:{' '}
+                  {searchCriteriaSummaryResults && searchCriteriaSummaryResults.sex
+                    ? displaySex(searchCriteriaSummaryResults.sex)
+                    : 'None'}         
                 </span>
-                {searchCriteriaSummaryResults && searchCriteriaSummaryResults.sex
-                  ? displaySex(searchCriteriaSummaryResults.sex)
-                  : 'None'}
-
-                <span className="border-left border-secondary mx-3" style={{maxHeight: '1.6em'}}></span>
-            
-                <span>
-                  <b>Total Variants:</b> {' '}
-                </span>
-                {sampleSize 
-                  ? sampleSize.toLocaleString() :
-                  'None'}
               </div>
 
-              <div>
-                {
-                  searchCriteriaSummaryResults &&
-                    <div className="d-flex justify-content-end">
-                      <ShareLink 
-                        params={{
-                          selectedPhenotype,
-                          selectedChromosome,
-                          selectedPlot
-                        }}
-                      />
-                    </div>
-                }
+              <div className="">
+                <div className="d-flex">
+                  <span className="py-1">
+                    <b>Total Variants:</b> {' '}
+                    {sampleSize 
+                      ? sampleSize.toLocaleString() :
+                      'None'}
+                  </span>
+                  {
+                    searchCriteriaSummaryResults &&
+                      <>
+                        <span className="ml-3" style={{maxHeight: '1.6em'}}></span>
+                        <div className="d-flex justify-content-end">
+                          <ShareLink 
+                            params={{
+                              selectedPhenotype,
+                              selectedChromosome,
+                              selectedPlot
+                            }}
+                          />
+                        </div>
+                      </>
+                  }
+                </div> 
               </div>
           </div>
         </Tab>
