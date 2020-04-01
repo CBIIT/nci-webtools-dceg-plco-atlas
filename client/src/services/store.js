@@ -33,7 +33,7 @@ export const getInitialState = () => ({
     // tooltipData: null,
     qqplotData: [],
     qqplotLayout: {},
-    searchCriteriaSummaryResults: {},
+    searchCriteriaSummaryResults: null,
     sampleSize: null,
     manhattanPlotConfig: {},
     zoomStack: [],
