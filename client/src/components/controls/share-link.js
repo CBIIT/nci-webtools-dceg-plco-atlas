@@ -1,5 +1,6 @@
 import React, { forwardRef, useState, useEffect, useImperativeHandle } from 'react';
 import { Button, OverlayTrigger, Popover, Spinner } from 'react-bootstrap';
+import { LoadingOverlay } from './loading-overlay';
 
 export const ShareLink = forwardRef(({
     // submitted
@@ -18,11 +19,17 @@ export const ShareLink = forwardRef(({
 
   const [loading, setLoading] = useState(true);
 
+  const [displayCopied, setDisplayedCopied] = useState(false);
+
   const copyToClipboard = () => {
+    setDisplayedCopied(true);
     var copyText = document.getElementById("share-link-input");
     copyText.select();
     copyText.setSelectionRange(0, 99999); /*For mobile devices*/
     document.execCommand("copy");
+    setTimeout(function() {
+      setDisplayedCopied(false);
+    }, 1000);
   }
 
   const shareLink = () => {
@@ -37,6 +44,7 @@ export const ShareLink = forwardRef(({
       <Popover id="share-link-popover">
         <Popover.Title as="h3">Copy this URL</Popover.Title>
         <Popover.Content>
+          <LoadingOverlay active={displayCopied} content={"Copied!"}/>
           <div 
             className="text-center"
             style={{
@@ -73,8 +81,7 @@ export const ShareLink = forwardRef(({
                   title="Copy link to clipboard"
                   onClick={e => {
                     copyToClipboard();
-                  }}
-                  >
+                  }}>
                   <i className="fa fa-paste" style={{fontSize: '14px'}}></i>
                 </button>
               </div>
@@ -82,7 +89,7 @@ export const ShareLink = forwardRef(({
           </div>
         </Popover.Content>
       </Popover>
-    )
+    );
   }
 
   return (
@@ -92,10 +99,7 @@ export const ShareLink = forwardRef(({
         placement="bottom"
         rootClose
         shouldUpdatePosition
-        overlay={
-          sharePopover()
-        }
-      >
+        overlay={sharePopover()}>
       <div>
         <Button 
           variant="silver"
