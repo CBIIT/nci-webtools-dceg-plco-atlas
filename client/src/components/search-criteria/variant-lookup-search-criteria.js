@@ -2,6 +2,7 @@ import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { updateVariantLookup } from '../../services/actions';
 import { Tab, Tabs, Button } from 'react-bootstrap';
+import { ShareLink } from '../controls/share-link';
 
 
 export const VariantLookupSearchCriteria = props => {
@@ -25,7 +26,7 @@ export const VariantLookupSearchCriteria = props => {
   };
 
   const CollapseCaret = () => {
-    if (!collapseCriteria && searchCriteriaVariantLookup.phenotypes) {
+    if (searchCriteriaVariantLookup && !collapseCriteria && searchCriteriaVariantLookup.phenotypes) {
       return <i className="fa fa-caret-down fa-lg"></i>;
     } else {
       return <i className="fa fa-caret-right fa-lg"></i>;
@@ -49,134 +50,143 @@ export const VariantLookupSearchCriteria = props => {
         defaultActiveKey="variant-lookup-search-criteria">
         <Tab
           eventKey="variant-lookup-search-criteria"
-          className="d-flex justify-content-between px-3 py-2 bg-white tab-pane-bordered rounded-0">
-          <div className="row left py-1">
-            <div className="col-md-auto pr-0">
+          className="px-3 py-2 bg-white tab-pane-bordered rounded-0">
+          <div className="d-flex justify-content-between">              
+            <div className="py-1 d-flex justify-content-start">
               <span className="mr-1">
                 <Button
                   className="p-0"
                   title="Expand/collapse search criteria panel"
                   style={{
-                    color: searchCriteriaVariantLookup.phenotypes
-                      ? '#008CBA'
-                      : ''
+                    color: searchCriteriaVariantLookup ? '#008CBA' : ''
                   }}
                   variant="link"
                   onClick={e => toggleCollapseCriteria()}
                   aria-controls="search-criteria-collapse-panel"
                   aria-expanded={!collapseCriteria}
-                  disabled={!searchCriteriaVariantLookup.phenotypes || searchCriteriaVariantLookup.phenotypes.length < 2}>
+                  disabled={!searchCriteriaVariantLookup}>
                   <CollapseCaret />
                 </Button>
               </span>
               <span>
-                {/* <b>Phenotypes(</b>
-                {searchCriteriaVariantLookup.phenotypes
-                  ? searchCriteriaVariantLookup.phenotypes.length
-                  : 0}
-                <b>)</b>: */}
-                <b>Phenotypes:</b>
+                <b>Phenotypes:</b>{' '}           
+                {collapseCriteria && (
+                  <>
+                    <span>
+                      {searchCriteriaVariantLookup &&
+                      searchCriteriaVariantLookup.phenotypes && searchCriteriaVariantLookup.phenotypes.length >= 1
+                        ? searchCriteriaVariantLookup.phenotypes[0]
+                        : 'None'}
+                    </span>
+                    <span className="">
+                      {searchCriteriaVariantLookup &&
+                      searchCriteriaVariantLookup.phenotypes &&
+                      searchCriteriaVariantLookup.phenotypes.length > 1 ? (
+                        <span>{' '}and</span>
+                      ) : (
+                        <></>
+                      )}
+                      <button
+                        className="ml-1 p-0 text-primary"
+                        style={{
+                          all: 'unset',
+                          textDecoration: 'underline',
+                          cursor: 'pointer'
+                        }}
+                        title="Expand/collapse search criteria panel"
+                        onClick={e => toggleCollapseCriteria()}
+                        aria-controls="search-criteria-collapse-panel"
+                        aria-expanded={!collapseCriteria}>
+                        <span style={{ color: '#008CBA' }}>
+                          {searchCriteriaVariantLookup &&
+                          searchCriteriaVariantLookup.phenotypes &&
+                          searchCriteriaVariantLookup.phenotypes.length > 1
+                            ? searchCriteriaVariantLookup.phenotypes.length -
+                              1 +
+                              ` other${
+                                searchCriteriaVariantLookup.phenotypes.length -
+                                  1 ===
+                                1
+                                  ? ''
+                                  : 's'
+                              }`
+                            : ''}
+                        </span>
+                      </button>
+                    </span>
+                  </>
+                )}
               </span>
-            </div>
-            <div
-              className="col-md-auto ml-1 pl-0"
-              // style={{ maxHeight: '300px', overflow: 'none' }}
-              >
-              {collapseCriteria && (
-                <>
-                  <span>
-                    {searchCriteriaVariantLookup &&
-                    searchCriteriaVariantLookup.phenotypes && searchCriteriaVariantLookup.phenotypes.length >= 1
-                      ? searchCriteriaVariantLookup.phenotypes[0]
-                      : 'None'}
-                  </span>
-                  <span className="ml-1">
-                    {searchCriteriaVariantLookup &&
-                    searchCriteriaVariantLookup.phenotypes &&
-                    searchCriteriaVariantLookup.phenotypes.length > 1 ? (
-                      <span>and</span>
-                    ) : (
-                      <></>
-                    )}
-                    <button
-                      className="ml-1 p-0 text-primary"
-                      style={{
-                        all: 'unset',
-                        textDecoration: 'underline',
-                        cursor: 'pointer'
-                      }}
-                      title="Expand/collapse search criteria panel"
-                      onClick={e => toggleCollapseCriteria()}
-                      aria-controls="search-criteria-collapse-panel"
-                      aria-expanded={!collapseCriteria}>
-                      <span style={{ color: '#008CBA' }}>
-                        {searchCriteriaVariantLookup &&
-                        searchCriteriaVariantLookup.phenotypes &&
-                        searchCriteriaVariantLookup.phenotypes.length > 1
-                          ? searchCriteriaVariantLookup.phenotypes.length -
-                            1 +
-                            ` other${
-                              searchCriteriaVariantLookup.phenotypes.length -
-                                1 ===
-                              1
-                                ? ''
-                                : 's'
-                            }`
-                          : ''}
-                      </span>
-                    </button>
-                  </span>
-                </>
-              )}
-              {!collapseCriteria &&
-                searchCriteriaVariantLookup &&
-                searchCriteriaVariantLookup.phenotypes &&
-                searchCriteriaVariantLookup.phenotypes.map(phenotype => (
-                  <div title={phenotype}>
-                    {phenotype.length < 50 ? phenotype : phenotype.substring(0, 47) + "..." }
-                  </div>
+              <span className="ml-1">
+                {!collapseCriteria &&
+                  searchCriteriaVariantLookup &&
+                  searchCriteriaVariantLookup.phenotypes &&
+                  searchCriteriaVariantLookup.phenotypes.map(phenotype => (
+                    <div title={phenotype}>
+                      {phenotype.length < 50 ? phenotype : phenotype.substring(0, 47) + "..." }
+                    </div>
                 ))}
-            </div>
-            <div className="border-left border-secondary" style={{maxHeight: '1.6em'}}></div>
-            <div className="col-md-auto">
+              </span>
+              
+              <span className="border-left border-secondary mx-3" style={{maxHeight: '1.6em'}}></span>
+
               <span>
                 <b>Variant</b>:{' '}
+                {searchCriteriaVariantLookup &&
+                  searchCriteriaVariantLookup.variant
+                    ? searchCriteriaVariantLookup && searchCriteriaVariantLookup.variant.includes('rs')
+                    ? <a
+                      href={'https://www.ncbi.nlm.nih.gov/snp/' + searchCriteriaVariantLookup.variant}
+                      target="_blank"
+                      style={{
+                        textDecoration: 'underline',
+                      }}>
+                        {searchCriteriaVariantLookup.variant}
+                      </a>
+                    : <span>{searchCriteriaVariantLookup.variant}</span>
+                    : 'None'
+                }
               </span>
-              {searchCriteriaVariantLookup &&
-              searchCriteriaVariantLookup.variant
-                ? searchCriteriaVariantLookup.variant.includes('rs')
-                  ? <a
-                    href={'https://www.ncbi.nlm.nih.gov/snp/' + searchCriteriaVariantLookup.variant}
-                    target="_blank"
-                    style={{
-                      textDecoration: 'underline',
-                    }}>
-                      {searchCriteriaVariantLookup.variant}
-                    </a>
-                  : <span>{searchCriteriaVariantLookup.variant}</span>
-                : 'None'}
-            </div>
-            <div className="border-left border-secondary" style={{maxHeight: '1.6em'}}></div>
-            <div className="col-md-auto">
+
+              <span className="border-left border-secondary mx-3" style={{maxHeight: '1.6em'}}></span>
+              
               <span>
                 <b>Sex</b>:{' '}
+                {searchCriteriaVariantLookup && searchCriteriaVariantLookup.sex
+                  ? displaySex(searchCriteriaVariantLookup.sex)
+                  : 'None'
+                }
               </span>
-              {searchCriteriaVariantLookup && searchCriteriaVariantLookup.sex
-                ? displaySex(searchCriteriaVariantLookup.sex)
-                : 'None'}
             </div>
-          </div>
 
-          <div className="right py-1">
-            <b><span className="ml-3">Total Results: </span></b>
-            {searchCriteriaVariantLookup && numResults ? 
-              numResults.toString() + (searchCriteriaVariantLookup.phenotypes
-              ? " of " + searchCriteriaVariantLookup.phenotypes.length + " phenotypes"
-              : "")
-              : 'None' + (searchCriteriaVariantLookup.phenotypes
-              ? " of " + searchCriteriaVariantLookup.phenotypes.length + " phenotypes"
-              : "")
-            }
+            <div className="d-flex">
+              <span className="py-1">
+                <b>Total Results:</b>{' '}
+                {searchCriteriaVariantLookup && numResults ? 
+                  numResults.toString() + (searchCriteriaVariantLookup && searchCriteriaVariantLookup.phenotypes
+                  ? " of " + searchCriteriaVariantLookup.phenotypes.length + " phenotypes"
+                  : "")
+                  : 'None' + (searchCriteriaVariantLookup && searchCriteriaVariantLookup.phenotypes
+                  ? " of " + searchCriteriaVariantLookup.phenotypes.length + " phenotypes"
+                  : "")
+                }
+              </span>
+              {
+                searchCriteriaVariantLookup &&
+                  <>
+                    <span className="ml-3" style={{maxHeight: '1.6em'}}></span>
+                    <div className="d-inline">
+                      <ShareLink 
+                        params={{
+                          // selectedPhenotype,
+                          // selectedChromosome,
+                          // selectedPlot
+                        }}
+                      />
+                    </div>
+                  </>
+              }
+            </div>
           </div>
         </Tab>
       </Tabs>

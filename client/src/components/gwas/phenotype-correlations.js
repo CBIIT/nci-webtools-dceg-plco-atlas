@@ -98,7 +98,7 @@ export function PhenotypeCorrelations() {
         heatmapLayout: {},
         submitted: null,
         messages: [],
-        searchCriteriaPhenotypeCorrelations: {},
+        searchCriteriaPhenotypeCorrelations: null,
         collapseCriteria: true
       })
     );

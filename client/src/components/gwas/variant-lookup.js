@@ -225,7 +225,7 @@ export function VariantLookup() {
         results: null,
         messages: [],
         submitted: null,
-        searchCriteriaVariantLookup: {},
+        searchCriteriaVariantLookup: null,
         numResults: null,
         collapseCriteria: true
       })
