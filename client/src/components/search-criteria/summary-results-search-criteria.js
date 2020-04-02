@@ -50,31 +50,29 @@ export const SummaryResultsSearchCriteria = () => {
                 </span>
               </div>
 
-              <div className="">
-                <div className="d-flex">
-                  <span className="py-1">
-                    <b>Total Variants:</b> {' '}
-                    {sampleSize 
-                      ? sampleSize.toLocaleString() :
-                      'None'}
-                  </span>
-                  {
-                    searchCriteriaSummaryResults &&
-                      <>
-                        <span className="ml-3" style={{maxHeight: '1.6em'}}></span>
-                        <div className="d-flex justify-content-end">
-                          <ShareLink 
-                            params={{
-                              selectedPhenotype,
-                              selectedChromosome,
-                              selectedPlot
-                            }}
-                          />
-                        </div>
-                      </>
-                  }
-                </div> 
-              </div>
+              <div className="d-flex">
+                <span className="py-1">
+                  <b>Total Variants:</b> {' '}
+                  {sampleSize 
+                    ? sampleSize.toLocaleString() :
+                    'None'}
+                </span>
+                {
+                  searchCriteriaSummaryResults &&
+                    <>
+                      <span className="ml-3" style={{maxHeight: '1.6em'}}></span>
+                      <div className="d-flex justify-content-end">
+                        <ShareLink 
+                          params={{
+                            selectedPhenotype,
+                            selectedChromosome,
+                            selectedPlot
+                          }}
+                        />
+                      </div>
+                    </>
+                }
+              </div> 
           </div>
         </Tab>
       </Tabs>
