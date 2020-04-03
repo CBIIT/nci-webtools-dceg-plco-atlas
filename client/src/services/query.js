@@ -27,3 +27,11 @@ export const query = (resource, params) =>
 
 export const rawQuery = (resource, params) =>
   query(resource, { ...params, raw: true });
+
+export const post = (resource, params) =>
+  fetch(`${root}/${resource}`, {
+    method: 'post',
+    headers: {'content-type': 'application/json'},
+    body: JSON.stringify(params)}
+  ).then(r => r.json());
+
