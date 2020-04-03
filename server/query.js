@@ -821,8 +821,8 @@ async function getShareLink(connection, params) {
     let [shareLinkRows] = await connection.execute(
         `SELECT route, parameters
         FROM share_link
-        WHERE share_id = :id`,
-        {id: params.id}
+        WHERE share_id = :share_id`,
+        {params}
     );
 
     return shareLinkRows[0];
