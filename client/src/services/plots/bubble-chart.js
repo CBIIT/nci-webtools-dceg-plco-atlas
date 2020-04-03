@@ -40,7 +40,8 @@ export class BubbleChart {
             .attr("width", diameter)
             .attr("height", diameter)
             .attr("class", "bubble")
-            .attr("id", "bubble-chart-svg");
+            .attr("id", "bubble-chart-svg")
+            .style("cursor", "pointer");
 
         svg.append("rect")
             .attr("class", "overlay")
@@ -111,7 +112,9 @@ export class BubbleChart {
             .style("opacity", function (d) {
                 return getChildren(d, data) ? "100%" : "50%";
             })
-            .attr("class", "circle");
+            .attr("class", "circle")
+            .style("stroke-width", "2px")
+            .style("stroke", "transparent");
 
         node.append("circle")
             .attr("r", function (d) {
@@ -136,7 +139,7 @@ export class BubbleChart {
             .attr("dy", "0em")
             .style("text-anchor", "middle")
             .text(function (d) {
-                if (d.r < 20) {
+                if (d.r < 35) {
                     return ""+ "<br>" + "";
                 } else {
                     return d.data.title + "<br>" + d.data.participant_count;
@@ -191,7 +194,7 @@ export class BubbleChart {
                 .duration(200);
             tooltip
                 .style("opacity", 1)
-                .html((getChildren(d, data) ? "Category: " : "Phenotype: ") + "<b>" + d.data.title + "</b><br>" + "Participants: <b>" + Number(d.data.participant_count).toLocaleString() + "</b>") 
+                .html((getChildren(d, data) ? "Category: " : "Phenotype: ") + "<b>" + d.data.title + "</b><br>" + "Participants: <b>" + Number(d.data.participant_count).toLocaleString() + "</b>")
                 .style("left", (d.x + 250) + "px")
                 .style("top", (d.y) + "px");
             d3.select(this)
@@ -273,7 +276,7 @@ function wrap(text, width) {
         var text = d3.select(this);
         var label = text.text().split('<br>')[0],
             value = text.text().split('<br>')[1],
-            words = label.split(/[/\s+]/).reverse(),
+            words = label.split(/[\s]/).reverse(),
             word,
             line = [],
             lineNumber = 1,
@@ -289,7 +292,7 @@ function wrap(text, width) {
                 line.pop();
                 tspan.text(line.join(" "));
                 line = [word];
-                tspan = text.append("tspan").attr("x", 0).attr("y", y).attr("dy", "1em").text(lineNumber === 3 && words.length > 0 ? word + " ..." : word);
+                tspan = text.append("tspan").attr("x", 0).attr("y", y).attr("dy", "1em").text(lineNumber === 3 && words.length > 0 ? word + "..." : word);
             } 
         }
         tspan = text.append("tspan").attr("x", 0).attr("y", y).attr("dy", "1.2em").text(value.length > 0 ? Number(value).toLocaleString() : "");

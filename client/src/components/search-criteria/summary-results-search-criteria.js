@@ -1,11 +1,17 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
 import { Tab, Tabs } from 'react-bootstrap';
+import { ShareLink } from '../controls/share-link';
+
 
 export const SummaryResultsSearchCriteria = () => {
-  const { searchCriteriaSummaryResults, sampleSize } = useSelector(
-    state => state.summaryResults
-  );
+  const { 
+    searchCriteriaSummaryResults, 
+    sampleSize,
+    selectedPhenotype,
+    selectedChromosome,
+    selectedPlot
+  } = useSelector(state => state.summaryResults);
 
   const displaySex = sex =>
     ({
@@ -23,31 +29,50 @@ export const SummaryResultsSearchCriteria = () => {
         defaultActiveKey="summary-results-search-criteria">
         <Tab
           eventKey="summary-results-search-criteria"
-          className="d-flex justify-content-between px-3 py-2 bg-white tab-pane-bordered rounded-0">
-          <div className="row left py-1">
-            <div className="col-md-auto ml-1">
-              <span>
-                <b>Phenotype</b>:{' '}
-              </span>
-              {searchCriteriaSummaryResults &&
-              searchCriteriaSummaryResults.phenotype
-                ? searchCriteriaSummaryResults.phenotype
-                : 'None'}
-            </div>
-            <div className="border-left border-secondary" style={{maxHeight: '1.6em'}}></div>
-            <div className="col-md-auto">
-              <span>
-                <b>Sex</b>:{' '}
-              </span>
-              {searchCriteriaSummaryResults && searchCriteriaSummaryResults.sex
-                ? displaySex(searchCriteriaSummaryResults.sex)
-                : 'None'}
-            </div>
-          </div>
+          className="px-3 py-2 bg-white tab-pane-bordered rounded-0">
+          <div className="d-flex justify-content-between">
+              <div className="py-1">
+                <span>
+                  <b>Phenotype</b>:{' '}
+                  {searchCriteriaSummaryResults &&
+                  searchCriteriaSummaryResults.phenotype
+                    ? searchCriteriaSummaryResults.phenotype
+                    : 'None'}
+                </span>
 
-          <div className="right py-1">
-            <b><span>Total Variants: </span></b>
-            {sampleSize ? sampleSize.toLocaleString() : 'None'}
+                <span className="border-left border-secondary mx-3" style={{maxHeight: '1.6em'}}></span>
+                
+                <span>
+                  <b>Sex</b>:{' '}
+                  {searchCriteriaSummaryResults && searchCriteriaSummaryResults.sex
+                    ? displaySex(searchCriteriaSummaryResults.sex)
+                    : 'None'}         
+                </span>
+              </div>
+
+              <div className="d-flex">
+                <span className="py-1">
+                  <b>Total Variants:</b> {' '}
+                  {sampleSize 
+                    ? sampleSize.toLocaleString() :
+                    'None'}
+                </span>
+                {
+                  searchCriteriaSummaryResults &&
+                    <>
+                      <span className="ml-3" style={{maxHeight: '1.6em'}}></span>
+                      <div className="d-flex justify-content-end">
+                        <ShareLink 
+                          params={{
+                            selectedPhenotype,
+                            selectedChromosome,
+                            selectedPlot
+                          }}
+                        />
+                      </div>
+                    </>
+                }
+              </div> 
           </div>
         </Tab>
       </Tabs>

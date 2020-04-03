@@ -16,7 +16,9 @@ const {
   getPhenotypes,
   getRanges,
   getCounts,
-  getConfig
+  getConfig,
+  getShareLink,
+  setShareLink
 } = require("./query");
 
 logger.info(`[${process.pid}] Started process`);
@@ -116,6 +118,14 @@ app.get("/ranges", async ({ query }, res) => {
 // retrieves variant counts
 app.get("/counts", async ({ query }, res) => {
   return getCounts(connection, query);
+});
+
+app.get("/share-link", async ({ query }, res) => {
+  return getShareLink(connection, query);
+});
+
+app.post("/share-link", async ({ body }, res) => {
+  return setShareLink(connection, body);
 });
 
 // retrieves configuration

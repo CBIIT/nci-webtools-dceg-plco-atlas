@@ -48,10 +48,6 @@ export function Phenotypes() {
     dispatch(updateBrowsePhenotypes({ messages }));
   };
 
-  const setSearchCriteriaPhenotypes = searchCriteriaPhenotypes => {
-    dispatch(updateBrowsePhenotypes({ searchCriteriaPhenotypes }));
-  };
-
   const setBreadcrumb = breadcrumb => {
     dispatch(updateBrowsePhenotypes({ breadcrumb}));
   };
@@ -195,10 +191,6 @@ export function Phenotypes() {
         phenotypeData: data,
       })
     );
-
-    setSearchCriteriaPhenotypes({
-      phenotype: [...phenotype.title]
-    });
   };
 
   const handleReset = params => {
@@ -206,7 +198,6 @@ export function Phenotypes() {
       selectedPhenotype: null,
       messages: [],
       submitted: null,
-      searchCriteriaPhenotypes: {},
       selectedPlot: 'frequency',
       phenotypeType: 'binary',
       breadcrumb: [],

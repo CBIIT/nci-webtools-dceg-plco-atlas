@@ -22,8 +22,23 @@ const loaderStyle = {
 
 const DefaultLoader = props => (
     <div style={{...loaderStyle, ...props.loaderStyle}} {...props.loaderProps}>
-        <Spinner animation="border" variant="primary" role="status"></Spinner>
-        <div>{props.children || <span className="sr-only">Loading</span>}</div>
+        {
+             props.content ? 
+             <>{props.content}</> 
+             : <Spinner animation="border" variant="primary" role="status"></Spinner>
+        }
+        <div>
+            {
+                props.children || 
+                    <span className="sr-only">
+                        {
+                            props.content ? 
+                                <>{props.content}</> 
+                                : <>Loading</>
+                        }
+                    </span>
+            }
+        </div>
     </div>
 );
 
