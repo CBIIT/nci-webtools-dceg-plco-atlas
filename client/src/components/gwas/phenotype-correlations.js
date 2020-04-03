@@ -70,6 +70,7 @@ export function PhenotypeCorrelations() {
       ]);
       return;
     }
+
     // close sidebar on submit
     // setOpenSidebar(false);
     setSearchCriteriaPhenotypeCorrelations({
@@ -97,7 +98,7 @@ export function PhenotypeCorrelations() {
         heatmapLayout: {},
         submitted: null,
         messages: [],
-        searchCriteriaPhenotypeCorrelations: {},
+        searchCriteriaPhenotypeCorrelations: null,
         collapseCriteria: true
       })
     );

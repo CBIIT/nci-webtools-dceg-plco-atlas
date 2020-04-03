@@ -182,7 +182,6 @@ export function SummaryResults() {
         manhattanPlotMirroredData: {},
         manhattanPlotView: '',
         messages: [],
-        qqplotSrc: '',
         areaItems: [],
         lambdaGC: '',
         submitted: null,
@@ -194,7 +193,7 @@ export function SummaryResults() {
         popupTooltipData: null,
         showSnpResults: false,
         snp: '',
-        searchCriteriaSummaryResults: {},
+        searchCriteriaSummaryResults: null,
         sampleSize: null,
         manhattanPlotConfig: {},
       })

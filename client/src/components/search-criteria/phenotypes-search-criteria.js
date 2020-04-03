@@ -3,12 +3,12 @@ import { useDispatch, useSelector } from 'react-redux';
 import { updateBrowsePhenotypes } from '../../services/actions';
 import { Tab, Tabs } from 'react-bootstrap';
 import { Icon } from '../controls/icon';
+import { ShareLink } from '../controls/share-link';
 
 
 export const PhenotypesSearchCriteria = () => {
   const dispatch = useDispatch();
   const {
-    searchCriteriaPhenotypes,
     submitted,
     phenotypeData
   } = useSelector(
@@ -39,8 +39,11 @@ export const PhenotypesSearchCriteria = () => {
           eventKey="phenotypes-search-criteria"
           className="d-flex justify-content-between px-3 py-2 bg-white tab-pane-bordered rounded-0">
           <div
-            className="left"
-            style={{ display: !submitted ? 'none' : 'block' }}>
+            className=""
+            style={{ 
+              display: !submitted ? 'none' : 'block',
+              width: '85%'
+            }}>
 
             {/* <div
               className="left">
@@ -66,6 +69,21 @@ export const PhenotypesSearchCriteria = () => {
 
           </div>
           {placeholder}
+          {
+            phenotypeData &&
+              <>
+                <span className="ml-3" style={{maxHeight: '1.6em'}}></span>
+                <div className="d-inline">
+                  <ShareLink 
+                    params={{
+                      // selectedPhenotype,
+                      // selectedChromosome,
+                      // selectedPlot
+                    }}
+                  />
+                </div>
+              </>
+          }
         </Tab>
       </Tabs>
     </div>

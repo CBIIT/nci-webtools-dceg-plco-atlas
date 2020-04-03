@@ -61,7 +61,8 @@ function intersection(...arrays) {
 }
 
 function pluck(rows) {
-    if (!rows) return null;
+    if (!rows || !rows.length) return null;
+    console.log(typeof rows);
     let [firstRow] = rows;
     let [firstKey] = Object.keys(firstRow);
     return firstRow[firstKey];
@@ -70,11 +71,11 @@ function pluck(rows) {
 
 function getValidColumns(tableName, columns) {
     if (!Array.isArray(columns))
-        columns = (columns || '').split(',').filter(e => e.length);
+        columns = (columns || '').split(',').filter(e => /^\w+$/.test(e));
 
     let validColumns = {
-        variant: ['id', 'sex', 'chromosome', 'position', 'snp', 'allele_reference', 'allele_alternate', 'p_value', 'p_value_nlog', 'p_value_nlog_expected', 'odds_ratio', 'show_qq_plot'],
-        aggregate: ['id', 'sex', 'chromosome', 'position_abs', 'p_value_nlog'],
+        variant: ['id', 'phenotype_id', 'sex', 'chromosome', 'position', 'snp', 'allele_reference', 'allele_alternate', 'p_value', 'p_value_nlog', 'p_value_nlog_expected', 'odds_ratio', 'show_qq_plot'],
+        aggregate: ['id', 'phenotype_id', 'sex', 'chromosome', 'position_abs', 'p_value_nlog'],
         phenotype: ['id', 'parent_id', 'name', 'display_name', 'description', 'color', 'type', 'participant_count'],
     }[tableName];
 
@@ -83,6 +84,23 @@ function getValidColumns(tableName, columns) {
         : validColumns;
 }
 
+async function query(connection, tableName, conditions, conditionJoiner) {
+    let conditionSql = Object.keys(conditions)
+        .filter(key => /^\w+$/.test(key))
+        .map(key => `${quote(key)} = :${key}`)
+        .join(` ${conditionJoiner || 'AND'} `);
+
+    return await connection.execute(
+        `SELECT * FROM ${tableName}
+            ${conditionSql.length ? `WHERE ${conditionSql}` : ''}`,
+        conditions
+    );
+}
+
+async function hasRecord(connection, tableName, conditions, conditionJoiner) {
+    const [data] = await query(connection, tableName, conditions, conditionJoiner);
+    return data.length > 0;
+}
 
 function getValidTable(table) {
     // todo: validate table name
@@ -115,20 +133,32 @@ function getValidTable(table) {
    }} params - Database query criteria
  * @returns Records in the aggregate summary table which match query criteria
  */
-async function getSummary(connection, params) {
+async function getSummary(connection, {phenotype_id, table, sex, p_value_nlog_min, raw}) {
     let timestamp = getTimestamp();
-    const [data, columns] = await connection.query({
-        rowsAsArray: params.raw,
-        values: [params.table, params.sex, params.p_value_nlog_min],
-        sql: `
-        SELECT
-            chromosome, position_abs, p_value_nlog FROM ??
-        WHERE
-            sex = ? AND
-            p_value_nlog > ?`,
-    });
-    logger.info(`[${process.pid}] /summary: ${timestamp()}s in database`, params);
 
+    // validate parameters
+    if (!/^(all|female|male)$/.test(sex) ||
+        (phenotype_id && !await hasRecord(connection, 'phenotype', {id: phenotype_id})))
+        return null;
+
+    // determine id if table name was supplied (remove once table parameter is no longer used)
+    if (table) {
+        const name = table.replace('aggregate_', '');
+        const [phenotypeRows] = await query(connection, 'phenotype', {name});
+        if (!phenotypeRows.length) return null;
+        phenotype_id = phenotypeRows[0].id;
+    }
+
+    const partition = quote(`${phenotype_id}_${sex}`);
+    const [data, columns] = await connection.query({
+        rowsAsArray: raw,
+        values: {p_value_nlog_min},//[params.table, params.sex, params.p_value_nlog_min],
+        sql: `SELECT chromosome, position_abs, p_value_nlog
+            FROM phenotype_aggregate partition(${partition})
+            WHERE p_value_nlog > :p_value_nlog_min`,
+    });
+
+    logger.info(`[${process.pid}] /summary: ${timestamp()}s in database`);
     return {data, columns: columns.map(c => c.name)};
 }
 
@@ -163,7 +193,22 @@ async function getSummary(connection, params) {
 
 async function getVariants(connection, params) {
     let timestamp = getTimestamp();
-    let tables = params.table.split(',').map(getValidTable);
+    let phenotypes = [];
+
+    if (params.table) {
+        [phenotypes] = await connection.query(
+            `SELECT * FROM phenotype WHERE name in (?)`,
+            [params.table.split(',').map(e => e.replace('variant_', '')).filter(e => /^\w+$/.test(e))]
+        );
+    }
+
+    if (params.phenotype_id) {
+        [phenotypes] = await connection.query(
+            `SELECT * FROM phenotype WHERE id in (?)`,
+            [params.phenotype_id.split(',').filter(e => /^\d+$/.test(e))]
+        );
+    }
+
     let columnNames = getValidColumns('variant', params.columns).map(quote).join(',')
     // console.log("params.columns", params.columns);
     // let columnNames = params.columns.map(quote).join(',');
@@ -176,12 +221,10 @@ async function getVariants(connection, params) {
     // };
 
     // filter by id, chr, base position, and -log10(p), if provided
-    let sql = tables.map(table => `
-        SELECT ${columnNames} ${[coalesce(params.show_table_name, `, '${table}' as table_name`)]}
-        FROM ${table} as v
-        WHERE ${[
+    let sql = phenotypes.map(phenotype => {
+        const conditions = [
             coalesce(params.id, `id = :id`),
-            coalesce(params.sex, `sex = :sex`),
+            // coalesce(params.sex, `sex = :sex`),
             coalesce(params.snp, `snp = :snp`),
             coalesce(params.chromosome, `chromosome = :chromosome`),
             coalesce(params.position, `position = :position`),
@@ -193,8 +236,16 @@ async function getVariants(connection, params) {
             coalesce(params.p_value_max, `p_value <= :p_value_max`),
             coalesce(params.mod, `(id % :mod) = 0`),
             coalesce(params.show_qq_plot, `show_qq_plot = 1`)
-        ].filter(Boolean).join(' AND ')}
-        ${groupby}`).join(' UNION ');
+        ].filter(Boolean).join(' AND ');
+
+        return `
+            SELECT ${columnNames} ${[coalesce(params.show_table_name, `, 'variant_${phenotype.name}' as table_name`)]}
+            FROM phenotype_variant partition(${quote(`${phenotype.id}_${params.sex}`)}) as v
+            ${conditions.length ? `WHERE ${conditions}` : ''}
+            ${groupby}`
+    }).join(' UNION ');
+
+    console.log(sql);
 
     // create count sql based on original query
     let countSql = `SELECT COUNT(*) as count FROM (${sql}) as c`;
@@ -362,24 +413,15 @@ async function getPhenotypes(connection, params) {
 }
 
 async function getPhenotype(connection, params) {
-    // document allowed query types
-    const queryTypes = {
-        all: 'all',
-        frequency: 'frequency',
-        frequencyByAge: 'frequencyByAge',
-        frequencyBySex: 'frequencyBySex',
-        frequencyByAncestry: 'frequencyByAncestry',
-    };
-    const type = params.type || queryTypes.all;
-    const [phenotypeRows] = await connection.execute(`
-        SELECT id, name, display_name as displayName, description, type
+    const {id, type} = params;
+    const [phenotypeRows] = await connection.execute(
+        `SELECT id, name, display_name as displayName, description, type
         FROM phenotype
-        WHERE id = :id
-    `, {id: params.id});
-    if (!phenotypeRows.length)
-        return null;
-
+        WHERE id = :id`,
+        {id}
+    );
     const phenotype = phenotypeRows[0];
+    if (!phenotype) return null;
 
     phenotype.categoryTypes = {
         frequencyByAge: [
@@ -403,90 +445,85 @@ async function getPhenotype(connection, params) {
         ]
     }
 
+    const getPercentage = counts => {
+        let sum = 0;
+        let percentage = {};
+        // first, determine total
+        for (let key in counts)
+            sum += counts[key].reduce((a, b) => a + b)
+
+        phenotype.totalCount = sum;
+
+        // then, divide by sum
+        for (let key in counts)
+            percentage[key] = counts[key].map(a => 100 * a / sum);
+
+        return percentage;
+    }
+
     switch(phenotype.type) {
         case 'binary':
-            let keyValueReducer = ((obj = {}, curr) => ({...obj, [curr.key]: [...(obj[curr.key] || []), curr.value]}));
-            if (type === 'all' || type === 'frequency') {
-                const [frequency] = await connection.execute(
-                    `SELECT count(*) as count FROM participant_data pd
+            phenotype.categories = [`Without ${phenotype.displayName}`, `With ${phenotype.displayName}`];
+            phenotype.distributionCategories = [phenotype.categories[1]];
+
+            if (type === 'frequency') {
+                phenotype.frequency = (await connection.execute(
+                    `SELECT value, count(*) as count FROM participant_data pd
                     JOIN participant p ON p.id = pd.participant_id
                     WHERE
                         pd.phenotype_id = :id AND
                         pd.value is not null AND
                         p.age >= 55
                     group by value
-                    order by value;`,
-                    {id: params.id}
+                    order by value`,
+                    {id}
+                ))[0].map(f => f.count); // [without #, with #]
+            } else if (/^frequencyBy(Age|Sex|Ancestry)$/.test(type)) {
+                 // generates an array of values for each key
+                const keyValueArrayReducer = (key, value) => ((obj = {}, curr) => ({
+                    ...obj,
+                    [curr[key]]: [...(obj[curr[key]] || []), +curr[value]]
+                }));
+
+                const key = {
+                    frequencyByAge: 'age',
+                    frequencyBySex: 'sex',
+                    frequencyByAncestry: 'ancestry',
+                }[type];
+
+                // validate type
+                if (!key) return null;
+
+                const [distribution] = await connection.execute(
+                    `WITH
+                        participant_selection as (
+                            SELECT p.${key} as \`key\`
+                            FROM participant_data pd
+                            JOIN participant p ON p.id = pd.participant_id
+                            WHERE
+                                pd.phenotype_id = :id AND
+                                pd.value = 1 AND
+                                p.${key} IS NOT NULL AND
+                                p.age >= 55
+                        ),
+                        participant_count AS (
+                            SELECT count(*) AS total
+                            FROM participant_selection
+                        )
+                    SELECT
+                        \`key\`,
+                        count(*) as counts,
+                        100 * count(*) / (select total from participant_count) as percentage
+                    FROM participant_selection p
+                    GROUP BY \`key\`
+                    ORDER BY \`key\``,
+                    {id}
                 );
-
-                phenotype.frequency = frequency.map(f => f.count);
-                phenotype.categories = [`Without ${phenotype.displayName}`, `With ${phenotype.displayName}`];
-                phenotype.distributionCategories = [phenotype.categories[1]];
-            }
-
-            if (type === 'all' || type === 'frequencyByAge') {
-                let [distribution] = await connection.execute(`
-                    SELECT
-                        p.age AS "key",
-                        COUNT(*) AS "value"
-                    FROM participant_data pd
-                    JOIN participant p ON p.id = pd.participant_id
-                    WHERE
-                        pd.phenotype_id = :id AND
-                        pd.value = 1 AND
-                        p.age IS NOT NULL AND
-                        p.age >= 55
-                    GROUP BY p.age
-                    ORDER BY p.age;
-                `, {id: params.id});
-
-                phenotype.frequencyByAge = {
-                    counts: distribution.reduce(keyValueReducer, {}),
-                    percentage: {}
-                }
-            }
-
-            if (type === 'all' || type === 'frequencyBySex') {
-                let [distribution] = await connection.execute(`
-                    SELECT
-                        p.sex AS "key",
-                        COUNT(*) AS "value"
-                    FROM participant_data pd
-                    JOIN participant p ON p.id = pd.participant_id
-                    WHERE
-                        pd.phenotype_id = :id AND
-                        pd.value = 1 AND
-                        p.age >= 55
-                    GROUP BY p.sex
-                    ORDER BY p.sex;
-                `, {id: params.id});
-
-                phenotype.frequencyBySex = {
-                    counts: distribution.reduce(keyValueReducer, {}),
-                    percentage: {}
-                }
-            }
-
-            if (type === 'all' || type === 'frequencyByAncestry') {
-                let [distribution] = await connection.execute(`
-                    SELECT
-                        p.ancestry AS "key",
-                        COUNT(*) AS "value"
-                    FROM participant_data pd
-                    JOIN participant p ON p.id = pd.participant_id
-                    WHERE
-                        pd.phenotype_id = :id AND
-                        pd.value = 1 AND
-                        p.ancestry IS NOT NULL AND
-                        p.age >= 55
-                    GROUP BY p.ancestry
-                    ORDER BY p.ancestry;
-                `, {id: params.id});
-
-                phenotype.frequencyByAncestry = {
-                    counts: distribution.reduce(keyValueReducer, {}),
-                    percentage: {}
-                }
+                phenotype[type] = {
+                    counts: distribution.reduce(keyValueArrayReducer('key', 'counts'), {}),
+                    percentage: distribution.reduce(keyValueArrayReducer('key', 'percentage'), {})
+                };
+                getPercentage(phenotype[type].counts);
             }
         break;
 
@@ -526,6 +563,7 @@ async function getPhenotype(connection, params) {
                     {id: params.id}
                 );
                phenotype.frequency = frequencyRows.map(e => e.count);
+               phenotype.totalCount = frequencyRows.reduce((a, b) => a + b.count, 0);
             }
 
             if (type === 'all' || type === 'frequencyByAge') {
@@ -556,7 +594,7 @@ async function getPhenotype(connection, params) {
 
                 phenotype.frequencyByAge = {
                     counts: frequencyByAgeCounts,
-                    percentage: {}
+                    percentage: getPercentage(frequencyByAgeCounts)
                 }
             }
 
@@ -586,7 +624,7 @@ async function getPhenotype(connection, params) {
 
                 phenotype.frequencyBySex = {
                     counts: frequencyBySexCounts,
-                    percentage: {}
+                    percentage: getPercentage(frequencyBySexCounts)
                 }
             }
 
@@ -616,7 +654,7 @@ async function getPhenotype(connection, params) {
 
                 phenotype.frequencyByAncestry = {
                     counts: frequencyByAncestryCounts,
-                    percentage: {}
+                    percentage: getPercentage(frequencyByAncestryCounts)
                 }
             }
             break;
@@ -637,6 +675,7 @@ async function getPhenotype(connection, params) {
                 );
                 phenotype.frequency = frequencies.map(e => e.value);
                 phenotype.categories = frequencies.map(e => e.value_group);
+                phenotype.totalCount = frequencies.reduce((a, b) => a + b.value, 0);
             }
 
             if (type === 'all' || type === 'frequencyByAge') {
@@ -664,7 +703,7 @@ async function getPhenotype(connection, params) {
 
                 phenotype.frequencyByAge = {
                     counts: frequencyByAgeCounts,
-                    percentage: {}
+                    percentage: getPercentage(frequencyByAgeCounts)
                 }
             }
 
@@ -691,7 +730,7 @@ async function getPhenotype(connection, params) {
 
                 phenotype.frequencyBySex = {
                     counts: frequencyBySexCounts,
-                    percentage: {}
+                    percentage: getPercentage(frequencyBySexCounts)
                 }
             }
 
@@ -718,14 +757,14 @@ async function getPhenotype(connection, params) {
 
                 phenotype.frequencyByAncestry = {
                     counts: frequencyByAncestryCounts,
-                    percentage: {}
+                    percentage: getPercentage(frequencyByAncestryCounts)
                 }
             }
 
             break;
     }
 
-    if (type === 'all' || type === 'related') {
+    if (type === 'related') {
         phenotype.related = [
             {
                 "name": "Ewing's Sarcoma",
@@ -778,6 +817,34 @@ function getConfig(key) {
         : null;
 }
 
+async function getShareLink(connection, params) {
+    let [shareLinkRows] = await connection.execute(
+        `SELECT parameters
+        FROM share_link
+        WHERE share_id = :id`,
+        {id: params.id}
+    );
+
+    return shareLinkRows[0].parameters;
+}
+
+async function setShareLink(connection, params) {
+    let [results] = await connection.execute(
+        `INSERT INTO share_link (share_id, parameters, created_date)
+        VALUES (UUID(), :parameters, NOW());`,
+        {parameters: params}
+    );
+
+    let shareLinkRows = await connection.execute(
+        `SELECT share_id
+        FROM share_link
+        WHERE id = :id`,
+        {id: results.insertId}
+    );
+
+    return pluck(shareLinkRows);
+}
+
 module.exports = {
     connection,
     getSummary,
@@ -789,5 +856,7 @@ module.exports = {
     getRanges,
     getGenes,
     getCounts,
-    getConfig
+    getConfig,
+    getShareLink,
+    setShareLink
 };

@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { updatePhenotypeCorrelations } from '../../services/actions';
 import { Tab, Tabs, Button } from 'react-bootstrap';
+import { ShareLink } from '../controls/share-link';
+
 
 export const PhenotypeCorrelationsSearchCriteria = props => {
   const dispatch = useDispatch();
@@ -23,7 +25,7 @@ export const PhenotypeCorrelationsSearchCriteria = props => {
   };
 
   const CollapseCaret = () => {
-    if (!collapseCriteria && searchCriteriaPhenotypeCorrelations.phenotypes) {
+    if (searchCriteriaPhenotypeCorrelations && !collapseCriteria && searchCriteriaPhenotypeCorrelations.phenotypes) {
       return <i className="fa fa-caret-down fa-lg"></i>;
     } else {
       return <i className="fa fa-caret-right fa-lg"></i>;
@@ -44,17 +46,20 @@ export const PhenotypeCorrelationsSearchCriteria = props => {
       <Tabs
         transition={false}
         className=""
-        defaultActiveKey="search-criteria">
+        defaultActiveKey="phenotype-correlations-search-criteria">
         <Tab
-          eventKey="search-criteria"
-          className="d-flex justify-content-between px-3 py-2 bg-white tab-pane-bordered rounded-0">
-          <div className="row left py-1">
-            <div className="col-md-auto pr-0">
+          eventKey="phenotype-correlations-search-criteria"
+          className="px-3 py-2 bg-white tab-pane-bordered rounded-0">
+          <div className="d-flex justify-content-between">
+            <div className="py-1 d-flex justify-content-start">
               <span className="mr-1">
                 <Button
                   className="p-0"
                   style={{
-                    color: searchCriteriaPhenotypeCorrelations.phenotypes
+                    color: 
+                      searchCriteriaPhenotypeCorrelations && 
+                      searchCriteriaPhenotypeCorrelations.phenotypes && 
+                      searchCriteriaPhenotypeCorrelations.phenotypes.length > 1
                       ? '#008CBA'
                       : ''
                   }}
@@ -63,99 +68,112 @@ export const PhenotypeCorrelationsSearchCriteria = props => {
                   onClick={e => toggleCollapseCriteria()}
                   aria-controls="search-criteria-collapse-panel"
                   aria-expanded={!collapseCriteria}
-                  disabled={!searchCriteriaPhenotypeCorrelations.phenotypes}>
+                  disabled={
+                    !searchCriteriaPhenotypeCorrelations || 
+                    (searchCriteriaPhenotypeCorrelations && searchCriteriaPhenotypeCorrelations.phenotypes.length < 2)
+                  }>
                   <CollapseCaret />
                 </Button>
               </span>
               <span>
-                {/* <b>Phenotypes(</b>
-                {searchCriteriaPhenotypeCorrelations.phenotypes
-                  ? searchCriteriaPhenotypeCorrelations.phenotypes.length
-                  : 0}
-                <b>)</b>: */}
-                <b>Phenotypes:</b>
-              </span>
-            </div>
-            <div
-              className="col-md-auto ml-1 pl-0"
-              // style={{ maxHeight: '300px', overflow: 'auto' }}
-              >
-              {collapseCriteria && (
-                <>
-                  <span>
-                    {searchCriteriaPhenotypeCorrelations &&
-                    searchCriteriaPhenotypeCorrelations.phenotypes && searchCriteriaPhenotypeCorrelations.phenotypes.length >= 1
-                      ? searchCriteriaPhenotypeCorrelations.phenotypes[0]
-                      : 'None'}
-                  </span>
-                  <span className="ml-1">
-                    {searchCriteriaPhenotypeCorrelations &&
-                    searchCriteriaPhenotypeCorrelations.phenotypes &&
-                    searchCriteriaPhenotypeCorrelations.phenotypes.length >
-                      1 ? (
-                      <span>and</span>
-                    ) : (
-                      <></>
-                    )}
-                    <button
-                      className="ml-1 p-0 text-primary"
-                      style={{
-                        all: 'unset',
-                        textDecoration: 'underline',
-                        cursor: 'pointer'
-                      }}
-                      title="Expand/collapse search criteria panel"
-                      onClick={e => toggleCollapseCriteria()}
-                      aria-controls="search-criteria-collapse-panel"
-                      aria-expanded={!collapseCriteria}>
-                      <span style={{ color: '#008CBA' }}>
-                        {searchCriteriaPhenotypeCorrelations &&
-                        searchCriteriaPhenotypeCorrelations.phenotypes
-                          ? searchCriteriaPhenotypeCorrelations.phenotypes
-                              .length -
-                            1 +
-                            ` other${
-                              searchCriteriaPhenotypeCorrelations.phenotypes
+                <b>Phenotypes:</b>{' '}
+                {collapseCriteria && (
+                  <>
+                    <span>
+                      {searchCriteriaPhenotypeCorrelations &&
+                      searchCriteriaPhenotypeCorrelations.phenotypes && searchCriteriaPhenotypeCorrelations.phenotypes.length >= 1
+                        ? searchCriteriaPhenotypeCorrelations.phenotypes[0]
+                        : 'None'}
+                    </span>
+                    <span className="">
+                      {searchCriteriaPhenotypeCorrelations &&
+                      searchCriteriaPhenotypeCorrelations.phenotypes &&
+                      searchCriteriaPhenotypeCorrelations.phenotypes.length >
+                        1 ? (
+                        <span>{' '}and</span>
+                      ) : (
+                        <></>
+                      )}
+                      <button
+                        className="ml-1 p-0 text-primary"
+                        style={{
+                          all: 'unset',
+                          textDecoration: 'underline',
+                          cursor: 'pointer'
+                        }}
+                        title="Expand/collapse search criteria panel"
+                        onClick={e => toggleCollapseCriteria()}
+                        aria-controls="search-criteria-collapse-panel"
+                        aria-expanded={!collapseCriteria}>
+                        <span style={{ color: '#008CBA' }}>
+                          {searchCriteriaPhenotypeCorrelations &&
+                          searchCriteriaPhenotypeCorrelations.phenotypes
+                            ? searchCriteriaPhenotypeCorrelations.phenotypes
                                 .length -
-                                1 ===
-                              1
-                                ? ''
-                                : 's'
-                            }`
-                          : ''}
-                      </span>
-                    </button>
-                  </span>
-                </>
-              )}
-              {!collapseCriteria &&
-                searchCriteriaPhenotypeCorrelations &&
-                searchCriteriaPhenotypeCorrelations.phenotypes &&
-                searchCriteriaPhenotypeCorrelations.phenotypes.map(phenotype => (
-                  <div title={phenotype}>
-                    {phenotype.length < 50 ? phenotype : phenotype.substring(0, 47) + "..." }
-                  </div>
+                              1 +
+                              ` other${
+                                searchCriteriaPhenotypeCorrelations.phenotypes
+                                  .length -
+                                  1 ===
+                                1
+                                  ? ''
+                                  : 's'
+                              }`
+                            : ''}
+                        </span>
+                      </button>
+                    </span>
+                  </>
+                )}
+              </span>
+              <span className="ml-1">
+                {!collapseCriteria &&
+                  searchCriteriaPhenotypeCorrelations &&
+                  searchCriteriaPhenotypeCorrelations.phenotypes &&
+                  searchCriteriaPhenotypeCorrelations.phenotypes.map(phenotype => (
+                    <div title={phenotype}>
+                      {phenotype.length < 50 ? phenotype : phenotype.substring(0, 47) + "..." }
+                    </div>
                 ))}
-            </div>
-            <div className="border-left border-secondary" style={{maxHeight: '1.6em'}}></div>
-            <div className="col-md-auto">
+              </span>
 
+              <span className="border-left border-secondary mx-3" style={{maxHeight: '1.6em'}}></span>
+              
               <span>
                 <b>Sex</b>:{' '}
+                {searchCriteriaPhenotypeCorrelations &&
+                searchCriteriaPhenotypeCorrelations.sex
+                  ? displaySex(searchCriteriaPhenotypeCorrelations.sex)
+                  : 'None'
+                }
               </span>
-              {searchCriteriaPhenotypeCorrelations &&
-              searchCriteriaPhenotypeCorrelations.sex
-                ? displaySex(searchCriteriaPhenotypeCorrelations.sex)
-                : 'None'}
             </div>
-          </div>
 
-          <div className="right py-1">
-            <b><span>Total Phenotypes: </span></b>
-            {searchCriteriaPhenotypeCorrelations &&
-            searchCriteriaPhenotypeCorrelations.totalPhenotypes
-              ? searchCriteriaPhenotypeCorrelations.totalPhenotypes
-              : 'None'}
+            <div className="d-flex">
+              <span className="py-1">
+                <b>Total Phenotypes:</b>{' '}
+                {searchCriteriaPhenotypeCorrelations &&
+                  searchCriteriaPhenotypeCorrelations.totalPhenotypes
+                    ? searchCriteriaPhenotypeCorrelations.totalPhenotypes
+                    : 'None'
+                }
+              </span>
+              {
+                searchCriteriaPhenotypeCorrelations &&
+                  <>
+                    <span className="ml-3" style={{maxHeight: '1.6em'}}></span>
+                    <div className="d-inline">
+                      <ShareLink 
+                        params={{
+                          // selectedPhenotype,
+                          // selectedChromosome,
+                          // selectedPlot
+                        }}
+                      />
+                    </div>
+                  </>
+              }
+            </div>
           </div>
         </Tab>
       </Tabs>

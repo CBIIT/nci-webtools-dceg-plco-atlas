@@ -1,13 +1,16 @@
 import React, { forwardRef, useImperativeHandle } from 'react';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { query } from '../../services/query';
 import { Spinner } from 'react-bootstrap';
 import Plot from 'react-plotly.js';
 import {
   viewportToLocalCoordinates,
   createElement as h
 } from '../../services/plots/utils';
+import { updateBrowsePhenotypes } from '../../services/actions';
 
 export const Heatmap = forwardRef(({}, ref) => {
+  const dispatch = useDispatch();
 
   useImperativeHandle(ref, () => ({
     resetTooltip() {
@@ -38,14 +41,12 @@ export const Heatmap = forwardRef(({}, ref) => {
     tooltip.innerHTML = '';
     tooltip.style.display = 'inline-block';
     if (html instanceof Element) {
-      console.log('ELEMENT');
       tooltip.insertAdjacentElement('beforeend', html);
     } else {
-      console.log('HTML');
       tooltip.insertAdjacentHTML('beforeend', html);
     }
 
-    const tooltipLeft = x + 130 + 'px';
+    const tooltipLeft = x + 115 + 'px';
     const tooltipTop = y + 120 + 'px';
 
     tooltip.style.left = tooltipLeft;
@@ -61,12 +62,51 @@ export const Heatmap = forwardRef(({}, ref) => {
     // tooltip.style.display = 'none';
   };
 
+  const setBrowsePhenotypesLoading = loading =>  {
+    dispatch(updateBrowsePhenotypes({ loading }));
+  }
+
+  const handlePhenotypeLookup = async (pointData) => {
+    var phenotype = JSON.parse(pointData)
+    
+    dispatch(
+      updateBrowsePhenotypes({
+        phenotypeData: null,
+        submitted: false,
+        displayTreeParent: null
+      })
+    );
+      
+    setBrowsePhenotypesLoading(true);
+    const data = await query('phenotype', {
+      id: phenotype.id,
+      type: 'frequency'
+    });
+    setBrowsePhenotypesLoading(false);
+
+    // update browse phenotypes filters
+    dispatch(
+      updateBrowsePhenotypes({
+        selectedPhenotype: phenotype,
+        displayTreeParent: {
+          data: phenotype
+        },
+        submitted: true,
+        phenotypeData: data,
+        selectedPlot: 'frequency'
+      })
+    );
+  };
+
   const popupMarkerClick = e => {
-    console.log('E', e);
+    e.event.preventDefault();
+    // close all plotly hover tooltips
+    var plotlyHoverTooltips = document.getElementsByClassName("hovertext");
+    if (plotlyHoverTooltips.length > 0) {
+      plotlyHoverTooltips[0].setAttribute("style", "display: none;")
+    }
     const ev = e.event;
-    console.log('EVENT', ev);
     const points = e.points;
-    console.log('POINTS', points);
     if (e && ev && points && points[0]) {
       hideTooltip();
       const tooltip = createTooltip();
@@ -86,25 +126,40 @@ export const Heatmap = forwardRef(({}, ref) => {
           h(
             'a',
             {
-              className: '',
-              href: 'javascript:void(0)',
-              onclick: () => console.log(tooltipX)
+              className: 'font-weight-bold',
+              href: '#/phenotypes',
+              onclick: () => handlePhenotypeLookup(points[0].x)
             },
-            `${tooltipX}`
+            `Go to ${tooltipX} details`
           )
         ]),
         h('div', null, [
           h(
             'a',
             {
-              className: '',
-              href: 'javascript:void(0)',
-              onclick: () => console.log(tooltipY)
+              className: 'font-weight-bold',
+              href: '#/phenotypes',
+              onclick: () => handlePhenotypeLookup(points[0].y)
             },
-            `${tooltipY}`
+            `Go to ${tooltipY} details`
           )
         ]),
-        h('div', null, [h('b', null, 'Correlation: '), `${tooltipCorrelation}`])
+        h('div', null, [
+          h(
+            'b', null, 'Correlation: '), 
+            `${tooltipCorrelation}`
+        ]),
+        h('div', {
+          className: 'tooltip-close',
+          style: 'position: absolute; cursor: pointer; top: 0px; right: 5px;'
+        }, [
+          h(
+            'i', {
+              className: 'fa fa-times',
+              onclick: () => hideTooltip()
+            }, ``), 
+            ``
+        ])
       ]);
       showTooltip(ev, tooltip, html);
     }
@@ -142,7 +197,7 @@ export const Heatmap = forwardRef(({}, ref) => {
             textAlign: 'left'
           }}>
           <Plot
-            className="heatmap"
+            className="heatmap override-cursor-heatmap"
             style={{ position: 'relative', height: '1000px', width: '1000px' }}
             data={heatmapData}
             layout={heatmapLayout}

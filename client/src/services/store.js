@@ -21,7 +21,6 @@ export const getInitialState = () => ({
     bpMin: null,
     bpMax: null,
     messages: [],
-    qqplotSrc: '',
     areaItems: [],
     lambdaGC: '',
     submitted: null,
@@ -33,7 +32,7 @@ export const getInitialState = () => ({
     // tooltipData: null,
     qqplotData: [],
     qqplotLayout: {},
-    searchCriteriaSummaryResults: {},
+    searchCriteriaSummaryResults: null,
     sampleSize: null,
     manhattanPlotConfig: {},
     zoomStack: [],
@@ -97,7 +96,7 @@ export const getInitialState = () => ({
     results: null,
     messages: [],
     submitted: null,
-    searchCriteriaVariantLookup: {},
+    searchCriteriaVariantLookup: null,
     numResults: null,
     collapseCriteria: true
   },
@@ -109,7 +108,7 @@ export const getInitialState = () => ({
     heatmapLayout: {},
     submitted: null,
     messages: [],
-    searchCriteriaPhenotypeCorrelations: {},
+    searchCriteriaPhenotypeCorrelations: null,
     collapseCriteria: true
   },
   browsePhenotypes: {
@@ -117,7 +116,6 @@ export const getInitialState = () => ({
     displayTreeParent: null,
     submitted: null,
     messages: [],
-    searchCriteriaPhenotypes: {},
     selectedPlot: 'frequency',
     phenotypeType: 'binary',
     breadcrumb: [],
