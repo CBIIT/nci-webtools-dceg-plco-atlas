@@ -819,20 +819,20 @@ function getConfig(key) {
 
 async function getShareLink(connection, params) {
     let [shareLinkRows] = await connection.execute(
-        `SELECT parameters
+        `SELECT route, parameters
         FROM share_link
         WHERE share_id = :id`,
         {id: params.id}
     );
 
-    return shareLinkRows[0].parameters;
+    return shareLinkRows[0];
 }
 
 async function setShareLink(connection, params) {
     let [results] = await connection.execute(
-        `INSERT INTO share_link (share_id, parameters, created_date)
-        VALUES (UUID(), :parameters, NOW());`,
-        {parameters: params}
+        `INSERT INTO share_link (share_id, route, parameters, created_date)
+        VALUES (UUID(), :route, :parameters, NOW());`,
+        {params}
     );
 
     let shareLinkRows = await connection.execute(
