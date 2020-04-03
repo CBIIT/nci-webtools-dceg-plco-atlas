@@ -96,7 +96,7 @@ export const getInitialState = () => ({
     results: null,
     messages: [],
     submitted: null,
-    searchCriteriaVariantLookup: {},
+    searchCriteriaVariantLookup: null,
     numResults: null,
     collapseCriteria: true
   },
@@ -108,7 +108,7 @@ export const getInitialState = () => ({
     heatmapLayout: {},
     submitted: null,
     messages: [],
-    searchCriteriaPhenotypeCorrelations: {},
+    searchCriteriaPhenotypeCorrelations: null,
     collapseCriteria: true
   },
   browsePhenotypes: {
