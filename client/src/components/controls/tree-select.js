@@ -548,7 +548,8 @@ export const TreeSelect = forwardRef(({
               cursor: 'pointer',
               textOverflow: 'ellipsis',
               whiteSpace: 'nowrap',
-              overflow: 'hidden'
+              overflow: 'hidden',
+              width: '90%'
             }}
             onClick={e => handleSelect(item)}
             disabled={submitted}>

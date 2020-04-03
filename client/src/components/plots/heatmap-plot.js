@@ -46,7 +46,7 @@ export const Heatmap = forwardRef(({}, ref) => {
       tooltip.insertAdjacentHTML('beforeend', html);
     }
 
-    const tooltipLeft = x + 130 + 'px';
+    const tooltipLeft = x + 115 + 'px';
     const tooltipTop = y + 120 + 'px';
 
     tooltip.style.left = tooltipLeft;
@@ -99,6 +99,12 @@ export const Heatmap = forwardRef(({}, ref) => {
   };
 
   const popupMarkerClick = e => {
+    e.event.preventDefault();
+    // close all plotly hover tooltips
+    var plotlyHoverTooltips = document.getElementsByClassName("hovertext");
+    if (plotlyHoverTooltips.length > 0) {
+      plotlyHoverTooltips[0].setAttribute("style", "display: none;")
+    }
     const ev = e.event;
     const points = e.points;
     if (e && ev && points && points[0]) {
@@ -120,22 +126,22 @@ export const Heatmap = forwardRef(({}, ref) => {
           h(
             'a',
             {
-              className: '',
+              className: 'font-weight-bold',
               href: '#/phenotypes',
               onclick: () => handlePhenotypeLookup(points[0].x)
             },
-            `${tooltipX}`
+            `Go to ${tooltipX} details`
           )
         ]),
         h('div', null, [
           h(
             'a',
             {
-              className: '',
+              className: 'font-weight-bold',
               href: '#/phenotypes',
               onclick: () => handlePhenotypeLookup(points[0].y)
             },
-            `${tooltipY}`
+            `Go to ${tooltipY} details`
           )
         ]),
         h('div', null, [

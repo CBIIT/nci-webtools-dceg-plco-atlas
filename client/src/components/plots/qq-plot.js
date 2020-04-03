@@ -75,8 +75,8 @@ export function QQPlot({ onVariantLookup }) {
     // const tooltipHeight = tooltip.clientHeight;
     // console.log("tooltipWidth", tooltipWidth);
     // console.log("tooltipHeight", tooltipHeight);
-    let tooltipLeft = x + 85;
-    let tooltipTop = y + 105;
+    let tooltipLeft = x + 80;
+    let tooltipTop = y + 100;
     if (containerWidth.includes('px')) {
       containerWidth = containerWidth.replace(/px/, '');
     }
@@ -165,6 +165,11 @@ export function QQPlot({ onVariantLookup }) {
 
   function popupMarkerClick(e) {
     e.event.preventDefault();
+    // close all plotly hover tooltips
+    var plotlyHoverTooltips = document.getElementsByClassName("hovertext");
+    if (plotlyHoverTooltips.length > 0) {
+      plotlyHoverTooltips[0].setAttribute("style", "display: none;")
+    }
     const ev = e.event;
     const points = e.points;
     if (e && ev && points && points[0]) {
