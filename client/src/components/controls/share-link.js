@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { Button, OverlayTrigger, Popover, Spinner } from 'react-bootstrap';
 import { LoadingOverlay } from './loading-overlay';
+import { generateShareLink } from '../../services/actions';
+
 
 export const ShareLink = props => {
 
@@ -22,6 +24,7 @@ export const ShareLink = props => {
   const shareLink = () => {
     setLoading(true);
     console.log("do something!", props);
+    // generateShareLink(props);
     setTimeout(function() {
       setLoading(false);
     }, 1000);
