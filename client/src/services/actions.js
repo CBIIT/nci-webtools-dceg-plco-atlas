@@ -969,3 +969,14 @@ export function lookupVariants(phenotypes, variant, sex) {
     );
   };
 }
+
+export function generateShareLink(params) {
+  return async function(dispatch) {
+    console.log("params", params);
+    const response = await query('share-link', params);
+    console.log("response", response);
+    dispatch(
+      
+    );
+  };
+}
