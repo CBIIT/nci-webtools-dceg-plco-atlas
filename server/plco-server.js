@@ -4,7 +4,7 @@ const cors = require("fastify-cors");
 const compress = require("fastify-compress");
 const static = require("fastify-static");
 const logger = require("./logger");
-const { port, dbpath } = require("./config.json");
+const { port } = require("./config.json");
 const {
   connection,
   getSummary,
@@ -29,13 +29,6 @@ app.register(compress);
 app.register(cors);
 app.register(static, {
   root: path.resolve("www")
-});
-
-// todo: replace .json files with api routes (if needed)
-app.register(static, {
-  root: path.resolve(dbpath),
-  prefix: "/data/",
-  decorateReply: false
 });
 
 // execute before handling request
