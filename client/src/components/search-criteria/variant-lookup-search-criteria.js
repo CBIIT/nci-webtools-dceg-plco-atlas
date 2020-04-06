@@ -171,21 +171,20 @@ export const VariantLookupSearchCriteria = props => {
                   : "")
                 }
               </span>
-              {
-                searchCriteriaVariantLookup &&
-                  <>
-                    <span className="ml-3" style={{maxHeight: '1.6em'}}></span>
-                    <div className="d-inline">
-                      <ShareLink 
-                        params={{
-                          // selectedPhenotype,
-                          // selectedChromosome,
-                          // selectedPlot
-                        }}
-                      />
-                    </div>
-                  </>
-              }
+              
+              <span className="ml-3" style={{maxHeight: '1.6em'}}></span>
+
+              <div className="d-inline">
+                <ShareLink 
+                  disabled={!searchCriteriaVariantLookup}
+                  shareID={shareID}
+                  params={{
+                    // selectedPhenotype,
+                    // selectedChromosome,
+                    // selectedPlot
+                  }}
+                />
+              </div>
             </div>
           </div>
         </Tab>
