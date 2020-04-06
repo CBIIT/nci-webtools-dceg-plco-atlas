@@ -6,6 +6,8 @@ import { About } from './pages/about';
 import { Gwas } from './pages/gwas';
 import { Phenotypes } from './pages/phenotypes';
 import { Downloads } from './pages/downloads';
+import { ShareWrapper } from './pages/share-wrapper';
+
 
 function App() {
   const [params, setParams] = useState({ trait: 'example' });
@@ -44,8 +46,29 @@ function App() {
       cardText: 'Download files of genome-wide association study estimates and summary statistics',
       image: 'assets/images/downloads.svg',
       navIndex: 2
-    }
+    },
+    {
+      route: '/link'
+    },
   ];
+
+  // const QueryShareLink = async (props) => {
+  //   const { shareID } = props.match.params;
+  //   console.log("shareID", shareID)
+  //   const response = await query('share-link', {share_id:shareID});
+  //   // console.log("response", response);
+  //   // const updateStore = {
+  //   //   "#/gwas/summary": updateSummaryResults,
+  //   //   "#/gwas/lookup": updateVariantLookup,
+  //   //   "#/gwas/correlations": updatePhenotypeCorrelations,
+  //   //   "#/phenotypes": updateBrowsePhenotypes
+  //   // }[params.route];
+  //   return (
+  //     <>
+  //       {'123'}
+  //     </>
+  //   )
+  // }
 
   return (
     <Router>
@@ -63,6 +86,11 @@ function App() {
       />
       <Route path="/downloads" component={Downloads} />
       {/* <Redirect to="/search/gwas" /> */}
+      <Route 
+        path="/link/:shareID" 
+        component={ShareWrapper}
+        // render={_ => <QueryShareLink />}
+      />
     </Router>
   );
 }

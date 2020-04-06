@@ -15,8 +15,14 @@ import {
 } from '../../services/actions';
 
 
-export function PhenotypeCorrelations() {
+export function PhenotypeCorrelations(props) {
   const dispatch = useDispatch();
+
+  const shareLinkState = props.location.state;
+  if (shareLinkState) {
+    console.log('shareLinkState', shareLinkState.params);
+  }
+
   const phenotypeCorrelations = useSelector(
     state => state.phenotypeCorrelations
   );
@@ -61,6 +67,7 @@ export function PhenotypeCorrelations() {
   };
 
   const handleSubmit = params => {
+    console.log('handleSubmit', params);
     if (params.length < 2) {
       setMessages([
         {
