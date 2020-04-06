@@ -934,10 +934,10 @@ export function generateShareLink(params) {
   return async function(dispatch) {
     console.log("params.route", params.route);
     const updateStore = {
-      "#/gwas/summary": updateSummaryResults,
-      "#/gwas/lookup": updateVariantLookup,
-      "#/gwas/correlations": updatePhenotypeCorrelations,
-      "#/phenotypes": updateBrowsePhenotypes
+      "/gwas/summary": updateSummaryResults,
+      "/gwas/lookup": updateVariantLookup,
+      "/gwas/correlations": updatePhenotypeCorrelations,
+      "/phenotypes": updateBrowsePhenotypes
     }[params.route];
     console.log("updateStore", updateStore)
     dispatch(
