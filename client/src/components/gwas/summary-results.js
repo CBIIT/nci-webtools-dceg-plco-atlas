@@ -196,6 +196,7 @@ export function SummaryResults() {
         searchCriteriaSummaryResults: null,
         sampleSize: null,
         manhattanPlotConfig: {},
+        shareID: null
       })
     );
 

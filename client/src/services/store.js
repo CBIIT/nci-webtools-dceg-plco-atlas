@@ -4,7 +4,6 @@ import { initialize } from './actions';
 import ReduxThunk from 'redux-thunk';
 
 export const getInitialState = () => ({
-  tmp_phenotypes: null,
   phenotypes: null,
   summaryResults: {
     selectedListType: 'categorical',
@@ -37,6 +36,7 @@ export const getInitialState = () => ({
     manhattanPlotConfig: {},
     zoomStack: [],
     genes: [],
+    shareID: null
   },
   manhattanPlot: {
     data: {},
@@ -98,7 +98,8 @@ export const getInitialState = () => ({
     submitted: null,
     searchCriteriaVariantLookup: null,
     numResults: null,
-    collapseCriteria: true
+    collapseCriteria: true,
+    shareID: null
   },
   phenotypeCorrelations: {
     selectedListType: 'categorical',
@@ -109,7 +110,8 @@ export const getInitialState = () => ({
     submitted: null,
     messages: [],
     searchCriteriaPhenotypeCorrelations: null,
-    collapseCriteria: true
+    collapseCriteria: true,
+    shareID: null
   },
   browsePhenotypes: {
     selectedPhenotype: null,
@@ -122,7 +124,8 @@ export const getInitialState = () => ({
     currentBubbleData: null,
     phenotypeData: null,
     categoryColor: null,
-    loading: false
+    loading: false,
+    shareID: null
   },
   downloads: {
     selectedPhenotypes: [],

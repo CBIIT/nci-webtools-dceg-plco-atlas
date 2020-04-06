@@ -69,21 +69,20 @@ export const PhenotypesSearchCriteria = () => {
 
           </div>
           {placeholder}
-          {
-            phenotypeData &&
-              <>
-                <span className="ml-3" style={{maxHeight: '1.6em'}}></span>
-                <div className="d-inline">
-                  <ShareLink 
-                    params={{
-                      // selectedPhenotype,
-                      // selectedChromosome,
-                      // selectedPlot
-                    }}
-                  />
-                </div>
-              </>
-          }
+          
+          <span className="ml-3" style={{maxHeight: '1.6em'}}></span>
+          
+          <div className="d-inline">
+            <ShareLink 
+              disabled={false}
+              shareID={shareID}
+              params={{
+                // selectedPhenotype,
+                // selectedChromosome,
+                // selectedPlot
+              }}
+            />
+          </div>
         </Tab>
       </Tabs>
     </div>

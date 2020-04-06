@@ -227,7 +227,8 @@ export function VariantLookup() {
         submitted: null,
         searchCriteriaVariantLookup: null,
         numResults: null,
-        collapseCriteria: true
+        collapseCriteria: true,
+        shareID: null
       })
     );
   };

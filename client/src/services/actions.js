@@ -1,4 +1,4 @@
-import { query, rawQuery } from './query';
+import { query, rawQuery, post } from './query';
 
 export const UPDATE_KEY = 'UPDATE_KEY';
 export const UPDATE_SUMMARY_RESULTS = 'UPDATE_SUMMARY_RESULTS';
@@ -8,7 +8,6 @@ export const UPDATE_SUMMARY_SNP = 'UPDATE_SUMMARY_SNP';
 export const UPDATE_VARIANT_LOOKUP = 'UPDATE_VARIANT_LOOKUP';
 export const UPDATE_PHENOTYPE_CORRELATIONS = 'UPDATE_PHENOTYPE_CORRELATIONS';
 export const UPDATE_PHENOTYPES = 'UPDATE_PHENOTYPES';
-export const UPDATE_TMP_PHENOTYPES = 'UPDATE_TMP_PHENOTYPES';
 export const UPDATE_BROWSE_PHENOTYPES = 'UPDATE_BROWSE_PHENOTYPES';
 export const UPDATE_DOWNLOADS = 'UPDATE_DOWNLOADS';
 
@@ -18,10 +17,6 @@ export function updateKey(key, data) {
 
 export function updatePhenotypes(data) {
   return { type: UPDATE_PHENOTYPES, data };
-}
-
-export function updateTmpPhenotypes(data) {
-  return { type: UPDATE_TMP_PHENOTYPES, data };
 }
 
 export function updateSummaryResults(data) {
@@ -115,41 +110,6 @@ export function initialize() {
         tree: data
       }));
     }
-
-    // update tmp_phenotypes
-    const tmpData = await query('data/phenotypes.json');
-    const tmpRecords = [];
-    const tmpCategories = [];
-    const tmpPopulateRecords = node => {
-      // only populate alphabetic phenotype list with leaf nodes
-      if (node.children === undefined) {
-        tmpRecords.push({
-          title: node.title,
-          value: node.value
-        });
-      } else {
-        tmpCategories.push({
-          title: node.title,
-          value: node.value,
-          color: node.color || '#444',
-          children: node.children
-        });
-      }
-      if (node.children) {
-        node.children.forEach(tmpPopulateRecords);
-      }
-    };
-    tmpData.forEach(tmpPopulateRecords, 0);
-
-    const tmpAlphabetizedRecords = [...tmpRecords].sort((a, b) =>
-      a.title.localeCompare(b.title)
-    );
-
-    dispatch(updateTmpPhenotypes({
-      flat: tmpAlphabetizedRecords,
-      categories: tmpCategories,
-      tree: tmpData
-    }));
   }
 }
 
@@ -972,11 +932,17 @@ export function lookupVariants(phenotypes, variant, sex) {
 
 export function generateShareLink(params) {
   return async function(dispatch) {
-    console.log("params", params);
-    const response = await query('share-link', params);
-    console.log("response", response);
     dispatch(
-      
+      updateSummaryResults({
+        shareID: null
+      })
+    );
+    console.log("params", params);
+    const response = await post('share-link', params);
+    dispatch(
+      updateSummaryResults({
+        shareID: response.share_id
+      })
     );
   };
 }

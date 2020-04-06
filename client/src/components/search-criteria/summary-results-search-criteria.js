@@ -10,7 +10,8 @@ export const SummaryResultsSearchCriteria = () => {
     sampleSize,
     selectedPhenotype,
     selectedChromosome,
-    selectedPlot
+    selectedPlot,
+    shareID
   } = useSelector(state => state.summaryResults);
 
   const displaySex = sex =>
@@ -62,6 +63,8 @@ export const SummaryResultsSearchCriteria = () => {
                 
                 <div className="d-flex justify-content-end">
                   <ShareLink 
+                    disabled={!searchCriteriaSummaryResults}
+                    shareID={shareID}
                     params={{
                       selectedPhenotype,
                       selectedChromosome,
