@@ -10,7 +10,9 @@ export const PhenotypesSearchCriteria = () => {
   const dispatch = useDispatch();
   const {
     submitted,
-    phenotypeData
+    phenotypeData,
+    shareID,
+    selectedPhenotype
   } = useSelector(
     state => state.browsePhenotypes
   );
@@ -77,9 +79,7 @@ export const PhenotypesSearchCriteria = () => {
               disabled={false}
               shareID={shareID}
               params={{
-                // selectedPhenotype,
-                // selectedChromosome,
-                // selectedPlot
+                selectedPhenotype
               }}
             />
           </div>
