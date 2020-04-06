@@ -16,6 +16,7 @@ export const ShareLink = props => {
     copyText.select();
     copyText.setSelectionRange(0, 99999); /*For mobile devices*/
     document.execCommand("copy");
+    copyText.setSelectionRange(99999, 99999);
     setTimeout(function() {
       setDisplayedCopied(false);
     }, 1000);
@@ -63,6 +64,7 @@ export const ShareLink = props => {
                 value={props.shareID ? props.shareID : window.location.href}
                 type="text"
                 // disabled={!data}
+                onChange={_ => _}
               />
               <div className="input-group-append">
                 <button
