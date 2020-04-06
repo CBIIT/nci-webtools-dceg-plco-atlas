@@ -10,7 +10,8 @@ export const SummaryResultsSearchCriteria = () => {
     sampleSize,
     selectedPhenotype,
     selectedChromosome,
-    selectedPlot
+    selectedPlot,
+    shareID
   } = useSelector(state => state.summaryResults);
 
   const displaySex = sex =>
@@ -57,21 +58,21 @@ export const SummaryResultsSearchCriteria = () => {
                     ? sampleSize.toLocaleString() :
                     'None'}
                 </span>
-                {
-                  searchCriteriaSummaryResults &&
-                    <>
-                      <span className="ml-3" style={{maxHeight: '1.6em'}}></span>
-                      <div className="d-flex justify-content-end">
-                        <ShareLink 
-                          params={{
-                            selectedPhenotype,
-                            selectedChromosome,
-                            selectedPlot
-                          }}
-                        />
-                      </div>
-                    </>
-                }
+                
+                <span className="ml-3" style={{maxHeight: '1.6em'}}></span>
+                
+                <div className="d-flex justify-content-end">
+                  <ShareLink 
+                    disabled={!searchCriteriaSummaryResults}
+                    shareID={shareID}
+                    params={{
+                      selectedPhenotype,
+                      selectedChromosome,
+                      selectedPlot
+                    }}
+                  />
+                </div>
+                    
               </div> 
           </div>
         </Tab>

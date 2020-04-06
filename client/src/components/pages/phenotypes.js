@@ -33,9 +33,7 @@ export function Phenotypes() {
   const plotContainer = useRef(null);
   // const plot = useRef(null);
 
-  // const phenotypes = useSelector(state => state.tmp_phenotypes);
   const phenotypes = useSelector(state => state.phenotypes);
-
 
   const [openSidebar, setOpenSidebar] = useState(true);
   // const [loading, setLoading] = useState(false);
@@ -205,7 +203,8 @@ export function Phenotypes() {
       displayTreeParent: null,
       phenotypeData: null,
       categoryColor: null,
-      loading: false
+      loading: false,
+      shareID: null
     }));
   }
 

@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
+import { useDispatch } from 'react-redux';
 import { Button, OverlayTrigger, Popover, Spinner } from 'react-bootstrap';
 import { LoadingOverlay } from './loading-overlay';
+import { generateShareLink } from '../../services/actions';
+
 
 export const ShareLink = props => {
-
-  const [loading, setLoading] = useState(true);
+  const dispatch = useDispatch();
 
   const [displayCopied, setDisplayedCopied] = useState(false);
 
@@ -20,23 +22,22 @@ export const ShareLink = props => {
   }
 
   const shareLink = () => {
-    setLoading(true);
-    console.log("do something!", props);
-    setTimeout(function() {
-      setLoading(false);
-    }, 1000);
+    // console.log("do something!", props);
+    dispatch(generateShareLink({
+      route: window.location.hash,
+      parameters: props
+    }));
   }
 
   const sharePopover = () => {
     return (
       <Popover id="share-link-popover">
         <LoadingOverlay active={displayCopied} content={"Copied!"}/>
-        {/* <Popover.Title as="h3">Copy this URL</Popover.Title> */}
         <Popover.Content>
           <div 
             className="text-center"
             style={{
-              display: loading ? 'block' : 'none',
+              display: !props.shareID ? 'block' : 'none',
               width: '250px'
             }}>
             <Spinner animation="border" variant="primary" role="status">
@@ -45,7 +46,7 @@ export const ShareLink = props => {
           </div>
           <div 
             style={{
-              display: loading ? 'none' : 'block'
+              display: !props.shareID ? 'none' : 'block'
             }}>
             <div 
               className="input-group my-1" 
@@ -57,9 +58,9 @@ export const ShareLink = props => {
                 id="share-link-input"
                 className="form-control py-1 h-100 border-right-0"
                 title="Share link"
-                // placeholder="Search Phenotype"
                 aria-label="Share link"
-                value={window.location.href}
+                // value={window.location.href}
+                value={props.shareID ? props.shareID : window.location.href}
                 type="text"
                 // disabled={!data}
               />
@@ -95,7 +96,8 @@ export const ShareLink = props => {
         onClick={e => {
           e.preventDefault();
           shareLink();
-        }}>
+        }}
+        disabled={props.disabled}>
         Share Link <i className="fa fa-caret-down"></i>
       </Button>
     </div>

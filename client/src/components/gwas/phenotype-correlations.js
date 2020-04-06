@@ -99,7 +99,8 @@ export function PhenotypeCorrelations() {
         submitted: null,
         messages: [],
         searchCriteriaPhenotypeCorrelations: null,
-        collapseCriteria: true
+        collapseCriteria: true,
+        shareID: null
       })
     );
     tooltipRef.current.resetTooltip();
