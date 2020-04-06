@@ -218,7 +218,6 @@ export function VariantLookup() {
     dispatch(
       updateVariantLookup({
         selectedListType: 'categorical',
-        selectedPhenotype: null,
         selectedPhenotypes: [],
         selectedVariant: '',
         selectedSex: 'combined',

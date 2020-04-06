@@ -89,7 +89,6 @@ export const getInitialState = () => ({
   },
   variantLookup: {
     selectedListType: 'categorical',
-    selectedPhenotype: null,
     selectedPhenotypes: [],
     selectedVariant: '',
     selectedSex: 'combined',
