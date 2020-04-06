@@ -28,6 +28,7 @@ const { phenotype, sex } = args;
 //const errorLog = getLogStream(`./failed-variants-${new Date().toISOString()}.txt`);
 const errorLog = {write: e => console.log(e)};
 const duration = timestamp();
+const quote = identifier => '`' + identifier + '`';
 const connection = mysql.createConnection({
     host: database.host,
     database: database.name,
@@ -69,6 +70,7 @@ async function importVariants() {
     const phenotypeName = phenotypes[0].name;
     const phenotypeId = phenotypes[0].id;
     const variantTable = `variant_${phenotypeName}`;
+    const partition = quote(`${phenotypeId}_${sex}`)
 
     console.log(`[${duration()} s] Storing lambdaGC and counts...`);
     await connection.execute(`
@@ -77,7 +79,7 @@ async function importVariants() {
             :phenotypeId,
             :sex,
             :chromosome,
-            (SELECT COUNT(*) AS count FROM ${variantTable} WHERE sex = :sex)
+            (SELECT COUNT(*) AS count FROM phenotype_variant PARTITION (${partition}))
         ) ON DUPLICATE KEY UPDATE
             count = VALUES(count);
     `, {phenotypeId, sex, chromosome: 'all'});
@@ -89,7 +91,7 @@ async function importVariants() {
             "${sex}" as sex,
             chromosome,
             count(*) as count
-        FROM ${variantTable}
+        FROM phenotype_variant PARTITION (${partition})
         WHERE sex = "${sex}"
         GROUP BY chromosome
         ON DUPLICATE KEY UPDATE
