@@ -9,7 +9,10 @@ export const PhenotypeCorrelationsSearchCriteria = props => {
   const dispatch = useDispatch();
   const {
     searchCriteriaPhenotypeCorrelations,
-    collapseCriteria
+    collapseCriteria,
+    selectedPhenotypes,
+    selectedSex,
+    shareID
   } = useSelector(state => state.phenotypeCorrelations);
 
   const setCollapseCriteria = collapseCriteria => {
@@ -158,21 +161,19 @@ export const PhenotypeCorrelationsSearchCriteria = props => {
                     : 'None'
                 }
               </span>
-              {
-                searchCriteriaPhenotypeCorrelations &&
-                  <>
-                    <span className="ml-3" style={{maxHeight: '1.6em'}}></span>
-                    <div className="d-inline">
-                      <ShareLink 
-                        params={{
-                          // selectedPhenotype,
-                          // selectedChromosome,
-                          // selectedPlot
-                        }}
-                      />
-                    </div>
-                  </>
-              }
+              
+              <span className="ml-3" style={{maxHeight: '1.6em'}}></span>
+              
+              <div className="d-inline">
+                <ShareLink 
+                  disabled={!searchCriteriaPhenotypeCorrelations}
+                  shareID={shareID}
+                  params={{
+                    selectedPhenotypes,
+                    selectedSex,
+                  }}
+                />
+              </div>
             </div>
           </div>
         </Tab>

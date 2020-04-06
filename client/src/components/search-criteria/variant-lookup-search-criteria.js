@@ -10,7 +10,11 @@ export const VariantLookupSearchCriteria = props => {
   const {
     searchCriteriaVariantLookup,
     numResults,
-    collapseCriteria
+    collapseCriteria,
+    shareID,
+    selectedPhenotypes,
+    selectedVariant,
+    selectedSex
   } = useSelector(state => state.variantLookup);
 
   const setCollapseCriteria = collapseCriteria => {
@@ -171,21 +175,20 @@ export const VariantLookupSearchCriteria = props => {
                   : "")
                 }
               </span>
-              {
-                searchCriteriaVariantLookup &&
-                  <>
-                    <span className="ml-3" style={{maxHeight: '1.6em'}}></span>
-                    <div className="d-inline">
-                      <ShareLink 
-                        params={{
-                          // selectedPhenotype,
-                          // selectedChromosome,
-                          // selectedPlot
-                        }}
-                      />
-                    </div>
-                  </>
-              }
+              
+              <span className="ml-3" style={{maxHeight: '1.6em'}}></span>
+
+              <div className="d-inline">
+                <ShareLink 
+                  disabled={!searchCriteriaVariantLookup}
+                  shareID={shareID}
+                  params={{
+                    selectedPhenotypes,
+                    selectedVariant,
+                    selectedSex
+                  }}
+                />
+              </div>
             </div>
           </div>
         </Tab>
