@@ -8,7 +8,8 @@ import {
   UPDATE_PHENOTYPE_CORRELATIONS,
   UPDATE_PHENOTYPES,
   UPDATE_BROWSE_PHENOTYPES,
-  UPDATE_DOWNLOADS
+  UPDATE_DOWNLOADS,
+  UPDATE_SHARED_STATE
 } from './actions';
 
 export const rootReducer = (state, action) => {
@@ -79,6 +80,14 @@ export const rootReducer = (state, action) => {
         ...state,
         downloads: {
           ...state.downloads,
+          ...action.data
+        }
+      };
+    case UPDATE_SHARED_STATE:
+      return {
+        ...state,
+        sharedState: {
+          ...state.shareLink,
           ...action.data
         }
       };

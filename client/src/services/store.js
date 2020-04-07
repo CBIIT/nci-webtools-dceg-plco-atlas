@@ -5,6 +5,7 @@ import ReduxThunk from 'redux-thunk';
 
 export const getInitialState = () => ({
   phenotypes: null,
+  sharedState: null,
   summaryResults: {
     selectedListType: 'categorical',
     selectedPhenotype: null,
