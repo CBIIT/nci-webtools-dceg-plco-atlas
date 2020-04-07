@@ -28,7 +28,11 @@ export function VariantLookupForm({ onChange, onSubmit, onReset }) {
 
   const handleKeyPress = e => {
     if(e.key ==='Enter') {
-      onSubmit({ selectedPhenotypes, selectedVariant });
+      onSubmit({ 
+        phenotypes: selectedPhenotypes, 
+        variant: selectedVariant,
+        sex: selectedSex
+      });
     }
   };
 
@@ -121,7 +125,11 @@ export function VariantLookupForm({ onChange, onSubmit, onReset }) {
               variant="silver"
               onClick={e => {
                 e.preventDefault();
-                onSubmit({ selectedPhenotypes, selectedVariant });
+                onSubmit({
+                  phenotypes: selectedPhenotypes, 
+                  variant: selectedVariant,
+                  sex: selectedSex
+                });
               }}
               disabled={
                 (!selectedPhenotypes || selectedPhenotypes.length < 1) ||

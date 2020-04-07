@@ -1,7 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { query } from '../../services/query';
 import { useDispatch } from 'react-redux';
-import { updateSharedState } from '../../services/actions';
+import { 
+    updateSummaryResults,
+    updateVariantLookup,
+    updatePhenotypeCorrelations,
+    updateBrowsePhenotypes
+ } from '../../services/actions';
 
 
 export function ShareWrapper(props) {
@@ -26,7 +31,13 @@ export function ShareWrapper(props) {
         console.log("response", response);
         if (response && response.route) {
             setErrorMessage(null);
-            dispatch(updateSharedState(response));
+            const updateStore = {
+                "/gwas/summary": updateSummaryResults,
+                "/gwas/lookup": updateVariantLookup,
+                "/gwas/correlations": updatePhenotypeCorrelations,
+                "/phenotypes": updateBrowsePhenotypes
+            }[response.route];
+            dispatch(updateStore({sharedState: response}));
             window.location.hash = response.route;
         } else {
             setErrorMessage('Invalid or expired reference ID.');

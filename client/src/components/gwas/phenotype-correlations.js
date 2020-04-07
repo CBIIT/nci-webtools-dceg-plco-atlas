@@ -22,15 +22,10 @@ export function PhenotypeCorrelations() {
     state => state.phenotypeCorrelations
   );
 
-  const sharedState = useSelector(
-    state => state.sharedState
-  );
-
   const {
-    selectedPhenotypes,
-    selectedSex,
     submitted,
-    messages
+    messages,
+    sharedState
   } = phenotypeCorrelations;
 
   const tooltipRef = useRef();
@@ -81,11 +76,11 @@ export function PhenotypeCorrelations() {
     // close sidebar on submit
     // setOpenSidebar(false);
     setSearchCriteriaPhenotypeCorrelations({
-      phenotypes: selectedPhenotypes.map(item =>
+      phenotypes: params.phenotypes.map(item =>
         item.title ? item.title : item.label
       ),
-      sex: selectedSex,
-      totalPhenotypes: selectedPhenotypes.length
+      sex: params.sex,
+      totalPhenotypes: params.phenotypes.length
     });
 
     setSubmitted(new Date());
@@ -93,16 +88,22 @@ export function PhenotypeCorrelations() {
 
     dispatch(drawHeatmap(params));
     tooltipRef.current.resetTooltip();
+    dispatch(updatePhenotypeCorrelations({
+      sharedState: null
+    }))
   };
 
   useEffect(() => {
-    if (sharedState && sharedState.route === '/gwas/correlations') {
+    if (sharedState) {
       handleReset();
       dispatch(updatePhenotypeCorrelations({
         selectedPhenotypes: sharedState.parameters.params.selectedPhenotypes,
         selectedSex: sharedState.parameters.params.selectedSex
       }))
-      handleSubmit(sharedState.parameters.params.selectedPhenotypes)
+      handleSubmit({
+        phenotypes: sharedState.parameters.params.selectedPhenotypes,
+        sex: sharedState.parameters.params.selectedSex
+      });
     }
   }, [sharedState]);
 
@@ -118,7 +119,8 @@ export function PhenotypeCorrelations() {
         messages: [],
         searchCriteriaPhenotypeCorrelations: null,
         collapseCriteria: true,
-        shareID: null
+        shareID: null,
+        sharedState: null
       })
     );
     tooltipRef.current.resetTooltip();
