@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { PhenotypeCorrelationsForm } from '../forms/phenotype-correlations-form';
 import { Heatmap } from '../plots/heatmap-plot';
@@ -21,6 +21,11 @@ export function PhenotypeCorrelations() {
   const phenotypeCorrelations = useSelector(
     state => state.phenotypeCorrelations
   );
+
+  const sharedState = useSelector(
+    state => state.sharedState
+  );
+
   const {
     selectedPhenotypes,
     selectedSex,
@@ -90,7 +95,18 @@ export function PhenotypeCorrelations() {
     tooltipRef.current.resetTooltip();
   };
 
-  const handleReset = params => {
+  useEffect(() => {
+    if (sharedState && sharedState.route === '/gwas/correlations') {
+      handleReset();
+      dispatch(updatePhenotypeCorrelations({
+        selectedPhenotypes: sharedState.parameters.params.selectedPhenotypes,
+        selectedSex: sharedState.parameters.params.selectedSex
+      }))
+      handleSubmit(sharedState.parameters.params.selectedPhenotypes)
+    }
+  }, [sharedState]);
+
+  const handleReset = () => {
     dispatch(
       updatePhenotypeCorrelations({
         selectedListType: 'categorical',

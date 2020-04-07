@@ -1,23 +1,21 @@
 import React, { useState, useEffect } from 'react';
-import { Redirect } from 'react-router-dom';
 import { query } from '../../services/query';
-// import { Home } from '../pages/home';
-// import { SummaryResults } from '../gwas/summary-results';
-// import { VariantLookup } from '../gwas/variant-lookup';
-// import { PhenotypeCorrelations } from '../gwas/phenotype-correlations';
-// import { Phenotypes } from '../pages/phenotypes';
+import { useDispatch } from 'react-redux';
+import { updateSharedState } from '../../services/actions';
 
 
 export function ShareWrapper(props) {
+    const dispatch = useDispatch();
+
     const { shareID } = props.match.params;
 
-    const [shareParams, setShareParams] = useState(null);
+    const [errorMessage, setErrorMessage] = useState(null);
 
     useEffect(() => {
-        try {
+        if (shareID && shareID.length > 0) {
             getShareParams(shareID);
-        } catch(err) {
-           // error handling
+        } else {
+            setErrorMessage('Missing reference ID.');
         }
     });
      
@@ -26,36 +24,18 @@ export function ShareWrapper(props) {
         console.log("shareID", shareID)
         const response = await query('share-link', {share_id:shareID});
         console.log("response", response);
-        setShareParams(response);
-    }
-
-    const Reroute = () => {
-        console.log("reroute!", shareParams);
-
-        return (
-            <Redirect
-                to={{
-                    pathname: shareParams.route,
-                    state: shareParams.parameters
-                }}
-            />
-        );
+        if (response && response.route) {
+            setErrorMessage(null);
+            dispatch(updateSharedState(response));
+            window.location.hash = response.route;
+        } else {
+            setErrorMessage('Invalid or expired reference ID.');
+        }
     }
 
     return (
-        <>
-            {
-                !shareParams && (
-                    <div className="mt-3 container bg-white border rounded-0 p-4">
-                        {shareID}
-                    </div>
-                )
-            }
-            {
-                shareParams && (
-                    <Reroute />
-                )
-            }
-        </>
+        <div className="mt-3 container bg-white border rounded-0 p-4">
+            {errorMessage}
+        </div>
     );
 }

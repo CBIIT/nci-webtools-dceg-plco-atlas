@@ -10,6 +10,7 @@ export const UPDATE_PHENOTYPE_CORRELATIONS = 'UPDATE_PHENOTYPE_CORRELATIONS';
 export const UPDATE_PHENOTYPES = 'UPDATE_PHENOTYPES';
 export const UPDATE_BROWSE_PHENOTYPES = 'UPDATE_BROWSE_PHENOTYPES';
 export const UPDATE_DOWNLOADS = 'UPDATE_DOWNLOADS';
+export const UPDATE_SHARED_STATE = 'UPDATE_SHARED_STATE';
 
 export function updateKey(key, data) {
   return { type: UPDATE_KEY, key, data };
@@ -57,6 +58,10 @@ export function updateBrowsePhenotypes(data) {
 
 export function updateDownloads(data) {
   return { type: UPDATE_DOWNLOADS, data };
+}
+
+export function updateSharedState(data) {
+  return { type: UPDATE_SHARED_STATE, data };
 }
 
 export function initialize() {
