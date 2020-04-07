@@ -60,10 +60,6 @@ export function updateDownloads(data) {
   return { type: UPDATE_DOWNLOADS, data };
 }
 
-export function updateSharedState(data) {
-  return { type: UPDATE_SHARED_STATE, data };
-}
-
 export function initialize() {
   return async function(dispatch) {
     // update ranges
@@ -701,7 +697,7 @@ export function drawQQPlot(phenotype, sex) {
   };
 }
 
-export function drawHeatmap(phenotypes) {
+export function drawHeatmap({phenotypes, sex}) {
   return async function(dispatch) {
     const filterCorrelationData = (phenotype1, phenotype2, correlationData) => {
       return correlationData.filter((data) => {
