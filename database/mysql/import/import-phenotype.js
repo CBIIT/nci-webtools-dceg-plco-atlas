@@ -49,6 +49,14 @@ importPhenotypes().then(numRows => {
 });
 
 async function importPhenotypes() {
+    // save current colors (use both id and display_name as keys in case one of them gets updated)
+    // const [phenotypeRows] = await connection.query(`SELECT * FROM phenotype`);
+    // const colors = phenotypeRows.reduce((colors, record) => ({
+    //     ...colors,
+    //     [record.id]: record.color,
+    //     [record.display_name]: record.color,
+    // }), {});
+
     // remove phenotype table and all other associated tables
     await connection.query(`
         DROP TABLE IF EXISTS participant_data_category;
@@ -61,15 +69,20 @@ async function importPhenotypes() {
 
     // recreate tables
     await connection.query(
-        readFile('../../schema/tables/global.sql')
+        readFile('../../schema/tables/main.sql')
     );
 
     // parse records
     let records = parse(readFile(inputFilePath), {
         bom: true,
         from_line: 2,
-        columns: ['id', 'parent_id', 'display_name', 'name', 'description', 'type', null],
+        columns: ['id', 'parent_id', 'display_name', 'name', 'description', 'type'],
         on_record: (record, context) => {
+            // ensure that:
+            // id and parent_id are numeric values or null
+            // NULL strings are replaced with actual nulls
+            // ordinal records are treated as categorical
+
             // replace NULL records with actual nulls first
             for (let key in record) {
                 let value = record[key].trim();
@@ -128,9 +141,10 @@ async function importPhenotypes() {
 
     // add test data (todo: remove once we have data for actual phenotypes)
     let maxId = orderedRecords.reduce((acc, curr) => Math.max(acc, curr.id), 0);
+    let parentId = Math.max(10000, maxId + 1);
     orderedRecords.push(
         {
-            id: maxId + 1,
+            id: parentId,
             parent_id: null,
             display_name: 'Test',
             name: null,
@@ -138,39 +152,47 @@ async function importPhenotypes() {
             type: null
         },
         {
-            id: maxId + 2,
-            parent_id: maxId + 1,
-            name: `ewings_sarcoma_2`,
+            id: parentId + 1,
+            parent_id: parentId,
+            name: `test_ewings_sarcoma`,
             display_name: `Ewing's Sarcoma`,
             description: `Test Description`,
             type: `binary`
         },
         {
-            id: maxId + 3,
-            parent_id: maxId + 1,
-            name: `melanoma_3`,
+            id: parentId + 2,
+            parent_id: parentId,
+            name: `test_melanoma`,
             display_name: `Melanoma`,
             description: `Test Description`,
             type: `binary`
         },
         {
-            id: maxId + 4,
-            parent_id: maxId + 1,
-            name: `renal_cell_carcinoma_4`,
+            id: parentId + 3,
+            parent_id: parentId,
+            name: `test_renal_cell_carcinoma`,
             display_name: `Renal Cell Carcinoma`,
             description: `Test Description`,
             type: `binary`
         },
     );
 
-    // insert records
+    // insert records (preserve color)
     for (let record of orderedRecords) {
+
+        // record.color = colors[record.id] || colors[record.display_name] || null;
         await connection.execute(
             `INSERT INTO phenotype (id, parent_id, display_name, name, description, type)
                 VALUES (:id, :parent_id, :display_name, :name, :description, :type)`,
             record
         );
     };
+
+    // update partition references
+
+
+    // update partition ids
+
 
     return orderedRecords.length;
 }
