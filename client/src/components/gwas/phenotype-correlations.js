@@ -15,13 +15,8 @@ import {
 } from '../../services/actions';
 
 
-export function PhenotypeCorrelations(props) {
+export function PhenotypeCorrelations() {
   const dispatch = useDispatch();
-
-  const shareLinkState = props.location.state;
-  if (shareLinkState) {
-    console.log('shareLinkState', shareLinkState.params);
-  }
 
   const phenotypeCorrelations = useSelector(
     state => state.phenotypeCorrelations
