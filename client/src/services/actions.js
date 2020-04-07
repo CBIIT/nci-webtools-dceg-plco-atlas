@@ -10,6 +10,7 @@ export const UPDATE_PHENOTYPE_CORRELATIONS = 'UPDATE_PHENOTYPE_CORRELATIONS';
 export const UPDATE_PHENOTYPES = 'UPDATE_PHENOTYPES';
 export const UPDATE_BROWSE_PHENOTYPES = 'UPDATE_BROWSE_PHENOTYPES';
 export const UPDATE_DOWNLOADS = 'UPDATE_DOWNLOADS';
+export const UPDATE_SHARED_STATE = 'UPDATE_SHARED_STATE';
 
 export function updateKey(key, data) {
   return { type: UPDATE_KEY, key, data };
@@ -696,7 +697,7 @@ export function drawQQPlot(phenotype, sex) {
   };
 }
 
-export function drawHeatmap(phenotypes) {
+export function drawHeatmap({phenotypes, sex}) {
   return async function(dispatch) {
     const filterCorrelationData = (phenotype1, phenotype2, correlationData) => {
       return correlationData.filter((data) => {
@@ -934,10 +935,10 @@ export function generateShareLink(params) {
   return async function(dispatch) {
     console.log("params.route", params.route);
     const updateStore = {
-      "#/gwas/summary": updateSummaryResults,
-      "#/gwas/lookup": updateVariantLookup,
-      "#/gwas/correlations": updatePhenotypeCorrelations,
-      "#/phenotypes": updateBrowsePhenotypes
+      "/gwas/summary": updateSummaryResults,
+      "/gwas/lookup": updateVariantLookup,
+      "/gwas/correlations": updatePhenotypeCorrelations,
+      "/phenotypes": updateBrowsePhenotypes
     }[params.route];
     console.log("updateStore", updateStore)
     dispatch(
@@ -954,3 +955,4 @@ export function generateShareLink(params) {
     );
   };
 }
+
