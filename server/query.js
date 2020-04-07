@@ -209,6 +209,8 @@ async function getVariants(connection, params) {
         );
     }
 
+    if (!phenotypes.length) return null;
+
     let columnNames = getValidColumns('variant', params.columns).map(quote).join(',')
     // console.log("params.columns", params.columns);
     // let columnNames = params.columns.map(quote).join(',');
@@ -220,8 +222,13 @@ async function getVariants(connection, params) {
     //     params.show_table_name ? `, '` + tableName + `' as table_name ` : ``
     // };
 
+
     // filter by id, chr, base position, and -log10(p), if provided
     let sql = phenotypes.map(phenotype => {
+        const partition = (phenotype.id && params.sex)
+            ? `partition(${quote(`${phenotype.id}_${params.sex}`)})`
+            : `partition(${quote(`${phenotype.id}`)})`;
+
         const conditions = [
             coalesce(params.id, `id = :id`),
             // coalesce(params.sex, `sex = :sex`),
@@ -240,7 +247,7 @@ async function getVariants(connection, params) {
 
         return `
             SELECT ${columnNames} ${[coalesce(params.show_table_name, `, 'variant_${phenotype.name}' as table_name`)]}
-            FROM phenotype_variant partition(${quote(`${phenotype.id}_${params.sex}`)}) as v
+            FROM phenotype_variant ${partition} as v
             ${conditions.length ? `WHERE ${conditions}` : ''}
             ${groupby}`
     }).join(' UNION ');

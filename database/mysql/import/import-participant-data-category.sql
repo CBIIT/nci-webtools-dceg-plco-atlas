@@ -12,12 +12,10 @@ DROP TABLE IF EXISTS participant_data_category;
 DROP TABLE IF EXISTS participant_data_category_stage;
 
 CREATE TABLE participant_data_category_stage (
-    `id`                    TEXT,
-    `phenotype_id`          TEXT,
     `phenotype_name`        TEXT,
     `value`                 TEXT,
     `label`                 TEXT,
-    `display_distribution`  TEXT,
+    `show_distribution`     TEXT,
     `order`                 TEXT
 );
 
@@ -26,7 +24,7 @@ CREATE TABLE participant_data_category (
     `phenotype_id`          INTEGER NOT NULL,
     `value`                 INTEGER,
     `label`                 TEXT,
-    `display_distribution`  BOOLEAN,
+    `show_distribution`     BOOLEAN,
     `order`                 INTEGER,
     FOREIGN KEY (phenotype_id) REFERENCES phenotype(id)
 );
@@ -34,14 +32,14 @@ CREATE TABLE participant_data_category (
 -- D:/Development/Work/nci-webtools-dceg-plco-atlas/database/mysql/import/raw/participant_data_category.csv
 LOAD DATA LOCAL INFILE "D:/Development/Work/nci-webtools-dceg-plco-atlas/database/mysql/import/raw/participant_data_category.csv" INTO TABLE participant_data_category_stage
     FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"'
-    IGNORE 1 ROWS (phenotype_name, value, label, display_distribution);
+    IGNORE 1 ROWS (`phenotype_name`, `value`, `label`, `show_distribution`, `order`, @undefined);
 
-INSERT INTO participant_data_category (`phenotype_id`, `value`, `label`, `display_distribution`, `order`)
+INSERT INTO participant_data_category (`phenotype_id`, `value`, `label`, `show_distribution`, `order`)
 SELECT
        p.id,
        stage.value,
        stage.label,
-       IF(stage.display_distribution REGEXP 'TRUE', 1, 0),
+       IF(stage.show_distribution REGEXP 'TRUE', 1, 0),
        stage.order
 FROM participant_data_category_stage stage
 INNER JOIN phenotype p ON p.name = stage.phenotype_name

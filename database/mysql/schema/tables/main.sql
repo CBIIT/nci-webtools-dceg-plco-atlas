@@ -163,7 +163,7 @@ CREATE TABLE IF NOT EXISTS `gene` (
     `exon_ends` MEDIUMTEXT
 );
 
-CREATE TABLE phenotype_variant (
+CREATE TABLE IF NOT EXISTS phenotype_variant (
     id BIGINT AUTO_INCREMENT NOT NULL,
     phenotype_id INTEGER NOT NULL,
     sex ENUM('all', 'female', 'male') NOT NULL,
@@ -218,7 +218,7 @@ CREATE TABLE phenotype_variant (
         )
 );
 
-CREATE TABLE phenotype_aggregate (
+CREATE TABLE IF NOT EXISTS phenotype_aggregate (
     `id` BIGINT AUTO_INCREMENT NOT NULL,
     `phenotype_id` INTEGER NOT NULL,
     `sex` ENUM('all', 'female', 'male') NOT NULL,
@@ -261,9 +261,10 @@ CREATE TABLE phenotype_aggregate (
         )
 );
 
-CREATE TABLE share_link (
-  id INTEGER PRIMARY KEY AUTO_INCREMENT,
-  share_id CHAR(36) UNIQUE,
-  parameters JSON,
-  created_date DATETIME
+CREATE TABLE IF NOT EXISTS share_link (
+  `id` INTEGER PRIMARY KEY AUTO_INCREMENT,
+  `share_id` CHAR(36) UNIQUE,
+  `route` VARCHAR(100),
+  `parameters` JSON,
+  `created_date` DATETIME
 );
