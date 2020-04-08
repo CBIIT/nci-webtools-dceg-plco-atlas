@@ -64,11 +64,11 @@ export function ShareWrapper(props) {
     const placeholder = (
         <div style={{ display: 'block' }}>
             
-            <p className="h4 text-center">
+            <div className="h4 text-center">
                 <Spinner animation="border" variant="primary" role="status">
                     <span className="sr-only">Loading...</span>
                 </Spinner>
-            </p>
+            </div>
             {
                 !errorMessage && 
                 <p className="h4 text-center text-secondary">
