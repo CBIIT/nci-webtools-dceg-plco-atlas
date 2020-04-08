@@ -12,7 +12,11 @@ export const PhenotypesSearchCriteria = () => {
     submitted,
     phenotypeData,
     shareID,
-    selectedPhenotype
+    selectedPhenotype,
+    displayTreeParent,
+    breadCrumb,
+    currentBubbleData,
+    categoryColor, 
   } = useSelector(
     state => state.browsePhenotypes
   );
@@ -79,7 +83,12 @@ export const PhenotypesSearchCriteria = () => {
               disabled={false}
               shareID={shareID}
               params={{
-                selectedPhenotype
+                selectedPhenotype,
+                displayTreeParent,
+                breadCrumb,
+                currentBubbleData,
+                categoryColor,
+                submitted
               }}
             />
           </div>

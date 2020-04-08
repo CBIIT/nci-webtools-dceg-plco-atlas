@@ -122,7 +122,7 @@ export const getInitialState = () => ({
     messages: [],
     selectedPlot: 'frequency',
     phenotypeType: 'binary',
-    breadcrumb: [],
+    breadCrumb: [],
     currentBubbleData: null,
     phenotypeData: null,
     categoryColor: null,

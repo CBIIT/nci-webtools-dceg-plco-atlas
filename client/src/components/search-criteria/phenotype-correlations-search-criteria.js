@@ -5,7 +5,7 @@ import { Tab, Tabs, Button } from 'react-bootstrap';
 import { ShareLink } from '../controls/share-link';
 
 
-export const PhenotypeCorrelationsSearchCriteria = props => {
+export const PhenotypeCorrelationsSearchCriteria = () => {
   const dispatch = useDispatch();
   const {
     searchCriteriaPhenotypeCorrelations,

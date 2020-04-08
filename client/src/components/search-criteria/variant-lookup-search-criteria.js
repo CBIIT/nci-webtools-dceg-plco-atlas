@@ -5,7 +5,7 @@ import { Tab, Tabs, Button } from 'react-bootstrap';
 import { ShareLink } from '../controls/share-link';
 
 
-export const VariantLookupSearchCriteria = props => {
+export const VariantLookupSearchCriteria = () => {
   const dispatch = useDispatch();
   const {
     searchCriteriaVariantLookup,
