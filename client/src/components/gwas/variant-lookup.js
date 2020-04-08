@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { VariantLookupForm } from '../forms/variant-lookup-form';
 import { updateVariantLookup, lookupVariants } from '../../services/actions';
@@ -30,6 +30,7 @@ export function VariantLookup() {
     results,
     messages,
     submitted,
+    sharedState
   } = variantLookup;
 
   const { ExportCSVButton } = CSVExport;
@@ -164,9 +165,10 @@ export function VariantLookup() {
   };
 
   const handleSubmit = params => {
+    console.log("handleSubmit", params);
     if (
-      params.selectedPhenotypes.length < 1 &&
-      params.selectedVariant.length < 1
+      params.phenotypes.length < 1 &&
+      params.variant.length < 1
     ) {
       setMessages([
         {
@@ -176,7 +178,7 @@ export function VariantLookup() {
       ]);
       return;
     }
-    if (params.selectedPhenotypes.length < 1) {
+    if (params.phenotypes.length < 1) {
       setMessages([
         {
           type: 'danger',
@@ -185,7 +187,7 @@ export function VariantLookup() {
       ]);
       return;
     }
-    if (params.selectedVariant.length < 1) {
+    if (params.variant.length < 1) {
       setMessages([
         {
           type: 'danger',
@@ -194,7 +196,7 @@ export function VariantLookup() {
       ]);
       return;
     }
-    if (!validateVariantInput(params.selectedVariant)) {
+    if (!validateVariantInput(params.variant)) {
       setMessages([
         {
           type: 'danger',
@@ -206,13 +208,32 @@ export function VariantLookup() {
     // close sidebar on submit
     // setOpenSidebar(false);
     setSearchCriteriaVariantLookup({
-      phenotypes: selectedPhenotypes.map(item => item.title),
-      variant: selectedVariant,
-      sex: selectedSex
+      phenotypes: params.phenotypes.map(item => item.title),
+      variant: params.variant,
+      sex: params.sex
     });
     setSubmitted(new Date());
-    dispatch(lookupVariants(selectedPhenotypes, selectedVariant, selectedSex === 'combined' ? 'all' : selectedSex));
+    dispatch(lookupVariants(params.phenotypes, params.variant, params.sex === 'combined' ? 'all' : params.sex));
+    dispatch(updateVariantLookup({
+      sharedState: null
+    }))
   };
+
+  useEffect(() => {
+    if (sharedState) {
+      handleReset();
+      dispatch(updateVariantLookup({
+        selectedPhenotypes: sharedState.parameters.params.selectedPhenotypes,
+        selectedVariant: sharedState.parameters.params.selectedVariant,
+        selectedSex: sharedState.parameters.params.selectedSex
+      }))
+      handleSubmit({
+        phenotypes: sharedState.parameters.params.selectedPhenotypes,
+        variant: sharedState.parameters.params.selectedVariant,
+        sex: sharedState.parameters.params.selectedSex
+      });
+    }
+  }, [sharedState]);
 
   const handleReset = params => {
     dispatch(
@@ -227,7 +248,8 @@ export function VariantLookup() {
         searchCriteriaVariantLookup: null,
         numResults: null,
         collapseCriteria: true,
-        shareID: null
+        shareID: null,
+        sharedState: null
       })
     );
   };

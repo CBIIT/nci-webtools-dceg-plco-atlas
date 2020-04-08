@@ -36,7 +36,8 @@ export const getInitialState = () => ({
     manhattanPlotConfig: {},
     zoomStack: [],
     genes: [],
-    shareID: null
+    shareID: null,
+    sharedState: null
   },
   manhattanPlot: {
     data: {},
@@ -98,7 +99,8 @@ export const getInitialState = () => ({
     searchCriteriaVariantLookup: null,
     numResults: null,
     collapseCriteria: true,
-    shareID: null
+    shareID: null,
+    sharedState: null
   },
   phenotypeCorrelations: {
     selectedListType: 'categorical',
@@ -110,7 +112,8 @@ export const getInitialState = () => ({
     messages: [],
     searchCriteriaPhenotypeCorrelations: null,
     collapseCriteria: true,
-    shareID: null
+    shareID: null,
+    sharedState: null
   },
   browsePhenotypes: {
     selectedPhenotype: null,
@@ -124,7 +127,8 @@ export const getInitialState = () => ({
     phenotypeData: null,
     categoryColor: null,
     loading: false,
-    shareID: null
+    shareID: null,
+    sharedState: null
   },
   downloads: {
     selectedPhenotypes: [],
