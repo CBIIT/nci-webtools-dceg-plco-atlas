@@ -1,6 +1,6 @@
 import React, { useRef, useEffect } from 'react';
 import { Spinner } from 'react-bootstrap';
-import { useNonStaticParent } from './hooks';
+import { useNonStaticParent, useAbsoluteCenteredPositioning } from './hooks';
 
 const overlayStyle = {
     position: 'absolute',
@@ -14,38 +14,28 @@ const overlayStyle = {
 };
 
 const loaderStyle = {
-    position: 'absolute',
-    left: '50%',
-    top: '50%',
     textAlign: 'center',
 };
 
 const DefaultLoader = props => (
     <div style={{...loaderStyle, ...props.loaderStyle}} {...props.loaderProps}>
-        {
-             props.content ? 
-             <>{props.content}</> 
-             : <Spinner animation="border" variant="primary" role="status"></Spinner>
-        }
-        <div>
-            {
-                props.children || 
-                    <span className="sr-only">
-                        {
-                            props.content ? 
-                                <>{props.content}</> 
-                                : <>Loading</>
-                        }
-                    </span>
-            }
-        </div>
+        {props.children || props.content || <>
+            <Spinner animation="border" variant="primary" role="status"></Spinner>
+            <div className="sr-only">Loading...</div>
+        </>}
     </div>
 );
 
+/**
+ * Example Usage: <LoadingOverlay active={loading}>Loading</LoadingOverlay>
+ * @param {*} props
+ */
 export const LoadingOverlay = props => {
-    const node = useRef(null);
-    useNonStaticParent(node);
-    return props.active && <div ref={node} style={{...overlayStyle, ...props.overlayStyle}} {...props.overlayProps}>
-        {(props.loader || DefaultLoader)(props)}
+    const overlayNode = useRef(null);
+    const loaderNode = useRef(null);
+    useNonStaticParent(overlayNode);
+    useAbsoluteCenteredPositioning(loaderNode);
+    return props.active && <div ref={overlayNode} style={{...overlayStyle, ...props.overlayStyle}} {...props.overlayProps}>
+        <div style={{visibility: 'hidden'}} ref={loaderNode}>{(props.loader || DefaultLoader)(props)}</div>
     </div>
 };
