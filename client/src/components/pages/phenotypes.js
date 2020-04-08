@@ -23,7 +23,7 @@ export function Phenotypes() {
     submitted,
     breadCrumb,
     currentBubbleData,
-    displayTreeParent,
+    // displayTreeParent,
     categoryColor,
     selectedPlot,
     loading,
@@ -298,11 +298,11 @@ export function Phenotypes() {
       <SidebarPanel className="col-lg-3">
         <div className="px-2 pt-2 pb-3 bg-white border rounded-0">
           <PhenotypesForm
-            phenotype={selectedPhenotype}
+            // phenotype={selectedPhenotype}
             onChange={handleChange}
             onSubmit={handleSubmit}
             onReset={handleReset}
-            displayTreeParent={displayTreeParent}
+            // displayTreeParent={displayTreeParent}
           />
           {messages &&
             messages.map(({ type, content }) => (
