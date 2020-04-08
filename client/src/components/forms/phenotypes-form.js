@@ -4,29 +4,35 @@ import { Button, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import { TreeSelect } from '../controls/tree-select';
 
 export function PhenotypesForm({
-  phenotype = null,
+  // phenotype = null,
   onSubmit,
   onChange,
   onReset,
-  displayTreeParent
+  // displayTreeParent
 }) {
 
   // private members prefixed with _
-  const [_phenotype, _setPhenotype] = useState(null);
+  // const [_phenotype, _setPhenotype] = useState(null);
   // const submitRef = useRef(null);
+
   const treeRef = useRef();
 
   // update state when props change
-  useEffect(() => _setPhenotype(phenotype), [phenotype]);
+  // useEffect(() => _setPhenotype(phenotype), [phenotype]);
+
+  // select store members
+  const phenotypes = useSelector(state => state.phenotypes);
+  const { 
+    submitted, 
+    loading,
+    displayTreeParent,
+    selectedPhenotype
+  }  = useSelector(state => state.browsePhenotypes);
 
   useEffect(() => {
     if (!displayTreeParent) return;
     treeRef.current.expandSelectedPhenotype(displayTreeParent);
-  }, [displayTreeParent]);
-
-  // select store members
-  const phenotypes = useSelector(state => state.phenotypes);
-  const { submitted, loading }  = useSelector(state => state.browsePhenotypes);
+  }, [displayTreeParent, phenotypes]);
 
   return (
     <>
@@ -35,7 +41,7 @@ export function PhenotypesForm({
         <label className="required">Phenotypes</label>
         <TreeSelect
           data={phenotypes}
-          value={_phenotype}
+          value={selectedPhenotype}
           // onChange={val => _setPhenotype((val && val.length) ? val[0] : null)}
           onChange={val => onChange((val && val.length) ? val[0] : null)}
           singleSelect
@@ -48,19 +54,19 @@ export function PhenotypesForm({
         <OverlayTrigger
           overlay={
             <Tooltip
-              style={{display: _phenotype ? 'none' : 'block'}}
+              style={{display: selectedPhenotype ? 'none' : 'block'}}
               id="submit-summary-results">
               Please select a phenotype.
           </Tooltip>}>
-          <span className={`d-inline-block ${!_phenotype && 'c-not-allowed'}`}>
+          <span className={`d-inline-block ${!selectedPhenotype && 'c-not-allowed'}`}>
             <Button
               type="submit"
               variant="silver"
-              className={!_phenotype && 'pointer-events-none'}
-              disabled={!_phenotype || submitted || loading}
+              className={!selectedPhenotype && 'pointer-events-none'}
+              disabled={!selectedPhenotype || submitted || loading}
               onClick={e => {
                 e.preventDefault();
-                onSubmit(_phenotype);
+                onSubmit(selectedPhenotype);
               }}>
               Submit
             </Button>
@@ -72,7 +78,7 @@ export function PhenotypesForm({
           variant="silver"
           onClick={e => {
             e.preventDefault();
-            _setPhenotype(null);
+            // _setPhenotype(null);
             onReset();
             treeRef.current.resetSearchFilter();
           }}>
