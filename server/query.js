@@ -737,7 +737,7 @@ async function getShareLink(connection, {share_id}) {
         {share_id}
     );
 
-    return shareLinkRows[0];
+    return shareLinkRows.length ? shareLinkRows[0] : null;;
 }
 
 async function setShareLink(connection, {route, parameters}) {
