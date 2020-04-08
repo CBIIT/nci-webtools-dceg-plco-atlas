@@ -8,10 +8,11 @@ export function PhenotypeCorrelationsForm({ onChange, onSubmit, onReset }) {
   const dispatch = useDispatch();
   const phenotypes = useSelector(state => state.phenotypes);
 
-  const phenotypeCorrelations = useSelector(
-    state => state.phenotypeCorrelations
-  );
-  const { selectedPhenotypes, selectedSex, submitted } = phenotypeCorrelations;
+  const { 
+    selectedPhenotypes, 
+    selectedSex, 
+    submitted 
+  } = useSelector(state => state.phenotypeCorrelations);
 
   const treeRef = useRef();
 
