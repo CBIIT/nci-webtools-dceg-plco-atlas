@@ -428,7 +428,7 @@ async function getPhenotype(connection, params) {
         {id}
     );
     const phenotype = phenotypeRows[0];
-    if (!phenotype) return null;
+    if (!phenotype || !type) return null;
 
     phenotype.categoryTypes = {
         frequencyByAge: [
@@ -452,6 +452,12 @@ async function getPhenotype(connection, params) {
         ]
     }
 
+    // generates an array of values for each key
+    const keyValueArrayReducer = (key, value) => ((obj = {}, curr) => ({
+        ...obj,
+        [curr[key]]: [...(obj[curr[key]] || []), +curr[value]]
+    }));
+
     const getPercentage = counts => {
         let sum = 0;
         let percentage = {};
@@ -466,6 +472,70 @@ async function getPhenotype(connection, params) {
             percentage[key] = counts[key].map(a => 100 * a / sum);
 
         return percentage;
+    }
+
+    let key, distributionSql;
+    if (/^frequencyBy(Age|Sex|Ancestry)$/.test(type)) {
+        key = {
+            frequencyByAge: 'age',
+            frequencyBySex: 'sex',
+            frequencyByAncestry: 'ancestry',
+        }[type];
+
+        distributionSql = key === 'age'
+            ? `WITH participant_age AS (
+                    SELECT
+                        CASE
+                            WHEN p.age between 55 and 59 then '55-59'
+                            WHEN p.age BETWEEN 60 AND 64 THEN '60-64'
+                            WHEN p.age BETWEEN 65 AND 69 THEN '65-69'
+                            WHEN p.age BETWEEN 70 AND 74 THEN '70-74'
+                            WHEN p.age BETWEEN 75 AND 79 THEN '75-79'
+                        END AS \`age_range\`,
+                        COUNT(*) AS \`count\`
+                    FROM participant p
+                    WHERE p.age BETWEEN 55 AND 79
+                    GROUP BY \`age_range\`
+                ) SELECT
+                    CASE
+                        WHEN p.age between 55 and 59 then '55-59'
+                        WHEN p.age BETWEEN 60 AND 64 THEN '60-64'
+                        WHEN p.age BETWEEN 65 AND 69 THEN '65-69'
+                        WHEN p.age BETWEEN 70 AND 74 THEN '70-74'
+                        WHEN p.age BETWEEN 75 AND 79 THEN '75-79'
+                    END AS \`key\`,
+                    pd.value AS \`group\`,
+                    COUNT(*) AS \`counts\`,
+                    100 * COUNT(*) / (SELECT pa.count FROM participant_age pa WHERE pa.age_range = \`key\`) AS \`percentage\`
+                FROM participant_data pd
+                JOIN participant p ON p.id = pd.participant_id
+                WHERE
+                    pd.phenotype_id = :id AND
+                    pd.value IS NOT NULL AND
+                    p.age BETWEEN 55 AND 79
+                GROUP BY \`key\`, \`group\`
+                ORDER BY \`key\`, \`group\`;`
+            : `WITH participant_counts AS (
+                SELECT
+                    p.${key} AS \`pc_key\`,
+                    COUNT(*) AS \`count\`
+                FROM participant p
+                WHERE p.age BETWEEN 55 AND 79
+                AND p.${key} IS NOT NULL
+                GROUP BY \`pc_key\`
+                ) SELECT
+                    p.${key} AS \`key\`,
+                    pd.value as \`group\`,
+                    COUNT(*) AS \`counts\`,
+                    100 * COUNT(*) / (SELECT count FROM participant_counts WHERE pc_key = \`key\`) as \`percentage\`
+                FROM participant_data pd
+                JOIN participant p ON p.id = pd.participant_id
+                WHERE
+                    pd.phenotype_id = :id AND
+                    pd.value IS NOT NULL AND
+                    p.${key} IS NOT NULL
+                GROUP BY \`key\`, \`group\`
+                ORDER BY \`key\`, \`group\`;`;
     }
 
     switch(phenotype.type) {
@@ -486,25 +556,16 @@ async function getPhenotype(connection, params) {
                     {id}
                 ))[0].map(f => f.count); // [without #, with #]
             } else if (/^frequencyBy(Age|Sex|Ancestry)$/.test(type)) {
-                 // generates an array of values for each key
-                const keyValueArrayReducer = (key, value) => ((obj = {}, curr) => ({
-                    ...obj,
-                    [curr[key]]: [...(obj[curr[key]] || []), +curr[value]]
-                }));
-
                 const key = {
                     frequencyByAge: 'age',
                     frequencyBySex: 'sex',
                     frequencyByAncestry: 'ancestry',
                 }[type];
 
-                // validate type
-                if (!key) return null;
-
                 const [distribution] = await connection.execute(
                     `WITH
-                        participant_selection as (
-                            SELECT p.${key} as \`key\`
+                        participant_selection AS (
+                            SELECT p.${key} AS \`key\`
                             FROM participant_data pd
                             JOIN participant p ON p.id = pd.participant_id
                             WHERE
@@ -514,13 +575,15 @@ async function getPhenotype(connection, params) {
                                 p.age >= 55
                         ),
                         participant_count AS (
-                            SELECT count(*) AS total
-                            FROM participant_selection
+                            SELECT ${key}, COUNT(*) AS total
+                            FROM participant
+                            WHERE ${key} IS NOT NULL
+                            GROUP BY ${key}
                         )
                     SELECT
                         \`key\`,
-                        count(*) as counts,
-                        100 * count(*) / (select total from participant_count) as percentage
+                        count(*) AS counts,
+                        100 * count(*) / (SELECT total FROM participant_count pc WHERE pc.${key} = \`key\`) AS percentage
                     FROM participant_selection p
                     GROUP BY \`key\`
                     ORDER BY \`key\``,
@@ -530,15 +593,14 @@ async function getPhenotype(connection, params) {
                     counts: distribution.reduce(keyValueArrayReducer('key', 'counts'), {}),
                     percentage: distribution.reduce(keyValueArrayReducer('key', 'percentage'), {})
                 };
-                getPercentage(phenotype[type].counts);
             }
         break;
 
         case 'categorical':
             let [categoryRows] = await connection.execute(
-                `SELECT label, show_distribution FROM participant_data_category
+                `SELECT label, show_distribution, value FROM participant_data_category
                 WHERE phenotype_id = :id
-                ORDER BY value`,
+                ORDER BY \`order\`, \`value\`;`,
                 {id: params.id}
             )
 
@@ -547,127 +609,47 @@ async function getPhenotype(connection, params) {
                 .filter(e => e.show_distribution)
                 .map(e => e.label);
 
-            let keyGroupValueReducer = (acc, curr) => {
-                if (!acc[curr.key])
-                    acc[curr.key] = new Array(phenotype.categories.length).fill(0);
-                acc[curr.key][curr.group - 1] = curr.value;
+            let keyGroupReducer = (categories, distributionKey) => (acc, curr) => {
+                let categoryName = categoryRows.find(c => c.value == curr.group).label;
+                if (!phenotype.distributionCategories.includes(categoryName)) return acc;
+                if (!acc[categoryName])
+                    acc[categoryName] = new Array(categories.length).fill(0);
+                acc[categoryName][categories.indexOf(curr.key)] = +curr[distributionKey];
                 return acc;
-            };
+            }
 
-            let distributionCategoryReducer = (subcategories, distribution) => (acc, category, idx) => ({
-                ...acc,
-                [category]: subcategories.map(c => distribution[c][idx]),
-            });
-
-            if (type === 'all' || type === 'frequency') {
+            if (type === 'frequency') {
                 let [frequencyRows] = await connection.execute(
-                    `SELECT count(*) as count FROM participant_data
+                    `SELECT pd.value, count(*) as count
+                    FROM participant_data pd
+                    LEFT JOIN participant_data_category pdc on pdc.phenotype_id = pd.phenotype_id and pdc.value = pd.value
                     WHERE
-                        phenotype_id = :id AND
-                        value IS NOT NULL
-                    GROUP BY value
-                    ORDER BY value`,
+                        pd.phenotype_id = :id AND
+                        pd.value IS NOT NULL
+                    GROUP BY \`value\`
+                    ORDER BY pdc.order, pdc.value;`,
                     {id: params.id}
                 );
-               phenotype.frequency = frequencyRows.map(e => e.count);
-               phenotype.totalCount = frequencyRows.reduce((a, b) => a + b.count, 0);
+                phenotype.frequency = frequencyRows.map(e => e.count);
+                phenotype.totalCount = phenotype.frequency.reduce((a, b) => a + b, 0);
             }
-
-            if (type === 'all' || type === 'frequencyByAge') {
-                let [distribution] = (await connection.execute(`
-                    SELECT
-                        pd.value as "key",
-                        p.age AS "group",
-                        COUNT(*) AS "value"
-                    FROM participant_data pd
-                    JOIN participant p ON p.id = pd.participant_id
-                    WHERE
-                        pd.phenotype_id = :id AND
-                        pd.value IS NOT NULL AND
-                        p.age IS NOT NULL AND
-                        p.age >= 55
-                    GROUP BY pd.value, p.age
-                    ORDER BY pd.value, p.age;
-                `, {id: params.id}));
-
-                let frequencyByAgeCounts = phenotype.distributionCategories.reduce((acc, category, idx) => ({
-                    ...acc,
-                    [category]: phenotype.categoryTypes.frequencyByAge
-                        .map(c => c.split('-').map(Number))
-                        .map(range => distribution
-                            .filter(({key, group}) => key === idx + 1 && group >= range[0] && group <= range[1])
-                            .reduce((acc, curr) => acc + curr.value, 0))
-                }), {});
-
-                phenotype.frequencyByAge = {
-                    counts: frequencyByAgeCounts,
-                    percentage: getPercentage(frequencyByAgeCounts)
-                }
-            }
-
-            if (type === 'all' || type === 'frequencyBySex') {
-                let [distribution] = await connection.execute(`
-                    SELECT
-                        p.sex AS "key",
-                        pd.value as "group",
-                        COUNT(*) AS "value"
-                    FROM participant_data pd
-                    JOIN participant p ON p.id = pd.participant_id
-                    WHERE
-                        pd.phenotype_id = :id AND
-                        pd.value IS NOT NULL AND
-                        p.sex IS NOT NULL
-                    GROUP BY p.sex, pd.value
-                    ORDER BY p.sex, pd.value;
-                `, {id: params.id});
-
-                let frequencyBySexCounts = phenotype.categories.reduce(
-                    distributionCategoryReducer(
-                        phenotype.categoryTypes.frequencyBySex,
-                        distribution.reduce(keyGroupValueReducer, {})
-                    ),
-                    {}
+            else if (/^frequencyBy(Age|Sex|Ancestry)$/.test(type)) {
+                let [distribution] = await connection.execute(
+                    distributionSql,
+                    {id: params.id}
                 );
 
-                phenotype.frequencyBySex = {
-                    counts: frequencyBySexCounts,
-                    percentage: getPercentage(frequencyBySexCounts)
-                }
-            }
+                let categories = phenotype.categoryTypes[type];
 
-            if (type === 'all' || type === 'frequencyByAncestry') {
-                let [distribution] = await connection.execute(`
-                    SELECT
-                        p.ancestry AS "key",
-                        pd.value as "group",
-                        COUNT(*) AS "value"
-                    FROM participant_data pd
-                    JOIN participant p ON p.id = pd.participant_id
-                    WHERE
-                        pd.phenotype_id = :id AND
-                        pd.value IS NOT NULL AND
-                        p.ancestry IS NOT NULL
-                    GROUP BY p.ancestry, pd.value
-                    ORDER BY p.ancestry, pd.value;
-                `, {id: params.id});
-
-                let frequencyByAncestryCounts = phenotype.distributionCategories.reduce(
-                    distributionCategoryReducer(
-                        phenotype.categoryTypes.frequencyByAncestry,
-                        distribution.reduce(keyGroupValueReducer, {})
-                    ),
-                    {}
-                );
-
-                phenotype.frequencyByAncestry = {
-                    counts: frequencyByAncestryCounts,
-                    percentage: getPercentage(frequencyByAncestryCounts)
-                }
+                phenotype[type] = {
+                    counts: distribution.reduce(keyGroupReducer(categories, 'counts'), {}),
+                    percentage: distribution.reduce(keyGroupReducer(categories, 'percentage'), {})
+                };
             }
             break;
-        case 'continuous':
 
-            if (type === 'all' || type === 'frequency') {
+        case 'continuous':
+            if (type === 'frequency') {
                 let [frequencies] = await connection.query(
                     `SELECT
                         FLOOR(value) AS value_group,
@@ -685,87 +667,24 @@ async function getPhenotype(connection, params) {
                 phenotype.totalCount = frequencies.reduce((a, b) => a + b.value, 0);
             }
 
-            if (type === 'all' || type === 'frequencyByAge') {
-                let frequencyByAgeCounts = (await connection.execute(`
-                    SELECT
-                        floor(pd.value) as "key",
-                        p.age AS "group",
-                        COUNT(*) AS "value"
-                    FROM participant_data pd
-                    JOIN participant p ON p.id = pd.participant_id
-                    WHERE
-                        pd.phenotype_id = :id AND
-                        pd.value IS NOT NULL AND
-                        p.age IS NOT NULL
-                    GROUP BY \`key\`, \`group\`
-                    ORDER BY \`key\`, \`group\`;
-                `, {id: params.id}))[0].reduce((acc, curr) => {
-                    if (!acc[curr.key])
-                    acc[curr.key] = new Array(phenotype.categoryTypes.frequencyByAge.length).fill(0);
-                    let ranges = phenotype.categoryTypes.frequencyByAge.map(c => c.split('-').map(Number));
-                    let groupIndex = ranges.findIndex(range => curr.group >= range[0] && curr.group <= range[1])
-                    if (groupIndex > -1) acc[curr.key][groupIndex] += curr.value;
+            else if (/^frequencyBy(Age|Sex|Ancestry)$/.test(type)) {
+                let keyGroupReducer = (categories, distributionKey) => (acc, curr) => {
+                    if (!acc[curr.group]) acc[curr.group] = new Array(categories.length).fill(0);
+                    acc[curr.group][categories.indexOf(curr.key)] = +curr[distributionKey];
                     return acc;
-                }, {});
-
-                phenotype.frequencyByAge = {
-                    counts: frequencyByAgeCounts,
-                    percentage: getPercentage(frequencyByAgeCounts)
                 }
-            }
 
-            if (type === 'all' || type === 'frequencyBySex') {
-                let frequencyBySexCounts = (await connection.execute(`
-                    SELECT
-                        floor(pd.value) as "key",
-                        p.sex AS "group",
-                        COUNT(*) AS "value"
-                    FROM participant_data pd
-                    JOIN participant p ON p.id = pd.participant_id
-                    WHERE
-                        pd.phenotype_id = :id AND
-                        pd.value IS NOT NULL AND
-                        p.sex IS NOT NULL
-                    GROUP BY \`key\`, \`group\`
-                    ORDER BY \`key\`, \`group\`;
-                `, {id: params.id}))[0].reduce((acc, curr) => {
-                    if (!acc[curr.key])
-                    acc[curr.key] = new Array(phenotype.categoryTypes.frequencyBySex.length).fill(0);
-                    acc[curr.key][phenotype.categoryTypes.frequencyBySex.indexOf(curr.group)] = curr.value;
-                    return acc;
-                }, {})
+                let [distribution] = await connection.execute(
+                    distributionSql,
+                    {id: params.id}
+                );
 
-                phenotype.frequencyBySex = {
-                    counts: frequencyBySexCounts,
-                    percentage: getPercentage(frequencyBySexCounts)
-                }
-            }
+                let categories = phenotype.categoryTypes[type];
 
-            if (type === 'all' || type === 'frequencyByAncestry') {
-                let frequencyByAncestryCounts = (await connection.execute(`
-                    SELECT
-                        floor(pd.value) as "key",
-                        p.ancestry AS "group",
-                        COUNT(*) AS "value"
-                    FROM participant_data pd
-                    JOIN participant p ON p.id = pd.participant_id
-                    WHERE
-                        pd.phenotype_id = :id AND
-                        pd.value IS NOT NULL AND
-                        p.ancestry IS NOT NULL
-                    GROUP BY \`key\`, \`group\`
-                    ORDER BY \`key\`, \`group\`;
-                `, {id: params.id}))[0].reduce((acc, curr) => {
-                    if (!acc[curr.key])
-                    acc[curr.key] = new Array(phenotype.categoryTypes.frequencyByAncestry.length).fill(0);
-                    acc[curr.key][phenotype.categoryTypes.frequencyByAncestry.indexOf(curr.group)] = curr.value;
-                    return acc;
-                }, {})
-
-                phenotype.frequencyByAncestry = {
-                    counts: frequencyByAncestryCounts,
-                    percentage: getPercentage(frequencyByAncestryCounts)
-                }
+                phenotype[type] = {
+                    counts: distribution.reduce(keyGroupReducer(categories, 'counts'), {}),
+                    percentage: distribution.reduce(keyGroupReducer(categories, 'percentage'), {})
+                };
             }
 
             break;
