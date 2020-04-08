@@ -25,7 +25,7 @@ export const ShareLink = props => {
   const shareLink = () => {
     // console.log("do something!", props);
     dispatch(generateShareLink({
-      route: window.location.hash,
+      route: window.location.hash.replace('#', ''),
       parameters: props
     }));
   }
@@ -61,7 +61,10 @@ export const ShareLink = props => {
                 title="Share link"
                 aria-label="Share link"
                 // value={window.location.href}
-                value={props.shareID ? props.shareID : window.location.href}
+                value={
+                  props.shareID 
+                  ? window.location.origin + '/#/link/' + props.shareID 
+                  : window.location.href}
                 type="text"
                 // disabled={!data}
                 onChange={_ => _}

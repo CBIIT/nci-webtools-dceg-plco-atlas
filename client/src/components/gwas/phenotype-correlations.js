@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { PhenotypeCorrelationsForm } from '../forms/phenotype-correlations-form';
 import { Heatmap } from '../plots/heatmap-plot';
@@ -17,14 +17,15 @@ import {
 
 export function PhenotypeCorrelations() {
   const dispatch = useDispatch();
+
   const phenotypeCorrelations = useSelector(
     state => state.phenotypeCorrelations
   );
+
   const {
-    selectedPhenotypes,
-    selectedSex,
     submitted,
-    messages
+    messages,
+    sharedState
   } = phenotypeCorrelations;
 
   const tooltipRef = useRef();
@@ -61,6 +62,7 @@ export function PhenotypeCorrelations() {
   };
 
   const handleSubmit = params => {
+    console.log('handleSubmit', params);
     if (params.length < 2) {
       setMessages([
         {
@@ -74,11 +76,11 @@ export function PhenotypeCorrelations() {
     // close sidebar on submit
     // setOpenSidebar(false);
     setSearchCriteriaPhenotypeCorrelations({
-      phenotypes: selectedPhenotypes.map(item =>
+      phenotypes: params.phenotypes.map(item =>
         item.title ? item.title : item.label
       ),
-      sex: selectedSex,
-      totalPhenotypes: selectedPhenotypes.length
+      sex: params.sex,
+      totalPhenotypes: params.phenotypes.length
     });
 
     setSubmitted(new Date());
@@ -86,9 +88,26 @@ export function PhenotypeCorrelations() {
 
     dispatch(drawHeatmap(params));
     tooltipRef.current.resetTooltip();
+    dispatch(updatePhenotypeCorrelations({
+      sharedState: null
+    }))
   };
 
-  const handleReset = params => {
+  useEffect(() => {
+    if (sharedState) {
+      handleReset();
+      dispatch(updatePhenotypeCorrelations({
+        selectedPhenotypes: sharedState.parameters.params.selectedPhenotypes,
+        selectedSex: sharedState.parameters.params.selectedSex
+      }))
+      handleSubmit({
+        phenotypes: sharedState.parameters.params.selectedPhenotypes,
+        sex: sharedState.parameters.params.selectedSex
+      });
+    }
+  }, [sharedState]);
+
+  const handleReset = () => {
     dispatch(
       updatePhenotypeCorrelations({
         selectedListType: 'categorical',
@@ -100,7 +119,8 @@ export function PhenotypeCorrelations() {
         messages: [],
         searchCriteriaPhenotypeCorrelations: null,
         collapseCriteria: true,
-        shareID: null
+        shareID: null,
+        sharedState: null
       })
     );
     tooltipRef.current.resetTooltip();

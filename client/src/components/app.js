@@ -6,6 +6,9 @@ import { About } from './pages/about';
 import { Gwas } from './pages/gwas';
 import { Phenotypes } from './pages/phenotypes';
 import { Downloads } from './pages/downloads';
+import { query } from '../services/query'
+import { ShareWrapper } from './pages/share-wrapper';
+
 
 function App() {
   const [params, setParams] = useState({ trait: 'example' });
@@ -44,7 +47,10 @@ function App() {
       cardText: 'Download files of genome-wide association study estimates and summary statistics',
       image: 'assets/images/downloads.svg',
       navIndex: 2
-    }
+    },
+    {
+      route: '/link'
+    },
   ];
 
   return (
@@ -63,6 +69,10 @@ function App() {
       />
       <Route path="/downloads" component={Downloads} />
       {/* <Redirect to="/search/gwas" /> */}
+      <Route 
+        path="/link/:shareID?" 
+        component={ShareWrapper}
+      />
     </Router>
   );
 }

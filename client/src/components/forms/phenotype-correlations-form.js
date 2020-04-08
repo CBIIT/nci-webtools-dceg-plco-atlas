@@ -82,7 +82,10 @@ export function PhenotypeCorrelationsForm({ onChange, onSubmit, onReset }) {
               variant="silver"
               onClick={e => {
                 e.preventDefault();
-                onSubmit(selectedPhenotypes);
+                onSubmit({
+                  phenotypes: selectedPhenotypes, 
+                  sex: selectedSex
+                });
               }}
               disabled={(!selectedPhenotypes || selectedPhenotypes.length < 2 || selectedPhenotypes.length > 120) || submitted}
               >
