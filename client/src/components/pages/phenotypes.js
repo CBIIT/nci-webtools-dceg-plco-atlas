@@ -21,13 +21,13 @@ export function Phenotypes() {
     selectedPhenotype,
     messages,
     submitted,
-    breadcrumb,
+    breadCrumb,
     currentBubbleData,
-    data,
     displayTreeParent,
     categoryColor,
     selectedPlot,
-    loading
+    loading,
+    sharedState
   } = useSelector(state => state.browsePhenotypes);
 
   const plotContainer = useRef(null);
@@ -46,8 +46,8 @@ export function Phenotypes() {
     dispatch(updateBrowsePhenotypes({ messages }));
   };
 
-  const setBreadcrumb = breadcrumb => {
-    dispatch(updateBrowsePhenotypes({ breadcrumb}));
+  const setBreadCrumb = breadCrumb => {
+    dispatch(updateBrowsePhenotypes({ breadCrumb}));
   };
 
   const setCurrentBubbleData = currentBubbleData => {
@@ -135,7 +135,7 @@ export function Phenotypes() {
     const parent = getParent(phenotypesTreeFull, phenotype, null)[0];
     if (parent) {
       setCurrentBubbleData(parent.children);
-      setBreadcrumb([{
+      setBreadCrumb([{
         data: {
           title: parent.title
         },
@@ -187,24 +187,42 @@ export function Phenotypes() {
         selectedPhenotype: phenotype,
         submitted: true,
         phenotypeData: data,
+        sharedState: null
       })
     );
   };
 
-  const handleReset = params => {
+  useEffect(() => {
+    if (sharedState) {
+      handleReset();
+      dispatch(updateBrowsePhenotypes({
+        selectedPhenotype: sharedState.parameters.params.selectedPhenotype,
+        displayTreeParent: sharedState.parameters.params.displayTreeParent,
+        breadCrumb: sharedState.parameters.params.breadCrumb,
+        currentBubbleData: sharedState.parameters.params.currentBubbleData,
+        categoryColor: sharedState.parameters.params.categoryColor
+      }));
+      if (sharedState.parameters.params.submitted) {
+        handleSubmit(sharedState.parameters.params.selectedPhenotype);
+      } 
+    }
+  }, [sharedState]);
+
+  const handleReset = () => {
     dispatch(updateBrowsePhenotypes({
       selectedPhenotype: null,
       messages: [],
       submitted: null,
       selectedPlot: 'frequency',
       phenotypeType: 'binary',
-      breadcrumb: [],
+      breadCrumb: [],
       currentBubbleData: null,
       displayTreeParent: null,
       phenotypeData: null,
       categoryColor: null,
       loading: false,
-      shareID: null
+      shareID: null,
+      sharedState: null
     }));
   }
 
@@ -214,7 +232,7 @@ export function Phenotypes() {
     plotContainer.current.innerHTML = '';
     // console.log("currentBubbleData", currentBubbleData);
     drawBubbleChart(currentBubbleData ? currentBubbleData : phenotypes.tree);
-  }, [phenotypes, breadcrumb, currentBubbleData, selectedPhenotype, submitted])
+  }, [phenotypes, breadCrumb, currentBubbleData, selectedPhenotype, submitted])
 
   const drawBubbleChart = (data) => {
     new Plot(plotContainer.current, data, handleSingleClick, handleDoubleClick, handleBackgroundDoubleClick, selectedPhenotype, categoryColor);
@@ -243,7 +261,7 @@ export function Phenotypes() {
       const color = getColor(e.data);
       setCategoryColor(color);
       setCurrentBubbleData(e.data.children);
-      setBreadcrumb([...breadcrumb, e]);
+      setBreadCrumb([...breadCrumb, e]);
       setDisplayTreeParent(e);
     } else {
       // leaf
@@ -252,13 +270,13 @@ export function Phenotypes() {
   }
 
   const handleBackgroundDoubleClick = () => {
-    if (breadcrumb.length >= 1) {
-      if (breadcrumb.length === 1) {
+    if (breadCrumb.length >= 1) {
+      if (breadCrumb.length === 1) {
         setCategoryColor(null);
       }
-      const crumbParents = getParents(breadcrumb[breadcrumb.length - 1].data);
+      const crumbParents = getParents(breadCrumb[breadCrumb.length - 1].data);
       setCurrentBubbleData(crumbParents.length > 0 ? crumbParents[0].children : phenotypes.tree);
-      setBreadcrumb([...breadcrumb.splice(0, breadcrumb.length -  1)]);
+      setBreadCrumb([...breadCrumb.splice(0, breadCrumb.length -  1)]);
     }
   }
 
@@ -267,8 +285,8 @@ export function Phenotypes() {
     if (idx === 0) {
       setCategoryColor(null);
     }
-    let newBreadcrumb = breadcrumb.splice(0, idx);
-    setBreadcrumb(newBreadcrumb);
+    let newBreadCrumb = breadCrumb.splice(0, idx);
+    setBreadCrumb(newBreadCrumb);
     setCurrentBubbleData(crumbParents.length > 0 ? crumbParents[0].children : phenotypes.tree);
   }
 
@@ -316,7 +334,7 @@ export function Phenotypes() {
                 }}
                 id="browse-phenotypes-container">
                 {
-                  breadcrumb.length > 0 && breadcrumb.map((item, idx) =>
+                  breadCrumb.length > 0 && breadCrumb.map((item, idx) =>
                     <span className="" key={"crumb-" + item.data.title}>
                       <a
                         href="javascript:void(0)"
@@ -333,7 +351,7 @@ export function Phenotypes() {
                   )
                 }
                 {
-                  breadcrumb.length === 0 &&
+                  breadCrumb.length === 0 &&
                   <br />
                 }
                 <div

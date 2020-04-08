@@ -170,7 +170,7 @@ export function SummaryResults() {
     hideQQTooltips();
   };
 
-  const handleReset = params => {
+  const handleReset = () => {
     dispatch(
       updateSummaryResults({
         selectedListType: 'categorical',
