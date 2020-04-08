@@ -931,22 +931,22 @@ export function lookupVariants(phenotypes, variant, sex) {
   };
 }
 
+// upload user's input parameters to db table share_link
+// return share reference ID
 export function generateShareLink(params) {
   return async function(dispatch) {
-    console.log("params.route", params.route);
+    // figure which store key to update by params route
     const updateStore = {
       "/gwas/summary": updateSummaryResults,
       "/gwas/lookup": updateVariantLookup,
       "/gwas/correlations": updatePhenotypeCorrelations,
       "/phenotypes": updateBrowsePhenotypes
     }[params.route];
-    console.log("updateStore", updateStore)
     dispatch(
       updateStore({
         shareID: null
       })
     );
-    console.log("params", params);
     const response = await post('share-link', params);
     dispatch(
       updateStore({

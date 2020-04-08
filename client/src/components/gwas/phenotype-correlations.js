@@ -62,7 +62,6 @@ export function PhenotypeCorrelations() {
   };
 
   const handleSubmit = params => {
-    console.log('handleSubmit', params);
     if (params.length < 2) {
       setMessages([
         {

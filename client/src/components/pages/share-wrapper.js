@@ -16,6 +16,8 @@ export function ShareWrapper(props) {
 
     const [errorMessage, setErrorMessage] = useState(null);
 
+    // see if link reference ID is missing or not
+    // if missing, display error
     useEffect(() => {
         if (shareID && shareID.length > 0) {
             getShareParams(shareID);
@@ -23,12 +25,11 @@ export function ShareWrapper(props) {
             setErrorMessage('Missing reference ID.');
         }
     });
-     
+    
+    // retrieved shared parameters by share ID reference in link
+    // if share ID is not found in db, display error message
     const getShareParams = async (shareID) => {
-        // const { shareID } = props.match.params;
-        console.log("shareID", shareID)
         const response = await query('share-link', {share_id:shareID});
-        console.log("response", response);
         if (response && response.route) {
             setErrorMessage(null);
             const updateStore = {
