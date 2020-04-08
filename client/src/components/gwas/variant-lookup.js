@@ -165,7 +165,6 @@ export function VariantLookup() {
   };
 
   const handleSubmit = params => {
-    console.log("handleSubmit", params);
     if (
       params.phenotypes.length < 1 &&
       params.variant.length < 1
@@ -235,7 +234,7 @@ export function VariantLookup() {
     }
   }, [sharedState]);
 
-  const handleReset = params => {
+  const handleReset = () => {
     dispatch(
       updateVariantLookup({
         selectedListType: 'categorical',
