@@ -35,7 +35,7 @@ app.register(static, {
 app.addHook("onRequest", (req, res, done) => {
   let pathname = req.raw.url.replace(/\?.*$/, "");
   res.header("Timestamp", new Date().getTime());
-  logger.info(`[${process.pid}] ${pathname}: Started Request`, req.query);
+  logger.info(`[${process.pid} - ${req.ip}] ${pathname}: Started Request`, req.query);
   done();
 });
 
@@ -49,10 +49,12 @@ app.addHook("onSend", (req, res, payload, done) => {
   const loggedRoutes = /summary|variants|metadata|genes|correlations|config|phenotype/;
   if (timestamp && loggedRoutes.test(pathname)) {
     let duration = new Date().getTime() - timestamp;
-    logger.info(`[${process.pid}] ${pathname}: ${duration/1000}s`, req.query);
+    logger.info(`[${process.pid} - ${req.ip}] ${pathname}: ${duration/1000}s`, req.query);
 
     res.header("Cache-Control", "max-age=300");
     res.header("Response-Time", duration);
+  } else {
+    logger.error(`[${process.pid} - ${req.ip}] ${pathname}: Invalid route`, req.query)
   }
 
   done();
