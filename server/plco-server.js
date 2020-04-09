@@ -60,8 +60,8 @@ app.addHook("onSend", (req, res, payload, done) => {
 
 app.get("/ping", async (req, res) => {
   try {
-    await connection.ping()
-    return true;
+    const [result] = await connection.query(`SELECT "true" as status`);
+    return result[0].status;
   } catch (error) {
     logger.error(`[${process.pid}] ${ERROR}: ${error}`, req.query);
     throw(error);
