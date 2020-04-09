@@ -6,7 +6,8 @@ import {
     updateVariantLookup,
     updatePhenotypeCorrelations,
     updateBrowsePhenotypes
- } from '../../services/actions';
+} from '../../services/actions';
+ import { Alert, Spinner } from 'react-bootstrap';
 
 
 export function ShareWrapper(props) {
@@ -16,13 +17,27 @@ export function ShareWrapper(props) {
 
     const [errorMessage, setErrorMessage] = useState(null);
 
+    const [timerSeconds, setTimerSeconds] = useState(10);
+
+    // redirect to home page in _ seconds
+    const countdownRedirect = () => {
+        if (timerSeconds > 0) {
+            setTimeout(function() {
+                setTimerSeconds(timerSeconds  - 1);
+            }, 1000);
+        } else {
+            window.location.hash = '/';
+        }
+    }
+
     // see if link reference ID is missing or not
     // if missing, display error
     useEffect(() => {
         if (shareID && shareID.length > 0) {
             getShareParams(shareID);
         } else {
-            setErrorMessage('Missing reference ID.');
+            setErrorMessage('Missing share link.');
+            countdownRedirect();
         }
     });
     
@@ -41,13 +56,44 @@ export function ShareWrapper(props) {
             dispatch(updateStore({sharedState: response}));
             window.location.hash = response.route;
         } else {
-            setErrorMessage('Invalid or expired reference ID.');
+            setErrorMessage('Invalid or expired share link.');
+            countdownRedirect();
         }
     }
 
-    return (
-        <div className="mt-3 container bg-white border rounded-0 p-4">
-            {errorMessage}
+    const placeholder = (
+        <div style={{ display: 'block' }}>
+            
+            <div className="h4 text-center">
+                <Spinner animation="border" variant="primary" role="status">
+                    <span className="sr-only">Loading...</span>
+                </Spinner>
+            </div>
+            {
+                !errorMessage && 
+                <p className="h4 text-center text-secondary">
+                    Redirecting...
+                </p>
+            }
+            {
+                errorMessage && 
+                <p className="h4 text-center text-secondary">
+                    Redirecting to home page in {timerSeconds} seconds...
+                </p>
+            }
         </div>
+    );
+
+    return (
+        <>  
+            {errorMessage &&
+                <Alert className="container" variant={'danger'}>
+                    {errorMessage}
+                </Alert>
+            }
+            <div className="mt-3 container bg-white border rounded-0 p-4 justify-content-center align-items-center">
+                {placeholder}
+            </div>
+        </>
     );
 }
