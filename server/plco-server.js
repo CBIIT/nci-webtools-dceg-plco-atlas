@@ -80,7 +80,7 @@ app.addHook("onSend", (req, res, payload, done) => {
     res.header("Cache-Control", "max-age=300");
     res.header("Response-Time", duration);
   } else {
-    logger.error(`[${process.pid} - ${req.ip}] `, new Error(`Invalid route: ${pathname}`), req.query)
+    logger.info(`[${process.pid} - ${req.ip}] Route ${pathname} not logged`, req.query)
   }
 
   done();
