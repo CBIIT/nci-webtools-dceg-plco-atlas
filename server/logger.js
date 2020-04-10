@@ -10,9 +10,14 @@ const { logpath, loglevel } = require('./config.json');
 require('winston-daily-rotate-file');
 // winston.emitErrs = true;
 
+
 var logger = new createLogger({
   level: loglevel || 'info',
   format: format.combine(
+    format.errors({ stack: true }), // <-- use errors format
+    format.colorize(),
+    format.timestamp(),
+    format.prettyPrint(),
     format.label({ label: '[PLCO-SERVER]' }),
     format.timestamp({
       format: 'YYYY-MM-DD HH:mm:ss'
