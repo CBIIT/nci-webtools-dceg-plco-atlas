@@ -15,7 +15,7 @@ var logger = new createLogger({
   level: loglevel || 'info',
   format: format.combine(
     format.errors({ stack: true }), // <-- use errors format
-    format.colorize(),
+    // format.colorize(),
     format.timestamp(),
     format.prettyPrint(),
     format.label({ label: '[PLCO-SERVER]' }),
@@ -26,13 +26,19 @@ var logger = new createLogger({
     // The simple format outputs
     // `${level}: ${message} ${[Object with everything else]}`
     //
-    format.simple()
+    // format.simple(),
     //
     // Alternatively you could use this custom printf format if you
     // want to control where the timestamp comes in your final message.
     // Try replacing `format.simple()` above with this:
     //
-    // format.printf(info => `${info.timestamp} ${info.level}: ${info.message}`)
+    format.printf(info => {
+      if (info.level === 'error') {
+        return `[${info.timestamp}] [${info.level}] ${info.stack}`;
+      } else {
+        return `[${info.timestamp}] [${info.level}] ${info.message}`;
+      }
+    })
   ),
   transports: [
     new (transports.DailyRotateFile)({

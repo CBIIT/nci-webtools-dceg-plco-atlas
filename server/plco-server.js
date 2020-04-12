@@ -33,11 +33,11 @@ app.register(static, {
 app.setErrorHandler(async (error, req, reply) => {
   var statusCode = error.statusCode
   if (statusCode >= 500) {
-    logger.error(`[${process.pid} - ${req.ip}] `, new Error(error), req.query);
+    logger.error(`[${process.pid}] `, new Error(error), req.query);
   } else if (statusCode >= 400) {
-    logger.info(`[${process.pid} - ${req.ip}] `, new Error(error), req.query);
+    logger.info(`[${process.pid}] `, new Error(error), req.query);
   } else {
-    logger.error(`[${process.pid} - ${req.ip}] `, new Error(error), req.query);
+    logger.error(`[${process.pid}] `, new Error(error), req.query);
   }
   reply.status(500);
   reply.send();
@@ -47,7 +47,8 @@ app.setErrorHandler(async (error, req, reply) => {
 app.addHook("onRequest", (req, res, done) => {
   let pathname = req.raw.url.replace(/\?.*$/, "");
   res.header("Timestamp", new Date().getTime());
-  logger.info(`[${process.pid} - ${req.ip}] ${pathname}: Started Request`, req.query);
+  logger.info(`[${process.pid}] ${pathname}: Started Request`, req.query);
+  logger.debug(`[${process.pid}] ${pathname} ${JSON.stringify(req.query, null, 2)}`);
   done();
 });
 
@@ -75,12 +76,12 @@ app.addHook("onSend", (req, res, payload, done) => {
   ];
   if (timestamp && loggedRoutes.includes(pathname)) {
     let duration = new Date().getTime() - timestamp;
-    logger.info(`[${process.pid} - ${req.ip}] ${pathname}: ${duration/1000}s`, req.query);
+    logger.info(`[${process.pid}] ${pathname}: ${duration/1000}s`, req.query);
 
     res.header("Cache-Control", "max-age=300");
     res.header("Response-Time", duration);
   } else {
-    logger.info(`[${process.pid} - ${req.ip}] Route ${pathname} not logged`, req.query)
+    logger.info(`[${process.pid}] Route ${pathname} not logged`, req.query)
   }
 
   done();
