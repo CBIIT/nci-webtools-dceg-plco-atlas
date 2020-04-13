@@ -237,7 +237,7 @@ export function VariantLookup() {
   const handleReset = () => {
     dispatch(
       updateVariantLookup({
-        selectedListType: 'categorical',
+        // selectedListType: 'categorical',
         selectedPhenotypes: [],
         selectedVariant: '',
         selectedSex: 'combined',
