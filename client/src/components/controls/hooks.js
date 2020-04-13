@@ -39,7 +39,7 @@ export function useAbsoluteCenteredPositioning(ref) {
         node.style.visibility = 'hidden';
 
         // calculate marginLeft and marginTop based on the node's dimensions
-        const {offsetWidth, offsetHeight} = ref.current;
+        const {offsetWidth, offsetHeight} = node;
         node.style.marginLeft = `-${offsetWidth / 2}px`;
         node.style.marginTop = `-${offsetHeight / 2}px`;
         node.style.visibility = 'visible';

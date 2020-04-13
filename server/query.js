@@ -62,7 +62,7 @@ function intersection(...arrays) {
 
 function pluck(rows) {
     if (!rows || !rows.length) return null;
-    console.log(typeof rows);
+    // console.log(typeof rows);
     let [firstRow] = rows;
     let [firstKey] = Object.keys(firstRow);
     return firstRow[firstKey];
@@ -150,15 +150,22 @@ async function getSummary(connection, {phenotype_id, table, sex, p_value_nlog_mi
     }
 
     const partition = quote(`${phenotype_id}_${sex}`);
+
+    let sql = `
+        SELECT chromosome, position_abs, p_value_nlog
+        FROM phenotype_aggregate partition(${partition})
+        WHERE p_value_nlog > :p_value_nlog_min
+    `;
+
+    logger.debug(`getSummary sql: ${sql}`);
+
     const [data, columns] = await connection.query({
         rowsAsArray: raw,
         values: {p_value_nlog_min},//[params.table, params.sex, params.p_value_nlog_min],
-        sql: `SELECT chromosome, position_abs, p_value_nlog
-            FROM phenotype_aggregate partition(${partition})
-            WHERE p_value_nlog > :p_value_nlog_min`,
+        sql,
     });
 
-    logger.info(`[${process.pid}] /summary: ${timestamp()}s in database`);
+    // logger.info(`[${process.pid}] /summary: ${timestamp()}s in database`);
     return {data, columns: columns.map(c => c.name)};
 }
 
@@ -252,7 +259,7 @@ async function getVariants(connection, params) {
             ${groupby}`
     }).join(' UNION ');
 
-    console.log(sql);
+    // console.log(sql);
 
     // create count sql based on original query
     let countSql = `SELECT COUNT(*) as count FROM (${sql}) as c`;
@@ -273,8 +280,7 @@ async function getVariants(connection, params) {
     params.offset = +params.offset || 0;
     if (params.limit) sql += ' LIMIT :offset, :limit ';
 
-    logger.debug(`SQL: ${sql}`);
-    console.log(`SQL: ${sql}`);
+    logger.debug(`getVariants sql: ${sql}`);
 
     // query database
     let [data, columns] = await connection.query({
@@ -283,13 +289,15 @@ async function getVariants(connection, params) {
 
     const records = {data, columns: columns.map(c => c.name)};
 
+    logger.debug(`getVariants count sql: ${countSql}`);
+
     // add counts if necessary
     if (params.count) {
         let [results] = await connection.query(countSql, params);
         records.count = results[0].count;
     }
 
-    logger.info(`[${process.pid}] /variants: ${timestamp()}s in database`, params);
+    // logger.info(`[${process.pid}] /variants: ${timestamp()}s in database`, params);
 
     return records;
 }
@@ -309,30 +317,34 @@ async function exportVariants(filepath, params) {
  * metadata properties if the key is not specified
  */
 async function getMetadata(connection, params) {
+    let sql = `
+        SELECT
+            m.id as id,
+            m.phenotype_id as phenotype_id,
+            p.name as phenotype_name,
+            p.display_name as phenotype_display_name,
+            m.sex as sex,
+            m.chromosome as chromosome,
+            m.lambda_gc as lambda_gc,
+            m.count as count
+        FROM
+            phenotype_metadata m
+        JOIN
+            phenotype p on m.phenotype_id = p.id
+        WHERE
+            ${params.phenotype_name
+                ? 'p.name = :phenotype_name AND'
+                : 'm.phenotype_id = :phenotype_id AND'
+            }
+            sex = :sex AND
+            chromosome = :chromosome
+        LIMIT 1
+    `;
+
+    logger.debug(`getMetadata sql: ${sql}`);
+
     let [results] = await connection.query(
-        `
-            SELECT
-                m.id as id,
-                m.phenotype_id as phenotype_id,
-                p.name as phenotype_name,
-                p.display_name as phenotype_display_name,
-                m.sex as sex,
-                m.chromosome as chromosome,
-                m.lambda_gc as lambda_gc,
-                m.count as count
-            FROM
-                phenotype_metadata m
-            JOIN
-                phenotype p on m.phenotype_id = p.id
-            WHERE
-                ${params.phenotype_name
-                    ? 'p.name = :phenotype_name AND'
-                    : 'm.phenotype_id = :phenotype_id AND'
-                }
-                sex = :sex AND
-                chromosome = :chromosome
-            LIMIT 1
-        `,
+        sql,
         params
     );
     return results[0];
@@ -354,13 +366,17 @@ async function getGenes(connection, params) {
         .filter(e => e !== '')
         .map(e => +e);
 
-    const [results] = await connection.query(`
+    let sql = `
         SELECT *
         FROM gene
         WHERE chromosome = :chromosome AND (
             (transcription_start BETWEEN :transcription_start AND :transcription_end) OR
             (transcription_end BETWEEN :transcription_start AND :transcription_end))
-    `, params);
+    `;
+
+    logger.debug(`getGenes sql: ${sql}`);
+
+    const [results] = await connection.query(sql, params);
 
     return results.map(record => ({
         ...record,
@@ -395,7 +411,8 @@ async function getCorrelations(connection, {a, b}) {
         (phenotype_b IN (${a}) AND phenotype_a IN (${b}))`;
     }
 
-    console.log(sql);
+    // console.log(sql);
+    logger.debug(`getCorrelations sql: ${sql}`)
 
     let [results] = await connection.query(sql);
     return results;
@@ -403,11 +420,13 @@ async function getCorrelations(connection, {a, b}) {
 
 async function getPhenotypes(connection, params) {
     let columns = getValidColumns('phenotype', params.columns).map(quote).join(',');
-    let [phenotypes] = await connection.execute(`
+    let sql = `
         SELECT ${columns}
         FROM phenotype
         ${params.id ? 'WHERE id = :id' : ''}
-    `, params);
+    `;
+    logger.debug(`getPhenotypes sql: ${sql}`);
+    let [phenotypes] = await connection.execute(sql, params);
 
     phenotypes.forEach(phenotype => {
         let parent = phenotypes.find(parent => parent.id === phenotype.parent_id);
@@ -467,15 +486,19 @@ async function getPhenotype(connection, params) {
 
         // for frequency charts, retrieve the counts for each distinct value
         if (type === 'frequency') {
-            phenotype.frequency = (await connection.execute(
-                `SELECT value, count(*) as count FROM participant_data pd
+            let binaryFrequencySql = `
+                SELECT value, count(*) as count FROM participant_data pd
                 JOIN participant p ON p.id = pd.participant_id
                 WHERE
                     pd.phenotype_id = :id AND
                     pd.value is not null AND
                     p.age >= 55
                 group by value
-                order by value`,
+                order by value
+            `;
+            logger.debug(`getPhenotype binary frequency sql: ${binaryFrequencySql}`)
+            phenotype.frequency = (await connection.execute(
+                binaryFrequencySql,
                 {id}
             ))[0].map(f => f.count); // [without #, with #]
         } else if (/^frequencyBy(Age|Sex|Ancestry)$/.test(type)) {
@@ -492,32 +515,38 @@ async function getPhenotype(connection, params) {
                 [curr[key]]: [...(obj[curr[key]] || []), +curr[value]]
             }));
 
-            // determine the distribution of unique values for the specified key
-            const [distribution] = await connection.execute(
-                `WITH
-                    participant_selection AS (
-                        SELECT p.${key} AS \`key\`
-                        FROM participant_data pd
-                        JOIN participant p ON p.id = pd.participant_id
-                        WHERE
-                            pd.phenotype_id = :id AND
-                            pd.value = 1 AND
-                            p.${key} IS NOT NULL AND
-                            p.age >= 55
-                    ),
-                    participant_count AS (
-                        SELECT ${key}, COUNT(*) AS total
-                        FROM participant
-                        WHERE ${key} IS NOT NULL
-                        GROUP BY ${key}
-                    )
+            let binaryDistributionSql = `
+                WITH
+                participant_selection AS (
+                    SELECT p.${key} AS \`key\`
+                    FROM participant_data pd
+                    JOIN participant p ON p.id = pd.participant_id
+                    WHERE
+                        pd.phenotype_id = :id AND
+                        pd.value = 1 AND
+                        p.${key} IS NOT NULL AND
+                        p.age >= 55
+                ),
+                participant_count AS (
+                    SELECT ${key}, COUNT(*) AS total
+                    FROM participant
+                    WHERE ${key} IS NOT NULL
+                    GROUP BY ${key}
+                )
                 SELECT
                     \`key\`,
                     count(*) AS counts,
                     100 * count(*) / (SELECT total FROM participant_count pc WHERE pc.${key} = \`key\`) AS percentage
                 FROM participant_selection p
                 GROUP BY \`key\`
-                ORDER BY \`key\``,
+                ORDER BY \`key\`
+            `;
+
+            logger.debug(`getPhenotype binary ${key} distribution sql: ${binaryDistributionSql}`)
+
+            // determine the distribution of unique values for the specified key
+            const [distribution] = await connection.execute(
+                binaryDistributionSql,
                 {id}
             );
             phenotype[type] = {
@@ -535,10 +564,17 @@ async function getPhenotype(connection, params) {
         if (phenotype.type === 'categorical') {
             // fetch categorical phenotype categories from the participant_data_category table
             // and update the keyValueReducer to include only records within distributionCategories
-            let [categoryRows] = await connection.execute(
-                `SELECT label, show_distribution, value FROM participant_data_category
+
+            let categoricalCategoriesSql = `
+                SELECT label, show_distribution, value FROM participant_data_category
                 WHERE phenotype_id = :id
-                ORDER BY \`order\`, \`value\`;`,
+                ORDER BY \`order\`, \`value\`;
+            `;
+
+            logger.debug(`getPhenotype categorical categories sql: ${categoricalCategoriesSql}`);
+
+            let [categoryRows] = await connection.execute(
+                categoricalCategoriesSql,
                 {id: params.id}
             )
 
@@ -567,21 +603,25 @@ async function getPhenotype(connection, params) {
 
         if (type === 'frequency' && phenotype.type === 'categorical') {
             // fetch frequencies for categorical phenotypes
-            phenotype.frequency = (await connection.execute(
-                `SELECT pd.value, count(*) as count
+            let categoricalFrequencySql = `
+                SELECT pd.value, count(*) as count
                 FROM participant_data pd
                 LEFT JOIN participant_data_category pdc on pdc.phenotype_id = pd.phenotype_id and pdc.value = pd.value
                 WHERE
                     pd.phenotype_id = :id AND
                     pd.value IS NOT NULL
                 GROUP BY \`value\`
-                ORDER BY pdc.order, pdc.value;`,
+                ORDER BY pdc.order, pdc.value;
+            `;
+            logger.debug(`getPhenotype categorical frequency sql: ${categoricalFrequencySql}`)
+            phenotype.frequency = (await connection.execute(
+                categoricalFrequencySql,
                 {id: params.id}
             ))[0].map(e => e.count);
         } else if (type === 'frequency' && phenotype.type === 'continuous') {
             // fetch frequencies for continuous phenotypes
-            let [frequencyRows] = await connection.query(
-                `SELECT
+            let continuousFrequencySql = `
+                SELECT
                     FLOOR(value) AS continuous_value,
                     COUNT(*) as count
                 FROM participant_data
@@ -589,7 +629,11 @@ async function getPhenotype(connection, params) {
                     phenotype_id = :id AND
                     value IS NOT NULL
                 GROUP BY continuous_value
-                ORDER BY continuous_value`,
+                ORDER BY continuous_value
+            `;
+            logger.debug(`getPhenotype continuous frequency sql: ${continuousFrequencySql}`);
+            let [frequencyRows] = await connection.query(
+                continuousFrequencySql,
                 {id: params.id}
             );
             phenotype.frequency = frequencyRows.map(e => e.count);
@@ -662,6 +706,9 @@ async function getPhenotype(connection, params) {
 
 
             const categories = phenotype.categoryTypes[type];
+            
+            logger.debug(`getPhenotype categorical ${key} distribution sql: ${distributionSql}`);
+
             const [distributionRows] = await connection.execute(
                 distributionSql,
                 {id: params.id}
@@ -699,20 +746,13 @@ async function getPhenotype(connection, params) {
 
 
 async function getRanges(connection) {
-    let [ranges] = await connection.query(`SELECT * FROM chromosome_range`);
-    return ranges;
-}
+    let sql = `SELECT * FROM chromosome_range`;
 
-async function getCounts(connection, params) {
-    let table = getValidTable(params.table);
-    let [countRows] = await connection.execute(`
-        SELECT COUNT(*) as count
-        FROM ${table}
-        WHERE sex = :sex
-        ${params.chromosome ? 'AND chromosome = :chromosome' : ''}
-    `, params);
-    return {count: countRows[0].count};
-}
+    logger.debug(`getRanges sql: ${sql}`);
+
+    let [ranges] = await connection.query(sql);
+    return ranges;
+}   
 
 
 /**
@@ -730,10 +770,16 @@ function getConfig(key) {
 async function getShareLink(connection, {share_id}) {
     if (!share_id) return null;
 
-    let [shareLinkRows] = await connection.execute(
-        `SELECT route, parameters
+    let sql = `
+        SELECT route, parameters
         FROM share_link
-        WHERE share_id = :share_id`,
+        WHERE share_id = :share_id
+    `;
+
+    logger.debug(`getShareLink sql: ${sql}`);
+
+    let [shareLinkRows] = await connection.execute(
+        sql,
         {share_id}
     );
 
@@ -743,16 +789,28 @@ async function getShareLink(connection, {share_id}) {
 async function setShareLink(connection, {route, parameters}) {
     if (!route || !parameters) return null;
 
+    let sql1 = `
+        INSERT INTO share_link (share_id, route, parameters, created_date)
+        VALUES (UUID(), :route, :parameters, NOW());
+    `;
+
+    logger.debug(`setShareLink generate id sql: ${sql1}`)
+
     let [results] = await connection.execute(
-        `INSERT INTO share_link (share_id, route, parameters, created_date)
-        VALUES (UUID(), :route, :parameters, NOW());`,
+        sql1,
         {route, parameters: JSON.stringify(parameters)}
     );
 
-    let shareLinkRows = await connection.execute(
-        `SELECT share_id
+    let sql2 = `
+        SELECT share_id
         FROM share_link
-        WHERE id = :id`,
+        WHERE id = :id
+    `;
+
+    logger.debug(`setShareLink get id sql: ${sql2}`)
+
+    let shareLinkRows = await connection.execute(
+        sql2,
         {id: results.insertId}
     );
 
@@ -769,7 +827,6 @@ module.exports = {
     getPhenotypes,
     getRanges,
     getGenes,
-    getCounts,
     getConfig,
     getShareLink,
     setShareLink
