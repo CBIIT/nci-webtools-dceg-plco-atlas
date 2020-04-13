@@ -116,8 +116,6 @@ export function Phenotypes() {
 
 
   const handleChange = (phenotype) => {
-    // console.log("handleChange", phenotype);
-
     const color = getColor(phenotype);
     setCategoryColor(color);
 
@@ -126,19 +124,26 @@ export function Phenotypes() {
     };
     const parent = getParent(phenotypesTreeFull, phenotype, null)[0];
     if (parent) {
-      setCurrentBubbleData(parent.children);
-      setBreadCrumb([{
-        data: {
-          title: parent.title
-        },
-        parent: {
-          data:  {
-            children: phenotypes.tree
-          }
-        }
-      }]);
+      dispatch(updateBrowsePhenotypes({
+        currentBubbleData: parent.children,
+        bread: [{
+            data: {
+              title: parent.title
+            },
+            parent: {
+              data:  {
+                children: phenotypes.tree
+              }
+            }
+          }]
+      }));
     }
-    setSelectedPhenotype(phenotype);
+    dispatch(updateBrowsePhenotypes({
+      selectedPhenotype: phenotype,
+      displayTreeParent: {
+        data: phenotype
+      }
+    }));
   }
 
   // when submitting:
@@ -298,11 +303,9 @@ export function Phenotypes() {
       <SidebarPanel className="col-lg-3">
         <div className="px-2 pt-2 pb-3 bg-white border rounded-0">
           <PhenotypesForm
-            // phenotype={selectedPhenotype}
             onChange={handleChange}
             onSubmit={handleSubmit}
             onReset={handleReset}
-            // displayTreeParent={displayTreeParent}
           />
           {messages &&
             messages.map(({ type, content }) => (

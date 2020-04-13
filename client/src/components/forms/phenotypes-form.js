@@ -4,11 +4,9 @@ import { Button, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import { TreeSelect } from '../controls/tree-select';
 
 export function PhenotypesForm({
-  // phenotype = null,
   onSubmit,
   onChange,
   onReset,
-  // displayTreeParent
 }) {
 
   // private members prefixed with _

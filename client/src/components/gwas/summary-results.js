@@ -173,7 +173,6 @@ export function SummaryResults() {
   const handleReset = () => {
     dispatch(
       updateSummaryResults({
-        // selectedListType: 'categorical',
         selectedPhenotype: null,
         selectedChromosome: null,
         selectedPlot: 'manhattan-plot',
