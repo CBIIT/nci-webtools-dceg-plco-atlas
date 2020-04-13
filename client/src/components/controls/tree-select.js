@@ -21,8 +21,15 @@ export const TreeSelect = forwardRef(({
   }));
 
   useEffect(() => {
-    if (!data) return;
-    data.categories.map((item) => checkParents(item));
+    if (!data || !value || value.length < 1) return;
+    const parents = data.categories.filter((item) => {
+      if (singleSelect) {
+        return containsVal(item.children, value.id);
+      } else {
+        return item.children.some(r => value.indexOf(r) >= 0);
+      }
+    });
+    parents.map((parent) => checkParents(parent));
   }, [data]);
 
   const [expandAll, setExpandAll] = useState(false);
