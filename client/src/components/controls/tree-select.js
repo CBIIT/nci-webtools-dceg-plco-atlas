@@ -20,6 +20,11 @@ export const TreeSelect = forwardRef(({
     }
   }));
 
+  useEffect(() => {
+    if (!data) return;
+    data.categories.map((item) => checkParents(item));
+  }, [data]);
+
   const [expandAll, setExpandAll] = useState(false);
   const [searchInput, setSearchInput] = useState('');
   const [listType, setListType] = useState('categorical');
