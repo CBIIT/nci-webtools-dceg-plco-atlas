@@ -23,7 +23,6 @@ export function Phenotypes() {
     submitted,
     breadCrumb,
     currentBubbleData,
-    // displayTreeParent,
     categoryColor,
     selectedPlot,
     loading,
@@ -31,12 +30,10 @@ export function Phenotypes() {
   } = useSelector(state => state.browsePhenotypes);
 
   const plotContainer = useRef(null);
-  // const plot = useRef(null);
 
   const phenotypes = useSelector(state => state.phenotypes);
 
   const [openSidebar, setOpenSidebar] = useState(true);
-  // const [loading, setLoading] = useState(false);
 
   const setLoading = loading =>  {
     dispatch(updateBrowsePhenotypes({ loading }));
@@ -53,16 +50,11 @@ export function Phenotypes() {
   const setCurrentBubbleData = currentBubbleData => {
     dispatch(updateBrowsePhenotypes({
       currentBubbleData,
-      selectedPhenotype: null
     }))
   };
 
   const setSelectedPhenotype = selectedPhenotype => {
     dispatch(updateBrowsePhenotypes({ selectedPhenotype }));
-  };
-
-  const setDisplayTreeParent = displayTreeParent => {
-    dispatch(updateBrowsePhenotypes({ displayTreeParent }));
   };
 
   const setCategoryColor = categoryColor => {
@@ -245,9 +237,10 @@ export function Phenotypes() {
         setSelectedPhenotype(null);
       } else {
         //leaf
-        // console.log("LEAF!", e.data);
-        setSelectedPhenotype(e.data);
-        setDisplayTreeParent(e);
+        dispatch(updateBrowsePhenotypes({
+          selectedPhenotype: e.data,
+          displayTreeParent: e
+        }));
       }
     } else {
       // background is clicked
@@ -259,10 +252,12 @@ export function Phenotypes() {
     if (e.data.children && e.data.children.length > 0) {
       // parent
       const color = getColor(e.data);
-      setCategoryColor(color);
-      setCurrentBubbleData(e.data.children);
-      setBreadCrumb([...breadCrumb, e]);
-      setDisplayTreeParent(e);
+      dispatch(updateBrowsePhenotypes({
+        categoryColor: color,
+        currentBubbleData: e.data.children,
+        breadCrumb: [...breadCrumb, e],
+        displayTreeParent: e
+      }));
     } else {
       // leaf
       handleSubmit(e.data);
@@ -275,8 +270,10 @@ export function Phenotypes() {
         setCategoryColor(null);
       }
       const crumbParents = getParents(breadCrumb[breadCrumb.length - 1].data);
-      setCurrentBubbleData(crumbParents.length > 0 ? crumbParents[0].children : phenotypes.tree);
-      setBreadCrumb([...breadCrumb.splice(0, breadCrumb.length -  1)]);
+      dispatch(updateBrowsePhenotypes({
+        breadCrumb: [...breadCrumb.splice(0, breadCrumb.length -  1)],
+        currentBubbleData: crumbParents.length > 0 ? crumbParents[0].children : phenotypes.tree
+      }));
     }
   }
 
@@ -286,8 +283,11 @@ export function Phenotypes() {
       setCategoryColor(null);
     }
     let newBreadCrumb = breadCrumb.splice(0, idx);
-    setBreadCrumb(newBreadCrumb);
-    setCurrentBubbleData(crumbParents.length > 0 ? crumbParents[0].children : phenotypes.tree);
+    dispatch(updateBrowsePhenotypes({
+      breadCrumb: newBreadCrumb,
+      currentBubbleData: crumbParents.length > 0 ? crumbParents[0].children : phenotypes.tree,
+      selectedPhenotype: null
+    }));
   }
 
   return (
