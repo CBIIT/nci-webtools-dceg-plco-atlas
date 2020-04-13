@@ -15,7 +15,6 @@ const {
   getPhenotype,
   getPhenotypes,
   getRanges,
-  getCounts,
   getConfig,
   getShareLink,
   setShareLink
@@ -31,11 +30,25 @@ app.register(static, {
   root: path.resolve("www")
 });
 
+app.setErrorHandler(async (error, req, reply) => {
+  var statusCode = error.statusCode
+  if (statusCode >= 500) {
+    logger.error(`[${process.pid}] `, new Error(error), req.query);
+  } else if (statusCode >= 400) {
+    logger.info(`[${process.pid}] `, new Error(error), req.query);
+  } else {
+    logger.error(`[${process.pid}] `, new Error(error), req.query);
+  }
+  reply.status(500);
+  reply.send();
+})
+
 // execute before handling request
 app.addHook("onRequest", (req, res, done) => {
   let pathname = req.raw.url.replace(/\?.*$/, "");
   res.header("Timestamp", new Date().getTime());
   logger.info(`[${process.pid}] ${pathname}: Started Request`, req.query);
+  logger.debug(`[${process.pid}] ${pathname} ${JSON.stringify(req.query, null, 2)}`);
   done();
 });
 
@@ -46,26 +59,39 @@ app.addHook("onSend", (req, res, payload, done) => {
   let timestamp = res.getHeader("Timestamp");
 
   // log response time and parameters for the specified routes
-  const loggedRoutes = /summary|variants|metadata|genes|correlations|config|phenotype/;
-  if (timestamp && loggedRoutes.test(pathname)) {
+  
+  const loggedRoutes = [
+    '/favicon.ico',
+    '/ping',
+    '/summary',
+    '/variants',
+    '/metadata',
+    '/genes',
+    '/phenotypes',
+    '/correlations',
+    '/config',
+    '/phenotype',
+    '/ranges',
+    '/share-link'
+  ];
+  if (timestamp && loggedRoutes.includes(pathname)) {
     let duration = new Date().getTime() - timestamp;
     logger.info(`[${process.pid}] ${pathname}: ${duration/1000}s`, req.query);
 
     res.header("Cache-Control", "max-age=300");
     res.header("Response-Time", duration);
+  } else {
+    logger.info(`[${process.pid}] Route ${pathname} not logged`, req.query)
   }
 
   done();
 });
 
 app.get("/ping", async (req, res) => {
-  try {
-    await connection.ping()
-    return true;
-  } catch (error) {
-    logger.error(`[${process.pid}] ${ERROR}: ${error}`, req.query);
-    throw(error);
-  }
+  let sql = `SELECT "true" as status`;
+  logger.debug(`ping sql: ${sql}`);
+  const [result] = await connection.query(sql);
+  return result[0].status;
 });
 
 // retrieves all variant groups for all chroms. at the lowest granularity (in MBases)
@@ -106,11 +132,6 @@ app.get("/correlations", async ({ query }, res) => {
 // retrieves chromosome ranges
 app.get("/ranges", async ({ query }, res) => {
   return getRanges(connection);
-});
-
-// retrieves variant counts
-app.get("/counts", async ({ query }, res) => {
-  return getCounts(connection, query);
 });
 
 app.get("/share-link", async ({ query }, res) => {
