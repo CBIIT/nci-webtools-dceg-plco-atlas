@@ -25,8 +25,7 @@ export function SummaryResultsTable() {
   const {
     selectedPhenotype,
     selectedChromosome,
-    selectedTable,
-    selectedManhattanPlotType,
+    selectedSex,
     nlogpMin,
     nlogpMax,
     bpMin,
@@ -98,7 +97,7 @@ export function SummaryResultsTable() {
       fetchSummaryTable(key, {
           offset: limit * (page - 1),
           table: 'variant_' + selectedPhenotype.value,
-          sex: selectedManhattanPlotType == 'stacked' ? sex : selectedManhattanPlotType,
+          sex: selectedSex == 'stacked' ? sex : selectedSex,
           chromosome: selectedChromosome,
           count: shouldCount,
           // key: shouldCount ? null : countKey,
@@ -128,7 +127,7 @@ export function SummaryResultsTable() {
       stacked: ['female', 'male'],
       female: ['female'],
       male: ['male']
-    }[selectedManhattanPlotType];
+    }[selectedSex];
 
     sexs.forEach(sex => {
       dispatch(fetchSummarySnpTable(sex, {
@@ -172,7 +171,7 @@ export function SummaryResultsTable() {
 
       <div className="d-flex align-items-center justify-content-between">
         <div className="d-flex align-items-center">
-          {selectedManhattanPlotType === 'stacked' &&
+          {selectedSex === 'stacked' &&
             <div className="btn-group" role="group">
               <button
                 className={`btn btn-sm ${sex === 'female' ? 'btn-primary btn-primary-gradient active' : 'btn-silver'}`}
@@ -210,21 +209,21 @@ export function SummaryResultsTable() {
       </div>
 
       {!summarySnpTables.visible && <>
-        {/^(all|male|female)$/.test(selectedManhattanPlotType) &&
-          <Table {...getVariantTableProps(selectedManhattanPlotType)} />}
+        {/^(all|male|female)$/.test(selectedSex) &&
+          <Table {...getVariantTableProps(selectedSex)} />}
 
-        {/^stacked$/.test(selectedManhattanPlotType) &&
+        {/^stacked$/.test(selectedSex) &&
           <Table {...getVariantTableProps(sex)} />}
       </>}
 
       {summarySnpTables.visible && <>
-        {/^(all|male|female)$/.test(selectedManhattanPlotType) &&
+        {/^(all|male|female)$/.test(selectedSex) &&
           <Table
             keyField="variant_id"
-            data={summarySnpTables[selectedManhattanPlotType].results}
+            data={summarySnpTables[selectedSex].results}
             columns={columns} />}
 
-        {/^stacked$/.test(selectedManhattanPlotType) &&
+        {/^stacked$/.test(selectedSex) &&
           <Table
             keyField="variant_id"
             data={summarySnpTables[sex].results}

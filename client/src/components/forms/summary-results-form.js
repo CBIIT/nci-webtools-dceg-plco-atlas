@@ -6,9 +6,12 @@ import { TreeSelect } from '../controls/tree-select';
 export function SummaryResultsForm({
   phenotype = null,
   sex = 'all',
-  onSubmit,
-  onReset
+  onSubmit = any => {},
+  onReset = any => {}
 }) {
+  // in order to prevent updating the redux store until after the form has
+  // been submitted, we should store the state in the component, and then emit
+  // this state on submit or reset, allowing the handler to update the store
 
   // private members prefixed with _
   const [_phenotype, _setPhenotype] = useState(null);
@@ -72,7 +75,7 @@ export function SummaryResultsForm({
               disabled={!_phenotype || submitted}
               onClick={e => {
                 e.preventDefault();
-                onSubmit(_phenotype, _sex);
+                onSubmit({phenotype: _phenotype, sex: _sex});
               }}>
               Submit
             </Button>

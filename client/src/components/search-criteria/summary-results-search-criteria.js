@@ -5,14 +5,23 @@ import { ShareLink } from '../controls/share-link';
 
 
 export const SummaryResultsSearchCriteria = () => {
-  const { 
-    searchCriteriaSummaryResults, 
-    sampleSize,
+  const {
+    searchCriteriaSummaryResults,
     selectedPhenotype,
     selectedChromosome,
     selectedPlot,
+    selectedSex,
+    manhattanPlotView,
+    nlogpMin,
+    nlogpMax,
+    bpMin,
+    bpMax,
     shareID
   } = useSelector(state => state.summaryResults);
+
+  const {
+    sampleSize
+  } = useSelector(state => state.qqPlot);
 
   const displaySex = sex =>
     ({
@@ -35,45 +44,51 @@ export const SummaryResultsSearchCriteria = () => {
               <div className="py-1">
                 <span>
                   <b>Phenotype</b>:{' '}
-                  {searchCriteriaSummaryResults &&
-                  searchCriteriaSummaryResults.phenotype
-                    ? searchCriteriaSummaryResults.phenotype
+                  {selectedPhenotype &&
+                  selectedPhenotype.display_name
+                    ? selectedPhenotype.display_name
                     : 'None'}
                 </span>
 
                 <span className="border-left border-secondary mx-3" style={{maxHeight: '1.6em'}}></span>
-                
+
                 <span>
                   <b>Sex</b>:{' '}
-                  {searchCriteriaSummaryResults && searchCriteriaSummaryResults.sex
-                    ? displaySex(searchCriteriaSummaryResults.sex)
-                    : 'None'}         
+                  {selectedSex
+                    ? displaySex(selectedSex)
+                    : 'None'}
                 </span>
               </div>
 
               <div className="d-flex">
                 <span className="py-1">
                   <b>Total Variants:</b> {' '}
-                  {sampleSize 
+                  {sampleSize
                     ? sampleSize.toLocaleString() :
                     'None'}
                 </span>
-                
+
                 <span className="ml-3" style={{maxHeight: '1.6em'}}></span>
-                
+
                 <div className="d-flex justify-content-end">
-                  <ShareLink 
+                  <ShareLink
                     disabled={!searchCriteriaSummaryResults}
                     shareID={shareID}
                     params={{
                       selectedPhenotype,
                       selectedChromosome,
-                      selectedPlot
+                      selectedPlot,
+                      selectedSex,
+                      manhattanPlotView,
+                      nlogpMin,
+                      nlogpMax,
+                      bpMin,
+                      bpMax,
                     }}
                   />
                 </div>
-                    
-              </div> 
+
+              </div>
           </div>
         </Tab>
       </Tabs>
