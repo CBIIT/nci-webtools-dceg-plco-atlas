@@ -207,8 +207,10 @@ export function Phenotypes() {
   }, [sharedState]);
 
   const handleReset = () => {
-    const initialState = getInitialState()
-    dispatch(updateBrowsePhenotypes(initialState.browsePhenotypes));
+    const initialState = getInitialState();
+    dispatch(
+      updateBrowsePhenotypes(initialState.browsePhenotypes)
+    );
   }
 
   useEffect(() => {

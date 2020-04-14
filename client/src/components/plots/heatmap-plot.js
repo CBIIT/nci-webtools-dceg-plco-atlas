@@ -21,7 +21,7 @@ export const Heatmap = forwardRef(({}, ref) => {
   const {
     heatmapData,
     heatmapLayout
-  } = useSelector(state => state.phenotypeCorrelations);
+  } = useSelector(state => state.heatmap);
 
   const createTooltip = () => {
     const tooltip = document.createElement('div');
@@ -187,7 +187,7 @@ export const Heatmap = forwardRef(({}, ref) => {
       <div
         className="col-md-12"
         style={{
-          display: heatmapData && heatmapData.length > 0 ? 'block' : 'none'
+          display: heatmapData ? 'block' : 'none'
         }}>
         <div
           style={{
@@ -210,7 +210,7 @@ export const Heatmap = forwardRef(({}, ref) => {
         </div>
       </div>
       {
-        heatmapData && heatmapData.length <= 0 && 
+        !heatmapData && 
         <div className="col-md-12">
           <Spinner animation="border" variant="primary" role="status">
             <span className="sr-only">Loading...</span>

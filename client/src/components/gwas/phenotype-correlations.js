@@ -11,6 +11,7 @@ import {
 } from '../controls/sidebar-container';
 import {
   updatePhenotypeCorrelations,
+  updateHeatmap,
   drawHeatmap
 } from '../../services/actions';
 import { getInitialState } from '../../services/store';
@@ -75,42 +76,49 @@ export function PhenotypeCorrelations() {
 
     // close sidebar on submit
     // setOpenSidebar(false);
-    setSearchCriteriaPhenotypeCorrelations({
-      phenotypes: params.phenotypes.map(item =>
-        item.title ? item.title : item.label
-      ),
-      sex: params.sex,
-      totalPhenotypes: params.phenotypes.length
-    });
-
-    setSubmitted(new Date());
-    console.log('submit');
-
+    dispatch(updatePhenotypeCorrelations({
+      searchCriteriaPhenotypeCorrelations: {
+        phenotypes: params.phenotypes.map(item =>
+          item.title ? item.title : item.label
+        ),
+        sex: params.sex,
+        totalPhenotypes: params.phenotypes.length
+      },
+      submitted: new Date()
+    }));
     dispatch(drawHeatmap(params));
     tooltipRef.current.resetTooltip();
-    dispatch(updatePhenotypeCorrelations({
-      sharedState: null
-    }))
   };
 
+  const loadState = state => {
+    if (!state || !Object.keys(state).length) return;
+    dispatch(updatePhenotypeCorrelations({
+      ...state, 
+      submitted: new Date(),
+      sharedState: null
+    }));
+    dispatch(
+      drawHeatmap({
+        phenotypes: state.selectedPhenotypes,
+        sex: state.selectedSex
+      })
+    );
+    tooltipRef.current.resetTooltip();
+  }
+
   useEffect(() => {
-    if (sharedState) {
-      handleReset();
-      dispatch(updatePhenotypeCorrelations({
-        selectedPhenotypes: sharedState.parameters.params.selectedPhenotypes,
-        selectedSex: sharedState.parameters.params.selectedSex
-      }))
-      handleSubmit({
-        phenotypes: sharedState.parameters.params.selectedPhenotypes,
-        sex: sharedState.parameters.params.selectedSex
-      });
+    if (sharedState && sharedState.parameters && sharedState.parameters.params) {
+      loadState(sharedState.parameters.params)
     }
   }, [sharedState]);
 
   const handleReset = () => {
-    const initialState = getInitialState()
+    const initialState = getInitialState();
     dispatch(
       updatePhenotypeCorrelations(initialState.phenotypeCorrelations)
+    );
+    dispatch(
+      updateHeatmap(initialState.heatmap)
     );
     tooltipRef.current.resetTooltip();
   };

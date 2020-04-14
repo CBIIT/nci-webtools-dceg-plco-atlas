@@ -38,8 +38,10 @@ export function Downloads() {
   }
 
   function handleReset() {
-    const initialState = getInitialState()
-    dispatch(updateDownloads(initialState.downloads));
+    const initialState = getInitialState();
+    dispatch(
+      updateDownloads(initialState.downloads)
+    );
   }
 
   function handleChange(items) {

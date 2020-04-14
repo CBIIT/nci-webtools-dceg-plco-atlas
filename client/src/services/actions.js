@@ -1,5 +1,6 @@
 import { query, rawQuery, post } from './query';
 import { systemFont } from './plots/text';
+import { getInitialState } from './store';
 
 export const UPDATE_KEY = 'UPDATE_KEY';
 export const UPDATE_SUMMARY_RESULTS = 'UPDATE_SUMMARY_RESULTS';
@@ -10,6 +11,7 @@ export const UPDATE_SUMMARY_SNP_TABLE = 'UPDATE_SUMMARY_SNP_TABLE';
 export const UPDATE_SUMMARY_SNP = 'UPDATE_SUMMARY_SNP';
 export const UPDATE_VARIANT_LOOKUP = 'UPDATE_VARIANT_LOOKUP';
 export const UPDATE_PHENOTYPE_CORRELATIONS = 'UPDATE_PHENOTYPE_CORRELATIONS';
+export const UPDATE_HEATMAP = 'UPDATE_HEATMAP';
 export const UPDATE_PHENOTYPES = 'UPDATE_PHENOTYPES';
 export const UPDATE_BROWSE_PHENOTYPES = 'UPDATE_BROWSE_PHENOTYPES';
 export const UPDATE_DOWNLOADS = 'UPDATE_DOWNLOADS';
@@ -61,6 +63,10 @@ export function updateVariantLookup(data) {
 
 export function updatePhenotypeCorrelations(data) {
   return { type: UPDATE_PHENOTYPE_CORRELATIONS, data };
+}
+
+export function updateHeatmap(data) {
+  return { type: UPDATE_HEATMAP, data };
 }
 
 export function updateBrowsePhenotypes(data) {
@@ -760,15 +766,8 @@ export function drawHeatmap({phenotypes, sex}) {
       };
     };
 
-    const setHeatmapData = heatmapData => {
-      dispatch(updatePhenotypeCorrelations({ heatmapData }));
-    };
-    const setHeatmapLayout = heatmapLayout => {
-      dispatch(updatePhenotypeCorrelations({ heatmapLayout }));
-    };
-
-    setHeatmapLayout({});
-    setHeatmapData([]);
+    const initialState = getInitialState();
+    dispatch(updateHeatmap(initialState.heatmap));
 
     var phenotypesID = phenotypes.map((phenotype) =>
       phenotype.id
@@ -882,8 +881,10 @@ export function drawHeatmap({phenotypes, sex}) {
         // dtick: 5
       }
     };
-    setHeatmapLayout(heatmapLayout);
-    setHeatmapData([heatmapData]);
+    dispatch(updateHeatmap({
+      heatmapData: [heatmapData],
+      heatmapLayout
+    }));
   };
 }
 

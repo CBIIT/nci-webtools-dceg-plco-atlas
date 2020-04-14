@@ -236,7 +236,7 @@ export function VariantLookup() {
   }, [sharedState]);
 
   const handleReset = () => {
-    const initialState = getInitialState()
+    const initialState = getInitialState();
     dispatch(
       updateVariantLookup(initialState.variantLookup)
     );

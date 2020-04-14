@@ -7,13 +7,16 @@ import { ShareLink } from '../controls/share-link';
 
 export const PhenotypeCorrelationsSearchCriteria = () => {
   const dispatch = useDispatch();
+
+  const phenotypeCorrelations = useSelector(
+    state => state.phenotypeCorrelations
+  );
+
   const {
     searchCriteriaPhenotypeCorrelations,
     collapseCriteria,
-    selectedPhenotypes,
-    selectedSex,
     shareID
-  } = useSelector(state => state.phenotypeCorrelations);
+  } = phenotypeCorrelations;
 
   const setCollapseCriteria = collapseCriteria => {
     dispatch(updatePhenotypeCorrelations({ collapseCriteria }));
@@ -168,10 +171,7 @@ export const PhenotypeCorrelationsSearchCriteria = () => {
                 <ShareLink 
                   disabled={!searchCriteriaPhenotypeCorrelations}
                   shareID={shareID}
-                  params={{
-                    selectedPhenotypes,
-                    selectedSex,
-                  }}
+                  params={phenotypeCorrelations}
                 />
               </div>
             </div>

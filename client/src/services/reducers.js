@@ -10,7 +10,8 @@ import {
   UPDATE_PHENOTYPE_CORRELATIONS,
   UPDATE_PHENOTYPES,
   UPDATE_BROWSE_PHENOTYPES,
-  UPDATE_DOWNLOADS
+  UPDATE_HEATMAP,
+  UPDATE_DOWNLOADS,
 } from './actions';
 
 export const rootReducer = (state, action) => {
@@ -76,6 +77,14 @@ export const rootReducer = (state, action) => {
         ...state,
         phenotypeCorrelations: {
           ...state.phenotypeCorrelations,
+          ...action.data
+        }
+      };
+    case UPDATE_HEATMAP:
+      return {
+        ...state,
+        heatmap: {
+          ...state.heatmap,
           ...action.data
         }
       };
