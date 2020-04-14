@@ -1,4 +1,5 @@
 import { query, rawQuery, post } from './query';
+import { systemFont } from './plots/text';
 
 export const UPDATE_KEY = 'UPDATE_KEY';
 export const UPDATE_SUMMARY_RESULTS = 'UPDATE_SUMMARY_RESULTS';
@@ -347,6 +348,15 @@ export function drawQQPlot(phenotype, sex) {
       };
 
       let qqplotLayout = {
+        hoverlabel: {
+          bgcolor: "#fff",
+          bordercolor: '#bbb',
+          font: {
+            size: 14,
+            color: '#212529',
+            family: systemFont
+          },
+        },
         dragmode: 'pan',
         clickmode: 'event',
         hovermode: 'closest',
@@ -634,6 +644,15 @@ export function drawQQPlot(phenotype, sex) {
       };
 
       let qqplotLayout = {
+        hoverlabel: {
+          bgcolor: "#fff",
+          bordercolor: '#bbb',
+          font: {
+            size: 14,
+            color: '#212529',
+            family: systemFont
+          },
+        },
         dragmode: 'pan',
         clickmode: 'event',
         hovermode: 'closest',
@@ -815,6 +834,15 @@ export function drawHeatmap({phenotypes, sex}) {
         '<extra></extra>'
     };
     let heatmapLayout = {
+      hoverlabel: {
+        bgcolor: "#fff",
+        bordercolor: '#bbb',
+        font: {
+          size: 14,
+          color: '#212529',
+          family: systemFont
+        },
+      },
       // width: 1000,
       // height: 1000,
       autosize: true,

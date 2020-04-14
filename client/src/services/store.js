@@ -8,7 +8,6 @@ export const getInitialState = () => ({
   phenotypes: null,
 
   summaryResults: {
-    selectedListType: 'categorical',
     selectedPhenotype: null,
     selectedChromosome: null,
     selectedPlot: 'manhattan-plot',
@@ -92,7 +91,6 @@ export const getInitialState = () => ({
     },
   },
   variantLookup: {
-    selectedListType: 'categorical',
     selectedPhenotypes: [],
     selectedVariant: '',
     selectedSex: 'combined',
@@ -106,7 +104,6 @@ export const getInitialState = () => ({
     sharedState: null
   },
   phenotypeCorrelations: {
-    selectedListType: 'categorical',
     selectedPhenotypes: [],
     selectedSex: 'combined',
     heatmapData: null,
