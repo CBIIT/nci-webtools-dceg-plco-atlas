@@ -7,6 +7,7 @@ import {
   UPDATE_SUMMARY_SNP,
   UPDATE_SUMMARY_SNP_TABLE,
   UPDATE_VARIANT_LOOKUP,
+  UPDATE_VARIANT_LOOKUP_TABLE,
   UPDATE_PHENOTYPE_CORRELATIONS,
   UPDATE_PHENOTYPES,
   UPDATE_BROWSE_PHENOTYPES,
@@ -72,6 +73,14 @@ export const rootReducer = (state, action) => {
           ...action.data
         }
       };
+    case UPDATE_VARIANT_LOOKUP_TABLE:
+      return {
+        ...state,
+        variantLookupTable: {
+          ...state.variantLookupTable,
+          ...action.data
+        }
+      }
     case UPDATE_PHENOTYPE_CORRELATIONS:
       return {
         ...state,

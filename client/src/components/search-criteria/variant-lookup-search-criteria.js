@@ -7,15 +7,15 @@ import { ShareLink } from '../controls/share-link';
 
 export const VariantLookupSearchCriteria = () => {
   const dispatch = useDispatch();
+  const variantLookup = useSelector(state => state.variantLookup);
   const {
     searchCriteriaVariantLookup,
-    numResults,
     collapseCriteria,
-    shareID,
-    selectedPhenotypes,
-    selectedVariant,
-    selectedSex
-  } = useSelector(state => state.variantLookup);
+    shareID
+  } = variantLookup;
+  const {
+    numResults
+  } = useSelector(state => state.variantLookupTable);
 
   const setCollapseCriteria = collapseCriteria => {
     dispatch(updateVariantLookup({ collapseCriteria }));
@@ -182,11 +182,7 @@ export const VariantLookupSearchCriteria = () => {
                 <ShareLink 
                   disabled={!searchCriteriaVariantLookup}
                   shareID={shareID}
-                  params={{
-                    selectedPhenotypes,
-                    selectedVariant,
-                    selectedSex
-                  }}
+                  params={variantLookup}
                 />
               </div>
             </div>
