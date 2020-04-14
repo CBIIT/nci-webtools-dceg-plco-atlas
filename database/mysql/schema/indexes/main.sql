@@ -15,15 +15,15 @@ ALTER TABLE gene
     ADD INDEX idx_gene__transcription_end    (transcription_end);
 
 --variants
-ALTER TABLE variant
-    ADD INDEX idx_variant__chromosome       (chromosome),
-    ADD INDEX idx_variant__p_value          (p_value),
-    ADD INDEX idx_variant__p_value_nlog     (p_value_nlog),
-    ADD INDEX idx_variant__position         (position),
-    ADD INDEX idx_variant__show_qq_plot     (show_qq_plot),
-    ADD INDEX idx_variant__snp              (snp);
+ALTER TABLE phenotype_variant
+    ADD INDEX idx_phenotype_variant__chromosome       (chromosome),
+    ADD INDEX idx_phenotype_variant__p_value          (p_value),
+    ADD INDEX idx_phenotype_variant__p_value_nlog     (p_value_nlog),
+    ADD INDEX idx_phenotype_variant__position         (position),
+    ADD INDEX idx_phenotype_variant__show_qq_plot     (show_qq_plot),
+    ADD INDEX idx_phenotype_variant__snp              (snp);
 
 -- aggregated variants
-ALTER TABLE variant_aggregate
-    ADD INDEX idx_variant_aggregate__chromosome     (chromosome),
-    ADD INDEX idx_variant_aggregate__p_value_nlog   (p_value_nlog);
+ALTER TABLE phenotype_aggregate
+    ADD INDEX idx_phenotype_aggregate__chromosome     (chromosome),
+    ADD INDEX idx_phenotype_aggregate__p_value_nlog   (p_value_nlog);
