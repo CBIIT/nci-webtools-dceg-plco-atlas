@@ -178,10 +178,11 @@ export class ManhattanPlot {
     if (data) {
       xData = data.map(d => d[config.xAxis.key]);
       yData = data.map(d => d[config.yAxis.key]);
+      let isDefined = el => el !== null && el !== undefined;
 
-      if (!config.xAxis.extent) config.xAxis.extent = extent(xData);
+      if (!config.xAxis.extent || config.xAxis.extent.includes(null) || config.xAxis.extent.includes(undefined)) config.xAxis.extent = extent(xData);
 
-      if (!config.yAxis.extent) config.yAxis.extent = extent(yData);
+      if (!config.yAxis.extent || config.yAxis.extent.includes(null) || config.yAxis.extent.includes(undefined)) config.yAxis.extent = extent(yData);
     }
 
     if (data2) {

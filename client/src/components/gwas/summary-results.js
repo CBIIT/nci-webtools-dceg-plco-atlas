@@ -21,6 +21,7 @@ import {
   drawManhattanPlot,
   fetchSummaryTable,
 } from '../../services/actions';
+import { getInitialState } from '../../services/store';
 
 export function SummaryResults() {
   const dispatch = useDispatch();
@@ -178,31 +179,15 @@ export function SummaryResults() {
   };
 
   const handleReset = () => {
+    const initialState = getInitialState()
     dispatch(
-      updateSummaryResults({
-        selectedPhenotype: null,
-        selectedChromosome: null,
-        selectedPlot: 'manhattan-plot',
-        selectedSex: 'all',
-        manhattanPlotData: {},
-        manhattanPlotMirroredData: {},
-        manhattanPlotView: '',
-        messages: [],
-        areaItems: [],
-        lambdaGC: '',
-        submitted: null,
-        loadingManhattanTable: false,
-        loadingManhattanPlot: false,
-        loadingQQPlot: false,
-        updateResultsTable: null,
-        popupTooltipData: null,
-        showSnpResults: false,
-        snp: '',
-        searchCriteriaSummaryResults: null,
-        sampleSize: null,
-        manhattanPlotConfig: {},
-        shareID: null
-      })
+      updateSummaryResults(initialState.summaryResults)
+    );
+    dispatch(
+      updateManhattanPlot(initialState.manhattanPlot)
+    );
+    dispatch(
+      updateQQPlot(initialState.qqPlot)
     );
 
     // reset summary results tables
@@ -369,6 +354,10 @@ export function SummaryResults() {
           })
         );
 
+        // dispatch(updateManhattanPlot({
+        //   restoredZoomLevel: {xMin: range.position_min, xMax: range.position_max, yMin: 2, yMax: nlogpMax},
+        // }))
+
         // fetch variant results tables
         fetchVariantTables(
           selectedPhenotype,
@@ -397,9 +386,13 @@ export function SummaryResults() {
         })
       );
 
+      let restoredZoomLevel = {xMin: bpMin, xMax: bpMax, yMin: nlogpMin, yMax: nlogpMax};
       dispatch(updateManhattanPlot({
-        restoredZoomLevel: {xMin: bpMin, xMax: bpMax, yMin: nlogpMin, yMax: nlogpMax},
-        zoomStack: [{bounds: {xMin: bpMin, xMax: bpMax, yMin: nlogpMin, yMax: nlogpMax}}]
+        restoredZoomLevel,
+        zoomStack: [
+          {bounds: {xMin: bpMin, xMax: bpMax, yMin: nlogpMin, yMax: nlogpMax}},
+//          {bounds: restoredZoomLevel}
+        ]
       }))
 
       // fetch variant results tables
