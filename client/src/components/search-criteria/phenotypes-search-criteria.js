@@ -21,6 +21,8 @@ export const PhenotypesSearchCriteria = () => {
     state => state.browsePhenotypes
   );
 
+  const phenotypes = useSelector(state => state.phenotypes);
+
   const placeholder = (
     <div style={{ display: submitted ? 'none' : 'block' }}>
       <p className="h5 text-center text-secondary my-1">
@@ -80,7 +82,7 @@ export const PhenotypesSearchCriteria = () => {
           
           <div className="d-inline">
             <ShareLink 
-              disabled={false}
+              disabled={!phenotypes}
               shareID={shareID}
               params={{
                 selectedPhenotype,

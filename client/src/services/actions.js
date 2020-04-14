@@ -1,7 +1,10 @@
 import { query, rawQuery, post } from './query';
+import { systemFont } from './plots/text';
 
 export const UPDATE_KEY = 'UPDATE_KEY';
 export const UPDATE_SUMMARY_RESULTS = 'UPDATE_SUMMARY_RESULTS';
+export const UPDATE_QQ_PLOT = 'UPDATE_QQ_PLOT';
+export const UPDATE_MANHATTAN_PLOT = 'UPDATE_MANHATTAN_PLOT';
 export const UPDATE_SUMMARY_TABLE = 'UPDATE_SUMMARY_TABLE';
 export const UPDATE_SUMMARY_SNP_TABLE = 'UPDATE_SUMMARY_SNP_TABLE';
 export const UPDATE_SUMMARY_SNP = 'UPDATE_SUMMARY_SNP';
@@ -22,6 +25,14 @@ export function updatePhenotypes(data) {
 
 export function updateSummaryResults(data) {
   return { type: UPDATE_SUMMARY_RESULTS, data };
+}
+
+export function updateManhattanPlot(data) {
+  return { type: UPDATE_MANHATTAN_PLOT, data };
+}
+
+export function updateQQPlot(data) {
+  return { type: UPDATE_QQ_PLOT, data };
 }
 
 export function updateSummaryTable(key, data) {
@@ -121,10 +132,10 @@ export function fetchSummaryTable(tableKey, params, existingResults) {
     const response = await query('variants', params);
     if (response.error) return;
 
-    if (params.metadataCount && params.phenotype) {
+    if (params.metadataCount && params.phenotype_id) {
       console.log(tableKey, params)
       let metadata = await query('metadata', {
-        phenotype_name: params.phenotype,
+        phenotype_id: params.phenotype_id,
         sex: params.sex,
         chromosome: params.chromosome || 'all'
       })
@@ -173,7 +184,7 @@ export function fetchSummarySnpTable(tableKey, params, existingResults) {
 export function drawManhattanPlot(plotType, params) {
   console.log('drawing plot', plotType, params);
   return async function(dispatch) {
-    dispatch(updateSummaryResults({ loadingManhattanPlot: true }));
+    dispatch(updateManhattanPlot({ loadingManhattanPlot: true }));
     if (params.sex.length === 2) {
       // if 2 tables are provided, this is a mirrored plot
       const manhattanPlotData = await rawQuery(plotType, {
@@ -187,7 +198,7 @@ export function drawManhattanPlot(plotType, params) {
       });
 
       dispatch(
-        updateSummaryResults({
+        updateManhattanPlot({
           manhattanPlotData,
           manhattanPlotMirroredData
         })
@@ -195,14 +206,14 @@ export function drawManhattanPlot(plotType, params) {
     } else {
       const manhattanPlotData = await rawQuery(plotType, params);
       dispatch(
-        updateSummaryResults({
+        updateManhattanPlot({
           manhattanPlotData,
           manhattanPlotMirroredData: {}
         })
       );
     }
 
-    dispatch(updateSummaryResults({ loadingManhattanPlot: false }));
+    dispatch(updateManhattanPlot({ loadingManhattanPlot: false }));
   };
 }
 
@@ -212,16 +223,16 @@ export function drawQQPlot(phenotype, sex) {
     console.log('sex', sex); // all, stacked, female, male
 
     const setQQPlotLoading = loadingQQPlot => {
-      dispatch(updateSummaryResults({ loadingQQPlot }));
+      dispatch(updateQQPlot({ loadingQQPlot }));
     };
     const setQQPlotData = qqplotData => {
-      dispatch(updateSummaryResults({ qqplotData }));
+      dispatch(updateQQPlot({ qqplotData }));
     };
     const setQQPlotLayout = qqplotLayout => {
-      dispatch(updateSummaryResults({ qqplotLayout }));
+      dispatch(updateQQPlot({ qqplotLayout }));
     };
     const setSampleSize = sampleSize => {
-      dispatch(updateSummaryResults({ sampleSize }));
+      dispatch(updateQQPlot({ sampleSize }));
     };
     setQQPlotLoading(true);
     setQQPlotLayout({});
@@ -337,6 +348,15 @@ export function drawQQPlot(phenotype, sex) {
       };
 
       let qqplotLayout = {
+        hoverlabel: {
+          bgcolor: "#fff",
+          bordercolor: '#bbb',
+          font: {
+            size: 14,
+            color: '#212529',
+            family: systemFont
+          },
+        },
         dragmode: 'pan',
         clickmode: 'event',
         hovermode: 'closest',
@@ -624,6 +644,15 @@ export function drawQQPlot(phenotype, sex) {
       };
 
       let qqplotLayout = {
+        hoverlabel: {
+          bgcolor: "#fff",
+          bordercolor: '#bbb',
+          font: {
+            size: 14,
+            color: '#212529',
+            family: systemFont
+          },
+        },
         dragmode: 'pan',
         clickmode: 'event',
         hovermode: 'closest',
@@ -805,6 +834,15 @@ export function drawHeatmap({phenotypes, sex}) {
         '<extra></extra>'
     };
     let heatmapLayout = {
+      hoverlabel: {
+        bgcolor: "#fff",
+        bordercolor: '#bbb',
+        font: {
+          size: 14,
+          color: '#212529',
+          family: systemFont
+        },
+      },
       // width: 1000,
       // height: 1000,
       autosize: true,
