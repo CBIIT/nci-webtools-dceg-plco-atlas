@@ -1,6 +1,8 @@
 import {
   UPDATE_KEY,
   UPDATE_SUMMARY_RESULTS,
+  UPDATE_MANHATTAN_PLOT,
+  UPDATE_QQ_PLOT,
   UPDATE_SUMMARY_TABLE,
   UPDATE_SUMMARY_SNP,
   UPDATE_SUMMARY_SNP_TABLE,
@@ -26,6 +28,22 @@ export const rootReducer = (state, action) => {
           ...action.data
         }
       };
+    case UPDATE_MANHATTAN_PLOT:
+      return {
+        ...state,
+        manhattanPlot: {
+          ...state.manhattanPlot,
+          ...action.data,
+        }
+      }
+    case UPDATE_QQ_PLOT:
+      return {
+        ...state,
+        qqPlot: {
+          ...state.qqPlot,
+          ...action.data,
+        }
+      }
     case UPDATE_SUMMARY_TABLE:
       let summaryTables = {
         ...state.summaryTables,
