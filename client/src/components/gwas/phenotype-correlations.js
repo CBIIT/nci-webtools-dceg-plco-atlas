@@ -32,9 +32,9 @@ export function PhenotypeCorrelations() {
 
   const tooltipRef = useRef();
 
-  const setSubmitted = submitted => {
-    dispatch(updatePhenotypeCorrelations({ submitted }));
-  };
+  // const setSubmitted = submitted => {
+  //   dispatch(updatePhenotypeCorrelations({ submitted }));
+  // };
 
   const setMessages = messages => {
     dispatch(updatePhenotypeCorrelations({ messages }));
@@ -108,7 +108,7 @@ export function PhenotypeCorrelations() {
 
   useEffect(() => {
     if (sharedState && sharedState.parameters && sharedState.parameters.params) {
-      loadState(sharedState.parameters.params)
+      loadState(sharedState.parameters.params);
     }
   }, [sharedState]);
 

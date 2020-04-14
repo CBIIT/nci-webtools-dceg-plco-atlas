@@ -94,14 +94,16 @@ export const getInitialState = () => ({
     selectedPhenotypes: [],
     selectedVariant: '',
     selectedSex: 'combined',
-    results: null,
     messages: [],
     submitted: null,
     searchCriteriaVariantLookup: null,
-    numResults: null,
     collapseCriteria: true,
     shareID: null,
     sharedState: null
+  },
+  variantLookupTable: {
+    results: null,
+    numResults: null,
   },
   phenotypeCorrelations: {
     selectedPhenotypes: [],

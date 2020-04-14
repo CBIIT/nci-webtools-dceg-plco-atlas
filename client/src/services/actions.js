@@ -10,6 +10,7 @@ export const UPDATE_SUMMARY_TABLE = 'UPDATE_SUMMARY_TABLE';
 export const UPDATE_SUMMARY_SNP_TABLE = 'UPDATE_SUMMARY_SNP_TABLE';
 export const UPDATE_SUMMARY_SNP = 'UPDATE_SUMMARY_SNP';
 export const UPDATE_VARIANT_LOOKUP = 'UPDATE_VARIANT_LOOKUP';
+export const UPDATE_VARIANT_LOOKUP_TABLE = 'UPDATE_VARIANT_LOOKUP_TABLE';
 export const UPDATE_PHENOTYPE_CORRELATIONS = 'UPDATE_PHENOTYPE_CORRELATIONS';
 export const UPDATE_HEATMAP = 'UPDATE_HEATMAP';
 export const UPDATE_PHENOTYPES = 'UPDATE_PHENOTYPES';
@@ -59,6 +60,10 @@ export function setSummarySnpLoading(loading) {
 
 export function updateVariantLookup(data) {
   return { type: UPDATE_VARIANT_LOOKUP, data };
+}
+
+export function updateVariantLookupTable(data) {
+  return { type: UPDATE_VARIANT_LOOKUP_TABLE, data };
 }
 
 export function updatePhenotypeCorrelations(data) {
@@ -890,12 +895,8 @@ export function drawHeatmap({phenotypes, sex}) {
 
 export function lookupVariants(phenotypes, variant, sex) {
   return async function(dispatch) {
-    dispatch(
-      updateVariantLookup({
-        results: [],
-        submitted: new Date()
-      })
-    );
+    const initialState = getInitialState();
+    dispatch(updateHeatmap(initialState.variantLookupTable));
 
     const sexSanitized = {
       all: 'all',
@@ -925,8 +926,6 @@ export function lookupVariants(phenotypes, variant, sex) {
       position: bp ? bp : null,
       show_table_name: true
     });
-
-    console.log("allData", allData);
 
     for (let i = 0; i < phenotypes.length; i++) {
       const table = 'variant_' + phenotypes[i].value;
@@ -962,7 +961,7 @@ export function lookupVariants(phenotypes, variant, sex) {
     const numResults = tableList.length;
     tableList = tableList.concat(tableListNull);
     dispatch(
-      updateVariantLookup({
+      updateVariantLookupTable({
         results: tableList,
         numResults
       })

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { VariantLookupForm } from '../forms/variant-lookup-form';
-import { updateVariantLookup, lookupVariants } from '../../services/actions';
+import { updateVariantLookup, lookupVariants, updateVariantLookupTable } from '../../services/actions';
 import { getInitialState } from '../../services/store';
 import {
   SidebarContainer,
@@ -23,16 +23,14 @@ import { VariantLookupSearchCriteria } from '../search-criteria/variant-lookup-s
 
 export function VariantLookup() {
   const dispatch = useDispatch();
-  const variantLookup = useSelector(state => state.variantLookup);
   const {
-    selectedPhenotypes,
-    selectedVariant,
-    selectedSex,
-    results,
     messages,
     submitted,
     sharedState
-  } = variantLookup;
+  } = useSelector(state => state.variantLookup);
+  const {
+    results
+  } = useSelector(state => state.variantLookupTable);
 
   const { ExportCSVButton } = CSVExport;
 
@@ -207,31 +205,33 @@ export function VariantLookup() {
     }
     // close sidebar on submit
     // setOpenSidebar(false);
-    setSearchCriteriaVariantLookup({
-      phenotypes: params.phenotypes.map(item => item.title),
-      variant: params.variant,
-      sex: params.sex
-    });
-    setSubmitted(new Date());
-    dispatch(lookupVariants(params.phenotypes, params.variant, params.sex === 'combined' ? 'all' : params.sex));
+
     dispatch(updateVariantLookup({
-      sharedState: null
-    }))
+      searchCriteriaVariantLookup: {
+        phenotypes: params.phenotypes.map(item => item.title),
+        variant: params.variant,
+        sex: params.sex
+      },
+      submitted: new Date()
+    }));
+    dispatch(lookupVariants(params.phenotypes, params.variant, params.sex === 'combined' ? 'all' : params.sex));
   };
 
+  const loadState = state => {
+    if (!state || !Object.keys(state).length) return;
+    dispatch(updateVariantLookup({
+      ...state, 
+      submitted: new Date(),
+      sharedState: null
+    }));
+    dispatch(
+      lookupVariants(state.selectedPhenotypes, state.selectedVariant, state.selectedSex === 'combined' ? 'all' : state.selectedSex)
+    );
+  }
+
   useEffect(() => {
-    if (sharedState) {
-      handleReset();
-      dispatch(updateVariantLookup({
-        selectedPhenotypes: sharedState.parameters.params.selectedPhenotypes,
-        selectedVariant: sharedState.parameters.params.selectedVariant,
-        selectedSex: sharedState.parameters.params.selectedSex
-      }))
-      handleSubmit({
-        phenotypes: sharedState.parameters.params.selectedPhenotypes,
-        variant: sharedState.parameters.params.selectedVariant,
-        sex: sharedState.parameters.params.selectedSex
-      });
+    if (sharedState && sharedState.parameters && sharedState.parameters.params) {
+      loadState(sharedState.parameters.params);
     }
   }, [sharedState]);
 
@@ -239,6 +239,9 @@ export function VariantLookup() {
     const initialState = getInitialState();
     dispatch(
       updateVariantLookup(initialState.variantLookup)
+    );
+    dispatch(
+      updateVariantLookupTable(initialState.variantLookupTable)
     );
   };
 
@@ -275,16 +278,16 @@ export function VariantLookup() {
               eventKey="variant-lookup"
               // title="Table"
               className={
-                submitted && results && results.length > 0 ?
+                submitted && results ?
                 "p-2 bg-white tab-pane-bordered rounded-0" :
                 "p-2 bg-white tab-pane-bordered rounded-0 d-flex justify-content-center align-items-center"
               }
               style={{ minHeight: '474px' }}>
               {
-                results && results.length > 0 &&
+                results &&
                   <div
                     className="mw-100 my-2 px-4"
-                    style={{ display: submitted && results && results.length > 0 ? 'block' : 'none' }}>
+                    style={{ display: submitted && results ? 'block' : 'none' }}>
                     <ToolkitProvider
                       keyField="variant_id"
                       data={results}
@@ -328,7 +331,7 @@ export function VariantLookup() {
                   </div>
               }
               {
-                results && results.length <= 0 &&
+                submitted && !results &&
                   <Spinner animation="border" variant="primary" role="status">
                     <span className="sr-only">Loading...</span>
                   </Spinner>
