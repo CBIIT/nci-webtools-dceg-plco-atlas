@@ -1,5 +1,11 @@
 import React, { forwardRef, useState, useEffect, useImperativeHandle } from 'react';
 import { Spinner } from 'react-bootstrap';
+import { 
+  containsVal, 
+  containsAllVals, 
+  removeVal, 
+  removeAllVals
+} from './tree-select-utils';
 
 export const TreeSelect = forwardRef(({
     onChange,
@@ -20,6 +26,7 @@ export const TreeSelect = forwardRef(({
     }
   }));
 
+  // check parent checked/indeterminate state when tree is loaded/reloaded
   useEffect(() => {
     if (!data || !value || value.length < 1) return;
     const parents = data.categories.filter((item) => {
@@ -36,47 +43,13 @@ export const TreeSelect = forwardRef(({
   const [searchInput, setSearchInput] = useState('');
   const [listType, setListType] = useState('categorical');
 
+  // clear any search input text, set tree select to categorical/tree view
   const clearSearchFilter = () => {
     setSearchInput('');
     setListType('categorical');
   };
 
-  const containsVal = (arr, val) => {
-    let result = false;
-    for (var i = 0; i < arr.length; i++) {
-      if (arr[i].id === val) {
-        result = true;
-      }
-    }
-    return result;
-  };
-
-  const containsAllVals = (arr, vals) => {
-    let result = true;
-    for (var i = 0; i < vals.length; i++) {
-      if (!containsVal(arr, vals[i].id)) {
-        result = false;
-      }
-    }
-    return result;
-  };
-
-  const removeVal = (arr, val) => {
-    for (var i = 0; i < arr.length; i++) {
-      if (arr[i].id === val) {
-        arr.splice(i, 1);
-      }
-    }
-    return arr;
-  };
-
-  const removeAllVals = (arr, vals) => {
-    for (var i = 0; i < vals.length; i++) {
-      removeVal(arr, vals[i].id);
-    }
-    return arr;
-  };
-
+  // given child, expand all parent tree nodes leading to child in tree
   const expandParents = (displayTreeParent) => {
     var parents = getParents(displayTreeParent.data);
     parents.push(displayTreeParent.data);
@@ -87,6 +60,7 @@ export const TreeSelect = forwardRef(({
     });
   }
 
+  // find all parents of a node
   const getParents = (node, parents = []) => {
     data && data.categories.map((item) => {
       item.children.map((child) => {
@@ -99,6 +73,7 @@ export const TreeSelect = forwardRef(({
     return parents;
   }
 
+  // helper func to find all leafs of a node
   const getLeafs = (item, node, allLeafs = []) => {
     if (!node.children || node.children.length === 0) {
       allLeafs.push(node);
@@ -115,6 +90,7 @@ export const TreeSelect = forwardRef(({
     return allLeafs;
   };
 
+  // find all leafs of a node
   const getAllLeafs = item => {
     let allLeafs = [];
     if (item.children && item.children.length > 0) {
@@ -132,6 +108,7 @@ export const TreeSelect = forwardRef(({
     return allLeafs;
   };
 
+  // expand all parent nodes in tree
   const toggleExpandAllParents = () => {
     if (!expandAll) {
       for (let i = 0; i < data.categories.length; i++) {
@@ -169,6 +146,7 @@ export const TreeSelect = forwardRef(({
     }
   };
 
+  // collapse all parent nodes in tree
   const collapseAllParents = () => {
     if (!data) return;
     for (let i = 0; i < data.categories.length; i++) {
@@ -189,6 +167,7 @@ export const TreeSelect = forwardRef(({
     setExpandAll(false);
   };
 
+  // hide children of specified node in tree
   const toggleHideChildren = name => {
     const className = 'children-of-' + name;
     let node =  document.getElementsByClassName(className)[0];
@@ -214,6 +193,7 @@ export const TreeSelect = forwardRef(({
     }
   };
 
+  // return true only if all children of a parent node is selected in tree
   const checkAllChildrenLeafsSelected = (leafs, selectedValues) => {
     for (var i = 0; i < leafs.length; i++) {
       if (selectedValues.indexOf(leafs[i]) === -1) return false;
@@ -221,10 +201,12 @@ export const TreeSelect = forwardRef(({
     return true;
   };
 
+  // return true if at least 1 child of a parent node is selected in tree 
   const checkSomeChildrenLeafsSelected = (leafs, selectedValues) => {
     return leafs.some(r => selectedValues.indexOf(r) >= 0);
   };
 
+  // given parent, determine its checkbox state in tree
   const checkParents = item => {
     const itemAllLeafs = getAllLeafs(item);
     if (!singleSelect) {
@@ -302,12 +284,14 @@ export const TreeSelect = forwardRef(({
     }
   };
 
+  // handle checkbox behaviors for single and multi-select tree
   const handleSelect = item => {
     if (singleSelect) {
+      // if single select
       onChange([item]);
     } else {
+      // if multi-select
       const parentCheckboxClassName = 'parent-checkbox-' + item.id;
-      // const leafCheckboxClassName = "leaf-checkbox-" + item.id;
       let values = [...value];
       let newValues = getAllLeafs(item);
       if (containsAllVals(values, newValues)) {
@@ -366,11 +350,11 @@ export const TreeSelect = forwardRef(({
           }
         }
       }
-
       onChange(values);
     }
   };
 
+  // construct tree
   const selectTreeCategorical = data =>
     data.map(item => {
       if (item.children && item.children.length > 0) {
@@ -517,6 +501,7 @@ export const TreeSelect = forwardRef(({
       }
     });
 
+  // construct flat list of phenotypes (only show for search filter)
   const selectTreeAlphabetical = () => {
     const stringMatch = item => {
       // console.log("searchInput", searchInput);
@@ -590,6 +575,7 @@ export const TreeSelect = forwardRef(({
     }
   };
 
+  // select all phenotypes when checkbox is toggled
   const selectAll = () => {
     if (!data) return;
     if (checkAllLeafsSelected()) {
@@ -601,6 +587,7 @@ export const TreeSelect = forwardRef(({
     }
   };
 
+  // return true if all leafs are selected
   const checkAllLeafsSelected = () => {
     if (!data) return;
     let allLeafs = [];

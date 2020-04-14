@@ -30,7 +30,7 @@
   "scripts": {
     "start": "react-scripts --max_old_space_size=4096 start",
     "build": "npm run format && react-scripts --max_old_space_size=4096 build && rm -rf ../www && mv build ../www",
-    "test": "react-scripts test",
+    "test": "react-scripts test --ci --reporters=default --reporters=jest-junit --watchAll=false",
     "eject": "react-scripts eject",
     "format": "prettier --single-quote --jsx-bracket-same-line --write \"src/**/*.{js,json,css,scss}\""
   },
@@ -52,6 +52,7 @@
     ]
   },
   "devDependencies": {
+    "jest-junit": "^10.0.0",
     "node-sass": "^4.13.1",
     "prettier": "^1.18.2"
   }
