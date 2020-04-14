@@ -12,7 +12,7 @@ export function QQPlot({ onVariantLookup }) {
     loadingQQPlot,
     qqplotData,
     qqplotLayout,
-  } = useSelector(state => state.summaryResults);
+  } = useSelector(state => state.qqPlot);
 
   const [selectedVariant, setSelectedVariant] = useState(null);
   const [selectedSex, setSelectedSex] = useState(null);
@@ -137,7 +137,7 @@ export function QQPlot({ onVariantLookup }) {
             'i', {
               className: 'fa fa-times',
               onclick: () => hideTooltip()
-            }, ``), 
+            }, ``),
             ``
         ])
       ]);
@@ -156,7 +156,7 @@ export function QQPlot({ onVariantLookup }) {
             'i', {
               className: 'fa fa-times',
               onclick: () => hideTooltip()
-            }, ``), 
+            }, ``),
             ``
         ])
       ]);

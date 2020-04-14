@@ -36,7 +36,6 @@ if (!fs.existsSync(inputFilePath)) {
     process.exit(1);
 }
 
-
 importPhenotypes().then(numRows => {
     console.log(`[${duration()} s] Imported ${numRows} phenotypes, please run the following scripts:
         import-participant-data.sql
@@ -187,12 +186,6 @@ async function importPhenotypes() {
             record
         );
     };
-
-    // update partition references
-
-
-    // update partition ids
-
 
     return orderedRecords.length;
 }

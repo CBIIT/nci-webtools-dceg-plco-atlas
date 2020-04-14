@@ -3,13 +3,14 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Spinner } from 'react-bootstrap';
 import LoadingOverlay from 'react-loading-overlay';
 import * as merge from 'lodash.merge';
+import * as isEqual from 'lodash.isequal';
 import { plotOverlayConfig } from '../controls/table';
 import { rawQuery, query } from '../../services/query';
 import { ManhattanPlot as Plot } from '../../services/plots/manhattan-plot';
 import { Icon } from '../controls/icon';
 import { createElement as h, removeChildren } from '../../services/plots/utils';
 import { systemFont } from '../../services/plots/text';
-import { updateSummaryResults } from '../../services/actions';
+import { updateSummaryResults, updateManhattanPlot } from '../../services/actions';
 
 export function ManhattanPlot({
   onAllChromosomeSelected,
@@ -23,34 +24,40 @@ export function ManhattanPlot({
   const [genePlotCollapsed, setGenePlotCollapsed] = useState(false);
   const plotContainer = useRef(null);
   const plot = useRef(null);
+
   const {
     selectedPlot,
-    manhattanPlotData,
-    manhattanPlotMirroredData,
     manhattanPlotView,
-    selectedManhattanPlotType,
+    selectedSex,
     selectedPhenotype,
     selectedChromosome,
     ranges,
+  } = useSelector(state => state.summaryResults);
+
+  const {
+    manhattanPlotData,
+    manhattanPlotMirroredData,
     manhattanPlotConfig,
+    restoredZoomLevel,
     zoomStack,
     genes,
-  } = useSelector(state => state.summaryResults);
+  } = useSelector(state => state.manhattanPlot);
+
   const hasData = () =>
     manhattanPlotData &&
     manhattanPlotData.data &&
     manhattanPlotData.data.length;
 
   const setManhattanPlotConfig = manhattanPlotConfig => {
-    dispatch(updateSummaryResults({manhattanPlotConfig}))
+    dispatch(updateManhattanPlot({manhattanPlotConfig}))
   }
 
   const setZoomStack = zoomStack => {
-    dispatch(updateSummaryResults({zoomStack}))
+    dispatch(updateManhattanPlot({zoomStack}))
   }
 
   const setGenes = genes => {
-    dispatch(updateSummaryResults({genes}))
+    dispatch(updateManhattanPlot({genes}))
   }
 
   const colors = {
@@ -84,7 +91,7 @@ export function ManhattanPlot({
     plotContainer.current.innerHTML = '';
 
     let params;
-    if (selectedManhattanPlotType === 'stacked') {
+    if (selectedSex === 'stacked') {
       params =
         manhattanPlotView === 'summary'
           ? getMirroredSummaryPlot(manhattanPlotData, manhattanPlotMirroredData)
@@ -134,7 +141,7 @@ export function ManhattanPlot({
     return () => {
       // plot.current.destroy();
     };
-  }, [manhattanPlotData, manhattanPlotMirroredData, selectedPlot]);
+  }, [manhattanPlotData, manhattanPlotMirroredData, selectedPlot, selectedChromosome]);
 
   useEffect(() => {
     plot.current && plot.current.redraw();
@@ -340,6 +347,7 @@ export function ManhattanPlot({
   }
 
   function getSummaryPlot(plotData) {
+
     let columnIndexes = {
       chr: plotData.columns.indexOf('chromosome'),
       bp: plotData.columns.indexOf('position_abs'),
@@ -384,8 +392,8 @@ export function ManhattanPlot({
         size: 2,
         opacity: 1,
         color: (d, i) => (d[columnIndexes.chr] % 2
-            ? colors[selectedManhattanPlotType].light
-            : colors[selectedManhattanPlotType].dark) //#e47833')
+            ? colors[selectedSex].light
+            : colors[selectedSex].dark) //#e47833')
       },
       lines: [{ y: -Math.log10(5e-8) }]
     };
@@ -482,8 +490,8 @@ export function ManhattanPlot({
         interactiveSize: 3,
         opacity: 1,
         color: selectedChromosome % 2
-          ? colors[selectedManhattanPlotType].light
-          : colors[selectedManhattanPlotType].dark,
+          ? colors[selectedSex].light
+          : colors[selectedSex].dark,
         tooltip: {
           trigger: 'hover',
           class: 'custom-tooltip',
@@ -585,7 +593,7 @@ export function ManhattanPlot({
     const titlecase = str => str[0].toUpperCase() + str.substring(1, str.length)
     const formatTitle = str => str.split(' ').map(titlecase).join('-');
     let title = formatTitle(selectedPhenotype.title);
-    let plotType = formatTitle(selectedManhattanPlotType);
+    let plotType = formatTitle(selectedSex);
     let chr = selectedChromosome ? formatTitle(`Chr${selectedChromosome}`) : '';
     let range = getXRangeTitle();
 
@@ -596,6 +604,17 @@ export function ManhattanPlot({
       range
     ].filter(Boolean).join('-') + '.png'
   }
+
+
+  useEffect(() => {
+    if (plot.current && restoredZoomLevel) {
+      plot.current.config.setZoomWindow({bounds: restoredZoomLevel})
+      dispatch(updateManhattanPlot({
+        restoredZoomLevel: null
+      }))
+    }
+
+  }, [restoredZoomLevel, plot.current])
 
   return (
     <div

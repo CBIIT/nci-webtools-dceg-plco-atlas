@@ -204,14 +204,14 @@ async function getVariants(connection, params) {
 
     if (params.table) {
         [phenotypes] = await connection.query(
-            `SELECT * FROM phenotype WHERE name in (?)`,
+            `SELECT * FROM phenotype WHERE name in (?) AND import_date IS NOT NULL`,
             [params.table.split(',').map(e => e.replace('variant_', '')).filter(e => /^\w+$/.test(e))]
         );
     }
 
     if (params.phenotype_id) {
         [phenotypes] = await connection.query(
-            `SELECT * FROM phenotype WHERE id in (?)`,
+            `SELECT * FROM phenotype WHERE id in (?) AND import_date IS NOT NULL`,
             [params.phenotype_id.split(',').filter(e => /^\d+$/.test(e))]
         );
     }
@@ -706,7 +706,7 @@ async function getPhenotype(connection, params) {
 
 
             const categories = phenotype.categoryTypes[type];
-            
+
             logger.debug(`getPhenotype categorical ${key} distribution sql: ${distributionSql}`);
 
             const [distributionRows] = await connection.execute(
@@ -752,7 +752,7 @@ async function getRanges(connection) {
 
     let [ranges] = await connection.query(sql);
     return ranges;
-}   
+}
 
 
 /**
