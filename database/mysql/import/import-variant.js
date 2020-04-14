@@ -20,13 +20,13 @@ if (!(args.file && args.phenotype && args.sex)) {
             --file "filename"
             --phenotype "phenotype name or id"
             --sex "all" | "female" | "male"
-            --reset (if specified, drop the variant/summary tables before importing)
-            --index (if specified, build indexes on variant/summary tables after importing)`);
+            --reset (if specified, drop the variant/summary partitions before importing)
+            --create (if specified, create a new partition)`);
     process.exit(0);
 }
 
 // parse arguments and set defaults
-const { file: inputFilePath, phenotype, sex, reset: shouldReset, index: shouldIndex } = args;
+const { file: inputFilePath, phenotype, sex, reset: shouldReset, create: shouldCreatePartition } = args;
 //const errorLog = getLogStream(`./failed-variants-${new Date().toISOString()}.txt`);
 const errorLog = {write: e => console.log(e)};
 const duration = timestamp();
@@ -78,35 +78,43 @@ async function importVariants() {
     const phenotypeId = phenotypes[0].id;
     const partition = `\`${phenotypeId}\``; // quote partition identifier
     const subpartition = `\`${phenotypeId}_${sex}\``; // quote subpartition identifier
-    const variantTable = `variant`;
-    const aggregateTable = `variant_aggregate`;
-    const stageTable = `stage_${phenotypeName}`;
+    const variantTable = `phenotype_variant`;
+    const aggregateTable = `phenotype_aggregate`;
+    const stageTable = `phenotype_stage_${phenotypeId}_${sex}`;
 
     // clear variants if needed
     if (shouldReset) {
-        console.log(`[${duration()} s] Clearing ${variantTable}, ${aggregateTable}...`);
 
-        // drop existing tables
-        await connection.query(`
-            ALTER TABLE ${variantTable} DROP PARTITION ${partition};
-            ALTER TABLE ${variantTable} add PARTITION (PARTITION ${partition} VALUES IN (${phenotypeId}) (
-                subpartition \`${phenotypeId}_all\`,
-                subpartition \`${phenotypeId}_female\`,
-                subpartition \`${phenotypeId}_male\`
-            ));
+        // drop existing tables and recreate partitions
+        // both variant and aggregate tables have the same partitioning schema
+        for (let table of [variantTable, aggregateTable]) {
+            console.log(`[${duration()} s] Dropping and recreating partition(${partition}) on ${table}...`);
+            await connection.query(`
+                ALTER TABLE ${table} DROP PARTITION ${partition};
+                ALTER TABLE ${table} ADD PARTITION (PARTITION ${partition} VALUES IN (${phenotypeId}) (
+                    subpartition \`${phenotypeId}_all\`,
+                    subpartition \`${phenotypeId}_female\`,
+                    subpartition \`${phenotypeId}_male\`
+                ));
+            `);
+        }
+    }
 
-            ALTER TABLE ${aggregateTable} DROP PARTITION ${partition};
-            ALTER TABLE ${aggregateTable} add PARTITION (PARTITION ${partition} VALUES IN (${phenotypeId}) (
-                subpartition \`${phenotypeId}_all\`,
-                subpartition \`${phenotypeId}_female\`,
-                subpartition \`${phenotypeId}_male\`
-            ));
-        `);
+    if (shouldCreatePartition) {
+        for (let table of [variantTable, aggregateTable]) {
+            console.log(`[${duration()} s] Creating partition(${partition}) on ${table}...`);
+            await connection.query(`
+                ALTER TABLE ${table} ADD PARTITION (PARTITION ${partition} VALUES IN (${phenotypeId}) (
+                    subpartition \`${phenotypeId}_all\`,
+                    subpartition \`${phenotypeId}_female\`,
+                    subpartition \`${phenotypeId}_male\`
+                ));
+            `);
+        }
     }
 
     console.log(`[${duration()} s] Setting up temporary table...`);
     await connection.query(`
-        FLUSH TABLES;
         START TRANSACTION;
         SET autocommit = 0;
         SET unique_checks = 0;
@@ -182,8 +190,8 @@ async function importVariants() {
 
         -- calculate the show_qq_plot flag using -x^2, using id as the index parameter
         WITH ids as (
-            SELECT @count - ROUND(@count * (1 - POW(id / 10000 - 1, 2)))
-            FROM ${stageTable} WHERE id <= 10000
+            SELECT @count - ROUND(@count * (1 - POW(id / 7500 - 1, 2)))
+            FROM ${stageTable} WHERE id <= 7500
         ) UPDATE ${stageTable} SET
             show_qq_plot = 1
             WHERE id IN (SELECT * FROM ids);
@@ -192,55 +200,69 @@ async function importVariants() {
         SELECT AVG(p_value) FROM ${stageTable}
             WHERE id IN (@midpoint, 1 + @midpoint - @midpoint_offset);
     `);
+
+    // retrieve median value and lambdaGC
     const pMedian = pluck(medianRows.pop()); // get last result set
     const lambdaGC = getLambdaGC(pMedian);
     console.log({pMedian, lambdaGC});
 
-    console.log(`[${duration()} s] Inserting values into variant table...`);
-    await connection.execute(`
-        INSERT INTO ${variantTable} partition (${partition}) (
-            phenotype_id,
-            sex,
-            chromosome,
-            position,
-            snp,
-            allele_reference,
-            allele_alternate,
-            p_value,
-            p_value_nlog,
-            p_value_nlog_expected,
-            p_value_r,
-            odds_ratio,
-            odds_ratio_r,
-            n,
-            q,
-            i,
-            show_qq_plot
-        ) SELECT
-            ${phenotypeId},
-            "${sex}",
-            chromosome,
-            position,
-            snp,
-            allele_reference,
-            allele_alternate,
-            p_value,
-            p_value_nlog,
-            p_value_nlog_expected,
-            p_value_r,
-            odds_ratio,
-            odds_ratio_r,
-            n,
-            q,
-            i,
-            show_qq_plot
-        FROM ${stageTable}
-        ORDER BY chromosome, p_value;
-    `);
+    // retrieve variant count
+    const [countRows] = await connection.query(`SELECT COUNT(*) AS count FROM ${stageTable}`)
+    const count = pluck(countRows);
 
-    console.log(`[${duration()} s] Storing aggregated variants...`);
+    console.log(`[${duration()} s] Inserting ${count} values into variant table...`);
+
+    // batch inserts in groups of 1000000 to minimize swapping
+    for (let i = 0; i <= count; i += 1e6) {
+        await connection.execute(`
+            INSERT INTO ${variantTable} partition (${subpartition}) (
+                phenotype_id,
+                sex,
+                chromosome,
+                position,
+                snp,
+                allele_reference,
+                allele_alternate,
+                p_value,
+                p_value_nlog,
+                p_value_nlog_expected,
+                p_value_r,
+                odds_ratio,
+                odds_ratio_r,
+                n,
+                q,
+                i,
+                show_qq_plot
+            ) SELECT
+                ${phenotypeId},
+                "${sex}",
+                chromosome,
+                position,
+                snp,
+                allele_reference,
+                allele_alternate,
+                p_value,
+                p_value_nlog,
+                p_value_nlog_expected,
+                p_value_r,
+                odds_ratio,
+                odds_ratio_r,
+                n,
+                q,
+                i,
+                show_qq_plot
+            FROM ${stageTable}
+            ORDER BY chromosome, p_value
+            LIMIT ${i}, 1000000;
+        `);
+
+        console.log(`[${duration()} s] Inserted ${Math.min(i + 1e6, count)}/${count} values into variant table...`);
+    }
+
+
+    console.log(`[${duration()} s] Inserting aggregated variants...`);
     await connection.execute(`
-        INSERT INTO ${aggregateTable} partition (${partition})
+        INSERT INTO ${aggregateTable} partition (${subpartition})
             (phenotype_id, sex, chromosome, position_abs, p_value_nlog)
         SELECT DISTINCT
             ${phenotypeId},
@@ -251,11 +273,6 @@ async function importVariants() {
         FROM ${stageTable}
         ORDER BY chromosome, position_abs, p_value_nlog;
     `);
-
-    if (shouldIndex) {
-        console.log(`[${duration()} s] Indexing ${variantTable}, ${aggregateTable}...`);
-        await connection.query(indexSql);
-    }
 
     console.log(`[${duration()} s] Storing lambdaGC and counts...`);
     await connection.execute(`

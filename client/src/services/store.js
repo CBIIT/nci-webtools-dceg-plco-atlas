@@ -3,45 +3,47 @@ import { rootReducer } from './reducers';
 import { initialize } from './actions';
 import ReduxThunk from 'redux-thunk';
 
+// returns a reference to a new object
 export const getInitialState = () => ({
   phenotypes: null,
+
   summaryResults: {
-    selectedListType: 'categorical',
     selectedPhenotype: null,
     selectedChromosome: null,
     selectedPlot: 'manhattan-plot',
     selectedTable: '',
-    selectedManhattanPlotType: 'all',
-    manhattanPlotData: {},
-    manhattanMirroredData: {},
+    selectedSex: 'all',
     manhattanPlotView: '',
     nlogpMin: null,
     nlogpMax: null,
     bpMin: null,
     bpMax: null,
     messages: [],
-    areaItems: [],
-    lambdaGC: '',
     submitted: null,
-    loadingManhattanTable: false,
-    loadingManhattanPlot: false,
-    loadingQQPlot: false,
-    drawManhattanPlot: null,
-    // popupTooltipData: null,
-    // tooltipData: null,
-    qqplotData: [],
-    qqplotLayout: {},
     searchCriteriaSummaryResults: null,
-    sampleSize: null,
-    manhattanPlotConfig: {},
-    zoomStack: [],
-    genes: [],
     shareID: null,
     sharedState: null
   },
+  qqPlot: {
+    loadingQQPlot: false,
+    lambdaGC: null,
+    sampleSize: null,
+    qqplotData: [],
+    qqplotLayout: {},
+    lambdaGC: '',
+    areaItems: [],
+    // popupTooltipData: null,
+    // tooltipData: null,
+  },
   manhattanPlot: {
-    data: {},
-    mirroredData: {},
+    loadingManhattanPlot: false,
+    manhattanPlotData: {},
+    manhattanMirroredData: {},
+    loadingManhattanTable: false,
+    manhattanPlotConfig: {},
+    restoredZoomLevel: null,
+    zoomStack: [],
+    genes: [],
   },
   summaryTables: {
     visible: true,
@@ -89,7 +91,6 @@ export const getInitialState = () => ({
     },
   },
   variantLookup: {
-    selectedListType: 'categorical',
     selectedPhenotypes: [],
     selectedVariant: '',
     selectedSex: 'combined',
@@ -103,7 +104,6 @@ export const getInitialState = () => ({
     sharedState: null
   },
   phenotypeCorrelations: {
-    selectedListType: 'categorical',
     selectedPhenotypes: [],
     selectedSex: 'combined',
     heatmapData: null,

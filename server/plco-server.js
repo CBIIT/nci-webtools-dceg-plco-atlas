@@ -30,7 +30,7 @@ app.register(static, {
   root: path.resolve("www")
 });
 
-app.setErrorHandler(async (error, req, reply) => {
+app.addHook('onError', async (req, reply, error) => {
   var statusCode = error.statusCode
   if (statusCode >= 500) {
     logger.error(`[${process.pid}] `, new Error(error), req.query);
@@ -153,6 +153,6 @@ app
     logger.info(`[${process.pid}] Application is running on: ${addr}`)
   )
   .catch(error => {
-    logger.error(error);
+    logger.error(`[${process.pid}] `, new Error(error));
     process.exit(1);
   });
