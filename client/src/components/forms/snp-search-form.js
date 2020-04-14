@@ -13,7 +13,7 @@ export const SnpSearchForm = () => {
     showSnpResults,
     selectedPhenotype,
     selectedChromosome,
-    selectedManhattanPlotType
+    selectedSex
   } = useSelector(state => state.summaryResults);
 
   const columns = [
@@ -58,7 +58,7 @@ export const SnpSearchForm = () => {
       stacked: 'variant_all',
       female: 'variant_female',
       male: 'variant_male'
-    }[selectedManhattanPlotType];
+    }[selectedSex];
 
     const { data } = await query('variants', {
       database: selectedPhenotype.value + '.db',
