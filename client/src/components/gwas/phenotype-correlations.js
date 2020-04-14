@@ -109,7 +109,7 @@ export function PhenotypeCorrelations() {
   const handleReset = () => {
     dispatch(
       updatePhenotypeCorrelations({
-        selectedListType: 'categorical',
+        // selectedListType: 'categorical',
         selectedPhenotypes: [],
         selectedSex: 'combined',
         heatmapData: null,
