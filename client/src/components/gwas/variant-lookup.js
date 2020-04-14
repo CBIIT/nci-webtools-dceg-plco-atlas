@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { VariantLookupForm } from '../forms/variant-lookup-form';
 import { updateVariantLookup, lookupVariants } from '../../services/actions';
+import { getInitialState } from '../../services/store';
 import {
   SidebarContainer,
   SidebarPanel,
@@ -235,20 +236,9 @@ export function VariantLookup() {
   }, [sharedState]);
 
   const handleReset = () => {
+    const initialState = getInitialState()
     dispatch(
-      updateVariantLookup({
-        selectedPhenotypes: [],
-        selectedVariant: '',
-        selectedSex: 'combined',
-        results: null,
-        messages: [],
-        submitted: null,
-        searchCriteriaVariantLookup: null,
-        numResults: null,
-        collapseCriteria: true,
-        shareID: null,
-        sharedState: null
-      })
+      updateVariantLookup(initialState.variantLookup)
     );
   };
 

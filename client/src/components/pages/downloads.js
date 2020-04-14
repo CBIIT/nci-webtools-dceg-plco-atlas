@@ -8,6 +8,8 @@ import { Button, Tooltip, OverlayTrigger } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
 import { TreeSelect } from '../controls/tree-select';
 import { updateDownloads } from '../../services/actions';
+import { getInitialState } from '../../services/store';
+
 
 export function Downloads() {
   const dispatch = useDispatch();
@@ -36,10 +38,8 @@ export function Downloads() {
   }
 
   function handleReset() {
-    dispatch(updateDownloads({
-      selectedPhenotypes: [],
-      submitted: false,
-    }));
+    const initialState = getInitialState()
+    dispatch(updateDownloads(initialState.downloads));
   }
 
   function handleChange(items) {

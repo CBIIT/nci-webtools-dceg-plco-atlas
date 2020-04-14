@@ -13,6 +13,7 @@ import {
   updatePhenotypeCorrelations,
   drawHeatmap
 } from '../../services/actions';
+import { getInitialState } from '../../services/store';
 
 
 export function PhenotypeCorrelations() {
@@ -107,20 +108,9 @@ export function PhenotypeCorrelations() {
   }, [sharedState]);
 
   const handleReset = () => {
+    const initialState = getInitialState()
     dispatch(
-      updatePhenotypeCorrelations({
-        // selectedListType: 'categorical',
-        selectedPhenotypes: [],
-        selectedSex: 'combined',
-        heatmapData: null,
-        heatmapLayout: {},
-        submitted: null,
-        messages: [],
-        searchCriteriaPhenotypeCorrelations: null,
-        collapseCriteria: true,
-        shareID: null,
-        sharedState: null
-      })
+      updatePhenotypeCorrelations(initialState.phenotypeCorrelations)
     );
     tooltipRef.current.resetTooltip();
   };

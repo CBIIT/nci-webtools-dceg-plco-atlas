@@ -10,6 +10,7 @@ import {
   MainPanel,
 } from '../controls/sidebar-container';
 import { updateBrowsePhenotypes } from '../../services/actions';
+import { getInitialState } from '../../services/store';
 import { query } from '../../services/query';
 import { BubbleChart as Plot } from '../../services/plots/bubble-chart';
 import { LoadingOverlay } from '../controls/loading-overlay';
@@ -206,21 +207,8 @@ export function Phenotypes() {
   }, [sharedState]);
 
   const handleReset = () => {
-    dispatch(updateBrowsePhenotypes({
-      selectedPhenotype: null,
-      messages: [],
-      submitted: null,
-      selectedPlot: 'frequency',
-      phenotypeType: 'binary',
-      breadCrumb: [],
-      currentBubbleData: null,
-      displayTreeParent: null,
-      phenotypeData: null,
-      categoryColor: null,
-      loading: false,
-      shareID: null,
-      sharedState: null
-    }));
+    const initialState = getInitialState()
+    dispatch(updateBrowsePhenotypes(initialState.browsePhenotypes));
   }
 
   useEffect(() => {
