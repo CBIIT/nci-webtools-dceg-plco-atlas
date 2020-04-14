@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Alert, Tab, Tabs, Button } from 'react-bootstrap';
 import { SummaryResultsForm } from '../forms/summary-results-form';
@@ -14,10 +14,12 @@ import {
 import {
   updateSummaryResults,
   updateVariantLookup,
+  updateManhattanPlot,
+  updateQQPlot,
   lookupVariants,
   drawQQPlot,
   drawManhattanPlot,
-  fetchSummaryTable
+  fetchSummaryTable,
 } from '../../services/actions';
 
 export function SummaryResults() {
@@ -29,26 +31,34 @@ export function SummaryResults() {
     submitted,
     ranges,
     messages,
-    selectedManhattanPlotType,
-    loadingManhattanPlot,
+    selectedSex,
+    sharedState,
   } = useSelector(state => state.summaryResults);
+
+  const {
+    loadingManhattanPlot,
+  } = useSelector(state => state.manhattanPlot)
 
   const [openSidebar, setOpenSidebar] = useState(true);
 
+  // qq plot tooltip data
   const setPopupTooltipData = popupTooltipData => {
     dispatch(updateSummaryResults({ popupTooltipData }));
   };
 
+  // selected tab
   const setSelectedPlot = selectedPlot => {
     dispatch(updateSummaryResults({ selectedPlot }));
   };
 
-  const setMessages = messages => {
-    dispatch(updateSummaryResults({ messages }));
-  };
-
+  // search criteria summary bar data
   const setSearchCriteriaSummaryResults = searchCriteriaSummaryResults => {
     dispatch(updateSummaryResults({ searchCriteriaSummaryResults }));
+  };
+
+  // alerts and warnings
+  const setMessages = messages => {
+    dispatch(updateSummaryResults({ messages }));
   };
 
   const clearMessages = e => {
@@ -59,52 +69,47 @@ export function SummaryResults() {
   //   clearMessages();
   // };
 
-
   const hideQQTooltips = () => {
-    // if tooltip already exists, destroy
-    const elem = document.getElementsByClassName('qq-plot-tooltip');
-    if (elem && elem.length > 0) {
-      elem[0].remove();
-    }
+    for (let el of document.querySelectorAll('.qq-plot-tooltip'))
+      el.remove();
   };
 
-  // phenotype is selected phenotype's value
-  // plotType is all, stacked, female, or male
-  const fetchVariantTables = (phenotype, plotType, params) => {
-    params = params || {};
+  /**
+   * Fetches initial results for variant tables
+   * @param {object} phenotype selected tree item (should contain id/value property)
+   * @param {'all'|'stacked'|'female'|'male'} plotType the selected plot type (under treeview)
+   * @param {object} params additional parameters to include in the fetch request
+   */
+  const fetchVariantTables = (selectedPhenotype, selectedSex, params = {}) => {
     let sexs = {
       all: ['all'],
       stacked: ['female', 'male'],
       female: ['female'],
       male: ['male'],
-    }[plotType];
+    }[selectedSex];
 
     // fetch variant results tables
-    sexs.forEach((sex, i) => {
-      let key = sex;
-
+    sexs.forEach(sex => {
       dispatch(
         fetchSummaryTable(sex, {
           ...params,
-          table: 'variant_' + phenotype,
+          phenotype_id: selectedPhenotype.id,
           sex: sex,
           offset: 0,
           limit: 10,
           columns: ['chromosome', 'position', 'snp', 'allele_reference', 'allele_alternate', 'odds_ratio', 'p_value'],
           orderBy: 'p_value',
           order: 'asc',
-
           // key: params.count ? null : countKey, // metadata key for counts
         })
       );
     });
   }
 
-
   // when submitting:
   // 1. Fetch aggregate data for displaying manhattan plot(s)
   // 2. Fetch variant data for each selected sex
-  const handleSubmit = (phenotype, manhattanPlotType) => {
+  const handleSubmit = ({phenotype, sex}) => {
     if (!phenotype) {
       return setMessages([
         {
@@ -118,33 +123,35 @@ export function SummaryResults() {
       stacked: ['female', 'male'],
       female: ['female'],
       male: ['male'],
-    }[manhattanPlotType];
+    }[sex];
 
     // determine which tables to use for manhattan plot
-    // const aggregateTable = getAggregateTable(manhattanPlotType);
+    // const aggregateTable = getAggregateTable(sex);
 
     // close sidebar on submit
     // setOpenSidebar(false);
     setPopupTooltipData(null);
-    dispatch(drawQQPlot(phenotype, manhattanPlotType));
+    dispatch(drawQQPlot(phenotype, sex));
 
     // update summary results filters
     dispatch(
       updateSummaryResults({
         selectedPhenotype: phenotype,
-        selectedManhattanPlotType: manhattanPlotType,
+        selectedSex: sex,
         manhattanPlotView: 'summary',
         selectedTable: 'aggregate_' + phenotype.value,
         selectedChromosome: null,
-        selectedManhattanPlotType: manhattanPlotType,
         nlogpMin: null,
         nlogpMax: null,
         bpMin: null,
         bpMax: null,
         submitted: true,
-        manhattanPlotConfig: {},
       })
     );
+
+    dispatch(updateManhattanPlot({
+      manhattanPlotConfig: {},
+    }))
 
     // draw summary plot using aggregate data
     dispatch(
@@ -157,14 +164,14 @@ export function SummaryResults() {
 
     // // fetch variant results tables
     fetchVariantTables(
-      phenotype.value,
-      manhattanPlotType,
-      {metadataCount: true, phenotype: phenotype.value}
+      phenotype,
+      sex,
+      {metadataCount: true, phenotype_id: phenotype.id}
     );
 
     setSearchCriteriaSummaryResults({
       phenotype: [...phenotype.title],
-      sex: manhattanPlotType
+      sex: sex
     });
     // if any Q-Q plot tooltips exist, destory
     hideQQTooltips();
@@ -177,7 +184,7 @@ export function SummaryResults() {
         selectedPhenotype: null,
         selectedChromosome: null,
         selectedPlot: 'manhattan-plot',
-        selectedManhattanPlotType: 'all',
+        selectedSex: 'all',
         manhattanPlotData: {},
         manhattanPlotMirroredData: {},
         manhattanPlotView: '',
@@ -188,7 +195,6 @@ export function SummaryResults() {
         loadingManhattanTable: false,
         loadingManhattanPlot: false,
         loadingQQPlot: false,
-        drawManhattanPlot: null,
         updateResultsTable: null,
         popupTooltipData: null,
         showSnpResults: false,
@@ -216,25 +222,24 @@ export function SummaryResults() {
       );
     }
 */
-    // if any Q-Q plot tooltips exist, destory
+    // if any Q-Q plot tooltips exist, destroy
     hideQQTooltips();
   };
 
   // resubmit summary results
   const onAllChromosomeSelected = () => {
-    handleSubmit(selectedPhenotype, selectedManhattanPlotType);
+    handleSubmit({phenotype: selectedPhenotype, sex: selectedSex});
   };
 
   // redraw plot and update table(s) for single chromosome selection
   const onChromosomeSelected = chromosome => {
-    const database = selectedPhenotype.value + '.db';
     const range = ranges.find(r => r.chromosome === chromosome);
     const sexs = {
       all: ['all'],
       stacked: ['female', 'male'],
       female: ['female'],
       male: ['male'],
-    }[selectedManhattanPlotType];
+    }[selectedSex];
 
     // update form parameters
     dispatch(
@@ -242,7 +247,7 @@ export function SummaryResults() {
         manhattanPlotView: 'variants',
         selectedTable: 'variant_' + selectedPhenotype.value,
         selectedChromosome: chromosome,
-        selectedManhattanPlotType,
+        selectedSex,
         bpMin: range.position_min,
         bpMax: range.position_max,
         nlogpMin: 2,
@@ -265,9 +270,9 @@ export function SummaryResults() {
 
     // fetch variant results tables
     fetchVariantTables(
-      selectedPhenotype.value,
-      selectedManhattanPlotType,
-      {chromosome, phenotype: selectedPhenotype.value, metadataCount: true}
+      selectedPhenotype,
+      selectedSex,
+      {chromosome, metadataCount: true, phenotype_id: selectedPhenotype.id}
     );
   };
 
@@ -291,8 +296,8 @@ export function SummaryResults() {
 
     // fetch variant results tables
     fetchVariantTables(
-      selectedPhenotype.value,
-      selectedManhattanPlotType,
+      selectedPhenotype,
+      selectedSex,
       {
         ...zoomParams,
         chromosome: selectedChromosome,
@@ -302,7 +307,7 @@ export function SummaryResults() {
   };
 
   const handleVariantLookup = ({ snp }, sex) => {
-    const sexSanitized = sex ? (sex.includes('Male') ? 'male' : 'female') : selectedManhattanPlotType === 'male' || selectedManhattanPlotType === 'female' ? selectedManhattanPlotType : 'all';
+    const sexSanitized = sex ? (sex.includes('Male') ? 'male' : 'female') : selectedSex === 'male' || selectedSex === 'female' ? selectedSex : 'all';
     console.log("sexSanitized", sexSanitized);
     dispatch(
       updateVariantLookup({
@@ -318,6 +323,111 @@ export function SummaryResults() {
     );
     dispatch(lookupVariants([selectedPhenotype], snp, sexSanitized));
   };
+
+  const loadState = state => {
+    if (!state || !Object.keys(state).length) return;
+    dispatch(updateSummaryResults({...state, submitted: true}));
+
+    const {
+      bpMax,
+      bpMin,
+      manhattanPlotView,
+      nlogpMax,
+      nlogpMin,
+      selectedChromosome,
+      selectedPhenotype,
+      selectedPlot,
+      selectedSex,
+    } = state;
+
+    const sexs = {
+      all: ['all'],
+      stacked: ['female', 'male'],
+      female: ['female'],
+      male: ['male'],
+    }[selectedSex];
+
+    if (!bpMax || !bpMax || !nlogpMin || !nlogpMin || !selectedChromosome) {
+      if (!selectedChromosome) {
+        // handle default submission
+        handleSubmit({phenotype: selectedPhenotype, sex: selectedSex})
+      } else {
+        // handle chromosome submission
+        const range = ranges.find(r => r.chromosome === selectedChromosome);
+        setPopupTooltipData(null);
+        dispatch(drawQQPlot(selectedPhenotype, selectedSex));
+
+        dispatch(
+          drawManhattanPlot('variants', {
+            table: 'variant_' + selectedPhenotype.value,
+            sex: sexs,
+            chromosome: selectedChromosome,
+            position_min: range.position_min,
+            position_max: range.position_max,
+            p_value_nlog_min: 2,
+            p_value_nlog_max: null,
+            columns: ['id', 'chromosome', 'position', 'p_value_nlog'],
+          })
+        );
+
+        // fetch variant results tables
+        fetchVariantTables(
+          selectedPhenotype,
+          selectedSex,
+          {chromosome: selectedChromosome, metadataCount: true, phenotype_id: selectedPhenotype.id}
+        );
+      }
+    } else {
+      // handle zoomed in view submission
+      const range = ranges.find(r => r.chromosome === selectedChromosome);
+
+      // handle chromosome submission
+      setPopupTooltipData(null);
+      dispatch(drawQQPlot(selectedPhenotype, selectedSex));
+
+      dispatch(
+        drawManhattanPlot('variants', {
+          table: 'variant_' + selectedPhenotype.value,
+          sex: sexs,
+          chromosome: selectedChromosome,
+          position_min: range.position_min,
+          position_max: range.position_max,
+          p_value_nlog_min: 2,
+          p_value_nlog_max: null,
+          columns: ['id', 'chromosome', 'position', 'p_value_nlog'],
+        })
+      );
+
+      dispatch(updateManhattanPlot({
+        restoredZoomLevel: {xMin: bpMin, xMax: bpMax, yMin: nlogpMin, yMax: nlogpMax},
+        zoomStack: [{bounds: {xMin: bpMin, xMax: bpMax, yMin: nlogpMin, yMax: nlogpMax}}]
+      }))
+
+      // fetch variant results tables
+      fetchVariantTables(
+        selectedPhenotype,
+        selectedSex,
+        {
+          chromosome: selectedChromosome,
+          position_min: bpMin,
+          position_max: bpMax,
+          p_value_nlog_min: nlogpMin,
+          p_value_nlog_max: nlogpMax,
+          count: true
+        }
+      );
+
+    }
+
+
+    console.log('LOADED STATE', state);
+  }
+
+  useEffect(() => {
+    if (sharedState && sharedState.parameters && sharedState.parameters.params) {
+      loadState(sharedState.parameters.params)
+    }
+  }, [sharedState]);
 
   const placeholder = (
     <div style={{ display: submitted ? 'none' : 'block' }}>
@@ -339,7 +449,7 @@ export function SummaryResults() {
           <div className="px-2 pt-2 pb-3 bg-white border rounded-0">
             <SummaryResultsForm
               phenotype={selectedPhenotype}
-              sex={selectedManhattanPlotType}
+              sex={selectedSex}
               onSubmit={handleSubmit}
               onReset={handleReset}
             />
