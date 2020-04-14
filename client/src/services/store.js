@@ -106,14 +106,17 @@ export const getInitialState = () => ({
   phenotypeCorrelations: {
     selectedPhenotypes: [],
     selectedSex: 'combined',
-    heatmapData: null,
-    heatmapLayout: {},
+    
     submitted: null,
     messages: [],
     searchCriteriaPhenotypeCorrelations: null,
     collapseCriteria: true,
     shareID: null,
     sharedState: null
+  },
+  heatmap: {
+    heatmapData: null,
+    heatmapLayout: null,
   },
   browsePhenotypes: {
     selectedPhenotype: null,

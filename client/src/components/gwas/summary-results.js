@@ -179,7 +179,7 @@ export function SummaryResults() {
   };
 
   const handleReset = () => {
-    const initialState = getInitialState()
+    const initialState = getInitialState();
     dispatch(
       updateSummaryResults(initialState.summaryResults)
     );
