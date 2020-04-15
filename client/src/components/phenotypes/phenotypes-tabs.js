@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import * as merge from 'lodash.merge';
 import * as clone from 'lodash.clonedeep';
@@ -14,6 +14,7 @@ export function PhenotypesTabs() {
   const {
     selectedPhenotype,
     selectedPlot,
+    sharedState
   } = useSelector(state => state.browsePhenotypes);
   const {
     phenotypeType,
@@ -58,6 +59,11 @@ export function PhenotypesTabs() {
     else if (/categorical|binary/.test(phenotypeData.type))
       return BarChart;
   }
+
+  useEffect(() => {
+    if (!selectedPlot || (selectedPlot && selectedPlot === 'frequency')) return ;
+    setSelectedPlot(selectedPlot);
+  }, [sharedState]);
 
   return (
     <div style={{ minHeight: '600px'}}>
