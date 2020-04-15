@@ -104,7 +104,6 @@ export function Phenotypes() {
     }
   }
 
-
   const handleChange = (phenotype) => {
     const color = getColor(phenotype);
     // setCategoryColor(color);
@@ -206,6 +205,12 @@ export function Phenotypes() {
       loadState(sharedState.parameters.params);
     }
   }, [sharedState]);
+
+  useEffect(() => {
+    if (selectedPhenotype) {
+      setSelectedPhenotype(selectedPhenotype);
+    }
+  }, [selectedPhenotype]);
 
   const handleReset = () => {
     const initialState = getInitialState();
