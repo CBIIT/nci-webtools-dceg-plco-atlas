@@ -206,11 +206,11 @@ export function Phenotypes() {
     }
   }, [sharedState]);
 
-  useEffect(() => {
-    if (selectedPhenotype) {
-      setSelectedPhenotype(selectedPhenotype);
-    }
-  }, [selectedPhenotype]);
+  // useEffect(() => {
+  //   if (selectedPhenotype) {
+  //     setSelectedPhenotype(selectedPhenotype);
+  //   }
+  // }, [selectedPhenotype, phenotypes]);
 
   const handleReset = () => {
     const initialState = getInitialState();
