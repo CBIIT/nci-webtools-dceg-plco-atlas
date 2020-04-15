@@ -108,7 +108,6 @@ export const getInitialState = () => ({
   phenotypeCorrelations: {
     selectedPhenotypes: [],
     selectedSex: 'combined',
-    
     submitted: null,
     messages: [],
     searchCriteriaPhenotypeCorrelations: null,
@@ -126,14 +125,16 @@ export const getInitialState = () => ({
     submitted: null,
     messages: [],
     selectedPlot: 'frequency',
-    phenotypeType: 'binary',
     breadCrumb: [],
     currentBubbleData: null,
-    phenotypeData: null,
     categoryColor: null,
-    loading: false,
     shareID: null,
     sharedState: null
+  },
+  browsePhenotypesPlots: {
+    phenotypeData: null,
+    phenotypeType: 'binary',
+    loading: false
   },
   downloads: {
     selectedPhenotypes: [],

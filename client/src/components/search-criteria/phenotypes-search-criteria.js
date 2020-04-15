@@ -8,18 +8,19 @@ import { ShareLink } from '../controls/share-link';
 
 export const PhenotypesSearchCriteria = () => {
   const dispatch = useDispatch();
+  const browsePhenotypes = useSelector(state => state.browsePhenotypes);
   const {
     submitted,
-    phenotypeData,
     shareID,
     selectedPhenotype,
     displayTreeParent,
     breadCrumb,
     currentBubbleData,
     categoryColor, 
-  } = useSelector(
-    state => state.browsePhenotypes
-  );
+  } = browsePhenotypes;
+  const {
+    phenotypeData
+  } = useSelector(state => state.browsePhenotypesPlots);
 
   const phenotypes = useSelector(state => state.phenotypes);
 
@@ -84,14 +85,7 @@ export const PhenotypesSearchCriteria = () => {
             <ShareLink 
               disabled={!phenotypes}
               shareID={shareID}
-              params={{
-                selectedPhenotype,
-                displayTreeParent,
-                breadCrumb,
-                currentBubbleData,
-                categoryColor,
-                submitted
-              }}
+              params={browsePhenotypes}
             />
           </div>
         </Tab>

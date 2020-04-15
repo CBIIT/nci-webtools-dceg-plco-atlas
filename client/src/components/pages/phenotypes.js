@@ -9,7 +9,7 @@ import {
   SidebarPanel,
   MainPanel,
 } from '../controls/sidebar-container';
-import { updateBrowsePhenotypes } from '../../services/actions';
+import { updateBrowsePhenotypes, updateBrowsePhenotypesPlots } from '../../services/actions';
 import { getInitialState } from '../../services/store';
 import { query } from '../../services/query';
 import { BubbleChart as Plot } from '../../services/plots/bubble-chart';
@@ -26,9 +26,12 @@ export function Phenotypes() {
     currentBubbleData,
     categoryColor,
     selectedPlot,
-    loading,
+    // loading,
     sharedState
   } = useSelector(state => state.browsePhenotypes);
+  const {
+    loading
+  } = useSelector( state => state.browsePhenotypesPlots);
 
   const plotContainer = useRef(null);
 
@@ -36,22 +39,8 @@ export function Phenotypes() {
 
   const [openSidebar, setOpenSidebar] = useState(true);
 
-  const setLoading = loading =>  {
-    dispatch(updateBrowsePhenotypes({ loading }));
-  }
-
   const setMessages = messages => {
     dispatch(updateBrowsePhenotypes({ messages }));
-  };
-
-  const setBreadCrumb = breadCrumb => {
-    dispatch(updateBrowsePhenotypes({ breadCrumb}));
-  };
-
-  const setCurrentBubbleData = currentBubbleData => {
-    dispatch(updateBrowsePhenotypes({
-      currentBubbleData,
-    }))
   };
 
   const setSelectedPhenotype = selectedPhenotype => {
@@ -118,7 +107,7 @@ export function Phenotypes() {
 
   const handleChange = (phenotype) => {
     const color = getColor(phenotype);
-    setCategoryColor(color);
+    // setCategoryColor(color);
 
     let phenotypesTreeFull = {
         children: phenotypes.tree
@@ -126,6 +115,7 @@ export function Phenotypes() {
     const parent = getParent(phenotypesTreeFull, phenotype, null)[0];
     if (parent) {
       dispatch(updateBrowsePhenotypes({
+        color: categoryColor,
         currentBubbleData: parent.children,
         bread: [{
             data: {
@@ -161,13 +151,18 @@ export function Phenotypes() {
     }
 
     dispatch(
-      updateBrowsePhenotypes({
+      updateBrowsePhenotypesPlots({
         phenotypeData: null,
-        submitted: false
+        loading: true
       })
     );
 
-    setLoading(true);
+    dispatch(
+      updateBrowsePhenotypes({
+        submitted: false,
+      })
+    );
+
     const data = await query('phenotype', {
       id: phenotype.id,
       type: {
@@ -177,32 +172,38 @@ export function Phenotypes() {
         'related-phenotypes': 'related',
       }[selectedPlot] || 'all'
     });
-    setLoading(false);
+
+    dispatch(
+      updateBrowsePhenotypesPlots({
+        phenotypeData: data,
+        loading: false
+      })
+    )
 
     // update browse phenotypes filters
     dispatch(
       updateBrowsePhenotypes({
         selectedPhenotype: phenotype,
-        submitted: true,
-        phenotypeData: data,
-        sharedState: null
+        submitted: new Date(),
       })
     );
   };
 
+  const loadState = state => {
+    if (!state || !Object.keys(state).length) return;
+    dispatch(updateBrowsePhenotypes({
+      ...state, 
+      submitted: false,
+      sharedState: null
+    }));
+    if (state.submitted) {
+      handleSubmit(state.selectedPhenotype);
+    } 
+  }
+
   useEffect(() => {
-    if (sharedState) {
-      handleReset();
-      dispatch(updateBrowsePhenotypes({
-        selectedPhenotype: sharedState.parameters.params.selectedPhenotype,
-        displayTreeParent: sharedState.parameters.params.displayTreeParent,
-        breadCrumb: sharedState.parameters.params.breadCrumb,
-        currentBubbleData: sharedState.parameters.params.currentBubbleData,
-        categoryColor: sharedState.parameters.params.categoryColor
-      }));
-      if (sharedState.parameters.params.submitted) {
-        handleSubmit(sharedState.parameters.params.selectedPhenotype);
-      } 
+    if (sharedState && sharedState.parameters && sharedState.parameters.params) {
+      loadState(sharedState.parameters.params);
     }
   }, [sharedState]);
 
@@ -210,6 +211,9 @@ export function Phenotypes() {
     const initialState = getInitialState();
     dispatch(
       updateBrowsePhenotypes(initialState.browsePhenotypes)
+    );
+    dispatch(
+      updateBrowsePhenotypesPlots(initialState.browsePhenotypesPlots)
     );
   }
 

@@ -15,6 +15,7 @@ export const UPDATE_PHENOTYPE_CORRELATIONS = 'UPDATE_PHENOTYPE_CORRELATIONS';
 export const UPDATE_HEATMAP = 'UPDATE_HEATMAP';
 export const UPDATE_PHENOTYPES = 'UPDATE_PHENOTYPES';
 export const UPDATE_BROWSE_PHENOTYPES = 'UPDATE_BROWSE_PHENOTYPES';
+export const UPDATE_BROWSE_PHENOTYPES_PLOTS = 'UPDATE_BROWSE_PHENOTYPES_PLOTS';
 export const UPDATE_DOWNLOADS = 'UPDATE_DOWNLOADS';
 export const UPDATE_SHARED_STATE = 'UPDATE_SHARED_STATE';
 
@@ -76,6 +77,10 @@ export function updateHeatmap(data) {
 
 export function updateBrowsePhenotypes(data) {
   return { type: UPDATE_BROWSE_PHENOTYPES, data };
+}
+
+export function updateBrowsePhenotypesPlots(data) {
+  return { type: UPDATE_BROWSE_PHENOTYPES_PLOTS, data };
 }
 
 export function updateDownloads(data) {
