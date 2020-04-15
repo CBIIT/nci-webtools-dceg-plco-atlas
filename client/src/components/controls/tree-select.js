@@ -213,6 +213,7 @@ export const TreeSelect = forwardRef(({
 
   // given parent, determine its checkbox state in tree
   const checkParents = item => {
+    if (!item) return false;
     const itemAllLeafs = getAllLeafs(item);
     if (!singleSelect) {
       // multi-select
