@@ -66,7 +66,7 @@ export class BubbleChart {
                 handleBackgroundDoubleClick();
             })
             .append("title")
-            .text("Double-click to navigate phenotype categories.\nSingle-click to select a phenotype.");
+            .text("Double-click background for previous view.\nSingle-click to select a phenotype or category.");
 
         var nodes = d3.hierarchy(childlessData)
             .each(function (d) {
