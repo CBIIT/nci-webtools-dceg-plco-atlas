@@ -115,7 +115,7 @@ export function Phenotypes() {
     const parent = getParent(phenotypesTreeFull, phenotype, null)[0];
     if (parent) {
       dispatch(updateBrowsePhenotypes({
-        color: categoryColor,
+        categoryColor: color,
         currentBubbleData: parent.children,
         bread: [{
             data: {
