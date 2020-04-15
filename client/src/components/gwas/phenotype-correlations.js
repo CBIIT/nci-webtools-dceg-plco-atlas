@@ -31,6 +31,8 @@ export function PhenotypeCorrelations() {
     selectedPhenotypes
   } = phenotypeCorrelations;
 
+  const phenotypes = useSelector(state => state.phenotypes);
+
   const tooltipRef = useRef();
 
   // const setSubmitted = submitted => {
@@ -117,11 +119,11 @@ export function PhenotypeCorrelations() {
     }
   }, [sharedState]);
 
-  useEffect(() => {
-    if (selectedPhenotypes) {
-      setSelectedPhenotypes(selectedPhenotypes);
-    }
-  }, [selectedPhenotypes]);
+  // useEffect(() => {
+  //   if (selectedPhenotypes) {
+  //     setSelectedPhenotypes(selectedPhenotypes);
+  //   }
+  // }, [selectedPhenotypes, phenotypes]);
 
   const handleReset = () => {
     const initialState = getInitialState();
