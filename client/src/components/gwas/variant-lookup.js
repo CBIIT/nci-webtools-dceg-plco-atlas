@@ -242,11 +242,12 @@ export function VariantLookup() {
     }
   }, [sharedState]);
 
-  // useEffect(() => {
-  //   if (selectedPhenotypes) {
-  //     setSelectedPhenotypes(selectedPhenotypes);
-  //   }
-  // }, [selectedPhenotypes, phenotypes]);
+  useEffect(() => {
+    if (sharedState) return;
+    if (selectedPhenotypes) {
+      setSelectedPhenotypes(selectedPhenotypes);
+    }
+  }, [selectedPhenotypes]);
 
   const handleReset = () => {
     const initialState = getInitialState();

@@ -26,7 +26,6 @@ export function Phenotypes() {
     currentBubbleData,
     categoryColor,
     selectedPlot,
-    // loading,
     sharedState
   } = useSelector(state => state.browsePhenotypes);
   const {
@@ -206,11 +205,12 @@ export function Phenotypes() {
     }
   }, [sharedState]);
 
-  // useEffect(() => {
-  //   if (selectedPhenotype) {
-  //     setSelectedPhenotype(selectedPhenotype);
-  //   }
-  // }, [selectedPhenotype, phenotypes]);
+  useEffect(() => {
+    // if (sharedState) return;
+    if (selectedPhenotype) {
+      setSelectedPhenotype(selectedPhenotype);
+    }
+  }, [selectedPhenotype]);
 
   const handleReset = () => {
     const initialState = getInitialState();

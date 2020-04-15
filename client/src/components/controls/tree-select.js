@@ -22,7 +22,7 @@ export const TreeSelect = forwardRef(({
     },
     expandSelectedPhenotype(displayTreeParent) {
       collapseAllParents();
-      expandParents(displayTreeParent)
+      expandParents(displayTreeParent);
     }
   }));
 
@@ -37,11 +37,11 @@ export const TreeSelect = forwardRef(({
       parents = parents.flat();
     }
     parents.map((parent) => checkParents(parent));
-    // if (singleSelect) {
-    //   expandParents({data: value});
-    // } else {
-    //   value.forEach((val) => expandParents({data: val}));
-    // }
+    if (singleSelect) {
+      expandParents({data: value});
+    } else {
+      value.forEach((val) => expandParents({data: val}));
+    }
   }, [data]);
 
   const [expandAll, setExpandAll] = useState(false);
@@ -60,9 +60,9 @@ export const TreeSelect = forwardRef(({
     parents.push(displayTreeParent.data);
     parents.map((item) => {
       if (document.getElementsByClassName('collapse-button-text-' + item.id)[0]) {
-        // if (document.getElementsByClassName('collapse-button-text-' + item.id)[0].classList.contains("fa-plus-square")) {
-        document.getElementsByClassName('collapse-button-text-' + item.id)[0].click();
-        // }
+        if (document.getElementsByClassName('collapse-button-text-' + item.id)[0].classList.contains("fa-plus-square")) {
+          document.getElementsByClassName('collapse-button-text-' + item.id)[0].click();
+        }
       }
     });
   }
