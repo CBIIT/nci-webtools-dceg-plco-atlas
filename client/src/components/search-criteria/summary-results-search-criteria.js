@@ -5,19 +5,20 @@ import { ShareLink } from '../controls/share-link';
 
 
 export const SummaryResultsSearchCriteria = () => {
+  const summaryResults = useSelector(state => state.summaryResults);
   const {
     searchCriteriaSummaryResults,
     selectedPhenotype,
-    selectedChromosome,
-    selectedPlot,
+    // selectedChromosome,
+    // selectedPlot,
     selectedSex,
-    manhattanPlotView,
-    nlogpMin,
-    nlogpMax,
-    bpMin,
-    bpMax,
+    // manhattanPlotView,
+    // nlogpMin,
+    // nlogpMax,
+    // bpMin,
+    // bpMax,
     shareID
-  } = useSelector(state => state.summaryResults);
+  } = summaryResults;
 
   const {
     sampleSize
@@ -74,17 +75,21 @@ export const SummaryResultsSearchCriteria = () => {
                   <ShareLink
                     disabled={!searchCriteriaSummaryResults}
                     shareID={shareID}
-                    params={{
-                      selectedPhenotype,
-                      selectedChromosome,
-                      selectedPlot,
-                      selectedSex,
-                      manhattanPlotView,
-                      nlogpMin,
-                      nlogpMax,
-                      bpMin,
-                      bpMax,
-                    }}
+                    params={
+                      summaryResults
+                      // {
+                        // selectedPhenotype,
+                        // selectedChromosome,
+                        // selectedPlot,
+                        // selectedSex,
+                        // manhattanPlotView,
+                        // nlogpMin,
+                        // nlogpMax,
+                        // bpMin,
+                        // bpMax,
+                        // searchCriteriaSummaryResults
+                      // }
+                    }
                   />
                 </div>
 
