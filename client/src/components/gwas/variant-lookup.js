@@ -26,7 +26,8 @@ export function VariantLookup() {
   const {
     messages,
     submitted,
-    sharedState
+    sharedState,
+    selectedPhenotypes
   } = useSelector(state => state.variantLookup);
   const {
     results
@@ -133,6 +134,10 @@ export function VariantLookup() {
     setMessages([]);
   };
 
+  const setSelectedPhenotypes = selectedPhenotypes => {
+    dispatch(updateVariantLookup({ selectedPhenotypes }));
+  };
+
   const setSubmitted = submitted => {
     dispatch(updateVariantLookup({ submitted }));
   };
@@ -234,6 +239,12 @@ export function VariantLookup() {
       loadState(sharedState.parameters.params);
     }
   }, [sharedState]);
+
+  useEffect(() => {
+    if (selectedPhenotypes) {
+      setSelectedPhenotypes(selectedPhenotypes);
+    }
+  }, [selectedPhenotypes]);
 
   const handleReset = () => {
     const initialState = getInitialState();

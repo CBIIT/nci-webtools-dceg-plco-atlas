@@ -27,7 +27,8 @@ export function PhenotypeCorrelations() {
   const {
     submitted,
     messages,
-    sharedState
+    sharedState,
+    selectedPhenotypes
   } = phenotypeCorrelations;
 
   const tooltipRef = useRef();
@@ -38,6 +39,10 @@ export function PhenotypeCorrelations() {
 
   const setMessages = messages => {
     dispatch(updatePhenotypeCorrelations({ messages }));
+  };
+
+  const setSelectedPhenotypes = selectedPhenotypes => {
+    dispatch(updatePhenotypeCorrelations({ selectedPhenotypes }));
   };
 
   const clearMessages = e => {
@@ -111,6 +116,12 @@ export function PhenotypeCorrelations() {
       loadState(sharedState.parameters.params);
     }
   }, [sharedState]);
+
+  useEffect(() => {
+    if (selectedPhenotypes) {
+      setSelectedPhenotypes(selectedPhenotypes);
+    }
+  }, [selectedPhenotypes]);
 
   const handleReset = () => {
     const initialState = getInitialState();
