@@ -60,6 +60,11 @@ function intersection(...arrays) {
     );
 }
 
+/**
+ * Retrieves the first value in the first column of a results set
+ * @example: let [results] = await query(sql); pluck(results);
+ * @param {array} rows - An array of records
+ */
 function pluck(rows) {
     if (!rows || !rows.length) return null;
     // console.log(typeof rows);
@@ -68,10 +73,18 @@ function pluck(rows) {
     return firstRow[firstKey];
 }
 
-
+/**
+ * Retrieves valid, publicly accessible column names for a given table
+ * @param {*} tableName
+ * @param {*} columns
+ */
 function getValidColumns(tableName, columns) {
+    // ensure that columns are provided as an array
     if (!Array.isArray(columns))
-        columns = (columns || '').split(',').filter(e => /^\w+$/.test(e));
+        columns = (columns || '').split(',').filter(Boolean);
+
+    // filter column names as valid mysql identifiers
+    columns = columns.filter(e => /^\w+$/.test(e));
 
     let validColumns = {
         variant: ['id', 'phenotype_id', 'sex', 'chromosome', 'position', 'snp', 'allele_reference', 'allele_alternate', 'p_value', 'p_value_nlog', 'p_value_nlog_expected', 'odds_ratio', 'show_qq_plot'],
@@ -100,22 +113,6 @@ async function query(connection, tableName, conditions, conditionJoiner) {
 async function hasRecord(connection, tableName, conditions, conditionJoiner) {
     const [data] = await query(connection, tableName, conditions, conditionJoiner);
     return data.length > 0;
-}
-
-function getValidTable(table) {
-    // todo: validate table name
-
-    // let validTable = {
-    //     ewings_sarcoma_2_variant,
-    //     melanoma_3_variant,
-    //     renal_cell_carcinoma_4_variant
-    // }[tableName];
-
-    // return validTable
-    //     ? validTable
-    //     : '';
-
-    return table;
 }
 
 /**
@@ -443,8 +440,12 @@ async function getPhenotypes(connection, params) {
  * @param {*} connection - The connection to the mysql database
  * @param {{phenotype_id: number, type: "frequency"|"frequencyByAge"|"frequencyBySex"|"frequencyByAncestry"|"related"}} params - Type may be a string with the following values:
  */
-async function getPhenotype(connection, params) {
+async function getPhenotype(connectionPool, params) {
+
     const {id, type} = params;
+
+    let connection = await connectionPool.getConnection();
+    await connection.query(`SET sql_mode = 'STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION'`);
 
     // retrieve the specified phenotype
     const [phenotypeRows] = await connection.execute(
@@ -740,6 +741,8 @@ async function getPhenotype(connection, params) {
             }
         ];
     }
+
+    // await connectionPool.releaseConnection(connection);
 
     return phenotype;
 }
