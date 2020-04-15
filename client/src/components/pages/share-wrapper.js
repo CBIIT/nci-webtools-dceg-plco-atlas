@@ -17,7 +17,7 @@ export function ShareWrapper(props) {
 
     const [errorMessage, setErrorMessage] = useState(null);
 
-    const [timerSeconds, setTimerSeconds] = useState(10);
+    const [timerSeconds, setTimerSeconds] = useState(5);
 
     // redirect to home page in _ seconds
     const countdownRedirect = () => {
