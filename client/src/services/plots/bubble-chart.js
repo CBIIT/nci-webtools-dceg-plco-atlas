@@ -137,6 +137,7 @@ export class BubbleChart {
 
         node.append("text")
             .attr("dy", "0em")
+            .attr("class", "no-select")
             .style("text-anchor", "middle")
             .text(function (d) {
                 if (d.r < 35) {
@@ -183,7 +184,7 @@ export class BubbleChart {
         var tooltip = d3.select(container)
             .append("div")
             .style("opacity", 0)
-            .attr("class", "tooltip border")
+            .attr("class", "tooltip border no-select")
             .style("position", "absolute")
             .style("background-color", "white")
             .style("padding", "2px");
