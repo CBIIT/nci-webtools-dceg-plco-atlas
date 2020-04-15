@@ -11,6 +11,7 @@ import {
   UPDATE_PHENOTYPE_CORRELATIONS,
   UPDATE_PHENOTYPES,
   UPDATE_BROWSE_PHENOTYPES,
+  UPDATE_BROWSE_PHENOTYPES_PLOTS,
   UPDATE_HEATMAP,
   UPDATE_DOWNLOADS,
 } from './actions';
@@ -107,6 +108,14 @@ export const rootReducer = (state, action) => {
         ...state,
         browsePhenotypes: {
           ...state.browsePhenotypes,
+          ...action.data
+        }
+      };
+    case UPDATE_BROWSE_PHENOTYPES_PLOTS:
+      return {
+        ...state,
+        browsePhenotypesPlots: {
+          ...state.browsePhenotypesPlots,
           ...action.data
         }
       };

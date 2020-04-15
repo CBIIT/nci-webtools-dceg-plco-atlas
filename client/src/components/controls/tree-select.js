@@ -29,14 +29,19 @@ export const TreeSelect = forwardRef(({
   // check parent checked/indeterminate state when tree is loaded/reloaded
   useEffect(() => {
     if (!data || !value || value.length < 1) return;
-    const parents = data.categories.filter((item) => {
-      if (singleSelect) {
-        return containsVal(item.children, value.id);
-      } else {
-        return item.children.some(r => value.indexOf(r) >= 0);
-      }
-    });
+    let parents = [];
+    if (singleSelect) {
+      parents = getParents(value);
+    } else {
+      value.forEach((val) => parents.push(getParents(val)));
+      parents = parents.flat();
+    }
     parents.map((parent) => checkParents(parent));
+    // if (singleSelect) {
+    //   expandParents({data: value});
+    // } else {
+    //   value.forEach((val) => expandParents({data: val}));
+    // }
   }, [data]);
 
   const [expandAll, setExpandAll] = useState(false);
@@ -220,6 +225,7 @@ export const TreeSelect = forwardRef(({
           'parent-checkbox-' + item.id
         )[0];
         if (checkbox) {
+          // checkbox.checked = true;
           checkbox.indeterminate = false;
         }
         return true;
@@ -234,18 +240,21 @@ export const TreeSelect = forwardRef(({
             'parent-checkbox-' + item.id
           )[0];
           if (checkbox) {
+            // checkbox.checked = false;
             checkbox.indeterminate = true;
           }
-          return true;
+          return false;
         } else {
           let checkbox = document.getElementsByClassName(
             'parent-checkbox-' + item.id
           )[0];
           if (checkbox) {
+            // checkbox.checked = false;
             checkbox.indeterminate = false;
           }
           return false;
         }
+        // return false;
       }
     } else {
       // single-select
@@ -260,6 +269,7 @@ export const TreeSelect = forwardRef(({
             'parent-checkbox-' + item.id
           )[0];
           if (checkbox) {
+            // checkbox.checked = false;
             checkbox.indeterminate = true;
           }
           return false;
@@ -268,15 +278,18 @@ export const TreeSelect = forwardRef(({
             'parent-checkbox-' + item.id
           )[0];
           if (checkbox) {
+            // checkbox.checked = false;
             checkbox.indeterminate = false;
           }
           return false;
         }
+        // return false;
       } else {
         let checkbox = document.getElementsByClassName(
           'parent-checkbox-' + item.id
         )[0];
         if (checkbox) {
+          // checkbox.checked = false;
           checkbox.indeterminate = false;
         }
         return false;

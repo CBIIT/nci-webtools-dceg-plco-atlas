@@ -7,7 +7,7 @@ import {
   viewportToLocalCoordinates,
   createElement as h
 } from '../../services/plots/utils';
-import { updateBrowsePhenotypes } from '../../services/actions';
+import { updateBrowsePhenotypes, updateBrowsePhenotypesPlots } from '../../services/actions';
 
 export const Heatmap = forwardRef(({}, ref) => {
   const dispatch = useDispatch();
@@ -62,27 +62,34 @@ export const Heatmap = forwardRef(({}, ref) => {
     // tooltip.style.display = 'none';
   };
 
-  const setBrowsePhenotypesLoading = loading =>  {
-    dispatch(updateBrowsePhenotypes({ loading }));
-  }
-
   const handlePhenotypeLookup = async (pointData) => {
     var phenotype = JSON.parse(pointData)
     
     dispatch(
       updateBrowsePhenotypes({
-        phenotypeData: null,
         submitted: false,
         displayTreeParent: null
       })
     );
+
+    dispatch(
+      updateBrowsePhenotypesPlots({
+        phenotypeData: null,
+        loading: true
+      })
+    )
       
-    setBrowsePhenotypesLoading(true);
     const data = await query('phenotype', {
       id: phenotype.id,
       type: 'frequency'
     });
-    setBrowsePhenotypesLoading(false);
+
+    dispatch(
+      updateBrowsePhenotypesPlots({
+        phenotypeData: data,
+        loading: false
+      })
+    )
 
     // update browse phenotypes filters
     dispatch(
@@ -91,8 +98,7 @@ export const Heatmap = forwardRef(({}, ref) => {
         displayTreeParent: {
           data: phenotype
         },
-        submitted: true,
-        phenotypeData: data,
+        submitted: new Date(),
         selectedPlot: 'frequency'
       })
     );
