@@ -33,6 +33,8 @@ export function VariantLookup() {
     results
   } = useSelector(state => state.variantLookupTable);
 
+  const phenotypes = useSelector(state => state.phenotypes);
+
   const { ExportCSVButton } = CSVExport;
 
   const columns = [
@@ -240,11 +242,11 @@ export function VariantLookup() {
     }
   }, [sharedState]);
 
-  useEffect(() => {
-    if (selectedPhenotypes) {
-      setSelectedPhenotypes(selectedPhenotypes);
-    }
-  }, [selectedPhenotypes]);
+  // useEffect(() => {
+  //   if (selectedPhenotypes) {
+  //     setSelectedPhenotypes(selectedPhenotypes);
+  //   }
+  // }, [selectedPhenotypes, phenotypes]);
 
   const handleReset = () => {
     const initialState = getInitialState();
