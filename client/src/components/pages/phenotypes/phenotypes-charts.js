@@ -1,6 +1,7 @@
 import React from "react";
 import Plot from "react-plotly.js";
-import { systemFont } from '../../../services/plots/text';
+import { systemFont } from '../../plots/custom/text';
+
 
 export const hoverLayout = {
   hoverlabel: {

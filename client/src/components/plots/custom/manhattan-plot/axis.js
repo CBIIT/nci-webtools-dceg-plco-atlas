@@ -1,4 +1,4 @@
-import { renderText, measureWidth } from './text.js';
+import { renderText, measureWidth } from '../text.js';
 import { interpolateTicks } from './scale.js';
 import * as clone from 'lodash.clonedeep';
 

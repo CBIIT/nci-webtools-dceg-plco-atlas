@@ -4,7 +4,7 @@ import { Spinner } from 'react-bootstrap';
 import {
   viewportToLocalCoordinates,
   createElement as h
-} from '../../services/plots/utils';
+} from '../../../plots/custom/utils';
 import Plot from 'react-plotly.js';
 
 export function QQPlot({ onVariantLookup }) {
@@ -43,6 +43,7 @@ export function QQPlot({ onVariantLookup }) {
   const createTooltip = () => {
     const tooltip = document.createElement('div');
     tooltip.classList.add('qq-plot-tooltip');
+    tooltip.classList.add('popup-tooltip');
     tooltip.style.display = 'none';
     tooltip.style.position = 'absolute';
     return tooltip;

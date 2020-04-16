@@ -1,4 +1,4 @@
-import { ManhattanPlot } from './manhattan-plot.js';
+import { ManhattanPlot } from './manhattan-plot/manhattan-plot';
 import { systemFont } from './text.js';
 
 (async function main() {

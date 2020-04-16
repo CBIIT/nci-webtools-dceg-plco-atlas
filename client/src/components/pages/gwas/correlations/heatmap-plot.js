@@ -1,13 +1,14 @@
 import React, { forwardRef, useImperativeHandle } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { query } from '../../services/query';
+import { query } from '../../../../services/query';
 import { Spinner } from 'react-bootstrap';
 import Plot from 'react-plotly.js';
 import {
   viewportToLocalCoordinates,
   createElement as h
-} from '../../services/plots/utils';
-import { updateBrowsePhenotypes, updateBrowsePhenotypesPlots } from '../../services/actions';
+} from '../../../plots/custom/utils';
+import { updateBrowsePhenotypes, updateBrowsePhenotypesPlots } from '../../../../services/actions';
+
 
 export const Heatmap = forwardRef(({}, ref) => {
   const dispatch = useDispatch();
@@ -26,6 +27,7 @@ export const Heatmap = forwardRef(({}, ref) => {
   const createTooltip = () => {
     const tooltip = document.createElement('div');
     tooltip.classList.add('heatmap-tooltip');
+    tooltip.classList.add('popup-tooltip');
     tooltip.style.display = 'none';
     tooltip.style.position = 'absolute';
     return tooltip;

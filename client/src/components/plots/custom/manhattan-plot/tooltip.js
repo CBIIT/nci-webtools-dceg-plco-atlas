@@ -3,7 +3,7 @@ import {
   removeChildren,
   setStyles,
   viewportToLocalCoordinates
-} from './utils';
+} from '../utils';
 
 /**
  *

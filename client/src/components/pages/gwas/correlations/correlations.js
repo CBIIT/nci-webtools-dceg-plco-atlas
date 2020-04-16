@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { PhenotypeCorrelationsForm } from './correlations-form';
-import { Heatmap } from '../../../plots/heatmap-plot';
+import { Heatmap } from './heatmap-plot';
 import { Alert, Tabs, Tab, Button, Spinner } from 'react-bootstrap';
 import { PhenotypeCorrelationsSearchCriteria } from './correlations-search-criteria';
 import {

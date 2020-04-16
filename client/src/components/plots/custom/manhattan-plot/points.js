@@ -1,4 +1,4 @@
-import { indexToColor } from './utils.js';
+import { indexToColor } from '../utils.js';
 
 export function drawPoints(config, ctx, hiddenCtx) {
   const data = config.data;

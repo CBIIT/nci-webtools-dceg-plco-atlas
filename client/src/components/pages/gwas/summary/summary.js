@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Alert, Tab, Tabs, Button } from 'react-bootstrap';
 import { SummaryResultsForm } from './summary-form';
-import { ManhattanPlot } from '../../../plots/manhattan-plot';
-import { QQPlot } from '../../../plots/qq-plot';
+import { ManhattanPlot } from './manhattan-plot';
+import { QQPlot } from './qq-plot';
 import { SummaryResultsTable } from './summary-table';
 import { SummaryResultsSearchCriteria } from './summary-search-criteria';
 import {

@@ -1,5 +1,5 @@
-import { viewportToLocalCoordinates, min, max, addEventListener, withSavedContext, extent } from './utils.js';
-import { renderText, systemFont } from './text.js';
+import { viewportToLocalCoordinates, min, max, addEventListener, withSavedContext, extent } from '../utils.js';
+import { renderText, systemFont } from '../text.js';
 import { getScale } from './scale.js';
 
 

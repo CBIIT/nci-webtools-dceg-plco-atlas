@@ -287,6 +287,8 @@ select.form-control-sm {
   font-size: 10pt !important;
 }
 
+
+
 .form-control {
   box-shadow: none;
 }
@@ -307,6 +309,9 @@ select.form-control-sm {
   color: #aaa;
 } /* Microsoft Edge */
 
+
+
+
 .pagination {
   .page-item .page-link {
     color: #595959;
@@ -324,56 +329,9 @@ select.form-control-sm {
   }
 }
 
-/** home.js banner*/
-.banner-container {
-  z-index: 0;
-  overflow: hidden;
-  display: block;
-  height: 233px;
-  position: relative;
 
-  #banner {
-    width: 100%;
-    position: relative;
-    display: block;
-  }
 
-  .banner-overlay-text {
-    position: absolute;
-    top: 60%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-  }
-}
 
-/** navbar.js tab links*/
-// .navlinks {
-//   text-decoration: none !important;
-//   font-weight: 700;
-// }
-
-// .navlinks:hover {
-//   color: #ddd !important;
-// }
-
-// .navlinks.active-navlinks:hover {
-//   color: #444 !important;
-// }
-
-// .active-navlinks {
-//   background-color: #2cc799 !important;
-//   color: #333c4e !important;
-
-//   button {
-//     background-color: white !important;
-//     color: black !important;
-//     font-weight: 700 !important;
-//   }
-
-//   // &:hover {
-//   //   color: black !important;
-//   // }
-// }
 
 
 
@@ -427,7 +385,9 @@ select.form-control-sm {
   }
 }
 
-.manhattan-plot-tooltip {
+// custom popup tooltip
+
+.popup-tooltip {
   background-color: white;
   border-radius: 0.25rem;
   padding: 0.5rem 1rem;
@@ -435,104 +395,6 @@ select.form-control-sm {
 }
 
 
-.qq-plot-tooltip {
-  background-color: white;
-  border-radius: 0.25rem;
-  padding: 0.5rem 1rem;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-}
-
-.heatmap-tooltip {
-  background-color: white;
-  border-radius: 0.25rem;
-  padding: 0.5rem 1rem;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-}
-
-// // custom tree select
-// .collapse-button {
-//   cursor: pointer !important;
-//   :hover {
-//     text-decoration: underline;
-//   }
-// }
-
-// // custom tree select
-// .collapse-button-all {
-//   cursor: pointer !important;
-//   :hover {
-//     text-decoration: underline;
-//   }
-// }
-
-footer {
-  text-rendering: optimizeLegibility !important;
-  -webkit-font-smoothing: antialiased !important;
-}
-
-.footer-header h1 {
-  font-weight: bold !important;
-  font-style: normal !important;
-  font-size: 25px !important;
-  line-height: 1.1em !important;
-}
-
-.footer-header h1 span {
-  display: block;
-  font-size: 16px;
-}
-
-.footer-header-mobile h1 {
-  font-weight: bold !important;
-  font-style: normal !important;
-  font-size: 20px !important;
-  line-height: 1.1em !important;
-}
-
-.footer-header-mobile h1 span {
-  display: block;
-  font-size: 14px;
-}
-
-.footer-nav {
-  line-height: 1.5;
-}
-
-.footer-nav h2 {
-  font-size: 1.2em !important;
-  line-height: 1.215em !important;
-  font-weight: 400 !important;
-}
-
-.footer-link {
-  font-weight: 700;
-}
-
-.footer-agencies {
-  font-size: 0.8em;
-}
-
-.footer-tagline h4{
-  font-size: 16px !important;
-  font-weight: 400 !important;
-  line-height: 1.333em !important;
-}
-
-
-.js-plotly-plot.disable-x-axis-tooltip {
-  .main-svg .hoverlayer .axistext {
-    display: none;
-  }
-}
-
-
-.js-plotly-plot.override-cursor .plotly .cursor-pointer {
-  cursor: default;
-}
-
-.js-plotly-plot.override-cursor-heatmap .plotly .cursor-crosshair {
-  cursor: pointer;
-}
 
 .no-select {
   -webkit-touch-callout: none; /* iOS Safari */
