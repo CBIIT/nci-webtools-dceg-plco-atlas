@@ -115,7 +115,7 @@ export function Phenotypes() {
       dispatch(updateBrowsePhenotypes({
         categoryColor: color,
         currentBubbleData: parent.children,
-        bread: [{
+        breadCrumb: [{
             data: {
               title: parent.title
             },
