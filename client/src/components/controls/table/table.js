@@ -1,7 +1,9 @@
 import React, { useEffect } from 'react';
 import BootstrapTable from 'react-bootstrap-table-next';
 import overlayFactory from 'react-bootstrap-table2-overlay';
-import { Icon } from './icon';
+import { Icon } from '../icon';
+import './table.scss'
+
 
 export const defaultProps = {
   bootstrap4: true,

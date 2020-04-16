@@ -15,7 +15,7 @@ import {
   paginationSizeSelector,
   paginationButton,
   loadingOverlay
-} from '../../../controls/table';
+} from '../../../controls/table/table';
 import paginationFactory from 'react-bootstrap-table2-paginator';
 
 export function SummaryResultsTable() {

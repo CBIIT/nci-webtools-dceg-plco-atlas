@@ -1,4 +1,6 @@
 import * as d3 from 'd3'
+import './bubble-chart.scss';
+
 
 export class BubbleChart {
     constructor(container, currentData, handleSingleClick, handleDoubleClick, handleBackgroundDoubleClick, selectedPhenotype, categoryColor) {

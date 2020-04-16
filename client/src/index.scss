@@ -236,24 +236,6 @@ a:hover, a:focus {
   pointer-events: none;
 }
 
-.table {
-  thead th {
-    border-bottom: 1px solid #ddd;
-  }
-  td {
-    overflow-x: auto;
-    word-wrap: break-word;
-  }
-}
-.table.table-striped th,
-.table.table-striped td {
-  border-top: none;
-}
-
-.table.table-striped tbody tr:nth-of-type(odd) {
-  background-color: #fafafa;
-}
-
 .link {
   cursor: pointer;
   text-decoration: underline;
@@ -312,79 +294,6 @@ select.form-control-sm {
 
 
 
-.pagination {
-  .page-item .page-link {
-    color: #595959;
-  }
-
-  .page-item.active .page-link {
-    background-color: transparent;
-    color: #007bff;
-    font-weight: 600;
-    text-decoration: underline;
-  }
-
-  .page-link:focus {
-    box-shadow: none;
-  }
-}
-
-
-
-
-
-
-
-.manhattan-plot {
-  min-width: 700px;
-  min-height: 600px;
-  height: 100%;
-  max-width: 100%;
-  position: relative;
-
-  .overlay {
-    position: absolute;
-    cursor: pointer;
-    opacity: 0.05;
-    transition: all 0.1s;
-  }
-
-  .overlay:hover {
-    background-color: #005ea2;
-  }
-
-  .interactive-overlay {
-    pointer-events: none;
-    position: absolute;
-    top: 0;
-    left: 0;
-  }
-
-  .selection-overlay {
-    position: absolute;
-    opacity: 0.2;
-    background-color: #888;
-    top: 0;
-    left: 0;
-    display: none;
-  }
-
-  .custom-tooltip {
-    display: none;
-    position: absolute;
-    background-color: white;
-    border: 1px solid #bbb;
-    border-radius: 4px;
-    padding: 10px;
-  }
-
-  &.gene-plot-collapsed {
-    [data-type='gene-plot'] {
-      display: none;
-    }
-  }
-}
-
 // custom popup tooltip
 
 .popup-tooltip {
@@ -394,14 +303,21 @@ select.form-control-sm {
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
 }
 
+/** plotly **/
 
-
-.no-select {
-  -webkit-touch-callout: none; /* iOS Safari */
-    -webkit-user-select: none; /* Safari */
-     -khtml-user-select: none; /* Konqueror HTML */
-       -moz-user-select: none; /* Old versions of Firefox */
-        -ms-user-select: none; /* Internet Explorer/Edge */
-            user-select: none; /* Non-prefixed version, currently
-                                  supported by Chrome, Opera and Firefox */
+// phenotypes-charts override
+.js-plotly-plot.disable-x-axis-tooltip {
+  .main-svg .hoverlayer .axistext {
+    display: none;
+  }
 }
+
+.js-plotly-plot.override-cursor .plotly .cursor-pointer {
+  cursor: default;  
+}
+
+// heatmap override
+.js-plotly-plot.override-cursor-heatmap .plotly .cursor-crosshair {
+  cursor: pointer;
+}
+

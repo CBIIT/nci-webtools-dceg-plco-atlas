@@ -22,6 +22,8 @@ import {
   fetchSummaryTable,
 } from '../../../../services/actions';
 import { getInitialState } from '../../../../services/store';
+import './summary.scss'
+
 
 export function SummaryResults() {
   const dispatch = useDispatch();

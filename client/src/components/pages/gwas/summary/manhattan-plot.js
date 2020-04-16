@@ -4,7 +4,7 @@ import { Spinner } from 'react-bootstrap';
 import LoadingOverlay from 'react-loading-overlay';
 import * as merge from 'lodash.merge';
 import * as isEqual from 'lodash.isequal';
-import { plotOverlayConfig } from '../../../controls/table';
+import { plotOverlayConfig } from '../../../controls/table/table';
 import { rawQuery, query } from '../../../../services/query';
 import { ManhattanPlot as Plot } from '../../../plots/custom/manhattan-plot/manhattan-plot';
 import { Icon } from '../../../controls/icon';
