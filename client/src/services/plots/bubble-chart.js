@@ -66,7 +66,7 @@ export class BubbleChart {
                 handleBackgroundDoubleClick();
             })
             .append("title")
-            .text("Double-click to navigate phenotype categories.\nSingle-click to select a phenotype.");
+            .text("Single-click category to browse.\nSingle-click phenotype to select.\nDouble-click phenotype to submit.\nDouble-click background for previous view.");
 
         var nodes = d3.hierarchy(childlessData)
             .each(function (d) {
@@ -137,6 +137,7 @@ export class BubbleChart {
 
         node.append("text")
             .attr("dy", "0em")
+            .attr("class", "no-select")
             .style("text-anchor", "middle")
             .text(function (d) {
                 if (d.r < 35) {
@@ -183,7 +184,7 @@ export class BubbleChart {
         var tooltip = d3.select(container)
             .append("div")
             .style("opacity", 0)
-            .attr("class", "tooltip border")
+            .attr("class", "tooltip border no-select")
             .style("position", "absolute")
             .style("background-color", "white")
             .style("padding", "2px");

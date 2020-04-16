@@ -12,11 +12,6 @@ export const PhenotypesSearchCriteria = () => {
   const {
     submitted,
     shareID,
-    selectedPhenotype,
-    displayTreeParent,
-    breadCrumb,
-    currentBubbleData,
-    categoryColor, 
   } = browsePhenotypes;
   const {
     phenotypeData
