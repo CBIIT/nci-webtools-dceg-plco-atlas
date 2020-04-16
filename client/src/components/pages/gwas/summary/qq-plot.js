@@ -5,7 +5,7 @@ import {
   viewportToLocalCoordinates,
   createElement as h
 } from '../../../plots/custom/utils';
-import Plot from 'react-plotly.js';
+import { PlotlyWrapper as Plot } from '../../../plots/plotly/plotly-wrapper';
 
 export function QQPlot({ onVariantLookup }) {
   const {

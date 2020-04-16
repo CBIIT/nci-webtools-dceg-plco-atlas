@@ -1,5 +1,5 @@
 import React from "react";
-import Plot from "react-plotly.js";
+import { PlotlyWrapper as Plot } from '../../plots/plotly/plotly-wrapper';
 import { systemFont } from '../../plots/custom/text';
 
 
