@@ -1,24 +1,24 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { VariantLookupForm } from '../forms/variant-lookup-form';
-import { updateVariantLookup, lookupVariants, updateVariantLookupTable } from '../../services/actions';
-import { getInitialState } from '../../services/store';
+import { VariantLookupForm } from './lookup-form';
+import { updateVariantLookup, lookupVariants, updateVariantLookupTable } from '../../../../services/actions';
+import { getInitialState } from '../../../../services/store';
 import {
   SidebarContainer,
   SidebarPanel,
   MainPanel,
-} from '../controls/sidebar-container';
+} from '../../../controls/sidebar-container';
 import {
   Table,
   paginationText,
   paginationSizeSelector,
   paginationButton
-} from '../controls/table';
+} from '../../../controls/table';
 import paginationFactory from 'react-bootstrap-table2-paginator';
 import filterFactory, { textFilter } from 'react-bootstrap-table2-filter';
 import ToolkitProvider, { CSVExport } from 'react-bootstrap-table2-toolkit';
 import { Alert, Tabs, Tab, Spinner } from 'react-bootstrap';
-import { VariantLookupSearchCriteria } from '../search-criteria/variant-lookup-search-criteria';
+import { VariantLookupSearchCriteria } from '../summary/variant-lookup-search-criteria';
 
 
 export function VariantLookup() {

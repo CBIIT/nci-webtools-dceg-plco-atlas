@@ -1,8 +1,8 @@
 import React, { useState, useRef } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { Button, OverlayTrigger, Tooltip } from 'react-bootstrap';
-import { updatePhenotypeCorrelations } from '../../services/actions';
-import { TreeSelect } from '../controls/tree-select';
+import { updatePhenotypeCorrelations } from '../../../../services/actions';
+import { TreeSelect } from '../../../controls/tree-select/tree-select';
 
 export function PhenotypeCorrelationsForm({ onChange, onSubmit, onReset }) {
   const dispatch = useDispatch();

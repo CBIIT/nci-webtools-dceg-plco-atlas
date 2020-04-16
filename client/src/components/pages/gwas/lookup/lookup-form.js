@@ -1,8 +1,8 @@
 import React, { useState, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Button, OverlayTrigger, Tooltip } from 'react-bootstrap';
-import { updateVariantLookup } from '../../services/actions';
-import { TreeSelect } from '../controls/tree-select';
+import { updateVariantLookup } from '../../../../services/actions';
+import { TreeSelect } from '../../../controls/tree-select/tree-select';
 
 export function VariantLookupForm({ onChange, onSubmit, onReset }) {
   const dispatch = useDispatch();

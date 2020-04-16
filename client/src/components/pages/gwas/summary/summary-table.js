@@ -5,17 +5,17 @@ import {
   updateSummarySnp,
   fetchSummaryTable,
   fetchSummarySnpTable,
-} from '../../services/actions';
-import { Icon } from '../controls/icon';
-import { query } from '../../services/query';
-import { getInitialState } from '../../services/store';
+} from '../../../../services/actions';
+import { Icon } from '../../../controls/icon';
+import { query } from '../../../../services/query';
+import { getInitialState } from '../../../../services/store';
 import {
   Table,
   paginationText,
   paginationSizeSelector,
   paginationButton,
   loadingOverlay
-} from '../controls/table';
+} from '../../../controls/table';
 import paginationFactory from 'react-bootstrap-table2-paginator';
 
 export function SummaryResultsTable() {

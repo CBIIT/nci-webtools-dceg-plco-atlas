@@ -1,25 +1,24 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { updatePhenotypeCorrelations } from '../../services/actions';
+import { updateVariantLookup } from '../../../../services/actions';
 import { Tab, Tabs, Button } from 'react-bootstrap';
-import { ShareLink } from '../controls/share-link';
+import { ShareLink } from '../../../controls/share-link';
 
 
-export const PhenotypeCorrelationsSearchCriteria = () => {
+export const VariantLookupSearchCriteria = () => {
   const dispatch = useDispatch();
-
-  const phenotypeCorrelations = useSelector(
-    state => state.phenotypeCorrelations
-  );
-
+  const variantLookup = useSelector(state => state.variantLookup);
   const {
-    searchCriteriaPhenotypeCorrelations,
+    searchCriteriaVariantLookup,
     collapseCriteria,
     shareID
-  } = phenotypeCorrelations;
+  } = variantLookup;
+  const {
+    numResults
+  } = useSelector(state => state.variantLookupTable);
 
   const setCollapseCriteria = collapseCriteria => {
-    dispatch(updatePhenotypeCorrelations({ collapseCriteria }));
+    dispatch(updateVariantLookup({ collapseCriteria }));
   };
 
   const toggleCollapseCriteria = () => {
@@ -31,7 +30,7 @@ export const PhenotypeCorrelationsSearchCriteria = () => {
   };
 
   const CollapseCaret = () => {
-    if (searchCriteriaPhenotypeCorrelations && !collapseCriteria && searchCriteriaPhenotypeCorrelations.phenotypes) {
+    if (searchCriteriaVariantLookup && !collapseCriteria && searchCriteriaVariantLookup.phenotypes) {
       return <i className="fa fa-caret-down fa-lg"></i>;
     } else {
       return <i className="fa fa-caret-right fa-lg"></i>;
@@ -52,50 +51,41 @@ export const PhenotypeCorrelationsSearchCriteria = () => {
       <Tabs
         transition={false}
         className=""
-        defaultActiveKey="phenotype-correlations-search-criteria">
+        defaultActiveKey="variant-lookup-search-criteria">
         <Tab
-          eventKey="phenotype-correlations-search-criteria"
+          eventKey="variant-lookup-search-criteria"
           className="px-3 py-2 bg-white tab-pane-bordered rounded-0">
-          <div className="d-flex justify-content-between">
+          <div className="d-flex justify-content-between">              
             <div className="py-1 d-flex justify-content-start">
               <span className="mr-1">
                 <Button
                   className="p-0"
-                  style={{
-                    color: 
-                      searchCriteriaPhenotypeCorrelations && 
-                      searchCriteriaPhenotypeCorrelations.phenotypes && 
-                      searchCriteriaPhenotypeCorrelations.phenotypes.length > 1
-                      ? '#008CBA'
-                      : ''
-                  }}
                   title="Expand/collapse search criteria panel"
+                  style={{
+                    color: searchCriteriaVariantLookup ? '#008CBA' : ''
+                  }}
                   variant="link"
                   onClick={e => toggleCollapseCriteria()}
                   aria-controls="search-criteria-collapse-panel"
                   aria-expanded={!collapseCriteria}
-                  disabled={
-                    !searchCriteriaPhenotypeCorrelations || 
-                    (searchCriteriaPhenotypeCorrelations && searchCriteriaPhenotypeCorrelations.phenotypes.length < 2)
-                  }>
+                  disabled={!searchCriteriaVariantLookup}>
                   <CollapseCaret />
                 </Button>
               </span>
               <span>
-                <b>Phenotypes:</b>{' '}
+                <b>Phenotypes:</b>{' '}           
                 {collapseCriteria && (
                   <>
                     <span>
-                      {searchCriteriaPhenotypeCorrelations &&
-                      searchCriteriaPhenotypeCorrelations.phenotypes && searchCriteriaPhenotypeCorrelations.phenotypes.length >= 1
-                        ? searchCriteriaPhenotypeCorrelations.phenotypes[0]
+                      {searchCriteriaVariantLookup &&
+                      searchCriteriaVariantLookup.phenotypes && searchCriteriaVariantLookup.phenotypes.length >= 1
+                        ? searchCriteriaVariantLookup.phenotypes[0]
                         : 'None'}
                     </span>
                     <span className="">
-                      {searchCriteriaPhenotypeCorrelations &&
-                      searchCriteriaPhenotypeCorrelations.phenotypes &&
-                      searchCriteriaPhenotypeCorrelations.phenotypes.length >
-                        1 ? (
+                      {searchCriteriaVariantLookup &&
+                      searchCriteriaVariantLookup.phenotypes &&
+                      searchCriteriaVariantLookup.phenotypes.length > 1 ? (
                         <span>{' '}and</span>
                       ) : (
                         <></>
@@ -112,14 +102,13 @@ export const PhenotypeCorrelationsSearchCriteria = () => {
                         aria-controls="search-criteria-collapse-panel"
                         aria-expanded={!collapseCriteria}>
                         <span style={{ color: '#008CBA' }}>
-                          {searchCriteriaPhenotypeCorrelations &&
-                          searchCriteriaPhenotypeCorrelations.phenotypes
-                            ? searchCriteriaPhenotypeCorrelations.phenotypes
-                                .length -
+                          {searchCriteriaVariantLookup &&
+                          searchCriteriaVariantLookup.phenotypes &&
+                          searchCriteriaVariantLookup.phenotypes.length > 1
+                            ? searchCriteriaVariantLookup.phenotypes.length -
                               1 +
                               ` other${
-                                searchCriteriaPhenotypeCorrelations.phenotypes
-                                  .length -
+                                searchCriteriaVariantLookup.phenotypes.length -
                                   1 ===
                                 1
                                   ? ''
@@ -134,22 +123,41 @@ export const PhenotypeCorrelationsSearchCriteria = () => {
               </span>
               <span className="ml-1">
                 {!collapseCriteria &&
-                  searchCriteriaPhenotypeCorrelations &&
-                  searchCriteriaPhenotypeCorrelations.phenotypes &&
-                  searchCriteriaPhenotypeCorrelations.phenotypes.map(phenotype => (
+                  searchCriteriaVariantLookup &&
+                  searchCriteriaVariantLookup.phenotypes &&
+                  searchCriteriaVariantLookup.phenotypes.map(phenotype => (
                     <div title={phenotype}>
                       {phenotype.length < 50 ? phenotype : phenotype.substring(0, 47) + "..." }
                     </div>
                 ))}
+              </span>
+              
+              <span className="border-left border-secondary mx-3" style={{maxHeight: '1.6em'}}></span>
+
+              <span>
+                <b>Variant</b>:{' '}
+                {searchCriteriaVariantLookup &&
+                  searchCriteriaVariantLookup.variant
+                    ? searchCriteriaVariantLookup && searchCriteriaVariantLookup.variant.includes('rs')
+                    ? <a
+                      href={'https://www.ncbi.nlm.nih.gov/snp/' + searchCriteriaVariantLookup.variant}
+                      target="_blank"
+                      style={{
+                        textDecoration: 'underline',
+                      }}>
+                        {searchCriteriaVariantLookup.variant}
+                      </a>
+                    : <span>{searchCriteriaVariantLookup.variant}</span>
+                    : 'None'
+                }
               </span>
 
               <span className="border-left border-secondary mx-3" style={{maxHeight: '1.6em'}}></span>
               
               <span>
                 <b>Sex</b>:{' '}
-                {searchCriteriaPhenotypeCorrelations &&
-                searchCriteriaPhenotypeCorrelations.sex
-                  ? displaySex(searchCriteriaPhenotypeCorrelations.sex)
+                {searchCriteriaVariantLookup && searchCriteriaVariantLookup.sex
+                  ? displaySex(searchCriteriaVariantLookup.sex)
                   : 'None'
                 }
               </span>
@@ -157,21 +165,24 @@ export const PhenotypeCorrelationsSearchCriteria = () => {
 
             <div className="d-flex">
               <span className="py-1">
-                <b>Total Phenotypes:</b>{' '}
-                {searchCriteriaPhenotypeCorrelations &&
-                  searchCriteriaPhenotypeCorrelations.totalPhenotypes
-                    ? searchCriteriaPhenotypeCorrelations.totalPhenotypes
-                    : 'None'
+                <b>Total Results:</b>{' '}
+                {searchCriteriaVariantLookup && numResults ? 
+                  numResults.toString() + (searchCriteriaVariantLookup && searchCriteriaVariantLookup.phenotypes
+                  ? " of " + searchCriteriaVariantLookup.phenotypes.length + " phenotypes"
+                  : "")
+                  : 'None' + (searchCriteriaVariantLookup && searchCriteriaVariantLookup.phenotypes
+                  ? " of " + searchCriteriaVariantLookup.phenotypes.length + " phenotypes"
+                  : "")
                 }
               </span>
               
               <span className="ml-3" style={{maxHeight: '1.6em'}}></span>
-              
+
               <div className="d-inline">
                 <ShareLink 
-                  disabled={!searchCriteriaPhenotypeCorrelations}
+                  disabled={!searchCriteriaVariantLookup}
                   shareID={shareID}
-                  params={phenotypeCorrelations}
+                  params={variantLookup}
                 />
               </div>
             </div>

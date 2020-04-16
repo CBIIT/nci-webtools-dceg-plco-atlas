@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import { Button, OverlayTrigger, Tooltip } from 'react-bootstrap';
-import { TreeSelect } from '../controls/tree-select';
+import { TreeSelect } from '../../controls/tree-select/tree-select';
 
 export function PhenotypesForm({
   onSubmit,

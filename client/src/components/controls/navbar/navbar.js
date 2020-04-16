@@ -1,5 +1,7 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
+import './navbar.scss';
+
 
 export function Navbar({ links }) {
   return (
@@ -16,7 +18,7 @@ export function Navbar({ links }) {
                 key={title}>
                 <NavLink
                   // key={title}
-                  className="navlinks text-white py-2 px-4 d-inline-block"
+                  className="navlinks py-2 px-4 d-inline-block"
                   activeClassName="active-navlinks"
                   exact={exact}
                   to={route}>
