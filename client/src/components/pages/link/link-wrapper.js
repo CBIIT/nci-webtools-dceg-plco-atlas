@@ -1,16 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { query } from '../../services/query';
+import { query } from '../../../services/query';
 import { useDispatch } from 'react-redux';
 import { 
     updateSummaryResults,
     updateVariantLookup,
     updatePhenotypeCorrelations,
     updateBrowsePhenotypes
-} from '../../services/actions';
+} from '../../../services/actions';
  import { Alert, Spinner } from 'react-bootstrap';
 
 
-export function ShareWrapper(props) {
+export function LinkWrapper(props) {
     const dispatch = useDispatch();
 
     const { shareID } = props.match.params;

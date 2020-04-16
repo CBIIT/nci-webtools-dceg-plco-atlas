@@ -1,9 +1,9 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { updateBrowsePhenotypes } from '../../services/actions';
+import { updateBrowsePhenotypes } from '../../../services/actions';
 import { Tab, Tabs } from 'react-bootstrap';
-import { Icon } from '../controls/icon';
-import { ShareLink } from '../controls/share-link';
+import { Icon } from '../../controls/icon';
+import { ShareLink } from '../../controls/share-link';
 
 
 export const PhenotypesSearchCriteria = () => {

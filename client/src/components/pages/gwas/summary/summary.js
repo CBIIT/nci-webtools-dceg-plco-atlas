@@ -1,16 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Alert, Tab, Tabs, Button } from 'react-bootstrap';
-import { SummaryResultsForm } from '../forms/summary-results-form';
-import { ManhattanPlot } from '../plots/manhattan-plot';
-import { QQPlot } from '../plots/qq-plot';
-import { SummaryResultsTable } from './summary-results-table';
-import { SummaryResultsSearchCriteria } from '../search-criteria/summary-results-search-criteria';
+import { SummaryResultsForm } from './summary-form';
+import { ManhattanPlot } from '../../../plots/manhattan-plot';
+import { QQPlot } from '../../../plots/qq-plot';
+import { SummaryResultsTable } from './summary-table';
+import { SummaryResultsSearchCriteria } from './summary-search-criteria';
 import {
   SidebarContainer,
   SidebarPanel,
   MainPanel,
-} from '../controls/sidebar-container';
+} from '../../../controls/sidebar-container';
 import {
   updateSummaryResults,
   updateVariantLookup,
@@ -20,8 +20,8 @@ import {
   drawQQPlot,
   drawManhattanPlot,
   fetchSummaryTable,
-} from '../../services/actions';
-import { getInitialState } from '../../services/store';
+} from '../../../../services/actions';
+import { getInitialState } from '../../../../services/store';
 
 export function SummaryResults() {
   const dispatch = useDispatch();

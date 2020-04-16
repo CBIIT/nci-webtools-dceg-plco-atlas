@@ -3,11 +3,11 @@ import { useDispatch, useSelector } from 'react-redux';
 import * as merge from 'lodash.merge';
 import * as clone from 'lodash.clonedeep';
 import { Tab, Tabs, Form } from 'react-bootstrap';
-import { updateBrowsePhenotypes, updateBrowsePhenotypesPlots } from '../../services/actions';
-import { query } from '../../services/query';
+import { updateBrowsePhenotypes, updateBrowsePhenotypesPlots } from '../../../services/actions';
+import { query } from '../../../services/query';
 import { PhenotypesRelated } from './phenotypes-related'
 import { BarChart, AreaChart, GroupedAreaChart, PieChart, HorizontalBarChart } from './phenotypes-charts';
-import { LoadingOverlay } from '../controls/loading-overlay';
+import { LoadingOverlay } from '../../controls/loading-overlay';
 
 export function PhenotypesTabs() {
   const dispatch = useDispatch();

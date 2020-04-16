@@ -1,9 +1,9 @@
 import React from 'react';
 import { Route, NavLink, Redirect } from 'react-router-dom';
 import { Nav } from 'react-bootstrap';
-import { SummaryResults } from '../gwas/summary-results';
-import { VariantLookup } from '../gwas/variant-lookup';
-import { PhenotypeCorrelations } from '../gwas/phenotype-correlations';
+import { SummaryResults } from './summary/summary';
+import { VariantLookup } from './lookup/lookup';
+import { PhenotypeCorrelations } from './correlations/correlations';
 
 export function Gwas() {
   const gwasLinks = [

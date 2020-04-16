@@ -1,7 +1,7 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
 import { Tab, Tabs } from 'react-bootstrap';
-import { ShareLink } from '../controls/share-link';
+import { ShareLink } from '../../../controls/share-link';
 
 
 export const SummaryResultsSearchCriteria = () => {

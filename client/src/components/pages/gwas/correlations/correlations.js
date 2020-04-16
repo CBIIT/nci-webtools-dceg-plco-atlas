@@ -1,20 +1,20 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { PhenotypeCorrelationsForm } from '../forms/phenotype-correlations-form';
-import { Heatmap } from '../plots/heatmap-plot';
+import { PhenotypeCorrelationsForm } from './correlations-form';
+import { Heatmap } from '../../../plots/heatmap-plot';
 import { Alert, Tabs, Tab, Button, Spinner } from 'react-bootstrap';
-import { PhenotypeCorrelationsSearchCriteria } from '../search-criteria/phenotype-correlations-search-criteria';
+import { PhenotypeCorrelationsSearchCriteria } from './correlations-search-criteria';
 import {
   SidebarContainer,
   SidebarPanel,
   MainPanel,
-} from '../controls/sidebar-container';
+} from '../../../controls/sidebar-container';
 import {
   updatePhenotypeCorrelations,
   updateHeatmap,
   drawHeatmap
-} from '../../services/actions';
-import { getInitialState } from '../../services/store';
+} from '../../../../services/actions';
+import { getInitialState } from '../../../../services/store';
 
 
 export function PhenotypeCorrelations() {

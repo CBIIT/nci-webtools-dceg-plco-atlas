@@ -1,20 +1,20 @@
 import React, { useState, useRef, useEffect} from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Alert, Spinner } from 'react-bootstrap';
-import { PhenotypesForm } from '../forms/phenotypes-form';
-import { PhenotypesTabs } from '../phenotypes/phenotypes-tabs';
-import { PhenotypesSearchCriteria } from '../search-criteria/phenotypes-search-criteria';
+import { PhenotypesForm } from './phenotypes-form';
+import { PhenotypesTabs } from './phenotypes-tabs';
+import { PhenotypesSearchCriteria } from './phenotypes-search-criteria';
 import {
   SidebarContainer,
   SidebarPanel,
   MainPanel,
-} from '../controls/sidebar-container';
-import { updateBrowsePhenotypes, updateBrowsePhenotypesPlots } from '../../services/actions';
-import { getInitialState } from '../../services/store';
-import { query } from '../../services/query';
-import { BubbleChart as Plot } from '../../services/plots/bubble-chart';
-import { LoadingOverlay } from '../controls/loading-overlay';
-import { Icon } from '../controls/icon';
+} from '../../controls/sidebar-container';
+import { updateBrowsePhenotypes, updateBrowsePhenotypesPlots } from '../../../services/actions';
+import { getInitialState } from '../../../services/store';
+import { query } from '../../../services/query';
+import { BubbleChart as Plot } from '../../../services/plots/bubble-chart';
+import { LoadingOverlay } from '../../controls/loading-overlay';
+import { Icon } from '../../controls/icon';
 
 export function Phenotypes() {
   const dispatch = useDispatch();
