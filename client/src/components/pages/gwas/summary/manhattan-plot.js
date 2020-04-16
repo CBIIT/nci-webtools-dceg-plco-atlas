@@ -4,13 +4,13 @@ import { Spinner } from 'react-bootstrap';
 import LoadingOverlay from 'react-loading-overlay';
 import * as merge from 'lodash.merge';
 import * as isEqual from 'lodash.isequal';
-import { plotOverlayConfig } from '../controls/table';
-import { rawQuery, query } from '../../services/query';
-import { ManhattanPlot as Plot } from '../../services/plots/manhattan-plot';
-import { Icon } from '../controls/icon';
-import { createElement as h, removeChildren } from '../../services/plots/utils';
-import { systemFont } from '../../services/plots/text';
-import { updateSummaryResults, updateManhattanPlot } from '../../services/actions';
+import { plotOverlayConfig } from '../../../controls/table';
+import { rawQuery, query } from '../../../../services/query';
+import { ManhattanPlot as Plot } from '../../../plots/custom/manhattan-plot/manhattan-plot';
+import { Icon } from '../../../controls/icon';
+import { createElement as h, removeChildren } from '../../../plots/custom/utils';
+import { systemFont } from '../../../plots/custom/text';
+import { updateSummaryResults, updateManhattanPlot } from '../../../../services/actions';
 
 export function ManhattanPlot({
   onAllChromosomeSelected,

@@ -2,6 +2,8 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import Card from 'react-bootstrap/Card';
 import { CardDeck, Button } from 'react-bootstrap';
+import './home.scss';
+ 
 
 export function Home({ links }) {
   return (
@@ -11,9 +13,6 @@ export function Home({ links }) {
           src="assets/images/plco-banner.jpg"
           alt="PLCO banner"
           style={{ width: '100%' }}></img>
-        {/* <video id="banner" autoPlay muted loop>
-          <source src="assets/images/plco-banner.mp4" type="video/mp4" />
-        </video> */}
         <div className="banner-overlay-text row justify-content-center text-center text-light w-75">
           <div className="col-12">
             <h1 className="text-light">

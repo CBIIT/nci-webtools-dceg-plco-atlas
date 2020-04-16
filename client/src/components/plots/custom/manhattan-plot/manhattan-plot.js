@@ -15,8 +15,8 @@ import {
   addEventListener,
   removeEventListeners,
   getElementOffset,
-} from './utils.js';
-import { measureWidth, renderText, systemFont } from './text.js';
+} from '../utils.js';
+import { measureWidth, renderText, systemFont } from '../text.js';
 import { getScale, getTicks } from './scale.js';
 import { axisLeft, axisBottom } from './axis.js';
 import { drawPoints } from './points.js';
@@ -96,13 +96,13 @@ export class ManhattanPlot {
 
     // create a tooltip container
     this.tooltip = createTooltip({
-      className: 'manhattan-plot-tooltip'
+      className: 'manhattan-plot-tooltip popup-tooltip'
     });
     this.container.appendChild(this.tooltip);
 
     // create a tooltip container for the gene plot
     this.geneTooltip = createTooltip({
-      className: 'manhattan-plot-tooltip'
+      className: 'manhattan-plot-tooltip popup-tooltip'
     });
     this.geneTooltip.style.position = 'fixed';
     document.body.appendChild(this.geneTooltip);

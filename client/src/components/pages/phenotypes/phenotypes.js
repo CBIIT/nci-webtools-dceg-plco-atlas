@@ -12,7 +12,7 @@ import {
 import { updateBrowsePhenotypes, updateBrowsePhenotypesPlots } from '../../../services/actions';
 import { getInitialState } from '../../../services/store';
 import { query } from '../../../services/query';
-import { BubbleChart as Plot } from '../../../services/plots/bubble-chart';
+import { BubbleChart as Plot } from '../../plots/custom/bubble-chart/bubble-chart';
 import { LoadingOverlay } from '../../controls/loading-overlay';
 import { Icon } from '../../controls/icon';
 
