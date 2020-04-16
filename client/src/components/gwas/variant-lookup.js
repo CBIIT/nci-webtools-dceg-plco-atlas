@@ -26,11 +26,14 @@ export function VariantLookup() {
   const {
     messages,
     submitted,
-    sharedState
+    sharedState,
+    selectedPhenotypes
   } = useSelector(state => state.variantLookup);
   const {
     results
   } = useSelector(state => state.variantLookupTable);
+
+  const phenotypes = useSelector(state => state.phenotypes);
 
   const { ExportCSVButton } = CSVExport;
 
@@ -131,6 +134,10 @@ export function VariantLookup() {
 
   const clearMessages = e => {
     setMessages([]);
+  };
+
+  const setSelectedPhenotypes = selectedPhenotypes => {
+    dispatch(updateVariantLookup({ selectedPhenotypes }));
   };
 
   const setSubmitted = submitted => {
@@ -234,6 +241,13 @@ export function VariantLookup() {
       loadState(sharedState.parameters.params);
     }
   }, [sharedState]);
+
+  useEffect(() => {
+    if (sharedState) return;
+    if (selectedPhenotypes) {
+      setSelectedPhenotypes(selectedPhenotypes);
+    }
+  }, [selectedPhenotypes]);
 
   const handleReset = () => {
     const initialState = getInitialState();
