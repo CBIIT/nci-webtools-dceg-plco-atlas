@@ -304,7 +304,8 @@ export function SummaryResults() {
           phenotypes: [selectedPhenotype].map(item => item.title),
           variant: snp,
           sex: sexSanitized
-        }
+        },
+        submitted: new Date()
       })
     );
     dispatch(lookupVariants([selectedPhenotype], snp, sexSanitized));
