@@ -238,9 +238,9 @@ export function Phenotypes() {
     if (e) {
       if (e.data.children && e.data.children.length > 0) {
         // parent
-        // setSelectedPhenotype(null);
         const color = getColor(e.data);
         dispatch(updateBrowsePhenotypes({
+          selectedPhenotype: null,
           categoryColor: color,
           currentBubbleData: e.data.children,
           breadCrumb: [...breadCrumb, e],
