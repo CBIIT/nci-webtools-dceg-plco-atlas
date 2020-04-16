@@ -13,7 +13,7 @@ import {
   paginationText,
   paginationSizeSelector,
   paginationButton
-} from '../../../controls/table';
+} from '../../../controls/table/table';
 import paginationFactory from 'react-bootstrap-table2-paginator';
 import filterFactory, { textFilter } from 'react-bootstrap-table2-filter';
 import ToolkitProvider, { CSVExport } from 'react-bootstrap-table2-toolkit';
