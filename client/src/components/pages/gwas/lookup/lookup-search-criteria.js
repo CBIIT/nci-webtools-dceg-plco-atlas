@@ -1,8 +1,8 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { updateVariantLookup } from '../../services/actions';
+import { updateVariantLookup } from '../../../../services/actions';
 import { Tab, Tabs, Button } from 'react-bootstrap';
-import { ShareLink } from '../controls/share-link';
+import { ShareLink } from '../../../controls/share-link';
 
 
 export const VariantLookupSearchCriteria = () => {
