@@ -769,6 +769,8 @@ async function getPhenotype(connectionPool, params) {
     }
 
     // await connectionPool.releaseConnection(connection);
+    
+    await connection.release();
 
     return phenotype;
 }
