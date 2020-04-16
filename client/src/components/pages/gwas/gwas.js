@@ -4,6 +4,8 @@ import { Nav } from 'react-bootstrap';
 import { SummaryResults } from './summary/summary';
 import { VariantLookup } from './lookup/lookup';
 import { PhenotypeCorrelations } from './correlations/correlations';
+import './gwas.scss'
+
 
 export function Gwas() {
   const gwasLinks = [
