@@ -277,30 +277,12 @@ select.form-control-sm {
   color: #aaa;
 } /* Microsoft Edge */
 
-// custom popup tooltip
+// custom popup tooltip for manhattan plot, qq-plot, and heatmap
 
 .popup-tooltip {
   background-color: white;
   border-radius: 0.25rem;
   padding: 0.5rem 1rem;
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-}
-
-/** plotly **/
-
-// phenotypes-charts override
-.js-plotly-plot.disable-x-axis-tooltip {
-  .main-svg .hoverlayer .axistext {
-    display: none;
-  }
-}
-
-.js-plotly-plot.override-cursor .plotly .cursor-pointer {
-  cursor: default;  
-}
-
-// heatmap override
-.js-plotly-plot.override-cursor-heatmap .plotly .cursor-crosshair {
-  cursor: pointer;
 }
 

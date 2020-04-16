@@ -2,7 +2,7 @@ import React, { forwardRef, useImperativeHandle } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { query } from '../../../../services/query';
 import { Spinner } from 'react-bootstrap';
-import Plot from 'react-plotly.js';
+import { PlotlyWrapper as Plot } from '../../../plots/plotly/plotly-wrapper';
 import {
   viewportToLocalCoordinates,
   createElement as h

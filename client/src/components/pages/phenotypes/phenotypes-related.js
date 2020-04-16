@@ -1,5 +1,5 @@
 import React from "react";
-import Plot from "react-plotly.js";
+import { PlotlyWrapper as Plot } from '../../plots/plotly/plotly-wrapper';
 import { hoverLayout } from './phenotypes-charts';
 
 export function PhenotypesRelated({
