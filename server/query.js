@@ -457,6 +457,27 @@ async function getPhenotype(connectionPool, params) {
     const phenotype = phenotypeRows[0];
     if (!phenotype || !type) return null;
 
+    // retrieve average value and standard deviation
+    const [metadataRows] = await connection.execute(
+        `SELECT average_value, standard_deviation
+        FROM phenotype_metadata
+        WHERE phenotype_id = :id
+        AND sex = "all"
+        AND chromosome = "all"`,
+        {id}
+    );
+    const metadata = metadataRows[0];
+
+
+    if (!metadata) return 'no metadata';
+
+    // determine value cutoff
+    const {average_value, standard_deviation} = metadata;
+    const [minValue, maxValue] = [
+        +average_value - standard_deviation * 4, 
+        +average_value + standard_deviation * 4
+    ];
+
     // defined categories for each distribution type
     phenotype.categoryTypes = {
         frequencyByAge: [
@@ -493,7 +514,8 @@ async function getPhenotype(connectionPool, params) {
                 WHERE
                     pd.phenotype_id = :id AND
                     pd.value is not null AND
-                    p.age >= 55
+                    p.age >= 55 AND 
+                    pd.value BETWEEN ${minValue} AND ${maxValue}
                 group by value
                 order by value
             `;
@@ -610,7 +632,8 @@ async function getPhenotype(connectionPool, params) {
                 LEFT JOIN participant_data_category pdc on pdc.phenotype_id = pd.phenotype_id and pdc.value = pd.value
                 WHERE
                     pd.phenotype_id = :id AND
-                    pd.value IS NOT NULL
+                    pd.value IS NOT NULL AND
+                    pd.value BETWEEN ${minValue} AND ${maxValue}
                 GROUP BY \`value\`
                 ORDER BY pdc.order, pdc.value;
             `;
@@ -628,7 +651,8 @@ async function getPhenotype(connectionPool, params) {
                 FROM participant_data
                 WHERE
                     phenotype_id = :id AND
-                    value IS NOT NULL
+                    value IS NOT NULL AND
+                    value BETWEEN ${minValue} AND ${maxValue}
                 GROUP BY continuous_value
                 ORDER BY continuous_value
             `;
@@ -680,6 +704,7 @@ async function getPhenotype(connectionPool, params) {
                     WHERE
                         pd.phenotype_id = :id AND
                         pd.value IS NOT NULL AND
+                        pd.value BETWEEN ${minValue} AND ${maxValue} AND
                         p.age BETWEEN 55 AND 79
                     GROUP BY \`key\`, \`group\`
                     ORDER BY \`key\`, \`group\`;`
@@ -701,6 +726,7 @@ async function getPhenotype(connectionPool, params) {
                     WHERE
                         pd.phenotype_id = :id AND
                         pd.value IS NOT NULL AND
+                        pd.value BETWEEN ${minValue} AND ${maxValue} AND
                         p.${key} IS NOT NULL
                     GROUP BY \`key\`, \`group\`
                     ORDER BY \`key\`, \`group\`;`;
