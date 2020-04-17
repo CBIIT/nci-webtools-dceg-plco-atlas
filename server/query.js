@@ -267,8 +267,8 @@ async function getVariants(connection, params) {
         // by default, sort by p-value ascending
         if (!['asc', 'desc'].includes(order))
             order = 'asc';
-        // if (!validColumns.includes(orderBy))
-        //     orderBy = 'p_value';
+        if (!getValidColumns('variant', orderBy).length)
+            orderBy = 'p_value';
         sql += ` ORDER BY ${orderBy} ${order} `;
     }
 
@@ -768,10 +768,7 @@ async function getPhenotype(connectionPool, params) {
         ];
     }
 
-    // await connectionPool.releaseConnection(connection);
-    
     await connection.release();
-
     return phenotype;
 }
 
