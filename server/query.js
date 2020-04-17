@@ -97,6 +97,13 @@ function getValidColumns(tableName, columns) {
         : validColumns;
 }
 
+/**
+ * Returns records given a table name and optionally, conditions and condition joiner (AND/OR)
+ * @param {*} connection A mysql connection 
+ * @param {*} tableName The name of a table to query
+ * @param {*} conditions Conditions, given in the following format: {key: value, key2: value2}
+ * @param {*} conditionJoiner An optional joiner for each condition. Defaults to 'AND'
+ */
 async function query(connection, tableName, conditions, conditionJoiner) {
     let conditionSql = Object.keys(conditions)
         .filter(key => /^\w+$/.test(key))
@@ -110,6 +117,13 @@ async function query(connection, tableName, conditions, conditionJoiner) {
     );
 }
 
+/**
+ * Checks if a record exists in a table
+ * @param {*} connection A mysql connection 
+ * @param {*} tableName The name of a table to query
+ * @param {*} conditions Conditions, given in the following format: {key: value, key2: value2}
+ * @param {*} conditionJoiner An optional joiner for each condition. Defaults to 'AND'
+ */
 async function hasRecord(connection, tableName, conditions, conditionJoiner) {
     const [data] = await query(connection, tableName, conditions, conditionJoiner);
     return data.length > 0;
