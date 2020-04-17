@@ -81,6 +81,8 @@ export class BubbleChart {
             .padding(1.5);
 
         var bubbleNodes = bubble(nodes).descendants();
+        
+        var cc = clickcancel();
 
         var node = svg.selectAll(".node")
             .data(bubbleNodes)
@@ -92,7 +94,8 @@ export class BubbleChart {
             .attr("class", "node")
             .attr("transform", function (d) {
                 return "translate(" + d.x + ", " + d.y + ")";
-            });
+            })
+            .call(cc);
 
         // node.append("title")
         //     .text(function (d) {
@@ -157,7 +160,7 @@ export class BubbleChart {
             })
             .call(wrap, 18);
 
-        node.on("click", function (e) {
+        cc.on("click", function (e) {
             if (!getChildren(e, data)) {
                 d3.selectAll(".circle")
                     .style("opacity", function (d) {
@@ -179,7 +182,7 @@ export class BubbleChart {
             handleSingleClick(getNode(e, data));
         });
 
-        node.on("dblclick", function (e) {
+        cc.on("dblclick", function (e) {
             handleDoubleClick(getNode(e, data));
         });
 
@@ -272,6 +275,52 @@ function getNode(node, data) {
     } else {
         return null;
     }
+}
+
+function clickcancel() {
+    // we want to a distinguish single/double click
+    var dispatcher = d3.dispatch('click', 'dblclick');
+    function cc(selection) {
+        var down, tolerance = 5, last, wait = null, args;
+        function dist(a, b) {
+            return Math.sqrt(Math.pow(a[0] - b[0], 2), Math.pow(a[1] - b[1], 2));
+        }
+        selection.on('mousedown', function() {
+            down = d3.mouse(document.body);
+            last = +new Date();
+            args = arguments;
+        });
+        selection.on('mouseup', function() {
+            if (dist(down, d3.mouse(document.body)) > tolerance) {
+                return;
+            } else {
+                if (wait) {
+                    window.clearTimeout(wait);
+                    wait = null;
+                    dispatcher.apply("dblclick", this, args);
+                } else {
+                    wait = window.setTimeout((function() {
+                        return function() {
+                            dispatcher.apply("click", this, args);
+                            wait = null;
+                        };
+                    })(), 200);
+                }
+            }
+        });
+    };
+    var d3rebind = function(target, source) {
+        var i = 1, n = arguments.length, method;
+        while (++i < n) target[method = arguments[i]] = d3_rebind(target, source, source[method]);
+        return target;
+    };
+    function d3_rebind(target, source, method) {
+        return function() {
+        var value = method.apply(source, arguments);
+        return value === source ? target : value;
+        };
+    }
+    return d3rebind(cc, dispatcher, 'on');
 }
 
 function wrap(text, width) {
