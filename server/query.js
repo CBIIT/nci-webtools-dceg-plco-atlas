@@ -218,7 +218,7 @@ async function getVariants(connection, params) {
     let columnNames = getValidColumns('variant', params.columns).map(quote).join(',')
     // console.log("params.columns", params.columns);
     // let columnNames = params.columns.map(quote).join(',');
-    const groupby = getValidColumns('variant', params.groupby).length
+    const groupby = (params.groupby && getValidColumns('variant', params.groupby).length)
         ? ` GROUP BY "${params.groupby}" `
         : ``;
 
