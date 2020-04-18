@@ -31,17 +31,14 @@ app.register(static, {
 });
 
 app.addHook('onError', async (req, reply, error) => {
-  var statusCode = error.statusCode
-  if (statusCode >= 500) {
-    logger.error(`[${process.pid}] `, new Error(error), req.query);
-  } else if (statusCode >= 400) {
-    logger.info(`[${process.pid}] `, new Error(error), req.query);
-  } else {
-    logger.error(`[${process.pid}] `, new Error(error), req.query);
-  }
+  const statusCode = error.statusCode;
+  const isClientError = statusCode >= 400 && statusCode < 500;
+  logger[isClientError ? 'info' : 'error'](
+    `[${process.pid}] `, new Error(error), req.query
+  );
   reply.status(500);
   reply.send();
-})
+});
 
 // execute before handling request
 app.addHook("onRequest", (req, res, done) => {
