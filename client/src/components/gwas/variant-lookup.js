@@ -221,7 +221,12 @@ export function VariantLookup() {
       },
       submitted: new Date()
     }));
-    dispatch(lookupVariants(params.phenotypes, params.variant, params.sex === 'combined' ? 'all' : params.sex));
+    
+    dispatch(lookupVariants({
+      phenotypes: params.phenotypes, 
+      variant: params.variant, 
+      sex: params.sex
+    }));
   };
 
   const loadState = state => {
