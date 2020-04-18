@@ -6,7 +6,6 @@ import { About } from './pages/about';
 import { Gwas } from './pages/gwas';
 import { Phenotypes } from './pages/phenotypes';
 import { Downloads } from './pages/downloads';
-import { query } from '../services/query'
 import { ShareWrapper } from './pages/share-wrapper';
 
 
