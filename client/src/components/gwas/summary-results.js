@@ -288,22 +288,26 @@ export function SummaryResults() {
     );
   };
 
-  const handleVariantLookup = ({ snp }, sex) => {
-    const sexSanitized = sex ? (sex.includes('Male') ? 'male' : 'female') : selectedSex === 'male' || selectedSex === 'female' ? selectedSex : 'all';
-    console.log("sexSanitized", sexSanitized);
+  const handleVariantLookup = ({snp, sex}) => {
     dispatch(
       updateVariantLookup({
         selectedPhenotypes: [selectedPhenotype],
         selectedVariant: snp,
-        selectedSex: sexSanitized,
+        selectedSex: sex,
         searchCriteriaVariantLookup: {
           phenotypes: [selectedPhenotype].map(item => item.title),
           variant: snp,
-          sex: sexSanitized
-        }
+          sex: sex
+        },
+        submitted: new Date()
       })
     );
-    dispatch(lookupVariants([selectedPhenotype], snp, sexSanitized));
+
+    dispatch(lookupVariants({
+      phenotypes: [selectedPhenotype], 
+      variant: snp, 
+      sex
+    }));    
   };
 
   const loadState = state => {
