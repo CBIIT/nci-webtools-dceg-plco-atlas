@@ -129,6 +129,7 @@ export const HorizontalBarChart = ({ data, categories }) => (
 );
 
 export const AreaChart = ({data, categories, xTitle, yTitle, formatPercent}) => {
+  /*
   let items = categories.map((name, i) => {
     let x = [];
     let y = [];
@@ -137,7 +138,8 @@ export const AreaChart = ({data, categories, xTitle, yTitle, formatPercent}) => 
         y.push(data[key][i]);
     }
     return {x, y}
-  });
+  })
+  */
 
   return <Plot
       className="w-100 disable-x-axis-tooltip override-cursor"
@@ -184,6 +186,7 @@ export const AreaChart = ({data, categories, xTitle, yTitle, formatPercent}) => 
 }
 
 export const GroupedAreaChart = ({data, categories, xTitle, yTitle, fill, yMax, formatPercent}) => {
+  /*
   let items = categories.map((name, i) => {
     let x = [];
     let y = [];
@@ -193,6 +196,7 @@ export const GroupedAreaChart = ({data, categories, xTitle, yTitle, fill, yMax, 
     }
     return {x, y}
   });
+  */
 
   if (!yMax) {
     for (let key in data) {
