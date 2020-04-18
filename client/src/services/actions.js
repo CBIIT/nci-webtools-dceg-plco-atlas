@@ -148,16 +148,6 @@ export function fetchSummaryTable(tableKey, params, existingResults) {
     const response = await query('variants', params);
     if (response.error) return;
 
-    if (params.metadataCount && params.phenotype_id) {
-      console.log(tableKey, params)
-      let metadata = await query('metadata', {
-        phenotype_id: params.phenotype_id,
-        sex: params.sex,
-        chromosome: params.chromosome || 'all'
-      })
-      response.count = metadata.count;
-    }
-
     dispatch(
       updateSummaryTable(tableKey, {
         results: response.data,
@@ -235,6 +225,165 @@ export function drawManhattanPlot(plotType, params) {
 
 export function drawQQPlot(phenotype, sex) {
   return async function(dispatch) {
+
+    dispatch(updateQQPlot({ loadingQQPlot: true }));
+
+    const sexes = sex === 'stacked' ? ['female', 'male'] : [sex];
+
+    const metadata = await query('metadata', {
+      phenotype_id: phenotype.id,
+      chromosome: 'all',
+      sex: sexes,
+    });
+
+    const data = await Promise.all(sexes.map(async sex => {
+      const subsetVariants = await query('variants', {
+        phenotype_id: phenotype.id,
+        columns: ['p_value_nlog_expected', 'p_value_nlog'],
+        sex,
+        nlog_p_max: 3,
+        show_qq_plot: true,
+        raw: true,
+      });
+
+      const topVariants = await query('variants', {
+        phenotype_id: phenotype.id,
+        columns: ['p_value_nlog_expected', 'p_value_nlog', 'chromosome', 'position', 'snp'],
+        sex,
+        nlog_p_min: 3,
+        raw: true,
+      })
+
+      const markerColor = {
+        all: '#F2990D',
+        female: '#f41c52',
+        male: '#006bb8'
+      }[sex];
+
+      const {lambda_gc, count} = metadata.find(m => m.sex === sex);
+      const variants = subsetVariants.data.concat(topVariants.data);
+
+      return {
+        x: variants.map(d => d[0]),
+        y: variants.map(d => d[1]),
+        customdata: variants.map(d => ({
+          phenotype_id: phenotype.id,
+          sex,
+          // properties below will be undefined for subsetVariants.data
+          // we can use this to differentiate between these two datasets in each trace
+          chromosome: d[2],
+          position: d[3],
+          snp: d[4],
+          p: Math.pow(10, -d[1]),
+        })),
+        name: `${sex} <b>\u03BB</b> = ${lambda_gc}, <b>Sample Size</b> = ${count}`,
+        mode: 'markers',
+        type: 'scattergl',
+        hoverinfo: 'none',
+        text: null,
+        marker: {
+          color: markerColor,
+          size: 8,
+          opacity: 0.65
+        },
+      }
+    }));
+
+    // the title property is only used for non-stacked plots
+    // stacked plots use the legend instead as the title
+    const title = sex === 'stacked' ? undefined : [
+      `<b>\u03BB</b> = ${metadata[0].lambda_gc}`,
+      `<b>Sample Size</b> = ${metadata[0].count.toLocaleString()}`,
+    ].join(' '.repeat(5));
+
+    const layout = {
+      hoverlabel: {
+        bgcolor: "#fff",
+        bordercolor: '#bbb',
+        font: {
+          size: 14,
+          color: '#212529',
+          family: systemFont
+        },
+      },
+      dragmode: 'pan',
+      clickmode: 'event',
+      hovermode: 'closest',
+      // width: 800,
+      // height: 800,
+      autosize: true,
+      title: {
+        text: title,
+        font: {
+          family: systemFont,
+          size: 14,
+          color: 'black'
+        }
+      },
+      xaxis: {
+        automargin: true,
+        rangemode: 'tozero', // only show positive
+        showgrid: false, // disable grid lines
+        fixedrange: true, // disable zoom
+        title: {
+          text: '<b>Expected -log<sub>10</sub>(p)</b>',
+          font: {
+            family: 'Arial',
+            size: 14,
+            color: 'black'
+          }
+        },
+        tick0: 0,
+        ticklen: 10,
+        tickfont: {
+          family: systemFont,
+          size: 10,
+          color: 'black'
+        }
+      },
+      yaxis: {
+        automargin: true,
+        rangemode: 'tozero', // only show positive
+        showgrid: false, // disable grid lines
+        fixedrange: true, // disable zoom
+        title: {
+          text: '<b>Observed -log<sub>10</sub>(p)</b>',
+          font: {
+            family: systemFont,
+            size: 14,
+            color: 'black'
+          }
+        },
+        tick0: 0,
+        ticklen: 10,
+        tickfont: {
+          family: systemFont,
+          size: 10,
+          color: 'black'
+        }
+      },
+      showlegend: sex === 'stacked',
+      legend: {
+        itemclick: false,
+        itemdoubleclick: false,
+        orientation: "v",
+        x: 0.2,
+        y: 1.1
+      }
+    };
+
+    dispatch(updateQQPlot({ 
+      loadingQQPlot: false,
+      qqplotData: data,
+      qqplotLayout: layout,
+      sampleSize: metadata.reduce((a, b) => a + b.count, 0),
+    }));
+
+    return;
+
+
+  
+
     console.log('drawQQPlot', phenotype);
     console.log('sex', sex); // all, stacked, female, male
 
@@ -255,8 +404,6 @@ export function drawQQPlot(phenotype, sex) {
     setQQPlotData([]);
     setSampleSize(null);
 
-    const table = 'variant_' + phenotype.value;
-
     if (sex !== 'stacked') {
       const metadata = await query('metadata', {
         phenotype_id: phenotype.id,
@@ -269,7 +416,7 @@ export function drawQQPlot(phenotype, sex) {
       const metadata_lambdaGC = metadata.lambda_gc;
 
       const topVariantData = await query('variants', {
-        table,
+        phenotype_id: phenotype.id,
         sex,
         columns: ['chromosome', 'position', 'snp', 'p_value', 'p_value_nlog', 'p_value_nlog_expected'],
         p_value_nlog_min: 3.0,
@@ -295,7 +442,7 @@ export function drawQQPlot(phenotype, sex) {
       );
 
       const subsetVariantData = await query('variants', {
-        table,
+        phenotype_id: phenotype.id,
         sex,
         columns: ['p_value_nlog', 'p_value_nlog_expected'],
         p_value_nlog_max: 3.0,
@@ -461,7 +608,7 @@ export function drawQQPlot(phenotype, sex) {
       const metadata_lambdaGC_male = metadata_male.lambda_gc;
 
       const topVariantDataFemale = await query('variants', {
-        table,
+        phenotype_id: phenotype.id,
         sex: 'female',
         columns: ['chromosome', 'position', 'snp', 'p_value', 'p_value_nlog', 'p_value_nlog_expected'],
         p_value_nlog_min: 3.0,
@@ -490,7 +637,7 @@ export function drawQQPlot(phenotype, sex) {
       );
 
       const subsetVariantDataFemale = await query('variants', {
-        table,
+        phenotype_id: phenotype.id,
         sex: 'female',
         columns: ['p_value_nlog', 'p_value_nlog_expected'],
         p_value_nlog_max: 3.0,
@@ -511,7 +658,7 @@ export function drawQQPlot(phenotype, sex) {
       );
 
       const topVariantDataMale = await query('variants', {
-        table,
+        phenotype_id: phenotype.id,
         sex: 'male',
         columns: ['chromosome', 'position', 'snp', 'p_value', 'p_value_nlog', 'p_value_nlog_expected'],
         p_value_nlog_min: 3.0,
@@ -540,7 +687,7 @@ export function drawQQPlot(phenotype, sex) {
       );
 
       const subsetVariantDataMale = await query('variants', {
-        table,
+        phenotype_id: phenotype.id,
         sex: 'male',
         columns: ['p_value_nlog', 'p_value_nlog_expected'],
         p_value_nlog_max: 3.0,
@@ -898,21 +1045,63 @@ export function drawHeatmap({phenotypes, sex}) {
   };
 }
 
-export function lookupVariants(phenotypes, variant, sex) {
+export function lookupVariants({phenotypes, variant, sex}) {
   return async function(dispatch) {
-    const initialState = getInitialState();
-    dispatch(updateHeatmap(initialState.variantLookupTable));
+    const {variantLookupTable} = getInitialState();
+    dispatch(updateHeatmap(variantLookupTable));
+    
+    let chromosome = null;
+    let position = null;
+    let snp = null;
 
-    const sexSanitized = {
-      all: 'all',
-      combined: 'all',
-      female: 'female',
-      male: 'male',
-      undefined: 'alll'
-    }[sex];
+    const coordinates = variant.match(/^chr(x|y|\d+):(\d+)$/i);
+    if (coordinates) {
+      [, chromosome, position] = coordinates;
+    } else {
+      snp = variant;
+    }
+
+    const {data} = await query('variants', {
+      phenotype_id: phenotypes.map(p => p.id),
+      sex: sex === 'combined' ? ['female', 'male'] : sex,
+      chromosome,
+      position,
+      snp
+    });
+
+    const results = data.map(record => ({
+      phenotype: phenotypes.find(p => p.id === record.phenotype_id).title,
+      variant,
+      ...record
+    }));
+
+    const emptyResults = phenotypes
+      .filter(p => !data.find(r => r.phenotype_id === p.id))
+      .map(p => ({
+        phenotype: p.title || p.label,
+        allele_reference: '-',
+        allele_alternate: '-',
+        position: '-',
+        chromosome: '-',
+        odds_ratio: '-',
+        p_value: '-',
+        variant_id: `not-found-${p.title || p.label}`,
+        sex,
+        variant
+      }));
+
+    dispatch(
+      updateVariantLookupTable({
+        results: results.concat(emptyResults),
+        numResults: results.length
+      })
+    );
+  }
+    /*
 
     var tableList = [];
     var tableListNull = [];
+    
     var chr = null;
     var bp = null;
     if (variant.substring(0,3).toLowerCase() === "chr") {
@@ -921,6 +1110,11 @@ export function lookupVariants(phenotypes, variant, sex) {
       chr = coord[0];
       bp = coord[1];
     }
+
+    await query('variants', {
+      phenotype_id: phenotypes.map(p => p.id),
+      sex: ''
+    })
 
     const tables = phenotypes.map(phenotype => 'variant_' + phenotype.value).join(',');
     var allData = await query('variants', {
@@ -972,6 +1166,7 @@ export function lookupVariants(phenotypes, variant, sex) {
       })
     );
   };
+  */
 }
 
 // upload user's input parameters to db table share_link
