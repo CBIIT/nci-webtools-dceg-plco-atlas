@@ -76,7 +76,7 @@ export function VariantLookupForm({ onChange, onSubmit, onReset }) {
           value={selectedSex}
           onChange={e => setSelectedSex(e.target.value)}
           disabled={submitted}>
-          <option value="combined">All</option>
+          <option value="all">All</option>
           <option value="female">Female</option>
           <option value="male">Male</option>
         </select>
