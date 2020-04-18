@@ -7,7 +7,6 @@ import {
   fetchSummarySnpTable,
 } from '../../services/actions';
 import { Icon } from '../controls/icon';
-import { query } from '../../services/query';
 import { getInitialState } from '../../services/store';
 import {
   Table,
@@ -30,7 +29,6 @@ export function SummaryResultsTable() {
     nlogpMax,
     bpMin,
     bpMax,
-    snp,
   } = useSelector(state => state.summaryResults);
 
   let [sex, setSex] = useState('female');
@@ -97,7 +95,7 @@ export function SummaryResultsTable() {
       fetchSummaryTable(key, {
           offset: limit * (page - 1),
           phenotype_id: selectedPhenotype.id,
-          sex: selectedSex == 'stacked' ? sex : selectedSex,
+          sex: selectedSex === 'stacked' ? sex : selectedSex,
           chromosome: selectedChromosome,
           count: shouldCount,
           // key: shouldCount ? null : countKey,
@@ -169,7 +167,7 @@ export function SummaryResultsTable() {
   return (
     <div className="mt-3">
 
-      <div className="d-flex align-items-center justify-content-between">
+      <div key="controls" className="d-flex align-items-center justify-content-between">
         <div className="d-flex align-items-center">
           {selectedSex === 'stacked' &&
             <div className="btn-group" role="group">
@@ -186,7 +184,7 @@ export function SummaryResultsTable() {
             </div>}
         </div>
 
-        <div className="d-flex mb-2">
+        <div key="snpSearch" className="d-flex mb-2">
           <input
             style={{ maxWidth: '400px' }}
             className="form-control form-control-sm"
@@ -210,21 +208,23 @@ export function SummaryResultsTable() {
 
       {!summarySnpTables.visible && <>
         {/^(all|male|female)$/.test(selectedSex) &&
-          <Table {...getVariantTableProps(selectedSex)} />}
+          <Table key={`single-variant-table${sex}`} {...getVariantTableProps(selectedSex)} />}
 
         {/^stacked$/.test(selectedSex) &&
-          <Table {...getVariantTableProps(sex)} />}
+          <Table key={`stacked-variant-table${sex}`} {...getVariantTableProps(sex)} />}
       </>}
 
       {summarySnpTables.visible && <>
         {/^(all|male|female)$/.test(selectedSex) &&
           <Table
+            key={`single-snp-table${sex}`} 
             keyField="variant_id"
             data={summarySnpTables[selectedSex].results}
             columns={columns} />}
 
         {/^stacked$/.test(selectedSex) &&
           <Table
+            key={`stacked-snp-table${sex}`} 
             keyField="variant_id"
             data={summarySnpTables[sex].results}
             columns={columns} />}
