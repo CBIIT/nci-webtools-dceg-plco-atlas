@@ -554,6 +554,10 @@ footer {
   cursor: pointer;
 }
 
+.js-plotly-plot.override-cursor-default .plotly .cursor-pointer {
+  cursor: default;
+}
+
 .no-select {
   -webkit-touch-callout: none; /* iOS Safari */
     -webkit-user-select: none; /* Safari */
