@@ -12,7 +12,7 @@ const { getIntervals, getLambdaGC } = require('./utils/math');
 lambdagc_ewing|1.036
 lambdagc_rcc|1.029
 lambdagc_mel|0.83
- */
+*/
 
 // display help if needed
 if (!(args.phenotype && args.sex)) {
