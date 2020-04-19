@@ -174,11 +174,11 @@ async function importVariants() {
 
         -- calculate the show_qq_plot flag using -x^2, using id as the index parameter
         WITH ids as (
-            SELECT @count - ROUND(@count * (1 - POW(id / 10000 - 1, 2)))
-            FROM ${stageTable} WHERE id <= 10000
+            SELECT @count - ROUND(@count * (1 - POW(id / 5000 - 1, 2)))
+            FROM ${stageTable} WHERE id <= 5000
         ) UPDATE ${stageTable} SET
             show_qq_plot = 1
-            WHERE id IN (SELECT * FROM ids);
+            WHERE id IN (SELECT * FROM ids) OR p_value_nlog > 3;
 
         -- calculate median p-value
         SELECT AVG(p_value) FROM ${stageTable}

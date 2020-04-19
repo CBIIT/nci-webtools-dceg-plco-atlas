@@ -22,5 +22,4 @@ LOAD DATA LOCAL INFILE "D:/Development/Work/nci-webtools-dceg-plco-atlas/databas
     FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"'
     IGNORE 1 ROWS (phenotype_a, phenotype_b, value);
 
-
 COMMIT;
