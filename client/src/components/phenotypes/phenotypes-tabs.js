@@ -1,13 +1,10 @@
 import React, {useState, useEffect} from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import * as merge from 'lodash.merge';
-import * as clone from 'lodash.clonedeep';
 import { Tab, Tabs, Form } from 'react-bootstrap';
 import { updateBrowsePhenotypes, updateBrowsePhenotypesPlots } from '../../services/actions';
 import { query } from '../../services/query';
-import { PhenotypesRelated } from './phenotypes-related'
-import { BarChart, AreaChart, GroupedAreaChart, PieChart, HorizontalBarChart } from './phenotypes-charts';
 import { LoadingOverlay } from '../controls/loading-overlay';
+import { BarChart, AreaChart, GroupedAreaChart, PieChart, PhenotypesRelated } from './phenotypes-charts';
 
 export function PhenotypesTabs() {
   const dispatch = useDispatch();
@@ -145,10 +142,8 @@ export function PhenotypesTabs() {
           title="Related Phenotypes"
           className="p-4 bg-white tab-pane-bordered rounded-0"
           style={{ minHeight: '50vh' }}>
-          {!loading && selectedPlot === 'related-phenotypes' && phenotypeData && phenotypeData.related && <PhenotypesRelated
-            selectedPhenotype={selectedPhenotype}
-            phenotypeType={phenotypeType}
-            relatedData={phenotypeData.related}
+          {!loading && selectedPlot === 'related-phenotypes' && phenotypeData && phenotypeData.relatedPhenotypes && <PhenotypesRelated
+            relatedData={phenotypeData.relatedPhenotypes}
           />}
         </Tab>
       </Tabs>
