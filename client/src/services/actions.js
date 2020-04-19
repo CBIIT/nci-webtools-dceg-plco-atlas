@@ -226,7 +226,12 @@ export function drawManhattanPlot(plotType, params) {
 export function drawQQPlot(phenotype, sex) {
   return async function(dispatch) {
 
-    dispatch(updateQQPlot({ loadingQQPlot: true }));
+    dispatch(updateQQPlot({ 
+      loadingQQPlot: true,
+      qqplotData: [],
+      qqplotLayout: {},
+      sampleSize: null,
+    }));
 
     const sexes = sex === 'stacked' ? ['female', 'male'] : [sex];
 
@@ -262,10 +267,11 @@ export function drawQQPlot(phenotype, sex) {
 
       const {lambda_gc, count} = metadata.find(m => m.sex === sex);
       const variants = subsetVariants.data.concat(topVariants.data);
+      const titleCase = str => str[0].toUpperCase() + str.substring(1, str.length).toLowerCase();
 
       return {
-        x: variants.map(d => d[0]),
-        y: variants.map(d => d[1]),
+        x: variants.map(d => d[0]), // expected -log10(p)
+        y: variants.map(d => d[1]), // observed -log10(p)
         customdata: variants.map(d => ({
           phenotype_id: phenotype.id,
           sex,
@@ -276,7 +282,7 @@ export function drawQQPlot(phenotype, sex) {
           snp: d[4],
           p: Math.pow(10, -d[1]),
         })),
-        name: `${sex} <b>\u03BB</b> = ${lambda_gc}, <b>Sample Size</b> = ${count}`,
+        name: `${titleCase(sex)}     <b>\u03BB</b> = ${lambda_gc}     <b>Sample Size</b> = ${count}`,
         mode: 'markers',
         type: 'scattergl',
         hoverinfo: 'none',
@@ -379,10 +385,7 @@ export function drawQQPlot(phenotype, sex) {
       sampleSize: metadata.reduce((a, b) => a + b.count, 0),
     }));
 
-    return;
-
-
-  
+    /*
 
     console.log('drawQQPlot', phenotype);
     console.log('sex', sex); // all, stacked, female, male
@@ -886,6 +889,7 @@ export function drawQQPlot(phenotype, sex) {
     }
 
     setQQPlotLoading(false);
+    */
   };
 }
 
