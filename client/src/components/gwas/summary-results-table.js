@@ -120,14 +120,14 @@ export function SummaryResultsTable() {
     if (!summarySnpTables.snp) return;
     dispatch(updateSummarySnp('visible', true));
 
-    const sexs = {
+    const sexes = {
       all: ['all'],
       stacked: ['female', 'male'],
       female: ['female'],
       male: ['male']
     }[selectedSex];
 
-    sexs.forEach(sex => {
+    sexes.forEach(sex => {
       dispatch(fetchSummarySnpTable(sex, {
         phenotype_id: selectedPhenotype.id,
         snp: summarySnpTables.snp,
