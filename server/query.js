@@ -758,24 +758,31 @@ async function getPhenotype(connectionPool, params) {
         }
     }
 
-    if (type === 'related') {
-        phenotype.related = [
-            {
-                "name": "Ewing's Sarcoma",
-                "sampleSize": 1000,
-                "correlation": 0.2
-            },
-            {
-                "name": "Melanoma",
-                "sampleSize": 100000,
-                "correlation": 1
-            },
-            {
-                "name": "Renal Cell Carcinoma",
-                "sampleSize": 4000,
-                "correlation": 0.1
-            }
-        ];
+    if (type === 'related-phenotypes') {
+        let sql = `
+            WITH related_phenotype AS (
+                SELECT phenotype_a AS phenotype_id, value
+                FROM phenotype_correlation
+                WHERE phenotype_b = :id AND phenotype_a != :id
+                UNION
+                SELECT phenotype_b AS phenotype_id, value
+                FROM phenotype_correlation
+                WHERE phenotype_a = :id AND phenotype_b != :id
+                ORDER BY value DESC
+                LIMIT 5
+            )
+            SELECT
+                rp.phenotype_id AS phenotype_id,
+                p.participant_count AS participant_count,
+                p.display_name AS display_name,
+                rp.value AS correlation
+            FROM related_phenotype rp
+            JOIN phenotype p ON rp.phenotype_id = p.id;
+        `;
+
+        logger.debug(`getPhenotype related phenotypes sql: ${sql}`);
+        const [relatedPhenotypeRows] = await connection.execute(sql, {id});
+        phenotype.relatedPhenotypes = relatedPhenotypeRows;
     }
 
     await connection.release();
