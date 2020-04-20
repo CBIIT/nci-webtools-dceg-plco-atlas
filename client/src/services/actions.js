@@ -235,6 +235,7 @@ export function drawQQPlot(phenotype, sex) {
 
     const sexes = sex === 'stacked' ? ['female', 'male'] : [sex];
 
+    // retrieve metadata for all sexes provided
     const metadata = await query('metadata', {
       phenotype_id: phenotype.id,
       chromosome: 'all',
@@ -242,6 +243,8 @@ export function drawQQPlot(phenotype, sex) {
     });
 
     const data = await Promise.all(sexes.map(async sex => {
+
+      // retrieve a subset of variants where show_qq_plot is true, and nlog_p is <= 3
       const subsetVariants = await query('variants', {
         phenotype_id: phenotype.id,
         columns: ['p_value_nlog_expected', 'p_value_nlog'],
@@ -256,13 +259,14 @@ export function drawQQPlot(phenotype, sex) {
         subsetVariants.length
       );
 
+      // retrieve all variants where nlog_p >= 3
       const topVariants = await query('variants', {
         phenotype_id: phenotype.id,
         columns: ['p_value_nlog_expected', 'p_value_nlog', 'chromosome', 'position', 'snp'],
         sex,
         nlog_p_min: 3,
         raw: true,
-      })
+      });
 
       console.log(
         `${sex}.topVariants.length`,
@@ -271,6 +275,7 @@ export function drawQQPlot(phenotype, sex) {
 
       const {lambda_gc, count} = metadata.find(m => m.sex === sex);
       const variants = subsetVariants.data.concat(topVariants.data);
+      const maxExpectedNLogP = variants.reduce((a, b) => Math.max(a, b[0]), 0);
       const titleCase = str => str[0].toUpperCase() + str.substring(1, str.length).toLowerCase();
       const markerColor = {
         all: '#f2990d',
@@ -278,31 +283,47 @@ export function drawQQPlot(phenotype, sex) {
         male: '#006bb8'
       }[sex];
 
-      return {
-        x: variants.map(d => d[0]), // expected -log10(p)
-        y: variants.map(d => d[1]), // observed -log10(p)
-        customdata: variants.map(d => ({
-          phenotype_id: phenotype.id,
-          sex,
-          // properties below will be undefined for subsetVariants.data
-          // we can use this to differentiate between these two datasets in each trace
-          chromosome: d[2],
-          position: d[3],
-          snp: d[4],
-          p: Math.pow(10, -d[1]),
-        })),
-        name: `${titleCase(sex)}     <b>\u03BB</b> = ${lambda_gc}     <b>Sample Size</b> = ${count}`,
-        mode: 'markers',
-        type: 'scattergl',
-        hoverinfo: 'none',
-        text: null,
-        marker: {
-          color: markerColor,
-          size: 8,
-          opacity: 0.65
+      return [
+        {
+          x: [0, maxExpectedNLogP], // expected -log10(p)
+          y: [0, maxExpectedNLogP], // expected -log10(p)
+          hoverinfo: 'none',
+          mode: 'lines',
+          type: 'scattergl',
+          line: {
+            color: 'gray',
+            width: 1
+          },
+          opacity: 0.5,
+          showlegend: false
         },
-      }
+        {
+          x: variants.map(d => d[0]), // expected -log10(p)
+          y: variants.map(d => d[1]), // observed -log10(p)
+          customdata: variants.map(d => ({
+            phenotype_id: phenotype.id,
+            sex,
+            // properties below will be undefined for subsetVariants.data
+            // we can use this to differentiate between these two datasets in each trace
+            chromosome: d[2],
+            position: d[3],
+            snp: d[4],
+            p: Math.pow(10, -d[1]),
+          })),
+          name: `${titleCase(sex)}     <b>\u03BB</b> = ${lambda_gc}     <b>Sample Size</b> = ${count}`,
+          mode: 'markers',
+          type: 'scattergl',
+          hoverinfo: 'none',
+          text: null,
+          marker: {
+            color: markerColor,
+            size: 8,
+            opacity: 0.65
+          },
+        }
+      ];
     }));
+
 
     // the title property is only used for non-stacked plots
     // stacked plots use the legend instead as the title
@@ -389,7 +410,7 @@ export function drawQQPlot(phenotype, sex) {
 
     dispatch(updateQQPlot({ 
       loadingQQPlot: false,
-      qqplotData: data,
+      qqplotData: data.flat(),
       qqplotLayout: layout,
       sampleSize: metadata.reduce((a, b) => a + b.count, 0),
     }));
