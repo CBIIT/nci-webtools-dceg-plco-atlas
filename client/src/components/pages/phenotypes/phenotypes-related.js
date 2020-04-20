@@ -16,13 +16,13 @@ export function PhenotypesRelated({
         [
           e.name,
           `Correlation: <b>${e.correlation}</b>`,
-          `Sample Size: <b>${e.sampleSize.toLocaleString()}</b>`
+          `Sample Size: <b>${e.sampleSize ? e.sampleSize.toLocaleString() : e.participant_count.toLocaleString()}</b>`
         ].join("<br>")
       ),
       hoverinfo: "text",
       mode: "markers",
       marker: {
-        size: relatedData.map(e => 10 * Math.log(e.sampleSize)),
+        size: relatedData.map(e => 10 * (e.sampleSize ? Math.log(e.sampleSize) : Math.log(e.participant_count))),
         color: [
           "rgb(93, 164, 214)",
           "rgb(255, 144, 14)",
