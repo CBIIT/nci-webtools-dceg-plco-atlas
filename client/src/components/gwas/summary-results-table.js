@@ -158,7 +158,7 @@ export function SummaryResultsTable() {
       totalSize: summaryTables[key].resultsCount,
       showTotal: summaryTables[key].results.length > 0,
       sizePerPageList: [10, 25, 50, 100],
-      paginationTotalRenderer: paginationText,
+      paginationTotalRenderer: paginationText('variant', 'variants'),
       sizePerPageRenderer: paginationSizeSelector,
       pageButtonRenderer: paginationButton
     })
