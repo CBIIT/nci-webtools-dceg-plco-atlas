@@ -5,6 +5,7 @@ import './plotly-wrapper.scss'
 export const PlotlyWrapper = params => {
     return (
         <Plot
+            {...params}
             className={params.className}
             style={params.style}
             data={params.data}
