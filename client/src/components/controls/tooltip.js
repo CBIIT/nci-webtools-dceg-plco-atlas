@@ -13,7 +13,7 @@ export const Tooltip = props => {
         borderRadius: '0.25rem',
         padding: '0.5rem 1rem',
         boxShadow: '0 5px 15px rgba(0, 0, 0, 0.1)',
-        // transition: 'all 0.025s',
+        transition: 'all 0.05s',
         backgroundColor: 'white',
         zIndex: 9999,
         ...props.style
@@ -28,7 +28,7 @@ export const Tooltip = props => {
         top: 0,
         right: 0,
         cursor: 'pointer',
-    }
+    };
     
     return <div style={style} className={props.className}>
         {props.closeButton && <button 
