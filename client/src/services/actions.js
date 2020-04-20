@@ -1,5 +1,5 @@
 import { query, rawQuery, post } from './query';
-import { systemFont } from './plots/text';
+import { systemFont } from '../components/plots/custom/text';
 import { getInitialState } from './store';
 
 export const UPDATE_KEY = 'UPDATE_KEY';

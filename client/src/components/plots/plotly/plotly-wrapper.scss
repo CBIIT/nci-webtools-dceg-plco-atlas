@@ -1,0 +1,16 @@
+// phenotypes-charts override
+.js-plotly-plot.disable-x-axis-tooltip {
+  .main-svg .hoverlayer .axistext {
+    display: none;
+  }
+}
+
+.js-plotly-plot.override-cursor .plotly .cursor-pointer {
+  cursor: default;  
+}
+
+// heatmap override
+.js-plotly-plot.override-cursor-heatmap .plotly .cursor-crosshair {
+  cursor: pointer;
+}
+

@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import { HashRouter as Router, Route } from 'react-router-dom';
-import { Navbar } from './navbar';
-import { Home } from './pages/home';
-import { About } from './pages/about';
-import { Gwas } from './pages/gwas';
-import { Phenotypes } from './pages/phenotypes';
-import { Downloads } from './pages/downloads';
-import { ShareWrapper } from './pages/share-wrapper';
+import { Navbar } from './controls/navbar/navbar';
+import { Home } from './pages/home/home';
+import { About } from './pages/about/about';
+import { Gwas } from './pages/gwas/gwas';
+import { Phenotypes } from './pages/phenotypes/phenotypes';
+import { Downloads } from './pages/downloads/downloads';
+import { LinkWrapper } from './pages/link/link-wrapper';
 
 
 function App() {
@@ -70,7 +70,7 @@ function App() {
       {/* <Redirect to="/search/gwas" /> */}
       <Route 
         path="/link/:shareID?" 
-        component={ShareWrapper}
+        component={LinkWrapper}
       />
     </Router>
   );

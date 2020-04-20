@@ -14,15 +14,32 @@ $enable-shadows: true;
 //   }
 // }
 
+/** Default Overrides **/
+
 a {
   color: rgb(0, 140, 186);
   text-decoration: none;
+}
+
+label {
+  font-weight: bold;
+  margin-bottom: 0;
+}
+
+label.required {
+  font-weight: bold;
+}
+
+label.required::after {
+  content: '*';
+  color: red;
 }
 
 a:hover, a:focus {
   text-decoration: underline;
 }
 
+/** Bootstrap Overrides **/
 
 .bg-primary-lighter {
   background-color: #d9e8f6;
@@ -95,25 +112,6 @@ a:hover, a:focus {
   outline: none;
 }
 
-label {
-  font-weight: bold;
-  margin-bottom: 0;
-}
-
-label.required {
-  font-weight: bold;
-}
-
-label.required::after {
-  content: '*';
-  color: red;
-}
-
-.custom-control-label {
-  font-weight: 400;
-  cursor: pointer;
-}
-
 .text-orange {
   color: orange !important;
 }
@@ -134,26 +132,6 @@ label.required::after {
 .flex-grow-auto {
   flex: 1 0 auto;
   width: auto;
-}
-
-.opacity-50 {
-  opacity: 0.5;
-}
-
-.c-pointer {
-  cursor: pointer;
-}
-
-.c-not-allowed {
-  cursor: not-allowed;
-}
-
-.pointer-events-all {
-  pointer-events: all;
-}
-
-.pointer-events-none {
-  pointer-events: none;
 }
 
 .nav-pills.nav-pills-inverse {
@@ -203,15 +181,6 @@ label.required::after {
   margin-bottom: -5px;
 }
 
-// .nav-tabs .nav-link:after {
-//   content: "";
-//   display: block;
-//   padding-top: 2px;
-//   width: 100%;
-//   border-bottom: 3px solid #c0c0c5;
-//   margin-bottom: -5px;
-// }
-
 .nav-tabs {
   margin-bottom: -1px;
   border: 0;
@@ -220,31 +189,35 @@ label.required::after {
   }
 }
 
+/** Common **/
+
 .tab-pane.tab-pane-bordered {
   border: 1px solid #dee2e6;
-  // border-left: 1px solid #dee2e6;
-  // border-right: 1px solid #dee2e6;
-  // border-bottom: 1px solid #dee2e6;
-  // border-radius: 0 0 0.25em 0.25em;
-  // border-radius: 0.25em;
 }
 
-.table {
-  thead th {
-    border-bottom: 1px solid #ddd;
-  }
-  td {
-    overflow-x: auto;
-    word-wrap: break-word;
-  }
-}
-.table.table-striped th,
-.table.table-striped td {
-  border-top: none;
+.custom-control-label {
+  font-weight: 400;
+  cursor: pointer;
 }
 
-.table.table-striped tbody tr:nth-of-type(odd) {
-  background-color: #fafafa;
+.opacity-50 {
+  opacity: 0.5;
+}
+
+.c-pointer {
+  cursor: pointer;
+}
+
+.c-not-allowed {
+  cursor: not-allowed;
+}
+
+.pointer-events-all {
+  pointer-events: all;
+}
+
+.pointer-events-none {
+  pointer-events: none;
 }
 
 .link {
@@ -287,283 +260,29 @@ select.form-control-sm {
 .form-control::-webkit-input-placeholder {
   color: #aaa;
 } /* WebKit, Blink, Edge */
+
 .form-control:-moz-placeholder {
   color: #aaa;
 } /* Mozilla Firefox 4 to 18 */
+
 .form-control::-moz-placeholder {
   color: #aaa;
 } /* Mozilla Firefox 19+ */
+
 .form-control:-ms-input-placeholder {
   color: #aaa;
 } /* Internet Explorer 10-11 */
+
 .form-control::-ms-input-placeholder {
   color: #aaa;
 } /* Microsoft Edge */
 
-.pagination {
-  .page-item .page-link {
-    color: #595959;
-  }
+// custom popup tooltip for manhattan plot, qq-plot, and heatmap
 
-  .page-item.active .page-link {
-    background-color: transparent;
-    color: #007bff;
-    font-weight: 600;
-    text-decoration: underline;
-  }
-
-  .page-link:focus {
-    box-shadow: none;
-  }
-}
-
-/** home.js banner*/
-.banner-container {
-  z-index: 0;
-  overflow: hidden;
-  display: block;
-  height: 233px;
-  position: relative;
-
-  #banner {
-    width: 100%;
-    position: relative;
-    display: block;
-  }
-
-  .banner-overlay-text {
-    position: absolute;
-    top: 60%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-  }
-}
-
-/** navbar.js tab links*/
-.navlinks {
-  text-decoration: none !important;
-  font-weight: 700;
-}
-
-.navlinks:hover {
-  color: #ddd !important;
-}
-
-.navlinks.active-navlinks:hover {
-  color: #444 !important;
-}
-
-.active-navlinks {
-  background-color: #2cc799 !important;
-  color: #333c4e !important;
-
-  button {
-    background-color: white !important;
-    color: black !important;
-    font-weight: 700 !important;
-  }
-
-  // &:hover {
-  //   color: black !important;
-  // }
-}
-
-.active-secondary-navlinks {
-  // border-color: #2cc799 !important;
-  // border-width: 3px !important;
-  color: 'black';
-}
-
-.active-secondary-navlinks:after {
-  content: "";
-  display: block;
-  padding-top: 4px;
-  width: 100%;
-  margin: 0 auto;
-  border-bottom: 3px solid #2cc799 !important;
-  margin-bottom: -5px;
-}
-
-// .secondary-navlinks:after {
-//   content: "";
-//   display: block;
-//   padding-top: 4px;
-//   width: 100%;
-//   margin: 0 auto;
-//   border-bottom: 3px solid #c0c0c5;
-//   margin-bottom: -5px;
-// }
-// .navlinks-card {
-//   font-size: 10pt;
-// }
-
-.manhattan-plot {
-  min-width: 700px;
-  min-height: 600px;
-  height: 100%;
-  max-width: 100%;
-  position: relative;
-
-  .overlay {
-    position: absolute;
-    cursor: pointer;
-    opacity: 0.05;
-    transition: all 0.1s;
-  }
-
-  .overlay:hover {
-    background-color: #005ea2;
-  }
-
-  .interactive-overlay {
-    pointer-events: none;
-    position: absolute;
-    top: 0;
-    left: 0;
-  }
-
-  .selection-overlay {
-    position: absolute;
-    opacity: 0.2;
-    background-color: #888;
-    top: 0;
-    left: 0;
-    display: none;
-  }
-
-  .custom-tooltip {
-    display: none;
-    position: absolute;
-    background-color: white;
-    border: 1px solid #bbb;
-    border-radius: 4px;
-    padding: 10px;
-  }
-
-  &.gene-plot-collapsed {
-    [data-type='gene-plot'] {
-      display: none;
-    }
-  }
-}
-
-.manhattan-plot-tooltip {
+.popup-tooltip {
   background-color: white;
   border-radius: 0.25rem;
   padding: 0.5rem 1rem;
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
 }
 
-
-.qq-plot-tooltip {
-  background-color: white;
-  border-radius: 0.25rem;
-  padding: 0.5rem 1rem;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-}
-
-.heatmap-tooltip {
-  background-color: white;
-  border-radius: 0.25rem;
-  padding: 0.5rem 1rem;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-}
-
-// custom tree select
-.collapse-button {
-  cursor: pointer !important;
-  :hover {
-    text-decoration: underline;
-  }
-}
-
-// custom tree select
-.collapse-button-all {
-  cursor: pointer !important;
-  :hover {
-    text-decoration: underline;
-  }
-}
-
-footer {
-  text-rendering: optimizeLegibility !important;
-  -webkit-font-smoothing: antialiased !important;
-}
-
-.footer-header h1 {
-  font-weight: bold !important;
-  font-style: normal !important;
-  font-size: 25px !important;
-  line-height: 1.1em !important;
-}
-
-.footer-header h1 span {
-  display: block;
-  font-size: 16px;
-}
-
-.footer-header-mobile h1 {
-  font-weight: bold !important;
-  font-style: normal !important;
-  font-size: 20px !important;
-  line-height: 1.1em !important;
-}
-
-.footer-header-mobile h1 span {
-  display: block;
-  font-size: 14px;
-}
-
-.footer-nav {
-  line-height: 1.5;
-}
-
-.footer-nav h2 {
-  font-size: 1.2em !important;
-  line-height: 1.215em !important;
-  font-weight: 400 !important;
-}
-
-.footer-link {
-  font-weight: 700;
-}
-
-.footer-agencies {
-  font-size: 0.8em;
-}
-
-.footer-tagline h4{
-  font-size: 16px !important;
-  font-weight: 400 !important;
-  line-height: 1.333em !important;
-}
-
-
-.js-plotly-plot.disable-x-axis-tooltip {
-  .main-svg .hoverlayer .axistext {
-    display: none;
-  }
-}
-
-
-.js-plotly-plot.override-cursor .plotly .cursor-pointer {
-  cursor: default;
-}
-
-.js-plotly-plot.override-cursor-heatmap .plotly .cursor-crosshair {
-  cursor: pointer;
-}
-
-.js-plotly-plot.override-cursor-default .plotly .cursor-pointer {
-  cursor: default;
-}
-
-.no-select {
-  -webkit-touch-callout: none; /* iOS Safari */
-    -webkit-user-select: none; /* Safari */
-     -khtml-user-select: none; /* Konqueror HTML */
-       -moz-user-select: none; /* Old versions of Firefox */
-        -ms-user-select: none; /* Internet Explorer/Edge */
-            user-select: none; /* Non-prefixed version, currently
-                                  supported by Chrome, Opera and Firefox */
-}
