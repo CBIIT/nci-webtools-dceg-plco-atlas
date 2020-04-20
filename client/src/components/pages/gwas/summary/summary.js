@@ -84,7 +84,7 @@ export function SummaryResults() {
    * @param {object} params additional parameters to include in the fetch request
    */
   const fetchVariantTables = (selectedPhenotype, selectedSex, params = {}) => {
-    let sexs = {
+    let sexes = {
       all: ['all'],
       stacked: ['female', 'male'],
       female: ['female'],
@@ -92,7 +92,7 @@ export function SummaryResults() {
     }[selectedSex];
 
     // fetch variant results tables
-    sexs.forEach(sex => {
+    sexes.forEach(sex => {
       dispatch(
         fetchSummaryTable(sex, {
           ...params,
@@ -121,7 +121,7 @@ export function SummaryResults() {
         }
       ]);
     }
-    let sexs = {
+    let sexes = {
       all: ['all'],
       stacked: ['female', 'male'],
       female: ['female'],
@@ -159,7 +159,7 @@ export function SummaryResults() {
     dispatch(
       drawManhattanPlot('summary', {
         phenotype_id: phenotype.id,
-        sex: sexs,
+        sex: sexes,
         p_value_nlog_min: 3,
       })
     );
@@ -219,7 +219,7 @@ export function SummaryResults() {
   // redraw plot and update table(s) for single chromosome selection
   const onChromosomeSelected = chromosome => {
     const range = ranges.find(r => r.chromosome === chromosome);
-    const sexs = {
+    const sexes = {
       all: ['all'],
       stacked: ['female', 'male'],
       female: ['female'],
@@ -242,7 +242,7 @@ export function SummaryResults() {
     dispatch(
       drawManhattanPlot('variants', {
         phenotype_id: selectedPhenotype.id,
-        sex: sexs,
+        sex: sexes,
         chromosome: chromosome,
         position_min: range.position_min,
         position_max: range.position_max,
@@ -290,23 +290,26 @@ export function SummaryResults() {
     );
   };
 
-  const handleVariantLookup = ({ snp }, sex) => {
-    const sexSanitized = sex ? (sex.includes('Male') ? 'male' : 'female') : selectedSex === 'male' || selectedSex === 'female' ? selectedSex : 'all';
-    console.log("sexSanitized", sexSanitized);
+  const handleVariantLookup = ({snp, sex}) => {
     dispatch(
       updateVariantLookup({
         selectedPhenotypes: [selectedPhenotype],
         selectedVariant: snp,
-        selectedSex: sexSanitized,
+        selectedSex: sex,
         searchCriteriaVariantLookup: {
           phenotypes: [selectedPhenotype].map(item => item.title),
           variant: snp,
-          sex: sexSanitized
+          sex: sex
         },
         submitted: new Date()
       })
     );
-    dispatch(lookupVariants([selectedPhenotype], snp, sexSanitized));
+
+    dispatch(lookupVariants({
+      phenotypes: [selectedPhenotype], 
+      variant: snp, 
+      sex
+    }));    
   };
 
   const loadState = state => {
@@ -325,7 +328,7 @@ export function SummaryResults() {
       selectedSex,
     } = state;
 
-    const sexs = {
+    const sexes = {
       all: ['all'],
       stacked: ['female', 'male'],
       female: ['female'],
@@ -345,7 +348,7 @@ export function SummaryResults() {
         dispatch(
           drawManhattanPlot('variants', {
             phenotype_id: selectedPhenotype.id,
-            sex: sexs,
+            sex: sexes,
             chromosome: selectedChromosome,
             position_min: range.position_min,
             position_max: range.position_max,
@@ -377,7 +380,7 @@ export function SummaryResults() {
       dispatch(
         drawManhattanPlot('variants', {
           phenotype_id: selectedPhenotype.id,
-          sex: sexs,
+          sex: sexes,
           chromosome: selectedChromosome,
           position_min: range.position_min,
           position_max: range.position_max,

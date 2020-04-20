@@ -10,7 +10,7 @@ export function Navbar({ links }) {
         <div className="ml-3">
           {[{ route: '/', title: 'Home', exact: true }]
             .concat(links)
-            .filter((link) => {if (link.title) return true;})
+            .filter(link => link.title)
             .sort((a, b) => a.navIndex - b.navIndex)
             .map(({ route, action, title, exact }) => (
               <div

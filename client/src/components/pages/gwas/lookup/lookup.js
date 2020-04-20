@@ -221,7 +221,12 @@ export function VariantLookup() {
       },
       submitted: new Date()
     }));
-    dispatch(lookupVariants(params.phenotypes, params.variant, params.sex === 'combined' ? 'all' : params.sex));
+    
+    dispatch(lookupVariants({
+      phenotypes: params.phenotypes, 
+      variant: params.variant, 
+      sex: params.sex
+    }));
   };
 
   const loadState = state => {
@@ -333,7 +338,7 @@ export function VariantLookup() {
                             pagination={paginationFactory({
                               showTotal: results ? results.length > 0 : false,
                               sizePerPageList: [25, 50, 100],
-                              paginationTotalRenderer: paginationText,
+                              paginationTotalRenderer: paginationText('variant', 'variants'),
                               sizePerPageRenderer: paginationSizeSelector,
                               pageButtonRenderer: paginationButton
                             })}

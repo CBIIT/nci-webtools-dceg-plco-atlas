@@ -130,6 +130,7 @@ export const HorizontalBarChart = ({ data, categories }) => (
 );
 
 export const AreaChart = ({data, categories, xTitle, yTitle, formatPercent}) => {
+  /*
   let items = categories.map((name, i) => {
     let x = [];
     let y = [];
@@ -138,7 +139,8 @@ export const AreaChart = ({data, categories, xTitle, yTitle, formatPercent}) => 
         y.push(data[key][i]);
     }
     return {x, y}
-  });
+  })
+  */
 
   return <Plot
       className="w-100 disable-x-axis-tooltip override-cursor"
@@ -185,6 +187,7 @@ export const AreaChart = ({data, categories, xTitle, yTitle, formatPercent}) => 
 }
 
 export const GroupedAreaChart = ({data, categories, xTitle, yTitle, fill, yMax, formatPercent}) => {
+  /*
   let items = categories.map((name, i) => {
     let x = [];
     let y = [];
@@ -194,6 +197,7 @@ export const GroupedAreaChart = ({data, categories, xTitle, yTitle, fill, yMax, 
     }
     return {x, y}
   });
+  */
 
   if (!yMax) {
     for (let key in data) {
@@ -271,7 +275,7 @@ export const GroupedAreaChart = ({data, categories, xTitle, yTitle, fill, yMax, 
 
 export const PieChart = ({ data, categories }) => (
   <Plot
-    style={{minHeight: "600px", maxWidth: "600px", margin: "0 auto"}}
+    style={{minHeight: "600px", maxWidth: "80%", margin: "0 auto"}}
     data={[
       {
         values: data,
@@ -292,3 +296,62 @@ export const PieChart = ({ data, categories }) => (
     }}
   />
 );
+
+export function PhenotypesRelated({relatedData}) {
+  relatedData = relatedData.sort((a, b) => b.correlation - a.correlation);
+
+  const data = [
+    {
+      x: relatedData.map((e, i) => i + 1),
+      y: relatedData.map(e => e.correlation),
+      text: relatedData.map(e =>
+        [
+          e.display_name,
+          `Correlation: <b>${e.correlation}</b>`,
+          `Sample Size: <b>${e.participant_count.toLocaleString()}</b>`
+        ].join("<br>")
+      ),
+      hoverinfo: "text",
+      mode: "markers",
+      marker: {
+        size: relatedData.map(e => 10 * Math.log(e.participant_count)),
+        color: [
+          "rgb(93, 164, 214)",
+          "rgb(255, 144, 14)",
+          "rgb(44, 160, 101)",
+          "rgb(255, 65, 54)"
+        ]
+      }
+    }
+  ];
+
+  const layout = {
+    ...hoverLayout,
+    // title: `Phenotypes Related to ${selectedPhenotype.title}`,
+    showlegend: false,
+    xaxis: {
+      showticklabels: false,
+      zeroline: true
+    },
+    yaxis: {
+      title: "Correlation",
+      showline: true,
+    },
+    autosize: true
+  };
+
+  const config = {
+    displayModeBar: false,
+    responsive: true
+  };
+
+  return (
+    <Plot
+      style={{ width: "100%", height: "600px" }}
+      data={data}
+      layout={layout}
+      config={config}
+      onLegendClick={_ => false}
+    />
+  );
+}
