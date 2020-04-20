@@ -274,7 +274,7 @@ export const GroupedAreaChart = ({data, categories, xTitle, yTitle, fill, yMax, 
 
 export const PieChart = ({ data, categories }) => (
   <Plot
-    style={{minHeight: "600px", maxWidth: "600px", margin: "0 auto"}}
+    style={{minHeight: "600px", maxWidth: "80%", margin: "0 auto"}}
     data={[
       {
         values: data,
