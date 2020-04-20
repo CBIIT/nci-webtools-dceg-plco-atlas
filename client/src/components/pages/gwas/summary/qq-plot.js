@@ -97,7 +97,7 @@ export function QQPlot({ onVariantLookup }) {
         x={tooltip.x} 
         y={tooltip.y} 
         onClose={e => updateTooltip({visible: false})}
-        style={{width: '220px'}}
+        style={{width: '240px'}}
         className="text-left">
         {(!tooltip.data || (tooltip.data && -Math.log10(tooltip.data.p) < 3))
           ? <div>No information displayed for variants with -log<sub>10</sub>(p) &lt; 3.</div> 
