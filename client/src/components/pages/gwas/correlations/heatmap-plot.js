@@ -1,8 +1,11 @@
-import React, { forwardRef, useImperativeHandle } from 'react';
+import React, { useRef, useState, forwardRef, useImperativeHandle } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { query } from '../../../../services/query';
 import { Spinner } from 'react-bootstrap';
 import { PlotlyWrapper as Plot } from '../../../plots/plotly/plotly-wrapper';
+import { LoadingOverlay } from '../../../controls/loading-overlay';
+import { Tooltip } from '../../../controls/tooltip';
+
 import {
   viewportToLocalCoordinates,
   createElement as h
@@ -15,58 +18,31 @@ export const Heatmap = forwardRef(({}, ref) => {
 
   useImperativeHandle(ref, () => ({
     resetTooltip() {
-      hideTooltip();
+      updateTooltip({visible: false})
     }
   }));
 
+  const phenotypes = useSelector(state => state.phenotypes);
   const {
     heatmapData,
     heatmapLayout
   } = useSelector(state => state.heatmap);
 
-  const createTooltip = () => {
-    const tooltip = document.createElement('div');
-    tooltip.classList.add('heatmap-tooltip');
-    tooltip.classList.add('popup-tooltip');
-    tooltip.style.display = 'none';
-    tooltip.style.position = 'absolute';
-    return tooltip;
-  };
+  const plotContainer = useRef(null);
 
-  const showTooltip = (ev, tooltip, html) => {
-    let { x, y } = viewportToLocalCoordinates(
-      ev.clientX,
-      ev.clientY,
-      ev.target
-    );
+  // use local state to reset tooltip when this component unmounts
+  const [tooltip, setTooltip] = useState({
+    visible: false,
+    data: {}
+  });
+  
+  const updateTooltip = state => setTooltip({
+    ...tooltip,
+    ...state
+  });  
 
-    tooltip.innerHTML = '';
-    tooltip.style.display = 'inline-block';
-    if (html instanceof Element) {
-      tooltip.insertAdjacentElement('beforeend', html);
-    } else {
-      tooltip.insertAdjacentHTML('beforeend', html);
-    }
-
-    const tooltipLeft = x + 115 + 'px';
-    const tooltipTop = y + 120 + 'px';
-
-    tooltip.style.left = tooltipLeft;
-    tooltip.style.top = tooltipTop;
-  };
-
-  const hideTooltip = () => {
-    // if tooltip already exists, destroy
-    const elem = document.getElementsByClassName('heatmap-tooltip');
-    if (elem && elem.length > 0) {
-      elem[0].remove();
-    }
-    // tooltip.style.display = 'none';
-  };
-
-  const handlePhenotypeLookup = async (pointData) => {
-    var phenotype = JSON.parse(pointData)
-    
+  const handlePhenotypeLookup = async (id) => {
+    const phenotype = phenotypes.flat.find(p => p.id === id);
     dispatch(
       updateBrowsePhenotypes({
         submitted: false,
@@ -106,73 +82,6 @@ export const Heatmap = forwardRef(({}, ref) => {
     );
   };
 
-  const popupMarkerClick = e => {
-    e.event.preventDefault();
-    // close all plotly hover tooltips
-    var plotlyHoverTooltips = document.getElementsByClassName("hovertext");
-    if (plotlyHoverTooltips.length > 0) {
-      plotlyHoverTooltips[0].setAttribute("style", "display: none;")
-    }
-    const ev = e.event;
-    const points = e.points;
-    if (e && ev && points && points[0]) {
-      hideTooltip();
-      const tooltip = createTooltip();
-      // add tooltip to heatmap container
-      const heatmapContainer = document.getElementsByClassName('heatmap')[0];
-      const containerStyle = getComputedStyle(heatmapContainer);
-      if (containerStyle.position === 'static') {
-        heatmapContainer.style.position = 'relative';
-      }
-      heatmapContainer.appendChild(tooltip);
-      // show tooltip
-      const tooltipX = points[0].text.x;
-      const tooltipY = points[0].text.y;
-      const tooltipCorrelation = points[0].text.z;
-      const html = h('div', { className: '' }, [
-        h('div', null, [
-          h(
-            'a',
-            {
-              className: 'font-weight-bold',
-              href: '#/phenotypes',
-              onclick: () => handlePhenotypeLookup(points[0].x)
-            },
-            `Go to ${tooltipX} details`
-          )
-        ]),
-        h('div', null, [
-          h(
-            'a',
-            {
-              className: 'font-weight-bold',
-              href: '#/phenotypes',
-              onclick: () => handlePhenotypeLookup(points[0].y)
-            },
-            `Go to ${tooltipY} details`
-          )
-        ]),
-        h('div', null, [
-          h(
-            'b', null, 'Correlation: '), 
-            `${tooltipCorrelation}`
-        ]),
-        h('div', {
-          className: 'tooltip-close',
-          style: 'position: absolute; cursor: pointer; top: 0px; right: 5px;'
-        }, [
-          h(
-            'i', {
-              className: 'fa fa-times',
-              onclick: () => hideTooltip()
-            }, ``), 
-            ``
-        ])
-      ]);
-      showTooltip(ev, tooltip, html);
-    }
-  };
-
   const config = {
     responsive: true,
     toImageButtonOptions: {
@@ -191,40 +100,63 @@ export const Heatmap = forwardRef(({}, ref) => {
   };
 
   return (
-    <div className="row">
-      <div
-        className="col-md-12"
-        style={{
-          display: heatmapData ? 'block' : 'none'
-        }}>
-        <div
-          style={{
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            textAlign: 'left'
-          }}>
-          <Plot
-            className="heatmap override-cursor-heatmap"
-            style={{ position: 'relative', height: '1000px', width: '1000px' }}
-            data={heatmapData}
-            layout={heatmapLayout}
-            config={config}
-            onClick={e => popupMarkerClick(e)}
-            onRelayout={relayout => {
-              hideTooltip();
-            }}
-          />
-        </div>
-      </div>
-      {
-        !heatmapData && 
-        <div className="col-md-12">
-          <Spinner animation="border" variant="primary" role="status">
-            <span className="sr-only">Loading...</span>
-          </Spinner>
-        </div>
-      }
+    <div 
+      className="text-center my-3 position-relative" 
+      ref={plotContainer}>
+      <LoadingOverlay active={!heatmapData} />
+
+      {heatmapData && <Plot
+        className="heatmap override-cursor-heatmap"
+        style={{ position: 'relative', height: '1000px', width: '1000px' }}
+        data={heatmapData}
+        layout={heatmapLayout}
+        config={config}
+        onHover={data => {
+          const [point] = data.points;
+         
+          // Use event.clientX/Y to position the tooltip at the cursor
+          const {clientX, clientY} = data.event;
+          const {x, y} = viewportToLocalCoordinates(
+            clientX, 
+            clientY, 
+            plotContainer.current
+          );
+
+          updateTooltip({
+            visible: true,
+            data: point.customdata,
+            x, y 
+          });
+        }}
+        onRelayout={relayout => {
+          updateTooltip({visible: false})
+        }}
+      />}
+
+      <Tooltip 
+        closeButton 
+        visible={tooltip.visible} 
+        x={tooltip.x} 
+        y={tooltip.y} 
+        onClose={e => updateTooltip({visible: false})}
+        style={{width: '400px'}}
+        className="text-left">
+          <div>
+            <a className="font-weight-bold" href="#/phenotypes" onClick={e => handlePhenotypeLookup(tooltip.data.phenotype_a)}>
+              Go to {tooltip.data.phenotype_a_display_name} details
+            </a>
+          </div>
+          <div>
+            <a className="font-weight-bold" href="#/phenotypes" onClick={e => handlePhenotypeLookup(tooltip.data.phenotype_b)}>
+              Go to {tooltip.data.phenotype_b_display_name} details
+            </a>
+          </div>
+          <div>
+            <span className="font-weight-bold">Correlation: </span>  
+            {(+tooltip.data.value || 0).toPrecision(5)}
+          </div>
+      </Tooltip>
     </div>
+
   );
 });
