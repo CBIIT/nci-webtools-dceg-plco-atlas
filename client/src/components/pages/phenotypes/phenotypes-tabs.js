@@ -163,24 +163,17 @@ export function PhenotypesTabs() {
           className="p-4 bg-white tab-pane-bordered rounded-0"
           style={{ minHeight: '600px'}}>
 
+          <div className="m-2 text-right">
+            <button 
+              className="btn btn-link"
+              onClick={e => setDisplayType({
+                ...displayType, 
+                frequency: displayType.frequency === 'plot' ? 'table' : 'plot'
+              })}>
+              {displayType.frequency === 'plot' ?  'Show Table' : 'Show Plot'}
+            </button>
+          </div>
 
-          <div className="m-2 text-right">{[
-              {label: 'Show Plot', value: 'plot'},
-              {label: 'Show Table', value: 'table'},
-            ].filter(Boolean).map((e, i) =>
-              <Form.Check
-                custom
-                inline
-                label={e.label}
-                className="font-weight-normal cursor-pointer mr-4"
-                onChange={e => setDisplayType({...displayType, frequency: e.target.value})}
-                checked={displayType.frequency == e.value}
-                value={e.value}
-                type="radio"
-                id={`select-frequency-${e.value}`}
-                key={`frequency-${e.value}-${e.id}`}
-              />
-            )}</div>
           {phenotypeData && phenotypeData.frequency && phenotypeData.categories && <>
 
             {displayType.frequency === 'plot' && <div className="text-center">
@@ -233,23 +226,15 @@ export function PhenotypesTabs() {
                 />
               )}</div>
 
-              <div className="m-2 text-right">{[
-                {label: 'Show Plot', value: 'plot'},
-                {label: 'Show Table', value: 'table'},
-              ].filter(Boolean).map((e, i) =>
-                <Form.Check
-                  custom
-                  inline
-                  label={e.label}
-                  className="font-weight-normal cursor-pointer mr-4"
-                  onChange={e => setDisplayType({...displayType, [t.key]: e.target.value})}
-                  checked={displayType[t.key] == e.value}
-                  value={e.value}
-                  type="radio"
-                  id={`select-${t.key}-${e.value}`}
-                  key={`${t.key}-${e.value}-${e.id}`}
-                />
-              )}</div>
+              <button 
+                className="btn btn-link"
+                onClick={e => setDisplayType({
+                  ...displayType, 
+                  [t.key]: displayType[t.key] === 'plot' ? 'table' : 'plot'
+                })}>
+                {displayType[t.key] === 'plot' ?  'Show Table' : 'Show Plot'}
+              </button>
+
            </div>
 
             {phenotypeData && phenotypeData[t.key] && <>
