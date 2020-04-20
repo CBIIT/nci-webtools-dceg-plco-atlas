@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import Plot from 'react-plotly.js';
-import { viewportToLocalCoordinates } from '../../services/plots/utils';
+// import { viewportToLocalCoordinates } from '../../services/plots/utils';
 import { LoadingOverlay } from '../controls/loading-overlay';
 import { Tooltip } from '../controls/tooltip';
 
@@ -66,16 +66,23 @@ export function QQPlot({ onVariantLookup }) {
         config={config}
         onHover={data => {
           const [point] = data.points;
+          const {xaxis, yaxis} = point;
+          const xOffset = xaxis.l2p(point.x) + xaxis._offset;
+          const yOffset = yaxis.l2p(point.y) + yaxis._offset;
+
+          /* Use event.clientX/Y if we want to position the tooltip at the cursor (instead of point)
           const {clientX, clientY} = data.event;
           const {x, y} = viewportToLocalCoordinates(
             clientX, 
             clientY, 
             plotContainer.current
-          );
+          ); */
+
           updateTooltip({
             visible: true,
             data: point.customdata,
-            x, y,
+            x: xOffset, 
+            y: yOffset,
           });
         }}
         onRelayout={relayout => {
@@ -89,7 +96,7 @@ export function QQPlot({ onVariantLookup }) {
         x={tooltip.x} 
         y={tooltip.y} 
         onClose={e => updateTooltip({visible: false})}
-        style={{width: '260px'}}
+        style={{width: '220px'}}
         className="text-left">
         {(!tooltip.data || (tooltip.data && -Math.log10(tooltip.data.p) < 3))
           ? <div>No information displayed for variants with -log<sub>10</sub>(p) &lt; 3.</div> 
@@ -97,7 +104,8 @@ export function QQPlot({ onVariantLookup }) {
               {tooltip.data.chromosome && tooltip.data.position && <div><b>position:</b> {tooltip.data.chromosome}:{tooltip.data.position}</div>}
               {tooltip.data.p && <div><b>p-value:</b> {(+tooltip.data.p || 0).toPrecision(5)}</div>}
               {tooltip.data.snp && <div><b>snp:</b> {tooltip.data.snp || 'N/A'}</div>}
-              {(tooltip.data.snp || (tooltip.data.chromosome && tooltip.data.position)) && <div>
+              {(tooltip.data.snp || (tooltip.data.chromosome && tooltip.data.position)) && 
+                <div>
                   <a 
                     href="#/gwas/lookup" 
                     className="font-weight-bold" 
