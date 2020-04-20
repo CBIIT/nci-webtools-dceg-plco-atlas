@@ -8,7 +8,6 @@ export function PhenotypesRelated({
   relatedData
 }) {
   relatedData = relatedData.sort((a, b) => b.correlation - a.correlation);
-
   const data = [
     {
       x: relatedData.map((e, i) => i + 1),

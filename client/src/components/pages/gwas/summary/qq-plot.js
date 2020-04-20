@@ -1,13 +1,7 @@
 
 import React, { useState, useRef } from 'react';
 import { useSelector } from 'react-redux';
-// import {
-//   viewportToLocalCoordinates,
-//   createElement as h
-// } from '../../../plots/custom/utils';
 import { PlotlyWrapper as Plot } from '../../../plots/plotly/plotly-wrapper';
-
-// import Plot from 'react-plotly.js';
 import { LoadingOverlay } from '../../../controls/loading-overlay';
 import { Tooltip } from '../../../controls/tooltip';
 
