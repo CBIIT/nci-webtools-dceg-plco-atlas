@@ -398,8 +398,8 @@ async function getGenes(connection, params) {
 async function getCorrelations(connection, {a, b}) {
     let sql = `
         SELECT
-            phenotype_a, pa.name as phenotype_a_name, pa.display_name as phenotype_a_display_name,
-            phenotype_b, pb.name as phenotype_b_name, pb.display_name as phenotype_b_display_name,
+            phenotype_a, pa.display_name as phenotype_a_display_name,
+            phenotype_b, pb.display_name as phenotype_b_display_name,
             value
         FROM phenotype_correlation pc
         JOIN phenotype pa on pc.phenotype_a = pa.id
