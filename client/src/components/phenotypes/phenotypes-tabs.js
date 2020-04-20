@@ -59,7 +59,7 @@ export function PhenotypesTabs() {
     .map(word => word[0].toUpperCase() + word.substr(1).toLowerCase())
     .join(' ');
 
-  const frequencyTable = phenotypeData => {
+  const FrequencyTable = ({phenotypeData}) => {
     const data = phenotypeData.categories.map((category, i) => ({
       id: category, 
       value: phenotypeData.frequency[i]
@@ -67,7 +67,7 @@ export function PhenotypesTabs() {
 
     const columns = [
       {dataField: 'id', text: phenotypeData.displayName, sort: true}, 
-      {dataField: 'value', text: 'Frequency', sort: true}
+      {dataField: 'value', text: 'Frequency', sort: true, formatter: e => e.toLocaleString()}
     ];
 
     return <Table
@@ -84,28 +84,46 @@ export function PhenotypesTabs() {
     />    
   }
 
-  const distributionTable = (phenotypeData, key, distributionCategory) => {
-    console.log(phenotypeData, key, distributionCategory);
-    const columns = [
-      {dataField: 'value', text: phenotypeData.displayName, sort: true}, // participant value, mapped to data categories
-      {dataField: 'type', text: distributionCategory, sort: true},  // distribution category (age, sex, ancestry)
-      {dataField: 'counts', text: 'Counts', sort: true}, // participant count
-      {dataField: 'percentage', text: 'Percentage', sort: true}, // participant percentages
-    ];
-    const {counts, percentage} = phenotypeData[key];
-
+  const DistributionTable = ({phenotypeData, distributionKey, distributionCategory}) => {
+    console.log(phenotypeData, distributionKey, distributionCategory);
+    const {counts, percentage} = phenotypeData[distributionKey];
+    let columns = [];
     let data = [];
-    for (let value of phenotypeData.categories) {
-      let categories = phenotypeData.categoryTypes[key]
-      for (let type of categories) {
-        let index = categories.indexOf(type);
-        data.push({
-          value, 
-          type, 
-          counts: counts[value][index], 
-          percentage: percentage[value][index] + '%'
-        })
+
+    if (phenotypeData.type === 'categorical' || phenotypeData.type === 'continuous') {
+      columns = [
+        {dataField: 'value', text: phenotypeData.displayName, sort: true}, // participant value, mapped to data categories
+        {dataField: 'type', text: distributionCategory, sort: true},  // distribution category (age, sex, ancestry)
+        {dataField: 'counts', text: 'Counts', sort: true, formatter: e => e.toLocaleString()}, // participant count
+        {dataField: 'percentage', text: 'Percentage', sort: true, formatter: e => e + '%'}, // participant percentages
+      ]
+      
+      let values = phenotypeData.distributionCategories || phenotypeData.categories;
+      for (let value of values) {
+        let categories = phenotypeData.categoryTypes[distributionKey]
+        for (let type of categories) {
+          let index = categories.indexOf(type);
+          data.push({
+            value, 
+            type, 
+            counts: counts[value][index],
+            percentage: percentage[value][index]
+          })
+        }
       }
+    } else {
+      columns = [
+        // {dataField: 'value', text: phenotypeData.displayName, sort: true}, // participant value, mapped to data categories
+        {dataField: 'type', text: distributionCategory, sort: true},  // distribution category (age, sex, ancestry)
+        {dataField: 'counts', text: 'Counts', sort: true, formatter: e => e.toLocaleString()}, // participant count
+        {dataField: 'percentage', text: 'Percentage', sort: true, formatter: e => e + '%'}, // participant percentages
+      ];
+
+      data = Object.keys(counts).map(type => ({
+        type, 
+        counts: counts[type], 
+        percentage: percentage[type]
+      }));
     }
 
     return <Table
@@ -140,7 +158,7 @@ export function PhenotypesTabs() {
           eventKey="frequency"
           title="Frequency (All)"
           className="p-4 bg-white tab-pane-bordered rounded-0"
-          style={{ minHeight: '600px', textAlign: 'center' }}>
+          style={{ minHeight: '600px'}}>
 
 
           <div className="m-2 text-right">{[
@@ -162,7 +180,7 @@ export function PhenotypesTabs() {
             )}</div>
           {phenotypeData && phenotypeData.frequency && phenotypeData.categories && <>
 
-            {displayType.frequency === 'plot' && <>
+            {displayType.frequency === 'plot' && <div className="text-center">
               {phenotypeData.type !== 'continuous' && <PieChart
                     data={phenotypeData.frequency}
                     categories={phenotypeData.categories} />}
@@ -172,11 +190,10 @@ export function PhenotypesTabs() {
                     categories={phenotypeData.categories}
                     xTitle={phenotypeData.displayName}
                     yTitle="Number of Participants" />}
-            </>}
-
-            {displayType.frequency === 'table' && <div className="text-left">
-              {phenotypeData.frequency && frequencyTable(phenotypeData)}
             </div>}
+
+            {displayType.frequency === 'table' && 
+              <FrequencyTable phenotypeData={phenotypeData} />}
           </>}
         </Tab>
 
@@ -230,28 +247,28 @@ export function PhenotypesTabs() {
                   key={`${t.key}-${e.value}-${e.id}`}
                 />
               )}</div>
-            </div>
+           </div>
 
-            
+            {phenotypeData && phenotypeData[t.key] && <>
+              {displayType[t.key] === 'plot' && <div className="text-center">
+                {((/continuous/.test(phenotypeData.type) || (/binary/.test(phenotypeData.type) && t.key === 'frequencyByAge')) ? GroupedAreaChart : BarChart)({
+                    data: phenotypeData[t.key][frequencyType[t.key]],
+                    categories: (phenotypeData.type === 'binary')
+                      ? phenotypeData.distributionCategories
+                      : phenotypeData.categoryTypes[t.key],
+                    xTitle: phenotypeData.displayName,
+                    yTitle: frequencyType[t.key] === 'counts' ? 'Number of Participants' : '% of Participants',
+                    fill: true,
+                    formatPercent: frequencyType[t.key] === 'percentage',
+                  })}
+              </div>}
 
-            {displayType[t.key] === 'plot' && phenotypeData && phenotypeData[t.key] && <div className="text-center">
-              {((/continuous/.test(phenotypeData.type) || (/binary/.test(phenotypeData.type) && t.key === 'frequencyByAge')) ? GroupedAreaChart : BarChart)({
-                  data: phenotypeData[t.key][frequencyType[t.key]],
-                  categories: (phenotypeData.type === 'binary')
-                    ? phenotypeData.distributionCategories
-                    : phenotypeData.categoryTypes[t.key],
-                  xTitle: phenotypeData.displayName,
-                  yTitle: frequencyType[t.key] === 'counts' ? 'Number of Participants' : '% of Participants',
-                  fill: true,
-                  formatPercent: frequencyType[t.key] === 'percentage',
-                })}
-            </div>}
-
-            {displayType[t.key] === 'table' && phenotypeData && phenotypeData[t.key] && distributionTable(
-              phenotypeData,
-              t.key,
-              t.title.split(' ').pop()
-            )}
+              {displayType[t.key] === 'table' && 
+                <DistributionTable
+                  phenotypeData={phenotypeData}
+                  distributionKey={t.key}
+                  distributionCategory={t.title.split(' ').pop()} />}
+            </>}
           </Tab>
         )}
 
@@ -260,8 +277,8 @@ export function PhenotypesTabs() {
           title="Related Phenotypes"
           className="p-4 bg-white tab-pane-bordered rounded-0"
           style={{ minHeight: '50vh' }}>
-          {!loading && selectedPlot === 'related-phenotypes' && phenotypeData && phenotypeData.relatedPhenotypes && <PhenotypesRelated
-            relatedData={phenotypeData.relatedPhenotypes}
+          {!loading && selectedPlot === 'related-phenotypes' && phenotypeData && phenotypeData.relatedPhenotypes && 
+            <PhenotypesRelated relatedData={phenotypeData.relatedPhenotypes}
           />}
         </Tab>
       </Tabs>
