@@ -1,0 +1,25 @@
+.navlinks {
+    text-decoration: none !important;
+    font-weight: 700;
+    color: white;
+  }
+  
+.navlinks:hover {
+    color: #ddd !important;
+}
+
+.navlinks.active-navlinks:hover {
+    color: #444 !important;
+}
+
+.active-navlinks {
+    background-color: #2cc799 !important;
+    color: #333c4e !important;
+
+    button {
+        background-color: white !important;
+        color: black !important;
+        font-weight: 700 !important;
+    }
+
+}
