@@ -4,8 +4,7 @@ import { Tab, Tabs, Form } from 'react-bootstrap';
 
 import { updateBrowsePhenotypes, updateBrowsePhenotypesPlots } from '../../../services/actions';
 import { query } from '../../../services/query';
-import { PhenotypesRelated } from './phenotypes-related'
-import { BarChart, AreaChart, GroupedAreaChart, PieChart, HorizontalBarChart } from './phenotypes-charts';
+import { BarChart, AreaChart, GroupedAreaChart, PieChart, PhenotypesRelated } from './phenotypes-charts';
 import { LoadingOverlay } from '../../controls/loading-overlay';
 
 import paginationFactory from 'react-bootstrap-table2-paginator';
