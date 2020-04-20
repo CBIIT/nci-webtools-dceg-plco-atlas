@@ -113,19 +113,25 @@ export const Heatmap = forwardRef(({}, ref) => {
         config={config}
         onHover={data => {
           const [point] = data.points;
-         
+          const {xaxis, yaxis, pointIndex} = point;
+          const [yIndex, xIndex] = pointIndex
+          const xOffset = xaxis.l2p(xIndex) + xaxis._offset;
+          const yOffset = yaxis.l2p(yIndex) + yaxis._offset;
+
           // Use event.clientX/Y to position the tooltip at the cursor
-          const {clientX, clientY} = data.event;
-          const {x, y} = viewportToLocalCoordinates(
-            clientX, 
-            clientY, 
-            plotContainer.current
-          );
+          // const {clientX, clientY} = data.event;
+          // const {x, y} = viewportToLocalCoordinates(
+          //   clientX, 
+          //   clientY, 
+          //   plotContainer.current
+          // );
 
           updateTooltip({
             visible: true,
             data: point.customdata,
-            x, y 
+            // x, y 
+            x: xOffset,
+            y: yOffset
           });
         }}
         onRelayout={relayout => {
@@ -142,6 +148,10 @@ export const Heatmap = forwardRef(({}, ref) => {
         style={{width: '400px'}}
         className="text-left">
           <div>
+            <span className="font-weight-bold">Correlation: </span>  
+            {(+tooltip.data.value || 0).toPrecision(5)}
+          </div>
+          <div>
             <a className="font-weight-bold" href="#/phenotypes" onClick={e => handlePhenotypeLookup(tooltip.data.phenotype_a)}>
               Go to {tooltip.data.phenotype_a_display_name} details
             </a>
@@ -150,10 +160,6 @@ export const Heatmap = forwardRef(({}, ref) => {
             <a className="font-weight-bold" href="#/phenotypes" onClick={e => handlePhenotypeLookup(tooltip.data.phenotype_b)}>
               Go to {tooltip.data.phenotype_b_display_name} details
             </a>
-          </div>
-          <div>
-            <span className="font-weight-bold">Correlation: </span>  
-            {(+tooltip.data.value || 0).toPrecision(5)}
           </div>
       </Tooltip>
     </div>
