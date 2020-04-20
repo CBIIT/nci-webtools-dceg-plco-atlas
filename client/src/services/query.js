@@ -9,8 +9,12 @@ function asQueryString(obj) {
   const query = [];
   for (let key in obj) {
     let value = obj[key];
+
+    // treat arrays as comma-delineated lists
     if (Array.isArray(value))
       value = value.join(',');
+
+    // exclude undefined, null, or false values
     if (![undefined, null, false].includes(value))
       query.push([key, value].map(encodeURIComponent).join('='));
   }
@@ -18,7 +22,7 @@ function asQueryString(obj) {
 }
 
 /**
- * allows users to query api using database name, bp positions (bpMin, bpMax) and p-values (pMin, pMax)
+ * allows users to query api using phenotype id, sex, chromosome, and p-value/position ranges
  * eg: http://localhost:9000/query?database=example&bpMin=0&bpMax=1000000&pMin=0&pMax=0.0001
  * @param {*} params
  */
