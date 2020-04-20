@@ -262,13 +262,14 @@ export function Phenotypes() {
   const handleDoubleClick = (e) => {
     if (e.data.children && e.data.children.length > 0) {
       // parent
-      // const color = getColor(e.data);
-      // dispatch(updateBrowsePhenotypes({
-      //   categoryColor: color,
-      //   currentBubbleData: e.data.children,
-      //   breadCrumb: [...breadCrumb, e],
-      //   displayTreeParent: e
-      // }));
+      const color = getColor(e.data);
+      dispatch(updateBrowsePhenotypes({
+        selectedPhenotype: null,
+        categoryColor: color,
+        currentBubbleData: e.data.children,
+        breadCrumb: [...breadCrumb, e],
+        displayTreeParent: e
+      }));
     } else {
       // leaf
       handleSubmit(e.data);

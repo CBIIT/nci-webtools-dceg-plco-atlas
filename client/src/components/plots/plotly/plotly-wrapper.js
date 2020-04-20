@@ -11,6 +11,7 @@ export const PlotlyWrapper = params => {
             layout={params.layout}
             config={params.config}
             onClick={params.onClick}
+            onHover={params.onHover}
             onRelayout={params.onRelayout}
             onLegendClick={params.onLegendClick}
         />
