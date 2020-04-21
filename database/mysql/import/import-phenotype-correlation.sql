@@ -18,7 +18,7 @@ CREATE TABLE `phenotype_correlation` (
 );
 
 -- D:/Development/Work/nci-webtools-dceg-plco-atlas/database/mysql/import/raw/participant_data_category.csv
-LOAD DATA LOCAL INFILE "D:/Development/Work/nci-webtools-dceg-plco-atlas/database/mysql/import/raw/phenotype_correlation.csv" INTO TABLE phenotype_correlation
+LOAD DATA LOCAL INFILE "raw/phenotype_correlation.csv" INTO TABLE phenotype_correlation
     FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"'
     IGNORE 1 ROWS (phenotype_a, phenotype_b, value);
 
