@@ -1428,6 +1428,13 @@ SELECT
     END AS sex
 FROM participant_data_stage;
 
+-- set has_diagnosis_age flag
+UPDATE phenotype p SET has_diagnosis_age = (
+    SELECT COUNT(*) FROM information_schema.columns
+      WHERE
+        table_name = 'participant_data_stage' AND 
+        column_name = CONCAT(p.name, '_dx_age'));
+
 -- import participant_data values
 CALL insert_participant_data();
 
