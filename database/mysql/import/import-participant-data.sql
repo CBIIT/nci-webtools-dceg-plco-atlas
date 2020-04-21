@@ -491,7 +491,7 @@ CREATE TABLE `participant_data_stage` (
 
 -- load data into staging table
 -- D:/Development/Work/nci-webtools-dceg-plco-atlas/database/mysql/import/raw
-LOAD DATA LOCAL INFILE "D:/Development/Work/nci-webtools-dceg-plco-atlas/database/mysql/import/raw/participant_data.tsv" INTO TABLE participant_data_stage
+LOAD DATA LOCAL INFILE "raw/participant_data.tsv" INTO TABLE participant_data_stage
     FIELDS TERMINATED BY '\t'
     IGNORE 1 ROWS (
         plco_id,
@@ -1444,6 +1444,7 @@ SELECT
     avg(value) as average_value,
     std(value) as standard_deviation
 FROM participant_data
+GROUP BY phenotype_id
 ON DUPLICATE KEY UPDATE
     average_value = VALUES(average_value),
     standard_deviation = VALUES(standard_deviation);

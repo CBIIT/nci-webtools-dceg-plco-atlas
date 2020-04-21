@@ -213,7 +213,8 @@ async function importVariants() {
     console.log(`[${duration()} s] Inserting ${count} values into variant table...`);
 
     // batch inserts in groups of 1000000 to minimize swapping
-    for (let i = 0; i <= count; i += 1e6) {
+    let batchSize = 5000000;
+    for (let i = 0; i <= count; i += batchSize) {
         await connection.execute(`
             INSERT INTO ${variantTable} partition (${subpartition}) (
                 phenotype_id,
@@ -253,10 +254,10 @@ async function importVariants() {
                 show_qq_plot
             FROM ${stageTable}
             ORDER BY chromosome, p_value
-            LIMIT ${i}, 1000000;
+            LIMIT ${i}, ${batchSize};
         `);
 
-        console.log(`[${duration()} s] Inserted ${Math.min(i + 1e6, count)}/${count} values into variant table...`);
+        console.log(`[${duration()} s] Inserted ${Math.min(i + batchSize, count)}/${count} values into variant table...`);
     }
 
 
