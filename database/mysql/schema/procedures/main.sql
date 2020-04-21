@@ -30,31 +30,36 @@ DROP PROCEDURE IF EXISTS insert_participant_data $$
 create procedure insert_participant_data()
   BEGIN
   DECLARE done INT;
-  DECLARE phenotype_name VARCHAR(200);
-  DECLARE phenotype_name_cursor CURSOR FOR
-    SELECT column_name FROM information_schema.columns
-      WHERE TABLE_NAME = 'participant_data_stage'
-      AND column_name IN (SELECT name from phenotype WHERE type IS NOT NULL);
+  DECLARE name VARCHAR(200);
+  DECLARE has_diagnosis_age INT;
+
+  DECLARE phenotype_cursor CURSOR FOR
+    SELECT p.name, p.has_diagnosis_age
+      FROM information_schema.columns c
+      INNER JOIN phenotype p ON c.column_name = p.name
+      WHERE TABLE_NAME = 'participant_data_stage';
   DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = 1;
 
-  OPEN phenotype_name_cursor;
+  OPEN phenotype_cursor;
   SET done = 0;
   REPEAT
-    FETCH phenotype_name_cursor INTO phenotype_name;
+    FETCH phenotype_cursor INTO name, has_diagnosis_age;
     SET @sql = CONCAT('
-      INSERT INTO participant_data (`phenotype_id`, `participant_id`, `value`)
+      INSERT INTO participant_data (`phenotype_id`, `participant_id`, `value`, `diagnosis_age`)
       SELECT
-          (SELECT id FROM phenotype WHERE name = ''', phenotype_name, ''' LIMIT 1) AS phenotype_id,
+          (SELECT id FROM phenotype WHERE name = ''', name, ''' LIMIT 1) AS phenotype_id,
           id AS phenotype_sample_id,
-          `', phenotype_name, '` AS value
+          `', name, '` AS value,
+          ', (SELECT IF(1 = has_diagnosis_age, concat('`', name, '_dx_age`'), 'NULL')), ' AS diagnosis_age
       FROM participant_data_stage;
     ');
     PREPARE dynamic_statement FROM @sql;
     EXECUTE dynamic_statement;
     DEALLOCATE PREPARE dynamic_statement;
   UNTIL done END REPEAT;
-  CLOSE phenotype_name_cursor;
+  CLOSE phenotype_cursor;
 END $$
+
 
 
 DELIMITER ;
