@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { PhenotypeCorrelationsForm } from './correlations-form';
 import { Heatmap } from './heatmap-plot';
-import { Alert, Tabs, Tab, Button, Spinner } from 'react-bootstrap';
+import { Alert } from 'react-bootstrap';
 import { PhenotypeCorrelationsSearchCriteria } from './correlations-search-criteria';
 import {
   SidebarContainer,
@@ -145,7 +145,7 @@ export function PhenotypeCorrelations() {
 
       <SidebarContainer className="mx-3">
         <SidebarPanel className="col-lg-3">
-          <div className="px-2 pt-2 pb-3 bg-white border rounded-0">
+          <div className="px-2 pt-2 pb-3 bg-white tab-pane-bordered rounded-0">
             <PhenotypeCorrelationsForm
               onSubmit={handleSubmit}
               onChange={handleChange}
@@ -163,24 +163,18 @@ export function PhenotypeCorrelations() {
 
         <MainPanel className="col-lg-9">
           <PhenotypeCorrelationsSearchCriteria />
-          <Tabs
-            transition={false}
-            defaultActiveKey="phenotype-correlations">
-            <Tab
-              eventKey="phenotype-correlations"
-              // title="Heatmap"
+            <div
               className={
-                "bg-white border rounded-0 p-3 d-flex justify-content-center align-items-center"
+                "bg-white tab-pane-bordered rounded-0 p-3 d-flex justify-content-center align-items-center"
               }
-              style={{ minHeight: '404px' }}>
+              style={{ minHeight: '426px' }}>
               <div
                 className="mw-100 my-4"
                 style={{ display: submitted ? 'block' : 'none' }}>
                 <Heatmap ref={tooltipRef} />
               </div>
               {placeholder}
-            </Tab>
-          </Tabs>
+            </div>
         </MainPanel>
       </SidebarContainer>
     </div>
