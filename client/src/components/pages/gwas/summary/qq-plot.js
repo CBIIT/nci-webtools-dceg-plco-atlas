@@ -30,7 +30,7 @@ export function QQPlot({ onVariantLookup }) {
     responsive: true,
     toImageButtonOptions: {
       format: 'svg', // one of png, svg, jpeg, webp
-      filename: 'custom_image',
+      filename: 'qq_plot',
       height: 1000,
       width: 1000,
       scale: 1 // Multiply title/legend/axis/canvas sizes by this factor
