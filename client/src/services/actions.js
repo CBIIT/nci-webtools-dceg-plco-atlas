@@ -249,7 +249,7 @@ export function drawQQPlot(phenotype, sex) {
         phenotype_id: phenotype.id,
         columns: ['p_value_nlog_expected', 'p_value_nlog'],
         sex,
-        nlog_p_max: 3,
+        p_value_nlog_max: 3,
         show_qq_plot: true,
         raw: true,
       });
@@ -264,7 +264,7 @@ export function drawQQPlot(phenotype, sex) {
         phenotype_id: phenotype.id,
         columns: ['p_value_nlog_expected', 'p_value_nlog', 'chromosome', 'position', 'snp'],
         sex,
-        nlog_p_min: 3,
+        p_value_nlog_min: 3,
         raw: true,
       });
 
