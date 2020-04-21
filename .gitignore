@@ -11,3 +11,4 @@ config.json
 *.Rhistory
 *.log
 *-audit.json
+.DS_Store
