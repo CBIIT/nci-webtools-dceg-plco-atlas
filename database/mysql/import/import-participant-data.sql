@@ -25,6 +25,7 @@ CREATE TABLE IF NOT EXISTS `participant_data` (
     `phenotype_id`      INTEGER NOT NULL,
     `participant_id`    INTEGER,
     `value`             DOUBLE,
+    `diagnosis_age`     INTEGER,
     FOREIGN KEY (phenotype_id) REFERENCES phenotype(id),
     FOREIGN KEY (participant_id) REFERENCES participant(id)
 );
