@@ -709,7 +709,10 @@ export const TreeSelect = forwardRef(({
                   <i className="fa fa-times" style={{fontSize: '14px'}}></i>
                 </button>
               ) : (
-                <button className="input-group-text bg-white" disabled>
+                <button 
+                  className="input-group-text bg-white" 
+                  title="Filter tree input icon"
+                  disabled>
                   <i className="fa fa-search" style={{fontSize: '14px'}}></i>
                 </button>
               )}

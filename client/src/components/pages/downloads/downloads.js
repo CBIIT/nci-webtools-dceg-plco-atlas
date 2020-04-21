@@ -70,7 +70,7 @@ export function Downloads() {
   return (
     <SidebarContainer className="m-3">
       <SidebarPanel className="col-lg-3">
-        <div className="px-2 pt-2 pb-3 bg-white border rounded-0">
+        <div className="px-2 pt-2 pb-3 bg-white tab-pane-bordered rounded-0">
           <div className="mb-2">
             <b>Phenotypes</b>
             <span style={{ color: 'red' }}>*</span>
@@ -142,8 +142,8 @@ export function Downloads() {
         <div
           className={
             submitted ?
-            "bg-white border rounded-0 p-4" :
-            "bg-white border rounded-0 p-4 d-flex justify-content-center align-items-center"
+            "bg-white tab-pane-bordered rounded-0 p-4" :
+            "bg-white tab-pane-bordered rounded-0 p-4 d-flex justify-content-center align-items-center"
           }
           style={{ minHeight: '409px' }}>
           {!submitted && <p className="h4 text-center text-secondary my-5">Please select phenotypes to download</p>}

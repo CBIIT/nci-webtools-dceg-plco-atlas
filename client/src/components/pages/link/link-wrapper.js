@@ -91,7 +91,7 @@ export function LinkWrapper(props) {
                     {errorMessage}
                 </Alert>
             }
-            <div className="mt-3 container bg-white border rounded-0 p-4 justify-content-center align-items-center">
+            <div className="mt-3 container bg-white tab-pane-bordered rounded-0 p-4 justify-content-center align-items-center">
                 {placeholder}
             </div>
         </>
