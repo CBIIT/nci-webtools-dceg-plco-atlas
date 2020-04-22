@@ -25,6 +25,7 @@ CREATE TABLE IF NOT EXISTS `participant_data` (
     `phenotype_id`      INTEGER NOT NULL,
     `participant_id`    INTEGER,
     `value`             DOUBLE,
+    `diagnosis_age`     INTEGER,
     FOREIGN KEY (phenotype_id) REFERENCES phenotype(id),
     FOREIGN KEY (participant_id) REFERENCES participant(id)
 );
@@ -1427,6 +1428,13 @@ SELECT
       ELSE NULL
     END AS sex
 FROM participant_data_stage;
+
+-- set has_diagnosis_age flag
+UPDATE phenotype p SET has_diagnosis_age = (
+    SELECT COUNT(*) FROM information_schema.columns
+      WHERE
+        table_name = 'participant_data_stage' AND 
+        column_name = CONCAT(p.name, '_dx_age'));
 
 -- import participant_data values
 CALL insert_participant_data();

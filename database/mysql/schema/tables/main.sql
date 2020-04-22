@@ -6,6 +6,7 @@ CREATE TABLE IF NOT EXISTS `phenotype` (
     `description` MEDIUMTEXT,
     `color` VARCHAR(40),
     `type` ENUM('binary', 'categorical', 'continuous') NULL,
+    `has_diagnosis_age` BOOLEAN,
     `participant_count` BIGINT,
     `import_count` BIGINT,
     `import_date` DATETIME,
@@ -79,6 +80,7 @@ CREATE TABLE IF NOT EXISTS `participant_data` (
     `phenotype_id` INTEGER NOT NULL,
     `participant_id` INTEGER,
     `value` DOUBLE,
+    `diagnosis_age` INTEGER,
     FOREIGN KEY (phenotype_id) REFERENCES phenotype(id),
     FOREIGN KEY (participant_id) REFERENCES participant(id)
 );
