@@ -15,8 +15,23 @@ export const hoverLayout = {
   },
 }
 
+export const opaqueColors = [
+  `rgba(23, 118, 182, 1)`,
+  `rgba(255, 127, 0, 1)`,
+  `rgba(36, 162, 33, 1)`,
+  `rgba(216, 36, 31, 1)`,
+  `rgba(149, 100, 191, 1)`,
+  `rgba(141, 86, 73, 1)`,
+  `rgba(229, 116, 195, 1)`,
+  `rgba(127, 127, 127, 1)`,
+  `rgba(188, 191, 0, 1)`,
+  `rgba(0, 190, 209, 1)`,
+];
+
+
 export const colors = [
   `rgba(23, 118, 182, 0.2)`,
+  `rgba(255, 127, 0, 0.2)`,
   `rgba(36, 162, 33, 0.2)`,
   `rgba(216, 36, 31, 0.2)`,
   `rgba(149, 100, 191, 0.2)`,
@@ -34,7 +49,7 @@ const percentFormatter = (value, decimals = 2) => {
   return `${label}%`;
 }
 
-export const BarChart = ({ data, categories, xTitle, yTitle, yMax, formatPercent }) => (
+export const BarChart = ({ data, categories, xTitle, yTitle, yMax, formatPercent, categoryPrefix }) => (
 <Plot
     className="w-100 disable-x-axis-tooltip override-cursor"
     style={{ minHeight: "600px", width: "600px" }}
@@ -45,25 +60,46 @@ export const BarChart = ({ data, categories, xTitle, yTitle, yMax, formatPercent
           x.push(key);
           y.push(data[key][i]);
       }
+      // console.log(name, i, x, y);
       let plotData = {
         x,
         y,
         name,
         type: "bar",
-        fillcolor: colors[colors.length % i],
-        line: {
-          color: colors[colors.length % i]
+        marker: {
+          color: opaqueColors[i % opaqueColors.length],
         },
-        hoverinfo: i === 0 ? 'y' : 'skip',
-        hovertemplate: i === 0 ? '%{text}<extra></extra>' : null,
-        text: i > 0 ? '' : Object.entries(data).map(([key, value]) => {
-          return [
-            `<b>${xTitle}</b>: ${key}`,
-            categories.map((name, i) =>  `<b>${name}</b>: ${
-              formatPercent ? percentFormatter(value[i]) : value[i].toLocaleString()
-            }`).join('<br>')
-          ].join('<br>');
-        })
+        hoverlabel: {
+          bgcolor: '#fff',
+          bordercolor: opaqueColors[i % opaqueColors.length],
+          font: {
+            size: 14,
+            color: '#444',
+            family: systemFont
+          },
+        },
+        // hoverinfo: 'all',
+        hovertemplate: formatPercent
+          ? [
+            `<b>${categoryPrefix || ''}:</b> ${name}`,
+              `<b>Participants:</b> %{y:.3f%}%<extra></extra>`
+          ].join('<br>')
+          : [
+              `<b>${categoryPrefix || ''}:</b> ${name}`,
+              `<b>Participants:</b> %{y}<extra></extra>`
+          ].join('<br>')
+        
+
+        // hoverinfo: i === 0 ? 'y' : 'skip',
+        // hovertemplate: i === 0 ? '%{text}<extra></extra>' : null,
+        // text: i > 0 ? '' : Object.entries(data).map(([key, value]) => {
+        //   return [
+        //     `<b>${xTitle}</b>: ${key}`,
+        //     categories.map((name, i) =>  `<b>${name}</b>: ${
+        //       formatPercent ? percentFormatter(value[i]) : value[i].toLocaleString()
+        //     }`).join('<br>')
+        //   ].join('<br>');
+        // })
       };
 
       if (x.length <= 2 && categories.length <= 2) {
@@ -73,8 +109,8 @@ export const BarChart = ({ data, categories, xTitle, yTitle, yMax, formatPercent
       return plotData;
     })}
     layout={{
-      ...hoverLayout,
-      hovermode: 'x',
+      // ...hoverLayout,
+      hovermode: 'closest',
       xaxis: {
           fixedrange: true,
           automargin: true,
@@ -186,7 +222,7 @@ export const AreaChart = ({data, categories, xTitle, yTitle, formatPercent}) => 
   />
 }
 
-export const GroupedAreaChart = ({data, categories, xTitle, yTitle, fill, yMax, formatPercent}) => {
+export const GroupedAreaChart = ({data, categories, xTitle, yTitle, fill, yMax, formatPercent, categoryPrefix}) => {
   /*
   let items = categories.map((name, i) => {
     let x = [];
@@ -227,6 +263,27 @@ export const GroupedAreaChart = ({data, categories, xTitle, yTitle, fill, yMax, 
         fill: fill ? 'tozeroy' : '',
         fillcolor: colors[i],
         line: {shape: 'spline'},
+
+        hoverlabel: {
+          bgcolor: '#fff',
+          bordercolor: opaqueColors[i % opaqueColors.length],
+          font: {
+            size: 14,
+            color: '#444',
+            family: systemFont
+          },
+        },
+        // hoverinfo: 'all',
+        hovertemplate: formatPercent
+          ? [
+            `<b>${categoryPrefix || ''}:</b> ${name}`,
+              `<b>Participants:</b> %{y:.3f%}%<extra></extra>`
+          ].join('<br>')
+          : [
+              `<b>${categoryPrefix || ''}:</b> ${name}`,
+              `<b>Participants:</b> %{y}<extra></extra>`
+          ].join('<br>'),        
+        /*
         hoverinfo: i === 0 ? 'y' : 'skip',
         hovertemplate: i === 0 ? '%{text}<extra></extra>' : null,
         text: i > 0 ? '' : Object.entries(data).map(([key, value]) => {
@@ -237,13 +294,14 @@ export const GroupedAreaChart = ({data, categories, xTitle, yTitle, fill, yMax, 
             }`).join('<br>')
           ].join('<br>');
         })
+        */
       };
 
       return plotData;
     })}
     layout={{
-      ...hoverLayout,
-      hovermode: 'x',
+      // ...hoverLayout,
+      hovermode: 'closest',
       xaxis: {
           fixedrange: true,
           automargin: true,
