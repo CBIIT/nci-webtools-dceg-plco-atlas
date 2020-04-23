@@ -242,6 +242,7 @@ export function PhenotypesTabs() {
                 {((/continuous/.test(phenotypeData.type) || (/binary/.test(phenotypeData.type) && t.key === 'frequencyByAge')) ? GroupedAreaChart : BarChart)({
                     data: phenotypeData[t.key][frequencyType[t.key]],
                     categoryPrefix: t.key.match(/frequencyBy(Age|Sex|Ancestry)/)[1],
+                    type: phenotypeData.type,
                     categories: (phenotypeData.type === 'binary')
                       ? phenotypeData.distributionCategories
                       : phenotypeData.categoryTypes[t.key],

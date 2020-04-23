@@ -49,7 +49,7 @@ const percentFormatter = (value, decimals = 2) => {
   return `${label}%`;
 }
 
-export const BarChart = ({ data, categories, xTitle, yTitle, yMax, formatPercent, categoryPrefix }) => (
+export const BarChart = ({ data, categories, xTitle, yTitle, yMax, formatPercent, categoryPrefix, type }) => (
 <Plot
     className="w-100 disable-x-axis-tooltip override-cursor"
     style={{ minHeight: "600px", width: "600px" }}
@@ -81,11 +81,13 @@ export const BarChart = ({ data, categories, xTitle, yTitle, yMax, formatPercent
         // hoverinfo: 'all',
         hovertemplate: formatPercent
           ? [
-            `<b>${categoryPrefix || ''}:</b> ${name}`,
+              type === 'binary' ? `` : `<b>${categoryPrefix || ''}:</b> ${name}`,
+              `<b>${type === 'binary' ? categoryPrefix : xTitle}:</b> %{x}`,
               `<b>Participants:</b> %{y:.3f%}%<extra></extra>`
           ].join('<br>')
           : [
-              `<b>${categoryPrefix || ''}:</b> ${name}`,
+              type === 'binary' ? `` :`<b>${categoryPrefix || ''}:</b> ${name}`,
+              `<b>${type === 'binary' ? categoryPrefix : xTitle}:</b> %{x}`,
               `<b>Participants:</b> %{y}<extra></extra>`
           ].join('<br>')
         
@@ -222,7 +224,7 @@ export const AreaChart = ({data, categories, xTitle, yTitle, formatPercent}) => 
   />
 }
 
-export const GroupedAreaChart = ({data, categories, xTitle, yTitle, fill, yMax, formatPercent, categoryPrefix}) => {
+export const GroupedAreaChart = ({data, categories, xTitle, yTitle, fill, yMax, formatPercent, categoryPrefix, type}) => {
   /*
   let items = categories.map((name, i) => {
     let x = [];
@@ -276,12 +278,16 @@ export const GroupedAreaChart = ({data, categories, xTitle, yTitle, fill, yMax, 
         // hoverinfo: 'all',
         hovertemplate: formatPercent
           ? [
-            `<b>${categoryPrefix || ''}:</b> ${name}`,
-              `<b>Participants:</b> %{y:.3f%}%<extra></extra>`
+            type === 'binary' ? `` : `<b>${categoryPrefix || ''}:</b> ${name}`,
+            `<b>${type === 'binary' ? categoryPrefix : xTitle}:</b> %{x}`,
+            `<b>Participants:</b> %{y:.3f%}%<extra></extra>`
           ].join('<br>')
           : [
-              `<b>${categoryPrefix || ''}:</b> ${name}`,
-              `<b>Participants:</b> %{y}<extra></extra>`
+            type === 'binary' 
+              ? `` 
+              : `<b>${categoryPrefix || ''}:</b> ${name}`,
+            `<b>${type === 'binary' ? categoryPrefix : xTitle}:</b> %{x}`,
+            `<b>Participants:</b> %{y}<extra></extra>`
           ].join('<br>'),        
         /*
         hoverinfo: i === 0 ? 'y' : 'skip',
