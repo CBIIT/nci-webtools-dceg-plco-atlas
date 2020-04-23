@@ -17,7 +17,8 @@ $enable-shadows: true;
 /** Default Overrides **/
 
 a {
-  color: rgb(0, 140, 186);
+  //color: rgb(0, 140, 186);
+  color: rgb(0, 126, 167);
   text-decoration: none;
 }
 
@@ -113,7 +114,8 @@ a:hover, a:focus {
 }
 
 .btn.btn-link {
-  color: rgb(0, 140, 186);
+  // color: rgb(0, 140, 186);
+  color: rgb(0, 126, 167);
 }
 
 .btn.btn-link:active,
@@ -201,7 +203,11 @@ a:hover, a:focus {
 
 /** Common **/
 
-.tab-pane.tab-pane-bordered {
+.tab-pane {
+  border: 1px solid #dee2e6;
+}
+
+.tab-pane-bordered {
   border: 1px solid #dee2e6;
 }
 
