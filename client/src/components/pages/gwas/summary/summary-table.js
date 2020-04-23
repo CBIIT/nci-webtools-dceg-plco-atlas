@@ -191,6 +191,7 @@ export function SummaryResultsTable() {
             placeholder="Search for a SNP"
             value={summarySnpTables.snp}
             onChange={e => setSnp(e.target.value)}
+            aria-label="Filter SNP"
           />
           <button
             className="btn btn-sm btn-silver flex-shrink-auto d-flex"

@@ -316,7 +316,7 @@ export function VariantLookup() {
                             all: 'unset',
                             textDecoration: 'underline',
                             cursor: 'pointer',
-                            color: '#008CBA'
+                            color: 'rgb(0, 126, 167)'
                           }}
                           {...props.csvProps}>
                           Export CSV
