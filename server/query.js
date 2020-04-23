@@ -459,7 +459,7 @@ async function getPhenotype(connectionPool, params) {
 
     // retrieve the specified phenotype
     const [phenotypeRows] = await connection.execute(
-        `SELECT id, name, display_name as displayName, description, type
+        `SELECT id, name, display_name as displayName, description, type, has_diagnosis_age as hasDiagnosisAge
         FROM phenotype
         WHERE id = :id`,
         {id}
@@ -477,7 +477,6 @@ async function getPhenotype(connectionPool, params) {
         {id}
     );
     const metadata = metadataRows[0];
-
 
     if (!metadata) return 'no metadata';
 
@@ -548,28 +547,39 @@ async function getPhenotype(connectionPool, params) {
                 [curr[key]]: [...(obj[curr[key]] || []), +curr[value]]
             }));
 
-            let binaryDistributionSql = `
-                WITH
-                participant_selection AS (
-                    SELECT p.${key} AS \`key\`
+            let keyAlias = (key === 'age' && phenotype.hasDiagnosisAge)
+                ? `pd.diagnosis_age`
+                : `p.${key}`
+
+            let selectParticipants = 
+                `SELECT ${keyAlias} AS \`key\`
                     FROM participant_data pd
-                    JOIN participant p ON p.id = pd.participant_id
+                    INNER JOIN participant p ON p.id = pd.participant_id
                     WHERE
                         pd.phenotype_id = :id AND
                         pd.value = 1 AND
-                        p.${key} IS NOT NULL AND
-                        p.age >= 55
-                ),
-                participant_count AS (
-                    SELECT ${key}, COUNT(*) AS total
-                    FROM participant
-                    WHERE ${key} IS NOT NULL
-                    GROUP BY ${key}
-                )
+                        ${keyAlias} IS NOT NULL AND
+                        p.age >= 55`;
+
+            let selectParticipantCount = (key === 'age' && phenotype.hasDiagnosisAge)
+                ? `select pd.diagnosis_age as value, count(*) as total
+                    from participant_data pd
+                    where phenotype_id = :id
+                    group by pd.diagnosis_age`
+                : `SELECT p.${key} as value, COUNT(*) AS total
+                    FROM participant p 
+                    WHERE p.${key} IS NOT NULL
+                    GROUP BY p.${key}`;
+            
+
+            let binaryDistributionSql = `
+                WITH
+                participant_selection AS (${selectParticipants}),
+                participant_count AS (${selectParticipantCount})
                 SELECT
                     \`key\`,
                     count(*) AS counts,
-                    100 * count(*) / (SELECT total FROM participant_count pc WHERE pc.${key} = \`key\`) AS percentage
+                    100 * count(*) / (SELECT total FROM participant_count pc WHERE pc.value = \`key\`) AS percentage
                 FROM participant_selection p
                 GROUP BY \`key\`
                 ORDER BY \`key\`
@@ -683,28 +693,46 @@ async function getPhenotype(connectionPool, params) {
                 frequencyByAncestry: 'ancestry',
             }[type];
 
-            // determine which query to use to fetch distribution counts and percentages
-            let distributionSql = key === 'age'
-                ? `WITH participant_age AS (
-                        SELECT
-                            CASE
-                                WHEN p.age between 55 and 59 then '55-59'
-                                WHEN p.age BETWEEN 60 AND 64 THEN '60-64'
-                                WHEN p.age BETWEEN 65 AND 69 THEN '65-69'
-                                WHEN p.age BETWEEN 70 AND 74 THEN '70-74'
-                                WHEN p.age BETWEEN 75 AND 79 THEN '75-79'
-                            END AS \`age_range\`,
-                            COUNT(*) AS \`count\`
-                        FROM participant p
-                        WHERE p.age BETWEEN 55 AND 79
-                        GROUP BY \`age_range\`
-                    ) SELECT
+            // determine if we should use diagnosis age or age at time of survey
+            let ageKeyAlias = phenotype.hasDiagnosisAge ? `pd.diagnosis_age` : `p.age`
+
+            let selectAgeDistribution = phenotype.hasDiagnosisAge
+                ? `SELECT
+                        CASE
+                            WHEN pd.diagnosis_age between 55 and 59 then '55-59'
+                            WHEN pd.diagnosis_age BETWEEN 60 AND 64 THEN '60-64'
+                            WHEN pd.diagnosis_age BETWEEN 65 AND 69 THEN '65-69'
+                            WHEN pd.diagnosis_age BETWEEN 70 AND 74 THEN '70-74'
+                            WHEN pd.diagnosis_age BETWEEN 75 AND 79 THEN '75-79'
+                        END AS \`age_range\`,
+                        COUNT(*) AS \`count\`
+                    FROM participant_data pd
+                    WHERE pd.diagnosis_age BETWEEN 55 AND 79
+                    AND pd.phenotype_id = ${id}
+                    GROUP BY \`age_range\``
+                : `SELECT
                         CASE
                             WHEN p.age between 55 and 59 then '55-59'
                             WHEN p.age BETWEEN 60 AND 64 THEN '60-64'
                             WHEN p.age BETWEEN 65 AND 69 THEN '65-69'
                             WHEN p.age BETWEEN 70 AND 74 THEN '70-74'
                             WHEN p.age BETWEEN 75 AND 79 THEN '75-79'
+                        END AS \`age_range\`,
+                        COUNT(*) AS \`count\`
+                    FROM participant p
+                    WHERE p.age BETWEEN 55 AND 79
+                    GROUP BY \`age_range\``;
+
+            // determine which query to use to fetch distribution counts and percentages
+            let distributionSql = key === 'age'
+                ? `WITH participant_age AS (${selectAgeDistribution}) 
+                    SELECT
+                        CASE
+                            WHEN ${ageKeyAlias} between 55 and 59 then '55-59'
+                            WHEN ${ageKeyAlias} BETWEEN 60 AND 64 THEN '60-64'
+                            WHEN ${ageKeyAlias} BETWEEN 65 AND 69 THEN '65-69'
+                            WHEN ${ageKeyAlias} BETWEEN 70 AND 74 THEN '70-74'
+                            WHEN ${ageKeyAlias} BETWEEN 75 AND 79 THEN '75-79'
                         END AS \`key\`,
                         FLOOR(pd.value) AS \`group\`,
                         COUNT(*) AS \`counts\`,
