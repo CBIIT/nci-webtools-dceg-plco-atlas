@@ -56,7 +56,7 @@ export const VariantLookupSearchCriteria = () => {
                 className="p-0"
                 title="Expand/collapse search criteria panel"
                 style={{
-                  color: searchCriteriaVariantLookup ? '#008CBA' : ''
+                  color: searchCriteriaVariantLookup ? 'rgb(0, 126, 167)' : ''
                 }}
                 variant="link"
                 onClick={e => toggleCollapseCriteria()}
@@ -95,7 +95,7 @@ export const VariantLookupSearchCriteria = () => {
                       onClick={e => toggleCollapseCriteria()}
                       aria-controls="search-criteria-collapse-panel"
                       aria-expanded={!collapseCriteria}>
-                      <span style={{ color: '#008CBA' }}>
+                      <span style={{ color: 'rgb(0, 126, 167)' }}>
                         {searchCriteriaVariantLookup &&
                         searchCriteriaVariantLookup.phenotypes &&
                         searchCriteriaVariantLookup.phenotypes.length > 1

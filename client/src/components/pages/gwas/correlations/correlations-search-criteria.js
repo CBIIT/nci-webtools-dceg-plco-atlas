@@ -60,7 +60,7 @@ export const PhenotypeCorrelationsSearchCriteria = () => {
                     searchCriteriaPhenotypeCorrelations && 
                     searchCriteriaPhenotypeCorrelations.phenotypes && 
                     searchCriteriaPhenotypeCorrelations.phenotypes.length > 1
-                    ? '#008CBA'
+                    ? 'rgb(0, 126, 167)'
                     : ''
                 }}
                 title="Expand/collapse search criteria panel"
@@ -105,7 +105,7 @@ export const PhenotypeCorrelationsSearchCriteria = () => {
                       onClick={e => toggleCollapseCriteria()}
                       aria-controls="search-criteria-collapse-panel"
                       aria-expanded={!collapseCriteria}>
-                      <span style={{ color: '#008CBA' }}>
+                      <span style={{ color: 'rgb(0, 126, 167)' }}>
                         {searchCriteriaPhenotypeCorrelations &&
                         searchCriteriaPhenotypeCorrelations.phenotypes
                           ? searchCriteriaPhenotypeCorrelations.phenotypes
