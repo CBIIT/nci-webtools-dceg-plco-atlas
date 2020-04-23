@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Alert, Tab, Tabs, Button } from 'react-bootstrap';
+import { Alert, Tab, Tabs } from 'react-bootstrap';
 import { SummaryResultsForm } from './summary-form';
 import { ManhattanPlot } from './manhattan-plot';
 import { QQPlot } from './qq-plot';
@@ -442,7 +442,7 @@ export function SummaryResults() {
         collapsed={!openSidebar}
         onCollapsed={collapsed => setOpenSidebar(!collapsed)}>
         <SidebarPanel className="col-lg-3">
-          <div className="px-2 pt-2 pb-3 bg-white border rounded-0">
+          <div className="px-2 pt-2 pb-3 bg-white tab-pane-bordered rounded-0">
             <SummaryResultsForm
               phenotype={selectedPhenotype}
               sex={selectedSex}
@@ -474,7 +474,7 @@ export function SummaryResults() {
                 "p-2 bg-white tab-pane-bordered rounded-0 d-flex justify-content-center align-items-center" :
                 "p-2 bg-white tab-pane-bordered rounded-0"
               }
-              style={{ minHeight: '366px' }}>
+              style={{ minHeight: '365px' }}>
               <div>
                 <ManhattanPlot
                   onChromosomeSelected={onChromosomeSelected}
@@ -500,7 +500,7 @@ export function SummaryResults() {
                 "p-2 bg-white tab-pane-bordered rounded-0 d-flex justify-content-center align-items-center" :
                 "p-2 bg-white tab-pane-bordered rounded-0"
               }
-              style={{ minHeight: '366px' }}>
+              style={{ minHeight: '365px' }}>
               <div
                 className="mw-100 my-4"
                 style={{ display: submitted ? 'block' : 'none' }}>

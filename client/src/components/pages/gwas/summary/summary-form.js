@@ -50,7 +50,7 @@ export function SummaryResultsForm({
           className="form-control"
           value={_sex}
           onChange={e => _setSex(e.target.value)}
-          aria-label="Select the type of data you wish to plot"
+          aria-label="Select sex"
           disabled={submitted}>
           <option value="all">All</option>
           <option value="stacked">Female/Male (Stacked)</option>
