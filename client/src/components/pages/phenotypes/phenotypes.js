@@ -138,7 +138,7 @@ export function Phenotypes() {
   // when submitting:
   // 1. Fetch aggregate data for displaying manhattan plot(s)
   // 2. Fetch variant data for each selected sex
-  const handleSubmit = async (phenotype) => {
+  const handleSubmit = async (phenotype, preserveTab) => {
     if (!phenotype) {
       return setMessages([
         {
@@ -161,6 +161,10 @@ export function Phenotypes() {
       })
     );
 
+    let plot = preserveTab
+      ? selectedPlot
+      : 'frequency'
+
     const data = await query('phenotype', {
       id: phenotype.id,
       type: {
@@ -168,7 +172,7 @@ export function Phenotypes() {
         'distribution': 'distribution',
         'distribution-inverted': 'distributionInverted',
         'related-phenotypes': 'related',
-      }[selectedPlot] || 'all'
+      }[plot] || 'all'
     });
 
     dispatch(
@@ -182,6 +186,7 @@ export function Phenotypes() {
     dispatch(
       updateBrowsePhenotypes({
         selectedPhenotype: phenotype,
+        selectedPlot: plot,
         submitted: new Date(),
       })
     );
@@ -326,7 +331,7 @@ export function Phenotypes() {
       <MainPanel className="col-lg-9">
         <PhenotypesSearchCriteria />
         {submitted
-          ? <PhenotypesTabs />
+          ? <PhenotypesTabs onSubmit={handleSubmit} />
           : <div
               className={
                 phenotypes ?

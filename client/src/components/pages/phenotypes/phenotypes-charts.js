@@ -361,7 +361,7 @@ export const PieChart = ({ data, categories }) => (
   />
 );
 
-export function PhenotypesRelated({relatedData}) {
+export function PhenotypesRelated({relatedData, onClick}) {
   relatedData = relatedData.sort((a, b) => b.correlation - a.correlation);
 
   const data = [
@@ -370,36 +370,44 @@ export function PhenotypesRelated({relatedData}) {
       y: relatedData.map(e => e.correlation),
       text: relatedData.map(e =>
         [
-          e.display_name,
-          `Correlation: <b>${e.correlation}</b>`,
-          `Sample Size: <b>${e.participant_count.toLocaleString()}</b>`
+          `<b>${e.display_name}</b>`,
+          `<b>Correlation:</b> ${(+e.correlation || 0).toPrecision(5)}`,
+          `<b>Sample Size:</b> ${e.participant_count.toLocaleString()}`
         ].join("<br>")
       ),
+      customdata: relatedData,
       hoverinfo: "text",
       mode: "markers",
       marker: {
         size: relatedData.map(e => 10 * Math.log(e.participant_count)),
-        color: [
-          "rgb(93, 164, 214)",
-          "rgb(255, 144, 14)",
-          "rgb(44, 160, 101)",
-          "rgb(255, 65, 54)"
-        ]
-      }
+        color: opaqueColors
+      },
+      hoverlabel: {
+        bgcolor: "#fff",
+        bordercolor: opaqueColors,
+        font: {
+          size: 14,
+          color: '#212529',
+          family: systemFont
+        },
+      },
     }
   ];
 
   const layout = {
-    ...hoverLayout,
+    // ...hoverLayout,
     // title: `Phenotypes Related to ${selectedPhenotype.title}`,
     showlegend: false,
     xaxis: {
       showticklabels: false,
-      zeroline: true
+      zeroline: true,
+      fixedrange: true,
+      automargin: true,
     },
     yaxis: {
       title: "Correlation",
       showline: true,
+      fixedrange: true,
     },
     autosize: true
   };
@@ -411,6 +419,7 @@ export function PhenotypesRelated({relatedData}) {
 
   return (
     <Plot
+      onClick={onClick}
       style={{ width: "100%", height: "600px" }}
       data={data}
       layout={layout}
