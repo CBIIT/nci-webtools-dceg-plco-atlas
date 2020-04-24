@@ -75,7 +75,8 @@ export function VariantLookupForm({ onChange, onSubmit, onReset }) {
           className="form-control"
           value={selectedSex}
           onChange={e => setSelectedSex(e.target.value)}
-          disabled={submitted}>
+          disabled={submitted}
+          aria-label="Select sex">
           <option value="all">All</option>
           <option value="female">Female</option>
           <option value="male">Male</option>

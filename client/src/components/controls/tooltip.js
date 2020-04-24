@@ -16,6 +16,7 @@ export const Tooltip = props => {
         transition: 'all 0.05s',
         backgroundColor: 'white',
         zIndex: 9999,
+        opacity: 0.9,
         ...props.style
     };
 

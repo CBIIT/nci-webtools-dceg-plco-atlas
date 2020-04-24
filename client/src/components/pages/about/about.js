@@ -2,7 +2,7 @@ import React from 'react';
 
 export function About() {
   return (
-    <div className="mt-3 container bg-white border rounded-0 p-4">
+    <div className="mt-3 container bg-white tab-pane-bordered rounded-0 p-4">
       <h1 className="font-weight-light">About PLCO Atlas</h1>
       <hr />
 
