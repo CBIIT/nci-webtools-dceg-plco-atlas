@@ -562,10 +562,10 @@ async function getPhenotype(connectionPool, params) {
                         p.age >= 55`;
 
             let selectParticipantCount = (key === 'age' && phenotype.hasDiagnosisAge)
-                ? `select pd.diagnosis_age as value, count(*) as total
+                ? `select count(*) as total
                     from participant_data pd
                     where phenotype_id = :id
-                    group by pd.diagnosis_age`
+                    and pd.value = 1`
                 : `SELECT p.${key} as value, COUNT(*) AS total
                     FROM participant p 
                     WHERE p.${key} IS NOT NULL
@@ -579,7 +579,10 @@ async function getPhenotype(connectionPool, params) {
                 SELECT
                     \`key\`,
                     count(*) AS counts,
-                    100 * count(*) / (SELECT total FROM participant_count pc WHERE pc.value = \`key\`) AS percentage
+                    100 * count(*) / (SELECT total FROM participant_count pc ${
+                        (key === 'age' && phenotype.hasDiagnosisAge) ? '' : 
+                        'WHERE pc.value = `key`'
+                    }) AS percentage
                 FROM participant_selection p
                 GROUP BY \`key\`
                 ORDER BY \`key\`
