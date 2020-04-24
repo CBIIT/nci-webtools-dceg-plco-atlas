@@ -308,7 +308,7 @@ export function Phenotypes() {
       collapsed={!openSidebar}
       onCollapsed={collapsed => setOpenSidebar(!collapsed)}>
       <SidebarPanel className="col-lg-3">
-        <div className="px-2 pt-2 pb-3 bg-white border rounded-0">
+        <div className="px-2 pt-2 pb-3 bg-white tab-pane-bordered rounded-0">
           <PhenotypesForm
             onChange={handleChange}
             onSubmit={handleSubmit}
@@ -330,8 +330,8 @@ export function Phenotypes() {
           : <div
               className={
                 phenotypes ?
-                "bg-white border rounded-0 p-3" :
-                "bg-white border rounded-0 p-3 d-flex justify-content-center align-items-center"
+                "bg-white tab-pane-bordered rounded-0 p-3" :
+                "bg-white tab-pane-bordered rounded-0 p-3 d-flex justify-content-center align-items-center"
               }
               style={{
                 position: 'static',

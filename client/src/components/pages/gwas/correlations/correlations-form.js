@@ -48,7 +48,8 @@ export function PhenotypeCorrelationsForm({ onChange, onSubmit, onReset }) {
           className="form-control"
           value={selectedSex}
           onChange={e => setSelectedSex(e.target.value)}
-          disabled={submitted}>
+          disabled={submitted}
+          aria-label="Select sex">
           <option value="combined">All</option>
           <option value="female">Female</option>
           <option value="male">Male</option>

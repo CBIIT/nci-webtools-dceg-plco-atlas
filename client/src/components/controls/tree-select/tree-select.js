@@ -376,83 +376,82 @@ export const TreeSelect = forwardRef(({
       if (item.children && item.children.length > 0) {
         return (
           // PARENT
-          <div key={'categorical-parent-' + item.id}>
-            <li className="my-1" style={{ display: 'block' }}>
-              <div className="d-flex align-items-center">
-                <button
-                  title={"Show/hide " + item.title + " phenotypes"}
-                  style={{ all: 'unset' }}
-                  className="collapse-button text-secondary"
-                  onClick={e => toggleHideChildren(item.id)}
-                  // disabled={submitted}
-                  >
-                  <i className={"fa fa-plus-square collapse-button-text-" + item.id}></i>
-                </button>
+          <li className="my-1" style={{ display: 'block' }}>
+            <div className="d-flex align-items-center">
+              <button
+                title={"Show/hide " + item.title + " phenotypes"}
+                style={{ all: 'unset' }}
+                className="collapse-button text-secondary"
+                onClick={e => toggleHideChildren(item.id)}
+                // disabled={submitted}
+                >
+                <i className={"fa fa-plus-square collapse-button-text-" + item.id}></i>
+              </button>
 
-                <div
-                  className="mx-1"
-                  style={{
-                    display: 'inline-block',
-                    borderLeft: '1px solid white',
-                    height: '10px'
-                  }}
-                />
+              <div
+                className="mx-1"
+                style={{
+                  display: 'inline-block',
+                  borderLeft: '1px solid white',
+                  height: '10px'
+                }}
+              />
 
-                <input
-                  title={
-                    singleSelect
-                      ? 'Only one phenotype can be selected'
-                      : 'Select/deselect all ' + item.title + ' phenotypes'
-                  }
-                  style={{
-                    verticalAlign: 'middle',
-                    alignSelf: 'center',
-                    cursor: submitted || singleSelect ? 'not-allowed' : 'pointer'
-                  }}
-                  className={'parent-checkbox-' + item.id}
-                  name={'parent-checkbox-' + item.id}
-                  type="checkbox"
-                  // checked={ !singleSelect && value && value.length > 0 && containsAllVals(getAllLeafs(item), value)}
-                  checked={checkParents(item)}
-                  onChange={e => handleSelect(item)}
-                  disabled={submitted || singleSelect ? true : false}
-                />
+              <input
+                title={
+                  singleSelect
+                    ? 'Unable to select all ' + item.title + ' phenotypes\nOnly one phenotype can be selected'
+                    : 'Select/deselect all ' + item.title + ' phenotypes'
+                }
+                style={{
+                  verticalAlign: 'middle',
+                  alignSelf: 'center',
+                  cursor: submitted || singleSelect ? 'not-allowed' : 'pointer'
+                }}
+                className={'parent-checkbox-' + item.id}
+                // name={'parent-checkbox-' + item.id}
+                type="checkbox"
+                aria-label="Checkbox"
+                // checked={ !singleSelect && value && value.length > 0 && containsAllVals(getAllLeafs(item), value)}
+                checked={checkParents(item)}
+                onChange={e => handleSelect(item)}
+                disabled={submitted || singleSelect ? true : false}
+              />
 
-                <div
-                  className="ml-1"
-                  style={{
-                    display: 'inline-block',
-                    borderLeft: '1px solid white',
-                    height: '10px'
-                  }}
-                />
+              <div
+                className="ml-1"
+                style={{
+                  display: 'inline-block',
+                  borderLeft: '1px solid white',
+                  height: '10px'
+                }}
+              />
 
-                <button
-                  title={singleSelect? "Show/hide " + item.title + " phenotypes" : 'Select/deselect all ' + item.title + ' phenotypes'}
-                  className="ml-1"
-                  style={{
-                    all: 'unset',
-                    cursor: submitted ? 'not-allowed' : 'pointer',
-                    // cursor: singleSelect ? 'not-allowed' : 'pointer',
-                    textOverflow: 'ellipsis',
-                    whiteSpace: 'nowrap',
-                    overflow: 'hidden'
-                  }}
-                  onClick={e => singleSelect ? toggleHideChildren(item.id) : handleSelect(item)}
-                  // disabled={singleSelect}
-                  disabled={submitted}
-                  >
-                  {item.title}
-                </button>
-              </div>
+              <button
+                title={singleSelect? "Show/hide " + item.title + " phenotypes" : 'Select/deselect all ' + item.title + ' phenotypes'}
+                className="ml-1"
+                style={{
+                  all: 'unset',
+                  cursor: submitted ? 'not-allowed' : 'pointer',
+                  // cursor: singleSelect ? 'not-allowed' : 'pointer',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden'
+                }}
+                onClick={e => singleSelect ? toggleHideChildren(item.id) : handleSelect(item)}
+                // disabled={singleSelect}
+                disabled={submitted}
+                >
+                {item.title}
+              </button>
+            </div>
 
-              <ul
-                className={'ml-3 pl-1 children-of-' + item.id}
-                style={{ listStyleType: 'none', display: 'none' }}>
-                {selectTreeCategorical(item.children)}
-              </ul>
-            </li>
-          </div>
+            <ul
+              className={'ml-3 pl-1 children-of-' + item.id}
+              style={{ listStyleType: 'none', display: 'none' }}>
+              {selectTreeCategorical(item.children)}
+            </ul>
+          </li>
         );
       } else {
         return (
@@ -473,11 +472,12 @@ export const TreeSelect = forwardRef(({
               }}
             />
             <input
-              title={singleSelect ? "Select phenotype" : "Select/deselect phenotype"}
+              title={singleSelect ? "Select " + item.title + " phenotype" : "Select/deselect " + item.title + " phenotype"}
               style={{ cursor: submitted ? 'not-allowed' : 'pointer' }}
               className={'ml-1 leaf-checkbox-' + item.id}
-              name={'leaf-checkbox-' + item.id}
+              // name={'leaf-checkbox-' + item.id}
               type="checkbox"
+              aria-label="Checkbox"
               // type={singleSelect ? 'radio' : 'checkbox'}
               checked={
                 (singleSelect && value && value.id === item.id) ||
@@ -539,11 +539,12 @@ export const TreeSelect = forwardRef(({
             overflow: 'hidden'
           }}>
           <input
-            title="Select phenotype"
+            title={"Select " + item.title + " phenotype"}
             style={{ cursor: 'pointer' }}
             className={'ml-0 leaf-checkbox-' + item.id}
-            name={'leaf-checkbox-' + item.id}
+            // name={'leaf-checkbox-' + item.id}
             type="checkbox"
+            aria-label="Checkbox"
             checked={
               (singleSelect && value && value.id === item.id) ||
               (!singleSelect &&
@@ -661,8 +662,9 @@ export const TreeSelect = forwardRef(({
             title={singleSelect ? 'Only one phenotype can be selected' : 'Select/deselect all'}
             style={{ cursor: singleSelect || !data ? 'not-allowed' : 'pointer' }}
             className={listType === 'alphabetical' ? 'ml-1' : ''}
-            name=""
+            // name=""
             type="checkbox"
+            aria-label="Checkbox"
             disabled={submitted || singleSelect || !data ? true : false}
             checked={!singleSelect && checkAllLeafsSelected()}
             onChange={e => !singleSelect && selectAll()}
@@ -709,7 +711,10 @@ export const TreeSelect = forwardRef(({
                   <i className="fa fa-times" style={{fontSize: '14px'}}></i>
                 </button>
               ) : (
-                <button className="input-group-text bg-white" disabled>
+                <button 
+                  className="input-group-text bg-white" 
+                  title="Filter tree input icon"
+                  disabled>
                   <i className="fa fa-search" style={{fontSize: '14px'}}></i>
                 </button>
               )}
@@ -732,30 +737,41 @@ export const TreeSelect = forwardRef(({
             }
           </div>
         }
-
-        <ul
-          className="pl-0 ml-1 mr-0 my-0"
-          style={{
-            display: data ? 'block' : 'none',
-            listStyleType: 'none',
-            textOverflow: 'ellipsis',
-            overflowY: 'auto',
-            overflowX: 'hidden',
-            whiteSpace: 'nowrap',
-            minHeight: '250px',
-            maxHeight: '500px',
-            fontSize: '10pt'
-          }}>
-          <span
-            style={{ display: listType === 'categorical' ? 'block' : 'none' }}>
-            {data && selectTreeCategorical(data.tree)}
-          </span>
-          <span
-            style={{ display: listType === 'categorical' ? 'none' : 'block' }}>
-            {data && selectTreeAlphabetical()}
-          </span>
-          
-        </ul>
+        { data &&
+          <>
+            <ul
+              className="pl-0 ml-1 mr-0 my-0"
+              style={{
+                display: data && listType === 'categorical' ? 'block' : 'none',
+                listStyleType: 'none',
+                textOverflow: 'ellipsis',
+                overflowY: 'auto',
+                overflowX: 'hidden',
+                whiteSpace: 'nowrap',
+                minHeight: '250px',
+                maxHeight: '500px',
+                fontSize: '10pt'
+              }}>
+                {selectTreeCategorical(data.tree)}
+            </ul>
+            <ul
+              className="pl-0 ml-1 mr-0 my-0"
+              style={{
+                display: data && listType === 'alphabetical' ? 'block' : 'none',
+                listStyleType: 'none',
+                textOverflow: 'ellipsis',
+                overflowY: 'auto',
+                overflowX: 'hidden',
+                whiteSpace: 'nowrap',
+                minHeight: '250px',
+                maxHeight: '500px',
+                fontSize: '10pt'
+              }}>
+                {selectTreeAlphabetical()}
+            </ul>
+          </>
+        }
+        
       </div>
     </>
   );

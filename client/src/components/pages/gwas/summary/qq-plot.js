@@ -97,7 +97,14 @@ export function QQPlot({ onVariantLookup }) {
         x={tooltip.x} 
         y={tooltip.y} 
         onClose={e => updateTooltip({visible: false})}
-        style={{width: '240px'}}
+        style={{
+          width: '240px', 
+          border: `1px solid ${{
+            all: '#f2990d',
+            female: '#f41c52',
+            male: '#006bb8'
+          }[tooltip.data.sex] || '#ddd'}`
+        }}
         className="text-left">
         {(!tooltip.data || (tooltip.data && -Math.log10(tooltip.data.p) < 3))
           ? <div>No information displayed for variants with -log<sub>10</sub>(p) &lt; 3.</div> 

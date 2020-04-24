@@ -94,6 +94,7 @@ export function Home({ links }) {
                     exact={exact}
                     key={index}
                     to={route}>
+                    <span className="sr-only">{title + ' link'}</span>
                     <div
                       className="bg-primary rounded-circle"
                       style={{ marginTop: '-40px', padding: '10px' }}>
@@ -102,9 +103,9 @@ export function Home({ links }) {
                   </Link>
                   <Card.Body>
                     <Card.Title style={{ color: '#545871', wordSpacing: '100vw' }}>
-                      <h3>
+                      <h2 style={{fontSize: '1.75rem'}}>
                         <b>{cardTitle}</b>
-                      </h3>
+                      </h2>
                     </Card.Title>
                     <Card.Text className="text-secondary">
                       <small>
