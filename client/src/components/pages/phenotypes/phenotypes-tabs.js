@@ -11,7 +11,7 @@ import paginationFactory from 'react-bootstrap-table2-paginator';
 import { Table, paginationSizeSelector, paginationText, paginationButton } from '../../controls/table/table';
 
 
-export function PhenotypesTabs() {
+export function PhenotypesTabs(props) {
   const dispatch = useDispatch();
   const {
     selectedPhenotype,
@@ -23,6 +23,7 @@ export function PhenotypesTabs() {
     phenotypeData,
     loading
   } = useSelector(state => state.browsePhenotypesPlots);
+  const phenotypes = useSelector(state => state.phenotypes);
 
   const [frequencyType, setFrequencyType] = useState({
     frequencyByAge: 'counts',
@@ -268,7 +269,15 @@ export function PhenotypesTabs() {
           className="p-4 bg-white tab-pane-bordered rounded-0"
           style={{ minHeight: '50vh' }}>
           {!loading && selectedPlot === 'related-phenotypes' && phenotypeData && phenotypeData.relatedPhenotypes && 
-            <PhenotypesRelated relatedData={phenotypeData.relatedPhenotypes}
+            <PhenotypesRelated 
+                  relatedData={phenotypeData.relatedPhenotypes}
+                  onClick={e => {
+                    if (props.onSubmit) {
+                      let id = e.points[0].customdata.phenotype_id;
+                      let phenotype = phenotypes.flat.find(p => p.id == id);
+                      props.onSubmit(phenotype);
+                    }
+                  }}
           />}
         </Tab>
       </Tabs>
