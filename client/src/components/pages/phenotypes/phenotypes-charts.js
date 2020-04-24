@@ -275,21 +275,20 @@ export const GroupedAreaChart = ({data, categories, xTitle, yTitle, fill, yMax, 
             family: systemFont
           },
         },
-        // hoverinfo: 'all',
-        hovertemplate: formatPercent
-          ? [
-            type === 'binary' ? `` : `<b>${categoryPrefix || ''}:</b> ${name}`,
-            `<b>${type === 'binary' ? categoryPrefix : xTitle}:</b> %{x}`,
-            `<b>Participants:</b> %{y:.3f%}%<extra></extra>`
-          ].join('<br>')
-          : [
-            type === 'binary' 
-              ? `` 
-              : `<b>${categoryPrefix || ''}:</b> ${name}`,
-            `<b>${type === 'binary' ? categoryPrefix : xTitle}:</b> %{x}`,
-            `<b>Participants:</b> %{y}<extra></extra>`
-          ].join('<br>'),        
-        /*
+        // // hoverinfo: 'all',
+        // hovertemplate: formatPercent
+        //   ? [
+        //     type === 'binary' ? `` : `<b>${categoryPrefix || ''}:</b> ${name}`,
+        //     `<b>${type === 'binary' ? categoryPrefix : xTitle}:</b> %{x}`,
+        //     `<b>Participants:</b> %{y:.3f%}%<extra></extra>`
+        //   ].join('<br>')
+        //   : [
+        //     type === 'binary' 
+        //       ? `` 
+        //       : `<b>${categoryPrefix || ''}:</b> ${name}`,
+        //     `<b>${type === 'binary' ? categoryPrefix : xTitle}:</b> %{x}`,
+        //     `<b>Participants:</b> %{y}<extra></extra>`
+        //   ].join('<br>'),        
         hoverinfo: i === 0 ? 'y' : 'skip',
         hovertemplate: i === 0 ? '%{text}<extra></extra>' : null,
         text: i > 0 ? '' : Object.entries(data).map(([key, value]) => {
@@ -300,14 +299,13 @@ export const GroupedAreaChart = ({data, categories, xTitle, yTitle, fill, yMax, 
             }`).join('<br>')
           ].join('<br>');
         })
-        */
       };
 
       return plotData;
     })}
     layout={{
-      // ...hoverLayout,
-      hovermode: 'closest',
+      ...hoverLayout,
+      hovermode: 'x',
       xaxis: {
           fixedrange: true,
           automargin: true,
