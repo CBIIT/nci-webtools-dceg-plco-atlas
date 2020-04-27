@@ -217,6 +217,7 @@ async function importVariants() {
     for (let i = 0; i <= count; i += batchSize) {
         await connection.execute(`
             INSERT INTO ${variantTable} partition (${subpartition}) (
+                id,
                 phenotype_id,
                 sex,
                 chromosome,
@@ -235,6 +236,7 @@ async function importVariants() {
                 i,
                 show_qq_plot
             ) SELECT
+                uuid_short(),
                 ${phenotypeId},
                 "${sex}",
                 chromosome,
@@ -264,8 +266,9 @@ async function importVariants() {
     console.log(`[${duration()} s] Inserting aggregated variants...`);
     await connection.execute(`
         INSERT INTO ${aggregateTable} partition (${subpartition})
-            (phenotype_id, sex, chromosome, position_abs, p_value_nlog)
+            (id, phenotype_id, sex, chromosome, position_abs, p_value_nlog)
         SELECT DISTINCT
+            uuid_short(),
             ${phenotypeId},
             "${sex}",
             chromosome,
