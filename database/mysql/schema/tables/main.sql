@@ -221,7 +221,7 @@ CREATE TABLE IF NOT EXISTS phenotype_variant (
 );
 
 CREATE TABLE IF NOT EXISTS phenotype_aggregate (
-    `id` BIGINT AUTO_INCREMENT NOT NULL,
+    `id` BIGINT NOT NULL DEFAULT (UUID_SHORT()),
     `phenotype_id` INTEGER NOT NULL,
     `sex` ENUM('all', 'female', 'male') NOT NULL,
     `chromosome` ENUM(
