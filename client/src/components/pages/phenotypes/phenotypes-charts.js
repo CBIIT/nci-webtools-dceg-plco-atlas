@@ -268,7 +268,7 @@ export const GroupedAreaChart = ({data, categories, xTitle, yTitle, fill, yMax, 
 
         hoverlabel: {
           bgcolor: '#fff',
-          bordercolor: opaqueColors[i % opaqueColors.length],
+          bordercolor: 'black', //opaqueColors[i % opaqueColors.length],
           font: {
             size: 14,
             color: '#444',
@@ -294,7 +294,7 @@ export const GroupedAreaChart = ({data, categories, xTitle, yTitle, fill, yMax, 
         text: i > 0 ? '' : Object.entries(data).map(([key, value]) => {
           return [
             `<b>${xTitle}</b>: ${key}`,
-            categories.map((name, i) => `<b>${name}</b>: ${
+            categories.map((name, i) => `• <b>${categoryPrefix === 'Age' && categoryPrefix || ''} ${name}</b>: ${
               formatPercent ? percentFormatter(value[i]) : value[i].toLocaleString()
             }`).join('<br>')
           ].join('<br>');
