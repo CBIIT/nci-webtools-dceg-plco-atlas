@@ -14,7 +14,7 @@ ALTER TABLE gene
     ADD INDEX idx_gene__transcription_start  (transcription_start),
     ADD INDEX idx_gene__transcription_end    (transcription_end);
 
---variants
+-- variants
 ALTER TABLE phenotype_variant
     ADD INDEX idx_phenotype_variant__chromosome       (chromosome),
     ADD INDEX idx_phenotype_variant__p_value          (p_value),
