@@ -294,7 +294,9 @@ export const GroupedAreaChart = ({data, categories, xTitle, yTitle, fill, yMax, 
         text: i > 0 ? '' : Object.entries(data).map(([key, value]) => {
           return [
             `<b>${xTitle}</b>: ${key}`,
-            categories.map((name, i) => `• <b>${categoryPrefix === 'Age' && categoryPrefix || ''} ${name}</b>: ${
+            categories.length === 1 
+              ? `<b>${name}</b>: ${formatPercent ? percentFormatter(value[0]) : value[0].toLocaleString()}`
+              : categories.map((name, i) => `• <b>${categoryPrefix === 'Age' && categoryPrefix || ''} ${name}</b>: ${
               formatPercent ? percentFormatter(value[i]) : value[i].toLocaleString()
             }`).join('<br>')
           ].join('<br>');
