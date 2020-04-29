@@ -238,7 +238,10 @@ export function VariantLookup() {
       sharedState: null
     }));
     dispatch(
-      lookupVariants(state.selectedPhenotypes, state.selectedVariant, state.selectedSex === 'combined' ? 'all' : state.selectedSex)
+      lookupVariants({
+        phenotypes: state.selectedPhenotypes, 
+        variant: state.selectedVariant, 
+        sex: state.selectedSex === 'combined' ? 'all' : state.selectedSex})
     );
   }
 
