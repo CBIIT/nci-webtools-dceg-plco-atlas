@@ -1,7 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { Button, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import { TreeSelect } from '../../../controls/tree-select/tree-select';
+import {
+  updateSummaryResults
+} from '../../../../services/actions';
 
 export function SummaryResultsForm({
   phenotype = null,
@@ -9,6 +12,7 @@ export function SummaryResultsForm({
   onSubmit = any => {},
   onReset = any => {}
 }) {
+  const dispatch = useDispatch();
   // in order to prevent updating the redux store until after the form has
   // been submitted, we should store the state in the component, and then emit
   // this state on submit or reset, allowing the handler to update the store
@@ -24,7 +28,7 @@ export function SummaryResultsForm({
 
   // select store members
   const phenotypes = useSelector(state => state.phenotypes);
-  const { submitted } = useSelector(state => state.summaryResults);
+  const { submitted, disableSubmit } = useSelector(state => state.summaryResults);
 
   const treeRef = useRef();
 
@@ -36,10 +40,12 @@ export function SummaryResultsForm({
         <TreeSelect
           data={phenotypes}
           value={_phenotype}
-          onChange={val => _setPhenotype((val && val.length) ? val[0] : null)}
+          onChange={val => {
+            _setPhenotype((val && val.length) ? val[0] : null);
+            dispatch(updateSummaryResults({ disableSubmit: false }));
+          }}
           singleSelect
           ref={treeRef}
-          submitted={submitted}
         />
       </div>
 
@@ -49,9 +55,13 @@ export function SummaryResultsForm({
           id="summary-results-sex"
           className="form-control"
           value={_sex}
-          onChange={e => _setSex(e.target.value)}
+          onChange={e => {
+            _setSex(e.target.value);
+            dispatch(updateSummaryResults({ disableSubmit: false }));
+          }}
           aria-label="Select sex"
-          disabled={submitted}>
+          // disabled={submitted}
+          >
           <option value="all">All</option>
           <option value="stacked">Female/Male (Stacked)</option>
           <option value="female">Female</option>
@@ -72,7 +82,8 @@ export function SummaryResultsForm({
               type="submit"
               variant="silver"
               className={!_phenotype && 'pointer-events-none'}
-              disabled={!_phenotype || submitted}
+              // disabled={!_phenotype || submitted}
+              disabled={!_phenotype || disableSubmit}
               onClick={e => {
                 e.preventDefault();
                 onSubmit({phenotype: _phenotype, sex: _sex});

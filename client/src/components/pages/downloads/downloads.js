@@ -27,7 +27,7 @@ export function Downloads() {
     }
 
     dispatch(updateDownloads({
-      submitted: true
+      submitted: new Date()
     }));
 
     selectedPhenotypes.forEach((e, i) => {
@@ -79,7 +79,6 @@ export function Downloads() {
               value={selectedPhenotypes}
               onChange={handleChange}
               ref={treeRef}
-              submitted={submitted}
             />
             <small className="text-muted"><i>Up to 5 phenotypes may be selected for download.</i></small>
           </div>

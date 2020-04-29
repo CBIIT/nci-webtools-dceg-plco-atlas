@@ -8,22 +8,19 @@ export function VariantLookupForm({ onChange, onSubmit, onReset }) {
   const dispatch = useDispatch();
   const phenotypes = useSelector(state => state.phenotypes);
   const variantLookup = useSelector(state => state.variantLookup);
-  const { selectedPhenotypes, selectedVariant, selectedSex, submitted } = variantLookup;
-
-  const setSelectedPhenotypes = selectedPhenotypes => {
-    dispatch(updateVariantLookup({ selectedPhenotypes }));
-  };
-
-  const setSelectedVariant = selectedVariant => {
-    dispatch(updateVariantLookup({ selectedVariant }));
-  };
-
-  const setSelectedSex = selectedSex => {
-    dispatch(updateVariantLookup({ selectedSex }));
-  };
+  const { 
+    selectedPhenotypes, 
+    selectedVariant, 
+    selectedSex, 
+    submitted, 
+    disableSubmit
+  } = variantLookup;
 
   const handleChangeCustom = items => {
-    setSelectedPhenotypes(items);
+    dispatch(updateVariantLookup({ 
+      selectedPhenotypes: items,
+      disableSubmit: false
+    }));
   };
 
   const handleKeyPress = e => {
@@ -47,7 +44,6 @@ export function VariantLookupForm({ onChange, onSubmit, onReset }) {
           value={selectedPhenotypes}
           onChange={handleChangeCustom}
           ref={treeRef}
-          submitted={submitted}
         />
       </div>
 
@@ -59,12 +55,14 @@ export function VariantLookupForm({ onChange, onSubmit, onReset }) {
           aria-label="Variant (required)"
           value={selectedVariant}
           onChange={e => {
-            setSelectedVariant(e.target.value);
+            dispatch(updateVariantLookup({ 
+              selectedVariant: e.target.value,
+              disableSubmit: false
+            }));
             onChange(e.target.value);
           }}
           onKeyPress={e => handleKeyPress(e)}
           type="text"
-          disabled={submitted}
           required
         />
       </div>
@@ -74,8 +72,12 @@ export function VariantLookupForm({ onChange, onSubmit, onReset }) {
         <select
           className="form-control"
           value={selectedSex}
-          onChange={e => setSelectedSex(e.target.value)}
-          disabled={submitted}
+          onChange={e => {
+            dispatch(updateVariantLookup({ 
+              selectedSex: e.target.value,
+              disableSubmit: false
+             }));
+          }}
           aria-label="Select sex">
           <option value="all">All</option>
           <option value="female">Female</option>
@@ -135,7 +137,7 @@ export function VariantLookupForm({ onChange, onSubmit, onReset }) {
               disabled={
                 (!selectedPhenotypes || selectedPhenotypes.length < 1) ||
                 (!selectedVariant || selectedVariant.length < 1) ||
-                submitted
+                disableSubmit
               }>
               Submit
             </Button>
