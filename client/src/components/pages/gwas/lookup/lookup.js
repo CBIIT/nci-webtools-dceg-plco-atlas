@@ -219,7 +219,8 @@ export function VariantLookup() {
         variant: params.variant,
         sex: params.sex
       },
-      submitted: new Date()
+      submitted: new Date(),
+      disableSubmit: true
     }));
     
     dispatch(lookupVariants({

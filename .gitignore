@@ -3,7 +3,7 @@
 /server/logs/
 /server/data/
 /www/
-config.json
+config*.json
 *.meta
 *.db
 *.db-journal

@@ -147,7 +147,8 @@ export function SummaryResults() {
         nlogpMax: null,
         bpMin: null,
         bpMax: null,
-        submitted: true,
+        submitted: new Date(),
+        disableSubmit: true
       })
     );
 
@@ -314,7 +315,7 @@ export function SummaryResults() {
 
   const loadState = state => {
     if (!state || !Object.keys(state).length) return;
-    dispatch(updateSummaryResults({...state, submitted: true}));
+    dispatch(updateSummaryResults({...state, submitted: new Date()}));
 
     const {
       bpMax,
