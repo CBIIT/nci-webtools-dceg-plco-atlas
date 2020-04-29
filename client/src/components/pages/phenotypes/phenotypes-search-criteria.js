@@ -11,6 +11,7 @@ export const PhenotypesSearchCriteria = () => {
   const {
     submitted,
     shareID,
+    disableSubmit
   } = browsePhenotypes;
   const {
     phenotypeData
@@ -71,7 +72,7 @@ export const PhenotypesSearchCriteria = () => {
         
         <div className="d-inline">
           <ShareLink 
-            disabled={!phenotypes}
+            disabled={!phenotypes || (!disableSubmit && phenotypeData)}
             shareID={shareID}
             params={browsePhenotypes}
           />

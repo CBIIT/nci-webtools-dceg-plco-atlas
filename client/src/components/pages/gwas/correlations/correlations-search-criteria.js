@@ -15,7 +15,8 @@ export const PhenotypeCorrelationsSearchCriteria = () => {
   const {
     searchCriteriaPhenotypeCorrelations,
     collapseCriteria,
-    shareID
+    shareID,
+    disableSubmit
   } = phenotypeCorrelations;
 
   const setCollapseCriteria = collapseCriteria => {
@@ -163,7 +164,7 @@ export const PhenotypeCorrelationsSearchCriteria = () => {
             
             <div className="d-inline">
               <ShareLink 
-                disabled={!searchCriteriaPhenotypeCorrelations}
+                disabled={!searchCriteriaPhenotypeCorrelations || !disableSubmit}
                 shareID={shareID}
                 params={phenotypeCorrelations}
               />

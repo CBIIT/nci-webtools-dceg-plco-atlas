@@ -11,7 +11,8 @@ export const VariantLookupSearchCriteria = () => {
   const {
     searchCriteriaVariantLookup,
     collapseCriteria,
-    shareID
+    shareID,
+    disableSubmit
   } = variantLookup;
   const {
     numResults
@@ -174,7 +175,7 @@ export const VariantLookupSearchCriteria = () => {
 
             <div className="d-inline">
               <ShareLink 
-                disabled={!searchCriteriaVariantLookup}
+                disabled={!searchCriteriaVariantLookup || !disableSubmit}
                 shareID={shareID}
                 params={variantLookup}
               />
