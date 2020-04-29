@@ -344,7 +344,8 @@ export const PieChart = ({ data, categories }) => (
       {
         values: data,
         labels: categories,
-        hoverinfo: "label+percent",
+        hoverinfo: "label+value+percent",
+        hovertemplate: `<b>%{label}</b><br>%{value} participants (%{percent})`,
         hole: 0.4,
         type: "pie"
       }
