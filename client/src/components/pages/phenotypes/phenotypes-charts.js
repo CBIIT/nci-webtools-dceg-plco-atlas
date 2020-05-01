@@ -118,6 +118,7 @@ export const BarChart = ({ data, categories, xTitle, yTitle, yMax, formatPercent
           automargin: true,
           title: xTitle,
           separatethousands: true,
+          type: 'category',
       },
       yaxis: {
           [yMax ? 'range' : '']: [0, yMax],
@@ -309,6 +310,7 @@ export const GroupedAreaChart = ({data, categories, xTitle, yTitle, fill, yMax, 
       ...hoverLayout,
       hovermode: 'x',
       xaxis: {
+          type: 'linear',
           fixedrange: true,
           automargin: true,
           title: xTitle,
