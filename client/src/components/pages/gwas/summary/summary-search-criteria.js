@@ -8,15 +8,9 @@ export const SummaryResultsSearchCriteria = () => {
   const {
     searchCriteriaSummaryResults,
     selectedPhenotype,
-    // selectedChromosome,
-    // selectedPlot,
     selectedSex,
-    // manhattanPlotView,
-    // nlogpMin,
-    // nlogpMax,
-    // bpMin,
-    // bpMax,
-    shareID
+    shareID,
+    disableSubmit
   } = summaryResults;
 
   const {
@@ -66,23 +60,9 @@ export const SummaryResultsSearchCriteria = () => {
 
               <div className="d-flex justify-content-end">
                 <ShareLink
-                  disabled={!searchCriteriaSummaryResults}
+                  disabled={!searchCriteriaSummaryResults || !disableSubmit}
                   shareID={shareID}
-                  params={
-                    summaryResults
-                    // {
-                      // selectedPhenotype,
-                      // selectedChromosome,
-                      // selectedPlot,
-                      // selectedSex,
-                      // manhattanPlotView,
-                      // nlogpMin,
-                      // nlogpMax,
-                      // bpMin,
-                      // bpMax,
-                      // searchCriteriaSummaryResults
-                    // }
-                  }
+                  params={summaryResults}
                 />
               </div>
 

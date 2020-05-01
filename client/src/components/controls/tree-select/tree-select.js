@@ -11,8 +11,7 @@ export const TreeSelect = forwardRef(({
     onChange,
     data,
     value,
-    singleSelect,
-    submitted
+    singleSelect
   }, ref) => {
 
   useImperativeHandle(ref, () => ({
@@ -382,9 +381,7 @@ export const TreeSelect = forwardRef(({
                 title={"Show/hide " + item.title + " phenotypes"}
                 style={{ all: 'unset' }}
                 className="collapse-button text-secondary"
-                onClick={e => toggleHideChildren(item.id)}
-                // disabled={submitted}
-                >
+                onClick={e => toggleHideChildren(item.id)}>
                 <i className={"fa fa-plus-square collapse-button-text-" + item.id}></i>
               </button>
 
@@ -406,7 +403,7 @@ export const TreeSelect = forwardRef(({
                 style={{
                   verticalAlign: 'middle',
                   alignSelf: 'center',
-                  cursor: submitted || singleSelect ? 'not-allowed' : 'pointer'
+                  cursor: singleSelect ? 'not-allowed' : 'pointer'
                 }}
                 className={'parent-checkbox-' + item.id}
                 // name={'parent-checkbox-' + item.id}
@@ -415,7 +412,7 @@ export const TreeSelect = forwardRef(({
                 // checked={ !singleSelect && value && value.length > 0 && containsAllVals(getAllLeafs(item), value)}
                 checked={checkParents(item)}
                 onChange={e => handleSelect(item)}
-                disabled={submitted || singleSelect ? true : false}
+                disabled={singleSelect ? true : false}
               />
 
               <div
@@ -432,15 +429,12 @@ export const TreeSelect = forwardRef(({
                 className="ml-1"
                 style={{
                   all: 'unset',
-                  cursor: submitted ? 'not-allowed' : 'pointer',
-                  // cursor: singleSelect ? 'not-allowed' : 'pointer',
+                  cursor: 'pointer',
                   textOverflow: 'ellipsis',
                   whiteSpace: 'nowrap',
                   overflow: 'hidden'
                 }}
                 onClick={e => singleSelect ? toggleHideChildren(item.id) : handleSelect(item)}
-                // disabled={singleSelect}
-                disabled={submitted}
                 >
                 {item.title}
               </button>
@@ -473,7 +467,9 @@ export const TreeSelect = forwardRef(({
             />
             <input
               title={singleSelect ? "Select " + item.title + " phenotype" : "Select/deselect " + item.title + " phenotype"}
-              style={{ cursor: submitted ? 'not-allowed' : 'pointer' }}
+              style={{ 
+                cursor: 'pointer' 
+              }}
               className={'ml-1 leaf-checkbox-' + item.id}
               // name={'leaf-checkbox-' + item.id}
               type="checkbox"
@@ -485,7 +481,6 @@ export const TreeSelect = forwardRef(({
                   value.map(item => item.id).includes(item.id))
               }
               onChange={e => handleSelect(item)}
-              disabled={submitted}
             />
 
             <div
@@ -502,14 +497,14 @@ export const TreeSelect = forwardRef(({
               className="ml-1"
               style={{
                 all: 'unset',
-                cursor: submitted ? 'not-allowed' : 'pointer',
+                cursor: 'pointer',
                 textOverflow: 'ellipsis',
                 whiteSpace: 'nowrap',
                 overflow: 'hidden',
                 width: '65%'
               }}
               onClick={e => handleSelect(item)}
-              disabled={submitted}>
+              >
               {item.title}
             </button>
           </li>
@@ -551,7 +546,6 @@ export const TreeSelect = forwardRef(({
                 value.map(item => item.id).includes(item.id))
             }
             onChange={e => handleSelect(item)}
-            disabled={submitted}
           />
 
           <button
@@ -565,8 +559,7 @@ export const TreeSelect = forwardRef(({
               overflow: 'hidden',
               width: '90%'
             }}
-            onClick={e => handleSelect(item)}
-            disabled={submitted}>
+            onClick={e => handleSelect(item)}>
             {/* {item.title.replace(searchInput, '[' + searchInput + ']')} */}
             {item.title.slice(
               0,
@@ -665,7 +658,7 @@ export const TreeSelect = forwardRef(({
             // name=""
             type="checkbox"
             aria-label="Checkbox"
-            disabled={submitted || singleSelect || !data ? true : false}
+            disabled={singleSelect || !data ? true : false}
             checked={!singleSelect && checkAllLeafsSelected()}
             onChange={e => !singleSelect && selectAll()}
           />
@@ -705,9 +698,7 @@ export const TreeSelect = forwardRef(({
                   title="Clear to go back to categorical view"
                   onClick={e => {
                     clearSearchFilter();
-                  }}
-                  // disabled={submitted}
-                  >
+                  }}>
                   <i className="fa fa-times" style={{fontSize: '14px'}}></i>
                 </button>
               ) : (

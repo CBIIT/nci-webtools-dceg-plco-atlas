@@ -11,21 +11,18 @@ export function PhenotypeCorrelationsForm({ onChange, onSubmit, onReset }) {
   const { 
     selectedPhenotypes, 
     selectedSex, 
-    submitted 
+    submitted,
+    disableSubmit
   } = useSelector(state => state.phenotypeCorrelations);
 
   const treeRef = useRef();
 
-  const setSelectedPhenotypes = selectedPhenotypes => {
-    dispatch(updatePhenotypeCorrelations({ selectedPhenotypes }));
-  };
-
-  const setSelectedSex = selectedSex => {
-    dispatch(updatePhenotypeCorrelations({ selectedSex }));
-  };
 
   const handleChangeCustom = items => {
-    setSelectedPhenotypes(items);
+    dispatch(updatePhenotypeCorrelations({ 
+      selectedPhenotypes: items,
+      disableSubmit: false 
+    }));
   };
 
   return (
@@ -37,7 +34,6 @@ export function PhenotypeCorrelationsForm({ onChange, onSubmit, onReset }) {
           value={selectedPhenotypes}
           onChange={handleChangeCustom}
           ref={treeRef}
-          submitted={submitted}
         />
         <small className="text-muted"><i>Up to 120 phenotypes may be selected.</i></small>
       </div>
@@ -47,8 +43,12 @@ export function PhenotypeCorrelationsForm({ onChange, onSubmit, onReset }) {
         <select
           className="form-control"
           value={selectedSex}
-          onChange={e => setSelectedSex(e.target.value)}
-          disabled={submitted}
+          onChange={e => {
+            dispatch(updatePhenotypeCorrelations({ 
+              selectedSex: e.target.value,
+              disableSubmit: false 
+            }));
+          }}
           aria-label="Select sex">
           <option value="combined">All</option>
           <option value="female">Female</option>
@@ -89,7 +89,7 @@ export function PhenotypeCorrelationsForm({ onChange, onSubmit, onReset }) {
                   sex: selectedSex
                 });
               }}
-              disabled={(!selectedPhenotypes || selectedPhenotypes.length < 2 || selectedPhenotypes.length > 120) || submitted}
+              disabled={(!selectedPhenotypes || selectedPhenotypes.length < 2 || selectedPhenotypes.length > 120) || disableSubmit}
               >
               Submit
             </Button>

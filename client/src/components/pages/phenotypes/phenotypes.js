@@ -188,6 +188,7 @@ export function Phenotypes() {
         selectedPhenotype: phenotype,
         selectedPlot: plot,
         submitted: new Date(),
+        disableSubmit: true
       })
     );
   };
