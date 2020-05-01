@@ -1,13 +1,16 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { Button, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import { TreeSelect } from '../../controls/tree-select/tree-select';
+import { updateBrowsePhenotypes } from '../../../services/actions';
+
 
 export function PhenotypesForm({
   onSubmit,
   onChange,
   onReset,
 }) {
+  const dispatch = useDispatch();
 
   // private members prefixed with _
   // const [_phenotype, _setPhenotype] = useState(null);
@@ -21,7 +24,8 @@ export function PhenotypesForm({
   // select store members
   const phenotypes = useSelector(state => state.phenotypes);
   const { 
-    submitted, 
+    submitted,
+    disableSubmit, 
     loading,
     displayTreeParent,
     selectedPhenotype
@@ -41,10 +45,12 @@ export function PhenotypesForm({
           data={phenotypes}
           value={selectedPhenotype}
           // onChange={val => _setPhenotype((val && val.length) ? val[0] : null)}
-          onChange={val => onChange((val && val.length) ? val[0] : null)}
+          onChange={val => {
+            onChange((val && val.length) ? val[0] : null);
+            dispatch(updateBrowsePhenotypes({ disableSubmit: false }));
+          }}
           singleSelect
           ref={treeRef}
-          submitted={submitted}
         />
       </div>
 
@@ -61,7 +67,7 @@ export function PhenotypesForm({
               type="submit"
               variant="silver"
               className={!selectedPhenotype && 'pointer-events-none'}
-              disabled={!selectedPhenotype || submitted || loading}
+              disabled={!selectedPhenotype || disableSubmit || loading}
               onClick={e => {
                 e.preventDefault();
                 onSubmit(selectedPhenotype);

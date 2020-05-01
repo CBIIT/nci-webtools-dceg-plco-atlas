@@ -91,7 +91,8 @@ export function PhenotypeCorrelations() {
         sex: params.sex,
         totalPhenotypes: params.phenotypes.length
       },
-      submitted: new Date()
+      submitted: new Date(),
+      disableSubmit: true
     }));
     dispatch(drawHeatmap(params));
     tooltipRef.current.resetTooltip();
