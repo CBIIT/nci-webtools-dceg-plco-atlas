@@ -523,8 +523,7 @@ async function getPhenotype(connectionPool, params) {
                 WHERE
                     pd.phenotype_id = :id AND
                     pd.value is not null AND
-                    p.age >= 55 AND 
-                    pd.value BETWEEN ${minValue} AND ${maxValue}
+                    p.age >= 55
                 group by value
                 order by value
             `;
