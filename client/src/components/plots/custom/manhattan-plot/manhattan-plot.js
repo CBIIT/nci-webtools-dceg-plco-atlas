@@ -45,7 +45,10 @@ export class ManhattanPlot {
     // create a canvas to be used for drawing main plot elements
     [this.canvas, this.ctx] = getCanvasAndContext();
     this.canvas.listeners = [];
-    setStyles(this.canvas, { display: 'block' });
+    setStyles(this.canvas, { 
+      display: 'block', 
+      maxWidth: '100%' 
+    });
     this.container.appendChild(this.canvas);
 
     // create an overlay canvas to be used for selecting areas (zooming)
@@ -56,7 +59,8 @@ export class ManhattanPlot {
       position: 'absolute',
       pointerEvents: 'none',
       top: '0',
-      left: '0'
+      left: '0',
+      maxWidth: '100%'
     });
 
     // create a hidden canvas to be used for selecting points
