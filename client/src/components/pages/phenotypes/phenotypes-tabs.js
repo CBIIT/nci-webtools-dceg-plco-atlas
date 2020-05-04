@@ -166,7 +166,7 @@ export function PhenotypesTabs(props) {
 
           <div className="m-2 text-right">
             <button 
-              className="btn btn-link"
+              className="btn btn-silver"
               onClick={e => setDisplayType({
                 ...displayType, 
                 frequency: displayType.frequency === 'plot' ? 'table' : 'plot'
@@ -228,7 +228,7 @@ export function PhenotypesTabs(props) {
               )}</div>
 
               <button 
-                className="btn btn-link"
+                className="btn btn-silver"
                 onClick={e => setDisplayType({
                   ...displayType, 
                   [t.key]: displayType[t.key] === 'plot' ? 'table' : 'plot'
