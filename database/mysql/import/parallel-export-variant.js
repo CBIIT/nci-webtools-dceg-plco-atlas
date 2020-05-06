@@ -100,43 +100,43 @@ connection.exec(`
         ('22', 0, 51857516, 2830085574, 2881943090),
         ('X', 0, 156040895, 2881943090, 3037983985),
         ('Y', 0, 57264655, 3037983985, 3095248640);
-        
-        -- create prestage table for importing raw variants
-        CREATE TABLE prestage (
-            chromosome              VARCHAR(2),
-            position                BIGINT,
-            snp                     VARCHAR(200),
-            allele_reference        VARCHAR(200),
-            allele_alternate        VARCHAR(200),
-            p_value                 DOUBLE,
-            p_value_r               DOUBLE,
-            odds_ratio              DOUBLE,
-            odds_ratio_r            DOUBLE,
-            n                       BIGINT,
-            q                       DOUBLE,
-            i                       DOUBLE 
-        );
     
-        -- create stage table for sorted/filtered variants
-        CREATE TABLE stage (
-            chromosome              VARCHAR(2),
-            position                BIGINT,
-            position_abs_aggregate  BIGINT,
-            snp                     VARCHAR(200),
-            allele_reference        VARCHAR(200),
-            allele_alternate        VARCHAR(200),
-            p_value                 DOUBLE,
-            p_value_nlog            DOUBLE, -- negative log10(P)
-            p_value_nlog_aggregate  DOUBLE, -- -log10(p) grouped by 1e-2
-            p_value_nlog_expected   DOUBLE, -- expected negative log10(P)
-            p_value_r               DOUBLE,
-            odds_ratio              DOUBLE,
-            odds_ratio_r            DOUBLE,
-            n                       BIGINT,
-            q                       DOUBLE,
-            i                       DOUBLE,
-            show_qq_plot            BOOLEAN
-        );
+    -- create prestage table for importing raw variants
+    CREATE TABLE prestage (
+        chromosome              VARCHAR(2),
+        position                BIGINT,
+        snp                     VARCHAR(200),
+        allele_reference        VARCHAR(200),
+        allele_alternate        VARCHAR(200),
+        p_value                 DOUBLE,
+        p_value_r               DOUBLE,
+        odds_ratio              DOUBLE,
+        odds_ratio_r            DOUBLE,
+        n                       BIGINT,
+        q                       DOUBLE,
+        i                       DOUBLE 
+    );
+
+    -- create stage table for sorted/filtered variants
+    CREATE TABLE stage (
+        chromosome              VARCHAR(2),
+        position                BIGINT,
+        position_abs_aggregate  BIGINT,
+        snp                     VARCHAR(200),
+        allele_reference        VARCHAR(200),
+        allele_alternate        VARCHAR(200),
+        p_value                 DOUBLE,
+        p_value_nlog            DOUBLE, -- negative log10(P)
+        p_value_nlog_aggregate  DOUBLE, -- -log10(p) grouped by 1e-2
+        p_value_nlog_expected   DOUBLE, -- expected negative log10(P)
+        p_value_r               DOUBLE,
+        odds_ratio              DOUBLE,
+        odds_ratio_r            DOUBLE,
+        n                       BIGINT,
+        q                       DOUBLE,
+        i                       DOUBLE,
+        show_qq_plot            BOOLEAN
+    );
 `);
 
 // load data into prestaging table
@@ -149,7 +149,6 @@ const importStatus = spawnSync(`sqlite3`, [
 ]);
 // show full import status if needed
 // console.log(importStatus, importStatus.stdout.toString(), importStatus.stderr.toString());
-
 
 console.log(`[${duration()} s] Beginning transaction...`);
 connection.exec(`BEGIN TRANSACTION`);
@@ -266,7 +265,6 @@ const exportVariantStatus = spawnSync(`sqlite3`, [
     ORDER BY cr.rowid, s.p_value`
 ]);
 
-
 console.log(`[${duration()} s] Exporting aggregated variants to ${exportAggregateFilePath}...`);
 const exportAggregateStatus = spawnSync(`sqlite3`, [
     databaseFilePath,
@@ -282,7 +280,6 @@ const exportAggregateStatus = spawnSync(`sqlite3`, [
     ORDER BY cr.rowid, p_value_nlog`
 ]);
 
-// const count = connection.
 console.log([
     `[${duration()} s] Finished exporting, generated the following files:`,
     exportVariantFilePath, 
