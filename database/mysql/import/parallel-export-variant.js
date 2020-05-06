@@ -4,7 +4,7 @@ const { spawnSync } = require('child_process');
 const sqlite = require('better-sqlite3');
 const { timestamp } = require('./utils/logging');
 const { getLambdaGC } = require('./utils/math');
-const args = process.argv.slice(2);
+const args = require('minimist')(process.argv.slice(2));
 
 /**
 lambdagc_ewing|1.036
@@ -13,13 +13,16 @@ lambdagc_mel|0.83
 */
 
 // display help if needed
-if (!args[0]) {
-    console.log(`USAGE: node export-variants.js "filepath"`);
+if (!(args.file && args.phenotype_id && args.sex)) {
+    console.log(`USAGE: node export-variants.js 
+        --file "filepath"
+        --phenotype_id N
+        --sex "all"`);
     process.exit(0);
 }
 
 // parse arguments and set defaults
-const [file] = args;
+const {file, phenotype_id: phenotypeId, sex} = args;
 const inputFilePath = path.resolve(file);
 const databaseFilePath = inputFilePath + '.db';
 const exportVariantFilePath = inputFilePath + '.export-variant.csv';
@@ -57,6 +60,23 @@ for (let filepath of [
 const connection = new sqlite(databaseFilePath);
 connection.function('LOG10', {deterministic: true}, v => Math.log10(v));
 connection.function('POW', {deterministic: true}, (base, exp) => Math.pow(base, exp));
+connection.function('LPAD', {deterministic: true}, (str, len, char) => {
+    return 0;
+    /*
+    const array = new Array(len);
+    const offset = len - str.length;
+
+    for (let i = 0; i < array.length; i ++) {
+        array[i] = char;
+    }
+
+    for (let j = 0; j < str.length; j ++) {
+        array[offset + j] = str[j];
+    }
+
+    return array;
+    */
+});
 
 connection.exec(`
     -- set up chromosome ranges
@@ -245,6 +265,11 @@ const exportVariantStatus = spawnSync(`sqlite3`, [
     `.headers on`,
     `.output '${exportVariantFilePath}'`,
     `SELECT
+        "${phenotypeId.toString().padStart(5, '0')}" || ROW_NUMBER () OVER ( 
+            ORDER BY cr.rowid, s.p_value
+        ) as id,
+        ${phenotypeId} as phenotype_id,
+        "${sex}" as sex,
         s.chromosome,
         s.position,
         s.snp,
@@ -272,6 +297,11 @@ const exportAggregateStatus = spawnSync(`sqlite3`, [
     `.headers on`,
     `.output '${exportAggregateFilePath}'`,
     `SELECT DISTINCT
+        "${phenotypeId.toString().padStart(5, '0')}" || ROW_NUMBER () OVER ( 
+            ORDER BY cr.rowid, s.p_value_nlog_aggregate
+        ) as id,    
+        ${phenotypeId} as phenotype_id,
+        "${sex}" as sex,
         s.chromosome,
         s.position_abs_aggregate as position_abs,
         s.p_value_nlog_aggregate as p_value_nlog
@@ -286,9 +316,14 @@ const exportMetadataStatus = spawnSync(`sqlite3`, [
     `.mode csv`,
     `.output '${exportMetadataFilePath}'`,
     `.headers on`,
-    `SELECT "all" as chromosome, ${lambdaGC} as lambda_gc, ${count} as count`,
+    `SELECT 
+        "${sex}" as sex, 
+        "all" as chromosome, 
+        ${lambdaGC} as lambda_gc, 
+        ${count} as count`,
     `.headers off`,
     `SELECT DISTINCT
+        "${sex}",
         s.chromosome,
         null as lambda_gc,
         count(*) as count
