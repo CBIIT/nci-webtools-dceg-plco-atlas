@@ -15,9 +15,11 @@ lambdagc_mel|0.83
  */
 
 // display help if needed
-if (!(args.file && args.phenotype && args.sex)) {
+if (!(args.variant_file && args.aggregate_file && args.metadata_file && args.phenotype && args.sex)) {
     console.log(`USAGE: node import-variant-csv.js
-            --file "filename"
+            --variant_file "filename"
+            --aggregate_file "filename"
+            --metadata_file "filename"
             --phenotype "phenotype name or id"
             --sex "all" | "female" | "male"
             --reset (if specified, drop the variant/summary partitions before importing)
@@ -26,7 +28,15 @@ if (!(args.file && args.phenotype && args.sex)) {
 }
 
 // parse arguments and set defaults
-const { file: inputFilePath, phenotype, sex, reset: shouldReset, create: shouldCreatePartition } = args;
+const {
+    variant_file: inputVariantFilePath,    
+    aggregate_file: inputAggregateFilePath,
+    metadata_file: inputMetadataFilePath,
+    phenotype, 
+    sex, 
+    reset: shouldReset, 
+    create: shouldCreatePartition 
+} = args;
 //const errorLog = getLogStream(`./failed-variants-${new Date().toISOString()}.txt`);
 const errorLog = {write: e => console.log(e)};
 const duration = timestamp();
@@ -41,8 +51,8 @@ const connection = mysql.createConnection({
   }).promise();
 
 // input file should exist
-if (!fs.existsSync(inputFilePath)) {
-    console.error(`ERROR: ${inputFilePath} does not exist.`);
+if (!fs.existsSync(inputVariantFilePath)) {
+    console.error(`ERROR: ${inputVariantFilePath} does not exist.`);
     process.exit(1);
 }
 
@@ -113,6 +123,8 @@ async function importVariants() {
         }
     }
 
+    await connection.query(`START TRANSACTION`);
+
     console.log(`[${duration()} s] Loading variants into table...`);
     await connection.query({
         infileStreamFactory: path => fs.createReadStream(inputVariantFilePath),
@@ -133,7 +145,7 @@ async function importVariants() {
 
     console.log(`[${duration()} s] Loading metadata into table...`);
     await connection.query({
-        infileStreamFactory: path => fs.createReadStream(inputAggregateFilePath),
+        infileStreamFactory: path => fs.createReadStream(inputMetadataFilePath),
         sql: `LOAD DATA LOCAL INFILE REPLACE "${inputMetadataFilePath}"
             INTO TEMPORARY TABLE metadata_stage
             FIELDS TERMINATED BY ','
