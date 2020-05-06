@@ -142,15 +142,15 @@ connection.exec(`
 // load data into prestaging table
 console.log(`.mode csv .import ${inputFilePath} prestage`);
 console.log(`[${duration()} s] Loading data into stage table...`);
-// const importStatus = spawnSync(`sqlite3`, [
-//     databaseFilePath,
-//     `.mode csv`,
-//     `.import '${inputFilePath}' prestage`
-// ]);
-connection.exec(`.mode csv`);
-connection.exec(`.import '${inputFilePath}' prestage`);
+const importStatus = spawnSync(`sqlite3`, [
+    databaseFilePath,
+    `.mode csv prestage`,
+    `.import '${inputFilePath}' prestage`
+]);
+// connection.exec(`.mode csv prestage`);
+// connection.exec(`.import '${inputFilePath}' prestage`);
 // show full import status if needed
-// console.log(importStatus, importStatus.stdout.toString(), importStatus.stderr.toString());
+console.log(importStatus, importStatus.stdout.toString(), importStatus.stderr.toString());
 
 console.log(`[${duration()} s] Beginning transaction...`);
 connection.exec(`BEGIN TRANSACTION`);
