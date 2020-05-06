@@ -24,7 +24,7 @@ const inputFilePath = path.resolve(file);
 const databaseFilePath = inputFilePath + '.db';
 const exportVariantFilePath = inputFilePath + '.export-variant.csv';
 const exportAggregateFilePath = inputFilePath + '.export-aggregate.csv';
-const exportMetadataFilePath = inputFilePath + '.export-metadata.json';
+const exportMetadataFilePath = inputFilePath + '.export-metadata.csv';
 
 //const errorLog = getLogStream(`./failed-variants-${new Date().toISOString()}.txt`);
 const errorLog = {write: e => console.log(e)};
@@ -278,6 +278,24 @@ const exportAggregateStatus = spawnSync(`sqlite3`, [
     FROM stage s
     JOIN chromosome_range cr ON s.chromosome = cr.chromosome
     ORDER BY cr.rowid, p_value_nlog`
+]);
+
+console.log(`[${duration()} s] Exporting variant metadata to ${exportMetadataFilePath}...`);
+const exportMetadataStatus = spawnSync(`sqlite3`, [
+    databaseFilePath,
+    `.mode csv`,
+    `.output '${exportMetadataFilePath}'`,
+    `.headers on`,
+    `SELECT "all" as chromosome, ${lambdaGC} as lambda_gc, ${count} as count`,
+    `.headers off`,
+    `SELECT DISTINCT
+        s.chromosome,
+        null as lambda_gc,
+        count(*) as count
+    FROM stage s
+    JOIN chromosome_range cr ON s.chromosome = cr.chromosome
+    GROUP BY s.chromosome
+    ORDER BY cr.rowid`,
 ]);
 
 console.log([
