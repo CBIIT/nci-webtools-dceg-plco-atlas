@@ -1,6 +1,7 @@
 /node_modules/
 /database/mysql/import/raw/*
 /database/mysql/import/slurm*
+/database/mysql/import/sqlite3
 /server/logs/
 /server/data/
 /www/
