@@ -15,6 +15,7 @@ lambdagc_mel|0.83
 // display help if needed
 if (!(args.file && args.phenotype_id && args.sex)) {
     console.log(`USAGE: node export-variants.js 
+        --sqlite "./sqlite"
         --file "filepath"
         --phenotype_id N
         --sex "all"`);
@@ -22,7 +23,8 @@ if (!(args.file && args.phenotype_id && args.sex)) {
 }
 
 // parse arguments and set defaults
-const {file, phenotype_id: phenotypeId, sex} = args;
+const {file, phenotype_id: phenotypeId, sex, sqlite: sqliteBin} = args;
+const sqlitePath = sqliteBin ? path.resolve(sqliteBin) : 'sqlite';
 const inputFilePath = path.resolve(file);
 const databaseFilePath = inputFilePath + '.db';
 const exportVariantFilePath = inputFilePath + '.export-variant.csv';
@@ -244,7 +246,7 @@ console.log(`[${duration()} s] Done`);
 connection.close();
 
 console.log(`[${duration()} s] Finished setting up stage table, exporting variants to ${exportVariantFilePath}...`);
-const exportVariantStatus = spawnSync(`sqlite3`, [
+const exportVariantStatus = spawnSync(sqlitePath, [
     databaseFilePath,
     `.mode csv`,
     `.headers on`,
@@ -276,7 +278,7 @@ const exportVariantStatus = spawnSync(`sqlite3`, [
 ]);
 
 console.log(`[${duration()} s] Exporting aggregated variants to ${exportAggregateFilePath}...`);
-const exportAggregateStatus = spawnSync(`sqlite3`, [
+const exportAggregateStatus = spawnSync(sqlitePath, [
     databaseFilePath,
     `.mode csv`,
     `.headers on`,
@@ -296,7 +298,7 @@ const exportAggregateStatus = spawnSync(`sqlite3`, [
 ]);
 
 console.log(`[${duration()} s] Exporting variant metadata to ${exportMetadataFilePath}...`);
-const exportMetadataStatus = spawnSync(`sqlite3`, [
+const exportMetadataStatus = spawnSync(sqlitePath, [
     databaseFilePath,
     `.mode csv`,
     `.output '${exportMetadataFilePath}'`,
