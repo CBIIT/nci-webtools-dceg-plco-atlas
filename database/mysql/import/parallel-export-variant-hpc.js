@@ -1,6 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-const { spawnSync } = require('child_process');
+const { execSync, spawnSync } = require('child_process');
 const mysql = require('mysql2');
 const sqlite = require('better-sqlite3');
 const { database } = require('../../../server/config.json');
@@ -233,7 +233,7 @@ function exportVariants({
     // load data into prestaging table
     console.log(`.mode csv .import ${inputFilePath} prestage`);
     console.log(`[${duration()} s] Loading data into stage table...`);
-    const importStatus = spawnSync(`${sqlitePath} ${databaseFilePath} ".mode csv" ".import '${inputFilePath}' prestage"`);
+    const importStatus = execSync(`${sqlitePath} ${databaseFilePath} ".mode csv" ".import '${inputFilePath}' prestage"`);
     // show full import status if needed
     // console.log(importStatus, importStatus.stdout.toString(), importStatus.stderr.toString());
     
@@ -326,7 +326,7 @@ function exportVariants({
     db.close();
     
     console.log(`[${duration()} s] Finished setting up stage table, exporting variants to ${exportVariantFilePath}...`);
-    const exportVariantStatus = spawnSync(`${sqlitePath} ${databaseFilePath} ` + 
+    const exportVariantStatus = execSync(`${sqlitePath} ${databaseFilePath} ` + 
         ` ".mode csv"` +
         ` ".headers on"` +
         ` ".output '${exportVariantFilePath}'"` +
@@ -357,7 +357,7 @@ function exportVariants({
     );
     
     console.log(`[${duration()} s] Exporting aggregated variants to ${exportAggregateFilePath}...`);
-    const exportAggregateStatus = spawnSync(`${sqlitePath} ${databaseFilePath} ` + 
+    const exportAggregateStatus = execSync(`${sqlitePath} ${databaseFilePath} ` + 
         ` ".mode csv"` +
         ` ".headers on"` +
         ` ".output '${exportAggregateFilePath}'"` +
@@ -376,7 +376,7 @@ function exportVariants({
     );
     
     console.log(`[${duration()} s] Exporting variant metadata to ${exportMetadataFilePath}...`);
-    const exportMetadataStatus = spawnSync(`${sqlitePath} ${databaseFilePath} ` + 
+    const exportMetadataStatus = execSync(`${sqlitePath} ${databaseFilePath} ` + 
         ` ".mode csv"` +
         ` ".output '${exportMetadataFilePath}'"` +
         ` ".headers on"` +
