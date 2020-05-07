@@ -1,18 +1,9 @@
 const fs = require('fs');
 const mysql = require('mysql2');
 const args = require('minimist')(process.argv.slice(2));
-const ranges = require('../../json/chromosome_ranges.json');
 const { database } = require('../../../server/config.json');
 const { timestamp } = require('./utils/logging');
-const { readFile } = require('./utils/file');
-const { getRecords, pluck } = require('./utils/query');
-const { getIntervals, getLambdaGC } = require('./utils/math');
-
-/**
-lambdagc_ewing|1.036
-lambdagc_rcc|1.029
-lambdagc_mel|0.83
- */
+module.exports = {importVariants};
 
 // display help if needed
 if (!(args.variant_file && args.aggregate_file && args.metadata_file && args.phenotype && args.sex)) {
@@ -22,20 +13,18 @@ if (!(args.variant_file && args.aggregate_file && args.metadata_file && args.phe
             --metadata_file "filename"
             --phenotype "phenotype name or id"
             --sex "all" | "female" | "male"
-            --reset (if specified, drop the variant/summary partitions before importing)
-            --create (if specified, create a new partition)`);
+            --reset (if specified, drop the variant/summary partitions before importing)`);
     process.exit(0);
 }
 
 // parse arguments and set defaults
 const {
-    variant_file: inputVariantFilePath,    
-    aggregate_file: inputAggregateFilePath,
-    metadata_file: inputMetadataFilePath,
+    variant_file: exportVariantFilePath,    
+    aggregate_file: exportAggregateFilePath,
+    metadata_file: exportMetadataFilePath,
     phenotype, 
     sex, 
-    reset: shouldReset, 
-    create: shouldCreatePartition 
+    reset, 
 } = args;
 //const errorLog = getLogStream(`./failed-variants-${new Date().toISOString()}.txt`);
 const errorLog = {write: e => console.log(e)};
@@ -51,8 +40,8 @@ const connection = mysql.createConnection({
   }).promise();
 
 // input file should exist
-if (!fs.existsSync(inputVariantFilePath)) {
-    console.error(`ERROR: ${inputVariantFilePath} does not exist.`);
+if (!fs.existsSync(exportVariantFilePath)) {
+    console.error(`ERROR: ${exportVariantFilePath} does not exist.`);
     process.exit(1);
 }
 
@@ -62,55 +51,79 @@ if (!/^(all|female|male)$/.test(sex)) {
     process.exit(1);
 }
 
-importVariants().then(e => {
-    console.log(`[${duration()} s] Imported variants`);
-    process.exit(0);
-});
+(async function main() {
+    try {
+        const {id: phenotypeId} = validatePhenotype(connection, phenotype);
 
-async function importVariants() {
-    // find phenotypes either by name or id (if a numeric value was provided)
+        await importVariants({
+            connection,
+            exportVariantFilePath, 
+            exportAggregateFilePath, 
+            exportMetadataFilePath,
+            phenotypeId,
+            sex,
+            reset,    
+        });
+    
+        console.log(`[${duration()} s] Imported variants`);
+        process.exit(0);
+    } catch (e) {
+        console.error(e);
+        process.exit(1);
+    }
+})();
+
+// validates a phenotype by name or id
+async function validatePhenotype(connection, phenotype) {
     const phenotypeKey = /^\d+$/.test(phenotype) ? 'id' : 'name';
     const phenotypes = await getRecords(connection, 'phenotype', {
         [phenotypeKey]: phenotype
     });
 
     if (phenotypes.length === 0) {
-        console.error(`ERROR: Phenotype does not exist`)
-        process.exit(1);
+        throw(`Phenotype does not exist`);
     }
 
     if (phenotypes.length > 1) {
-        console.error(`ERROR: More than one phenotype was found with the same name. Please specify the phenotype id instead of the name.`)
-        process.exit(1);
+        throw(`More than one phenotype was found with the same name. Please specify the phenotype id instead of the name.`)
     }
 
-    const phenotypeName = phenotypes[0].name;
-    const phenotypeId = phenotypes[0].id;
+    return phenotypes[0];
+}
+
+async function importVariants({
+    connection,
+    exportVariantFilePath, 
+    exportAggregateFilePath, 
+    exportMetadataFilePath,
+    phenotypeId,
+    sex,
+    reset,
+}) {
+
     const partition = `\`${phenotypeId}\``; // quote partition identifier
     const subpartition = `\`${phenotypeId}_${sex}\``; // quote subpartition identifier
     const variantTable = `phenotype_variant`;
     const aggregateTable = `phenotype_aggregate`;
-    const stageTable = `phenotype_stage_${phenotypeId}_${sex}`;
 
-    // clear variants if needed
-    if (shouldReset) {
+    // determine if we need to reset/create partitions
+    const [partitionRows] = await connection.execute(
+        `SELECT * FROM INFORMATION_SCHEMA.PARTITIONS
+        WHERE TABLE_NAME IN ('phenotype_variant', 'phenotype_aggregate')
+        AND PARTITION_NAME = :phenotypeId`,
+        {phenotypeId}
+    );
 
-        // drop existing tables and recreate partitions
-        // both variant and aggregate tables have the same partitioning schema
+    // There should be 6 subpartitions (3 per table)
+    if (reset || partitionRows.length !== 6) {
+        // clear variants if needed
         for (let table of [variantTable, aggregateTable]) {
-            console.log(`[${duration()} s] Dropping and recreating partition(${partition}) on ${table}...`);
-            await connection.query(`
-                ALTER TABLE ${table} DROP PARTITION ${partition};
-                ALTER TABLE ${table} ADD PARTITION (PARTITION ${partition} VALUES IN (${phenotypeId}) (
-                    subpartition \`${phenotypeId}_all\`,
-                    subpartition \`${phenotypeId}_female\`,
-                    subpartition \`${phenotypeId}_male\`
-                ));
-            `);
+            if (partitionRows.find(p => p.PARTITION_NAME == phenotypeId)) {
+                console.log(`[${duration()} s] Dropping partition(${partition}) on ${table}...`);
+                await connection.query(`ALTER TABLE ${table} DROP PARTITION ${partition};`)
+            }
         }
-    }
 
-    if (shouldCreatePartition) {
         for (let table of [variantTable, aggregateTable]) {
             console.log(`[${duration()} s] Creating partition(${partition}) on ${table}...`);
             await connection.query(`
@@ -123,39 +136,83 @@ async function importVariants() {
         }
     }
 
-    await connection.query(`START TRANSACTION`);
+    await connection.query(`
+        START TRANSACTION;
+        -- SET UNIQUE_CHECKS = 0;
+        SET AUTOCOMMIT = 0;
+    `);
 
     console.log(`[${duration()} s] Loading variants into table...`);
     await connection.query({
-        infileStreamFactory: path => fs.createReadStream(inputVariantFilePath),
-        sql: `LOAD DATA LOCAL INFILE "${inputVariantFilePath}"
-            INTO TABLE ${variantTable} partition (${partition})
+        infileStreamFactory: path => fs.createReadStream(exportVariantFilePath),
+        sql: `LOAD DATA LOCAL INFILE "${exportVariantFilePath}"
+            INTO TABLE ${variantTable} partition (${subpartition})
             FIELDS TERMINATED BY ','
-            IGNORE 1 LINES`
+            IGNORE 1 LINES
+            (
+                id,
+                phenotype_id,
+                sex,
+                chromosome,
+                position,
+                snp,
+                allele_reference,
+                allele_alternate,
+                p_value,
+                p_value_nlog,
+                p_value_nlog_expected,
+                p_value_r,
+                odds_ratio,
+                odds_ratio_r,
+                n,
+                q,
+                i,
+                show_qq_plot
+            )`
     });
 
     console.log(`[${duration()} s] Loading aggregate variants into table...`);
     await connection.query({
-        infileStreamFactory: path => fs.createReadStream(inputAggregateFilePath),
-        sql: `LOAD DATA LOCAL INFILE "${inputAggregateFilePath}"
-            INTO TABLE ${variantTable} partition (${partition})
+        infileStreamFactory: path => fs.createReadStream(exportAggregateFilePath),
+        sql: `LOAD DATA LOCAL INFILE "${exportAggregateFilePath}"
+            INTO TABLE ${aggregateTable} partition (${subpartition})
             FIELDS TERMINATED BY ','
-            IGNORE 1 LINES`
+            IGNORE 1 LINES
+            (
+                id,
+                phenotype_id,
+                sex,
+                chromosome,
+                position_abs,
+                p_value_nlog
+            )`
     });
 
     console.log(`[${duration()} s] Loading metadata into table...`);
+    await connection.query(`CREATE TEMPORARY TABLE metadata_stage LIKE phenotype_metadata`);
     await connection.query({
-        infileStreamFactory: path => fs.createReadStream(inputMetadataFilePath),
-        sql: `LOAD DATA LOCAL INFILE REPLACE "${inputMetadataFilePath}"
-            INTO TEMPORARY TABLE metadata_stage
+        infileStreamFactory: path => fs.createReadStream(exportMetadataFilePath),
+        sql: `LOAD DATA LOCAL INFILE "${exportMetadataFilePath}"
+            INTO TABLE metadata_stage
             FIELDS TERMINATED BY ','
-            IGNORE 1 LINES`
+            IGNORE 1 LINES
+            (
+                phenotype_id, 
+                sex, 
+                chromosome, 
+                lambda_gc, 
+                count
+            )`
     });
 
     // upsert metadata
     await connection.query(`
-        INSERT INTO phenotype_metadata (phenotype_id, sex, chromosome, lambda_gc, count)
-        SELECT phenotype_id, sex, chromosome, lambda_gc, count FROM metadata_stage
+        INSERT INTO phenotype_metadata 
+            (phenotype_id, sex, chromosome, lambda_gc, count)
+        SELECT 
+            phenotype_id, sex, chromosome, lambda_gc, count 
+        FROM 
+            metadata_stage
         ON DUPLICATE KEY UPDATE
             lambda_gc = VALUES(lambda_gc),
             count = VALUES(count);
@@ -180,5 +237,7 @@ async function importVariants() {
 
     await connection.query(`COMMIT`);
     await connection.end();
+
+    console.log(`[${duration()} s] Done importing`);
     return 0;
 }
