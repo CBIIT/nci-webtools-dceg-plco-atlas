@@ -28,6 +28,7 @@ const databaseFilePath = inputFilePath + '.db';
 const exportVariantFilePath = inputFilePath + '.export-variant.csv';
 const exportAggregateFilePath = inputFilePath + '.export-aggregate.csv';
 const exportMetadataFilePath = inputFilePath + '.export-metadata.csv';
+const idPrefix = phenotypeId.toString().padStart(5, '0') + ['all', 'female', 'male'].indexOf(sex);
 
 //const errorLog = getLogStream(`./failed-variants-${new Date().toISOString()}.txt`);
 const errorLog = {write: e => console.log(e)};
@@ -248,7 +249,7 @@ const exportVariantStatus = spawnSync(`sqlite3`, [
     `.headers on`,
     `.output '${exportVariantFilePath}'`,
     `SELECT
-        "${phenotypeId.toString().padStart(5, '0')}" || ROW_NUMBER () OVER ( 
+        "${idPrefix}" || ROW_NUMBER () OVER ( 
             ORDER BY cr.rowid, s.p_value
         ) as id,
         ${phenotypeId} as phenotype_id,
@@ -280,7 +281,7 @@ const exportAggregateStatus = spawnSync(`sqlite3`, [
     `.headers on`,
     `.output '${exportAggregateFilePath}'`,
     `SELECT DISTINCT
-        "${phenotypeId.toString().padStart(5, '0')}" || ROW_NUMBER () OVER ( 
+        "${idPrefix}" || ROW_NUMBER () OVER ( 
             ORDER BY cr.rowid, s.p_value_nlog_aggregate
         ) as id,    
         ${phenotypeId} as phenotype_id,
