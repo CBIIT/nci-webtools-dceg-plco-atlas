@@ -1,4 +1,4 @@
 #!/bin/bash
 
-module load SQLite --latest
+module load nodejs
 node parallel-export-variant.js raw/melanoma.csv

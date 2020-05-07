@@ -15,7 +15,7 @@ lambdagc_mel|0.83
 // display help if needed
 if (!(args.file && args.phenotype_id && args.sex)) {
     console.log(`USAGE: node export-variants.js 
-        --sqlite "./sqlite"
+        --sqlite "./sqlite3"
         --file "filepath"
         --phenotype_id N
         --sex "all"`);
@@ -24,7 +24,7 @@ if (!(args.file && args.phenotype_id && args.sex)) {
 
 // parse arguments and set defaults
 const {file, phenotype_id: phenotypeId, sex, sqlite: sqliteBin} = args;
-const sqlitePath = sqliteBin || 'sqlite';
+const sqlitePath = sqliteBin || 'sqlite3';
 const inputFilePath = path.resolve(file);
 const databaseFilePath = inputFilePath + '.db';
 const exportVariantFilePath = inputFilePath + '.export-variant.csv';
@@ -149,7 +149,7 @@ connection.exec(`
 // load data into prestaging table
 console.log(`.mode csv .import ${inputFilePath} prestage`);
 console.log(`[${duration()} s] Loading data into stage table...`);
-const importStatus = spawnSync(`sqlite3`, [
+const importStatus = spawnSync(sqlitePath, [
     databaseFilePath,
     `.mode csv`,
     `.import '${inputFilePath}' prestage`
