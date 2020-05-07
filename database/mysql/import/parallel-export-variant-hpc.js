@@ -1,6 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-const { execSync, spawnSync } = require('child_process');
+const { spawnSync } = require('child_process');
 const mysql = require('mysql2');
 const sqlite = require('better-sqlite3');
 const { database } = require('../../../server/config.json');
@@ -233,7 +233,7 @@ function exportVariants({
     // load data into prestaging table
     console.log(`.mode csv .import ${inputFilePath} prestage`);
     console.log(`[${duration()} s] Loading data into stage table...`);
-    const importStatus = execSync(`sqlite3 ` + databaseFilePath + ` ".mode csv"` + ` ".import '${inputFilePath}' prestage"`);
+    const importStatus = spawnSync(`${sqlitePath} ${databaseFilePath} ".mode csv" ".import '${inputFilePath}' prestage"`);
     // show full import status if needed
     // console.log(importStatus, importStatus.stdout.toString(), importStatus.stderr.toString());
     
@@ -326,17 +326,16 @@ function exportVariants({
     db.close();
     
     console.log(`[${duration()} s] Finished setting up stage table, exporting variants to ${exportVariantFilePath}...`);
-    const exportVariantStatus = spawnSync(sqlitePath, [
-        databaseFilePath,
-        `.mode csv`,
-        `.headers on`,
-        `.output '${exportVariantFilePath}'`,
-        `SELECT
+    const exportVariantStatus = spawnSync(`${sqlitePath} ${databaseFilePath} ` + 
+        ` ".mode csv"` +
+        ` ".headers on"` +
+        ` ".output '${exportVariantFilePath}'"` +
+        ` "SELECT
             ${idPrefix} || ROW_NUMBER () OVER ( 
                 ORDER BY cr.rowid, s.p_value
             ) as id,
             ${phenotypeId} as phenotype_id,
-            "${sex}" as sex,
+            \"${sex}\" as sex,
             s.chromosome,
             s.position,
             s.snp,
@@ -354,53 +353,51 @@ function exportVariants({
             s.show_qq_plot
         FROM stage s
         JOIN chromosome_range cr ON s.chromosome = cr.chromosome
-        ORDER BY cr.rowid, s.p_value`
-    ]);
+        ORDER BY cr.rowid, s.p_value"`
+    );
     
     console.log(`[${duration()} s] Exporting aggregated variants to ${exportAggregateFilePath}...`);
-    const exportAggregateStatus = spawnSync(sqlitePath, [
-        databaseFilePath,
-        `.mode csv`,
-        `.headers on`,
-        `.output '${exportAggregateFilePath}'`,
-        `SELECT DISTINCT
-            "${idPrefix}" || ROW_NUMBER () OVER ( 
+    const exportAggregateStatus = spawnSync(`${sqlitePath} ${databaseFilePath} ` + 
+        ` ".mode csv"` +
+        ` ".headers on"` +
+        ` ".output '${exportAggregateFilePath}'"` +
+        ` "SELECT DISTINCT
+            \"${idPrefix}\" || ROW_NUMBER () OVER ( 
                 ORDER BY cr.rowid, s.p_value_nlog_aggregate
             ) as id,    
             ${phenotypeId} as phenotype_id,
-            "${sex}" as sex,
+            \"${sex}\" as sex,
             s.chromosome,
             s.position_abs_aggregate as position_abs,
             s.p_value_nlog_aggregate as p_value_nlog
         FROM stage s
         JOIN chromosome_range cr ON s.chromosome = cr.chromosome
-        ORDER BY cr.rowid, p_value_nlog`
-    ]);
+        ORDER BY cr.rowid, p_value_nlog"`
+    );
     
     console.log(`[${duration()} s] Exporting variant metadata to ${exportMetadataFilePath}...`);
-    const exportMetadataStatus = spawnSync(sqlitePath, [
-        databaseFilePath,
-        `.mode csv`,
-        `.output '${exportMetadataFilePath}'`,
-        `.headers on`,
-        `SELECT 
+    const exportMetadataStatus = spawnSync(`${sqlitePath} ${databaseFilePath} ` + 
+        ` ".mode csv"` +
+        ` ".output '${exportMetadataFilePath}'"` +
+        ` ".headers on"` +
+        ` "SELECT 
             ${phenotypeId} as phenotype_id,
-            "${sex}" as sex, 
-            "all" as chromosome, 
+            \"${sex}\" as sex, 
+            \"all\" as chromosome, 
             ${lambdaGC} as lambda_gc, 
-            ${count} as count`,
-        `.headers off`,
-        `SELECT DISTINCT
+            ${count} as count"` +
+        ` ".headers off"` +
+        ` "SELECT DISTINCT
             ${phenotypeId} as phenotype_id,
-            "${sex}" as sex,
+            \"${sex}\" as sex,
             s.chromosome as chromosome,
             null as lambda_gc,
             count(*) as count
         FROM stage s
         JOIN chromosome_range cr ON s.chromosome = cr.chromosome
         GROUP BY s.chromosome
-        ORDER BY cr.rowid`,
-    ]);
+        ORDER BY cr.rowid"`
+    );
     
     console.log([
         `[${duration()} s] Finished exporting, generated the following files:`,
