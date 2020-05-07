@@ -28,7 +28,8 @@ const databaseFilePath = inputFilePath + '.db';
 const exportVariantFilePath = inputFilePath + '.export-variant.csv';
 const exportAggregateFilePath = inputFilePath + '.export-aggregate.csv';
 const exportMetadataFilePath = inputFilePath + '.export-metadata.csv';
-const idPrefix = phenotypeId.toString().padStart(5, '0') + ['all', 'female', 'male'].indexOf(sex);
+const idPrefix = [null, 'all', 'female', 'male'].indexOf(sex) 
+    + phenotypeId.toString().padStart(5, '0');
 
 //const errorLog = getLogStream(`./failed-variants-${new Date().toISOString()}.txt`);
 const errorLog = {write: e => console.log(e)};
