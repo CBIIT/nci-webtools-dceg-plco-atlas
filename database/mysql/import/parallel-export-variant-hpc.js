@@ -1,6 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-const { exec, spawnSync } = require('child_process');
+const { execSync, spawnSync } = require('child_process');
 const mysql = require('mysql2');
 const sqlite = require('better-sqlite3');
 const { database } = require('../../../server/config.json');
@@ -233,7 +233,7 @@ function exportVariants({
     // load data into prestaging table
     console.log(`.mode csv .import ${inputFilePath} prestage`);
     console.log(`[${duration()} s] Loading data into stage table...`);
-    const importStatus = exec(`sqlite3 ` + databaseFilePath + ` ".mode csv"` + ` ".import '${inputFilePath}' prestage"`);
+    const importStatus = execSync(`sqlite3 ` + databaseFilePath + ` ".mode csv"` + ` ".import '${inputFilePath}' prestage"`);
     // show full import status if needed
     // console.log(importStatus, importStatus.stdout.toString(), importStatus.stderr.toString());
     
