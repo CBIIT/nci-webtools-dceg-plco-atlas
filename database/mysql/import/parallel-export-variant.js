@@ -60,23 +60,6 @@ for (let filepath of [
 const connection = new sqlite(databaseFilePath);
 connection.function('LOG10', {deterministic: true}, v => Math.log10(v));
 connection.function('POW', {deterministic: true}, (base, exp) => Math.pow(base, exp));
-connection.function('LPAD', {deterministic: true}, (str, len, char) => {
-    return 0;
-    /*
-    const array = new Array(len);
-    const offset = len - str.length;
-
-    for (let i = 0; i < array.length; i ++) {
-        array[i] = char;
-    }
-
-    for (let j = 0; j < str.length; j ++) {
-        array[offset + j] = str[j];
-    }
-
-    return array;
-    */
-});
 
 connection.exec(`
     -- set up chromosome ranges
