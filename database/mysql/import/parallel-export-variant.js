@@ -24,7 +24,7 @@ if (!(args.file && args.phenotype_id && args.sex)) {
 
 // parse arguments and set defaults
 const {file, phenotype_id: phenotypeId, sex, sqlite: sqliteBin} = args;
-const sqlitePath = sqliteBin ? path.resolve(sqliteBin) : 'sqlite';
+const sqlitePath = sqliteBin || 'sqlite';
 const inputFilePath = path.resolve(file);
 const databaseFilePath = inputFilePath + '.db';
 const exportVariantFilePath = inputFilePath + '.export-variant.csv';
