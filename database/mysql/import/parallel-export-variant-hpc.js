@@ -358,7 +358,7 @@ function exportVariants({
         ORDER BY cr.rowid, s.p_value`
     ]);
 
-    console.log("exportVariantStatus", exportVariantStatus);
+    console.log("exportVariantStatus", exportVariantStatus.stdout.toString(), exportVariantStatus.stderr.toString());
     
     console.log(`[${duration()} s] Exporting aggregated variants to ${exportAggregateFilePath}...`);
     const exportAggregateStatus = spawnSync(sqlitePath, [
@@ -380,7 +380,7 @@ function exportVariants({
         ORDER BY cr.rowid, p_value_nlog`
     ]);
 
-    console.log("exportAggregateStatus", exportAggregateStatus);
+    console.log("exportAggregateStatus", exportAggregateStatus.stdout.toString(), exportAggregateStatus.stderr.toString());
     
     console.log(`[${duration()} s] Exporting variant metadata to ${exportMetadataFilePath}...`);
     const exportMetadataStatus = spawnSync(sqlitePath, [
@@ -407,7 +407,7 @@ function exportVariants({
         ORDER BY cr.rowid`,
     ]);
 
-    console.log("exportMetadataStatus", exportMetadataStatus);
+    console.log("exportMetadataStatus", exportMetadataStatus, exportMetadataStatus.stdout.toString(), exportAggregateStatus.stderr.toString());
     
     console.log([
         `[${duration()} s] Finished exporting, generated the following files:`,
