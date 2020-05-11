@@ -125,10 +125,10 @@ function exportVariants({
     sex,
 }) {
     const inputDirectory = path.dirname(inputFilePath);
-    const databaseFilePath = path.resolve(inputDirectory, `export.${phenotypeId}.db`);
-    const exportVariantFilePath = path.resolve(inputDirectory, `export-variant.${phenotypeId}.csv`);
-    const exportAggregateFilePath = path.resolve(inputDirectory, `export-aggregate.${phenotypeId}.csv`);
-    const exportMetadataFilePath = path.resolve(inputDirectory, `export-metadata.${phenotypeId}.csv`);
+    const databaseFilePath = path.resolve(inputDirectory, `export.${phenotypeId}.${sex}.db`);
+    const exportVariantFilePath = path.resolve(inputDirectory, `export-variant.${phenotypeId}.${sex}.csv`);
+    const exportAggregateFilePath = path.resolve(inputDirectory, `export-aggregate.${phenotypeId}.${sex}.csv`);
+    const exportMetadataFilePath = path.resolve(inputDirectory, `export-metadata.${phenotypeId}.${sex}.csv`);
     const idPrefix = [null, 'all', 'female', 'male'].indexOf(sex) 
         + phenotypeId.toString().padStart(5, '0');
 
