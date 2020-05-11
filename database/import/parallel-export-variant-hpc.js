@@ -1,9 +1,9 @@
 const fs = require('fs');
 const path = require('path');
-const { execSync, spawnSync } = require('child_process');
+const { execSync } = require('child_process');
 const mysql = require('mysql2');
 const sqlite = require('better-sqlite3');
-const { database } = require('../../../server/config.json');
+const { database } = require('../../server/config.json');
 const { timestamp } = require('./utils/logging');
 const { getLambdaGC } = require('./utils/math');
 const { getRecords, pluck } = require('./utils/query');

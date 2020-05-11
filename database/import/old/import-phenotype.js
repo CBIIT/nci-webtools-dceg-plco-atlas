@@ -4,10 +4,10 @@ const mysql = require('mysql2');
 const parse = require('csv-parse/lib/sync')
 const args = require('minimist')(process.argv.slice(2));
 const { database } = require('../../../server/config.json');
-const { timestamp } = require('./utils/logging');
-const { readFile } = require('./utils/file');
-const { getRecords, pluck } = require('./utils/query');
-const { getIntervals, getLambdaGC } = require('./utils/math');
+const { timestamp } = require('../utils/logging');
+const { readFile } = require('../utils/file');
+const { getRecords, pluck } = require('../utils/query');
+const { getIntervals, getLambdaGC } = require('../utils/math');
 
 // display help if needed
 if (!(args.file)) {
