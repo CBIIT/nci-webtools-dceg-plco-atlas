@@ -66,7 +66,8 @@ if (!/^(all|female|male)$/.test(sex)) {
 
 (async function main() {
     try {
-        let {id: phenotypeId} = await validatePhenotype(connection, phenotype);
+        // let {id: phenotypeId} = await validatePhenotype(connection, phenotype);
+        let phenotypeId = phenotype;
 
         let {
             exportVariantFilePath, 
