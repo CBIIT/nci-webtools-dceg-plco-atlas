@@ -3,10 +3,10 @@ const mysql = require('mysql2');
 const args = require('minimist')(process.argv.slice(2));
 const ranges = require('../../json/chromosome_ranges.json');
 const { database } = require('../../../server/config.json');
-const { timestamp } = require('./utils/logging');
-const { readFile } = require('./utils/file');
-const { getRecords, pluck } = require('./utils/query');
-const { getIntervals, getLambdaGC } = require('./utils/math');
+const { timestamp } = require('../utils/logging');
+const { readFile } = require('../utils/file');
+const { getRecords, pluck } = require('../utils/query');
+const { getIntervals, getLambdaGC } = require('../utils/math');
 
 /**
 lambdagc_ewing|1.036
