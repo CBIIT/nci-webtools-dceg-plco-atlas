@@ -1,31 +1,27 @@
 const fs = require('fs');
+const path = require('path');
 const mysql = require('mysql2');
 const args = require('minimist')(process.argv.slice(2));
+const { getRecords } = require('./utils/query');
 const { database } = require('../../server/config.json');
 const { timestamp } = require('./utils/logging');
-module.exports = {importVariants};
 
 // display help if needed
-if (!(args.variant_file && args.aggregate_file && args.metadata_file && args.phenotype && args.sex)) {
+if (!args.file) {
     console.log(`USAGE: node import-variant-csv.js
-            --variant_file "filename"
-            --aggregate_file "filename"
-            --metadata_file "filename"
-            --phenotype "phenotype name or id"
-            --sex "all" | "female" | "male"
+            --file "phenotype_id.sex.csv"
             --reset (if specified, drop the variant/summary partitions before importing)`);
     process.exit(0);
 }
 
 // parse arguments and set defaults
-const {
-    variant_file: exportVariantFilePath,    
-    aggregate_file: exportAggregateFilePath,
-    metadata_file: exportMetadataFilePath,
-    phenotype, 
-    sex, 
-    reset, 
-} = args;
+const {file, reset} = args;
+const filepath = path.resolve(file);
+const [phenotypeId, sex] = path.basename(filepath).split('.');
+const exportVariantFilePath = filepath + '.variant.csv';
+const exportAggregateFilePath = filepath + '.aggregate.csv';
+const exportMetadataFilePath = filepath + '.metadata.csv';
+
 //const errorLog = getLogStream(`./failed-variants-${new Date().toISOString()}.txt`);
 const errorLog = {write: e => console.log(e)};
 const duration = timestamp();
@@ -53,14 +49,14 @@ if (!/^(all|female|male)$/.test(sex)) {
 
 (async function main() {
     try {
-        const {id: phenotypeId} = validatePhenotype(connection, phenotype);
+        const {id} = await validatePhenotype(connection, phenotypeId);
 
         await importVariants({
             connection,
             exportVariantFilePath, 
             exportAggregateFilePath, 
             exportMetadataFilePath,
-            phenotypeId,
+            phenotypeId: id,
             sex,
             reset,    
         });

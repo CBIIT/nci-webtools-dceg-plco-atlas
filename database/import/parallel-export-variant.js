@@ -1,13 +1,10 @@
 const fs = require('fs');
 const path = require('path');
 const { execSync } = require('child_process');
-const mysql = require('mysql2');
 const sqlite = require('better-sqlite3');
 const parseCsv = require('csv-parse/lib/sync')
-const { database } = require('../../server/config.json');
 const { timestamp } = require('./utils/logging');
 const { getLambdaGC } = require('./utils/math');
-const { getRecords, pluck } = require('./utils/query');
 const args = require('minimist')(process.argv.slice(2));
 
 /**
