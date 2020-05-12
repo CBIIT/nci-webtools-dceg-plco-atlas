@@ -8,8 +8,8 @@ const { timestamp } = require('./utils/logging');
 
 // display help if needed
 if (!args.file) {
-    console.log(`USAGE: node import-variant-csv.js
-            --file "phenotype_id.sex.csv"
+    console.log(`USAGE: node parallel-import-variant.js
+            --file "path to file prefix. eg: phenotype_id.sex"
             --reset (if specified, drop the variant/summary partitions before importing)`);
     process.exit(0);
 }
