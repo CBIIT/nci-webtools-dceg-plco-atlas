@@ -15,6 +15,14 @@ export const hoverLayout = {
   },
 }
 
+let margin = {
+  l: 50,
+  r: 50,
+  b: 100,
+  t: 30,
+  pad: 4
+};
+
 export const opaqueColors = [
   `rgba(23, 118, 182, 1)`,
   `rgba(255, 127, 0, 1)`,
@@ -111,6 +119,7 @@ export const BarChart = ({ data, categories, xTitle, yTitle, yMax, formatPercent
       return plotData;
     })}
     layout={{
+      margin,
       // ...hoverLayout,
       hovermode: 'closest',
       xaxis: {
@@ -201,6 +210,7 @@ export const AreaChart = ({data, categories, xTitle, yTitle, formatPercent}) => 
       }]}
       layout={{
         ...hoverLayout,
+        margin,
         xaxis: {
             fixedrange: true,
             automargin: true,
@@ -307,6 +317,7 @@ export const GroupedAreaChart = ({data, categories, xTitle, yTitle, fill, yMax, 
       return plotData;
     })}
     layout={{
+      margin,
       ...hoverLayout,
       hovermode: 'x',
       xaxis: {
@@ -353,6 +364,7 @@ export const PieChart = ({ data, categories }) => (
       }
     ]}
     layout={{
+      margin,
       ...hoverLayout,
       showlegend: true,
       autosize: true
