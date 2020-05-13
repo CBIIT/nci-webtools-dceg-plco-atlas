@@ -1,3 +1,3 @@
-module use ~/mymodules; module load nodejs; module load SQLite_3.31.1; sqlite3 --version; node parallel-export-variant.js --file "../raw/ewings_sarcoma.csv" --phenotype 10001 --sex "all";
-module use ~/mymodules; module load nodejs; module load SQLite_3.31.1; sqlite3 --version; node parallel-export-variant.js --file "../raw/ewings_sarcoma.csv" --phenotype 10001 --sex "female";
-module use ~/mymodules; module load nodejs; module load SQLite_3.31.1; sqlite3 --version; node parallel-export-variant.js --file "../raw/ewings_sarcoma.csv" --phenotype 10001 --sex "male";
+module use ~/mymodules; module load nodejs; module load SQLite_3.31.1; sqlite3 --version; node ../parallel-export-variant.js --file "../raw/ewings_sarcoma.csv" --phenotype 10001 --sex "all";
+module use ~/mymodules; module load nodejs; module load SQLite_3.31.1; sqlite3 --version; node ../parallel-export-variant.js --file "../raw/ewings_sarcoma.csv" --phenotype 10001 --sex "female";
+module use ~/mymodules; module load nodejs; module load SQLite_3.31.1; sqlite3 --version; node ../parallel-export-variant.js --file "../raw/ewings_sarcoma.csv" --phenotype 10001 --sex "male";
