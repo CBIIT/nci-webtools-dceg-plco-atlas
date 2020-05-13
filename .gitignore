@@ -1,6 +1,7 @@
 /node_modules/
 /database/import/raw/*
-/database/import/slurm*
+/database/import/hpc/slurm*
+/database/import/hpc/swarm*
 /server/logs/
 /server/data/
 /www/
