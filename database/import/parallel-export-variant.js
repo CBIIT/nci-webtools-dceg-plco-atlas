@@ -14,10 +14,10 @@ lambdagc_mel|0.83
 */
 
 // display help if needed
-if (!(args.file && args.phenotype && args.sex)) {
+if (!(args.file)) {
     console.log(`USAGE: node export-variants.js 
         --sqlite "./sqlite3"
-        --file "filepath"
+        --file "optionally, phenotype.sex.csv"
         --phenotype_file "raw/phenotype.csv"
         --phenotype "test_melanoma" or 10002
         --sex "all"
@@ -26,12 +26,15 @@ if (!(args.file && args.phenotype && args.sex)) {
 }
 
 // parse arguments and set defaults
-const {sqlite: sqlite3, file, phenotype_file: phenotypeFile, phenotype, sex, validate } = args;
+let {sqlite: sqlite3, file, phenotype_file: phenotypeFile, phenotype, sex, validate } = args;
 const sqlitePath = sqlite3 || 'sqlite3';
 const phenotypeFilePath = phenotypeFile || 'raw/phenotype.csv';
 
 const inputFilePath = path.resolve(file);
 const phenotypePath = path.resolve(phenotypeFilePath);
+let [fileNamePhenotype, fileNamesex] = path.basename(inputFilePath).split('.');
+if (!phenotype) phenotype = fileNamePhenotype;
+if (!sex) sex = fileNamesex;
 
 //const errorLog = getLogStream(`./failed-variants-${new Date().toISOString()}.txt`);
 const errorLog = {write: e => console.log(e)};
