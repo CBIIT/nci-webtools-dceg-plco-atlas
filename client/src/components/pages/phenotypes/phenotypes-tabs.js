@@ -1,15 +1,14 @@
 import React, {useState, useEffect} from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Tab, Tabs, Form } from 'react-bootstrap';
+import paginationFactory from 'react-bootstrap-table2-paginator';
 
 import { updateBrowsePhenotypes, updateBrowsePhenotypesPlots } from '../../../services/actions';
 import { query } from '../../../services/query';
 import { BarChart, AreaChart, GroupedAreaChart, PieChart, PhenotypesRelated } from './phenotypes-charts';
-import { LoadingOverlay } from '../../controls/loading-overlay';
-
-import paginationFactory from 'react-bootstrap-table2-paginator';
 import { Table, paginationSizeSelector, paginationText, paginationButton } from '../../controls/table/table';
-
+import { LoadingOverlay } from '../../controls/loading-overlay';
+import { ButtonGroup } from '../../controls/button-group';
 
 export function PhenotypesTabs(props) {
   const dispatch = useDispatch();
@@ -130,18 +129,20 @@ export function PhenotypesTabs(props) {
       }));
     }
 
-    return <Table
-      keyField="id"
-      data={data}
-      columns={columns}
-      pagination={paginationFactory({
-        showTotal: data ? data.length > 0 : false,
-        sizePerPageList: [25, 50, 100],
-        paginationTotalRenderer: paginationText('record', 'records'),
-        sizePerPageRenderer: paginationSizeSelector,
-        pageButtonRenderer: paginationButton
-      })}
-    />;
+    return <div className="mt-4">
+      <Table
+        keyField="id"
+        data={data}
+        columns={columns}
+        pagination={paginationFactory({
+          showTotal: data ? data.length > 0 : false,
+          sizePerPageList: [25, 50, 100],
+          paginationTotalRenderer: paginationText('record', 'records'),
+          sizePerPageRenderer: paginationSizeSelector,
+          pageButtonRenderer: paginationButton
+        })}
+      />
+    </div>;
   }
 
   useEffect(() => {
@@ -165,14 +166,18 @@ export function PhenotypesTabs(props) {
           style={{ minHeight: '600px'}}>
 
           <div className="m-2 text-right">
-            <button 
-              className="btn btn-silver"
-              onClick={e => setDisplayType({
+            <ButtonGroup 
+              size="sm" 
+              options={[
+                {label: 'Plot', value: 'plot'},
+                {label: 'Table', value: 'table'},
+              ]}
+              value={displayType.frequency}
+              onChange={value => setDisplayType({
                 ...displayType, 
-                frequency: displayType.frequency === 'plot' ? 'table' : 'plot'
-              })}>
-              {displayType.frequency === 'plot' ?  'Show Table' : 'Show Plot'}
-            </button>
+                frequency: value
+              })}
+            />              
           </div>
 
           {phenotypeData && phenotypeData.frequency && phenotypeData.categories && <>
@@ -208,7 +213,7 @@ export function PhenotypesTabs(props) {
 
 
             <div className="d-flex align-items-center justify-content-between">
-              <div className="m-2 text-left">{[
+              {false && <div className="m-2 text-left">{[
                 {label: 'Counts', value: 'counts'},
                 {label: 'Percentage', value: 'percentage'},
               ].filter(Boolean).map((e, i) =>
@@ -225,9 +230,37 @@ export function PhenotypesTabs(props) {
                   key={`${t.key}-${e.value}-${e.id}`}
                   disabled={displayType[t.key] === 'table'}
                 />
-              )}</div>
+              )}</div>}
 
-              {t.key === 'frequencyByAge' && <button 
+
+              <ButtonGroup 
+                size="sm" 
+                disabled={displayType[t.key] === 'table'}
+                options={[
+                  {label: 'Counts', value: 'counts'},
+                  {label: 'Percentage', value: 'percentage'},
+                ]}
+                value={frequencyType[t.key]}
+                onChange={value => setFrequencyType({
+                  ...frequencyType, 
+                  [t.key]: value
+                })}
+              />                     
+
+              <ButtonGroup 
+                size="sm" 
+                options={[
+                  {label: 'Plot', value: 'plot'},
+                  {label: 'Table', value: 'table'},
+                ]}
+                value={displayType[t.key]}
+                onChange={value => setDisplayType({
+                  ...displayType, 
+                  [t.key]: value
+                })}
+              />              
+
+              {false && t.key === 'frequencyByAge' && <button 
                 className="btn btn-silver"
                 onClick={e => setDisplayType({
                   ...displayType, 
@@ -236,7 +269,7 @@ export function PhenotypesTabs(props) {
                 {displayType[t.key] === 'plot' ?  'Show Table' : 'Show Plot'}
               </button>}
 
-              {t.key === 'frequencyByAncestry' && <div className="m-2 text-left">{[
+              {false && t.key === '1frequencyByAncestry' && <div className="m-2 text-left">{[
                 {label: 'Show Plot', value: 'plot'},
                 {label: 'Show Table', value: 'table'},
               ].filter(Boolean).map((e, i) =>
@@ -254,9 +287,10 @@ export function PhenotypesTabs(props) {
                 />
             )}</div>}          
 
-           </div>
+            </div>
 
-           {t.key === 'frequencyBySex' && <div class="text-center">
+
+           {false && t.key === 'frequencyBySex' && <div class="text-center">
             <button 
                   className="btn btn-link font-weight-bold"
                   onClick={e => setDisplayType({
