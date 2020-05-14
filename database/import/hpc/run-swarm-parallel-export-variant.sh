@@ -6,6 +6,9 @@ SWARM_FILE="export-all-phenotypes.swarm"
 # Input directory path
 INPUT_DIR="../raw/input"
 
+# Output directory path
+OUTPUT_DIR="../raw/output"
+
 # Export script path
 EXPORT_SCRIPT="../parallel-export-variant.js"
 
@@ -31,14 +34,14 @@ do
         for DFILE in $FILE/*
         do
             echo "Found file: $DFILE"
-            echo "$DEPENDENCIES node $EXPORT_SCRIPT --file $DFILE"
-            echo "$DEPENDENCIES node $EXPORT_SCRIPT --file $DFILE" >> $SWARM_FILE
+            echo "$DEPENDENCIES node $EXPORT_SCRIPT --file $DFILE --output $OUTPUT_DIR --validate"
+            echo "$DEPENDENCIES node $EXPORT_SCRIPT --file $DFILE --output $OUTPUT_DIR --validate" >> $SWARM_FILE
             echo ""
         done
     else
         echo "Found file: $FILE"
-        echo "$DEPENDENCIES node $EXPORT_SCRIPT --file $FILE"
-        echo "$DEPENDENCIES node $EXPORT_SCRIPT --file $FILE" >> $SWARM_FILE
+        echo "$DEPENDENCIES node $EXPORT_SCRIPT --file $FILE --output $OUTPUT_DIR --validate"
+        echo "$DEPENDENCIES node $EXPORT_SCRIPT --file $FILE --output $OUTPUT_DIR --validate" >> $SWARM_FILE
         echo ""
     fi
 done
