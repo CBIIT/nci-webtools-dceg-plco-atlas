@@ -213,26 +213,6 @@ export function PhenotypesTabs(props) {
 
 
             <div className="d-flex align-items-center justify-content-between">
-              {false && <div className="m-2 text-left">{[
-                {label: 'Counts', value: 'counts'},
-                {label: 'Percentage', value: 'percentage'},
-              ].filter(Boolean).map((e, i) =>
-                <Form.Check
-                  custom
-                  inline
-                  label={e.label}
-                  className="font-weight-normal cursor-pointer mr-4"
-                  onChange={e => setFrequencyType({...frequencyType, [t.key]: e.target.value})}
-                  checked={frequencyType[t.key] == e.value}
-                  value={e.value}
-                  type="radio"
-                  id={`select-${t.key}-${e.value}`}
-                  key={`${t.key}-${e.value}-${e.id}`}
-                  disabled={displayType[t.key] === 'table'}
-                />
-              )}</div>}
-
-
               <ButtonGroup 
                 size="sm" 
                 disabled={displayType[t.key] === 'table'}
@@ -258,48 +238,8 @@ export function PhenotypesTabs(props) {
                   ...displayType, 
                   [t.key]: value
                 })}
-              />              
-
-              {false && t.key === 'frequencyByAge' && <button 
-                className="btn btn-silver"
-                onClick={e => setDisplayType({
-                  ...displayType, 
-                  [t.key]: displayType[t.key] === 'plot' ? 'table' : 'plot'
-                })}>
-                {displayType[t.key] === 'plot' ?  'Show Table' : 'Show Plot'}
-              </button>}
-
-              {false && t.key === '1frequencyByAncestry' && <div className="m-2 text-left">{[
-                {label: 'Show Plot', value: 'plot'},
-                {label: 'Show Table', value: 'table'},
-              ].filter(Boolean).map((e, i) =>
-                <Form.Check
-                  custom
-                  inline
-                  label={e.label}
-                  className="font-weight-normal cursor-pointer mr-4"
-                  onChange={e => setDisplayType({...displayType, [t.key]: e.target.value})}
-                  checked={displayType[t.key] == e.value}
-                  value={e.value}
-                  type="radio"
-                  id={`select-${t.key}-${e.value}`}
-                  key={`${t.key}-${e.value}-${e.id}`}
-                />
-            )}</div>}          
-
+              />
             </div>
-
-
-           {false && t.key === 'frequencyBySex' && <div class="text-center">
-            <button 
-                  className="btn btn-link font-weight-bold"
-                  onClick={e => setDisplayType({
-                    ...displayType, 
-                    [t.key]: displayType[t.key] === 'plot' ? 'table' : 'plot'
-                  })}>
-                  {displayType[t.key] === 'plot' ?  'Show Table' : 'Show Plot'}
-              </button>
-            </div>}
 
             {phenotypeData && phenotypeData[t.key] && <>
               {displayType[t.key] === 'plot' && <div className="text-center">
