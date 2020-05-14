@@ -1,6 +1,7 @@
 import React, {useState, useEffect} from 'react';
 
 export function ButtonGroup({
+    name = 'button-group',
     options = [], 
     value = null, 
     onChange = v => {}, 
@@ -21,16 +22,25 @@ export function ButtonGroup({
     return (
         <div className="btn-group" role="group">
             {options.map(option => 
-                <button
-                    disabled={disabled}
+                <label
                     className={[
                         'btn',
+                        'c-pointer',
+                        disabled ? 'disabled' : '',
                         ['lg', 'sm'].includes(size) ? `btn-${size}` : ``,
                         option.value === _value ? activeClass : inactiveClass,
-                    ].join(' ')}
-                    onClick={_ => handleChange(option.value)}>
+                    ].join(' ')}>
+                    <input 
+                        disabled={disabled}
+                        className="sr-only"
+                        type="radio" 
+                        name={name} 
+                        value={option.value}
+                        checked={option.value === _value}
+                        onChange={_ => handleChange(option.value)}
+                    />
                     {option.label}
-                </button>)}
+                </label>)}
         </div>
     );
 }
