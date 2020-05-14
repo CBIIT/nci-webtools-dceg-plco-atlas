@@ -14,23 +14,26 @@ lambdagc_mel|0.83
 */
 
 // display help if needed
-if (!(args.file)) {
+if (!(args.file) || !(args.output)) {
     console.log(`USAGE: node export-variants.js 
-        --sqlite "./sqlite3"
-        --file "optionally, phenotype.sex.csv"
-        --phenotype_file "raw/phenotype.csv"
-        --phenotype "test_melanoma" or 10002
-        --sex "all"
-        --validate`);
+        --sqlite "./sqlite3" [OPTIONAL, use PATH by default]
+        --file "phenotype.sex.csv" [REQUIRED]
+        --phenotype_file "raw/phenotype.csv" [OPTIONAL, use raw/phenotype.csv by default]
+        --phenotype "test_melanoma" or 10002 [OPTIONAL, use filename by default]
+        --sex "all" [OPTIONAL, use filename by default]
+        --validate [REQUIRED only if phenotype name is used as identifier]
+        --output [REQUIRED]
+    `);
     process.exit(0);
 }
 
 // parse arguments and set defaults
-let {sqlite: sqlite3, file, phenotype_file: phenotypeFile, phenotype, sex, validate } = args;
+let {sqlite: sqlite3, file, phenotype_file: phenotypeFile, phenotype, sex, validate, output } = args;
 const sqlitePath = sqlite3 || 'sqlite3';
 const phenotypeFilePath = phenotypeFile || 'raw/phenotype.csv';
 
 const inputFilePath = path.resolve(file);
+const outputFilePath = path.resolve(output);
 const phenotypePath = path.resolve(phenotypeFilePath);
 let [fileNamePhenotype, fileNamesex] = path.basename(inputFilePath).split('.');
 if (!phenotype) phenotype = fileNamePhenotype;
@@ -78,6 +81,7 @@ if (!validate && !/^\d+$/.test(phenotype)) {
         exportVariants({
             sqlitePath,
             inputFilePath,
+            outputFilePath,
             phenotypeId,
             sex,
         });
@@ -116,14 +120,16 @@ function validatePhenotype(phenotypePath, phenotype) {
 function exportVariants({
     sqlitePath,
     inputFilePath,
+    outputFilePath,
     phenotypeId,
     sex,
 }) {
-    const inputDirectory = path.dirname(inputFilePath);
-    const databaseFilePath = path.resolve(inputDirectory, `${phenotypeId}.${sex}.db`);
-    const exportVariantFilePath = path.resolve(inputDirectory, `${phenotypeId}.${sex}.variant.csv`);
-    const exportAggregateFilePath = path.resolve(inputDirectory, `${phenotypeId}.${sex}.aggregate.csv`);
-    const exportMetadataFilePath = path.resolve(inputDirectory, `${phenotypeId}.${sex}.metadata.csv`);
+    // const inputDirectory = path.dirname(inputFilePath);
+    // const outputDirectory = path.dirname(outputFilePath);
+    const databaseFilePath = path.resolve(outputFilePath, `${phenotypeId}.${sex}.db`);
+    const exportVariantFilePath = path.resolve(outputFilePath, `${phenotypeId}.${sex}.variant.csv`);
+    const exportAggregateFilePath = path.resolve(outputFilePath, `${phenotypeId}.${sex}.aggregate.csv`);
+    const exportMetadataFilePath = path.resolve(outputFilePath, `${phenotypeId}.${sex}.metadata.csv`);
     const idPrefix = [null, 'all', 'female', 'male'].indexOf(sex) 
         + phenotypeId.toString().padStart(5, '0');
 
