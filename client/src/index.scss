@@ -36,6 +36,10 @@ label.required::after {
   color: red;
 }
 
+label.disabled {
+  cursor: not-allowed;
+}
+
 a:hover, a:focus {
   text-decoration: underline;
 }
