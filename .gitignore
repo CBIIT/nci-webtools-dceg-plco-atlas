@@ -2,6 +2,7 @@
 /database/import/raw/*
 /database/import/hpc/slurm*
 /database/import/hpc/swarm*
+/database/import/hpc/export-all-phenotypes.swarm
 /server/logs/
 /server/data/
 /www/
