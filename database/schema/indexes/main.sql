@@ -1,3 +1,8 @@
+-- participant data
+ALTER TABLE participant_data
+    ADD INDEX idx_participant_data__participant_id (participant_id),
+    ADD INDEX idx_participant_data__value (value);
+
 -- phenotype correlations
 ALTER TABLE phenotype_correlation
     ADD INDEX idx_phenotype_correlation__phenotype_a (phenotype_a),
