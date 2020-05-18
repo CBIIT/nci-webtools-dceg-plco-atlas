@@ -2,11 +2,11 @@ CREATE TABLE IF NOT EXISTS `phenotype` (
     `id` INTEGER PRIMARY KEY NOT NULL AUTO_INCREMENT,
     `parent_id` INTEGER NULL,
     `name` VARCHAR(200),
+    `age_name` VARCHAR(200),
     `display_name` VARCHAR(200),
     `description` MEDIUMTEXT,
     `color` VARCHAR(40),
     `type` ENUM('binary', 'categorical', 'continuous') NULL,
-    `has_diagnosis_age` BOOLEAN,
     `participant_count` BIGINT,
     `import_count` BIGINT,
     `import_date` DATETIME,
@@ -63,7 +63,6 @@ CREATE TABLE IF NOT EXISTS `phenotype_correlation` (
 
 CREATE TABLE IF NOT EXISTS `participant` (
     `id` INTEGER PRIMARY KEY NOT NULL AUTO_INCREMENT,
-    `age` INTEGER,
     `sex` ENUM('female', 'male'),
     `ancestry` ENUM(
         'white',
@@ -80,7 +79,7 @@ CREATE TABLE IF NOT EXISTS `participant_data` (
     `phenotype_id` INTEGER NOT NULL,
     `participant_id` INTEGER,
     `value` DOUBLE,
-    `diagnosis_age` INTEGER,
+    `age` INTEGER,
     FOREIGN KEY (phenotype_id) REFERENCES phenotype(id),
     FOREIGN KEY (participant_id) REFERENCES participant(id)
 );
