@@ -3,11 +3,11 @@ const path = require('path');
 const mysql = require('mysql2');
 const parse = require('csv-parse/lib/sync')
 const args = require('minimist')(process.argv.slice(2));
-const { database } = require('../../../server/config.json');
-const { timestamp } = require('../utils/logging');
-const { readFile } = require('../utils/file');
-const { getRecords, pluck } = require('../utils/query');
-const { getIntervals, getLambdaGC } = require('../utils/math');
+const { database } = require('../../server/config.json');
+const { timestamp } = require('./utils/logging');
+const { readFile } = require('./utils/file');
+const { getRecords, pluck } = require('./utils/query');
+const { getIntervals, getLambdaGC } = require('./utils/math');
 
 // display help if needed
 if (!(args.file)) {
@@ -75,7 +75,7 @@ async function importPhenotypes() {
     let records = parse(readFile(inputFilePath), {
         bom: true,
         from_line: 2,
-        columns: ['id', 'parent_id', 'display_name', 'name', 'description', 'type'],
+        columns: ['id', 'parent_id', 'display_name', 'name', 'description', 'type', 'age_name'],
         on_record: (record, context) => {
             // ensure that:
             // id and parent_id are numeric values or null
@@ -156,7 +156,8 @@ async function importPhenotypes() {
             name: `test_ewings_sarcoma`,
             display_name: `Ewing's Sarcoma`,
             description: `Test Description`,
-            type: `binary`
+            type: `binary`,
+            age_name: null,
         },
         {
             id: parentId + 2,
@@ -164,7 +165,8 @@ async function importPhenotypes() {
             name: `test_melanoma`,
             display_name: `Melanoma`,
             description: `Test Description`,
-            type: `binary`
+            type: `binary`,
+            age_name: null,
         },
         {
             id: parentId + 3,
@@ -172,7 +174,8 @@ async function importPhenotypes() {
             name: `test_renal_cell_carcinoma`,
             display_name: `Renal Cell Carcinoma`,
             description: `Test Description`,
-            type: `binary`
+            type: `binary`,
+            age_name: null,
         },
     );
 
@@ -181,8 +184,8 @@ async function importPhenotypes() {
 
         // record.color = colors[record.id] || colors[record.display_name] || null;
         await connection.execute(
-            `INSERT INTO phenotype (id, parent_id, display_name, name, description, type)
-                VALUES (:id, :parent_id, :display_name, :name, :description, :type)`,
+            `INSERT INTO phenotype (id, parent_id, display_name, name, description, type, age_name)
+                VALUES (:id, :parent_id, :display_name, :name, :description, :type, :age_name)`,
             record
         );
     };

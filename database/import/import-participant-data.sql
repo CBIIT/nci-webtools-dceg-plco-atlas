@@ -15,17 +15,16 @@ DROP TABLE IF EXISTS participant;
 
 CREATE TABLE IF NOT EXISTS `participant` (
     `id`            INTEGER PRIMARY KEY NOT NULL AUTO_INCREMENT,
-    `age`           INTEGER,
     `sex`           ENUM('female', 'male'),
     `ancestry`      ENUM('white', 'black', 'hispanic', 'asian', 'pacific_islander', 'american_indian')
 );
 
 CREATE TABLE IF NOT EXISTS `participant_data` (
-    `id`                BIGINT PRIMARY KEY NOT NULL AUTO_INCREMENT,
-    `phenotype_id`      INTEGER NOT NULL,
-    `participant_id`    INTEGER,
-    `value`             DOUBLE,
-    `diagnosis_age`     INTEGER,
+    `id` BIGINT PRIMARY KEY NOT NULL AUTO_INCREMENT,
+    `phenotype_id` INTEGER NOT NULL,
+    `participant_id` INTEGER,
+    `value` DOUBLE,
+    `age` INTEGER,
     FOREIGN KEY (phenotype_id) REFERENCES phenotype(id),
     FOREIGN KEY (participant_id) REFERENCES participant(id)
 );
@@ -1409,10 +1408,9 @@ LOAD DATA LOCAL INFILE "raw/participant_data.tsv" INTO TABLE participant_data_st
         has_nonadvanced_adenoma = IF(@has_nonadvanced_adenoma IN('NA', ''), NULL, @has_nonadvanced_adenoma);
 
 -- import phenotype_sample values
-INSERT INTO participant (id, age, ancestry, sex)
+INSERT INTO participant (id, ancestry, sex)
 SELECT
     id,
-    bq_age_co as age,
     CASE bq_race7_ca
         WHEN 1 THEN 'white'
         WHEN 2 THEN 'black'
@@ -1429,12 +1427,14 @@ SELECT
     END AS sex
 FROM participant_data_stage;
 
--- set has_diagnosis_age flag
-UPDATE phenotype p SET has_diagnosis_age = (
+-- remove invalid age_name values
+UPDATE phenotype p 
+    SET age_name = NULL
+    WHERE 0 = (
     SELECT COUNT(*) FROM information_schema.columns
       WHERE
         table_name = 'participant_data_stage' AND 
-        column_name = CONCAT(p.name, '_dx_age'));
+        column_name = p.age_name);
 
 -- import participant_data values
 CALL insert_participant_data();
