@@ -33,11 +33,13 @@ let {sqlite: sqlite3, file, phenotype_file: phenotypeFile, phenotype, sex, valid
 const sqlitePath = sqlite3 || 'sqlite3';
 const phenotypeFilePath = phenotypeFile || 'raw/phenotype.csv';
 
-const inputFilePath = path.resolve(file);
+let inputFilePath = path.resolve(file);
+const filename = path.basename(inputFilePath);
 const outputFilePath = path.resolve(output);
 const tmpFilePath = tmp ? path.resolve(tmp) : outputFilePath;
+
 const phenotypePath = path.resolve(phenotypeFilePath);
-let [fileNamePhenotype, fileNamesex] = path.basename(inputFilePath).split('.');
+let [fileNamePhenotype, fileNamesex] = filename.split('.');
 if (!phenotype) phenotype = fileNamePhenotype;
 if (!sex) sex = fileNamesex;
 
@@ -73,8 +75,38 @@ if (!validate && !/^\d+$/.test(phenotype)) {
     process.exit(1);
 }
 
+const fileExtension = path.extname(inputFilePath);
+// if input file is compressed, copy to tmpFilePath and unzip
+// change inputFilePath to unzipped file path
+if (/^(.gz)$/.test(fileExtension)) {
+    const zippedFileDest = path.resolve(tmpFilePath, filename);
+    const unzippedFileDest = zippedFileDest.slice(0, -3);
+
+    if (fs.existsSync(unzippedFileDest)) {
+        console.warn(`WARNING: File already exists. ${unzippedFileDest} will be deleted.`);
+        fs.unlinkSync(unzippedFileDest);
+    }
+
+    console.log(`[${duration()} s] Copying zipped data file to ${zippedFileDest}...`);
+    fs.copyFileSync(inputFilePath, zippedFileDest);
+    console.log(`[${duration()} s] Done`);
+
+    console.log(`[${duration()} s] Unzipping...`);
+    const decompressStatus = execSync(`gzip -d ${zippedFileDest}`);
+    // show full decompress status if needed
+    console.log("decompressStatus", 
+        decompressStatus, 
+        decompressStatus.stdout ? decompressStatus.stdout.toString() : "Success", 
+        decompressStatus.stderr ? decompressStatus.stderr.toString() : "Success");
+    console.log(`[${duration()} s] Done`);
+
+    inputFilePath = unzippedFileDest;
+    console.log("unzippedFile", inputFilePath);
+}
+
 
 (function main() {
+    
     try {
         let phenotypeId = validate
             ? validatePhenotype(phenotypePath, phenotype).id
@@ -145,7 +177,7 @@ function exportVariants({
         exportMetadataFilePath
     ]) {
         if (fs.existsSync(filepath)) {
-            console.warn(`WARNING: ${filepath} will be deleted.`);
+            console.warn(`WARNING: File already exists. ${filepath} will be deleted.`);
             fs.unlinkSync(filepath);
         }
     }
