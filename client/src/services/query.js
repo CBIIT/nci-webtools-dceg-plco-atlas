@@ -5,7 +5,7 @@ export const root = window.location.pathname.replace(/\/+$/, '');
  * Serializes an object as a query string
  * @param {object} obj
  */
-function asQueryString(obj) {
+export function asQueryString(obj) {
   const query = [];
   for (let key in obj) {
     let value = obj[key];
