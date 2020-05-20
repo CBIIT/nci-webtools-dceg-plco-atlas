@@ -50,7 +50,7 @@ create procedure insert_participant_data()
           (SELECT id FROM phenotype WHERE name = ''', name, ''' LIMIT 1) AS phenotype_id,
           id AS phenotype_sample_id,
           `', name, '` AS value,
-          `', age_name, '` AS age
+          ', IFNULL(age_name, 'NULL'), ' AS age
       FROM participant_data_stage;
     ');
     PREPARE dynamic_statement FROM @sql;
