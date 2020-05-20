@@ -1,6 +1,6 @@
 const mysql = require('mysql2');
 const args = require('minimist')(process.argv.slice(2));
-const { database } = require('../../../server/config.json');
+const { database } = require('../../server/config.json');
 const { timestamp } = require('./utils/logging');
 const { getRecords, pluck } = require('./utils/query');
 
