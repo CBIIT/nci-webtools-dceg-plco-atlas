@@ -86,4 +86,4 @@ done
 # -g <#> = number of gb for each process subjob
 # --verbose <0-6> = choose verbose level, 6 being the most chatty
 # --gres=lscratch:<#> = number of gb of tmp space for each process subjob
-swarm -f $SWARM_FILE -g 4 --verbose 3 --gres=lscratch:10
+swarm -f $SWARM_FILE -g 4 --verbose 3 --gres=lscratch:10 --log-dir ./swarm_output
