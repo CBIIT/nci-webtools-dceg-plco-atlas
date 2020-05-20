@@ -459,7 +459,7 @@ async function getPhenotype(connectionPool, params) {
 
     // retrieve the specified phenotype
     const [phenotypeRows] = await connection.execute(
-        `SELECT id, name, display_name as displayName, description, type, has_diagnosis_age as hasDiagnosisAge
+        `SELECT id, name, display_name as displayName, age_name as ageName, description, type
         FROM phenotype
         WHERE id = :id`,
         {id}
@@ -523,7 +523,7 @@ async function getPhenotype(connectionPool, params) {
                 WHERE
                     pd.phenotype_id = :id AND
                     pd.value is not null AND
-                    p.age >= 55
+                    pd.age >= 55
                 group by value
                 order by value
             `;
@@ -546,8 +546,8 @@ async function getPhenotype(connectionPool, params) {
                 [curr[key]]: [...(obj[curr[key]] || []), +curr[value]]
             }));
 
-            let keyAlias = (key === 'age' && phenotype.hasDiagnosisAge)
-                ? `pd.diagnosis_age`
+            let keyAlias = (key === 'age' && phenotype.ageName)
+                ? `pd.age`
                 : `p.${key}`
 
             let selectParticipants = 
@@ -558,9 +558,9 @@ async function getPhenotype(connectionPool, params) {
                         pd.phenotype_id = :id AND
                         pd.value = 1 AND
                         ${keyAlias} IS NOT NULL AND
-                        p.age >= 55`;
+                        pd.age >= 55`;
 
-            let selectParticipantCount = (key === 'age' && phenotype.hasDiagnosisAge)
+            let selectParticipantCount = (key === 'age' && phenotype.ageName)
                 ? `select count(*) as total
                     from participant_data pd
                     where phenotype_id = :id
@@ -579,7 +579,7 @@ async function getPhenotype(connectionPool, params) {
                     \`key\`,
                     count(*) AS counts,
                     100 * count(*) / (SELECT total FROM participant_count pc ${
-                        (key === 'age' && phenotype.hasDiagnosisAge) ? '' : 
+                        (key === 'age' && phenotype.ageName) ? '' : 
                         'WHERE pc.value = `key`'
                     }) AS percentage
                 FROM participant_selection p
@@ -654,8 +654,7 @@ async function getPhenotype(connectionPool, params) {
                 LEFT JOIN participant_data_category pdc on pdc.phenotype_id = pd.phenotype_id and pdc.value = pd.value
                 WHERE
                     pd.phenotype_id = :id AND
-                    pd.value IS NOT NULL AND
-                    pd.value BETWEEN ${minValue} AND ${maxValue}
+                    pd.value IS NOT NULL
                 GROUP BY \`value\`
                 ORDER BY pdc.order, pdc.value;
             `;
@@ -695,57 +694,40 @@ async function getPhenotype(connectionPool, params) {
                 frequencyByAncestry: 'ancestry',
             }[type];
 
-            // determine if we should use diagnosis age or age at time of survey
-            let ageKeyAlias = phenotype.hasDiagnosisAge ? `pd.diagnosis_age` : `p.age`
-
-            let selectAgeDistribution = phenotype.hasDiagnosisAge
-                ? `SELECT
+            // determine which query to use to fetch distribution counts and percentages
+            let distributionSql = key === 'age'
+                ? `WITH participant_age AS (
+                    SELECT
                         CASE
-                            WHEN pd.diagnosis_age between 55 and 59 then '55-59'
-                            WHEN pd.diagnosis_age BETWEEN 60 AND 64 THEN '60-64'
-                            WHEN pd.diagnosis_age BETWEEN 65 AND 69 THEN '65-69'
-                            WHEN pd.diagnosis_age BETWEEN 70 AND 74 THEN '70-74'
-                            WHEN pd.diagnosis_age BETWEEN 75 AND 79 THEN '75-79'
+                            WHEN pd.age BETWEEN 55 and 59 then '55-59'
+                            WHEN pd.age BETWEEN 60 AND 64 THEN '60-64'
+                            WHEN pd.age BETWEEN 65 AND 69 THEN '65-69'
+                            WHEN pd.age BETWEEN 70 AND 74 THEN '70-74'
+                            WHEN pd.age BETWEEN 75 AND 79 THEN '75-79'
                         END AS \`age_range\`,
                         COUNT(*) AS \`count\`
                     FROM participant_data pd
-                    WHERE pd.diagnosis_age BETWEEN 55 AND 79
-                    AND pd.phenotype_id = ${id}
-                    GROUP BY \`age_range\``
-                : `SELECT
-                        CASE
-                            WHEN p.age between 55 and 59 then '55-59'
-                            WHEN p.age BETWEEN 60 AND 64 THEN '60-64'
-                            WHEN p.age BETWEEN 65 AND 69 THEN '65-69'
-                            WHEN p.age BETWEEN 70 AND 74 THEN '70-74'
-                            WHEN p.age BETWEEN 75 AND 79 THEN '75-79'
-                        END AS \`age_range\`,
-                        COUNT(*) AS \`count\`
-                    FROM participant p
-                    WHERE p.age BETWEEN 55 AND 79
-                    GROUP BY \`age_range\``;
-
-            // determine which query to use to fetch distribution counts and percentages
-            let distributionSql = key === 'age'
-                ? `WITH participant_age AS (${selectAgeDistribution}) 
+                    WHERE pd.phenotype_id = :id
+                    AND pd.age BETWEEN 55 AND 79
+                    GROUP BY \`age_range\`
+                ) 
                     SELECT
                         CASE
-                            WHEN ${ageKeyAlias} between 55 and 59 then '55-59'
-                            WHEN ${ageKeyAlias} BETWEEN 60 AND 64 THEN '60-64'
-                            WHEN ${ageKeyAlias} BETWEEN 65 AND 69 THEN '65-69'
-                            WHEN ${ageKeyAlias} BETWEEN 70 AND 74 THEN '70-74'
-                            WHEN ${ageKeyAlias} BETWEEN 75 AND 79 THEN '75-79'
+                            WHEN pd.age between 55 and 59 then '55-59'
+                            WHEN pd.age BETWEEN 60 AND 64 THEN '60-64'
+                            WHEN pd.age BETWEEN 65 AND 69 THEN '65-69'
+                            WHEN pd.age BETWEEN 70 AND 74 THEN '70-74'
+                            WHEN pd.age BETWEEN 75 AND 79 THEN '75-79'
                         END AS \`key\`,
                         FLOOR(pd.value) AS \`group\`,
                         COUNT(*) AS \`counts\`,
                         100 * COUNT(*) / (SELECT pa.count FROM participant_age pa WHERE pa.age_range = \`key\`) AS \`percentage\`
                     FROM participant_data pd
-                    JOIN participant p ON p.id = pd.participant_id
                     WHERE
                         pd.phenotype_id = :id AND
                         pd.value IS NOT NULL AND
                         pd.value BETWEEN ${minValue} AND ${maxValue} AND
-                        p.age BETWEEN 55 AND 79
+                        pd.age BETWEEN 55 AND 79
                     GROUP BY \`key\`, \`group\`
                     ORDER BY \`key\`, \`group\`;`
                 : `WITH participant_counts AS (
@@ -753,8 +735,7 @@ async function getPhenotype(connectionPool, params) {
                         p.${key} AS \`pc_key\`,
                         COUNT(*) AS \`count\`
                     FROM participant p
-                    WHERE p.age BETWEEN 55 AND 79
-                    AND p.${key} IS NOT NULL
+                    WHERE p.${key} IS NOT NULL
                     GROUP BY \`pc_key\`
                     ) SELECT
                         p.${key} AS \`key\`,
@@ -767,10 +748,10 @@ async function getPhenotype(connectionPool, params) {
                         pd.phenotype_id = :id AND
                         pd.value IS NOT NULL AND
                         pd.value BETWEEN ${minValue} AND ${maxValue} AND
+                        pd.age BETWEEN 55 AND 79 AND
                         p.${key} IS NOT NULL
                     GROUP BY \`key\`, \`group\`
                     ORDER BY \`key\`, \`group\`;`;
-
 
             const categories = phenotype.categoryTypes[type];
 
