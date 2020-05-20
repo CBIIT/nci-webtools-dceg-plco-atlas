@@ -490,7 +490,7 @@ CREATE TABLE `participant_data_stage` (
 ) ENGINE=MYISAM;
 
 -- load data into staging table
--- D:/Development/Work/nci-webtools-dceg-plco-atlas/database/mysql/import/raw
+-- D:/Development/Work/nci-webtools-dceg-plco-atlas/database/import/raw
 LOAD DATA LOCAL INFILE "raw/participant_data.tsv" INTO TABLE participant_data_stage
     FIELDS TERMINATED BY '\t'
     IGNORE 1 ROWS (
@@ -1427,14 +1427,17 @@ SELECT
     END AS sex
 FROM participant_data_stage;
 
--- remove invalid age_name values
+-- remove invalid age_name values 
+-- (non-numeric values which are not columns in the participant data stage table)
 UPDATE phenotype p 
     SET age_name = NULL
     WHERE 0 = (
     SELECT COUNT(*) FROM information_schema.columns
       WHERE
         table_name = 'participant_data_stage' AND 
-        column_name = p.age_name);
+        column_name = p.age_name)
+    AND age_name NOT REGEXP '^[0-9]+$';
+
 
 -- import participant_data values
 CALL insert_participant_data();

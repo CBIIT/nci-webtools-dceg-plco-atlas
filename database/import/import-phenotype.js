@@ -39,10 +39,10 @@ if (!fs.existsSync(inputFilePath)) {
 importPhenotypes().then(numRows => {
     console.log(`[${duration()} s] Imported ${numRows} phenotypes, please run the following scripts:
         import-participant-data.sql
-        import-participant-data-categories.sql
-        import-phenotype-correlations.sql
-        update-participant-counts.js
-        update-variants-counts.js
+        import-participant-data-category.sql
+        import-phenotype-correlation.sql
+        update-participant-count.js
+        update-variants-count.js
     `);
     process.exit(0);
 });
@@ -55,6 +55,8 @@ async function importPhenotypes() {
     //     [record.id]: record.color,
     //     [record.display_name]: record.color,
     // }), {});
+
+    console.log(`[${duration()} s] Recreating schema...`);
 
     // remove phenotype table and all other associated tables
     await connection.query(`
@@ -70,6 +72,8 @@ async function importPhenotypes() {
     await connection.query(
         readFile('../../schema/tables/main.sql')
     );
+
+    console.log(`[${duration()} s] Parsing records...`);
 
     // parse records
     let records = parse(readFile(inputFilePath), {
@@ -148,7 +152,8 @@ async function importPhenotypes() {
             display_name: 'Test',
             name: null,
             description: null,
-            type: null
+            type: null,
+            age_name: null,
         },
         {
             id: parentId + 1,
@@ -179,13 +184,14 @@ async function importPhenotypes() {
         },
     );
 
+    console.log(`[${duration()} s] Inserting records...`);
+
     // insert records (preserve color)
     for (let record of orderedRecords) {
-
         // record.color = colors[record.id] || colors[record.display_name] || null;
         await connection.execute(
-            `INSERT INTO phenotype (id, parent_id, display_name, name, description, type, age_name)
-                VALUES (:id, :parent_id, :display_name, :name, :description, :type, :age_name)`,
+            `INSERT INTO phenotype (id, parent_id, name, age_name, display_name, description, type)
+                VALUES (:id, :parent_id, :name, :age_name, :display_name, :description, :type)`,
             record
         );
     };

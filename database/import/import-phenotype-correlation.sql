@@ -17,7 +17,7 @@ CREATE TABLE `phenotype_correlation` (
     FOREIGN KEY (phenotype_b) REFERENCES phenotype(id)
 );
 
--- D:/Development/Work/nci-webtools-dceg-plco-atlas/database/mysql/import/raw/participant_data_category.csv
+-- D:/Development/Work/nci-webtools-dceg-plco-atlas/database/import/raw/participant_data_category.csv
 LOAD DATA LOCAL INFILE "raw/phenotype_correlation.csv" INTO TABLE phenotype_correlation
     FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"'
     IGNORE 1 ROWS (phenotype_a, phenotype_b, value);

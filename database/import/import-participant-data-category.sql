@@ -29,7 +29,7 @@ CREATE TABLE participant_data_category (
     FOREIGN KEY (phenotype_id) REFERENCES phenotype(id)
 );
 
--- D:/Development/Work/nci-webtools-dceg-plco-atlas/database/mysql/import/raw/participant_data_category.csv
+-- D:/Development/Work/nci-webtools-dceg-plco-atlas/database/import/raw/participant_data_category.csv
 LOAD DATA LOCAL INFILE "raw/participant_data_category.csv" INTO TABLE participant_data_category_stage
     FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"'
     IGNORE 1 ROWS (`phenotype_name`, `value`, `label`, `show_distribution`, `order`, @undefined);
