@@ -211,58 +211,66 @@ export function PhenotypesTabs(props) {
             className="p-4 bg-white tab-pane-bordered rounded-0"
             style={{ minHeight: '600px'}}>
 
+            {/* <pre>{JSON.stringify(phenotypeData, null, 2)}</pre> */}
 
-            <div className="d-flex align-items-center justify-content-between">
-              <ButtonGroup 
-                size="sm" 
-                disabled={displayType[t.key] === 'table'}
-                options={[
-                  {label: 'Counts', value: 'counts'},
-                  {label: 'Percentage', value: 'percentage'},
-                ]}
-                value={frequencyType[t.key]}
-                onChange={value => setFrequencyType({
-                  ...frequencyType, 
-                  [t.key]: value
-                })}
-              />                     
-
-              <ButtonGroup 
-                size="sm" 
-                options={[
-                  {label: 'Plot', value: 'plot'},
-                  {label: 'Table', value: 'table'},
-                ]}
-                value={displayType[t.key]}
-                onChange={value => setDisplayType({
-                  ...displayType, 
-                  [t.key]: value
-                })}
-              />
-            </div>
-
-            {phenotypeData && phenotypeData[t.key] && <>
-              {displayType[t.key] === 'plot' && <div className="text-center">
-                {((/continuous/.test(phenotypeData.type) || (/binary/.test(phenotypeData.type) && t.key === 'frequencyByAge')) ? GroupedAreaChart : BarChart)({
-                    data: phenotypeData[t.key][frequencyType[t.key]],
-                    categoryPrefix: t.key.match(/frequencyBy(Age|Sex|Ancestry)/)[1],
-                    type: phenotypeData.type,
-                    categories: (phenotypeData.type === 'binary')
-                      ? phenotypeData.distributionCategories
-                      : phenotypeData.categoryTypes[t.key],
-                    xTitle: phenotypeData.displayName,
-                    yTitle: frequencyType[t.key] === 'counts' ? 'Number of Participants' : '% of Participants',
-                    fill: true,
-                    formatPercent: frequencyType[t.key] === 'percentage',
+            {!loading && phenotypeData[t.key] && phenotypeData[t.key].counts && Object.keys(phenotypeData[t.key].counts).length ? <> 
+              <div className="d-flex align-items-center justify-content-between">
+                <ButtonGroup 
+                  size="sm" 
+                  disabled={displayType[t.key] === 'table'}
+                  options={[
+                    {label: 'Counts', value: 'counts'},
+                    {label: 'Percentage', value: 'percentage'},
+                  ]}
+                  value={frequencyType[t.key]}
+                  onChange={value => setFrequencyType({
+                    ...frequencyType, 
+                    [t.key]: value
                   })}
-              </div>}
+                />                     
 
-              {displayType[t.key] === 'table' && 
-                <DistributionTable
-                  phenotypeData={phenotypeData}
-                  distributionKey={t.key}
-                  distributionCategory={t.title.split(' ').pop()} />}
-            </>}
+                <ButtonGroup 
+                  size="sm" 
+                  options={[
+                    {label: 'Plot', value: 'plot'},
+                    {label: 'Table', value: 'table'},
+                  ]}
+                  value={displayType[t.key]}
+                  onChange={value => setDisplayType({
+                    ...displayType, 
+                    [t.key]: value
+                  })}
+                />
+              </div>
+
+              {phenotypeData && phenotypeData[t.key] && <>
+                {displayType[t.key] === 'plot' && <div className="text-center">
+                  {((/continuous/.test(phenotypeData.type) || (/binary/.test(phenotypeData.type) && t.key === 'frequencyByAge')) ? GroupedAreaChart : BarChart)({
+                      data: phenotypeData[t.key][frequencyType[t.key]],
+                      categoryPrefix: t.key.match(/frequencyBy(Age|Sex|Ancestry)/)[1],
+                      type: phenotypeData.type,
+                      categories: (phenotypeData.type === 'binary')
+                        ? phenotypeData.distributionCategories
+                        : phenotypeData.categoryTypes[t.key],
+                      xTitle: phenotypeData.displayName,
+                      yTitle: frequencyType[t.key] === 'counts' ? 'Number of Participants' : '% of Participants',
+                      fill: true,
+                      formatPercent: frequencyType[t.key] === 'percentage',
+                    })}
+                </div>}
+
+                {displayType[t.key] === 'table' && 
+                  <DistributionTable
+                    phenotypeData={phenotypeData}
+                    distributionKey={t.key}
+                    distributionCategory={t.title.split(' ').pop()} />}
+              </>}
+            </> : 
+            <div style={{ display: loading ? 'none' : 'block' }}>
+              <p className="h4 text-center text-secondary my-5">
+                No data exists for the selected plot
+              </p>
+            </div>}
           </Tab>
         )}
 
