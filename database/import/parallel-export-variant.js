@@ -101,7 +101,6 @@ if (/^(.gz)$/.test(fileExtension)) {
     console.log(`[${duration()} s] Done`);
 
     inputFilePath = unzippedFileDest;
-    console.log("unzippedFile", inputFilePath);
 }
 
 
@@ -166,6 +165,9 @@ function exportVariants({
     const exportVariantFilePath = path.resolve(outputFilePath, `${phenotypeId}.${sex}.variant.csv`);
     const exportAggregateFilePath = path.resolve(outputFilePath, `${phenotypeId}.${sex}.aggregate.csv`);
     const exportMetadataFilePath = path.resolve(outputFilePath, `${phenotypeId}.${sex}.metadata.csv`);
+    const exportVariantTmpFilePath = path.resolve(tmpFilePath, `${phenotypeId}.${sex}.variant.csv`);
+    const exportAggregateTmpFilePath = path.resolve(tmpFilePath, `${phenotypeId}.${sex}.aggregate.csv`);
+    const exportMetadataTmpFilePath = path.resolve(tmpFilePath, `${phenotypeId}.${sex}.metadata.csv`);
     const idPrefix = [null, 'all', 'female', 'male'].indexOf(sex) 
         + phenotypeId.toString().padStart(5, '0');
 
@@ -371,12 +373,12 @@ function exportVariants({
     console.log(`[${duration()} s] Done`);
     db.close();
     
-    console.log(`[${duration()} s] Finished setting up stage table, exporting variants to ${exportVariantFilePath}...`);
+    console.log(`[${duration()} s] Finished setting up stage table, exporting variants to ${exportVariantTmpFilePath}...`);
     const exportVariantStatus = execSync(sqlitePath + processArgs([
         databaseFilePath,
         `.mode csv`,
         `.headers on`,
-        `.output '${exportVariantFilePath}'`,
+        `.output '${exportVariantTmpFilePath}'`,
         `SELECT 
             ${idPrefix} || ROW_NUMBER () OVER (
                 ORDER BY cr.rowid, s.p_value
@@ -405,12 +407,12 @@ function exportVariants({
         exportVariantStatus.stdout ? exportVariantStatus.stdout.toString() : "Success", 
         exportVariantStatus.stderr ? exportVariantStatus.stderr.toString() : "Success");
     
-    console.log(`[${duration()} s] Exporting aggregated variants to ${exportAggregateFilePath}...`);
+    console.log(`[${duration()} s] Exporting aggregated variants to ${exportAggregateTmpFilePath}...`);
     const exportAggregateStatus = execSync(sqlitePath + processArgs([
         databaseFilePath,
         `.mode csv`,
         `.headers on`,
-        `.output '${exportAggregateFilePath}'`,
+        `.output '${exportAggregateTmpFilePath}'`,
         `SELECT 
             DISTINCT ${idPrefix} || ROW_NUMBER () OVER (
                 ORDER BY cr.rowid, s.p_value_nlog_aggregate
@@ -428,11 +430,11 @@ function exportVariants({
         exportAggregateStatus.stdout ? exportAggregateStatus.stdout.toString() : "Success", 
         exportAggregateStatus.stderr ? exportAggregateStatus.stderr.toString() : "Success");
     
-    console.log(`[${duration()} s] Exporting variant metadata to ${exportMetadataFilePath}...`);
+    console.log(`[${duration()} s] Exporting variant metadata to ${exportMetadataTmpFilePath}...`);
     const exportMetadataStatus = execSync(sqlitePath + processArgs([
         databaseFilePath,
         `.mode csv`,
-        `.output '${exportMetadataFilePath}'`,
+        `.output '${exportMetadataTmpFilePath}'`,
         `.headers on`,
         `SELECT 
             ${phenotypeId} as phenotype_id, 
@@ -458,10 +460,26 @@ function exportVariants({
     
     console.log([
         `[${duration()} s] Finished exporting, generated the following files:`,
-        exportVariantFilePath, 
-        exportAggregateFilePath, 
-        exportMetadataFilePath
+        exportVariantTmpFilePath, 
+        exportAggregateTmpFilePath, 
+        exportMetadataTmpFilePath
     ].join('\n'));
+
+    console.log(`[${duration()} s] Copying ${exportVariantTmpFilePath} to ${exportVariantFilePath}...`);
+    fs.copyFileSync(exportVariantTmpFilePath, exportVariantFilePath);
+    console.log(`[${duration()} s] Done`);
+
+    console.log(`[${duration()} s] Copying ${exportVariantTmpFilePath} to ${exportVariantFilePath}...`);
+    fs.copyFileSync(exportVariantTmpFilePath, exportVariantFilePath);
+    console.log(`[${duration()} s] Done`);
+
+    console.log(`[${duration()} s] Copying ${exportAggregateTmpFilePath} to ${exportAggregateFilePath}...`);
+    fs.copyFileSync(exportAggregateTmpFilePath, exportAggregateFilePath);
+    console.log(`[${duration()} s] Done`);
+
+    console.log(`[${duration()} s] Copying ${exportMetadataTmpFilePath} to ${exportMetadataFilePath}...`);
+    fs.copyFileSync(exportMetadataTmpFilePath, exportMetadataFilePath);
+    console.log(`[${duration()} s] Done`);
 
     return {
         exportVariantFilePath, 
