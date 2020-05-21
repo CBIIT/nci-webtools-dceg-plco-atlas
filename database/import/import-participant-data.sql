@@ -105,6 +105,7 @@ CREATE TABLE `participant_data_stage` (
     `j_esoph_cancer_fup_days` DOUBLE,
     `j_esoph_cancer_fup_age` DOUBLE,
     `j_esoph_cancer_dx_age` DOUBLE,
+    `j_esoph_adeno_carcinoma` DOUBLE,
     `j_esoph_squamous` DOUBLE,
     `j_hbv_related_dx_age` DOUBLE,
     `j_hbv_related` DOUBLE,
@@ -184,6 +185,10 @@ CREATE TABLE `participant_data_stage` (
     `j_mela_cancer_fup_days` DOUBLE,
     `j_mela_cancer_fup_age` DOUBLE,
     `j_mela_cancer_dx_age` DOUBLE,
+    `j_mela_invasive_cancer` DOUBLE,
+    `j_mela_invasive_cancer_fup_age` DOUBLE,
+    `j_mela_invasive_cancer_dx_age` DOUBLE,
+    `j_mela_invasive_cancer_fup_days` DOUBLE,
     `j_mesoth` DOUBLE,
     `j_mesoth_fup_days` DOUBLE,
     `j_mesoth_fup_age` DOUBLE,
@@ -489,7 +494,7 @@ CREATE TABLE `participant_data_stage` (
     `has_nonadvanced_adenoma` DOUBLE
 ) ENGINE=MYISAM;
 
--- load data into staging table
+-- load data into staging table (gsa_qx_v5.with_na.031320.txt)
 -- D:/Development/Work/nci-webtools-dceg-plco-atlas/database/import/raw
 LOAD DATA LOCAL INFILE "raw/participant_data.tsv" INTO TABLE participant_data_stage
     FIELDS TERMINATED BY '\t'
@@ -568,6 +573,7 @@ LOAD DATA LOCAL INFILE "raw/participant_data.tsv" INTO TABLE participant_data_st
         @j_esoph_cancer_fup_days,
         @j_esoph_cancer_fup_age,
         @j_esoph_cancer_dx_age,
+        @j_esoph_adeno_carcinoma,
         @j_esoph_squamous,
         @j_hbv_related_dx_age,
         @j_hbv_related,
@@ -647,6 +653,10 @@ LOAD DATA LOCAL INFILE "raw/participant_data.tsv" INTO TABLE participant_data_st
         @j_mela_cancer_fup_days,
         @j_mela_cancer_fup_age,
         @j_mela_cancer_dx_age,
+        @j_mela_invasive_cancer,
+        @j_mela_invasive_cancer_fup_age,
+        @j_mela_invasive_cancer_dx_age,
+        @j_mela_invasive_cancer_fup_days,
         @j_mesoth,
         @j_mesoth_fup_days,
         @j_mesoth_fup_age,
@@ -951,6 +961,7 @@ LOAD DATA LOCAL INFILE "raw/participant_data.tsv" INTO TABLE participant_data_st
         @has_advanced_adenoma,
         @has_nonadvanced_adenoma
     ) SET
+        plco_id = IF(@plco_id IN('NA', ''), NULL, @plco_id),
         j_adeno_carcinoma = IF(@j_adeno_carcinoma IN('NA', ''), NULL, @j_adeno_carcinoma),
         j_adeno_carcinoma_fup_days = IF(@j_adeno_carcinoma_fup_days IN('NA', ''), NULL, @j_adeno_carcinoma_fup_days),
         j_adeno_carcinoma_fup_age = IF(@j_adeno_carcinoma_fup_age IN('NA', ''), NULL, @j_adeno_carcinoma_fup_age),
@@ -1024,6 +1035,7 @@ LOAD DATA LOCAL INFILE "raw/participant_data.tsv" INTO TABLE participant_data_st
         j_esoph_cancer_fup_days = IF(@j_esoph_cancer_fup_days IN('NA', ''), NULL, @j_esoph_cancer_fup_days),
         j_esoph_cancer_fup_age = IF(@j_esoph_cancer_fup_age IN('NA', ''), NULL, @j_esoph_cancer_fup_age),
         j_esoph_cancer_dx_age = IF(@j_esoph_cancer_dx_age IN('NA', ''), NULL, @j_esoph_cancer_dx_age),
+        j_esoph_adeno_carcinoma = IF(@j_esoph_adeno_carcinoma IN('NA', ''), NULL, @j_esoph_adeno_carcinoma),
         j_esoph_squamous = IF(@j_esoph_squamous IN('NA', ''), NULL, @j_esoph_squamous),
         j_hbv_related_dx_age = IF(@j_hbv_related_dx_age IN('NA', ''), NULL, @j_hbv_related_dx_age),
         j_hbv_related = IF(@j_hbv_related IN('NA', ''), NULL, @j_hbv_related),
@@ -1103,6 +1115,10 @@ LOAD DATA LOCAL INFILE "raw/participant_data.tsv" INTO TABLE participant_data_st
         j_mela_cancer_fup_days = IF(@j_mela_cancer_fup_days IN('NA', ''), NULL, @j_mela_cancer_fup_days),
         j_mela_cancer_fup_age = IF(@j_mela_cancer_fup_age IN('NA', ''), NULL, @j_mela_cancer_fup_age),
         j_mela_cancer_dx_age = IF(@j_mela_cancer_dx_age IN('NA', ''), NULL, @j_mela_cancer_dx_age),
+        j_mela_invasive_cancer = IF(@j_mela_invasive_cancer IN('NA', ''), NULL, @j_mela_invasive_cancer),
+        j_mela_invasive_cancer_fup_age = IF(@j_mela_invasive_cancer_fup_age IN('NA', ''), NULL, @j_mela_invasive_cancer_fup_age),
+        j_mela_invasive_cancer_dx_age = IF(@j_mela_invasive_cancer_dx_age IN('NA', ''), NULL, @j_mela_invasive_cancer_dx_age),
+        j_mela_invasive_cancer_fup_days = IF(@j_mela_invasive_cancer_fup_days IN('NA', ''), NULL, @j_mela_invasive_cancer_fup_days),
         j_mesoth = IF(@j_mesoth IN('NA', ''), NULL, @j_mesoth),
         j_mesoth_fup_days = IF(@j_mesoth_fup_days IN('NA', ''), NULL, @j_mesoth_fup_days),
         j_mesoth_fup_age = IF(@j_mesoth_fup_age IN('NA', ''), NULL, @j_mesoth_fup_age),
