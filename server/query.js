@@ -523,7 +523,7 @@ async function getPhenotype(connectionPool, params) {
                 WHERE
                     pd.phenotype_id = :id AND
                     pd.value is not null AND
-                    pd.age >= 55
+                    (pd.age IS NULL OR pd.age >= 55)
                 group by value
                 order by value
             `;
@@ -558,7 +558,7 @@ async function getPhenotype(connectionPool, params) {
                         pd.phenotype_id = :id AND
                         pd.value = 1 AND
                         ${keyAlias} IS NOT NULL AND
-                        pd.age >= 55`;
+                        (pd.age IS NULL OR pd.age >= 55)`;
 
             let selectParticipantCount = (key === 'age' && phenotype.ageName)
                 ? `select count(*) as total
@@ -748,7 +748,7 @@ async function getPhenotype(connectionPool, params) {
                         pd.phenotype_id = :id AND
                         pd.value IS NOT NULL AND
                         pd.value BETWEEN ${minValue} AND ${maxValue} AND
-                        pd.age BETWEEN 55 AND 79 AND
+                        (pd.age IS NULL OR pd.age BETWEEN 55 AND 79) AND
                         p.${key} IS NOT NULL
                     GROUP BY \`key\`, \`group\`
                     ORDER BY \`key\`, \`group\`;`;
