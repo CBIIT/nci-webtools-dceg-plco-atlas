@@ -153,7 +153,7 @@ async function importPhenotypes() {
             name: null,
             description: null,
             type: null,
-            age_name: null,
+            age_name: null
         },
         {
             id: parentId + 1,
@@ -163,6 +163,7 @@ async function importPhenotypes() {
             description: `Test Description`,
             type: `binary`,
             age_name: null,
+            import_date: '2000-01-01 01:01:01'
         },
         {
             id: parentId + 2,
@@ -172,6 +173,7 @@ async function importPhenotypes() {
             description: `Test Description`,
             type: `binary`,
             age_name: null,
+            import_date: '2000-01-01 01:01:01'
         },
         {
             id: parentId + 3,
@@ -181,6 +183,7 @@ async function importPhenotypes() {
             description: `Test Description`,
             type: `binary`,
             age_name: null,
+            import_date: '2000-01-01 01:01:01'
         },
     );
 
