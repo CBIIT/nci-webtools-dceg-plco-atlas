@@ -116,8 +116,7 @@ async function importVariants({
         for (let table of [variantTable, aggregateTable]) {
             if (partitionRows.find(p => p.PARTITION_NAME == phenotypeId)) {
                 console.log(`[${duration()} s] Dropping partition(${partition}) on ${table}...`);
-                // await connection.query(`ALTER TABLE ${table} DROP PARTITION ${partition};`)
-                await connection.query(`ALTER TABLE ${table} DROP SUBPARTITION \'${subpartition};\``);
+                await connection.query(`ALTER TABLE ${table} DROP PARTITION ${partition};`)
             }
         }
     }
