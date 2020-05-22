@@ -11,12 +11,15 @@ const { getIntervals, getLambdaGC } = require('./utils/math');
 
 // display help if needed
 if (!(args.file)) {
-    console.log(`USAGE: node import-phenotypes.js --file "filename"`);
+    console.log(`USAGE: node import-phenotypes.js 
+        --file "filename"
+        --create_partitions_only
+    `);
     process.exit(0);
 }
 
 // parse arguments and set defaults
-const { file } = args;
+const { file, create_partitions_only: createPartitionsOnly } = args;
 const inputFilePath = path.resolve(file);
 const errorLog = {write: e => console.log(e)};
 const duration = timestamp();
@@ -58,20 +61,25 @@ async function importPhenotypes() {
 
     console.log(`[${duration()} s] Recreating schema...`);
 
-    // remove phenotype table and all other associated tables
-    await connection.query(`
-        DROP TABLE IF EXISTS participant_data_category;
-        DROP TABLE IF EXISTS participant_data;
-        DROP TABLE IF EXISTS participant;
-        DROP TABLE IF EXISTS phenotype_correlation;
-        DROP TABLE IF EXISTS phenotype_metadata;
-        DROP TABLE IF EXISTS phenotype;
-    `);
+    if (!createPartitionsOnly) {
 
-    // recreate tables
-    await connection.query(
-        readFile('../../schema/tables/main.sql')
-    );
+        // remove phenotype table and all other associated tables
+        await connection.query(`
+            DROP TABLE IF EXISTS participant_data_category;
+            DROP TABLE IF EXISTS participant_data;
+            DROP TABLE IF EXISTS participant;
+            DROP TABLE IF EXISTS phenotype_correlation;
+            DROP TABLE IF EXISTS phenotype_metadata;
+            DROP TABLE IF EXISTS phenotype;
+        `);
+
+        // recreate tables
+        await connection.query(
+            readFile('../../schema/tables/main.sql')
+        );
+            
+    }
+
 
     console.log(`[${duration()} s] Parsing records...`);
 
@@ -191,12 +199,47 @@ async function importPhenotypes() {
 
     // insert records (preserve color)
     for (let record of orderedRecords) {
+        const variantTable = `phenotype_variant`;
+        const aggregateTable = `phenotype_aggregate`;
+        const phenotypeId = record.id;
+    
         // record.color = colors[record.id] || colors[record.display_name] || null;
+        if (!createPartitionsOnly)
         await connection.execute(
             `INSERT INTO phenotype (id, parent_id, name, age_name, display_name, description, type)
                 VALUES (:id, :parent_id, :name, :age_name, :display_name, :description, :type)`,
             record
         );
+
+        // create partitions for each phenotype (if they do not exist)
+        const [partitionRows] = await connection.execute(
+            `SELECT * FROM INFORMATION_SCHEMA.PARTITIONS
+            WHERE TABLE_NAME IN ('phenotype_variant', 'phenotype_aggregate')
+            AND PARTITION_NAME = :phenotypeId`,
+            {phenotypeId}
+        );
+
+        // There should be 6 subpartitions (3 per table)
+        // If there are not, we have an invalid schema and should drop the specified partitions
+        if (partitionRows.length !== 6) {
+            // clear partitions if needed
+            for (let table of [variantTable, aggregateTable]) {
+                if (partitionRows.find(p => p.PARTITION_NAME == phenotypeId)) {
+                    console.log(`[${duration()} s] Dropping partition(${partition}) on ${table}...`);
+                    await connection.query(`ALTER TABLE ${table} DROP PARTITION ${partition};`)
+                }
+            }
+
+            // create partitions
+            await connection.query(`
+                ALTER TABLE ${table} ADD PARTITION (PARTITION ${partition} VALUES IN (${phenotypeId}) (
+                    subpartition \`${phenotypeId}_all\`,
+                    subpartition \`${phenotypeId}_female\`,
+                    subpartition \`${phenotypeId}_male\`
+                ));
+            `);
+        }
+        
     };
 
     return orderedRecords.length;
