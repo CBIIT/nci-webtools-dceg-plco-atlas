@@ -202,14 +202,15 @@ async function importPhenotypes() {
         const variantTable = `phenotype_variant`;
         const aggregateTable = `phenotype_aggregate`;
         const phenotypeId = record.id;
-    
+        const partition = `\`${phenotypeId}\``;
+
         // record.color = colors[record.id] || colors[record.display_name] || null;
         if (!createPartitionsOnly)
-        await connection.execute(
-            `INSERT INTO phenotype (id, parent_id, name, age_name, display_name, description, type)
-                VALUES (:id, :parent_id, :name, :age_name, :display_name, :description, :type)`,
-            record
-        );
+            await connection.execute(
+                `INSERT INTO phenotype (id, parent_id, name, age_name, display_name, description, type)
+                    VALUES (:id, :parent_id, :name, :age_name, :display_name, :description, :type)`,
+                record
+            );
 
         // create partitions for each phenotype (if they do not exist)
         const [partitionRows] = await connection.execute(
