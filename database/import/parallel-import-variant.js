@@ -117,25 +117,25 @@ async function importVariants({
             if (partitionRows.find(p => p.PARTITION_NAME == phenotypeId)) {
                 console.log(`[${duration()} s] Dropping partition(${partition}) on ${table}...`);
                 // await connection.query(`ALTER TABLE ${table} DROP PARTITION ${partition};`)
-                await connection.query(`ALTER TABLE ${table} DROP SUBPARTITION ${subpartition};`);
+                await connection.query(`ALTER TABLE ${table} DROP SUBPARTITION \'${subpartition};\``);
             }
         }
+    }
 
-        for (let table of [variantTable, aggregateTable]) {
-            console.log(`[${duration()} s] Creating partition(${partition}) on ${table}...`);
-            // await connection.query(`
-            //     ALTER TABLE ${table} ADD PARTITION (PARTITION ${partition} VALUES IN (${phenotypeId}) (
-            //         subpartition \`${phenotypeId}_all\`,
-            //         subpartition \`${phenotypeId}_female\`,
-            //         subpartition \`${phenotypeId}_male\`
-            //     ));
-            // `);
-            await connection.query(`
-                ALTER TABLE ${table} ADD PARTITION (PARTITION ${partition} VALUES IN (${phenotypeId}) (
-                    subpartition \`${subpartition}\`
-                ));
-            `);
-        }
+    for (let table of [variantTable, aggregateTable]) {
+        console.log(`[${duration()} s] Creating partition(${partition}) on ${table}...`);
+        // await connection.query(`
+        //     ALTER TABLE ${table} ADD PARTITION (PARTITION ${partition} VALUES IN (${phenotypeId}) (
+        //         subpartition \`${phenotypeId}_all\`,
+        //         subpartition \`${phenotypeId}_female\`,
+        //         subpartition \`${phenotypeId}_male\`
+        //     ));
+        // `);
+        await connection.query(`
+            ALTER TABLE ${table} ADD PARTITION (PARTITION ${partition} VALUES IN (${phenotypeId}) (
+                subpartition \`${subpartition}\`
+            ));
+        `);
     }
 
     await connection.query(`
