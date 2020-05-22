@@ -59,9 +59,9 @@ async function importPhenotypes() {
     //     [record.display_name]: record.color,
     // }), {});
 
-    console.log(`[${duration()} s] Recreating schema...`);
 
     if (!createPartitionsOnly) {
+        console.log(`[${duration()} s] Recreating schema...`);
 
         // remove phenotype table and all other associated tables
         await connection.query(`
@@ -215,7 +215,7 @@ async function importPhenotypes() {
         // create partitions for each phenotype (if they do not exist)
         const [partitionRows] = await connection.execute(
             `SELECT * FROM INFORMATION_SCHEMA.PARTITIONS
-            WHERE TABLE_NAME IN ('phenotype_variant', 'phenotype_aggregate')
+            WHERE TABLE_NAME IN ('${variantTable}', '${aggregateTable}')
             AND PARTITION_NAME = :phenotypeId`,
             {phenotypeId}
         );
@@ -223,22 +223,25 @@ async function importPhenotypes() {
         // There should be 6 subpartitions (3 per table)
         // If there are not, we have an invalid schema and should drop the specified partitions
         if (partitionRows.length !== 6) {
+            console.log(`[${duration()} s] (Re)creating partitions for ${record.id}:${record.name}:${record.display_name}...`);
+
             // clear partitions if needed
             for (let table of [variantTable, aggregateTable]) {
-                if (partitionRows.find(p => p.PARTITION_NAME == phenotypeId)) {
+                if (partitionRows.find(p => p.PARTITION_NAME == phenotypeId && p.TABLE_NAME == table)) {
                     console.log(`[${duration()} s] Dropping partition(${partition}) on ${table}...`);
                     await connection.query(`ALTER TABLE ${table} DROP PARTITION ${partition};`)
                 }
+
+                // create partitions
+                await connection.query(`
+                    ALTER TABLE ${table} ADD PARTITION (PARTITION ${partition} VALUES IN (${phenotypeId}) (
+                        subpartition \`${phenotypeId}_all\`,
+                        subpartition \`${phenotypeId}_female\`,
+                        subpartition \`${phenotypeId}_male\`
+                    ));
+                `);
             }
 
-            // create partitions
-            await connection.query(`
-                ALTER TABLE ${table} ADD PARTITION (PARTITION ${partition} VALUES IN (${phenotypeId}) (
-                    subpartition \`${phenotypeId}_all\`,
-                    subpartition \`${phenotypeId}_female\`,
-                    subpartition \`${phenotypeId}_male\`
-                ));
-            `);
         }
         
     };
