@@ -112,16 +112,16 @@ async function importVariants({
 
     // There should be 6 subpartitions (3 per table)
     if (reset || partitionRows.length !== 6) {
-        // clear variants if needed
+        console.log(`[${duration()} s] (Re)creating partitions for ${record.id}:${record.name}:${record.display_name}...`);
+
+        // clear partitions if needed
         for (let table of [variantTable, aggregateTable]) {
-            if (partitionRows.find(p => p.PARTITION_NAME == phenotypeId)) {
+            if (partitionRows.find(p => p.PARTITION_NAME == phenotypeId && p.TABLE_NAME == table)) {
                 console.log(`[${duration()} s] Dropping partition(${partition}) on ${table}...`);
                 await connection.query(`ALTER TABLE ${table} DROP PARTITION ${partition};`)
             }
-        }
 
-        for (let table of [variantTable, aggregateTable]) {
-            console.log(`[${duration()} s] Creating partition(${partition}) on ${table}...`);
+            // create partitions
             await connection.query(`
                 ALTER TABLE ${table} ADD PARTITION (PARTITION ${partition} VALUES IN (${phenotypeId}) (
                     subpartition \`${phenotypeId}_all\`,
