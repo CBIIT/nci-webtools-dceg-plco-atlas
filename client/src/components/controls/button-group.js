@@ -21,8 +21,9 @@ export function ButtonGroup({
 
     return (
         <div className="btn-group" role="group">
-            {options.map(option => 
+            {options.map((option, index) => 
                 <label
+                    key={`label-buttongroup-${index}-${option.value}`}
                     className={[
                         'btn',
                         'c-pointer',
@@ -31,6 +32,7 @@ export function ButtonGroup({
                         option.value === _value ? activeClass : inactiveClass,
                     ].join(' ')}>
                     <input 
+                        key={`input-buttongroup-${index}-${option.value}`}
                         disabled={disabled}
                         className="sr-only"
                         type="radio" 
