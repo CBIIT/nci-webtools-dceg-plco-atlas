@@ -49,12 +49,12 @@ export function SidebarContainer({
     }
 
     return (
-        <div className={`row ${className}`}>
-            <div className={_collapsed ? 'd-none' : sidebarPanelClass}>
+        <div data-testid="SidebarContainer" className={`row ${className}`}>
+            <div data-testid="SidebarPanel" className={_collapsed ? 'd-none' : sidebarPanelClass}>
                 {sidebarPanel}
             </div>
 
-            <div className={`
+            <div data-testid="MainPanel" className={`
                 position-relative
                 ${_collapsed ? 'col-md' : mainPanelClass}
             `}>
