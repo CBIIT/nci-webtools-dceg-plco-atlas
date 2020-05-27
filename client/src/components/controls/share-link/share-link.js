@@ -96,6 +96,7 @@ export const ShareLink = props => {
       transition={false}>
     <div>
       <Button 
+        data-testid="ShareLinkButton"
         variant="silver"
         size="sm"
         onClick={e => {
