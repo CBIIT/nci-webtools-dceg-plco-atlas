@@ -7,7 +7,7 @@ import { updateBrowsePhenotypes, updateBrowsePhenotypesPlots } from '../../../se
 import { query } from '../../../services/query';
 import { BarChart, AreaChart, GroupedAreaChart, PieChart, PhenotypesRelated } from './phenotypes-charts';
 import { Table, paginationSizeSelector, paginationText, paginationButton } from '../../controls/table/table';
-import { LoadingOverlay } from '../../controls/loading-overlay';
+import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 import { ButtonGroup } from '../../controls/button-group/button-group';
 
 export function PhenotypesTabs(props) {

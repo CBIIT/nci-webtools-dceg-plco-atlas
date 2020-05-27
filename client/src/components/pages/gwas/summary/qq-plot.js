@@ -2,7 +2,7 @@
 import React, { useState, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import { PlotlyWrapper as Plot } from '../../../plots/plotly/plotly-wrapper';
-import { LoadingOverlay } from '../../../controls/loading-overlay';
+import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
 import { Tooltip } from '../../../controls/tooltip';
 
 
