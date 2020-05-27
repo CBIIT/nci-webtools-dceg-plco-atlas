@@ -52,6 +52,8 @@
     ]
   },
   "devDependencies": {
+    "@testing-library/jest-dom": "^5.8.0",
+    "@testing-library/react": "^10.0.4",
     "jest-junit": "^10.0.0",
     "node-sass": "^4.14.1",
     "prettier": "^1.18.2",
