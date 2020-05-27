@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { Button, OverlayTrigger, Popover, Spinner } from 'react-bootstrap';
-import { LoadingOverlay } from './loading-overlay';
-import { generateShareLink } from '../../services/actions';
+import { LoadingOverlay } from '../loading-overlay/loading-overlay';
+import { generateShareLink } from '../../../services/actions';
 
 
 export const ShareLink = props => {
