@@ -9,7 +9,7 @@ import { ShareLink } from './share-link';
 describe('ShareLink Module', function () {
     test('ShareLink renders correctly', () => {
         // render share-link using default store
-        render(<Provider store={store}><ShareLink {...props} /></Provider>)
+        render(<Provider store={store}><ShareLink /></Provider>)
 
         // expect loading overlay to be visible
         expect(screen.getByTestId('ShareLinkButton')).toBeVisible();
