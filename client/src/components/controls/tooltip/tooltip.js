@@ -31,8 +31,9 @@ export const Tooltip = props => {
         cursor: 'pointer',
     };
     
-    return <div style={style} className={props.className}>
+    return <div data-testid="Tooltip" style={style} className={props.className}>
         {props.closeButton && <button 
+            data-testid="TooltipCloseButton"
             style={closeButtonStyle} 
             onClick={e => {
                 setVisible(false);

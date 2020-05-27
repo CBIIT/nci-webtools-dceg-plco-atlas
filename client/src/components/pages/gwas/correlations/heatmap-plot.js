@@ -4,7 +4,7 @@ import { query } from '../../../../services/query';
 import { Spinner } from 'react-bootstrap';
 import { PlotlyWrapper as Plot } from '../../../plots/plotly/plotly-wrapper';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
-import { Tooltip } from '../../../controls/tooltip';
+import { Tooltip } from '../../../controls/tooltip/tooltip';
 
 import {
   viewportToLocalCoordinates,
