@@ -14,7 +14,7 @@ import { getInitialState } from '../../../services/store';
 import { query } from '../../../services/query';
 import { BubbleChart as Plot } from '../../plots/custom/bubble-chart/bubble-chart';
 import { LoadingOverlay } from '../../controls/loading-overlay';
-import { Icon } from '../../controls/icon';
+import { Icon } from '../../controls/icon/icon';
 
 export function Phenotypes() {
   const dispatch = useDispatch();

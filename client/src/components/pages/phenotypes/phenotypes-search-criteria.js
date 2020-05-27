@@ -1,7 +1,7 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { updateBrowsePhenotypes } from '../../../services/actions';
-import { Icon } from '../../controls/icon';
+import { Icon } from '../../controls/icon/icon';
 import { ShareLink } from '../../controls/share-link';
 
 

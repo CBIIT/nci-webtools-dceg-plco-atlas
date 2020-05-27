@@ -7,7 +7,7 @@ import * as isEqual from 'lodash.isequal';
 import { plotOverlayConfig } from '../../../controls/table/table';
 import { rawQuery, query } from '../../../../services/query';
 import { ManhattanPlot as Plot } from '../../../plots/custom/manhattan-plot/manhattan-plot';
-import { Icon } from '../../../controls/icon';
+import { Icon } from '../../../controls/icon/icon';
 import { createElement as h, removeChildren } from '../../../plots/custom/utils';
 import { systemFont } from '../../../plots/custom/text';
 import { updateSummaryResults, updateManhattanPlot } from '../../../../services/actions';
