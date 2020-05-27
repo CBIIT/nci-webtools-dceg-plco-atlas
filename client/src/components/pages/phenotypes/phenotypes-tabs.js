@@ -8,7 +8,7 @@ import { query } from '../../../services/query';
 import { BarChart, AreaChart, GroupedAreaChart, PieChart, PhenotypesRelated } from './phenotypes-charts';
 import { Table, paginationSizeSelector, paginationText, paginationButton } from '../../controls/table/table';
 import { LoadingOverlay } from '../../controls/loading-overlay';
-import { ButtonGroup } from '../../controls/button-group';
+import { ButtonGroup } from '../../controls/button-group/button-group';
 
 export function PhenotypesTabs(props) {
   const dispatch = useDispatch();
