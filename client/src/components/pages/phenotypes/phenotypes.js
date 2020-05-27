@@ -8,7 +8,7 @@ import {
   SidebarContainer,
   SidebarPanel,
   MainPanel,
-} from '../../controls/sidebar-container';
+} from '../../controls/sidebar-container/sidebar-container';
 import { updateBrowsePhenotypes, updateBrowsePhenotypesPlots } from '../../../services/actions';
 import { getInitialState } from '../../../services/store';
 import { query } from '../../../services/query';
