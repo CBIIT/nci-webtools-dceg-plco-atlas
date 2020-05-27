@@ -10,7 +10,7 @@ import {
   SidebarContainer,
   SidebarPanel,
   MainPanel,
-} from '../../../controls/sidebar-container';
+} from '../../../controls/sidebar-container/sidebar-container';
 import {
   updateSummaryResults,
   updateVariantLookup,
