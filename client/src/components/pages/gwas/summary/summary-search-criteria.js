@@ -1,6 +1,6 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
-import { ShareLink } from '../../../controls/share-link';
+import { ShareLink } from '../../../controls/share-link/share-link';
 
 
 export const SummaryResultsSearchCriteria = () => {
