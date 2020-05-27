@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import BootstrapTable from 'react-bootstrap-table-next';
 import overlayFactory from 'react-bootstrap-table2-overlay';
-import { Icon } from '../icon';
+import { Icon } from '../icon/icon';
 import './table.scss'
 
 

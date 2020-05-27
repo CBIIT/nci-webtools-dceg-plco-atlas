@@ -6,7 +6,7 @@ import {
   fetchSummaryTable,
   fetchSummarySnpTable,
 } from '../../../../services/actions';
-import { Icon } from '../../../controls/icon';
+import { Icon } from '../../../controls/icon/icon';
 import { getInitialState } from '../../../../services/store';
 import {
   Table,
