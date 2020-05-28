@@ -1,3 +1,5 @@
+SET default_storage_engine = INNODB;
+
 CREATE TABLE IF NOT EXISTS `phenotype` (
     `id` INTEGER PRIMARY KEY NOT NULL AUTO_INCREMENT,
     `parent_id` INTEGER NULL,

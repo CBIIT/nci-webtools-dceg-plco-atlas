@@ -11,6 +11,7 @@ const duration = timestamp();
 const connection = mysql.createConnection({
     host: database.host,
     database: database.name,
+    port: database.port,
     user: database.user,
     password: database.password,
     namedPlaceholders: true,
