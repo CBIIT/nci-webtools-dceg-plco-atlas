@@ -208,10 +208,10 @@ export function PhenotypesTabs(props) {
         </Tab>
 
         {[
-          { key: 'frequencyByAge', title: 'Frequency By Age' },
+          phenotypeData.ageName && { key: 'frequencyByAge', title: 'Frequency By Age' },
           { key: 'frequencyBySex', title: 'Frequency By Sex' },
           { key: 'frequencyByAncestry', title: 'Frequency By Ancestry' },
-        ].map(t =>
+        ].filter(Boolean).map(t =>
           <Tab
             key={t.key}
             eventKey={t.key}
