@@ -210,18 +210,23 @@ async function getSummary(connection, {phenotype_id, table, sex, p_value_nlog_mi
 
 
 async function getVariants(connectionPool, params) {
-    if (!/^\d+(,\d+)*$/.test(params.phenotype_id) ||
-        (params.sex && !/^(all|female|male)(,(all|female|male))*$/.test(params.sex)))
-        return null;
+    if (!/^\d+(,\d+)*$/.test(params.phenotype_id))
+        throw('Phenotype ID must consist of numeric values');
+    
+    if (params.sex && !/^(all|female|male)(,(all|female|male))*$/.test(params.sex))
+        throw('Sex must be all, male, or female');
 
     const connection = await connectionPool.getConnection();
     const [phenotypes] = await connection.query(
-        `SELECT * FROM phenotype WHERE id IN (?) AND import_date IS NOT NULL`,
+        `SELECT * FROM phenotype WHERE id IN (?)`,
         [params.phenotype_id.split(',')]
     );
 
     if (!phenotypes.length) 
-        return null;
+        throw('No phenotypes with the specified id(s) were found');
+
+    if (!phenotypes.filter(p => p.import_date).length)
+        throw('The specified phenotype(s) do not have an import date');
 
     const columnNames = getValidColumns('variant', params.columns).map(quote);
     const partitions = phenotypes.map(p => params.sex 
@@ -449,8 +454,10 @@ async function getPhenotypes(connection, params) {
  * @param {{phenotype_id: number, type: "frequency"|"frequencyByAge"|"frequencyBySex"|"frequencyByAncestry"|"related"}} params - Type may be a string with the following values:
  */
 async function getPhenotype(connectionPool, params) {
-
     const {id, type} = params;
+
+    if (!type)
+        throw('Please specify a valid type:  "frequency"|"frequencyByAge"|"frequencyBySex"|"frequencyByAncestry"|"related"');
 
     let connection = await connectionPool.getConnection();
 
@@ -464,8 +471,11 @@ async function getPhenotype(connectionPool, params) {
         WHERE id = :id`,
         {id}
     );
+
+    if (!phenotypeRows.length)
+        throw('No phenotypes with the specified id was found');
+
     const phenotype = phenotypeRows[0];
-    if (!phenotype || !type) return null;
 
     // retrieve average value and standard deviation
     const [metadataRows] = await connection.execute(
@@ -509,6 +519,11 @@ async function getPhenotype(connectionPool, params) {
             "american_indian",
         ]
     };
+
+    phenotype.frequency = {};
+    phenotype.frequencyByAge = {};
+    phenotype.frequencyByAncestry = {};
+    phenotype.frequencyBySex = {};
 
     // if binary, assume there are two categories (with/without)
     if (phenotype.type === 'binary') {
