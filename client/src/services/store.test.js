@@ -143,7 +143,11 @@ describe('Store Module', function () {
             downloads: {
               selectedPhenotypes: [],
               downloadRoot: '',
-            }
+            },
+            error: {
+              visible: false,
+              message: `An error occured when requesting data. If this problem persists, please contact the administrator at <a href="mailto:PLCOWebAdmin@cancer.gov">PLCOWebAdmin@cancer.gov</a>.`
+            },
         });
     })
 });
