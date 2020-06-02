@@ -14,6 +14,7 @@ import {
     UPDATE_BROWSE_PHENOTYPES_PLOTS,
     UPDATE_HEATMAP,
     UPDATE_DOWNLOADS,
+    UPDATE_ERROR,
 } from './actions';
 import {
     getInitialState
@@ -232,5 +233,19 @@ describe('Reducers Module', function () {
               ...action.data
             }
         })
-    });    
+    });
+
+    test('rootReducer() returns correct state for action: UPDATE_ERROR', () => {
+        let state = getInitialState();
+        let type = UPDATE_ERROR;
+        let data = {test: 1};
+        let action = {type, data};
+        expect(rootReducer(state, action)).toEqual({
+            ...state,
+            error: {
+              ...state.error,
+              ...action.data
+            }
+        })
+    });        
 });
