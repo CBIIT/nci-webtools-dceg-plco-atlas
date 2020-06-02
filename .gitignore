@@ -3,6 +3,8 @@
 /database/import/hpc/slurm*
 /database/import/hpc/swarm*
 /database/import/nohup*
+/database/import/hpc/nohup*
+/database/import/hpc/my.cnf
 /database/import/hpc/export-all-phenotypes.swarm
 /server/logs/
 /server/data/
