@@ -7,10 +7,10 @@ import { Gwas } from './pages/gwas/gwas';
 import { Phenotypes } from './pages/phenotypes/phenotypes';
 import { Downloads } from './pages/downloads/downloads';
 import { LinkWrapper } from './pages/link/link-wrapper';
+import { ErrorModal } from './controls/error-modal/error-modal';
 
 
 function App() {
-  const [params, setParams] = useState({ trait: 'example' });
 
   const links = [
     {
@@ -54,25 +54,15 @@ function App() {
 
   return (
     <Router>
+      <ErrorModal />
       <Navbar links={links} />
       <Route path="/" exact={true} render={_ => <Home links={links} />} />
       <Route path="/about" component={About} />
-      {/* <Route path="/search/:searchType" component={Search} /> */}
-      <Route
-        path="/gwas"
-        render={_ => <Gwas params={params} setParams={setParams} />}
-      />
-      <Route
-        path="/phenotypes"
-        render={_ => <Phenotypes params={params} setParams={setParams} />}
-      />
+      <Route path="/gwas" component={Gwas} />
+      <Route path="/phenotypes" component={Phenotypes} />
       <Route path="/downloads" component={Downloads} />
-      {/* <Redirect to="/search/gwas" /> */}
-      <Route 
-        path="/link/:shareID?" 
-        component={LinkWrapper}
-      />
-    </Router>
+      <Route path="/link/:shareID?" component={LinkWrapper} />
+      </Router>
   );
 }
 
