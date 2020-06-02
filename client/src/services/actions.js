@@ -18,6 +18,7 @@ export const UPDATE_BROWSE_PHENOTYPES = 'UPDATE_BROWSE_PHENOTYPES';
 export const UPDATE_BROWSE_PHENOTYPES_PLOTS = 'UPDATE_BROWSE_PHENOTYPES_PLOTS';
 export const UPDATE_DOWNLOADS = 'UPDATE_DOWNLOADS';
 export const UPDATE_SHARED_STATE = 'UPDATE_SHARED_STATE';
+export const UPDATE_ERROR = 'UPDATE_ERROR';
 
 export function updateKey(key, data) {
   return { type: UPDATE_KEY, key, data };
@@ -87,98 +88,116 @@ export function updateDownloads(data) {
   return { type: UPDATE_DOWNLOADS, data };
 }
 
+export function updateError(data) {
+  return { type: UPDATE_ERROR, data };
+}
+
 export function initialize() {
-  return async function(dispatch) {
-    // update ranges
-    const ranges = await query('ranges')
-    dispatch(updateSummaryResults({ranges}));
+  return async function initializeAction(dispatch) {
+    try {
+      // update ranges
+      const ranges = await query('ranges')
+      dispatch(updateSummaryResults({ranges}));
 
-    // update download root
-    const { downloadRoot } = await query('config', {key: 'downloadRoot'})
-    dispatch(updateDownloads({downloadRoot}));
+      // update download root
+      const { downloadRoot } = await query('config', {key: 'downloadRoot'})
+      dispatch(updateDownloads({downloadRoot}));
 
-    // update phenotypes
-    const data = await query('phenotypes');
-    const records = [];
-    const categories = [];
-    const populateRecords = node => {
-      node.title = node.display_name;
-      node.value = node.name;
+      // update phenotypes
+      const data = await query('phenotypes');
+      const records = [];
+      const categories = [];
+      const populateRecords = node => {
+        node.title = node.display_name;
+        node.value = node.name;
 
-      // only populate alphabetic phenotype list with leaf nodes
-      if (node.children === undefined) {
-        records.push({
-          ...node
-          // title: node.title,
-          // value: node.value
-        });
-      } else {
-        categories.push({
-          ...node
-          // title: node.title,
-          // value: node.value,
-          // color: node.color || '#444',
-          // children: node.children
-        });
+        // only populate alphabetic phenotype list with leaf nodes
+        if (node.children === undefined) {
+          records.push({
+            ...node
+            // title: node.title,
+            // value: node.value
+          });
+        } else {
+          categories.push({
+            ...node
+            // title: node.title,
+            // value: node.value,
+            // color: node.color || '#444',
+            // children: node.children
+          });
+        }
+        if (node.children) {
+          node.children.forEach(populateRecords);
+        }
+      };
+
+      if (data && data.statusCode !== 500 ) {
+        data.forEach(populateRecords, 0);
+        const alphabetizedRecords = [...records].sort((a, b) =>
+          a.title.localeCompare(b.title)
+        );
+
+        dispatch(updatePhenotypes({
+          flat: alphabetizedRecords,
+          categories: categories,
+          tree: data
+        }));
       }
-      if (node.children) {
-        node.children.forEach(populateRecords);
-      }
-    };
-
-    if (data && data.statusCode !== 500 ) {
-      data.forEach(populateRecords, 0);
-      const alphabetizedRecords = [...records].sort((a, b) =>
-        a.title.localeCompare(b.title)
-      );
-
-      dispatch(updatePhenotypes({
-        flat: alphabetizedRecords,
-        categories: categories,
-        tree: data
-      }));
+    } catch (e) {
+      dispatch(updateError({visible: true}))
     }
   }
 }
 
 export function fetchSummaryTable(tableKey, params, existingResults) {
   return async function(dispatch) {
-    dispatch(setSummaryTableLoading(true));
-    // fetch variants given parameters
-    const response = await query('variants', params);
-    if (response.error) return;
-
-    dispatch(
-      updateSummaryTable(tableKey, {
-        results: response.data,
-        resultsCount: (existingResults && existingResults.resultsCount) || response.count || response.data.length,
-        page: 1 + Math.floor(params.offset / params.limit),
-        pageSize: params.limit
-      })
-    );
-
-    dispatch(setSummaryTableLoading(false));
+    try {
+      dispatch(setSummaryTableLoading(true));
+      // fetch variants given parameters
+      const response = await query('variants', params);
+      if (response.error) return;
+  
+      dispatch(
+        updateSummaryTable(tableKey, {
+          results: response.data,
+          resultsCount: (existingResults && existingResults.resultsCount) || response.count || response.data.length,
+          page: 1 + Math.floor(params.offset / params.limit),
+          pageSize: params.limit
+        })
+      );
+  
+      dispatch(setSummaryTableLoading(false));
+    } catch (e) {
+      dispatch(updateError({visible: true}))
+      dispatch(setSummaryTableLoading(false));
+    }
   }
 }
 
 export function fetchSummarySnpTable(tableKey, params, existingResults) {
   return async function(dispatch) {
-    dispatch(setSummarySnpLoading(true));
+    try {
+      dispatch(setSummarySnpLoading(true));
 
-    const response = await query('variants', params);
-    if (response.error) return;
-
-    dispatch(
-      updateSummarySnpTable(tableKey, {
-        ...existingResults,
-        results: response.data,
-        resultsCount: response.count || response.data.length,
-        page: 1 + Math.floor(params.offset / params.limit),
-        pageSize: params.limit
-      })
-    );
-
-    dispatch(setSummarySnpLoading(false));
+      const response = await query('variants', params);
+      if (response.error) return;
+  
+      dispatch(
+        updateSummarySnpTable(tableKey, {
+          ...existingResults,
+          results: response.data,
+          resultsCount: response.count || response.data.length,
+          page: 1 + Math.floor(params.offset / params.limit),
+          pageSize: params.limit
+        })
+      );
+  
+      dispatch(setSummarySnpLoading(false));
+    } catch (e) {
+      dispatch(updateError({visible: true}))
+      dispatch(setSummarySnpLoading(false));
+    }
   };
 }
 
@@ -190,552 +209,581 @@ export function fetchSummarySnpTable(tableKey, params, existingResults) {
 export function drawManhattanPlot(plotType, params) {
   console.log('drawing plot', plotType, params);
   return async function(dispatch) {
-    dispatch(updateManhattanPlot({ loadingManhattanPlot: true }));
-    if (params.sex.length === 2) {
-      // if 2 tables are provided, this is a mirrored plot
-      const manhattanPlotData = await rawQuery(plotType, {
-        ...params,
-        sex: params.sex[0]
-      });
-
-      const manhattanPlotMirroredData = await rawQuery(plotType, {
-        ...params,
-        sex: params.sex[1]
-      });
-
-      dispatch(
-        updateManhattanPlot({
-          manhattanPlotData,
-          manhattanPlotMirroredData
-        })
-      );
-    } else {
-      const manhattanPlotData = await rawQuery(plotType, params);
-      dispatch(
-        updateManhattanPlot({
-          manhattanPlotData,
-          manhattanPlotMirroredData: {}
-        })
-      );
+    try {
+      dispatch(updateManhattanPlot({ loadingManhattanPlot: true }));
+      if (params.sex.length === 2) {
+        // if 2 tables are provided, this is a mirrored plot
+        const manhattanPlotData = await rawQuery(plotType, {
+          ...params,
+          sex: params.sex[0]
+        });
+  
+        const manhattanPlotMirroredData = await rawQuery(plotType, {
+          ...params,
+          sex: params.sex[1]
+        });
+  
+        dispatch(
+          updateManhattanPlot({
+            manhattanPlotData,
+            manhattanPlotMirroredData
+          })
+        );
+      } else {
+        const manhattanPlotData = await rawQuery(plotType, params);
+        dispatch(
+          updateManhattanPlot({
+            manhattanPlotData,
+            manhattanPlotMirroredData: {}
+          })
+        );
+      }
+  
+      dispatch(updateManhattanPlot({ loadingManhattanPlot: false }));
+    } catch (e) {
+      dispatch(updateError({visible: true}))
+      dispatch(updateManhattanPlot({ loadingManhattanPlot: false }));
     }
-
-    dispatch(updateManhattanPlot({ loadingManhattanPlot: false }));
   };
 }
 
 export function drawQQPlot(phenotype, sex) {
   return async function(dispatch) {
-
-    dispatch(updateQQPlot({ 
-      loadingQQPlot: true,
-      qqplotData: [],
-      qqplotLayout: {},
-      sampleSize: null,
-    }));
-
-    const sexes = sex === 'stacked' ? ['female', 'male'] : [sex];
-
-    // retrieve metadata for all sexes provided
-    const metadata = await query('metadata', {
-      phenotype_id: phenotype.id,
-      chromosome: 'all',
-      sex: sexes,
-    });
-
-    const data = await Promise.all(sexes.map(async sex => {
-
-      // retrieve a subset of variants where show_qq_plot is true, and nlog_p is <= 3
-      const subsetVariants = await query('variants', {
+    try {
+      dispatch(updateQQPlot({ 
+        loadingQQPlot: true,
+        qqplotData: [],
+        qqplotLayout: {},
+        sampleSize: null,
+      }));
+  
+      const sexes = sex === 'stacked' ? ['female', 'male'] : [sex];
+  
+      // retrieve metadata for all sexes provided
+      const metadata = await query('metadata', {
         phenotype_id: phenotype.id,
-        columns: ['p_value_nlog_expected', 'p_value_nlog'],
-        sex,
-        p_value_nlog_max: 3,
-        show_qq_plot: true,
-        raw: true,
+        chromosome: 'all',
+        sex: sexes,
       });
-
-      console.log(
-        `${sex}.subsetVariants.length`,
-        subsetVariants.length
-      );
-
-      // retrieve all variants where nlog_p >= 3
-      const topVariants = await query('variants', {
-        phenotype_id: phenotype.id,
-        columns: ['p_value_nlog_expected', 'p_value_nlog', 'chromosome', 'position', 'snp'],
-        sex,
-        p_value_nlog_min: 3,
-        raw: true,
-      });
-
-      console.log(
-        `${sex}.topVariants.length`,
-        topVariants.length
-      );
-
-      const {lambda_gc, count} = metadata.find(m => m.sex === sex);
-      const variants = subsetVariants.data.concat(topVariants.data);
-      const maxExpectedNLogP = variants.reduce((a, b) => Math.max(a, b[0]), 0);
-      const titleCase = str => str[0].toUpperCase() + str.substring(1, str.length).toLowerCase();
-      const markerColor = {
-        all: '#f2990d',
-        female: '#f41c52',
-        male: '#006bb8'
-      }[sex];
-
-      return [
-        {
-          x: [0, maxExpectedNLogP], // expected -log10(p)
-          y: [0, maxExpectedNLogP], // expected -log10(p)
-          hoverinfo: 'none',
-          mode: 'lines',
-          type: 'scattergl',
-          line: {
-            color: 'gray',
-            width: 1
+  
+      const data = await Promise.all(sexes.map(async sex => {
+  
+        // retrieve a subset of variants where show_qq_plot is true, and nlog_p is <= 3
+        const subsetVariants = await query('variants', {
+          phenotype_id: phenotype.id,
+          columns: ['p_value_nlog_expected', 'p_value_nlog'],
+          sex,
+          p_value_nlog_max: 3,
+          show_qq_plot: true,
+          raw: true,
+        });
+  
+        console.log(
+          `${sex}.subsetVariants.length`,
+          subsetVariants.length
+        );
+  
+        // retrieve all variants where nlog_p >= 3
+        const topVariants = await query('variants', {
+          phenotype_id: phenotype.id,
+          columns: ['p_value_nlog_expected', 'p_value_nlog', 'chromosome', 'position', 'snp'],
+          sex,
+          p_value_nlog_min: 3,
+          raw: true,
+        });
+  
+        console.log(
+          `${sex}.topVariants.length`,
+          topVariants.length
+        );
+  
+        const {lambda_gc, count} = metadata.find(m => m.sex === sex);
+        const variants = subsetVariants.data.concat(topVariants.data);
+        const maxExpectedNLogP = variants.reduce((a, b) => Math.max(a, b[0]), 0);
+        const titleCase = str => str[0].toUpperCase() + str.substring(1, str.length).toLowerCase();
+        const markerColor = {
+          all: '#f2990d',
+          female: '#f41c52',
+          male: '#006bb8'
+        }[sex];
+  
+        return [
+          {
+            x: [0, maxExpectedNLogP], // expected -log10(p)
+            y: [0, maxExpectedNLogP], // expected -log10(p)
+            hoverinfo: 'none',
+            mode: 'lines',
+            type: 'scattergl',
+            line: {
+              color: 'gray',
+              width: 1
+            },
+            opacity: 0.5,
+            showlegend: false
           },
-          opacity: 0.5,
-          showlegend: false
-        },
-        {
-          x: variants.map(d => d[0]), // expected -log10(p)
-          y: variants.map(d => d[1]), // observed -log10(p)
-          customdata: variants.map(d => ({
-            phenotype_id: phenotype.id,
-            sex,
-            // properties below will be undefined for subsetVariants.data
-            // we can use this to differentiate between these two datasets in each trace
-            chromosome: d[2],
-            position: d[3],
-            snp: d[4],
-            p: Math.pow(10, -d[1]),
-          })),
-          name: `${titleCase(sex)}     <b>\u03BB</b> = ${lambda_gc}     <b>Sample Size</b> = ${count}`,
-          mode: 'markers',
-          type: 'scattergl',
-          hoverinfo: 'none',
-          text: null,
-          marker: {
-            color: markerColor,
-            size: 8,
-            opacity: 0.65
-          },
-        }
-      ];
-    }));
-
-
-    // the title property is only used for non-stacked plots
-    // stacked plots use the legend instead as the title
-    const title = sex === 'stacked' ? undefined : [
-      `<b>\u03BB</b> = ${metadata[0].lambda_gc}`,
-      `<b>Sample Size</b> = ${metadata[0].count.toLocaleString()}`,
-    ].join(' '.repeat(5));
-
-    const layout = {
-      hoverlabel: {
-        bgcolor: "#fff",
-        bordercolor: '#bbb',
-        font: {
-          size: 14,
-          color: '#212529',
-          family: systemFont
-        },
-      },
-      dragmode: 'pan',
-      clickmode: 'event',
-      hovermode: 'closest',
-      // width: 800,
-      // height: 800,
-      autosize: true,
-      title: {
-        text: title,
-        font: {
-          family: systemFont,
-          size: 14,
-          color: 'black'
-        }
-      },
-      xaxis: {
-        automargin: true,
-        rangemode: 'tozero', // only show positive
-        showgrid: false, // disable grid lines
-        fixedrange: true, // disable zoom
-        title: {
-          text: '<b>Expected -log<sub>10</sub>(p)</b>',
-          font: {
-            family: 'Arial',
-            size: 14,
-            color: 'black'
+          {
+            x: variants.map(d => d[0]), // expected -log10(p)
+            y: variants.map(d => d[1]), // observed -log10(p)
+            customdata: variants.map(d => ({
+              phenotype_id: phenotype.id,
+              sex,
+              // properties below will be undefined for subsetVariants.data
+              // we can use this to differentiate between these two datasets in each trace
+              chromosome: d[2],
+              position: d[3],
+              snp: d[4],
+              p: Math.pow(10, -d[1]),
+            })),
+            name: `${titleCase(sex)}     <b>\u03BB</b> = ${lambda_gc}     <b>Sample Size</b> = ${count}`,
+            mode: 'markers',
+            type: 'scattergl',
+            hoverinfo: 'none',
+            text: null,
+            marker: {
+              color: markerColor,
+              size: 8,
+              opacity: 0.65
+            },
           }
+        ];
+      }));
+  
+  
+      // the title property is only used for non-stacked plots
+      // stacked plots use the legend instead as the title
+      const title = sex === 'stacked' ? undefined : [
+        `<b>\u03BB</b> = ${metadata[0].lambda_gc}`,
+        `<b>Sample Size</b> = ${metadata[0].count.toLocaleString()}`,
+      ].join(' '.repeat(5));
+  
+      const layout = {
+        hoverlabel: {
+          bgcolor: "#fff",
+          bordercolor: '#bbb',
+          font: {
+            size: 14,
+            color: '#212529',
+            family: systemFont
+          },
         },
-        tick0: 0,
-        ticklen: 10,
-        tickfont: {
-          family: systemFont,
-          size: 10,
-          color: 'black'
-        }
-      },
-      yaxis: {
-        automargin: true,
-        rangemode: 'tozero', // only show positive
-        showgrid: false, // disable grid lines
-        fixedrange: true, // disable zoom
+        dragmode: 'pan',
+        clickmode: 'event',
+        hovermode: 'closest',
+        // width: 800,
+        // height: 800,
+        autosize: true,
         title: {
-          text: '<b>Observed -log<sub>10</sub>(p)</b>',
+          text: title,
           font: {
             family: systemFont,
             size: 14,
             color: 'black'
           }
         },
-        tick0: 0,
-        ticklen: 10,
-        tickfont: {
-          family: systemFont,
-          size: 10,
-          color: 'black'
+        xaxis: {
+          automargin: true,
+          rangemode: 'tozero', // only show positive
+          showgrid: false, // disable grid lines
+          fixedrange: true, // disable zoom
+          title: {
+            text: '<b>Expected -log<sub>10</sub>(p)</b>',
+            font: {
+              family: 'Arial',
+              size: 14,
+              color: 'black'
+            }
+          },
+          tick0: 0,
+          ticklen: 10,
+          tickfont: {
+            family: systemFont,
+            size: 10,
+            color: 'black'
+          }
+        },
+        yaxis: {
+          automargin: true,
+          rangemode: 'tozero', // only show positive
+          showgrid: false, // disable grid lines
+          fixedrange: true, // disable zoom
+          title: {
+            text: '<b>Observed -log<sub>10</sub>(p)</b>',
+            font: {
+              family: systemFont,
+              size: 14,
+              color: 'black'
+            }
+          },
+          tick0: 0,
+          ticklen: 10,
+          tickfont: {
+            family: systemFont,
+            size: 10,
+            color: 'black'
+          }
+        },
+        showlegend: sex === 'stacked',
+        legend: {
+          itemclick: false,
+          itemdoubleclick: false,
+          orientation: "v",
+          x: 0.2,
+          y: 1.1
         }
-      },
-      showlegend: sex === 'stacked',
-      legend: {
-        itemclick: false,
-        itemdoubleclick: false,
-        orientation: "v",
-        x: 0.2,
-        y: 1.1
-      }
-    };
-
-    dispatch(updateQQPlot({ 
-      loadingQQPlot: false,
-      qqplotData: data.flat(),
-      qqplotLayout: layout,
-      sampleSize: metadata.reduce((a, b) => a + b.count, 0),
-    }));
+      };
+  
+      dispatch(updateQQPlot({ 
+        loadingQQPlot: false,
+        qqplotData: data.flat(),
+        qqplotLayout: layout,
+        sampleSize: metadata.reduce((a, b) => a + b.count, 0),
+      }));
+    } catch (e) {
+      dispatch(updateError({visible: true}))
+      dispatch(updateQQPlot({ 
+        loadingQQPlot: false,
+        qqplotData: [],
+        qqplotLayout: {},
+        sampleSize: null,
+      }));
+    }
   };
 }
 
 export function drawHeatmap({phenotypes, sex}) {
   return async function(dispatch) {
-    const truncate = (str, limit = 20) => str.substring(0, limit) + (str.length > limit ? '...' : '');
-    const ids = phenotypes.map(p => p.id);
-    const heatmapIds = ids.map(id => `_${id}`); // needed for categorical x and y axes
-    const names = phenotypes.map(p => p.display_name);
-    const response = await query('correlations', {a: ids, b: ids});
-
-    // match ids to correlation values
-    const zData = ids.map(a => ids.map(b => response.find(p => 
-      (p.phenotype_a == a && p.phenotype_b === b) ||
-      (p.phenotype_a == b && p.phenotype_b === a)
-    )));
-
-    const heatmapData = {
-      x: heatmapIds,
-      y: heatmapIds,
-      z: zData.map(row => row.map(correlation => {
-        // ternary is a bit harder to read
-        if (!correlation || [1, -1].includes(correlation.value)) 
-          return 0;
-        return correlation.value;
-      })),
-      customdata: zData,
-      zmin: -1.0,
-      zmax: 1.0,
-      // text: z.zText,
-      xgap: 1,
-      ygap: 1,
-      type: 'heatmap',
-      colorscale: [
-        ['0.0', 'rgb(0,0,255)'],
-        ['0.49999999', 'rgb(255,255,255)'],
-        ['0.5', 'rgb(204,204,204)'],
-        ['0.50000001', 'rgb(255,255,255)'],
-        ['1.0', 'rgb(255,0,0)']
-      ],
-      colorbar: {
-        tickvals: [-1, -0.75, -0.5, -0.25, 0, 0.25, 0.5, 0.75, 1],
-        tickmode: "array",
-        thickness: 15,
-        title: {
-          text: 'Correlation',
-          side: 'right'
-        }
-      },
-      showscale: true,
-      hoverinfo: 'none',
-      // use custom tooltips instead of plotly defaults
-      // hoverinfo: 'text',
-      // hovertemplate:
-      //   '%{text.x}<br>' +
-      //   '%{text.y}<br>' +
-      //   '<b>Correlation:</b> %{text.z}' +
-      //   '<extra></extra>'
-    };
-    let heatmapLayout = {
-      hoverlabel: {
-        bgcolor: "#fff",
-        bordercolor: '#bbb',
-        font: {
-          size: 14,
-          color: '#212529',
-          family: systemFont
+    try {
+      const truncate = (str, limit = 20) => str.substring(0, limit) + (str.length > limit ? '...' : '');
+      const ids = phenotypes.map(p => p.id);
+      const heatmapIds = ids.map(id => `_${id}`); // needed for categorical x and y axes
+      const names = phenotypes.map(p => p.display_name);
+      const response = await query('correlations', {a: ids, b: ids});
+  
+      // match ids to correlation values
+      const zData = ids.map(a => ids.map(b => response.find(p => 
+        (p.phenotype_a == a && p.phenotype_b === b) ||
+        (p.phenotype_a == b && p.phenotype_b === a)
+      )));
+  
+      const heatmapData = {
+        x: heatmapIds,
+        y: heatmapIds,
+        z: zData.map(row => row.map(correlation => {
+          // ternary is a bit harder to read
+          if (!correlation || [1, -1].includes(correlation.value)) 
+            return 0;
+          return correlation.value;
+        })),
+        customdata: zData,
+        zmin: -1.0,
+        zmax: 1.0,
+        // text: z.zText,
+        xgap: 1,
+        ygap: 1,
+        type: 'heatmap',
+        colorscale: [
+          ['0.0', 'rgb(0,0,255)'],
+          ['0.49999999', 'rgb(255,255,255)'],
+          ['0.5', 'rgb(204,204,204)'],
+          ['0.50000001', 'rgb(255,255,255)'],
+          ['1.0', 'rgb(255,0,0)']
+        ],
+        colorbar: {
+          tickvals: [-1, -0.75, -0.5, -0.25, 0, 0.25, 0.5, 0.75, 1],
+          tickmode: "array",
+          thickness: 15,
+          title: {
+            text: 'Correlation',
+            side: 'right'
+          }
         },
-      },
-      // width: 1000,
-      // height: 1000,
-      // autosize: true,
-      margin: {
-        t: 120
-      },
-      // title: 'Example Heatmap',
-      xaxis: {
-        automargin: true,
-        // autorange: 'reversed',
-        side: 'top',
-        tickangle: -45,
-        tickfont: {
-          family: systemFont,
-          size: 10,
-          color: 'black'
+        showscale: true,
+        hoverinfo: 'none',
+        // use custom tooltips instead of plotly defaults
+        // hoverinfo: 'text',
+        // hovertemplate:
+        //   '%{text.x}<br>' +
+        //   '%{text.y}<br>' +
+        //   '<b>Correlation:</b> %{text.z}' +
+        //   '<extra></extra>'
+      };
+      let heatmapLayout = {
+        hoverlabel: {
+          bgcolor: "#fff",
+          bordercolor: '#bbb',
+          font: {
+            size: 14,
+            color: '#212529',
+            family: systemFont
+          },
         },
-        tickvals: heatmapIds, // use id to uniquely identify phenotype
-        ticktext: names.map(name => truncate(name, 20)),
-        // dtick: 5,
-      },
-      yaxis: {
-        automargin: true,
-        autorange: 'reversed',
-        tickangle: 'auto',
-        tickfont: {
-          family: systemFont,
-          size: 10,
-          color: 'black'
+        // width: 1000,
+        // height: 1000,
+        // autosize: true,
+        margin: {
+          t: 120
         },
-        tickvals: heatmapIds,
-        ticktext: names.map(name => truncate(name, 20)),
-        // dtick: 5
-      }
-    };
-    dispatch(updateHeatmap({
-      heatmapData: [heatmapData],
-      heatmapLayout
-    }));
-
-    /*
-
-    const filterCorrelationData = (phenotype1, phenotype2, correlationData) => {
-      return correlationData.filter((data) => {
-        return (data.phenotype_a === phenotype1.id && data.phenotype_b === phenotype2.id) ||
-          (data.phenotype_a === phenotype2.id && data.phenotype_b === phenotype1.id);
-      });
-    };
-
-    const getZ = (phenotype1, phenotype2, correlationData) => {
-      var r2 = 0.0;
-      var results = filterCorrelationData(phenotype1, phenotype2, correlationData);
-      if (results.length > 0) {
-        r2 = results[0].value;
-      } else {
-        r2 = 0.0;
-      }
-      var r2Color;
-      if (r2 === -1.0 || r2 === 1.0) {
-        r2Color = 0.0;
-      } else {
-        r2Color = r2;
-      }
-
-      return {
-        r2Color,
-        r2Text: {
-          x: phenotype2.display_name,
-          y: phenotype1.display_name,
-          z: r2
+        // title: 'Example Heatmap',
+        xaxis: {
+          automargin: true,
+          // autorange: 'reversed',
+          side: 'top',
+          tickangle: -45,
+          tickfont: {
+            family: systemFont,
+            size: 10,
+            color: 'black'
+          },
+          tickvals: heatmapIds, // use id to uniquely identify phenotype
+          ticktext: names.map(name => truncate(name, 20)),
+          // dtick: 5,
+        },
+        yaxis: {
+          automargin: true,
+          autorange: 'reversed',
+          tickangle: 'auto',
+          tickfont: {
+            family: systemFont,
+            size: 10,
+            color: 'black'
+          },
+          tickvals: heatmapIds,
+          ticktext: names.map(name => truncate(name, 20)),
+          // dtick: 5
         }
       };
-    };
-
-    const initialState = getInitialState();
-    dispatch(updateHeatmap(initialState.heatmap));
-
-    var phenotypesID = phenotypes.map((phenotype) =>
-      phenotype.id
-    );
-
-    const correlationData = await query('correlations', {
-      a: phenotypesID,
-      b: phenotypesID
-    });
-
-    let n = phenotypes.length;
-    let x = phenotypes;
-    let y = phenotypes;
-    let z = {
-      zColor: [],
-      zText: []
-    };
-
-    for (var xidx = 0; xidx < n; xidx++) {
-      let rowColor = [];
-      let rowText = [];
-      for (var yidx = 0; yidx < n; yidx++) {
-        let zData = getZ(x[xidx], y[yidx], correlationData)
-        rowColor.push(zData['r2Color']);
-        rowText.push(zData['r2Text']);
-      }
-      z.zColor.push(rowColor);
-      z.zText.push(rowText);
-    }
-
-
-    let heatmapData = {
-      x: phenotypes.map(phenotype => JSON.stringify(phenotype)),
-      y: phenotypes.map(phenotype => JSON.stringify(phenotype)),
-      z: z.zColor,
-      zmin: -1.0,
-      zmax: 1.0,
-      text: z.zText,
-      xgap: 1,
-      ygap: 1,
-      type: 'heatmap',
-      colorscale: [
-        ['0.0', 'rgb(0,0,255)'],
-        ['0.49999999', 'rgb(255,255,255)'],
-        ['0.5', 'rgb(204,204,204)'],
-        ['0.50000001', 'rgb(255,255,255)'],
-        ['1.0', 'rgb(255,0,0)']
-      ],
-      colorbar: {
-        tickvals: [-1, -0.75, -0.5, -0.25, 0, 0.25, 0.5, 0.75, 1],
-        tickmode: "array",
-        thickness: 15,
-        title: {
-          text: 'Correlation',
-          side: 'right'
+      dispatch(updateHeatmap({
+        heatmapData: [heatmapData],
+        heatmapLayout
+      }));
+  
+      /*
+  
+      const filterCorrelationData = (phenotype1, phenotype2, correlationData) => {
+        return correlationData.filter((data) => {
+          return (data.phenotype_a === phenotype1.id && data.phenotype_b === phenotype2.id) ||
+            (data.phenotype_a === phenotype2.id && data.phenotype_b === phenotype1.id);
+        });
+      };
+  
+      const getZ = (phenotype1, phenotype2, correlationData) => {
+        var r2 = 0.0;
+        var results = filterCorrelationData(phenotype1, phenotype2, correlationData);
+        if (results.length > 0) {
+          r2 = results[0].value;
+        } else {
+          r2 = 0.0;
         }
-      },
-      showscale: true,
-      hoverinfo: 'text',
-      hovertemplate:
-        '%{text.x}<br>' +
-        '%{text.y}<br>' +
-        '<b>Correlation:</b> %{text.z}' +
-        '<extra></extra>'
-    };
-    let heatmapLayout = {
-      hoverlabel: {
-        bgcolor: "#fff",
-        bordercolor: '#bbb',
-        font: {
-          size: 14,
-          color: '#212529',
-          family: systemFont
-        },
-      },
-      // width: 1000,
-      // height: 1000,
-      autosize: true,
-      margin: {
-        t: 120
-      },
-      // title: 'Example Heatmap',
-      xaxis: {
-        automargin: true,
-        // autorange: 'reversed',
-        side: 'top',
-        tickangle: -45,
-        tickfont: {
-          family: 'Arial',
-          size: 10,
-          color: 'black'
-        },
-        tickvals: phenotypes.map(phenotype => JSON.stringify(phenotype)),
-        ticktext: phenotypes.map(phenotype =>
-          phenotype.display_name.length > 20 ? phenotype.display_name.substring(0, 20) + '...' : phenotype.display_name
-        )
-        // dtick: 5,
-      },
-      yaxis: {
-        automargin: true,
-        autorange: 'reversed',
-        tickangle: 'auto',
-        tickfont: {
-          family: 'Arial',
-          size: 10,
-          color: 'black'
-        },
-        tickvals: phenotypes.map(phenotype => JSON.stringify(phenotype)),
-        ticktext: phenotypes.map(phenotype =>
-          phenotype.display_name.length > 20 ? phenotype.display_name.substring(0, 20) + '...' : phenotype.display_name
-        )
-        // dtick: 5
+        var r2Color;
+        if (r2 === -1.0 || r2 === 1.0) {
+          r2Color = 0.0;
+        } else {
+          r2Color = r2;
+        }
+  
+        return {
+          r2Color,
+          r2Text: {
+            x: phenotype2.display_name,
+            y: phenotype1.display_name,
+            z: r2
+          }
+        };
+      };
+  
+      const initialState = getInitialState();
+      dispatch(updateHeatmap(initialState.heatmap));
+  
+      var phenotypesID = phenotypes.map((phenotype) =>
+        phenotype.id
+      );
+  
+      const correlationData = await query('correlations', {
+        a: phenotypesID,
+        b: phenotypesID
+      });
+  
+      let n = phenotypes.length;
+      let x = phenotypes;
+      let y = phenotypes;
+      let z = {
+        zColor: [],
+        zText: []
+      };
+  
+      for (var xidx = 0; xidx < n; xidx++) {
+        let rowColor = [];
+        let rowText = [];
+        for (var yidx = 0; yidx < n; yidx++) {
+          let zData = getZ(x[xidx], y[yidx], correlationData)
+          rowColor.push(zData['r2Color']);
+          rowText.push(zData['r2Text']);
+        }
+        z.zColor.push(rowColor);
+        z.zText.push(rowText);
       }
-    };
-    dispatch(updateHeatmap({
-      heatmapData: [heatmapData],
-      heatmapLayout
-    }));
-    */
+  
+  
+      let heatmapData = {
+        x: phenotypes.map(phenotype => JSON.stringify(phenotype)),
+        y: phenotypes.map(phenotype => JSON.stringify(phenotype)),
+        z: z.zColor,
+        zmin: -1.0,
+        zmax: 1.0,
+        text: z.zText,
+        xgap: 1,
+        ygap: 1,
+        type: 'heatmap',
+        colorscale: [
+          ['0.0', 'rgb(0,0,255)'],
+          ['0.49999999', 'rgb(255,255,255)'],
+          ['0.5', 'rgb(204,204,204)'],
+          ['0.50000001', 'rgb(255,255,255)'],
+          ['1.0', 'rgb(255,0,0)']
+        ],
+        colorbar: {
+          tickvals: [-1, -0.75, -0.5, -0.25, 0, 0.25, 0.5, 0.75, 1],
+          tickmode: "array",
+          thickness: 15,
+          title: {
+            text: 'Correlation',
+            side: 'right'
+          }
+        },
+        showscale: true,
+        hoverinfo: 'text',
+        hovertemplate:
+          '%{text.x}<br>' +
+          '%{text.y}<br>' +
+          '<b>Correlation:</b> %{text.z}' +
+          '<extra></extra>'
+      };
+      let heatmapLayout = {
+        hoverlabel: {
+          bgcolor: "#fff",
+          bordercolor: '#bbb',
+          font: {
+            size: 14,
+            color: '#212529',
+            family: systemFont
+          },
+        },
+        // width: 1000,
+        // height: 1000,
+        autosize: true,
+        margin: {
+          t: 120
+        },
+        // title: 'Example Heatmap',
+        xaxis: {
+          automargin: true,
+          // autorange: 'reversed',
+          side: 'top',
+          tickangle: -45,
+          tickfont: {
+            family: 'Arial',
+            size: 10,
+            color: 'black'
+          },
+          tickvals: phenotypes.map(phenotype => JSON.stringify(phenotype)),
+          ticktext: phenotypes.map(phenotype =>
+            phenotype.display_name.length > 20 ? phenotype.display_name.substring(0, 20) + '...' : phenotype.display_name
+          )
+          // dtick: 5,
+        },
+        yaxis: {
+          automargin: true,
+          autorange: 'reversed',
+          tickangle: 'auto',
+          tickfont: {
+            family: 'Arial',
+            size: 10,
+            color: 'black'
+          },
+          tickvals: phenotypes.map(phenotype => JSON.stringify(phenotype)),
+          ticktext: phenotypes.map(phenotype =>
+            phenotype.display_name.length > 20 ? phenotype.display_name.substring(0, 20) + '...' : phenotype.display_name
+          )
+          // dtick: 5
+        }
+      };
+      dispatch(updateHeatmap({
+        heatmapData: [heatmapData],
+        heatmapLayout
+      }));
+      */
+    } catch (e) {
+      dispatch(updateError({visible: true}))
+    }
   };
 }
 
 export function lookupVariants({phenotypes, variant, sex}) {
   return async function(dispatch) {
-    const {variantLookupTable} = getInitialState();
-    dispatch(updateHeatmap(variantLookupTable));
-    
-    let chromosome = null;
-    let position = null;
-    let snp = null;
-
-    // determine if we should query by snp or chromosome/position
-    const coordinates = variant.match(/^chr(x|y|\d+):(\d+)$/i);
-    if (coordinates) {
-      [, chromosome, position] = coordinates;
-    } else {
-      snp = variant;
-    }
-
-    // null properties are not included in query
-    const {data} = await query('variants', {
-      phenotype_id: phenotypes.map(p => p.id),
-      sex: sex === 'combined' ? ['female', 'male'] : sex,
-      chromosome,
-      position,
-      snp
-    });
-
-    // populate results
-    const results = data.map(record => ({
-      phenotype: phenotypes.find(p => p.id === record.phenotype_id).title,
-      variant,
-      ...record
-    }));
-
-    // populate empty results
-    const emptyResults = phenotypes
-      .filter(p => !data.find(r => r.phenotype_id === p.id))
-      .map(p => ({
-        phenotype: p.title || p.label,
-        allele_reference: '-',
-        allele_alternate: '-',
-        position: '-',
-        chromosome: '-',
-        odds_ratio: '-',
-        p_value: '-',
-        variant_id: `not-found-${p.title || p.label}`,
-        sex,
-        variant
+    try {
+      const {variantLookupTable} = getInitialState();
+//      dispatch(updateVariantLookup())
+//      dispatch(updateHeatmap(variantLookupTable));
+      
+      let chromosome = null;
+      let position = null;
+      let snp = null;
+  
+      // determine if we should query by snp or chromosome/position
+      const coordinates = variant.match(/^chr(x|y|\d+):(\d+)$/i);
+      if (coordinates) {
+        [, chromosome, position] = coordinates;
+      } else {
+        snp = variant;
+      }
+  
+      // null properties are not included in query
+      const {data} = await query('variants', {
+        phenotype_id: phenotypes.map(p => p.id),
+        sex: sex === 'combined' ? ['female', 'male'] : sex,
+        chromosome,
+        position,
+        snp
+      });
+  
+      // populate results
+      const results = data.map(record => ({
+        phenotype: phenotypes.find(p => p.id === record.phenotype_id).title,
+        variant,
+        ...record
       }));
-
-    dispatch(
-      updateVariantLookupTable({
-        results: results.concat(emptyResults),
-        numResults: results.length
-      })
-    );
+  
+      // populate empty results
+      const emptyResults = phenotypes
+        .filter(p => !data.find(r => r.phenotype_id === p.id))
+        .map(p => ({
+          phenotype: p.title || p.label,
+          allele_reference: '-',
+          allele_alternate: '-',
+          position: '-',
+          chromosome: '-',
+          odds_ratio: '-',
+          p_value: '-',
+          variant_id: `not-found-${p.title || p.label}`,
+          sex,
+          variant
+        }));
+  
+      dispatch(
+        updateVariantLookupTable({
+          results: results.concat(emptyResults),
+          numResults: results.length
+        })
+      );
+    } catch (e) {
+      dispatch(updateError({visible: true}))
+      dispatch(
+        updateVariantLookupTable({
+          results: [],
+          numResults: 0
+        })
+      );
+    }
   }
 }
 
@@ -743,24 +791,28 @@ export function lookupVariants({phenotypes, variant, sex}) {
 // return share reference ID
 export function generateShareLink(params) {
   return async function(dispatch) {
-    // figure which store key to update by params route
-    const updateStore = {
-      "/gwas/summary": updateSummaryResults,
-      "/gwas/lookup": updateVariantLookup,
-      "/gwas/correlations": updatePhenotypeCorrelations,
-      "/phenotypes": updateBrowsePhenotypes
-    }[params.route];
-    dispatch(
-      updateStore({
-        shareID: null
-      })
-    );
-    const response = await post('share-link', params);
-    dispatch(
-      updateStore({
-        shareID: response.share_id
-      })
-    );
+    try {
+      // figure which store key to update by params route
+      const updateStore = {
+        "/gwas/summary": updateSummaryResults,
+        "/gwas/lookup": updateVariantLookup,
+        "/gwas/correlations": updatePhenotypeCorrelations,
+        "/phenotypes": updateBrowsePhenotypes
+      }[params.route];
+      dispatch(
+        updateStore({
+          shareID: null
+        })
+      );
+      const response = await post('share-link', params);
+      dispatch(
+        updateStore({
+          shareID: response.share_id
+        })
+      );
+    } catch (e) {
+      dispatch(updateError({visible: true}))
+    }
   };
 }
 
