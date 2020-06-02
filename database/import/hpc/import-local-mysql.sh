@@ -1,8 +1,8 @@
 #!/bin/bash
 
-DB_USER=$1
-DB_PASS=$2
-ARCHIVE_FILE=$3
+export DB_USER=$1
+export DB_PASS=$2
+export ARCHIVE_FILE=$3
 
 echo "LOADING MODULES (MySQL-8.0, GNU-Parallel, NodeJS)..."
 module load mysql/8.0 parallel nodejs
@@ -14,6 +14,7 @@ echo
 
 echo "INJECTING SLURM_JOB_ID ENV VAR TO MYSQL CONFIGURATION FILE..."
 envsubst < mysql.config > my.cnf
+echo 
 
 echo "COPYING OVER NEW MYSQL CONFIGURATION FILE..."
 rm /lscratch/$SLURM_JOB_ID/mysql/my.cnf
@@ -40,13 +41,13 @@ echo "STOPPING MYSQL SERVER..."
 local_mysql stop
 echo
 
-echo "COPYING MYSQL SERVER TO /data/$USER/plco/mysql/mysql-instance-$SLURM_JOB_ID ..."
-mkdir /data/$USER/plco/mysql/mysql-instance-$SLURM_JOB_ID
-time cp -avr /lscratch/$SLURM_JOB_ID/mysql /data/$USER/plco/mysql/mysql-instance-$SLURM_JOB_ID
-echo
+#echo "COPYING MYSQL SERVER TO /data/$USER/plco/mysql/mysql-instance-$SLURM_JOB_ID ..."
+#mkdir /data/$USER/plco/mysql/mysql-instance-$SLURM_JOB_ID
+#time cp -avr /lscratch/$SLURM_JOB_ID/mysql /data/$USER/plco/mysql/mysql-instance-$SLURM_JOB_ID
+#echo
 
-echo "ARCHIVING MYSQL SERVER..."
-time local_mysql archive --archivefile=/data/$USER/plco/mysql/mysql-archive-$SLURM_JOB_ID.tgz
-echo
+#echo "ARCHIVING MYSQL SERVER..."
+#time local_mysql archive --archivefile=/data/$USER/plco/mysql/mysql-archive-$SLURM_JOB_ID.tgz
+#echo
 
 echo "DONE"
