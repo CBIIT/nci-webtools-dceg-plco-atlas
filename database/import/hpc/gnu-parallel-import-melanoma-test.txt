@@ -1,0 +1,3 @@
+node ../parallel-import-variant.js --file ../raw/output_melanoma_1000/10002.all
+node ../parallel-import-variant.js --file ../raw/output_melanoma_1000/10002.female
+node ../parallel-import-variant.js --file ../raw/output_melanoma_1000/10002.male
