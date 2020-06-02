@@ -3,19 +3,24 @@ const path = require('path');
 const mysql = require('mysql2');
 const args = require('minimist')(process.argv.slice(2));
 const { getRecords } = require('./utils/query');
-const { database } = require('../../server/config.json');
+// const { database } = require('../../server/config.json');
 const { timestamp } = require('./utils/logging');
 
 // display help if needed
 if (!args.file) {
     console.log(`USAGE: node parallel-import-variant.js
             --file "path to file prefix. eg: phenotype_id.sex"
-            --reset (if specified, drop the variant/summary partitions before importing)`);
+            --reset (if specified, drop the variant/summary partitions before importing)
+            --host "MySQL hostname" 
+            --port "MySQL port" 
+            --db_name "MySQL database name" 
+            --user "MySQL username" 
+            --password "MySQL password" `);
     process.exit(0);
 }
 
 // parse arguments and set defaults
-const {file, reset} = args;
+const {file, reset, host, port, db_name, user, password} = args;
 const filepath = path.resolve(file);
 const [phenotypeId, sex] = path.basename(filepath).split('.');
 const exportVariantFilePath = filepath + '.variant.csv';
@@ -26,10 +31,11 @@ const exportMetadataFilePath = filepath + '.metadata.csv';
 const errorLog = {write: e => console.log(e)};
 const duration = timestamp();
 const connection = mysql.createConnection({
-    host: database.host,
-    database: database.name,
-    user: database.user,
-    password: database.password,
+    host: host,
+    port: port,
+    database: db_name,
+    user: user,
+    password: password,
     namedPlaceholders: true,
     multipleStatements: true,
     // debug: true,

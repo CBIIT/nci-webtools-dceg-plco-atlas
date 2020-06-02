@@ -28,8 +28,12 @@ echo "LOGGING INTO MYSQL WITH DB_USER=$DB_USER, DB_PASS=$DB_PASS, HOST=$SLURM_NO
 time mysql -u $DB_USER -p$DB_PASS --host=$SLURM_NODELIST --port=55555 plcogwas --execute="SELECT @@local_infile; SELECT @@innodb_buffer_pool_size; SELECT @@innodb_read_io_threads; SELECT @@innodb_write_io_threads; SELECT @@innodb_log_buffer_size; SELECT @@innodb_log_file_size; SELECT @@innodb_flush_log_at_trx_commit; SELECT @@key_buffer_size;"
 echo
 
+echo "INJECTING CREDENTIALS TO gnu-parallel-import-melanoma-test.txt ..."
+envsubst < gnu-parallel-import-melanoma-test.txt > gnu-parallel-import-melanoma-test-envsubst.txt
+echo
+
 echo "SPAWNING TEST PARALLEL IMPORT PROCESSES..."
-time parallel -j 3 < gnu-parallel-import-melanoma-test.txt
+time parallel -j 3 < gnu-parallel-import-melanoma-test-envsubst.txt
 echo
 
 echo "STOPPING MYSQL SERVER..."
