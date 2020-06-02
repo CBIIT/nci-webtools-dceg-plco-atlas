@@ -9,13 +9,15 @@ export function ErrorModal(props) {
     const closeErrorModal = () => dispatch(updateError({visible: false}));
 
     return (
-        <Modal show={error.visible} onHide={closeErrorModal}>
+        <Modal data-testid="ErrorModal" show={error.visible} onHide={closeErrorModal}>
             <Modal.Header closeButton>
                 <Modal.Title>Error</Modal.Title>
             </Modal.Header>
 
             <Modal.Body>
-                <p dangerouslySetInnerHTML={{__html: error.message}} />
+                <p 
+                    data-testid="ErrorModalMessage" 
+                    dangerouslySetInnerHTML={{__html: error.message}} />
             </Modal.Body>
 
             <Modal.Footer>
