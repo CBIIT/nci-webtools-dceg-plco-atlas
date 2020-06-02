@@ -54,7 +54,7 @@ export function QQPlot({ onVariantLookup }) {
       ref={plotContainer}>
       <LoadingOverlay active={loadingQQPlot} />
 
-      <Plot
+      {qqplotData.length > 0 && <Plot
         className="override-cursor-default"
         style={{
           display: !loadingQQPlot ? 'block' : 'none',
@@ -89,7 +89,7 @@ export function QQPlot({ onVariantLookup }) {
         onRelayout={relayout => {
           updateTooltip({visible: false})
         }}
-      />
+      />}
 
       <Tooltip 
         closeButton 

@@ -14,6 +14,7 @@ import {
   UPDATE_BROWSE_PHENOTYPES_PLOTS,
   UPDATE_HEATMAP,
   UPDATE_DOWNLOADS,
+  UPDATE_ERROR,
 } from './actions';
 
 export const rootReducer = (state, action) => {
@@ -124,6 +125,14 @@ export const rootReducer = (state, action) => {
         ...state,
         downloads: {
           ...state.downloads,
+          ...action.data
+        }
+      };
+    case UPDATE_ERROR:
+      return {
+        ...state,
+        error: {
+          ...state.error,
           ...action.data
         }
       };

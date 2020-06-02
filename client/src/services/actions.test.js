@@ -14,6 +14,7 @@ import {
     UPDATE_BROWSE_PHENOTYPES,
     UPDATE_BROWSE_PHENOTYPES_PLOTS,
     UPDATE_DOWNLOADS,
+    UPDATE_ERROR,
     updateKey,
     updatePhenotypes,
     updateSummaryResults,
@@ -31,6 +32,7 @@ import {
     updateBrowsePhenotypes,
     updateBrowsePhenotypesPlots,
     updateDownloads,
+    updateError,
 } from './actions';
 
 describe('Actions Module', function () {
@@ -122,5 +124,10 @@ describe('Actions Module', function () {
         const data = {test: 1};
         expect(updateDownloads(data)).toEqual({type: UPDATE_DOWNLOADS, data})
     });
+
+    test('updateError() generates expected action', () => {
+        const data = {test: 1};
+        expect(updateError(data)).toEqual({type: UPDATE_ERROR, data})
+    });    
 
 })
