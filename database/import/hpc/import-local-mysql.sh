@@ -25,15 +25,19 @@ local_mysql start
 echo
 
 echo "LOGGING INTO MYSQL WITH DB_USER=$DB_USER, DB_PASS=$DB_PASS, HOST=$SLURM_NODELIST, PORT=55555..."
-time mysql -u $DB_USER -p$DB_PASS --host=$SLURM_NODELIST --port=55555 plcogwas --execute="SELECT @@local_infile; SELECT @@innodb_buffer_pool_size; SELECT @@innodb_read_io_threads; SELECT @@innodb_write_io_threads; SELECT @@innodb_log_buffer_size; SELECT @@innodb_log_file_size; SELECT @@innodb_flush_log_at_trx_commit;"
+time mysql -u $DB_USER -p$DB_PASS --host=$SLURM_NODELIST --port=55555 plcogwas --execute="SELECT @@local_infile; SELECT @@innodb_buffer_pool_size; SELECT @@innodb_read_io_threads; SELECT @@innodb_write_io_threads; SELECT @@innodb_log_buffer_size; SELECT @@innodb_log_file_size; SELECT @@innodb_flush_log_at_trx_commit; SELECT @@key_buffer_size;"
 echo
 
-#echo "STOPPING MYSQL SERVER..."
-#local_mysql stop
-#echo
+# echo "SPAWNING TEST PARALLEL IMPORT PROCESSES..."
+# time parallel -j 3 < gnu-parallel-import-melanoma-test.txt
+# echo
 
-#echo "SAVING MYSQL SERVER..."
-#time local_mysql archive --archivefile=/data/$USER/plco/mysql/mysql-archive-$SLURM_JOB_ID.tgz
-#echo
+echo "STOPPING MYSQL SERVER..."
+local_mysql stop
+echo
+
+echo "SAVING MYSQL SERVER..."
+time local_mysql archive --archivefile=/data/$USER/plco/mysql/mysql-archive-$SLURM_JOB_ID.tgz
+echo
 
 echo "DONE"
