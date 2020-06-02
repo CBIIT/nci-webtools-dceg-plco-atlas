@@ -4,8 +4,8 @@ DB_USER=$1
 DB_PASS=$2
 ARCHIVE_FILE=$3
 
-echo "LOADING MODULES (MySQL-8.0, GNU-Parallel)..."
-module load mysql/8.0 parallel
+echo "LOADING MODULES (MySQL-8.0, GNU-Parallel, NodeJS)..."
+module load mysql/8.0 parallel nodejs
 echo
 
 echo "RESTORING MYSQL DATABASE FROM ARCHIVE FILE $ARCHIVE_FILE ..."

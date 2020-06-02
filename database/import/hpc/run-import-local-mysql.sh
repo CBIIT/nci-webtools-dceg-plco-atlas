@@ -33,4 +33,4 @@ if [ -z "$3" ]
 fi
 ARCHIVE_FILE=$3
 
-sbatch --gres=lscratch:20 --mem=32g --cpus-per-task=8 --partition=norm --wrap="sh import-local-mysql.sh $DB_USER $DB_PASS $ARCHIVE_FILE"
+sbatch --gres=lscratch:20 --mem=32g --cpus-per-task=16 --partition=norm --wrap="sh import-local-mysql.sh $DB_USER $DB_PASS $ARCHIVE_FILE"
