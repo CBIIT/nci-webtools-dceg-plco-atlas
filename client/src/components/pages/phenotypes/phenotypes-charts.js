@@ -358,7 +358,7 @@ export const PieChart = ({ data, categories }) => (
         values: data,
         labels: categories,
         hoverinfo: "label+value+percent",
-        hovertemplate: `<b>%{label}</b><br>%{value} participants (%{percent})`,
+        hovertemplate: `<b>%{label}</b><br>%{value} participants (%{percent})<extra></extra>`,
         hole: 0.4,
         type: "pie"
       }
@@ -375,6 +375,8 @@ export const PieChart = ({ data, categories }) => (
     }}
   />
 );
+
+
 
 export function PhenotypesRelated({relatedData, onClick}) {
   relatedData = relatedData.sort((a, b) => b.correlation - a.correlation);
