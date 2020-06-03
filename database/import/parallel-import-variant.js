@@ -220,6 +220,8 @@ async function importVariants({
             count = VALUES(count);
     `);
 
+    await connection.query(`COMMIT`);
+
     // log imported variants
     console.log(`[${duration()} s] Storing import log...`);
     connection.execute(`
@@ -236,8 +238,7 @@ async function importVariants({
             id = :phenotypeId`,
         {phenotypeId, sex, chromosome: 'all'}
     );
-
-    await connection.query(`COMMIT`);
+    
     await connection.end();
 
     console.log(`[${duration()} s] Done importing`);
