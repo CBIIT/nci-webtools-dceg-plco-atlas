@@ -30,11 +30,11 @@ time mysql -u $DB_USER -p$DB_PASS --host=$SLURM_NODELIST --port=55555 plcogwas -
 echo
 
 echo "INJECTING CREDENTIALS TO gnu-parallel-import-melanoma-test.txt ..."
-envsubst < gnu-parallel-import-melanoma-test.txt > gnu-parallel-import-melanoma-test-envsubst.txt
+envsubst < gnu-parallel-import-melanoma-test-9.txt > gnu-parallel-import-melanoma-test-envsubst.txt
 echo
 
 echo "SPAWNING TEST PARALLEL IMPORT PROCESSES..."
-time parallel -j 3 < gnu-parallel-import-melanoma-test-envsubst.txt
+time parallel -j 9 < gnu-parallel-import-melanoma-test-envsubst.txt
 echo
 
 echo "STOPPING MYSQL SERVER..."
