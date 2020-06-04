@@ -1,0 +1,3 @@
+node ../parallel-import-variant.js --file ../raw/output_melanoma_1000/10002.all --host $SLURM_NODELIST --port 55555 --db_name plcogwas --user $DB_USER --password $DB_PASS
+node ../parallel-import-variant.js --file ../raw/output_melanoma_1000/10002.female --host $SLURM_NODELIST --port 55555 --db_name plcogwas --user $DB_USER --password $DB_PASS
+node ../parallel-import-variant.js --file ../raw/output_melanoma_1000/10002.male --host $SLURM_NODELIST --port 55555 --db_name plcogwas --user $DB_USER --password $DB_PASS
