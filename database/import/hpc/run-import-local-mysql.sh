@@ -46,13 +46,13 @@ COMMANDS_FILE=$4
 
 # ARGUMENT 5: Input number of parallel import jobs to run
 # NUM_JOBS = 9
-if [ -z "$4" ]
+if [ -z "$5" ]
     then
         echo "ERROR: No number of parallel import jobs to run supplied..."
         echo "USAGE: sh run-import-local-mysql.sh <DB_USER> <DB_PASS> <ARCHIVE_FILE> <COMMANDS_FILE> <NUM_JOBS>"
         echo "EXAMPLE: sh run-import-local-mysql.sh sample_username sample_password /data/jiangk3/plco/mysql/save.tgz gnu-parallel-import-melanoma-test-9x-full 9"
         exit 1
 fi
-NUM_JOBS=$4
+NUM_JOBS=$5
 
 sbatch --gres=lscratch:200 --mem=128g --cpus-per-task=32 --partition=norm --wrap="sh import-local-mysql.sh $DB_USER $DB_PASS $ARCHIVE_FILE $COMMANDS_FILE $NUM_JOBS"
