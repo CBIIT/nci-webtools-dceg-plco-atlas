@@ -3,6 +3,8 @@
 export DB_USER=$1
 export DB_PASS=$2
 export ARCHIVE_FILE=$3
+export COMMANDS_FILE=$4
+export NUM_JOBS=$5
 export TMPDIR=/lscratch/$SLURM_JOB_ID
 
 echo "LOADING MODULES (MySQL-8.0, GNU-Parallel, NodeJS)..."
@@ -31,11 +33,11 @@ time mysql -u $DB_USER -p$DB_PASS --host=$SLURM_NODELIST --port=55555 plcogwas -
 echo
 
 echo "INJECTING CREDENTIALS TO gnu-parallel-import-melanoma-test.txt ..."
-envsubst < gnu-parallel-import-melanoma-test-3x-full.txt  > gnu-parallel-import-melanoma-test-envsubst.txt
+envsubst < $COMMANDS_FILE > gnu-parallel-import-commands.txt
 echo
 
 echo "SPAWNING TEST PARALLEL IMPORT PROCESSES..."
-time parallel -j 3 < gnu-parallel-import-melanoma-test-envsubst.txt
+time parallel -j $NUM_JOBS < gnu-parallel-import-commands.txt
 echo
 
 echo "STOPPING MYSQL SERVER..."

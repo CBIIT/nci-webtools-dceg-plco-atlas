@@ -6,7 +6,7 @@
 /database/import/hpc/nohup*
 /database/import/hpc/my.cnf
 /database/import/hpc/export-all-phenotypes.swarm
-/database/import/hpc/gnu-parallel-import-melanoma-test-envsubst.txt
+/database/import/hpc/gnu-parallel-import-commands.txt
 /server/logs/
 /server/data/
 /www/
