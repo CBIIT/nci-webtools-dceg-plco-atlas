@@ -238,6 +238,8 @@ async function importVariants({
             id = :phenotypeId`,
         {phenotypeId, sex, chromosome: 'all'}
     );
+
+    await connection.query(`COMMIT`);
     
     await connection.end();
 
