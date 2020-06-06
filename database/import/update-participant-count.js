@@ -1,19 +1,30 @@
 const mysql = require('mysql2');
 const args = require('minimist')(process.argv.slice(2));
-const { database } = require('../../server/config.json');
+// const { database } = require('../../server/config.json');
 const { timestamp } = require('./utils/logging');
 const { getRecords, pluck } = require('./utils/query');
+
+// display help if needed
+if (!(args.host) || !(args.port) || !(args.db_name) || !(args.user) || !(args.password)) {
+    console.log(`USAGE: node update-participant-count.js 
+        --host "MySQL hostname" 
+        --port "MySQL port" 
+        --db_name "MySQL database name" 
+        --user "MySQL username" 
+        --password "MySQL password" `);
+    process.exit(0);
+}
 
 // set defaults
 //const errorLog = getLogStream(`./failed-variants-${new Date().toISOString()}.txt`);
 const errorLog = {write: e => console.log(e)};
 const duration = timestamp();
 const connection = mysql.createConnection({
-    host: database.host,
-    database: database.name,
-    port: database.port,
-    user: database.user,
-    password: database.password,
+    host: host,
+    port: port,
+    database: db_name,
+    user: user,
+    password: password,
     namedPlaceholders: true,
     multipleStatements: true,
     // debug: true,
