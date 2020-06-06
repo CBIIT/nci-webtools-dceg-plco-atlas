@@ -496,7 +496,7 @@ CREATE TABLE `participant_data_stage` (
 
 -- load data into staging table (gsa_qx_v5.with_na.031320.txt)
 -- D:/Development/Work/nci-webtools-dceg-plco-atlas/database/import/raw
-LOAD DATA LOCAL INFILE "raw/participant_data.tsv" INTO TABLE participant_data_stage
+LOAD DATA LOCAL INFILE "../raw/participant_data.tsv" INTO TABLE participant_data_stage
     FIELDS TERMINATED BY '\t'
     IGNORE 1 ROWS (
         plco_id,

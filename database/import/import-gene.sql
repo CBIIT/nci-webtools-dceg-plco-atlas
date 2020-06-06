@@ -41,7 +41,7 @@ CREATE TEMPORARY TABLE gene_stage (
 );
 
 -- load data into staging table
-LOAD DATA LOCAL INFILE "raw/genes.tsv" INTO TABLE gene_stage
+LOAD DATA LOCAL INFILE "../raw/genes.tsv" INTO TABLE gene_stage
     FIELDS TERMINATED BY '\t'
     IGNORE 1 ROWS
     (

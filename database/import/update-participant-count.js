@@ -15,6 +15,8 @@ if (!(args.host) || !(args.port) || !(args.db_name) || !(args.user) || !(args.pa
     process.exit(0);
 }
 
+const { host, port, db_name, user, password } = args;
+
 // set defaults
 //const errorLog = getLogStream(`./failed-variants-${new Date().toISOString()}.txt`);
 const errorLog = {write: e => console.log(e)};
