@@ -3,32 +3,36 @@ const path = require('path');
 const mysql = require('mysql2');
 const parse = require('csv-parse/lib/sync')
 const args = require('minimist')(process.argv.slice(2));
-const { database } = require('../../server/config.json');
+// const { database } = require('../../server/config.json');
 const { timestamp } = require('./utils/logging');
 const { readFile } = require('./utils/file');
 const { getRecords, pluck } = require('./utils/query');
 const { getIntervals, getLambdaGC } = require('./utils/math');
 
 // display help if needed
-if (!(args.file)) {
+if (!(args.file) || !(args.host) || !(args.port) || !(args.db_name) || !(args.user) || !(args.password)) {
     console.log(`USAGE: node import-phenotypes.js 
         --file "filename"
         --create_partitions_only
-    `);
+        --host "MySQL hostname" 
+        --port "MySQL port" 
+        --db_name "MySQL database name" 
+        --user "MySQL username" 
+        --password "MySQL password" `);
     process.exit(0);
 }
 
 // parse arguments and set defaults
-const { file, create_partitions_only: createPartitionsOnly } = args;
+const { file, create_partitions_only: createPartitionsOnly, host, port, db_name, user, password } = args;
 const inputFilePath = path.resolve(file);
 const errorLog = {write: e => console.log(e)};
 const duration = timestamp();
 const connection = mysql.createConnection({
-    host: database.host,
-    database: database.name,
-    port: database.port,
-    user: database.user,
-    password: database.password,
+    host: host,
+    port: port,
+    database: db_name,
+    user: user,
+    password: password,
     namedPlaceholders: true,
     multipleStatements: true,
     // debug: true,
