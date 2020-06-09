@@ -41,7 +41,7 @@ export function PhenotypesTabs(props) {
     dispatch(updateBrowsePhenotypes({ selectedPlot }));
 
     // fetch items if they do not exist yet
-    if (!phenotypeData[selectedPlot]) {
+    if (!phenotypeData[selectedPlot] || !Object.keys(phenotypeData[selectedPlot]).length) {
       dispatch(updateBrowsePhenotypesPlots({
         loading: true,
       }));
@@ -260,6 +260,7 @@ export function PhenotypesTabs(props) {
                     categories: (phenotypeData.type === 'binary')
                       ? phenotypeData.distributionCategories
                       : phenotypeData.categoryTypes[t.key],
+                    distributionCategories: phenotypeData.distributionCategories,
                     xTitle: phenotypeData.displayName,
                     yTitle: frequencyType[t.key] === 'counts' ? 'Number of Participants' : '% of Participants',
                     fill: true,
