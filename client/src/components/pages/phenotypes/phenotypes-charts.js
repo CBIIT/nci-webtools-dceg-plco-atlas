@@ -57,11 +57,13 @@ const percentFormatter = (value, decimals = 2) => {
   return `${label}%`;
 }
 
-export const BarChart = ({ data, categories, xTitle, yTitle, yMax, formatPercent, categoryPrefix, type }) => (
+export const BarChart = ({ data, categories, distributionCategories, xTitle, yTitle, yMax, formatPercent, categoryPrefix, type }) => (
 <Plot
     className="w-100 disable-x-axis-tooltip override-cursor"
     style={{ minHeight: "600px", width: "600px" }}
     data={categories.map((name, i) => {
+      console.log('drawing category', name, categories, data);
+
       let x = [];
       let y = [];
       for (let key in data) {
@@ -128,6 +130,8 @@ export const BarChart = ({ data, categories, xTitle, yTitle, yMax, formatPercent
           title: xTitle,
           separatethousands: true,
           type: 'category',
+          categoryorder: 'array',
+          categoryarray: distributionCategories,
       },
       yaxis: {
           [yMax ? 'range' : '']: [0, yMax],
@@ -360,7 +364,9 @@ export const PieChart = ({ data, categories }) => (
         hoverinfo: "label+value+percent",
         hovertemplate: `<b>%{label}</b><br>%{value} participants (%{percent})<extra></extra>`,
         hole: 0.4,
-        type: "pie"
+        type: "pie",
+        sort: false,
+        direction: 'clockwise',
       }
     ]}
     layout={{
