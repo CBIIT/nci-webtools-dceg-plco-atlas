@@ -3,8 +3,8 @@
 export DB_USER=$1
 export DB_PASS=$2
 
-echo "LOADING MODULES (MySQL-5.7, NodeJS)..."
-module load mysql/5.7 nodejs
+echo "LOADING MODULES (MySQL-5.7.22, NodeJS)..."
+module load mysql/5.7.22 nodejs
 echo
 
 echo "CREATING LOCAL MYSQL DATABASE INSTANCE ON LSCRATCH ..."
@@ -68,13 +68,13 @@ echo "STOPPING MYSQL SERVER..."
 local_mysql stop
 echo
 
-echo "COPYING MYSQL SERVER TO /data/$USER/plco/mysql/mysql-instance-$SLURM_JOB_ID ..."
+echo "COPYING MYSQL SERVER TO /data/$USER/plco/mysql/mysql-instance-base-$SLURM_JOB_ID ..."
 mkdir /data/$USER/plco/mysql/mysql-instance-base-$SLURM_JOB_ID
 time cp -avr /lscratch/$SLURM_JOB_ID/mysql /data/$USER/plco/mysql/mysql-instance-base-$SLURM_JOB_ID
 echo
 
-echo "ARCHIVING MYSQL SERVER..."
-time local_mysql archive --archivefile=/data/$USER/plco/mysql/mysql-archive-base-$SLURM_JOB_ID.tgz
-echo
+# echo "ARCHIVING MYSQL SERVER..."
+# time local_mysql archive --archivefile=/data/$USER/plco/mysql/mysql-archive-base-$SLURM_JOB_ID.tgz
+# echo
 
 echo "DONE"
