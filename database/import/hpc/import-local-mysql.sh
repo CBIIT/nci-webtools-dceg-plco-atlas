@@ -7,8 +7,8 @@ export COMMANDS_FILE=$4
 export NUM_JOBS=$5
 export TMPDIR=/lscratch/$SLURM_JOB_ID
 
-echo "LOADING MODULES (MySQL-8.0, GNU-Parallel, NodeJS)..."
-module load mysql/8.0 parallel nodejs
+echo "LOADING MODULES (MySQL-5.7.22, GNU-Parallel, NodeJS)..."
+module load mysql/5.7.22 parallel nodejs
 echo
 
 echo "RESTORING MYSQL DATABASE FROM ARCHIVE FILE $ARCHIVE_FILE ..."
@@ -49,8 +49,8 @@ mkdir /data/$USER/plco/mysql/mysql-instance-$SLURM_JOB_ID
 time cp -avr /lscratch/$SLURM_JOB_ID/mysql /data/$USER/plco/mysql/mysql-instance-$SLURM_JOB_ID
 echo
 
-echo "ARCHIVING MYSQL SERVER..."
-time local_mysql archive --archivefile=/data/$USER/plco/mysql/mysql-archive-$SLURM_JOB_ID.tgz
-echo
+# echo "ARCHIVING MYSQL SERVER..."
+# time local_mysql archive --archivefile=/data/$USER/plco/mysql/mysql-archive-$SLURM_JOB_ID.tgz
+# echo
 
 echo "DONE"
