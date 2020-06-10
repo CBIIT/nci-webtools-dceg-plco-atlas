@@ -22,4 +22,4 @@ if [ -z "$2" ]
 fi
 DB_PASS=$2
 
-sbatch --gres=lscratch:100 --mem=96g --cpus-per-task=32 --partition=quick --time=04:00:00 --wrap="sh import-local-mysql-5.7-base-archive.sh $DB_USER $DB_PASS"
+sbatch --gres=lscratch:100 --mem=32g --cpus-per-task=4 --partition=quick --time=04:00:00 --wrap="sh import-local-mysql-5.7-base-archive.sh $DB_USER $DB_PASS"
