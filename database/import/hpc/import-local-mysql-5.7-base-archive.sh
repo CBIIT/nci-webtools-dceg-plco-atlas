@@ -29,7 +29,7 @@ time mysql -u root -p$DB_PASS --socket=/lscratch/$SLURM_JOB_ID/mysql/mysql.sock 
 echo
 
 echo "LOGGING INTO MYSQL WITH DB_USER=$DB_USER, DB_PASS=$DB_PASS, HOST=$SLURM_NODELIST, PORT=55555..."
-time mysql -u $DB_USER -p$DB_PASS --host=$SLURM_NODELIST --port=55555 plcogwas --execute="SELECT @@local_infile; SELECT @@innodb_buffer_pool_size; SELECT @@innodb_read_io_threads; SELECT @@innodb_write_io_threads; SELECT @@innodb_log_buffer_size; SELECT @@innodb_log_file_size; SELECT @@innodb_flush_log_at_trx_commit; SELECT @@key_buffer_size; SET GLOBAL unique_checks = 0; SET unique_checks = 0; SELECT @@unique_checks;"
+time mysql -u $DB_USER -p$DB_PASS --host=$SLURM_NODELIST --port=55555 plcogwas --execute="SELECT @@local_infile; SELECT @@innodb_buffer_pool_size; SELECT @@innodb_read_io_threads; SELECT @@innodb_write_io_threads; SELECT @@innodb_log_buffer_size; SELECT @@innodb_log_file_size; SELECT @@innodb_flush_log_at_trx_commit; SELECT @@innodb_file_per_table; SELECT @@key_buffer_size; SET GLOBAL unique_checks = 0; SET unique_checks = 0; SELECT @@unique_checks;"
 echo
 
 echo "IMPORTING TABLE SCHEMA, INDEXES, AND PROCEDURES..."
