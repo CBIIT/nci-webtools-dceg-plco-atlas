@@ -5,8 +5,8 @@
 if [ -z "$1" ]
     then
         echo "ERROR: No MySQL db username supplied..."
-        echo "USAGE: sh run-import-local-mysql.sh <DB_USER> <DB_PASS> <ARCHIVE_FILE> <COMMANDS_FILE> <NUM_JOBS>"
-        echo "EXAMPLE: sh run-import-local-mysql.sh sample_username sample_password /data/jiangk3/plco/mysql/save.tgz gnu-parallel-import-melanoma-test-9x-full 9"
+        echo "USAGE: sh run-xtrabackup-snapshot.sh <DB_USER> <DB_PASS> <BASE_DIR> <TARGET_DIR>"
+        echo "EXAMPLE: sh run-xtrabackup-snapshot.sh sample_username sample_password /data/jiangk3/plco/mysql/saved-instance-path /data/jiangk3/plco/mysql/rds-backup"
         exit 1
 fi
 DB_USER=$1

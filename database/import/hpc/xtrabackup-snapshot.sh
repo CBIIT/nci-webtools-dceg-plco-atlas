@@ -5,6 +5,7 @@ export DB_PASS=$2
 export BASE_DIR=$3
 export TARGET_DIR=$4
 export TMPDIR=/lscratch/$SLURM_JOB_ID
+# export SERVER_HOST=$SLURM_NODELIST
 
 module load mysql/5.7.22
 module use ~/mymodules
@@ -27,8 +28,18 @@ echo
 # time xtrabackup --backup --host=$SLURM_NODELIST --port=55555  --user=$DB_USER --password=$DB_PASS --datadir=$BASE_DIR/data/ --stream=xbstream --parallel=16 --target-dir=$TARGET_DIR | split -d --bytes=500MB - $TARGET_DIR/backup.xbstream
 # echo
 
+# SSH HELIX
+# module use ~/mymodules
+# module load xtrabackup_2.4.20
+
 echo "Backing up (MySQL-5.7.22, host=$SLURM_NODELIST, user=$DB_USER,basedir=$BASE_DIR, targetdir=$TARGET_DIR)..."
-time xtrabackup --backup --host=$SLURM_NODELIST --port=55555  --user=$DB_USER --password=$DB_PASS --datadir=$BASE_DIR/data/ --parallel=16 --target-dir=$TARGET_DIR 
+time xtrabackup --backup --host=$SERVER_HOST --port=55555  --user=$DB_USER --password=$DB_PASS --datadir=$BASE_DIR/data/ --parallel=16 --target-dir=$TARGET_DIR 
 echo
+
+# EXIT HELIX
+
+echo "STOPPPING MYSQL SERVER..."
+local_mysql --basedir $BASE_DIR stop
+echo 
 
 echo "Done"
