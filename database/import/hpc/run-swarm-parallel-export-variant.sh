@@ -83,9 +83,13 @@ done
 
 [ -d $OUTPUT_DIR ] && echo "$OUTPUT_DIR directory already exists" || mkdir $OUTPUT_DIR
 
+CURRENT_DATE=$(date +%F)
+
+mkdir ./swarm_out_$CURRENT_DATE
+
 # Run generated SWARM file
 # -f <filename> = specify .swarm file
 # -g <#> = number of gb for each process subjob
 # --verbose <0-6> = choose verbose level, 6 being the most chatty
 # --gres=lscratch:<#> = number of gb of tmp space for each process subjob
-swarm -f $SWARM_FILE -g 4 --verbose 3 --gres=lscratch:20 --logdir ./swarm_output
+swarm -f $SWARM_FILE -g 4 --verbose 3 --gres=lscratch:20 --logdir ./swarm_out_$CURRENT_DATE
