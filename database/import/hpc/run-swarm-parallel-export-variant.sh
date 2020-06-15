@@ -81,6 +81,8 @@ do
     fi
 done
 
+[ -d $OUTPUT_DIR ] && echo "$OUTPUT_DIR directory already exists" || mkdir $OUTPUT_DIR
+
 # Run generated SWARM file
 # -f <filename> = specify .swarm file
 # -g <#> = number of gb for each process subjob
