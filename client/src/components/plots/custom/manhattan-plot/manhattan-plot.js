@@ -398,7 +398,7 @@ export class ManhattanPlot {
     if (!genes || !this.config.zoomWindow) return;
 
     let getName = gene =>
-      gene.strand === '+' ? `${gene.name} 🡪` : `🡨 ${gene.name}`;
+      gene.strand === '+' ? `${gene.name} →` : `← ${gene.name}`;
 
     let labelPadding = 5;
     let labelHeight = 10;
