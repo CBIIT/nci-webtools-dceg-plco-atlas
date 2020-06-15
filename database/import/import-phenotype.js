@@ -251,5 +251,16 @@ async function importPhenotypes() {
         
     };
 
+    // add color to phenotype table
+    await connection.query(`
+        UPDATE phenotype SET color = '#fdcb6e' WHERE id = 200 or display_name = 'Anthropometric measures';
+        UPDATE phenotype SET color = '#e84393' WHERE id = 800 or display_name = 'Reproductive factors';
+        UPDATE phenotype SET color = '#e17055' WHERE id = 900 or display_name = 'Mortality';
+        UPDATE phenotype SET color = '#d63031' WHERE id = 300 or display_name = 'Cancer';
+        UPDATE phenotype SET color = '#6c5ce7' WHERE id = 500 or display_name = 'Lifestyle factors';
+        UPDATE phenotype SET color = '#00b894' WHERE id = 700 or display_name = 'Non-cancer medical conditions';
+        UPDATE phenotype SET color = '#8e44ad' WHERE id = 100 or display_name = 'Biochemical Measurements';
+    `);
+
     return orderedRecords.length;
 }

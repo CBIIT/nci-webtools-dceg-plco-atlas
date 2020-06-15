@@ -16,7 +16,7 @@ time local_mysql restore --archivefile=$ARCHIVE_FILE
 echo
 
 echo "INJECTING SLURM_JOB_ID ENV VAR TO MYSQL CONFIGURATION FILE..."
-envsubst < mysql.config > my.cnf
+envsubst < mysql-lscratch.config > my.cnf
 echo 
 
 echo "COPYING OVER NEW MYSQL CONFIGURATION FILE..."
