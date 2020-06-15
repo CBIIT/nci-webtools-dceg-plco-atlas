@@ -5,8 +5,8 @@
 if [ -z "$1" ]
     then
         echo "ERROR: No MySQL db username supplied..."
-        echo "USAGE: sh run-import-local-mysql-5.7-base-archive.sh <DB_USER> <DB_PASS>"
-        echo "EXAMPLE: sh run-import-local-mysql-5.7-base-archive.sh sample_username sample_password"
+        echo "USAGE: sh run-create-local-mysql-base.sh <DB_USER> <DB_PASS>"
+        echo "EXAMPLE: sh run-create-local-mysql-base.sh sample_username sample_password"
         exit 1
 fi
 DB_USER=$1
@@ -16,8 +16,8 @@ DB_USER=$1
 if [ -z "$2" ]
     then
         echo "ERROR: No MySQL db password supplied..."
-        echo "USAGE: sh run-import-local-mysql-5.7-base-archive.sh <DB_USER> <DB_PASS>"
-        echo "EXAMPLE: sh run-import-local-mysql-5.7-base-archive.sh sample_username sample_password"
+        echo "USAGE: sh run-create-local-mysql-base.sh <DB_USER> <DB_PASS>"
+        echo "EXAMPLE: sh run-create-local-mysql-base.sh sample_username sample_password"
         exit 1
 fi
 DB_PASS=$2
