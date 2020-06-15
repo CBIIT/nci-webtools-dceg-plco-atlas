@@ -29,7 +29,8 @@ local_mysql start
 echo
 
 echo "LOGGING INTO MYSQL WITH DB_USER=$DB_USER, DB_PASS=$DB_PASS, HOST=$SLURM_NODELIST, PORT=55555..."
-time mysql -u $DB_USER -p$DB_PASS --host=$SLURM_NODELIST --port=55555 plcogwas --execute="SELECT @@local_infile; SELECT @@innodb_buffer_pool_instances; SELECT @@innodb_buffer_pool_size; SELECT @@innodb_read_io_threads; SELECT @@innodb_write_io_threads; SELECT @@innodb_log_buffer_size; SELECT @@innodb_log_file_size; SELECT @@innodb_flush_log_at_trx_commit; SELECT @@innodb_file_per_table; SELECT @@key_buffer_size; SET GLOBAL unique_checks = 0; SET foreign_key_checks = 0; SET sql_log_bin = 0; SELECT @@unique_checks; SELECT @@foreign_key_checks; SELECT @@sql_log_bin;"
+echo "DROPPING EXISTING STAGE TABLES"
+time mysql -u $DB_USER -p$DB_PASS --host=$SLURM_NODELIST --port=55555 plcogwas --execute="SELECT @@local_infile; SELECT @@innodb_buffer_pool_instances; SELECT @@innodb_buffer_pool_size; SELECT @@innodb_read_io_threads; SELECT @@innodb_write_io_threads; SELECT @@innodb_log_buffer_size; SELECT @@innodb_log_file_size; SELECT @@innodb_flush_log_at_trx_commit; SELECT @@innodb_file_per_table; SELECT @@key_buffer_size; SET GLOBAL unique_checks = 0; SET foreign_key_checks = 0; SET sql_log_bin = 0; SELECT @@unique_checks; SELECT @@foreign_key_checks; SELECT @@sql_log_bin; DROP TABLE participant_data_stage; DROP TABLE participant_data_category_stage;"
 echo
 
 echo "INJECTING CREDENTIALS TO gnu-parallel-import-melanoma-test.txt ..."
