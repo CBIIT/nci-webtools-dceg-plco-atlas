@@ -1,0 +1,9 @@
+node ../parallel-import-variant.js --file ../raw/output_qa_test/10001.all --host $SLURM_NODELIST --port 55555 --db_name plcogwas --user $DB_USER --password $DB_PASS
+node ../parallel-import-variant.js --file ../raw/output_qa_test/10001.female --host $SLURM_NODELIST --port 55555 --db_name plcogwas --user $DB_USER --password $DB_PASS
+node ../parallel-import-variant.js --file ../raw/output_qa_test/10001.male --host $SLURM_NODELIST --port 55555 --db_name plcogwas --user $DB_USER --password $DB_PASS
+node ../parallel-import-variant.js --file ../raw/output_qa_test/10002.all --host $SLURM_NODELIST --port 55555 --db_name plcogwas --user $DB_USER --password $DB_PASS
+node ../parallel-import-variant.js --file ../raw/output_qa_test/10002.female --host $SLURM_NODELIST --port 55555 --db_name plcogwas --user $DB_USER --password $DB_PASS
+node ../parallel-import-variant.js --file ../raw/output_qa_test/10002.male --host $SLURM_NODELIST --port 55555 --db_name plcogwas --user $DB_USER --password $DB_PASS
+node ../parallel-import-variant.js --file ../raw/output_qa_test/10003.all --host $SLURM_NODELIST --port 55555 --db_name plcogwas --user $DB_USER --password $DB_PASS
+node ../parallel-import-variant.js --file ../raw/output_qa_test/10003.female --host $SLURM_NODELIST --port 55555 --db_name plcogwas --user $DB_USER --password $DB_PASS
+node ../parallel-import-variant.js --file ../raw/output_qa_test/10003.male --host $SLURM_NODELIST --port 55555 --db_name plcogwas --user $DB_USER --password $DB_PASS
