@@ -2,7 +2,7 @@
 
 export DB_USER=$1
 export DB_PASS=$2
-export BASE_DIR/data/$USER/plco/mysql/mysql-archive-base-$SLURM_JOB_ID
+export BASE_DIR=/data/$USER/plco/mysql/mysql-archive-base-$SLURM_JOB_ID
 
 echo "LOADING MODULES (MySQL-5.7.22, NodeJS)..."
 module load mysql/5.7.22 nodejs
