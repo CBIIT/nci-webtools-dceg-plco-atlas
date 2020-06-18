@@ -21,8 +21,8 @@ envsubst < mysql-basedir.config > my.cnf
 echo 
 
 echo "COPYING OVER NEW MYSQL CONFIGURATION FILE..."
-rm /lscratch/$SLURM_JOB_ID/mysql/my.cnf
-cp ./my.cnf /lscratch/$SLURM_JOB_ID/mysql/
+rm $BASE_DIR/my.cnf
+cp ./my.cnf $BASE_DIR/mysql/
 echo
 
 echo "STARTING LOCAL MYSQL DATABASE INSTANCE IN BASE DIR..."
@@ -30,7 +30,7 @@ time local_mysql --basedir $BASE_DIR start
 echo
 
 echo "LOGGING INTO MYSQL AS ROOT AND CREATING $DB_USER USER..."
-time mysql -u root -p$DB_PASS --socket=/lscratch/$SLURM_JOB_ID/mysql/mysql.sock --execute="CREATE USER '$DB_USER'@'localhost' IDENTIFIED BY '$DB_PASS'; GRANT ALL PRIVILEGES ON *.* TO '$DB_USER'@'localhost' WITH GRANT OPTION; CREATE USER '$DB_USER'@'%' IDENTIFIED BY '$DB_PASS';GRANT ALL PRIVILEGES ON *.* TO '$DB_USER'@'%' WITH GRANT OPTION; CREATE DATABASE plcogwas;"
+time mysql -u root -p$DB_PASS --host=$SLURM_NODELIST --execute="CREATE USER '$DB_USER'@'localhost' IDENTIFIED BY '$DB_PASS'; GRANT ALL PRIVILEGES ON *.* TO '$DB_USER'@'localhost' WITH GRANT OPTION; CREATE USER '$DB_USER'@'%' IDENTIFIED BY '$DB_PASS';GRANT ALL PRIVILEGES ON *.* TO '$DB_USER'@'%' WITH GRANT OPTION; CREATE DATABASE plcogwas;"
 echo
 
 echo "LOGGING INTO MYSQL WITH DB_USER=$DB_USER, DB_PASS=$DB_PASS, HOST=$SLURM_NODELIST, PORT=55555..."
