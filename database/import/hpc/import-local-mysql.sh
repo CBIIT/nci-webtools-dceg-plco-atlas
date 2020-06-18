@@ -2,7 +2,7 @@
 
 export DB_USER=$1
 export DB_PASS=$2
-export ARCHIVE_FILE=$3
+export BASE_DIR=$3
 export COMMANDS_FILE=$4
 export NUM_JOBS=$5
 export TMPDIR=/lscratch/$SLURM_JOB_ID
@@ -11,21 +11,8 @@ echo "LOADING MODULES (MySQL-5.7.22, GNU-Parallel, NodeJS)..."
 module load mysql/5.7.22 parallel nodejs
 echo
 
-echo "RESTORING MYSQL DATABASE FROM ARCHIVE FILE $ARCHIVE_FILE ..."
-time local_mysql restore --archivefile=$ARCHIVE_FILE
-echo
-
-echo "INJECTING SLURM_JOB_ID ENV VAR TO MYSQL CONFIGURATION FILE..."
-envsubst < mysql-lscratch.config > my.cnf
-echo 
-
-echo "COPYING OVER NEW MYSQL CONFIGURATION FILE..."
-rm /lscratch/$SLURM_JOB_ID/mysql/my.cnf
-cp ./my.cnf /lscratch/$SLURM_JOB_ID/mysql/
-echo
-
-echo "STARTING MYSQL SERVER..."
-local_mysql start
+echo "STARTING MYSQL DATABASE FROM BASE DIR $BASE_DIR ..."
+time local_mysql --basedir $BASE_DIR start
 echo
 
 echo "LOGGING INTO MYSQL WITH DB_USER=$DB_USER, DB_PASS=$DB_PASS, HOST=$SLURM_NODELIST, PORT=55555..."
@@ -42,16 +29,7 @@ time parallel -j $NUM_JOBS < gnu-parallel-import-commands.txt
 echo
 
 echo "STOPPING MYSQL SERVER..."
-local_mysql stop
+local_mysql --basedir $BASE_DIR stop
 echo
-
-echo "COPYING MYSQL SERVER TO /data/$USER/plco/mysql/mysql-instance-$SLURM_JOB_ID ..."
-mkdir /data/$USER/plco/mysql/mysql-instance-$SLURM_JOB_ID
-time cp -avr /lscratch/$SLURM_JOB_ID/mysql /data/$USER/plco/mysql/mysql-instance-$SLURM_JOB_ID
-echo
-
-# echo "ARCHIVING MYSQL SERVER..."
-# time local_mysql archive --archivefile=/data/$USER/plco/mysql/mysql-archive-$SLURM_JOB_ID.tgz
-# echo
 
 echo "DONE"

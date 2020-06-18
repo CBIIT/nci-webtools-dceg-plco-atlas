@@ -22,7 +22,7 @@ echo
 
 echo "COPYING OVER NEW MYSQL CONFIGURATION FILE..."
 rm $BASE_DIR/my.cnf
-cp ./my.cnf $BASE_DIR/mysql/
+cp ./my.cnf $BASE_DIR/
 echo
 
 echo "STARTING LOCAL MYSQL DATABASE INSTANCE IN BASE DIR..."
