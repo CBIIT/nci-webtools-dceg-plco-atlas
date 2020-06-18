@@ -2,17 +2,22 @@
 
 export DB_USER=$1
 export DB_PASS=$2
+export BASE_DIR/data/$USER/plco/mysql/mysql-archive-base-$SLURM_JOB_ID
 
 echo "LOADING MODULES (MySQL-5.7.22, NodeJS)..."
 module load mysql/5.7.22 nodejs
 echo
 
-echo "CREATING LOCAL MYSQL DATABASE INSTANCE ON LSCRATCH ..."
-time local_mysql create
+echo "CREATING BASE DIR PATH..."
+mkdir $BASE_DIR
+echo
+
+echo "CREATING LOCAL MYSQL DATABASE INSTANCE IN BASE DIR ..."
+time local_mysql --basedir $BASE_DIR create
 echo
 
 echo "INJECTING SLURM_JOB_ID ENV VAR TO MYSQL CONFIGURATION FILE..."
-envsubst < mysql-lscratch.config > my.cnf
+envsubst < mysql-basedir.config > my.cnf
 echo 
 
 echo "COPYING OVER NEW MYSQL CONFIGURATION FILE..."
@@ -20,8 +25,8 @@ rm /lscratch/$SLURM_JOB_ID/mysql/my.cnf
 cp ./my.cnf /lscratch/$SLURM_JOB_ID/mysql/
 echo
 
-echo "STARTING MYSQL SERVER..."
-local_mysql start
+echo "STARTING LOCAL MYSQL DATABASE INSTANCE IN BASE DIR..."
+time local_mysql --basedir $BASE_DIR start
 echo
 
 echo "LOGGING INTO MYSQL AS ROOT AND CREATING $DB_USER USER..."
@@ -65,16 +70,7 @@ time node ../update-participant-count.js --host $SLURM_NODELIST --port 55555 --d
 echo
 
 echo "STOPPING MYSQL SERVER..."
-local_mysql stop
-echo
-
-# echo "COPYING MYSQL SERVER TO /data/$USER/plco/mysql/mysql-instance-base-$SLURM_JOB_ID ..."
-# mkdir /data/$USER/plco/mysql/mysql-instance-base-$SLURM_JOB_ID
-# time cp -avr /lscratch/$SLURM_JOB_ID/mysql /data/$USER/plco/mysql/mysql-instance-base-$SLURM_JOB_ID
-# echo
-
-echo "ARCHIVING MYSQL SERVER..."
-time local_mysql archive --archivefile=/data/$USER/plco/mysql/mysql-archive-base-$SLURM_JOB_ID.tgz
+local_mysql --basedir $BASE_DIR stop
 echo
 
 echo "DONE"
