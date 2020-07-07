@@ -22,7 +22,7 @@ CREATE TABLE participant_data_category_stage (
 CREATE TABLE participant_data_category (
     `id`                    INTEGER PRIMARY KEY NOT NULL AUTO_INCREMENT,
     `phenotype_id`          INTEGER NOT NULL,
-    `value`                 INTEGER,
+    `value`                 DOUBLE,
     `label`                 TEXT,
     `show_distribution`     BOOLEAN,
     `order`                 INTEGER,
