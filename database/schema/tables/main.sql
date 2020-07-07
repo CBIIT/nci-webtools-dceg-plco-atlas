@@ -89,7 +89,7 @@ CREATE TABLE IF NOT EXISTS `participant_data` (
 CREATE TABLE IF NOT EXISTS `participant_data_category` (
     `id` INTEGER PRIMARY KEY NOT NULL AUTO_INCREMENT,
     `phenotype_id` INTEGER NOT NULL,
-    `value` INTEGER,
+    `value` DOUBLE,
     `label` TEXT,
     `display_distribution` BOOLEAN,
     `order` INTEGER,
