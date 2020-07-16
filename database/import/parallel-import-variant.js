@@ -152,23 +152,25 @@ async function importVariants({
             FIELDS TERMINATED BY ','
             IGNORE 1 LINES
             (
-                id,
-                phenotype_id,
-                sex,
+                id, 
+                phenotype_id, 
+                sex, 
                 chromosome,
                 position,
                 snp,
                 allele_reference,
                 allele_alternate,
+                allele_reference_frequency,
                 p_value,
                 p_value_nlog,
                 p_value_nlog_expected,
-                p_value_r,
+                p_value_heterogenous,
+                beta,
+                standard_error,
                 odds_ratio,
-                odds_ratio_r,
+                ci_95_low,
+                ci_95_high,
                 n,
-                q,
-                i,
                 show_qq_plot
             )`
     });
