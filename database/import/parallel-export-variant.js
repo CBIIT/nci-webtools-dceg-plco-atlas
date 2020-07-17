@@ -278,6 +278,7 @@ function exportVariants({
     const importStatus = execSync(sqlitePath + processArgs([
         databaseFilePath,
         `.mode csv`,
+        `.separator '\t'`,
         `.import '${inputFilePath}' prestage`
     ]));
 
