@@ -254,7 +254,7 @@ function exportVariants({
             standard_error              DOUBLE,
             p_value                     DOUBLE,
             n                           BIGINT,
-            p_value_heterogenous        BIGINT,
+            p_value_heterogenous        BIGINT
         );
     
         -- create stage table for sorted/filtered variants
