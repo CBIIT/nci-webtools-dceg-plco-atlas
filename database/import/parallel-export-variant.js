@@ -31,7 +31,7 @@ if (!(args.file) || !(args.output)) {
 // parse arguments and set defaults
 let {sqlite: sqlite3, file, phenotype_file: phenotypeFile, phenotype, sex, validate, output, tmp } = args;
 const sqlitePath = sqlite3 || 'sqlite3';
-const phenotypeFilePath = phenotypeFile || 'raw/phenotype.csv';
+const phenotypeFilePath = phenotypeFile || '../raw/phenotype.csv';
 
 let inputFilePath = path.resolve(file);
 const filename = path.basename(inputFilePath);
