@@ -70,7 +70,7 @@ if (/^(SAIGE|BOLTLMM|FASTGWA)$/.test(sex)) {
     sex = {
         SAIGE: 'all',
         BOLTLMM: 'female',
-        FASTGWAS: 'male'
+        FASTGWA: 'male'
     }[sex];
 }
 
