@@ -39,9 +39,9 @@ const outputFilePath = path.resolve(output);
 const tmpFilePath = tmp ? path.resolve(tmp) : outputFilePath;
 
 const phenotypePath = path.resolve(phenotypeFilePath);
-let [fileNamePhenotype, fileNamesex] = filename.split('.');
+let [fileNamePhenotype, fileNameAncestry, fileNameSex] = filename.split('.');
 if (!phenotype) phenotype = fileNamePhenotype;
-if (!sex) sex = fileNamesex;
+if (!sex) sex = fileNameSex;
 
 //const errorLog = getLogStream(`./failed-variants-${new Date().toISOString()}.txt`);
 const errorLog = {write: e => console.log(e)};
@@ -60,9 +60,18 @@ if (!fs.existsSync(inputFilePath)) {
 }
 
 // sex should be male, female, or all
-if (!/^(all|female|male)$/.test(sex)) {
+if (!/^(all|female|male|SAIGE|BOLTLMM|FASTGWA)$/.test(sex)) {
     console.error(`ERROR: Sex must be all, female, or male`);
     process.exit(1);
+}
+
+// if sex is a model (testing) (SAIGE|BOLTLMM|FASTGWA), assign sex
+if (/^(SAIGE|BOLTLMM|FASTGWA)$/.test(sex)) {
+    sex = {
+        SAIGE: 'all',
+        BOLTLMM: 'female',
+        FASTGWAS: 'male'
+    }[sex];
 }
 
 if (validate && !fs.existsSync(phenotypePath)) {
