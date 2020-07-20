@@ -146,7 +146,7 @@ function validatePhenotype(phenotypePath, phenotype) {
     // read the phenotypes file and attempt to find the specified phenotype
     const phenotypes = parseCsv(    
         fs.readFileSync(phenotypePath),
-        {columns: ['id', 'parent_id', 'display_name', 'name', 'description', 'type']}
+        {columns: ['id', 'parent_id', 'display_name', 'name', 'description', 'type', 'age']}
     ).filter(p => p[phenotypeKey] == phenotype);
     
     if (phenotypes.length === 0) {
