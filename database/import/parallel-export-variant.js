@@ -147,7 +147,7 @@ function validatePhenotype(phenotypePath, phenotype) {
     const phenotypes = parseCsv(    
         fs.readFileSync(phenotypePath),
         {columns: ['id', 'parent_id', 'display_name', 'name', 'description', 'type', 'age']}
-    ).filter(p => p[phenotypeKey] == phenotype);
+    ).filter(p => p[phenotypeKey] == phenotype.toLowerCase());
     
     if (phenotypes.length === 0) {
         throw(`Phenotype does not exist`);
