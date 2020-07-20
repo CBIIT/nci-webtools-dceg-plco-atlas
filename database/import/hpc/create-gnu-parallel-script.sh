@@ -5,16 +5,16 @@ PARALLEL_FILE="gnu-parallel-import-all-phenotypes.txt"
 # Export script path
 IMPORT_SCRIPT="../parallel-import-variant.js"
 
-# ARGUMENT 1: Input directory path
-# INPUT_DIR="../raw/input"
+# ARGUMENT 1: Data directory path
+# DATA_DIR="../raw/output"
 if [ -z "$1" ]
     then
         echo "ERROR: No input path supplied..."
-        echo "USAGE: sh create-gnu-parallel-script.sh <DATA_PATH> "
-        echo "EXAMPLE: sh create-gnu-parallel-script.sh ../raw/output "
+        echo "USAGE: sh create-gnu-parallel-script.sh <DATA_DIR>"
+        echo "EXAMPLE: sh create-gnu-parallel-script.sh ../raw/output"
         exit 1
 fi
-INPUT_DIR=$1
+DATA_DIR=$1
 
 # Delete existing GNU Parallel file if exists
 if [ -e $PARALLEL_FILE ] 
@@ -27,7 +27,7 @@ fi
 
 # Generate GNU Parallel file
 echo "Generating GNU Parallel scripts..."
-FILES_LS=$(ls $INPUT_DIR | sed -e "s/.aggregate//" -e "s/.metadata//" -e "s/.variant//" -e "s/.csv$//" | sort -u)
+FILES_LS=$(ls $DATA_DIR | sed -e "s/.aggregate//" -e "s/.metadata//" -e "s/.variant//" -e "s/.csv$//" | sort -u)
 for PHENOTYPE_GENDER in $FILES_LS
 do
     echo "Found phenotype: $PHENOTYPE_GENDER"
