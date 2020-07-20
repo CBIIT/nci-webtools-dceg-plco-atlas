@@ -25,7 +25,7 @@ envsubst < $COMMANDS_FILE > gnu-parallel-import-commands.txt
 echo
 
 echo "SPAWNING TEST PARALLEL IMPORT PROCESSES..."
-time parallel -j $NUM_JOBS < gnu-parallel-import-commands.txt
+time parallel -j$NUM_JOBS < gnu-parallel-import-commands.txt
 echo
 
 echo "STOPPING MYSQL SERVER..."
