@@ -31,7 +31,7 @@ FILES_LS=$(ls $DATA_DIR | sed -e "s/.aggregate//" -e "s/.metadata//" -e "s/.vari
 for PHENOTYPE_GENDER in $FILES_LS
 do
     echo "Found phenotype: $PHENOTYPE_GENDER"
-    echo "node $IMPORT_SCRIPT --file $PHENOTYPE_GENDER --host \$SLURM_NODELIST --port 55555 --db_name plcogwas --user \$DB_USER --password \$DB_PASS"
-    echo "node $IMPORT_SCRIPT --file $PHENOTYPE_GENDER --host \$SLURM_NODELIST --port 55555 --db_name plcogwas --user \$DB_USER --password \$DB_PASS" >> $PARALLEL_FILE
+    echo "node $IMPORT_SCRIPT --file $DATA_DIR/$PHENOTYPE_GENDER --host \$SLURM_NODELIST --port 55555 --db_name plcogwas --user \$DB_USER --password \$DB_PASS"
+    echo "node $IMPORT_SCRIPT --file $DATA_DIR/$PHENOTYPE_GENDER --host \$SLURM_NODELIST --port 55555 --db_name plcogwas --user \$DB_USER --password \$DB_PASS" >> $PARALLEL_FILE
     echo ""
 done
