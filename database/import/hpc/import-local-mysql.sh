@@ -22,7 +22,7 @@ echo
 
 sh create-gnu-parallel-script.sh $DATA_DIR
 
-echo "INJECTING CREDENTIALS TO gnu-parallel-import-melanoma-test.txt ..."
+echo "INJECTING CREDENTIALS TO gnu-parallel-import-all-phenotypes.txt ..."
 envsubst < gnu-parallel-import-all-phenotypes.txt > gnu-parallel-import-commands.txt
 echo
 
