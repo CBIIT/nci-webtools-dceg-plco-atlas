@@ -336,7 +336,7 @@ function exportVariants({
             p.p_value_heterogenous,
             p.beta,
             p.standard_error,
-            EXP(p.beta) as odds_ratio
+            EXP(p.beta) as odds_ratio,
             EXP(p.beta - 1.96 * p.standard_error) as ci_95_low,
             EXP(p.beta + 1.96 * p.standard_error) as ci_95_high,
             p.n
