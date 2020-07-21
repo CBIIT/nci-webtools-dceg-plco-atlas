@@ -31,7 +31,7 @@ if (!(args.file) || !(args.output)) {
 // parse arguments and set defaults
 let {sqlite: sqlite3, file, phenotype_file: phenotypeFile, phenotype, sex, validate, output, tmp } = args;
 const sqlitePath = sqlite3 || 'sqlite3';
-const phenotypeFilePath = phenotypeFile || 'raw/phenotype.csv';
+const phenotypeFilePath = phenotypeFile || '../raw/phenotype.csv';
 
 let inputFilePath = path.resolve(file);
 const filename = path.basename(inputFilePath);
@@ -39,9 +39,9 @@ const outputFilePath = path.resolve(output);
 const tmpFilePath = tmp ? path.resolve(tmp) : outputFilePath;
 
 const phenotypePath = path.resolve(phenotypeFilePath);
-let [fileNamePhenotype, fileNamesex] = filename.split('.');
+let [fileNamePhenotype, fileNameAncestry, fileNameSex] = filename.split('.');
 if (!phenotype) phenotype = fileNamePhenotype;
-if (!sex) sex = fileNamesex;
+if (!sex) sex = fileNameSex;
 
 //const errorLog = getLogStream(`./failed-variants-${new Date().toISOString()}.txt`);
 const errorLog = {write: e => console.log(e)};
@@ -60,9 +60,18 @@ if (!fs.existsSync(inputFilePath)) {
 }
 
 // sex should be male, female, or all
-if (!/^(all|female|male)$/.test(sex)) {
+if (!/^(all|female|male|SAIGE|BOLTLMM|FASTGWA)$/.test(sex)) {
     console.error(`ERROR: Sex must be all, female, or male`);
     process.exit(1);
+}
+
+// if sex is a model (testing) (SAIGE|BOLTLMM|FASTGWA), assign sex
+if (/^(SAIGE|BOLTLMM|FASTGWA)$/.test(sex)) {
+    sex = {
+        SAIGE: 'all',
+        BOLTLMM: 'female',
+        FASTGWA: 'male'
+    }[sex];
 }
 
 if (validate && !fs.existsSync(phenotypePath)) {
@@ -137,8 +146,8 @@ function validatePhenotype(phenotypePath, phenotype) {
     // read the phenotypes file and attempt to find the specified phenotype
     const phenotypes = parseCsv(    
         fs.readFileSync(phenotypePath),
-        {columns: ['id', 'parent_id', 'display_name', 'name', 'description', 'type']}
-    ).filter(p => p[phenotypeKey] == phenotype);
+        {columns: ['id', 'parent_id', 'display_name', 'name', 'description', 'type', 'age']}
+    ).filter(p => p[phenotypeKey] == phenotype.toLowerCase());
     
     if (phenotypes.length === 0) {
         throw(`Phenotype does not exist`);
@@ -188,6 +197,7 @@ function exportVariants({
     const db = new sqlite(databaseFilePath);
     db.function('LOG10', {deterministic: true}, v => Math.log10(v));
     db.function('POW', {deterministic: true}, (base, exp) => Math.pow(base, exp));
+    db.function('EXP', {deterministic: true}, (exp) => Math.pow(Math.E, exp));
     
     db.exec(`
         -- set up chromosome ranges
@@ -234,39 +244,40 @@ function exportVariants({
         
         -- create prestage table for importing raw variants
         CREATE TABLE prestage (
-            chromosome              VARCHAR(2),
-            position                BIGINT,
-            snp                     VARCHAR(200),
-            allele_reference        VARCHAR(200),
-            allele_alternate        VARCHAR(200),
-            p_value                 DOUBLE,
-            p_value_r               DOUBLE,
-            odds_ratio              DOUBLE,
-            odds_ratio_r            DOUBLE,
-            n                       BIGINT,
-            q                       DOUBLE,
-            i                       DOUBLE 
+            chromosome                  VARCHAR(2),
+            position                    BIGINT,
+            snp                         VARCHAR(200),
+            allele_reference            VARCHAR(200),
+            allele_alternate            VARCHAR(200),
+            allele_reference_frequency  DOUBLE,
+            beta                        DOUBLE,
+            standard_error              DOUBLE,
+            p_value                     DOUBLE,
+            n                           BIGINT,
+            p_value_heterogenous        BIGINT
         );
     
         -- create stage table for sorted/filtered variants
         CREATE TABLE stage (
-            chromosome              VARCHAR(2),
-            position                BIGINT,
-            position_abs_aggregate  BIGINT,
-            snp                     VARCHAR(200),
-            allele_reference        VARCHAR(200),
-            allele_alternate        VARCHAR(200),
-            p_value                 DOUBLE,
-            p_value_nlog            DOUBLE, -- negative log10(P)
-            p_value_nlog_aggregate  DOUBLE, -- -log10(p) grouped by 1e-2
-            p_value_nlog_expected   DOUBLE, -- expected negative log10(P)
-            p_value_r               DOUBLE,
-            odds_ratio              DOUBLE,
-            odds_ratio_r            DOUBLE,
-            n                       BIGINT,
-            q                       DOUBLE,
-            i                       DOUBLE,
-            show_qq_plot            BOOLEAN
+            chromosome                  VARCHAR(2),
+            position                    BIGINT,
+            position_abs_aggregate      BIGINT,
+            snp                         VARCHAR(200),
+            allele_reference            VARCHAR(200),
+            allele_alternate            VARCHAR(200),
+            allele_reference_frequency  DOUBLE,
+            p_value                     DOUBLE,
+            p_value_nlog                DOUBLE, -- negative log10(P)
+            p_value_nlog_aggregate      DOUBLE, -- -log10(p) grouped by 1e-2
+            p_value_nlog_expected       DOUBLE, -- expected negative log10(P)
+            p_value_heterogenous        BIGINT,
+            beta                        DOUBLE,
+            standard_error              DOUBLE,
+            odds_ratio                  DOUBLE,
+            ci_95_low                   DOUBLE,
+            ci_95_high                  DOUBLE,
+            n                           BIGINT,
+            show_qq_plot                BOOLEAN
         );
     `);
     
@@ -276,6 +287,7 @@ function exportVariants({
     const importStatus = execSync(sqlitePath + processArgs([
         databaseFilePath,
         `.mode csv`,
+        `.separator '\t'`,
         `.import '${inputFilePath}' prestage`
     ]));
 
@@ -298,15 +310,17 @@ function exportVariants({
             snp,
             allele_reference,
             allele_alternate,
+            allele_reference_frequency,
             p_value,
             p_value_nlog,
             p_value_nlog_aggregate,
-            p_value_r,
+            p_value_heterogenous,
+            beta,
+            standard_error,
             odds_ratio,
-            odds_ratio_r,
-            n,
-            q,
-            i  
+            ci_95_low,
+            ci_95_high,
+            n
         ) 
         SELECT 
             p.chromosome,
@@ -315,15 +329,17 @@ function exportVariants({
             p.snp,
             p.allele_reference,
             p.allele_alternate,
+            p.allele_reference_frequency,
             p.p_value,
             -LOG10(p.p_value) AS p_value_nlog,
             1e-2 * cast(1e2 * -LOG10(p.p_value) as int) AS p_value_nlog_aggregate,
-            p.p_value_r,
-            p.odds_ratio,
-            p.odds_ratio_r,
-            p.n,
-            p.q,
-            p.i
+            p.p_value_heterogenous,
+            p.beta,
+            p.standard_error,
+            EXP(p.beta) as odds_ratio,
+            EXP(p.beta - 1.96 * p.standard_error) as ci_95_low,
+            EXP(p.beta + 1.96 * p.standard_error) as ci_95_high,
+            p.n
         FROM prestage p
         INNER JOIN chromosome_range cr ON cr.chromosome = p.chromosome
         ORDER BY p_value;
@@ -385,18 +401,22 @@ function exportVariants({
             ) as id, 
             ${phenotypeId} as phenotype_id, 
             '${sex}' as sex, 
-            s.chromosome, 
-            s.position, 
-            s.snp, 
-            s.allele_reference, 
-            s.allele_alternate, 
-            s.p_value, s.p_value_nlog, 
-            s.p_value_nlog_expected, 
-            s.p_value_r, 
-            s.odds_ratio, 
-            s.odds_ratio_r, 
-            s.n, s.q, 
-            s.i, 
+            s.chromosome,
+            s.position,
+            s.snp,
+            s.allele_reference,
+            s.allele_alternate,
+            s.allele_reference_frequency,
+            s.p_value,
+            s.p_value_nlog,
+            s.p_value_nlog_expected,
+            s.p_value_heterogenous,
+            s.beta,
+            s.standard_error,
+            s.odds_ratio,
+            s.ci_95_low,
+            s.ci_95_high,
+            s.n,
             s.show_qq_plot 
         FROM stage s 
         JOIN chromosome_range cr ON s.chromosome = cr.chromosome 
@@ -465,21 +485,19 @@ function exportVariants({
         exportMetadataTmpFilePath
     ].join('\n'));
 
-    console.log(`[${duration()} s] Copying ${exportVariantTmpFilePath} to ${exportVariantFilePath}...`);
-    fs.copyFileSync(exportVariantTmpFilePath, exportVariantFilePath);
-    console.log(`[${duration()} s] Done`);
-
-    console.log(`[${duration()} s] Copying ${exportVariantTmpFilePath} to ${exportVariantFilePath}...`);
-    fs.copyFileSync(exportVariantTmpFilePath, exportVariantFilePath);
-    console.log(`[${duration()} s] Done`);
-
-    console.log(`[${duration()} s] Copying ${exportAggregateTmpFilePath} to ${exportAggregateFilePath}...`);
-    fs.copyFileSync(exportAggregateTmpFilePath, exportAggregateFilePath);
-    console.log(`[${duration()} s] Done`);
-
-    console.log(`[${duration()} s] Copying ${exportMetadataTmpFilePath} to ${exportMetadataFilePath}...`);
-    fs.copyFileSync(exportMetadataTmpFilePath, exportMetadataFilePath);
-    console.log(`[${duration()} s] Done`);
+    if (outputFilePath !== tmpFilePath) {
+        console.log(`[${duration()} s] Copying ${exportVariantTmpFilePath} to ${exportVariantFilePath}...`);
+        fs.copyFileSync(exportVariantTmpFilePath, exportVariantFilePath);
+        console.log(`[${duration()} s] Done`);
+        
+        console.log(`[${duration()} s] Copying ${exportAggregateTmpFilePath} to ${exportAggregateFilePath}...`);
+        fs.copyFileSync(exportAggregateTmpFilePath, exportAggregateFilePath);
+        console.log(`[${duration()} s] Done`);
+    
+        console.log(`[${duration()} s] Copying ${exportMetadataTmpFilePath} to ${exportMetadataFilePath}...`);
+        fs.copyFileSync(exportMetadataTmpFilePath, exportMetadataFilePath);
+        console.log(`[${duration()} s] Done`);
+    }
 
     return {
         exportVariantFilePath, 
