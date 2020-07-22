@@ -334,7 +334,7 @@ export function drawQQPlot(phenotype, sex) {
               snp: d[4],
               p: Math.pow(10, -d[1]),
             })),
-            name: `${titleCase(sex)}     <b>\u03BB</b> = ${lambda_gc}     <b>Sample Size</b> = ${count}`,
+            name: `${titleCase(sex)}     <b>\u03BB</b> = ${lambda_gc}     <b>Sample Size</b> = ${count.toLocaleString()}`,
             mode: 'markers',
             type: 'scattergl',
             hoverinfo: 'none',
