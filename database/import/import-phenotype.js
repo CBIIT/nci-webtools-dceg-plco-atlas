@@ -155,50 +155,50 @@ async function importPhenotypes() {
 
 
 
-    // add test data (todo: remove once we have data for actual phenotypes)
-    let maxId = orderedRecords.reduce((acc, curr) => Math.max(acc, curr.id), 0);
-    let parentId = Math.max(10000, maxId + 1);
-    orderedRecords.push(
-        {
-            id: parentId,
-            parent_id: null,
-            display_name: 'Test',
-            name: null,
-            description: null,
-            type: null,
-            age_name: null
-        },
-        {
-            id: parentId + 1,
-            parent_id: parentId,
-            name: `test_ewings_sarcoma`,
-            display_name: `Ewing's Sarcoma`,
-            description: `Test Description`,
-            type: `binary`,
-            age_name: null,
-            import_date: '2000-01-01 01:01:01'
-        },
-        {
-            id: parentId + 2,
-            parent_id: parentId,
-            name: `test_melanoma`,
-            display_name: `Melanoma`,
-            description: `Test Description`,
-            type: `binary`,
-            age_name: null,
-            import_date: '2000-01-01 01:01:01'
-        },
-        {
-            id: parentId + 3,
-            parent_id: parentId,
-            name: `test_renal_cell_carcinoma`,
-            display_name: `Renal Cell Carcinoma`,
-            description: `Test Description`,
-            type: `binary`,
-            age_name: null,
-            import_date: '2000-01-01 01:01:01'
-        },
-    );
+    // // add test data (todo: remove once we have data for actual phenotypes)
+    // let maxId = orderedRecords.reduce((acc, curr) => Math.max(acc, curr.id), 0);
+    // let parentId = Math.max(10000, maxId + 1);
+    // orderedRecords.push(
+    //     {
+    //         id: parentId,
+    //         parent_id: null,
+    //         display_name: 'Test',
+    //         name: null,
+    //         description: null,
+    //         type: null,
+    //         age_name: null
+    //     },
+    //     {
+    //         id: parentId + 1,
+    //         parent_id: parentId,
+    //         name: `test_ewings_sarcoma`,
+    //         display_name: `Ewing's Sarcoma`,
+    //         description: `Test Description`,
+    //         type: `binary`,
+    //         age_name: null,
+    //         import_date: '2000-01-01 01:01:01'
+    //     },
+    //     {
+    //         id: parentId + 2,
+    //         parent_id: parentId,
+    //         name: `test_melanoma`,
+    //         display_name: `Melanoma`,
+    //         description: `Test Description`,
+    //         type: `binary`,
+    //         age_name: null,
+    //         import_date: '2000-01-01 01:01:01'
+    //     },
+    //     {
+    //         id: parentId + 3,
+    //         parent_id: parentId,
+    //         name: `test_renal_cell_carcinoma`,
+    //         display_name: `Renal Cell Carcinoma`,
+    //         description: `Test Description`,
+    //         type: `binary`,
+    //         age_name: null,
+    //         import_date: '2000-01-01 01:01:01'
+    //     },
+    // );
 
     console.log(`[${duration()} s] Inserting records...`);
 
