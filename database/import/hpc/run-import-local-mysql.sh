@@ -55,4 +55,4 @@ if [ -z "$5" ]
 fi
 NUM_JOBS=$5
 
-sbatch --gres=lscratch:200 --mem=512g --cpus-per-task=72 --partition=largemem --time=08:00:00 --wrap="sh import-local-mysql.sh $DB_USER $DB_PASS $BASE_DIR $DATA_DIR $NUM_JOBS"
+sbatch --gres=lscratch:200 --mem=512g --cpus-per-task=72 --partition=largemem --time=48:00:00 --wrap="sh import-local-mysql.sh $DB_USER $DB_PASS $BASE_DIR $DATA_DIR $NUM_JOBS"
