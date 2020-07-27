@@ -452,67 +452,71 @@ export const TreeSelect = forwardRef(({
           </li>
         );
       } else {
-        return (
-          // LEAF
-          <li
-            key={'categorical-leaf-' + item.id}
-            style={{
-              textOverflow: 'ellipsis',
-              whiteSpace: 'nowrap',
-              overflow: 'hidden'
-            }}>
-            <div
-              className="ml-3"
+        // if (item.import_date) {
+          return (
+            // LEAF
+            <li
+              key={'categorical-leaf-' + item.id}
               style={{
-                display: 'inline-block',
-                borderLeft: '1px solid white',
-                height: '10px'
-              }}
-            />
-            <input
-              title={singleSelect ? "Select " + item.title + " phenotype" : "Select/deselect " + item.title + " phenotype"}
-              style={{ 
-                cursor: 'pointer' 
-              }}
-              className={'ml-1 leaf-checkbox-' + item.id}
-              // name={'leaf-checkbox-' + item.id}
-              type="checkbox"
-              aria-label="Checkbox"
-              // type={singleSelect ? 'radio' : 'checkbox'}
-              checked={
-                (singleSelect && value && value.id === item.id) ||
-                (!singleSelect &&
-                  value.map(item => item.id).includes(item.id))
-              }
-              onChange={e => handleSelect(item)}
-            />
-
-            <div
-              className="ml-1"
-              style={{
-                display: 'inline-block',
-                borderLeft: '1px solid white',
-                height: '10px'
-              }}
-            />
-
-            <button
-              title={item.title}
-              className="ml-1"
-              style={{
-                all: 'unset',
-                cursor: 'pointer',
                 textOverflow: 'ellipsis',
                 whiteSpace: 'nowrap',
-                overflow: 'hidden',
-                width: '65%'
-              }}
-              onClick={e => handleSelect(item)}
-              >
-              {item.title}
-            </button>
-          </li>
-        );
+                overflow: 'hidden'
+              }}>
+              <div
+                className="ml-3"
+                style={{
+                  display: 'inline-block',
+                  borderLeft: '1px solid white',
+                  height: '10px'
+                }}
+              />
+              <input
+                title={singleSelect ? "Select " + item.title + " phenotype" : "Select/deselect " + item.title + " phenotype"}
+                style={{ 
+                  cursor: 'pointer' 
+                }}
+                className={'ml-1 leaf-checkbox-' + item.id}
+                // name={'leaf-checkbox-' + item.id}
+                type="checkbox"
+                aria-label="Checkbox"
+                // type={singleSelect ? 'radio' : 'checkbox'}
+                checked={
+                  (singleSelect && value && value.id === item.id) ||
+                  (!singleSelect &&
+                    value.map(item => item.id).includes(item.id))
+                }
+                disabled={item.import_date ? false : true}
+                onChange={e => handleSelect(item)}
+              />
+
+              <div
+                className="ml-1"
+                style={{
+                  display: 'inline-block',
+                  borderLeft: '1px solid white',
+                  height: '10px'
+                }}
+              />
+
+              <button
+                title={item.title}
+                className="ml-1"
+                style={{
+                  all: 'unset',
+                  cursor: 'pointer',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  width: '65%'
+                }}
+                disabled={item.import_date ? false : true}
+                onClick={e => handleSelect(item)}
+                >
+                {item.title}
+              </button>
+            </li>
+          );
+        // }
       }
     });
 

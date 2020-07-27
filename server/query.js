@@ -89,7 +89,7 @@ function getValidColumns(tableName, columns) {
     let validColumns = {
         variant: ['id', 'phenotype_id', 'sex', 'chromosome', 'position', 'snp', 'allele_reference', 'allele_alternate', 'p_value', 'p_value_nlog', 'p_value_nlog_expected', 'odds_ratio', 'show_qq_plot'],
         aggregate: ['id', 'phenotype_id', 'sex', 'chromosome', 'position_abs', 'p_value_nlog'],
-        phenotype: ['id', 'parent_id', 'name', 'display_name', 'description', 'color', 'type', 'participant_count'],
+        phenotype: ['id', 'parent_id', 'name', 'age_name', 'display_name', 'description', 'color', 'type', 'participant_count', 'import_count', 'import_date'],
     }[tableName];
 
     return columns.length
