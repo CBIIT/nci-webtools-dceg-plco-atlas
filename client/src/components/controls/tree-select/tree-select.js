@@ -375,7 +375,11 @@ export const TreeSelect = forwardRef(({
       if (item.children && item.children.length > 0) {
         return (
           // PARENT
-          <li className="my-1" style={{ display: 'block' }}>
+          <li 
+            key={'categorical-' + item.id}
+            className="my-1" 
+            style={{ display: 'block' }}
+          >
             <div className="d-flex align-items-center">
               <button
                 title={"Show/hide " + item.title + " phenotypes"}
