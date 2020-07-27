@@ -73,9 +73,19 @@ export function PhenotypesTabs(props) {
       value: phenotypeData.frequency[i]
     }))
 
+    console.log("DATA", data);
+
     const columns = [
       { dataField: 'id', text: phenotypeData.displayName, sort: true },
-      { dataField: 'value', text: 'Frequency', sort: true, formatter: e => e.toLocaleString() }
+      { dataField: 'value', text: 'Frequency', sort: true, 
+        formatter: e => {
+          if (e) {
+            return e.toLocaleString() 
+          } else {
+            return '-'
+          }
+        }
+      }
     ];
 
     return <Table
