@@ -78,9 +78,9 @@ export function PhenotypesTabs(props) {
       { dataField: 'value', text: 'Frequency', sort: true, 
         formatter: e => {
           if (e) {
-            return e.toLocaleString() 
+            return e.toLocaleString();
           } else {
-            return '-'
+            return '-';
           }
         }
       }
@@ -110,8 +110,24 @@ export function PhenotypesTabs(props) {
       columns = [
         { dataField: 'value', text: phenotypeData.displayName, sort: true }, // participant value, mapped to data categories
         { dataField: 'type', text: distributionCategory, sort: true },  // distribution category (age, sex, ancestry)
-        { dataField: 'counts', text: 'Counts', sort: true, formatter: e => e.toLocaleString() }, // participant count
-        { dataField: 'percentage', text: 'Percentage', sort: true, formatter: e => e + '%' }, // participant percentages
+        { dataField: 'counts', text: 'Counts', sort: true, 
+          formatter: e => {
+            if (e) {
+              return e.toLocaleString();
+            } else {
+              return '-';
+            }
+          }
+        }, // participant count
+        { dataField: 'percentage', text: 'Percentage', sort: true, 
+          formatter: e => {
+            if (e) {
+              return e + '%';
+            } else {
+              return '-';
+            }
+          }
+        }, // participant percentages
       ]
 
       let values = phenotypeData.distributionCategories || phenotypeData.categories;
@@ -131,8 +147,24 @@ export function PhenotypesTabs(props) {
       columns = [
         // {dataField: 'value', text: phenotypeData.displayName, sort: true}, // participant value, mapped to data categories
         { dataField: 'type', text: distributionCategory, sort: true },  // distribution category (age, sex, ancestry)
-        { dataField: 'counts', text: 'Counts', sort: true, formatter: e => e.toLocaleString() }, // participant count
-        { dataField: 'percentage', text: 'Percentage', sort: true, formatter: e => e + '%' }, // participant percentages
+        { dataField: 'counts', text: 'Counts', sort: true, 
+          formatter: e => {
+            if (e) {
+              return e.toLocaleString();
+            } else {
+              return '-';
+            }
+          }
+        }, // participant count
+        { dataField: 'percentage', text: 'Percentage', sort: true, 
+          formatter: e => {
+            if (e) {
+              return e + '%';
+            } else {
+              return '-';
+            }
+          }
+        }, // participant percentages
       ];
 
       data = Object.keys(counts).map(type => ({
