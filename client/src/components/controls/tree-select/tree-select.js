@@ -201,6 +201,7 @@ export const TreeSelect = forwardRef(({
 
   // return true only if all children of a parent node is selected in tree
   const checkAllChildrenLeafsSelected = (leafs, selectedValues) => {
+    if (leafs.length === 0) return false;
     for (var i = 0; i < leafs.length; i++) {
       if (selectedValues.indexOf(leafs[i]) === -1) return false;
     }
@@ -232,7 +233,7 @@ export const TreeSelect = forwardRef(({
     if (!singleSelect) {
       // multi-select
       const checkAllLeafsSelectedResult = checkAllChildrenLeafsSelected(
-        itemAllLeafs.map(obj => obj.id),
+        itemAllLeafs.filter(obj => obj.import_date).map(obj => obj.id),
         value.map(obj => obj.id)
       );
       if (checkAllLeafsSelectedResult) {
