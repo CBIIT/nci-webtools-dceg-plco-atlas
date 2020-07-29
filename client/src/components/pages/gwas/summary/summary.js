@@ -161,7 +161,7 @@ export function SummaryResults() {
       drawManhattanPlot('summary', {
         phenotype_id: phenotype.id,
         sex: sexes,
-        p_value_nlog_min: 4,
+        p_value_nlog_min: 3,
       })
     );
 
@@ -235,7 +235,7 @@ export function SummaryResults() {
         selectedSex,
         bpMin: range.position_min,
         bpMax: range.position_max,
-        nlogpMin: 3,
+        nlogpMin: 2,
         nlogpMax: null
       })
     );
@@ -247,7 +247,7 @@ export function SummaryResults() {
         chromosome: chromosome,
         position_min: range.position_min,
         position_max: range.position_max,
-        p_value_nlog_min: 3,
+        p_value_nlog_min: 2,
         p_value_nlog_max: null,
         columns: ['id', 'chromosome', 'position', 'p_value_nlog'],
       })
@@ -353,7 +353,7 @@ export function SummaryResults() {
             chromosome: selectedChromosome,
             position_min: range.position_min,
             position_max: range.position_max,
-            p_value_nlog_min: 3,
+            p_value_nlog_min: 2,
             p_value_nlog_max: null,
             columns: ['id', 'chromosome', 'position', 'p_value_nlog'],
           })
@@ -385,7 +385,7 @@ export function SummaryResults() {
           chromosome: selectedChromosome,
           position_min: range.position_min,
           position_max: range.position_max,
-          p_value_nlog_min: 3,
+          p_value_nlog_min: 2,
           p_value_nlog_max: null,
           columns: ['id', 'chromosome', 'position', 'p_value_nlog'],
         })
