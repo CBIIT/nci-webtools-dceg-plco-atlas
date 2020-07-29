@@ -212,6 +212,19 @@ export const TreeSelect = forwardRef(({
     return leafs.some(r => selectedValues.indexOf(r) >= 0);
   };
 
+  // given parent, determine if all its childern are disabled or not
+  const checkAllChildrenDisabled = item => {
+    if (!item) return false;
+    // console.log("checkAllChildrenDisabled", item);
+    const itemAllLeafs = getAllLeafs(item);
+    if (!singleSelect) {
+      // console.log("itemAllLeafs", itemAllLeafs);
+      const itemImportDates = itemAllLeafs.map(obj => obj.import_date);
+      // console.log("itemImportDates", itemImportDates);
+      return itemImportDates.every(element => element === null);
+    }
+  }
+
   // given parent, determine its checkbox state in tree
   const checkParents = item => {
     if (!item) return false;
@@ -308,7 +321,7 @@ export const TreeSelect = forwardRef(({
       // if multi-select
       const parentCheckboxClassName = 'parent-checkbox-' + item.id;
       let values = [...value];
-      let newValues = getAllLeafs(item);
+      let newValues = getAllLeafs(item).filter(obj => obj.import_date);
       if (containsAllVals(values, newValues)) {
         // remove all leafs if parent is clicked and all leafs were already selected
         values = removeAllVals(values, newValues);
@@ -407,7 +420,7 @@ export const TreeSelect = forwardRef(({
                 style={{
                   verticalAlign: 'middle',
                   alignSelf: 'center',
-                  cursor: singleSelect ? 'not-allowed' : 'pointer'
+                  cursor: singleSelect || (!singleSelect && checkAllChildrenDisabled(item)) ? 'not-allowed' : 'pointer'
                 }}
                 className={'parent-checkbox-' + item.id}
                 // name={'parent-checkbox-' + item.id}
@@ -416,7 +429,7 @@ export const TreeSelect = forwardRef(({
                 // checked={ !singleSelect && value && value.length > 0 && containsAllVals(getAllLeafs(item), value)}
                 checked={checkParents(item)}
                 onChange={e => handleSelect(item)}
-                disabled={singleSelect ? true : false}
+                disabled={singleSelect || (!singleSelect && checkAllChildrenDisabled(item)) ? true : false}
               />
 
               <div
@@ -433,11 +446,12 @@ export const TreeSelect = forwardRef(({
                 className="ml-1"
                 style={{
                   all: 'unset',
-                  cursor: 'pointer',
+                  cursor: !singleSelect && checkAllChildrenDisabled(item) ? 'not-allowed' : 'pointer',
                   textOverflow: 'ellipsis',
                   whiteSpace: 'nowrap',
                   overflow: 'hidden'
                 }}
+                disabled={!singleSelect && checkAllChildrenDisabled(item) ? true : false}
                 onClick={e => singleSelect ? toggleHideChildren(item.id) : handleSelect(item)}
                 >
                 {item.title}
@@ -452,71 +466,69 @@ export const TreeSelect = forwardRef(({
           </li>
         );
       } else {
-        // if (item.import_date) {
-          return (
-            // LEAF
-            <li
-              key={'categorical-leaf-' + item.id}
+        return (
+          // LEAF
+          <li
+            key={'categorical-leaf-' + item.id}
+            style={{
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
+              overflow: 'hidden'
+            }}>
+            <div
+              className="ml-3"
               style={{
+                display: 'inline-block',
+                borderLeft: '1px solid white',
+                height: '10px'
+              }}
+            />
+            <input
+              title={singleSelect ? "Select " + item.title + " phenotype" : "Select/deselect " + item.title + " phenotype"}
+              style={{ 
+                cursor: item.import_date ? 'pointer' : 'not-allowed' 
+              }}
+              className={'ml-1 leaf-checkbox-' + item.id}
+              // name={'leaf-checkbox-' + item.id}
+              type="checkbox"
+              aria-label="Checkbox"
+              // type={singleSelect ? 'radio' : 'checkbox'}
+              checked={
+                (singleSelect && value && value.id === item.id) ||
+                (!singleSelect &&
+                  value.map(item => item.id).includes(item.id))
+              }
+              disabled={item.import_date ? false : true}
+              onChange={e => handleSelect(item)}
+            />
+
+            <div
+              className="ml-1"
+              style={{
+                display: 'inline-block',
+                borderLeft: '1px solid white',
+                height: '10px'
+              }}
+            />
+
+            <button
+              title={item.title}
+              className="ml-1"
+              style={{
+                all: 'unset',
+                cursor: item.import_date ? 'pointer' : 'not-allowed',
                 textOverflow: 'ellipsis',
                 whiteSpace: 'nowrap',
-                overflow: 'hidden'
-              }}>
-              <div
-                className="ml-3"
-                style={{
-                  display: 'inline-block',
-                  borderLeft: '1px solid white',
-                  height: '10px'
-                }}
-              />
-              <input
-                title={singleSelect ? "Select " + item.title + " phenotype" : "Select/deselect " + item.title + " phenotype"}
-                style={{ 
-                  cursor: 'pointer' 
-                }}
-                className={'ml-1 leaf-checkbox-' + item.id}
-                // name={'leaf-checkbox-' + item.id}
-                type="checkbox"
-                aria-label="Checkbox"
-                // type={singleSelect ? 'radio' : 'checkbox'}
-                checked={
-                  (singleSelect && value && value.id === item.id) ||
-                  (!singleSelect &&
-                    value.map(item => item.id).includes(item.id))
-                }
-                disabled={item.import_date ? false : true}
-                onChange={e => handleSelect(item)}
-              />
-
-              <div
-                className="ml-1"
-                style={{
-                  display: 'inline-block',
-                  borderLeft: '1px solid white',
-                  height: '10px'
-                }}
-              />
-
-              <button
-                title={item.title}
-                className="ml-1"
-                style={{
-                  all: 'unset',
-                  cursor: 'pointer',
-                  textOverflow: 'ellipsis',
-                  whiteSpace: 'nowrap',
-                  overflow: 'hidden',
-                  width: '65%'
-                }}
-                disabled={item.import_date ? false : true}
-                onClick={e => handleSelect(item)}
-                >
-                {item.title}
-              </button>
-            </li>
-          );
-        // }
+                overflow: 'hidden',
+                width: '65%'
+              }}
+              disabled={item.import_date ? false : true}
+              onClick={e => handleSelect(item)}
+              >
+              {item.title}
+            </button>
+          </li>
+        );
       }
     });
 
@@ -602,7 +614,7 @@ export const TreeSelect = forwardRef(({
       onChange([]);
     } else {
       const allLeafs = [];
-      data.tree.map(item => allLeafs.push(getAllLeafs(item)));
+      data.tree.map(item => allLeafs.push(getAllLeafs(item).filter(obj => obj.import_date)));
       onChange(allLeafs.flat());
     }
   };
@@ -611,7 +623,7 @@ export const TreeSelect = forwardRef(({
   const checkAllLeafsSelected = () => {
     if (!data) return;
     let allLeafs = [];
-    data.tree.map(item => allLeafs.push(getAllLeafs(item)));
+    data.tree.map(item => allLeafs.push(getAllLeafs(item).filter(obj => obj.import_date)));
     allLeafs = allLeafs.flat().map(item => item.id);
     for (var i = 0; i < allLeafs.length; i++) {
       if (value.map(item => item.id).indexOf(allLeafs[i]) === -1)
