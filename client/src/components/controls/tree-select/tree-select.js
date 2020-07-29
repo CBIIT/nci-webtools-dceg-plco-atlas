@@ -553,6 +553,7 @@ export const TreeSelect = forwardRef(({
               (!singleSelect &&
                 value.map(item => item.id).includes(item.id))
             }
+            disabled={item.import_date ? false : true}
             onChange={e => handleSelect(item)}
           />
 
@@ -567,6 +568,7 @@ export const TreeSelect = forwardRef(({
               overflow: 'hidden',
               width: '90%'
             }}
+            disabled={item.import_date ? false : true}
             onClick={e => handleSelect(item)}>
             {/* {item.title.replace(searchInput, '[' + searchInput + ']')} */}
             {item.title.slice(
