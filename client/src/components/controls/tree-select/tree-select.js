@@ -218,12 +218,12 @@ export const TreeSelect = forwardRef(({
     if (!item) return false;
     // console.log("checkAllChildrenDisabled", item);
     const itemAllLeafs = getAllLeafs(item);
-    if (!singleSelect) {
-      // console.log("itemAllLeafs", itemAllLeafs);
-      const itemImportDates = itemAllLeafs.map(obj => obj.import_date);
-      // console.log("itemImportDates", itemImportDates);
-      return itemImportDates.every(element => element === null);
-    }
+    // if (!singleSelect) {
+    // console.log("itemAllLeafs", itemAllLeafs);
+    const itemImportDates = itemAllLeafs.map(obj => obj.import_date);
+    // console.log("itemImportDates", itemImportDates);
+    return itemImportDates.every(element => element === null);
+    // }
   }
 
   // given parent, determine its checkbox state in tree
@@ -450,7 +450,8 @@ export const TreeSelect = forwardRef(({
                   cursor: !singleSelect && checkAllChildrenDisabled(item) ? 'not-allowed' : 'pointer',
                   textOverflow: 'ellipsis',
                   whiteSpace: 'nowrap',
-                  overflow: 'hidden'
+                  overflow: 'hidden',
+                  color: checkAllChildrenDisabled(item) ? '#D3D3D3' : 'unset'
                 }}
                 disabled={!singleSelect && checkAllChildrenDisabled(item) ? true : false}
                 onClick={e => singleSelect ? toggleHideChildren(item.id) : handleSelect(item)}
@@ -521,7 +522,8 @@ export const TreeSelect = forwardRef(({
                 textOverflow: 'ellipsis',
                 whiteSpace: 'nowrap',
                 overflow: 'hidden',
-                width: '65%'
+                width: '65%',
+                color: item.import_date ? 'unset' : '#D3D3D3'
               }}
               disabled={item.import_date ? false : true}
               onClick={e => handleSelect(item)}
