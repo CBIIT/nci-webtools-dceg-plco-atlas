@@ -92,14 +92,18 @@ export function VariantLookup() {
       text: 'Alternate Allele'
     },
     {
+      dataField: 'beta',
+      text: 'Beta'
+    },
+    {
       dataField: 'odds_ratio',
-      text: 'Odds Ratio/Beta',
+      text: 'Odds Ratio (95% CI)',
       sort: true,
-      sortFunc: (a, b, order, dataField, rowA, rowB) => {
-        if (order === 'asc') {
-          return a - b;
-        }
-        return b - a; // desc
+      formatter: (cell, row, rowIndex) => {
+        const isUndefined = value => value === null || value === undefined;
+        return (+cell).toFixed(3) + (isUndefined(row.ci_95_low) || isUndefined(row.ci_95_high) 
+          ? '' 
+          : ` (${+row.ci_95_low.toFixed(3)} - ${+row.ci_95_high.toFixed(3)})`);
       }
     },
     {

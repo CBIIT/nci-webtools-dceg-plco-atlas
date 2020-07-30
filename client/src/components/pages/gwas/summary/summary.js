@@ -100,7 +100,7 @@ export function SummaryResults() {
           sex: sex,
           offset: 0,
           limit: 10,
-          columns: ['chromosome', 'position', 'snp', 'allele_reference', 'allele_alternate', 'odds_ratio', 'p_value'],
+          columns: ['chromosome', 'position', 'snp', 'allele_reference', 'allele_alternate', 'beta', 'odds_ratio', 'ci_95_low', 'ci_95_high', 'p_value'],
           orderBy: 'p_value',
           order: 'asc',
           // key: params.count ? null : countKey, // metadata key for counts

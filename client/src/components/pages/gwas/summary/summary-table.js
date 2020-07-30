@@ -63,8 +63,18 @@ export function SummaryResultsTable() {
       text: 'Alternate Allele'
     },
     {
+      dataField: 'beta',
+      text: 'Beta'
+    },
+    {
       dataField: 'odds_ratio',
-      text: 'Odds Ratio'
+      text: 'Odds Ratio (95% CI)',
+      formatter: (cell, row, rowIndex) => {
+        const isUndefined = value => value === null || value === undefined;
+        return (+cell).toFixed(3) + (isUndefined(row.ci_95_low) || isUndefined(row.ci_95_high) 
+          ? '' 
+          : ` (${+row.ci_95_low.toFixed(3)} - ${+row.ci_95_high.toFixed(3)})`);
+      }
     },
     {
       dataField: 'p_value',
