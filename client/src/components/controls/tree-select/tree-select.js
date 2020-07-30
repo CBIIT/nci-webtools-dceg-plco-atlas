@@ -558,7 +558,7 @@ export const TreeSelect = forwardRef(({
           }}>
           <input
             title={"Select " + item.title + " phenotype"}
-            style={{ cursor: 'pointer' }}
+            style={{ cursor: item.import_date ? 'pointer' : 'not-allowed' }}
             className={'ml-0 leaf-checkbox-' + item.id}
             // name={'leaf-checkbox-' + item.id}
             type="checkbox"
@@ -577,11 +577,12 @@ export const TreeSelect = forwardRef(({
             className="ml-2"
             style={{
               all: 'unset',
-              cursor: 'pointer',
+              cursor: item.import_date ? 'pointer' : 'not-allowed',
               textOverflow: 'ellipsis',
               whiteSpace: 'nowrap',
               overflow: 'hidden',
-              width: '90%'
+              width: '90%',
+              color: item.import_date ? 'unset' : '#D3D3D3'
             }}
             disabled={item.import_date ? false : true}
             onClick={e => handleSelect(item)}>
