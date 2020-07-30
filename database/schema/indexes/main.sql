@@ -32,3 +32,7 @@ ALTER TABLE phenotype_variant
 ALTER TABLE phenotype_aggregate
     ADD INDEX idx_phenotype_aggregate__chromosome     (chromosome),
     ADD INDEX idx_phenotype_aggregate__p_value_nlog   (p_value_nlog);
+
+-- variant points
+ALTER TABLE phenotype_point
+    ADD INDEX idx_phenotype_point__p_value_nlog       (p_value_nlog);
