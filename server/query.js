@@ -88,6 +88,7 @@ function getValidColumns(tableName, columns) {
 
     let validColumns = {
         variant: ['id', 'phenotype_id', 'sex', 'chromosome', 'position', 'snp', 'allele_reference', 'allele_alternate', 'p_value', 'p_value_nlog', 'p_value_nlog_expected', 'beta', 'odds_ratio', 'ci_95_low', 'ci_95_high', 'show_qq_plot'],
+        point: ['id', 'phenotype_id', 'sex', 'chromosome', 'position', 'snp', 'p_value_nlog', 'p_value_nlog_expected'],
         aggregate: ['id', 'phenotype_id', 'sex', 'chromosome', 'position_abs', 'p_value_nlog'],
         phenotype: ['id', 'parent_id', 'name', 'age_name', 'display_name', 'description', 'color', 'type', 'participant_count', 'import_count', 'import_date'],
     }[tableName];
@@ -303,6 +304,78 @@ async function getVariants(connectionPool, params) {
     await connection.release();
     return results;
 }
+
+async function getPoints(connectionPool, params) {
+    if (!/^\d+(,\d+)*$/.test(params.phenotype_id))
+        throw('Phenotype ID must consist of numeric values');
+    
+    if (params.sex && !/^(all|female|male)(,(all|female|male))*$/.test(params.sex))
+        throw('Sex must be all, male, or female');
+
+    const connection = await connectionPool.getConnection();
+    const [phenotypes] = await connection.query(
+        `SELECT * FROM phenotype WHERE id IN (?)`,
+        [params.phenotype_id.split(',')]
+    );
+
+    if (!phenotypes.length) 
+        throw('No phenotypes with the specified id(s) were found');
+
+    if (!phenotypes.filter(p => p.import_date).length)
+        throw('The specified phenotype(s) do not have an import date');
+
+    const columnNames = getValidColumns('point', params.columns).map(quote);
+    const partitions = phenotypes.map(p => params.sex 
+        ? params.sex.split(',').map(sex => quote(`${p.id}_${sex}`)).join(',')
+        : quote(`${p.id}`)
+    );
+
+    const conditions = [
+        coalesce(params.id, `id = :id`),
+        coalesce(params.chromosome, `chromosome = :chromosome`),
+        coalesce(params.position, `position = :position`),
+        coalesce(params.position_min, `position >= :position_min`),
+        coalesce(params.position_max, `position <= :position_max`),
+        coalesce(params.p_value_nlog_min, `p_value_nlog >= :p_value_nlog_min`),
+        coalesce(params.p_value_nlog_max, `p_value_nlog <= :p_value_nlog_max`)
+    ].filter(Boolean).join(' AND ');
+
+    // determine valid order and orderBy columns
+    let order = ['asc', 'desc'].includes(params.order) 
+        ? params.order 
+        : 'asc';
+
+    // orderBy is limited to indexed columns and defaults to p_value
+    let orderBy = ['id', 'p_value_nlog'].includes(params.orderBy) 
+        ? params.orderBy 
+        : 'p_value_nlog';
+
+    // sets limits and offsets (by default, limit to 100,000 records to prevent memory overflow)
+    let limit = params.limit ? Math.min(params.limit, 1e5) : 1e5; // set hard limit to prevent overflow
+    let offset = +params.offset || 0;
+
+    // sql_calc_found_rows will eventually be deprecated, so we'll need to fall back using a secondary count(*) query at some point
+    const sql = `
+        SELECT ${columnNames.join(',')} 
+        FROM phenotype_point partition(${partitions.join(',')})
+        ${conditions.length ? `WHERE ${conditions}` : ''}
+        ${params.orderBy ? `ORDER BY ${orderBy} ${order}` : ''}
+        LIMIT ${offset}, ${limit};
+    `;
+
+    logger.debug(`getPoints sql: ${sql}`);
+
+    // query database
+    const [data, columns] = await connection.execute({
+        sql, rowsAsArray: params.raw,
+    }, params);
+
+    const results = {data, columns: columns.map(c => c.name)};
+
+    await connection.release();
+    return results;
+}
+
 
 /**
  * Retrieves metadata for a phenotype's variants
@@ -891,6 +964,7 @@ module.exports = {
     connection,
     getSummary,
     getVariants,
+    getPoints,
     getMetadata,
     getCorrelations,
     getPhenotype,
