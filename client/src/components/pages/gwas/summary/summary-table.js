@@ -52,26 +52,42 @@ export function SummaryResultsTable() {
     {
       dataField: 'snp',
       text: 'SNP',
-      sort: true
+      sort: true,
     },
     {
       dataField: 'allele_reference',
-      text: 'Reference Allele'
+      text: 'Ref. Allele',
+      headerTitle: _ => 'Reference Allele',
     },
     {
       dataField: 'allele_alternate',
-      text: 'Alternate Allele'
+      text: 'Alt. Allele',
+      headerTitle: _ => 'Alternate Allele',
     },
-    {
+    selectedPhenotype && selectedPhenotype.type === 'continuous' && {
+      dataField: 'beta',
+      text: 'Beta'
+    },
+    selectedPhenotype && selectedPhenotype.type === 'binary' && {
       dataField: 'odds_ratio',
-      text: 'Odds Ratio'
+      text: 'OR [95% CI]',
+      headerTitle: _ => 'Odds Ratio [95% Confidence Interval]',
+      formatter: (cell, row, rowIndex) => {
+        const isUndefined = value => value === null || value === undefined;
+        return (+cell).toFixed(3) + (isUndefined(row.ci_95_low) || isUndefined(row.ci_95_high) 
+          ? '' 
+          : ` [${+row.ci_95_low.toFixed(3)} - ${+row.ci_95_high.toFixed(3)}]`);
+      },
+      headerStyle: {
+        width: '200px'
+      }
     },
     {
       dataField: 'p_value',
       text: 'P-Value',
       sort: true
     }
-  ];
+  ].filter(Boolean);
 
   const handleTableChange = async (
     key,

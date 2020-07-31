@@ -266,6 +266,27 @@ CREATE TABLE IF NOT EXISTS phenotype_aggregate (
         )
 );
 
+CREATE TABLE IF NOT EXISTS phenotype_point
+(
+	id bigint auto_increment,
+	phenotype_id int not null,
+	sex enum('all', 'female', 'male') not null,
+	chromosome enum('1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', 'X', 'Y') not null,
+	position int not null,
+	snp varchar(200) not null,
+	p_value_nlog double null,
+	p_value_nlog_expected double null,
+	primary key (id, phenotype_id, sex)
+) PARTITION BY list(phenotype_id) SUBPARTITION BY LINEAR KEY(sex) SUBPARTITIONs 3 (
+    PARTITION `0`
+    VALUES
+        IN (0) (
+            SUBPARTITION `0_all`,
+            SUBPARTITION `0_female`,
+            SUBPARTITION `0_male`
+        )
+);
+
 CREATE TABLE IF NOT EXISTS share_link (
   `id` INTEGER PRIMARY KEY AUTO_INCREMENT,
   `share_id` CHAR(36) UNIQUE,
