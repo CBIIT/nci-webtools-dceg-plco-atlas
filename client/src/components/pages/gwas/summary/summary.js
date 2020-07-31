@@ -415,9 +415,6 @@ export function SummaryResults() {
       );
 
     }
-
-
-    console.log('LOADED STATE', state);
   }
 
   useEffect(() => {
