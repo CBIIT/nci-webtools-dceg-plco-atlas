@@ -284,7 +284,7 @@ export function drawQQPlot(phenotype, sex) {
         );
   
         // retrieve all variants where nlog_p >= 3
-        const topVariants = await query('points', {
+        const topVariants = await query('variants', {
           phenotype_id: phenotype.id,
           columns: ['p_value_nlog_expected', 'p_value_nlog', 'chromosome', 'position', 'snp'],
           sex,
