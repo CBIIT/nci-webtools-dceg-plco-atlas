@@ -209,7 +209,17 @@ export function fetchSummarySnpTable(tableKey, params, existingResults) {
 export function drawManhattanPlot(plotType, params) {
   console.log('drawing plot', plotType, params);
   return async function(dispatch) {
-    try {
+    try {  
+      // retrieve metadata for all sexes provided
+      const metadata = await query('metadata', {
+        phenotype_id: params.phenotype_id,
+        chromosome: 'all',
+        sex: params.sex,
+      });
+      dispatch(updateQQPlot({ 
+        sampleSize: metadata.reduce((a, b) => a + b.count, 0),
+      }));
+
       dispatch(updateManhattanPlot({ loadingManhattanPlot: true }));
       if (params.sex.length === 2) {
         // if 2 tables are provided, this is a mirrored plot
@@ -254,7 +264,7 @@ export function drawQQPlot(phenotype, sex) {
         loadingQQPlot: true,
         qqplotData: [],
         qqplotLayout: {},
-        sampleSize: null,
+        // sampleSize: null,
       }));
   
       const sexes = sex === 'stacked' ? ['female', 'male'] : [sex];

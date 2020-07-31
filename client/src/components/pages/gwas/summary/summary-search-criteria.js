@@ -1,6 +1,7 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
 import { ShareLink } from '../../../controls/share-link/share-link';
+// import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
 
 
 export const SummaryResultsSearchCriteria = () => {
@@ -51,9 +52,12 @@ export const SummaryResultsSearchCriteria = () => {
             <div className="d-flex">
               <span className="py-1">
                 <b>Total Variants:</b> {' '}
-                {sampleSize
-                  ? sampleSize.toLocaleString() :
-                  'None'}
+                <span>
+                  {/* <LoadingOverlay active={true} /> */}
+                  {sampleSize
+                    ? sampleSize.toLocaleString() :
+                    'None'}
+                </span>
               </span>
 
               <span className="ml-3" style={{maxHeight: '1.6em'}}></span>
