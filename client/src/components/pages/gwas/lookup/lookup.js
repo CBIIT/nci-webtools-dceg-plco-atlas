@@ -85,21 +85,32 @@ export function VariantLookup() {
     },
     {
       dataField: 'allele_reference',
-      text: 'Reference Allele'
+      text: 'Ref. Allele',
+      headerTitle: _ => 'Reference Allele',
     },
     {
       dataField: 'allele_alternate',
-      text: 'Alternate Allele'
+      text: 'Alt. Allele',
+      headerTitle: _ => 'Alternate Allele',
+    },
+    {
+      dataField: 'beta',
+      text: 'Beta',
+      sort: true,
     },
     {
       dataField: 'odds_ratio',
-      text: 'Odds Ratio/Beta',
+      text: 'OR [95% CI]',
       sort: true,
-      sortFunc: (a, b, order, dataField, rowA, rowB) => {
-        if (order === 'asc') {
-          return a - b;
-        }
-        return b - a; // desc
+      headerTitle: _ => 'Odds Ratio [95% Confidence Interval]',
+      formatter: (cell, row, rowIndex) => {
+        const isUndefined = value => value === null || value === undefined;
+        return (+cell).toFixed(3) + (isUndefined(row.ci_95_low) || isUndefined(row.ci_95_high) 
+          ? '' 
+          : ` [${+row.ci_95_low.toFixed(3)} - ${+row.ci_95_high.toFixed(3)}]`);
+      },
+      headerStyle: {
+        width: '200px'
       }
     },
     {
