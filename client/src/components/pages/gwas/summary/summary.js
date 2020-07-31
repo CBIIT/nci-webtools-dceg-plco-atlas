@@ -40,7 +40,11 @@ export function SummaryResults() {
 
   const {
     loadingManhattanPlot,
-  } = useSelector(state => state.manhattanPlot)
+  } = useSelector(state => state.manhattanPlot);
+
+  const {
+    qqplotData
+  } = useSelector(state => state.qqPlot);
 
   const [openSidebar, setOpenSidebar] = useState(true);
 
@@ -52,6 +56,9 @@ export function SummaryResults() {
   // selected tab
   const setSelectedPlot = selectedPlot => {
     dispatch(updateSummaryResults({ selectedPlot }));
+    if (submitted && selectedPlot === 'qq-plot' && qqplotData.length === 0) {
+      dispatch(drawQQPlot(selectedPhenotype, selectedSex));
+    }
   };
 
   // search criteria summary bar data
@@ -134,7 +141,10 @@ export function SummaryResults() {
     // close sidebar on submit
     // setOpenSidebar(false);
     setPopupTooltipData(null);
-    dispatch(drawQQPlot(phenotype, sex));
+
+    if (selectedPlot === 'qq-plot'){
+      dispatch(drawQQPlot(phenotype, sex));
+    }
 
     // update summary results filters
     dispatch(
@@ -316,7 +326,6 @@ export function SummaryResults() {
   const loadState = state => {
     if (!state || !Object.keys(state).length) return;
     dispatch(updateSummaryResults({...state, submitted: new Date()}));
-
     const {
       bpMax,
       bpMin,
@@ -340,11 +349,17 @@ export function SummaryResults() {
       if (!selectedChromosome) {
         // handle default submission
         handleSubmit({phenotype: selectedPhenotype, sex: selectedSex})
+        if (selectedPlot === 'qq-plot') {
+          dispatch(drawQQPlot(selectedPhenotype, selectedSex));
+        }
       } else {
         // handle chromosome submission
         const range = ranges.find(r => r.chromosome === selectedChromosome);
         setPopupTooltipData(null);
-        dispatch(drawQQPlot(selectedPhenotype, selectedSex));
+
+        if (selectedPlot === 'qq-plot') {
+          dispatch(drawQQPlot(selectedPhenotype, selectedSex));
+        }
 
         dispatch(
           drawManhattanPlot('variants', {
@@ -376,7 +391,10 @@ export function SummaryResults() {
 
       // handle chromosome submission
       setPopupTooltipData(null);
-      dispatch(drawQQPlot(selectedPhenotype, selectedSex));
+
+      if (selectedPlot === 'qq-plot') {
+        dispatch(drawQQPlot(selectedPhenotype, selectedSex));
+      }
 
       dispatch(
         drawManhattanPlot('variants', {

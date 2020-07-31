@@ -280,7 +280,7 @@ export function drawQQPlot(phenotype, sex) {
   
         console.log(
           `${sex}.subsetVariants.length`,
-          subsetVariants.length
+          subsetVariants.data.length
         );
   
         // retrieve all variants where nlog_p >= 3
@@ -294,7 +294,7 @@ export function drawQQPlot(phenotype, sex) {
   
         console.log(
           `${sex}.topVariants.length`,
-          topVariants.length
+          topVariants.data.length
         );
   
         const {lambda_gc, count} = metadata.find(m => m.sex === sex);
