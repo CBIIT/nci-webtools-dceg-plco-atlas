@@ -37,7 +37,9 @@ CREATE TEMPORARY TABLE gene_stage (
     `cdsEnd`        INTEGER,
     `exonCount`     INTEGER,
     `exonStarts`    TEXT,
-    `exonEnds`      TEXT
+    `exonEnds`      TEXT,
+    `score`         TEXT,
+    `name2`         TEXT
 );
 
 -- load data into staging table
@@ -56,8 +58,8 @@ LOAD DATA LOCAL INFILE "../raw/genes.tsv" INTO TABLE gene_stage
       exonCount,
       exonStarts,
       exonEnds,
-      @dummy,
-      @dummy,
+      score,
+      name2,
       @dummy,
       @dummy,
       @dummy
@@ -70,7 +72,7 @@ UPDATE gene_stage SET chrom = replace(chrom, 'chr', '');
 INSERT INTO gene
 SELECT
     null,
-    name,
+    COALESCE(name2, name),
     ANY_VALUE(chrom) as chromosome,
     ANY_VALUE(strand),
     MIN(txStart) as transcription_start,
@@ -79,7 +81,7 @@ SELECT
     GROUP_CONCAT(exonEnds, '') as exon_ends
 FROM gene_stage
 WHERE chrom IN (SELECT chromosome FROM chromosome_range)
-GROUP BY name
+GROUP BY name2
 ORDER BY chromosome, transcription_start, transcription_end;
 
 DROP TEMPORARY TABLE gene_stage;
