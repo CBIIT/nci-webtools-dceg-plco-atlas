@@ -128,6 +128,7 @@ export function SummaryResults() {
         }
       ]);
     }
+    // clear Manhattan Plot and QQ-Plot before calculating
     const initialState = getInitialState();
     dispatch(
       updateManhattanPlot(initialState.manhattanPlot)
@@ -136,6 +137,7 @@ export function SummaryResults() {
       updateQQPlot(initialState.qqPlot)
     );
     hideQQTooltips();
+    
     let sexes = {
       all: ['all'],
       stacked: ['female', 'male'],
