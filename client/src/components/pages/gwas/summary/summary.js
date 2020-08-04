@@ -128,6 +128,14 @@ export function SummaryResults() {
         }
       ]);
     }
+    const initialState = getInitialState();
+    dispatch(
+      updateManhattanPlot(initialState.manhattanPlot)
+    );
+    dispatch(
+      updateQQPlot(initialState.qqPlot)
+    );
+    hideQQTooltips();
     let sexes = {
       all: ['all'],
       stacked: ['female', 'male'],
