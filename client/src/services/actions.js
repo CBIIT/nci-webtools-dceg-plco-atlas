@@ -99,6 +99,12 @@ export function initialize() {
       const ranges = await query('ranges')
       dispatch(updateSummaryResults({ranges}));
 
+      const metadata = await query('metadata', {
+        chromosome: 'all',
+        countNotNull: true
+      });
+      console.log("INIT METADATA", metadata);
+
       // update download root
       const { downloadRoot } = await query('config', {key: 'downloadRoot'})
       dispatch(updateDownloads({downloadRoot}));

@@ -395,21 +395,31 @@ async function getPoints(connectionPool, params) {
 async function getMetadata(connection, params) {
 
     // assign default parameters if needed
-    const defaults = {sex: 'all', chromosome: 'all'};
+    const defaults = {
+        // sex: 'all',
+        chromosome: 'all'
+    };
     params = {...defaults, ...params};
 
     // validate parameters
-    if (!/^\d+(,\d+)*$/.test(params.phenotype_id) ||
-        !/^(all|female|male)(,(all|female|male))*$/.test(params.sex) ||
+    if ((params.phenotype_id && !/^\d+(,\d+)*$/.test(params.phenotype_id)) ||
+        (params.sex && !/^(all|female|male)(,(all|female|male))*$/.test(params.sex)) ||
         !/^(all|x|y|\d+)(,(all|x|y|\d+))*$/.test(params.chromosome))
     return null;
 
     // parse parameters as arrays
-    const phenotype_id = params.phenotype_id.split(',');
-    const sex = params.sex.split(',');
-    const chromosome = params.chromosome.split(',');
+    const phenotype_id = params.phenotype_id ? params.phenotype_id.split(',') : [];
+    const sex = params.sex ? params.sex.split(',') : [];
+    const chromosome = params.chromosome ? params.chromosome.split(',') : [];
     const getPlaceholders = length => new Array(length).fill('?').join(',');
 
+    const conditions = [
+        coalesce(params.phenotype_id, `m.phenotype_id IN (${getPlaceholders(phenotype_id.length)})`),
+        coalesce(params.sex, `sex IN (${getPlaceholders(sex.length)})`),
+        coalesce(params.chromosome, `chromosome IN (${getPlaceholders(chromosome.length)})`),
+        coalesce(params.countNotNull, `count IS NOT NULL`)
+    ].filter(Boolean).join(' AND ');
+    
     const sql = `
         SELECT
             m.id as id,
@@ -425,9 +435,7 @@ async function getMetadata(connection, params) {
         JOIN
             phenotype p on m.phenotype_id = p.id
         WHERE
-            m.phenotype_id IN (${getPlaceholders(phenotype_id.length)}) AND
-            sex IN (${getPlaceholders(sex.length)}) AND
-            chromosome IN (${getPlaceholders(chromosome.length)})
+            ${conditions}
     `;
 
     logger.debug(`getMetadata sql: ${sql}`);
