@@ -28,9 +28,54 @@ export function SummaryResultsForm({
 
   // select store members
   const phenotypes = useSelector(state => state.phenotypes);
-  const { submitted, disableSubmit } = useSelector(state => state.summaryResults);
+  const { 
+    submitted, 
+    disableSubmit, 
+    existingSexes 
+  } = useSelector(state => state.summaryResults);
 
   const treeRef = useRef();
+
+  const handleExistingSex = (chosen) => {
+    const existingSexes = phenotypes.metadata.filter((item) => item.phenotype_id === chosen.id).map((item) => item.sex).sort();
+    dispatch(updateSummaryResults({ existingSexes }));
+    if (existingSexes.length > 0) {
+      _setSex(existingSexes[0]);
+    }
+  }
+
+  const sexes = {
+    all: {
+      value: 'all',
+      name: 'All'
+    },
+    stacked: {
+      value: 'stacked',
+      name: 'Female/Male (Stacked)'
+    },
+    female: {
+      value: 'female',
+      name: 'Female'
+    },
+    male: {
+      value: 'male',
+      name: 'Male'
+    }
+  };
+
+  const SexOptions = () => {
+    let displayOptions = existingSexes.map((item) => sexes[item]);
+    if (existingSexes.includes('female') && existingSexes.includes('male')) {
+      displayOptions.push(sexes['stacked']);
+    }
+    return (
+      <>
+        {displayOptions.map((item) => 
+          <option key={item.value} value={item.value}>{item.name}</option>
+        )}
+      </>
+    )
+  }
 
   return (
     <>
@@ -43,6 +88,7 @@ export function SummaryResultsForm({
           onChange={val => {
             _setPhenotype((val && val.length) ? val[0] : null);
             dispatch(updateSummaryResults({ disableSubmit: false }));
+            handleExistingSex((val && val.length) ? val[0] : null);
           }}
           singleSelect
           ref={treeRef}
@@ -60,12 +106,11 @@ export function SummaryResultsForm({
             dispatch(updateSummaryResults({ disableSubmit: false }));
           }}
           aria-label="Select sex"
-          // disabled={submitted}
-          >
-          <option value="all">All</option>
-          <option value="stacked">Female/Male (Stacked)</option>
-          <option value="female">Female</option>
-          <option value="male">Male</option>
+          disabled={existingSexes.length === 0}>
+            { existingSexes.length === 0 &&
+              <option value="" disabled selected>Select a phenotype</option>
+            }
+            <SexOptions />
         </select>
       </div>
 

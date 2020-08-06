@@ -103,7 +103,6 @@ export function initialize() {
         chromosome: 'all',
         countNotNull: true
       });
-      console.log("INIT METADATA", metadata);
 
       // update download root
       const { downloadRoot } = await query('config', {key: 'downloadRoot'})
@@ -147,7 +146,8 @@ export function initialize() {
         dispatch(updatePhenotypes({
           flat: alphabetizedRecords,
           categories: categories,
-          tree: data
+          tree: data,
+          metadata: metadata
         }));
       }
     } catch (e) {
