@@ -33,9 +33,7 @@ export const getInitialState = () => ({
     qqplotData: [],
     qqplotLayout: {},
     lambdaGC: '',
-    areaItems: [],
-    // popupTooltipData: null,
-    // tooltipData: null,
+    areaItems: []
   },
   manhattanPlot: {
     loadingManhattanPlot: false,

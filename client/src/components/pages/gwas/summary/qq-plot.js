@@ -1,5 +1,5 @@
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { PlotlyWrapper as Plot } from '../../../plots/plotly/plotly-wrapper';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
@@ -25,6 +25,8 @@ export function QQPlot({ onVariantLookup }) {
     ...tooltip,
     ...state
   });
+
+  useEffect(() => updateTooltip({visible: false}), [qqplotData]);
   
   const config = {
     responsive: true,
@@ -54,10 +56,10 @@ export function QQPlot({ onVariantLookup }) {
       ref={plotContainer}>
       <LoadingOverlay active={loadingQQPlot} />
 
-      {qqplotData.length > 0 && <Plot
+      { <Plot
         className="override-cursor-default"
         style={{
-          display: !loadingQQPlot ? 'block' : 'none',
+          // display: !loadingQQPlot ? 'block' : 'none',
           position: 'relative',
           height: '800px',
           width: '800px'
@@ -105,7 +107,7 @@ export function QQPlot({ onVariantLookup }) {
             male: '#006bb8'
           }[tooltip.data.sex] || '#ddd'}`
         }}
-        className="text-left">
+        className="text-left qq-plot-tooltip">
         {(!tooltip.data || (tooltip.data && -Math.log10(tooltip.data.p) < 3))
           ? <div>No information displayed for variants with -log<sub>10</sub>(p) &lt; 3.</div> 
           : <div>
