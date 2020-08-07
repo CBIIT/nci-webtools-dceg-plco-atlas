@@ -69,24 +69,26 @@ export function QQPlot({ onVariantLookup }) {
         config={config}
         onHover={data => {
           const [point] = data.points;
-          const {xaxis, yaxis} = point;
-          const xOffset = xaxis.l2p(point.x) + xaxis._offset;
-          const yOffset = yaxis.l2p(point.y) + yaxis._offset;
+          if (point.customdata) {
+            const {xaxis, yaxis} = point;
+            const xOffset = xaxis.l2p(point.x) + xaxis._offset;
+            const yOffset = yaxis.l2p(point.y) + yaxis._offset;
 
-          /* Use event.clientX/Y if we want to position the tooltip at the cursor (instead of point)
-          const {clientX, clientY} = data.event;
-          const {x, y} = viewportToLocalCoordinates(
-            clientX, 
-            clientY, 
-            plotContainer.current
-          ); */
+            /* Use event.clientX/Y if we want to position the tooltip at the cursor (instead of point)
+            const {clientX, clientY} = data.event;
+            const {x, y} = viewportToLocalCoordinates(
+              clientX, 
+              clientY, 
+              plotContainer.current
+            ); */
 
-          updateTooltip({
-            visible: true,
-            data: point.customdata,
-            x: xOffset, 
-            y: yOffset,
-          });
+            updateTooltip({
+              visible: true,
+              data: point.customdata,
+              x: xOffset, 
+              y: yOffset,
+            });
+          }
         }}
         onRelayout={relayout => {
           updateTooltip({visible: false})
@@ -101,11 +103,11 @@ export function QQPlot({ onVariantLookup }) {
         onClose={e => updateTooltip({visible: false})}
         style={{
           width: '240px', 
-          border: `1px solid ${{
+          border: `1px solid ${tooltip.data ? {
             all: '#f2990d',
             female: '#f41c52',
             male: '#006bb8'
-          }[tooltip.data.sex] || '#ddd'}`
+          }[tooltip.data.sex] : '#ddd'}`
         }}
         className="text-left qq-plot-tooltip">
         {(!tooltip.data || (tooltip.data && -Math.log10(tooltip.data.p) < 3))
