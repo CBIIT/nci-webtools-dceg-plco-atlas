@@ -161,17 +161,17 @@ async function getSummary(connection, {phenotype_id, table, sex, p_value_nlog_mi
         phenotype_id = phenotypeRows[0].id;
     }
 
-    // determine number of variants
-    const [metadata] = await getMetadata(connection, {phenotype_id, sex, chromosome: 'all'});
-    const positionAbsPrecision = metadata.count > 1e7 ? -7 : -6;
-    const pValueNLogPrecision = metadata.count > 1e7 ? 1 : 2;
     const partition = quote(`${phenotype_id}_${sex}`);
+
+    // determine number of variants
+    const [maxPValueNlogRows] = await connection.query(`select max(p_value_nlog) from phenotype_aggregate partition (${partition})`);
+    const maxPValueNlog = pluck(maxPValueNlogRows)
+    const pValueNLogPrecision = maxPValueNlog > 20 ? 1 : 2;
 
     const sql = `
         SELECT DISTINCT 
             chromosome, 
             position_abs,
-            # ROUND(position_abs, ${positionAbsPrecision}) AS position_abs, 
             ROUND(p_value_nlog, ${pValueNLogPrecision}) as p_value_nlog
         FROM phenotype_aggregate partition(${partition})
         WHERE p_value_nlog > :p_value_nlog_min
