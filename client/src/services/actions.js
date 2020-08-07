@@ -270,7 +270,6 @@ export function drawQQPlot(phenotype, sex) {
         loadingQQPlot: true,
         qqplotData: [],
         qqplotLayout: {},
-        // sampleSize: null,
       }));
   
       const sexes = sex === 'stacked' ? ['female', 'male'] : [sex];
@@ -371,8 +370,10 @@ export function drawQQPlot(phenotype, sex) {
         qqplotLayout: layout,
         sampleSize: metadata.reduce((a, b) => a + b.count, 0),
       }));
-  
-      const data = await Promise.all(sexes.map(async sex => {
+      
+      let data = [];
+
+      await Promise.all(sexes.map(async sex => {
   
         // retrieve a subset of variants where show_qq_plot is true, and nlog_p is <= 3
         const subsetVariants = await query('points', {
@@ -413,7 +414,7 @@ export function drawQQPlot(phenotype, sex) {
           male: '#006bb8'
         }[sex];
   
-        return [
+        const newData =  [
           {
             x: [0, maxExpectedNLogP], // expected -log10(p)
             y: [0, maxExpectedNLogP], // expected -log10(p)
@@ -452,97 +453,14 @@ export function drawQQPlot(phenotype, sex) {
             },
           }
         ];
+        data.push(newData);
+        dispatch(updateQQPlot({ 
+          qqplotData: data.flat()
+        }));
       }));
-  
-  
-      // // the title property is only used for non-stacked plots
-      // // stacked plots use the legend instead as the title
-      // const title = sex === 'stacked' ? undefined : [
-      //   `<b>\u03BB</b> = ${metadata[0].lambda_gc}`,
-      //   `<b>Sample Size</b> = ${metadata[0].count.toLocaleString()}`,
-      // ].join(' '.repeat(5));
-  
-      // const layout = {
-      //   hoverlabel: {
-      //     bgcolor: "#fff",
-      //     bordercolor: '#bbb',
-      //     font: {
-      //       size: 14,
-      //       color: '#212529',
-      //       family: systemFont
-      //     },
-      //   },
-      //   dragmode: 'pan',
-      //   clickmode: 'event',
-      //   hovermode: 'closest',
-      //   // width: 800,
-      //   // height: 800,
-      //   autosize: true,
-      //   title: {
-      //     text: title,
-      //     font: {
-      //       family: systemFont,
-      //       size: 14,
-      //       color: 'black'
-      //     }
-      //   },
-      //   xaxis: {
-      //     automargin: true,
-      //     rangemode: 'tozero', // only show positive
-      //     showgrid: false, // disable grid lines
-      //     fixedrange: true, // disable zoom
-      //     title: {
-      //       text: '<b>Expected -log<sub>10</sub>(p)</b>',
-      //       font: {
-      //         family: 'Arial',
-      //         size: 14,
-      //         color: 'black'
-      //       }
-      //     },
-      //     tick0: 0,
-      //     ticklen: 10,
-      //     tickfont: {
-      //       family: systemFont,
-      //       size: 10,
-      //       color: 'black'
-      //     }
-      //   },
-      //   yaxis: {
-      //     automargin: true,
-      //     rangemode: 'tozero', // only show positive
-      //     showgrid: false, // disable grid lines
-      //     fixedrange: true, // disable zoom
-      //     title: {
-      //       text: '<b>Observed -log<sub>10</sub>(p)</b>',
-      //       font: {
-      //         family: systemFont,
-      //         size: 14,
-      //         color: 'black'
-      //       }
-      //     },
-      //     tick0: 0,
-      //     ticklen: 10,
-      //     tickfont: {
-      //       family: systemFont,
-      //       size: 10,
-      //       color: 'black'
-      //     }
-      //   },
-      //   showlegend: sex === 'stacked',
-      //   legend: {
-      //     itemclick: false,
-      //     itemdoubleclick: false,
-      //     orientation: "v",
-      //     x: 0.2,
-      //     y: 1.1
-      //   }
-      // };
-  
+
       dispatch(updateQQPlot({ 
         loadingQQPlot: false,
-        qqplotData: data.flat(),
-        // qqplotLayout: layout,
-        // sampleSize: metadata.reduce((a, b) => a + b.count, 0),
       }));
     } catch (e) {
       dispatch(updateError({visible: true}))
