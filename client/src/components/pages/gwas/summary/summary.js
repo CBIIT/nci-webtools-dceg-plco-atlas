@@ -22,6 +22,7 @@ import {
   fetchSummaryTable,
 } from '../../../../services/actions';
 import { getInitialState } from '../../../../services/store';
+import { Tooltip } from '../../../controls/tooltip/tooltip';
 import './summary.scss'
 
 
@@ -48,11 +49,6 @@ export function SummaryResults() {
 
   const [openSidebar, setOpenSidebar] = useState(true);
 
-  // qq plot tooltip data
-  const setPopupTooltipData = popupTooltipData => {
-    dispatch(updateSummaryResults({ popupTooltipData }));
-  };
-
   // selected tab
   const setSelectedPlot = selectedPlot => {
     dispatch(updateSummaryResults({ selectedPlot }));
@@ -78,11 +74,6 @@ export function SummaryResults() {
   // const handleChange = () => {
   //   clearMessages();
   // };
-
-  const hideQQTooltips = () => {
-    for (let el of document.querySelectorAll('.qq-plot-tooltip'))
-      el.remove();
-  };
 
   /**
    * Fetches initial results for variant tables
@@ -136,8 +127,7 @@ export function SummaryResults() {
     dispatch(
       updateQQPlot(initialState.qqPlot)
     );
-    hideQQTooltips();
-    
+
     let sexes = {
       all: ['all'],
       stacked: ['female', 'male'],
@@ -147,10 +137,6 @@ export function SummaryResults() {
 
     // determine which tables to use for manhattan plot
     // const aggregateTable = getAggregateTable(sex);
-
-    // close sidebar on submit
-    // setOpenSidebar(false);
-    setPopupTooltipData(null);
 
     if (selectedPlot === 'qq-plot'){
       dispatch(drawQQPlot(phenotype, sex));
@@ -196,8 +182,6 @@ export function SummaryResults() {
       phenotype: [...phenotype.title],
       sex: sex
     });
-    // if any Q-Q plot tooltips exist, destory
-    hideQQTooltips();
   };
 
   const handleReset = () => {
@@ -228,8 +212,6 @@ export function SummaryResults() {
       );
     }
 */
-    // if any Q-Q plot tooltips exist, destroy
-    hideQQTooltips();
   };
 
   // resubmit summary results
@@ -365,7 +347,6 @@ export function SummaryResults() {
       } else {
         // handle chromosome submission
         const range = ranges.find(r => r.chromosome === selectedChromosome);
-        setPopupTooltipData(null);
 
         if (selectedPlot === 'qq-plot') {
           dispatch(drawQQPlot(selectedPhenotype, selectedSex));
@@ -398,9 +379,6 @@ export function SummaryResults() {
     } else {
       // handle zoomed in view submission
       const range = ranges.find(r => r.chromosome === selectedChromosome);
-
-      // handle chromosome submission
-      setPopupTooltipData(null);
 
       if (selectedPlot === 'qq-plot') {
         dispatch(drawQQPlot(selectedPhenotype, selectedSex));

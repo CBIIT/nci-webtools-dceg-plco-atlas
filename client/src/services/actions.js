@@ -281,6 +281,96 @@ export function drawQQPlot(phenotype, sex) {
         chromosome: 'all',
         sex: sexes,
       });
+
+      // the title property is only used for non-stacked plots
+      // stacked plots use the legend instead as the title
+      const title = sex === 'stacked' ? undefined : [
+        `<b>\u03BB</b> = ${metadata[0].lambda_gc}`,
+        `<b>Sample Size</b> = ${metadata[0].count.toLocaleString()}`,
+      ].join(' '.repeat(5));
+  
+      const layout = {
+        hoverlabel: {
+          bgcolor: "#fff",
+          bordercolor: '#bbb',
+          font: {
+            size: 14,
+            color: '#212529',
+            family: systemFont
+          },
+        },
+        dragmode: 'pan',
+        clickmode: 'event',
+        hovermode: 'closest',
+        // width: 800,
+        // height: 800,
+        autosize: true,
+        title: {
+          text: title,
+          font: {
+            family: systemFont,
+            size: 14,
+            color: 'black'
+          }
+        },
+        xaxis: {
+          automargin: true,
+          rangemode: 'tozero', // only show positive
+          showgrid: false, // disable grid lines
+          fixedrange: true, // disable zoom
+          title: {
+            text: '<b>Expected -log<sub>10</sub>(p)</b>',
+            font: {
+              family: 'Arial',
+              size: 14,
+              color: 'black'
+            }
+          },
+          tick0: 0,
+          ticklen: 10,
+          tickfont: {
+            family: systemFont,
+            size: 10,
+            color: 'black'
+          }
+        },
+        yaxis: {
+          automargin: true,
+          rangemode: 'tozero', // only show positive
+          showgrid: false, // disable grid lines
+          fixedrange: true, // disable zoom
+          title: {
+            text: '<b>Observed -log<sub>10</sub>(p)</b>',
+            font: {
+              family: systemFont,
+              size: 14,
+              color: 'black'
+            }
+          },
+          tick0: 0,
+          ticklen: 10,
+          tickfont: {
+            family: systemFont,
+            size: 10,
+            color: 'black'
+          }
+        },
+        showlegend: sex === 'stacked',
+        legend: {
+          itemclick: false,
+          itemdoubleclick: false,
+          orientation: "v",
+          x: 0.2,
+          y: 1.1
+        }
+      };
+
+      dispatch(updateQQPlot({ 
+        // loadingQQPlot: false,
+        // qqplotData: data.flat(),
+        qqplotLayout: layout,
+        sampleSize: metadata.reduce((a, b) => a + b.count, 0),
+      }));
   
       const data = await Promise.all(sexes.map(async sex => {
   
@@ -365,99 +455,99 @@ export function drawQQPlot(phenotype, sex) {
       }));
   
   
-      // the title property is only used for non-stacked plots
-      // stacked plots use the legend instead as the title
-      const title = sex === 'stacked' ? undefined : [
-        `<b>\u03BB</b> = ${metadata[0].lambda_gc}`,
-        `<b>Sample Size</b> = ${metadata[0].count.toLocaleString()}`,
-      ].join(' '.repeat(5));
+      // // the title property is only used for non-stacked plots
+      // // stacked plots use the legend instead as the title
+      // const title = sex === 'stacked' ? undefined : [
+      //   `<b>\u03BB</b> = ${metadata[0].lambda_gc}`,
+      //   `<b>Sample Size</b> = ${metadata[0].count.toLocaleString()}`,
+      // ].join(' '.repeat(5));
   
-      const layout = {
-        hoverlabel: {
-          bgcolor: "#fff",
-          bordercolor: '#bbb',
-          font: {
-            size: 14,
-            color: '#212529',
-            family: systemFont
-          },
-        },
-        dragmode: 'pan',
-        clickmode: 'event',
-        hovermode: 'closest',
-        // width: 800,
-        // height: 800,
-        autosize: true,
-        title: {
-          text: title,
-          font: {
-            family: systemFont,
-            size: 14,
-            color: 'black'
-          }
-        },
-        xaxis: {
-          automargin: true,
-          rangemode: 'tozero', // only show positive
-          showgrid: false, // disable grid lines
-          fixedrange: true, // disable zoom
-          title: {
-            text: '<b>Expected -log<sub>10</sub>(p)</b>',
-            font: {
-              family: 'Arial',
-              size: 14,
-              color: 'black'
-            }
-          },
-          tick0: 0,
-          ticklen: 10,
-          tickfont: {
-            family: systemFont,
-            size: 10,
-            color: 'black'
-          }
-        },
-        yaxis: {
-          automargin: true,
-          rangemode: 'tozero', // only show positive
-          showgrid: false, // disable grid lines
-          fixedrange: true, // disable zoom
-          title: {
-            text: '<b>Observed -log<sub>10</sub>(p)</b>',
-            font: {
-              family: systemFont,
-              size: 14,
-              color: 'black'
-            }
-          },
-          tick0: 0,
-          ticklen: 10,
-          tickfont: {
-            family: systemFont,
-            size: 10,
-            color: 'black'
-          }
-        },
-        showlegend: sex === 'stacked',
-        legend: {
-          itemclick: false,
-          itemdoubleclick: false,
-          orientation: "v",
-          x: 0.2,
-          y: 1.1
-        }
-      };
+      // const layout = {
+      //   hoverlabel: {
+      //     bgcolor: "#fff",
+      //     bordercolor: '#bbb',
+      //     font: {
+      //       size: 14,
+      //       color: '#212529',
+      //       family: systemFont
+      //     },
+      //   },
+      //   dragmode: 'pan',
+      //   clickmode: 'event',
+      //   hovermode: 'closest',
+      //   // width: 800,
+      //   // height: 800,
+      //   autosize: true,
+      //   title: {
+      //     text: title,
+      //     font: {
+      //       family: systemFont,
+      //       size: 14,
+      //       color: 'black'
+      //     }
+      //   },
+      //   xaxis: {
+      //     automargin: true,
+      //     rangemode: 'tozero', // only show positive
+      //     showgrid: false, // disable grid lines
+      //     fixedrange: true, // disable zoom
+      //     title: {
+      //       text: '<b>Expected -log<sub>10</sub>(p)</b>',
+      //       font: {
+      //         family: 'Arial',
+      //         size: 14,
+      //         color: 'black'
+      //       }
+      //     },
+      //     tick0: 0,
+      //     ticklen: 10,
+      //     tickfont: {
+      //       family: systemFont,
+      //       size: 10,
+      //       color: 'black'
+      //     }
+      //   },
+      //   yaxis: {
+      //     automargin: true,
+      //     rangemode: 'tozero', // only show positive
+      //     showgrid: false, // disable grid lines
+      //     fixedrange: true, // disable zoom
+      //     title: {
+      //       text: '<b>Observed -log<sub>10</sub>(p)</b>',
+      //       font: {
+      //         family: systemFont,
+      //         size: 14,
+      //         color: 'black'
+      //       }
+      //     },
+      //     tick0: 0,
+      //     ticklen: 10,
+      //     tickfont: {
+      //       family: systemFont,
+      //       size: 10,
+      //       color: 'black'
+      //     }
+      //   },
+      //   showlegend: sex === 'stacked',
+      //   legend: {
+      //     itemclick: false,
+      //     itemdoubleclick: false,
+      //     orientation: "v",
+      //     x: 0.2,
+      //     y: 1.1
+      //   }
+      // };
   
       dispatch(updateQQPlot({ 
         loadingQQPlot: false,
         qqplotData: data.flat(),
-        qqplotLayout: layout,
-        sampleSize: metadata.reduce((a, b) => a + b.count, 0),
+        // qqplotLayout: layout,
+        // sampleSize: metadata.reduce((a, b) => a + b.count, 0),
       }));
     } catch (e) {
       dispatch(updateError({visible: true}))
       dispatch(updateQQPlot({ 
-        loadingQQPlot: false,
+        loadingQQPlot: true,
         qqplotData: [],
         qqplotLayout: {},
         sampleSize: null,
