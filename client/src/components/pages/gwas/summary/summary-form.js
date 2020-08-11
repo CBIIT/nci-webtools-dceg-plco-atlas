@@ -23,7 +23,10 @@ export function SummaryResultsForm({
   // const submitRef = useRef(null);
 
   // update state when props change
-  useEffect(() => _setPhenotype(phenotype), [phenotype]);
+  useEffect(() => {
+    _setPhenotype(phenotype)
+    handleExistingSex(phenotype);
+  }, [phenotype]);
   useEffect(() => _setSex(sex), [sex]);
 
   // select store members
@@ -37,10 +40,14 @@ export function SummaryResultsForm({
   const treeRef = useRef();
 
   const handleExistingSex = (chosen) => {
-    const existingSexes = phenotypes.metadata.filter((item) => item.phenotype_id === chosen.id).map((item) => item.sex).sort();
-    dispatch(updateSummaryResults({ existingSexes }));
-    if (existingSexes.length > 0) {
-      _setSex(existingSexes[0]);
+    if (chosen) {
+      const existingSexes = phenotypes.metadata.filter((item) => item.phenotype_id === chosen.id).map((item) => item.sex).sort();
+      dispatch(updateSummaryResults({ existingSexes }));
+      if (existingSexes.length > 0) {
+        _setSex(existingSexes[0]);
+      }
+    } else {
+      dispatch(updateSummaryResults({ existingSexes: [] }));
     }
   }
 
@@ -100,7 +107,7 @@ export function SummaryResultsForm({
         <select
           id="summary-results-sex"
           className="form-control"
-          value={_sex}
+          value={existingSexes.length === 0 ? 'empty-sex' : _sex}
           onChange={e => {
             _setSex(e.target.value);
             dispatch(updateSummaryResults({ disableSubmit: false }));
@@ -108,7 +115,7 @@ export function SummaryResultsForm({
           aria-label="Select sex"
           disabled={existingSexes.length === 0}>
             { existingSexes.length === 0 &&
-              <option value="" disabled selected>Select a phenotype</option>
+              <option value="empty-sex" disabled defaultValue>Select a phenotype</option>
             }
             <SexOptions />
         </select>

@@ -110,7 +110,7 @@ export function SummaryResults() {
   // when submitting:
   // 1. Fetch aggregate data for displaying manhattan plot(s)
   // 2. Fetch variant data for each selected sex
-  const handleSubmit = ({phenotype, sex}) => {
+  const handleSubmit = ({phenotype, sex, allChromosomeSelected}) => {
     if (!phenotype) {
       return setMessages([
         {
@@ -120,13 +120,15 @@ export function SummaryResults() {
       ]);
     }
     // clear Manhattan Plot and QQ-Plot before calculating
-    const initialState = getInitialState();
-    dispatch(
-      updateManhattanPlot(initialState.manhattanPlot)
-    );
-    dispatch(
-      updateQQPlot(initialState.qqPlot)
-    );
+    if (!allChromosomeSelected) {
+      const initialState = getInitialState();
+      dispatch(
+        updateManhattanPlot(initialState.manhattanPlot)
+      );
+      dispatch(
+        updateQQPlot(initialState.qqPlot)
+      );
+    }
 
     let sexes = {
       all: ['all'],
@@ -216,7 +218,7 @@ export function SummaryResults() {
 
   // resubmit summary results
   const onAllChromosomeSelected = () => {
-    handleSubmit({phenotype: selectedPhenotype, sex: selectedSex});
+    handleSubmit({phenotype: selectedPhenotype, sex: selectedSex, allChromosomeSelected: true});
   };
 
   // redraw plot and update table(s) for single chromosome selection
