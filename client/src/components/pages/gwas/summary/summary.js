@@ -479,18 +479,18 @@ export function SummaryResults() {
                 "p-2 bg-white tab-pane-bordered rounded-0"
               }
               style={{ minHeight: '365px' }}>
-              <div>
-                <ManhattanPlot
-                  onChromosomeSelected={onChromosomeSelected}
-                  onAllChromosomeSelected={onAllChromosomeSelected}
-                  onVariantLookup={handleVariantLookup}
-                  onZoom={handleZoom}
-                  loading={loadingManhattanPlot}
-                  panelCollapsed={openSidebar}
-                />
-                <div
-                  className="mw-100 my-4 px-5"
-                  style={{ display: submitted ? 'block' : 'none' }}>
+              <div style={{ display: submitted ? 'block' : 'none' }}>
+                <div style={{minHeight: '635px'}}>
+                  <ManhattanPlot
+                    onChromosomeSelected={onChromosomeSelected}
+                    onAllChromosomeSelected={onAllChromosomeSelected}
+                    onVariantLookup={handleVariantLookup}
+                    onZoom={handleZoom}
+                    loading={loadingManhattanPlot}
+                    panelCollapsed={openSidebar}
+                  />
+                </div>
+                <div className="mw-100 my-4 px-5">
                   <SummaryResultsTable />
                 </div>
               </div>
