@@ -708,7 +708,7 @@ export function ManhattanPlot({
 
   if (loading && !hasData()) {
     return <div style={{ minHeight: '600px', position: 'relative', marginTop: '2.5rem' }}>
-      <LoadingOverlay active={loading} {...plotOverlayConfig} />
+      {loading && <LoadingOverlay active={loading} {...plotOverlayConfig} />}
       <div className="manhattan-plot" ref={plotPlaceholderContainer} />
     </div>
   }
@@ -716,7 +716,7 @@ export function ManhattanPlot({
   return (
     <div
       style={{ display: hasData() ? 'block' : 'none', position: 'relative' }}>
-      <LoadingOverlay active={loading} {...plotOverlayConfig} />
+      {loading && <LoadingOverlay active={loading} {...plotOverlayConfig} />}
 
       <div className="d-flex align-items-center justify-content-between mx-4 mt-3">
         <div
