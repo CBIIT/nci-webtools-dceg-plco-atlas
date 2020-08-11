@@ -70,6 +70,7 @@ export function QQPlot({ onVariantLookup }) {
         onHover={data => {
           const [point] = data.points;
           if (point.customdata) {
+            // console.log(point.customdata);
             const {xaxis, yaxis} = point;
             const xOffset = xaxis.l2p(point.x) + xaxis._offset;
             const yOffset = yaxis.l2p(point.y) + yaxis._offset;
@@ -90,6 +91,30 @@ export function QQPlot({ onVariantLookup }) {
             });
           }
         }}
+        // onClick={data => {
+        //   const [point] = data.points;
+        //   if (point.customdata) {
+        //     console.log("clicked", point.customdata);
+        //     const {xaxis, yaxis} = point;
+        //     const xOffset = xaxis.l2p(point.x) + xaxis._offset;
+        //     const yOffset = yaxis.l2p(point.y) + yaxis._offset;
+
+        //     /* Use event.clientX/Y if we want to position the tooltip at the cursor (instead of point)
+        //     const {clientX, clientY} = data.event;
+        //     const {x, y} = viewportToLocalCoordinates(
+        //       clientX, 
+        //       clientY, 
+        //       plotContainer.current
+        //     ); */
+
+        //     updateTooltip({
+        //       visible: true,
+        //       data: point.customdata,
+        //       x: xOffset, 
+        //       y: yOffset,
+        //     });
+        //   }
+        // }}
         onRelayout={relayout => {
           updateTooltip({visible: false})
         }}
@@ -114,6 +139,7 @@ export function QQPlot({ onVariantLookup }) {
           ? <div>No information displayed for variants with -log<sub>10</sub>(p) &lt; 3.</div> 
           : <div>
               {tooltip.data.chromosome && tooltip.data.position && <div><b>position:</b> {tooltip.data.chromosome}:{tooltip.data.position}</div>}
+              {/* {tooltip.data.expected_p && <div><b>expected p-value:</b> {(+tooltip.data.expected_p || 0).toPrecision(5)}</div>} */}
               {tooltip.data.p && <div><b>p-value:</b> {(+tooltip.data.p || 0).toPrecision(5)}</div>}
               {tooltip.data.snp && <div><b>snp:</b> {tooltip.data.snp || 'N/A'}</div>}
               {(tooltip.data.snp || (tooltip.data.chromosome && tooltip.data.position)) && 
