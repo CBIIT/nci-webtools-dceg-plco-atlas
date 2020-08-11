@@ -11,6 +11,7 @@ import { Icon } from '../../../controls/icon/icon';
 import { createElement as h, removeChildren } from '../../../plots/custom/utils';
 import { systemFont } from '../../../plots/custom/text';
 import { updateSummaryResults, updateManhattanPlot } from '../../../../services/actions';
+import { CHECKBOX_STATUS_CHECKED } from 'react-bootstrap-table-next';
 
 export function ManhattanPlot({
   onAllChromosomeSelected,
@@ -23,6 +24,7 @@ export function ManhattanPlot({
   const dispatch = useDispatch();
   const [genePlotCollapsed, setGenePlotCollapsed] = useState(false);
   const plotContainer = useRef(null);
+  const plotPlaceholderContainer = useRef(null);
   const plot = useRef(null);
 
   const {
@@ -49,15 +51,15 @@ export function ManhattanPlot({
     manhattanPlotData.data.length;
 
   const setManhattanPlotConfig = manhattanPlotConfig => {
-    dispatch(updateManhattanPlot({manhattanPlotConfig}))
+    dispatch(updateManhattanPlot({ manhattanPlotConfig }))
   }
 
   const setZoomStack = zoomStack => {
-    dispatch(updateManhattanPlot({zoomStack}))
+    dispatch(updateManhattanPlot({ zoomStack }))
   }
 
   const setGenes = genes => {
-    dispatch(updateManhattanPlot({genes}))
+    dispatch(updateManhattanPlot({ genes }))
   }
 
   const colors = {
@@ -96,16 +98,16 @@ export function ManhattanPlot({
         manhattanPlotView === 'summary'
           ? getMirroredSummaryPlot(manhattanPlotData, manhattanPlotMirroredData)
           : getMirroredChromosomePlot(
-              manhattanPlotData,
-              manhattanPlotMirroredData
-            );
+            manhattanPlotData,
+            manhattanPlotMirroredData
+          );
     } else {
       params =
         manhattanPlotView === 'summary'
           ? getSummaryPlot(manhattanPlotData)
           : getChromosomePlot(manhattanPlotData);
     }
-    let config = {...params};
+    let config = { ...params };
     config.genes = genes;
     config.zoomStack = zoomStack;
 
@@ -146,6 +148,94 @@ export function ManhattanPlot({
   useEffect(() => {
     plot.current && plot.current.redraw();
   }, [panelCollapsed]);
+
+  useEffect(() => {
+    let plot;
+    if (loading && !hasData()) {
+      let config = {
+        data: [{x: 0, y: 0}, {x: 1, y: 1}],
+        title: [
+          {
+            text: selectedPhenotype.title,
+            font: `600 16px ${systemFont}`
+          }
+        ],
+        xAxis: {
+          title: [],
+          key: 'x',
+          ticks: [],
+        },
+        yAxis: {
+          key: 'y',
+          ticks: [],
+          title: [
+            { text: `-log`, font: `600 14px ${systemFont}` },
+            {
+              text: '10',
+              textBaseline: 'middle',
+              font: `600 10px ${systemFont}`
+            },
+            { text: `(p)`, font: `600 14px ${systemFont}` }
+          ],
+        },
+        lines: [{ y: -Math.log10(5e-8), style: 'dashed' }],
+        point: {
+          size: 1,
+          interactiveSize: 1,
+          opacity: 0,
+        },
+      }
+
+      let stackedConfig = {
+        mirrored: true,
+        data: [{x: 0, y: 0}, {x: 1, y: 1}],
+        data2: [{x: 0, y: 0}, {x: 1, y: 1}],
+        title: [
+          {
+            text: selectedPhenotype.title,
+            font: `600 16px ${systemFont}`
+          }
+        ],
+        xAxis: {
+          key: 'x',
+          ticks: [],
+          title: [],
+        },
+        yAxis: {
+          key: 'y',
+          ticks: [],
+          title: [
+            { text: `-log`, font: `600 14px ${systemFont}` },
+            {
+              text: '10',
+              textBaseline: 'middle',
+              font: `600 10px ${systemFont}`
+            },
+            { text: `(p)`, font: `600 14px ${systemFont}` }
+          ],
+          secondaryTitle: [{ text: `Female`, font: `600 11px ${systemFont}` }],
+        },
+        yAxis2: {
+          key: 'x',
+          ticks: [],
+          secondaryTitle: [{ text: `Male`, font: `600 11px ${systemFont}` }]
+        },
+        lines: [{ y: 0, style: 'dashed' }],
+        point: {
+          size: 1,
+          interactiveSize: 1,
+          opacity: 0,
+        }  
+      }
+
+      let plotConfig = selectedSex === 'stacked'
+        ? stackedConfig
+        : config;
+
+      plot = new Plot(plotPlaceholderContainer.current, plotConfig);
+    }
+    return () => plot && plot.destroy();
+  }, [loading]);
 
   function getMirroredSummaryPlot(plotData, mirroredPlotData) {
     let columnIndexes = {
@@ -247,7 +337,7 @@ export function ManhattanPlot({
         let { xAxis, zoomStack } = config;
         let stack = [...zoomStack]; // need new reference, since zoomStack updates
         let zoomRange = Math.abs(xAxis.extent[1] - xAxis.extent[0]);
-        setManhattanPlotConfig({...config});
+        setManhattanPlotConfig({ ...config });
         setZoomStack(stack);
         onZoom(e);
 
@@ -392,8 +482,8 @@ export function ManhattanPlot({
         size: 2,
         opacity: 1,
         color: (d, i) => (d[columnIndexes.chr] % 2
-            ? colors[selectedSex].light
-            : colors[selectedSex].dark) //#e47833')
+          ? colors[selectedSex].light
+          : colors[selectedSex].dark) //#e47833')
       },
       lines: [{ y: -Math.log10(5e-8) }]
     };
@@ -437,7 +527,7 @@ export function ManhattanPlot({
         let { xAxis, zoomStack } = config;
         let stack = [...zoomStack]; // need new reference, since zoomStack updates
         let zoomRange = Math.abs(xAxis.extent[1] - xAxis.extent[0]);
-        setManhattanPlotConfig({...config});
+        setManhattanPlotConfig({ ...config });
         setZoomStack(stack);
         onZoom(e);
 
@@ -565,7 +655,7 @@ export function ManhattanPlot({
       } else {
         zoomStack.pop();
         let window = zoomStack[zoomStack.length - 1];
-        plot.current.config.setZoomWindow({...window})
+        plot.current.config.setZoomWindow({ ...window })
         setZoomStack([...zoomStack]);
         // plot.current.config.zoomOut();
       }
@@ -608,7 +698,7 @@ export function ManhattanPlot({
 
   useEffect(() => {
     if (plot.current && restoredZoomLevel) {
-      plot.current.config.setZoomWindow({bounds: restoredZoomLevel})
+      plot.current.config.setZoomWindow({ bounds: restoredZoomLevel })
       dispatch(updateManhattanPlot({
         restoredZoomLevel: null
       }))
@@ -616,10 +706,17 @@ export function ManhattanPlot({
 
   }, [restoredZoomLevel, plot.current])
 
+  if (loading && !hasData()) {
+    return <div style={{ minHeight: '600px', position: 'relative', marginTop: '2.5rem' }}>
+      <LoadingOverlay active={loading} {...plotOverlayConfig} />
+      <div className="manhattan-plot" ref={plotPlaceholderContainer} />
+    </div>
+  }
+
   return (
     <div
       style={{ display: hasData() ? 'block' : 'none', position: 'relative' }}>
-      {loading && <LoadingOverlay active={loading} {...plotOverlayConfig} />}
+      <LoadingOverlay active={loading} {...plotOverlayConfig} />
 
       <div className="d-flex align-items-center justify-content-between mx-4 mt-3">
         <div
@@ -669,7 +766,7 @@ export function ManhattanPlot({
           rel="tooltip"
           href="javascript:void(0)"
           onClick={e => plot.current.exportPng(2000, 3000, getFilename())}>
-            Export
+          Export
         </a>
       </div>
 
@@ -720,9 +817,9 @@ export function ManhattanPlot({
               onClick={e => setGenePlotCollapsed(!genePlotCollapsed)}>
               {genePlotCollapsed
                 ? <a
-                      href="javascript:void(0)"
-                      className="d-flex-inline align-items-center mr-5">
-                    Show Gene Plot
+                  href="javascript:void(0)"
+                  className="d-flex-inline align-items-center mr-5">
+                  Show Gene Plot
                   </a>
                 : <Icon name="angle-up" width="10" title="Hide Gene Plot" />
               }
