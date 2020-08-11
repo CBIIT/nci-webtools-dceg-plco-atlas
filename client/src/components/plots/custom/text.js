@@ -10,11 +10,13 @@ export const systemFont = `-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto
   'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'`;
 
 export function renderText(ctx, textDefs, defaultDef) {
+  if (!textDefs) return null;
   ctx.save();
   defaultDef = Object.assign({}, defaultTextDef, defaultDef);
 
   let lastOffset = 0;
-  if (typeof textDefs === 'string') textDefs = [{ text: textDefs }];
+  if (typeof textDefs === 'string' || typeof textDefs === 'number') textDefs = [{ text: textDefs }];
+  console.log(textDefs);
 
   textDefs.forEach(function(def) {
     if (typeof def === 'string') def = { text: def };
@@ -27,8 +29,11 @@ export function renderText(ctx, textDefs, defaultDef) {
 }
 
 export function measureWidth(ctx, textDefs, defaultDef) {
+  if (!textDefs) return null;
+
   let lastOffset = 0;
-  if (typeof textDefs === 'string') textDefs = [{ text: textDefs }];
+  if (typeof textDefs === 'string' || typeof textDefs === 'number') textDefs = [{ text: textDefs }];
+  console.log(textDefs);
 
   textDefs.forEach(function(def) {
     if (typeof def === 'string') def = { text: def };
