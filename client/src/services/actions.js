@@ -396,9 +396,7 @@ export function drawQQPlot(phenotype, sex) {
           columns: [
             'p_value_nlog_expected', 
             'p_value_nlog', 
-            'chromosome', 
-            'position', 
-            'snp'
+            'id'
           ],
           sex,
           p_value_nlog_min: 3,
@@ -442,10 +440,8 @@ export function drawQQPlot(phenotype, sex) {
               sex,
               // properties below will be undefined for subsetVariants.data
               // we can use this to differentiate between these two datasets in each trace
-              chromosome: d[2],
-              position: d[3],
-              snp: d[4],
               p: Math.pow(10, -d[1]),
+              variantId: d[2]
               // expected_p: Math.pow(10, -d[0])
             })),
             name: `${titleCase(sex)}     <b>\u03BB</b> = ${lambda_gc}     <b>Sample Size</b> = ${count.toLocaleString()}`,
