@@ -174,7 +174,6 @@ function exportVariants({
     const exportVariantFilePath = path.resolve(outputFilePath, `${phenotypeId}.${sex}.variant.csv`);
     const exportAggregateFilePath = path.resolve(outputFilePath, `${phenotypeId}.${sex}.aggregate.csv`);
     const exportMetadataFilePath = path.resolve(outputFilePath, `${phenotypeId}.${sex}.metadata.csv`);
-    const exportDatabaseFilePath = path.resolve(outputFilePath, `${phenotypeId}.${sex}.db`);
     const exportVariantTmpFilePath = path.resolve(tmpFilePath, `${phenotypeId}.${sex}.variant.csv`);
     const exportAggregateTmpFilePath = path.resolve(tmpFilePath, `${phenotypeId}.${sex}.aggregate.csv`);
     const exportMetadataTmpFilePath = path.resolve(tmpFilePath, `${phenotypeId}.${sex}.metadata.csv`);
@@ -186,8 +185,7 @@ function exportVariants({
         databaseFilePath, 
         exportVariantFilePath,
         exportAggregateFilePath,
-        exportMetadataFilePath,
-        exportDatabaseFilePath
+        exportMetadataFilePath
     ]) {
         if (fs.existsSync(filepath)) {
             console.warn(`WARNING: File already exists. ${filepath} will be deleted.`);
@@ -488,10 +486,6 @@ function exportVariants({
     ].join('\n'));
 
     if (outputFilePath !== tmpFilePath) {
-        console.log(`[${duration()} s] Copying ${databaseFilePath} to ${exportDatabaseFilePath}...`);
-        fs.copyFileSync(databaseFilePath, exportDatabaseFilePath);
-        console.log(`[${duration()} s] Done`);
-
         console.log(`[${duration()} s] Copying ${exportVariantTmpFilePath} to ${exportVariantFilePath}...`);
         fs.copyFileSync(exportVariantTmpFilePath, exportVariantFilePath);
         console.log(`[${duration()} s] Done`);
