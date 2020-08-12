@@ -280,7 +280,7 @@ async function getVariants(connectionPool, params) {
         FROM phenotype_variant partition(${partitions.join(',')})
         ${conditions.length ? `WHERE ${conditions}` : ''}
         ${params.orderBy ? `ORDER BY ${orderBy} ${order}` : ''}
-        LIMIT ${offset}, ${limit};
+        ${params.limit ? `LIMIT ${offset}, ${limit}` : ''};
     `;
 
     logger.debug(`getVariants sql: ${sql}`);
@@ -368,7 +368,7 @@ async function getPoints(connectionPool, params) {
         FROM phenotype_point partition(${partitions.join(',')})
         ${conditions.length ? `WHERE ${conditions}` : ''}
         ${params.orderBy ? `ORDER BY ${orderBy} ${order}` : ''}
-        LIMIT ${offset}, ${limit};
+        ${params.limit ? `LIMIT ${offset}, ${limit}` : ''};
     `;
 
     logger.debug(`getPoints sql: ${sql}`);

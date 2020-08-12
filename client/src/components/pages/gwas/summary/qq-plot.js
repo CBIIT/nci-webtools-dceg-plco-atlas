@@ -4,9 +4,14 @@ import { useSelector } from 'react-redux';
 import { PlotlyWrapper as Plot } from '../../../plots/plotly/plotly-wrapper';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
 import { Tooltip } from '../../../controls/tooltip/tooltip';
+import { query } from '../../../../services/query';
 
 
 export function QQPlot({ onVariantLookup }) {
+  const {
+    selectedPhenotype,
+  } = useSelector(state => state.summaryResults);
+
   const {
     loadingQQPlot,
     qqplotData,
@@ -72,8 +77,8 @@ export function QQPlot({ onVariantLookup }) {
           if (point.customdata) {
             // console.log(point.customdata);
             const {xaxis, yaxis} = point;
-            const xOffset = xaxis.l2p(point.x) + xaxis._offset;
-            const yOffset = yaxis.l2p(point.y) + yaxis._offset;
+            const xOffset = xaxis.l2p(point.x) + xaxis._offset + 5;
+            const yOffset = yaxis.l2p(point.y) + yaxis._offset + 5;
 
             /* Use event.clientX/Y if we want to position the tooltip at the cursor (instead of point)
             const {clientX, clientY} = data.event;
@@ -91,30 +96,42 @@ export function QQPlot({ onVariantLookup }) {
             });
           }
         }}
-        // onClick={data => {
-        //   const [point] = data.points;
-        //   if (point.customdata) {
-        //     console.log("clicked", point.customdata);
-        //     const {xaxis, yaxis} = point;
-        //     const xOffset = xaxis.l2p(point.x) + xaxis._offset;
-        //     const yOffset = yaxis.l2p(point.y) + yaxis._offset;
+        onClick={ async data => {
+          const [point] = data.points;
+          if (point.customdata) {
+            const response = await query('variants', {
+              columns: [
+                'chromosome',
+                'position',
+                'snp'
+              ],
+              phenotype_id: selectedPhenotype.id,
+              id: point.customdata.variantId
+            });
+            const record = response.data[0];
+            const {xaxis, yaxis} = point;
+            const xOffset = xaxis.l2p(point.x) + xaxis._offset + 5;
+            const yOffset = yaxis.l2p(point.y) + yaxis._offset + 5;
 
-        //     /* Use event.clientX/Y if we want to position the tooltip at the cursor (instead of point)
-        //     const {clientX, clientY} = data.event;
-        //     const {x, y} = viewportToLocalCoordinates(
-        //       clientX, 
-        //       clientY, 
-        //       plotContainer.current
-        //     ); */
+            /* Use event.clientX/Y if we want to position the tooltip at the cursor (instead of point)
+            const {clientX, clientY} = data.event;
+            const {x, y} = viewportToLocalCoordinates(
+              clientX, 
+              clientY, 
+              plotContainer.current
+            ); */
 
-        //     updateTooltip({
-        //       visible: true,
-        //       data: point.customdata,
-        //       x: xOffset, 
-        //       y: yOffset,
-        //     });
-        //   }
-        // }}
+            updateTooltip({
+              visible: true,
+              data: {
+                ...point.customdata,
+                ...record
+              },
+              x: xOffset, 
+              y: yOffset,
+            });
+          }
+        }}
         onRelayout={relayout => {
           updateTooltip({visible: false})
         }}
@@ -142,6 +159,7 @@ export function QQPlot({ onVariantLookup }) {
               {/* {tooltip.data.expected_p && <div><b>expected p-value:</b> {(+tooltip.data.expected_p || 0).toPrecision(5)}</div>} */}
               {tooltip.data.p && <div><b>p-value:</b> {(+tooltip.data.p || 0).toPrecision(5)}</div>}
               {tooltip.data.snp && <div><b>snp:</b> {tooltip.data.snp || 'N/A'}</div>}
+              {!tooltip.data.snp && <div><b>Click Point for Details</b></div>}
               {(tooltip.data.snp || (tooltip.data.chromosome && tooltip.data.position)) && 
                 <div>
                   <a 
