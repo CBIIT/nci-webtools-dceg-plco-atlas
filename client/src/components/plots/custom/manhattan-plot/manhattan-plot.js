@@ -627,7 +627,7 @@ export class ManhattanPlot {
       pan.deltaX = pan.currentX - pan.initialX;
       let deltaX = Math.abs(pan.scale(pan.deltaX) / 1e6).toPrecision(4);
       let title = [{
-        text: `${pan.deltaX > 0 ? '🡪' : '🡨'} ${deltaX} MB`,
+        text: `${pan.deltaX > 0 ? '+' : '-'} ${deltaX} MB`,
         font: `24px ${systemFont}`
       }];
 
