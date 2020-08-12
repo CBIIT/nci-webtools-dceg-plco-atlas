@@ -3,6 +3,7 @@ const server = require("fastify");
 const cors = require("fastify-cors");
 const compress = require("fastify-compress");
 const static = require("fastify-static");
+const serverTimeout = require('fastify-server-timeout')
 const logger = require("./logger");
 const { port } = require("./config.json");
 const {
@@ -27,6 +28,7 @@ logger.info(`[${process.pid}] Started process`);
 const app = server({ ignoreTrailingSlash: true });
 app.register(compress);
 app.register(cors);
+app.register(serverTimeout, {serverTimeout: 1000 * 60 * 20}); // 20 min timeout
 app.register(static, {
   root: path.resolve("www")
 });
