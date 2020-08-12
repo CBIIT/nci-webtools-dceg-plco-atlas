@@ -77,8 +77,8 @@ export function QQPlot({ onVariantLookup }) {
           if (point.customdata) {
             // console.log(point.customdata);
             const {xaxis, yaxis} = point;
-            const xOffset = xaxis.l2p(point.x) + xaxis._offset;
-            const yOffset = yaxis.l2p(point.y) + yaxis._offset;
+            const xOffset = xaxis.l2p(point.x) + xaxis._offset + 5;
+            const yOffset = yaxis.l2p(point.y) + yaxis._offset + 5;
 
             /* Use event.clientX/Y if we want to position the tooltip at the cursor (instead of point)
             const {clientX, clientY} = data.event;
@@ -110,8 +110,8 @@ export function QQPlot({ onVariantLookup }) {
             });
             const record = response.data[0];
             const {xaxis, yaxis} = point;
-            const xOffset = xaxis.l2p(point.x) + xaxis._offset;
-            const yOffset = yaxis.l2p(point.y) + yaxis._offset;
+            const xOffset = xaxis.l2p(point.x) + xaxis._offset + 5;
+            const yOffset = yaxis.l2p(point.y) + yaxis._offset + 5;
 
             /* Use event.clientX/Y if we want to position the tooltip at the cursor (instead of point)
             const {clientX, clientY} = data.event;
