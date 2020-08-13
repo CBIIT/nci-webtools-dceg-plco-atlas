@@ -84,7 +84,7 @@ export function SummaryResults() {
   const fetchVariantTables = (selectedPhenotype, selectedSex, params = {}) => {
     let sexes = {
       all: ['all'],
-      stacked: ['female', 'male'],
+      stacked:  ['female'], // ['female', 'male'], // lazy-load options
       female: ['female'],
       male: ['male'],
     }[selectedSex];

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   updateKey,
@@ -32,6 +32,11 @@ export function SummaryResultsTable() {
   } = useSelector(state => state.summaryResults);
 
   let [sex, setSex] = useState('female');
+
+  // reset stacked sex to female when phenotype changes
+  useEffect(() => {
+    setSex('female');
+  }, [selectedPhenotype, selectedSex])
 
   const defaultSorted = [{
     dataField: 'p',
@@ -74,8 +79,8 @@ export function SummaryResultsTable() {
       headerTitle: _ => 'Odds Ratio [95% Confidence Interval]',
       formatter: (cell, row, rowIndex) => {
         const isUndefined = value => value === null || value === undefined;
-        return (+cell).toFixed(3) + (isUndefined(row.ci_95_low) || isUndefined(row.ci_95_high) 
-          ? '' 
+        return (+cell).toFixed(3) + (isUndefined(row.ci_95_low) || isUndefined(row.ci_95_high)
+          ? ''
           : ` [${+row.ci_95_low.toFixed(3)} - ${+row.ci_95_high.toFixed(3)}]`);
       },
       headerStyle: {
@@ -88,6 +93,33 @@ export function SummaryResultsTable() {
       sort: true
     }
   ].filter(Boolean);
+
+  const updateSummaryTable = (key, params) => {
+    if (!selectedPhenotype || !selectedPhenotype.value) return;
+    // console.log({ order, orderBy, limit, page, bpMin, bpMax });
+
+    // run a count query against the results only if results have been filtered
+    let shouldCount = !!(nlogpMin || nlogpMax || bpMin || bpMax);
+
+    dispatch(
+      fetchSummaryTable(key, {
+        offset: 0,
+        phenotype_id: selectedPhenotype.id,
+        sex: selectedSex === 'stacked' ? key : selectedSex,
+        chromosome: selectedChromosome,
+        count: shouldCount,
+        // key: shouldCount ? null : countKey,
+        limit: 10,
+        p_value_nlog_min: nlogpMin,
+        p_value_nlog_max: nlogpMax,
+        position_min: bpMin,
+        position_max: bpMax,
+        ...params
+      },
+        shouldCount ? {} : { resultsCount: summaryTables[key].resultsCount }
+      )
+    );
+  }
 
   const handleTableChange = async (
     key,
@@ -105,27 +137,14 @@ export function SummaryResultsTable() {
     //     ? `count_${key}_${selectedChromosome}`
     //     : `count_${key}`;
 
-    console.log('counts', {...summaryTables[key]})
+    // console.log('counts', { ...summaryTables[key] })
 
-    dispatch(
-      fetchSummaryTable(key, {
-          offset: limit * (page - 1),
-          phenotype_id: selectedPhenotype.id,
-          sex: selectedSex === 'stacked' ? sex : selectedSex,
-          chromosome: selectedChromosome,
-          count: shouldCount,
-          // key: shouldCount ? null : countKey,
-          limit,
-          orderBy,
-          order,
-          p_value_nlog_min: nlogpMin,
-          p_value_nlog_max: nlogpMax,
-          position_min: bpMin,
-          position_max: bpMax
-        },
-        shouldCount ? {} : {resultsCount: summaryTables[key].resultsCount}
-      )
-    );
+    updateSummaryTable(key, {
+      offset: limit * (page - 1),
+      limit,
+      orderBy,
+      order,
+    })
   };
 
   const setSnp = snp => {
@@ -153,7 +172,7 @@ export function SummaryResultsTable() {
   };
 
   const handleSnpReset = () => {
-    const {summarySnpTables} = getInitialState();
+    const { summarySnpTables } = getInitialState();
     dispatch(
       updateKey('summarySnpTables', summarySnpTables)
     );
@@ -194,7 +213,7 @@ export function SummaryResultsTable() {
               </button>
               <button
                 className={`btn btn-sm ${sex === 'male' ? 'btn-primary btn-primary-gradient active' : 'btn-silver'}`}
-                onClick={e => setSex('male')}>
+                onClick={e => {setSex('male'); updateSummaryTable('male', {metadataCount: true})}}>
                 Male
               </button>
             </div>}
@@ -234,14 +253,14 @@ export function SummaryResultsTable() {
       {summarySnpTables.visible && <>
         {/^(all|male|female)$/.test(selectedSex) &&
           <Table
-            key={`single-snp-table${sex}`} 
+            key={`single-snp-table${sex}`}
             keyField="variant_id"
             data={summarySnpTables[selectedSex].results}
             columns={columns} />}
 
         {/^stacked$/.test(selectedSex) &&
           <Table
-            key={`stacked-snp-table${sex}`} 
+            key={`stacked-snp-table${sex}`}
             keyField="variant_id"
             data={summarySnpTables[sex].results}
             columns={columns} />}
