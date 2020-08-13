@@ -285,7 +285,7 @@ export function drawQQPlot(phenotype, sex) {
       // stacked plots use the legend instead as the title
       const title = sex === 'stacked' ? undefined : [
         `<b>\u03BB</b> = ${metadata[0].lambda_gc}`,
-        `<b>Sample Size</b> = ${metadata[0].count.toLocaleString()}`,
+        `<b>Number of Variants</b> = ${metadata[0].count.toLocaleString()}`,
       ].join(' '.repeat(5));
   
       const layout = {
@@ -444,7 +444,7 @@ export function drawQQPlot(phenotype, sex) {
               variantId: d[2]
               // expected_p: Math.pow(10, -d[0])
             })),
-            name: `${titleCase(sex)}     <b>\u03BB</b> = ${lambda_gc}     <b>Sample Size</b> = ${count.toLocaleString()}`,
+            name: `${titleCase(sex)}     <b>\u03BB</b> = ${lambda_gc}     <b>Number of Variants</b> = ${count.toLocaleString()}`,
             mode: 'markers',
             type: 'scattergl',
             hoverinfo: 'none',
