@@ -159,7 +159,37 @@ export function QQPlot({ onVariantLookup }) {
               {/* {tooltip.data.expected_p && <div><b>expected p-value:</b> {(+tooltip.data.expected_p || 0).toPrecision(5)}</div>} */}
               {tooltip.data.p && <div><b>p-value:</b> {(+tooltip.data.p || 0).toPrecision(5)}</div>}
               {tooltip.data.snp && <div><b>snp:</b> {tooltip.data.snp || 'N/A'}</div>}
-              {!tooltip.data.snp && <div><b>Click Point for Details</b></div>}
+              {!tooltip.data.snp && 
+                <div className="text-secondary">
+                  <small>
+                    Click on Point or 
+                    <a 
+                      href="javascript:void(0)"
+                      className="mx-1"
+                      onClick={async _ => {
+                        const response = await query('variants', {
+                          columns: [
+                            'chromosome',
+                            'position',
+                            'snp'
+                          ],
+                          phenotype_id: selectedPhenotype.id,
+                          id: tooltip.data.variantId
+                        });
+                        const record = response.data[0];
+                        updateTooltip({
+                          data: {
+                            ...tooltip.data,
+                            ...record
+                          }
+                        });
+                      }}>
+                      here
+                    </a> 
+                    for details
+                  </small>
+                </div>
+              }
               {(tooltip.data.snp || (tooltip.data.chromosome && tooltip.data.position)) && 
                 <div>
                   <a 
