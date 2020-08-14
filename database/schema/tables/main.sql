@@ -166,7 +166,7 @@ CREATE TABLE IF NOT EXISTS `gene` (
     `exon_ends` MEDIUMTEXT
 );
 
-CREATE TABLE IF NOT EXISTS phenotype_variant_test (
+CREATE TABLE IF NOT EXISTS phenotype_variant (
     id BIGINT AUTO_INCREMENT NOT NULL,
     phenotype_id INTEGER NOT NULL,
     sex ENUM('all', 'female', 'male') NOT NULL,
