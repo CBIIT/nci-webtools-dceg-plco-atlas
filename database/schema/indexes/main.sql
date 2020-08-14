@@ -35,7 +35,6 @@ ALTER TABLE phenotype_aggregate
 
 -- variant points
 ALTER TABLE phenotype_point
-    ADD INDEX idx_phenotype_point__p_value_nlog       (p_value_nlog),
-    ADD INDEX idx_phenotype_point__position           (position);
+    ADD INDEX idx_phenotype_point__p_value_nlog       (p_value_nlog);
     
 

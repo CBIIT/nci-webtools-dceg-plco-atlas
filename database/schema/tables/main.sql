@@ -166,7 +166,7 @@ CREATE TABLE IF NOT EXISTS `gene` (
     `exon_ends` MEDIUMTEXT
 );
 
-CREATE TABLE IF NOT EXISTS phenotype_variant (
+CREATE TABLE IF NOT EXISTS phenotype_variant_test (
     id BIGINT AUTO_INCREMENT NOT NULL,
     phenotype_id INTEGER NOT NULL,
     sex ENUM('all', 'female', 'male') NOT NULL,
@@ -271,9 +271,6 @@ CREATE TABLE IF NOT EXISTS phenotype_point
 	id bigint auto_increment,
 	phenotype_id int not null,
 	sex enum('all', 'female', 'male') not null,
-	chromosome enum('1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', 'X', 'Y') not null,
-	position int not null,
-	snp varchar(200) not null,
 	p_value_nlog double null,
 	p_value_nlog_expected double null,
 	primary key (id, phenotype_id, sex)

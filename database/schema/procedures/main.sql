@@ -95,10 +95,10 @@ CREATE PROCEDURE update_phenotype_point()
     -- insert variants into partition
     call execute_sql(CONCAT('
         INSERT INTO phenotype_point PARTITION (`', phenotype_id, '_', sex, '`)
-        (phenotype_id, sex, chromosome, position, snp, p_value_nlog, p_value_nlog_expected)
-        SELECT ', phenotype_id, ', "', sex, '", chromosome, position, snp, p_value_nlog, p_value_nlog_expected
+        (phenotype_id, sex, p_value_nlog, p_value_nlog_expected)
+        SELECT ', phenotype_id, ', "', sex, '", p_value_nlog, p_value_nlog_expected
         FROM phenotype_variant PARTITION (`', phenotype_id, '_', sex, '`)
-        WHERE show_qq_plot = 1 OR p_value_nlog > 3'
+        WHERE show_qq_plot = 1'
     ));
   UNTIL done END REPEAT;
   CLOSE phenotype_cursor;
