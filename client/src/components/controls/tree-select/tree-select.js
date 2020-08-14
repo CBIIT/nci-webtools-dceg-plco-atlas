@@ -385,7 +385,7 @@ export const TreeSelect = forwardRef(({
 
   // construct tree
   const selectTreeCategorical = data =>
-    data.map(item => {
+    data.sort((a, b) => a.title.localeCompare(b.title)).map(item => {
       if (item.children && item.children.length > 0) {
         return (
           // PARENT
