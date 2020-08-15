@@ -27,7 +27,7 @@ module load xtrabackup_2.4.20
 [ -d $TARGET_DIR ] && echo "$TARGET_DIR directory already exists" || mkdir $TARGET_DIR
 
 echo "STARTING MYSQL SERVER..."
-local_mysql --basedir $BASE_DIR start
+local_mysql --basedir $BASE_DIR start --force
 echo 
 
 echo "BACKING UP VIA XTRABACKUP (MySQL-5.7.22, host=$SLURM_NODELIST, user=$DB_USER,basedir=$BASE_DIR, targetdir=$TARGET_DIR)..."
