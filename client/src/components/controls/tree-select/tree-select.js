@@ -11,7 +11,8 @@ export const TreeSelect = forwardRef(({
     onChange,
     data,
     value,
-    singleSelect
+    singleSelect,
+    alwaysEnabled
   }, ref) => {
 
   useImperativeHandle(ref, () => ({
@@ -215,6 +216,7 @@ export const TreeSelect = forwardRef(({
 
   // given parent, determine if all its childern are disabled or not
   const checkAllChildrenDisabled = item => {
+    if (alwaysEnabled) return false;
     if (!item) return false;
     // console.log("checkAllChildrenDisabled", item);
     const itemAllLeafs = getAllLeafs(item);
@@ -233,7 +235,7 @@ export const TreeSelect = forwardRef(({
     if (!singleSelect) {
       // multi-select
       const checkAllLeafsSelectedResult = checkAllChildrenLeafsSelected(
-        itemAllLeafs.filter(obj => obj.import_date).map(obj => obj.id),
+        itemAllLeafs.filter(obj => alwaysEnabled ? obj : obj.import_date).map(obj => obj.id),
         value.map(obj => obj.id)
       );
       if (checkAllLeafsSelectedResult) {
@@ -322,7 +324,7 @@ export const TreeSelect = forwardRef(({
       // if multi-select
       const parentCheckboxClassName = 'parent-checkbox-' + item.id;
       let values = [...value];
-      let newValues = getAllLeafs(item).filter(obj => obj.import_date);
+      let newValues = getAllLeafs(item).filter(obj => alwaysEnabled ? obj : obj.import_date);
       if (containsAllVals(values, newValues)) {
         // remove all leafs if parent is clicked and all leafs were already selected
         values = removeAllVals(values, newValues);
@@ -488,7 +490,7 @@ export const TreeSelect = forwardRef(({
             <input
               title={singleSelect ? "Select " + item.title + " phenotype" : "Select/deselect " + item.title + " phenotype"}
               style={{ 
-                cursor: item.import_date ? 'pointer' : 'not-allowed' 
+                cursor: alwaysEnabled || item.import_date ? 'pointer' : 'not-allowed' 
               }}
               className={'ml-1 leaf-checkbox-' + item.id}
               // name={'leaf-checkbox-' + item.id}
@@ -500,7 +502,7 @@ export const TreeSelect = forwardRef(({
                 (!singleSelect &&
                   value.map(item => item.id).includes(item.id))
               }
-              disabled={item.import_date ? false : true}
+              disabled={alwaysEnabled || item.import_date ? false : true}
               onChange={e => handleSelect(item)}
             />
 
@@ -518,14 +520,14 @@ export const TreeSelect = forwardRef(({
               className="ml-1"
               style={{
                 all: 'unset',
-                cursor: item.import_date ? 'pointer' : 'not-allowed',
+                cursor: alwaysEnabled || item.import_date ? 'pointer' : 'not-allowed',
                 textOverflow: 'ellipsis',
                 whiteSpace: 'nowrap',
                 overflow: 'hidden',
                 width: '65%',
-                color: item.import_date ? 'unset' : '#D3D3D3'
+                color: alwaysEnabled || item.import_date ? 'unset' : '#D3D3D3'
               }}
-              disabled={item.import_date ? false : true}
+              disabled={alwaysEnabled || item.import_date ? false : true}
               onClick={e => handleSelect(item)}
               >
               {item.title}
@@ -558,7 +560,7 @@ export const TreeSelect = forwardRef(({
           }}>
           <input
             title={"Select " + item.title + " phenotype"}
-            style={{ cursor: item.import_date ? 'pointer' : 'not-allowed' }}
+            style={{ cursor: alwaysEnabled || item.import_date ? 'pointer' : 'not-allowed' }}
             className={'ml-0 leaf-checkbox-' + item.id}
             // name={'leaf-checkbox-' + item.id}
             type="checkbox"
@@ -568,7 +570,7 @@ export const TreeSelect = forwardRef(({
               (!singleSelect &&
                 value.map(item => item.id).includes(item.id))
             }
-            disabled={item.import_date ? false : true}
+            disabled={alwaysEnabled || item.import_date ? false : true}
             onChange={e => handleSelect(item)}
           />
 
@@ -577,14 +579,14 @@ export const TreeSelect = forwardRef(({
             className="ml-2"
             style={{
               all: 'unset',
-              cursor: item.import_date ? 'pointer' : 'not-allowed',
+              cursor: alwaysEnabled || item.import_date ? 'pointer' : 'not-allowed',
               textOverflow: 'ellipsis',
               whiteSpace: 'nowrap',
               overflow: 'hidden',
               width: '90%',
-              color: item.import_date ? 'unset' : '#D3D3D3'
+              color: alwaysEnabled || item.import_date ? 'unset' : '#D3D3D3'
             }}
-            disabled={item.import_date ? false : true}
+            disabled={alwaysEnabled || item.import_date ? false : true}
             onClick={e => handleSelect(item)}>
             {/* {item.title.replace(searchInput, '[' + searchInput + ']')} */}
             {item.title.slice(
@@ -618,7 +620,7 @@ export const TreeSelect = forwardRef(({
       onChange([]);
     } else {
       const allLeafs = [];
-      data.tree.map(item => allLeafs.push(getAllLeafs(item).filter(obj => obj.import_date)));
+      data.tree.map(item => allLeafs.push(getAllLeafs(item).filter(obj => alwaysEnabled ? obj : obj.import_date)));
       onChange(allLeafs.flat());
     }
   };
@@ -627,7 +629,7 @@ export const TreeSelect = forwardRef(({
   const checkAllLeafsSelected = () => {
     if (!data) return;
     let allLeafs = [];
-    data.tree.map(item => allLeafs.push(getAllLeafs(item).filter(obj => obj.import_date)));
+    data.tree.map(item => allLeafs.push(getAllLeafs(item).filter(obj => alwaysEnabled ? obj : obj.import_date)));
     allLeafs = allLeafs.flat().map(item => item.id);
     for (var i = 0; i < allLeafs.length; i++) {
       if (value.map(item => item.id).indexOf(allLeafs[i]) === -1)

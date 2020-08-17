@@ -50,6 +50,7 @@ export function PhenotypesForm({
             dispatch(updateBrowsePhenotypes({ disableSubmit: false }));
           }}
           singleSelect
+          alwaysEnabled
           ref={treeRef}
         />
       </div>
