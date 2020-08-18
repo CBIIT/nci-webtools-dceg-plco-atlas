@@ -8,7 +8,7 @@ import { plotOverlayConfig } from '../../../controls/table/table';
 import { rawQuery, query } from '../../../../services/query';
 import { ManhattanPlot as Plot } from '../../../plots/custom/manhattan-plot/manhattan-plot';
 import { Icon } from '../../../controls/icon/icon';
-import { createElement as h, removeChildren } from '../../../plots/custom/utils';
+import { createElement as h, removeChildren, extent } from '../../../plots/custom/utils';
 import { systemFont } from '../../../plots/custom/text';
 import { updateSummaryResults, updateManhattanPlot } from '../../../../services/actions';
 import { CHECKBOX_STATUS_CHECKED } from 'react-bootstrap-table-next';
@@ -244,6 +244,9 @@ export function ManhattanPlot({
       nLogP: plotData.columns.indexOf('p_value_nlog')
     };
 
+    let yExtent = extent([...plotData.data, ...mirroredPlotData.data].map(d => d[columnIndexes.nLogP]));
+    yExtent[1] *= 1.1;
+
     return {
       mirrored: true,
       data: plotData.data,
@@ -279,7 +282,8 @@ export function ManhattanPlot({
         ],
         secondaryTitle: [{ text: `Female`, font: `600 11px ${systemFont}` }],
         key: columnIndexes.nLogP,
-        tickFormat: tick => tick.toPrecision(3)
+        tickFormat: tick => tick.toPrecision(3),
+        extent: yExtent
       },
       yAxis2: {
         secondaryTitle: [{ text: `Male`, font: `600 11px ${systemFont}` }]
@@ -314,6 +318,9 @@ export function ManhattanPlot({
     let title = `${selectedPhenotype.title} - Chromosome ${selectedChromosome}`;
 
     let range = ranges.find(r => r.chromosome == selectedChromosome);
+
+    let yExtent = extent([...plotData.data, ...mirroredPlotData.data].map(d => d[columnIndexes.nLogP]));
+    yExtent[1] *= 1.1;
 
     return {
       mirrored: true,
@@ -384,7 +391,8 @@ export function ManhattanPlot({
         ],
         secondaryTitle: [{ text: `Female`, font: `600 11px ${systemFont}` }],
         key: columnIndexes.nLogP,
-        tickFormat: tick => tick.toPrecision(3)
+        tickFormat: tick => tick.toPrecision(3),
+        extent: yExtent,
       },
       yAxis2: {
         secondaryTitle: [{ text: `Male`, font: `600 11px ${systemFont}` }]
@@ -444,6 +452,9 @@ export function ManhattanPlot({
       nLogP: plotData.columns.indexOf('p_value_nlog')
     };
 
+    let yExtent = extent([...plotData.data].map(d => d[columnIndexes.nLogP]));
+    yExtent[1] *= 1.1;
+
     return {
       data: plotData.data,
       genes: plotData.genes,
@@ -476,6 +487,7 @@ export function ManhattanPlot({
           { text: `(p)`, font: `600 14px ${systemFont}` }
         ],
         key: columnIndexes.nLogP,
+        extent: yExtent,
         tickFormat: tick => tick.toPrecision(3)
       },
       point: {
@@ -506,6 +518,8 @@ export function ManhattanPlot({
 
     let title = `${selectedPhenotype.title} - Chromosome ${selectedChromosome}`;
     let range = ranges.find(r => r.chromosome == selectedChromosome);
+    let yExtent = extent([...plotData.data].map(d => d[columnIndexes.nLogP]));
+    yExtent[1] *= 1.1;
 
     return {
       data: plotData.data,
@@ -573,6 +587,7 @@ export function ManhattanPlot({
           { text: `(p)`, font: `600 14px ${systemFont}` }
         ],
         key: columnIndexes.nLogP,
+        extent: yExtent,
         tickFormat: tick => tick.toPrecision(3)
       },
       point: {
