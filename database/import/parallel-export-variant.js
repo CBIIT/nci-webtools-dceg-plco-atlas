@@ -345,6 +345,9 @@ function exportVariants({
         ORDER BY p_value;
     `);
     console.log(`[${duration()} s] Done`);
+
+    // filter out extraneous -nlog10(p) values
+    const results = db.exec(`UPDATE stage SET p_value_nlog = 0 WHERE p_value_nlog > 1000000`);
     
     // determine count
     const count = db.prepare(`SELECT last_insert_rowid()`).pluck().get();
