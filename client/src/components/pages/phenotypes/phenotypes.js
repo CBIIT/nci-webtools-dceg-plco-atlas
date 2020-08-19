@@ -149,15 +149,15 @@ export function Phenotypes() {
     }
 
     dispatch(
-      updateBrowsePhenotypesPlots({
-        phenotypeData: null,
-        loading: true
+      updateBrowsePhenotypes({
+        submitted: false,
       })
     );
 
     dispatch(
-      updateBrowsePhenotypes({
-        submitted: false,
+      updateBrowsePhenotypesPlots({
+        phenotypeData: null,
+        loading: true
       })
     );
 
