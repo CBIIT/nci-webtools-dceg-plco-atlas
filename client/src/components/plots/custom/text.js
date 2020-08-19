@@ -16,7 +16,7 @@ export function renderText(ctx, textDefs, defaultDef) {
 
   let lastOffset = 0;
   if (typeof textDefs === 'string' || typeof textDefs === 'number') textDefs = [{ text: textDefs }];
-  console.log(textDefs);
+  // console.log(textDefs);
 
   textDefs.forEach(function(def) {
     if (typeof def === 'string') def = { text: def };
