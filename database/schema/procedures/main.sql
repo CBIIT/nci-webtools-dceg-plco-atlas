@@ -105,5 +105,90 @@ CREATE PROCEDURE update_phenotype_point()
 END $$
 
 
+DROP PROCEDURE IF EXISTS migrate_phenotype_variants $$
+CREATE PROCEDURE migrate_phenotype_variants(IN partition_name varchar(2000))
+  BEGIN
+  
+  call execute_sql(concat('DROP TABLE IF EXISTS phenotype_variant_', partition_name));
+  call execute_sql(concat(
+    'CREATE TABLE IF NOT EXISTS phenotype_variant_', partition_name, ' (
+        id BIGINT AUTO_INCREMENT NOT NULL,
+        chromosome INTEGER,
+        position int NOT NULL,
+        snp varchar(200) NOT NULL,
+        allele_reference varchar(200) NULL,
+        allele_alternate varchar(200) NULL,
+        allele_reference_frequency double NULL,
+        p_value double NULL,
+        p_value_nlog double NULL,
+        p_value_nlog_expected double NULL,
+        p_value_heterogenous double NULL,
+        beta double NULL,
+        standard_error double NULL,
+        odds_ratio double NULL,
+        ci_95_low double NULL,
+        ci_95_high double NULL,
+        n int NULL,
+        show_qq_plot BOOLEAN NULL,
+        PRIMARY KEY (id, chromosome)
+    ) PARTITION BY LIST(chromosome) (
+        PARTITION `', partition_name, '_1` VALUES IN (1),
+        PARTITION `', partition_name, '_2` VALUES IN (2),
+        PARTITION `', partition_name, '_3` VALUES IN (3),
+        PARTITION `', partition_name, '_4` VALUES IN (4),
+        PARTITION `', partition_name, '_5` VALUES IN (5),
+        PARTITION `', partition_name, '_6` VALUES IN (6),
+        PARTITION `', partition_name, '_7` VALUES IN (7),
+        PARTITION `', partition_name, '_8` VALUES IN (8),
+        PARTITION `', partition_name, '_9` VALUES IN (9),
+        PARTITION `', partition_name, '_10` VALUES IN (10),
+        PARTITION `', partition_name, '_11` VALUES IN (11),
+        PARTITION `', partition_name, '_12` VALUES IN (12),
+        PARTITION `', partition_name, '_13` VALUES IN (13),
+        PARTITION `', partition_name, '_14` VALUES IN (14),
+        PARTITION `', partition_name, '_15` VALUES IN (15),
+        PARTITION `', partition_name, '_16` VALUES IN (16),
+        PARTITION `', partition_name, '_17` VALUES IN (17),
+        PARTITION `', partition_name, '_18` VALUES IN (18),
+        PARTITION `', partition_name, '_19` VALUES IN (19),
+        PARTITION `', partition_name, '_20` VALUES IN (20),
+        PARTITION `', partition_name, '_21` VALUES IN (21),
+        PARTITION `', partition_name, '_22` VALUES IN (22)
+    )'));
+  call execute_sql(concat(
+    'INSERT INTO phenotype_variant_', partition_name, '
+      SELECT 
+        id,
+        chromosome,
+        position,
+        snp,
+        allele_reference,
+        allele_alternate,
+        allele_reference_frequency,
+        p_value,
+        p_value_nlog,
+        p_value_nlog_expected,
+        p_value_heterogenous,
+        beta,
+        standard_error,
+        odds_ratio,
+        ci_95_low,
+        ci_95_high,
+        n,
+        show_qq_plot
+      FROM phenotype_variant PARTITION (`', partition_name, '`)'
+    ));
+
+  call execute_sql(concat(
+    'ALTER TABLE phenotype_variant_', partition_name, '
+        ADD INDEX idx_phenotype_variant__p_value          (p_value),
+        ADD INDEX idx_phenotype_variant__p_value_nlog     (p_value_nlog),
+        ADD INDEX idx_phenotype_variant__position         (position),
+        ADD INDEX idx_phenotype_variant__show_qq_plot     (show_qq_plot),
+        ADD INDEX idx_phenotype_variant__snp              (snp);'
+  ));
+
+END $$
+
 DELIMITER ;
 
