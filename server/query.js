@@ -249,7 +249,7 @@ async function getVariants(connectionPool, params) {
     );
     const tableNames = tableNameRows
         .map(row => row.TABLE_NAME)
-        .filter(name => !params.sex || (params.sex && name.includes(params.sex)))
+        .filter(name => !params.sex || (params.sex && name.includes(`_${params.sex}`)))
 
     let columnNames = getValidColumns('variant', params.columns).map(quote);
 
