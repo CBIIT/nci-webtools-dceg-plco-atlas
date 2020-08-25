@@ -87,7 +87,7 @@ function getValidColumns(tableName, columns) {
     columns = columns.filter(e => /^\w+$/.test(e));
 
     let validColumns = {
-        variant: ['id', 'phenotype_id', 'sex', 'chromosome', 'position', 'snp', 'allele_reference', 'allele_alternate', 'p_value', 'p_value_nlog', 'p_value_nlog_expected', 'beta', 'odds_ratio', 'ci_95_low', 'ci_95_high', 'show_qq_plot'],
+        variant: ['id', 'chromosome', 'position', 'snp', 'allele_reference', 'allele_alternate', 'p_value', 'p_value_nlog', 'p_value_nlog_expected', 'beta', 'odds_ratio', 'ci_95_low', 'ci_95_high', 'show_qq_plot'],
         point: ['id', 'phenotype_id', 'sex', 'chromosome', 'position', 'snp', 'p_value_nlog', 'p_value_nlog_expected'],
         aggregate: ['id', 'phenotype_id', 'sex', 'chromosome', 'position_abs', 'p_value_nlog'],
         phenotype: ['id', 'parent_id', 'name', 'age_name', 'display_name', 'description', 'color', 'type', 'participant_count', 'import_count', 'import_date'],
@@ -221,9 +221,13 @@ async function getSummary(connection, {phenotype_id, table, sex, p_value_nlog_mi
 async function getVariants(connectionPool, params) {
     if (!/^\d+(,\d+)*$/.test(params.phenotype_id))
         throw('Phenotype ID must consist of numeric values');
-    
+
     if (params.sex && !/^(all|female|male)(,(all|female|male))*$/.test(params.sex))
         throw('Sex must be all, male, or female');
+
+    if (params.id) {
+        params.sex = [null, 'all', 'female', 'male'][+params.id[0]]
+    }
 
     const connection = await connectionPool.getConnection();
     const [phenotypes] = await connection.query(
@@ -237,11 +241,17 @@ async function getVariants(connectionPool, params) {
     if (!phenotypes.filter(p => p.import_date).length)
         throw('The specified phenotype(s) do not have an import date');
 
-    const columnNames = getValidColumns('variant', params.columns).map(quote);
-    const partitions = phenotypes.map(p => params.sex 
-        ? params.sex.split(',').map(sex => quote(`${p.id}_${sex}`)).join(',')
-        : quote(`${p.id}`)
+    const [tableNameRows] = await connection.query(
+        params.phenotype_id.split(',').map(id => `
+            select table_name from information_schema.tables where
+            table_name like 'phenotype_variant_${id}_%'
+        `).join(' UNION ')
     );
+    const tableNames = tableNameRows
+        .map(row => row.TABLE_NAME)
+        .filter(name => !params.sex || (params.sex && name.includes(params.sex)))
+
+    let columnNames = getValidColumns('variant', params.columns).map(quote);
 
     const conditions = [
         coalesce(params.id, `id = :id`),
@@ -273,12 +283,16 @@ async function getVariants(connectionPool, params) {
     let offset = +params.offset || 0;
 
     // sql_calc_found_rows will eventually be deprecated, so we'll need to fall back using a secondary count(*) query at some point
-    const sql = `
+    let querySql = tableNames.map(name => `
         SELECT 
-            ${params.count ? 'SQL_CALC_FOUND_ROWS' : ''} 
+            ${params.count ? 'SQL_CALC_FOUND_ROWS' : ''}
+            ${!params.columns || params.columns.includes('phenotype_id') ? `${name.match(/\d+/)[0]} as phenotype_id,` : ''} 
             ${columnNames.join(',')} 
-        FROM phenotype_variant partition(${partitions.join(',')})
+        FROM ${name}
         ${conditions.length ? `WHERE ${conditions}` : ''}
+    `).join(' UNION ');
+
+    let sql = querySql + `
         ${params.orderBy ? `ORDER BY ${orderBy} ${order}` : ''}
         ${params.limit ? `LIMIT ${offset}, ${limit}` : ''};
     `;
@@ -294,7 +308,10 @@ async function getVariants(connectionPool, params) {
 
     // determine counts if needed
     if (params.count) {
-        const [countRows] = await connection.query(`SELECT FOUND_ROWS()`);
+        // let countSql = `SELECT COUNT(*) as count FROM (${querySql}) s;`;
+        // const [countRows] = await connection.execute(countSql, params);
+        let countSql = `SELECT FOUND_ROWS();`;
+        const [countRows] = await connection.execute(countSql);
         results.count = pluck(countRows);
     }
 
