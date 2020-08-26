@@ -252,6 +252,8 @@ async function getVariants(connectionPool, params) {
         .filter(name => !params.sex || (params.sex && name.includes(`_${params.sex}`)))
 
     let columnNames = getValidColumns('variant', params.columns).map(quote);
+    let includePhenotypeId = !params.columns || params.columns.includes('phenotype_id');
+    let includeSex = !params.columns || params.columns.includes('sex');
 
     const conditions = [
         coalesce(params.id, `id = :id`),
@@ -283,14 +285,17 @@ async function getVariants(connectionPool, params) {
     let offset = +params.offset || 0;
 
     // sql_calc_found_rows will eventually be deprecated, so we'll need to fall back using a secondary count(*) query at some point
-    let querySql = tableNames.map(name => `
-        SELECT 
-            ${params.count ? 'SQL_CALC_FOUND_ROWS' : ''}
-            ${!params.columns || params.columns.includes('phenotype_id') ? `${name.match(/\d+/)[0]} as phenotype_id,` : ''} 
-            ${columnNames.join(',')} 
-        FROM ${name}
-        ${conditions.length ? `WHERE ${conditions}` : ''}
-    `).join(' UNION ');
+    let querySql = tableNames.map(name => {
+        const [phenotype_id, sex] = name.split('_').slice(-2);
+        let columns = [...columnNames];
+        if (includePhenotypeId) columns.unshift(`${phenotype_id} as phenotype_id`);
+        if (includeSex) columns.unshift(`"${sex}" as sex`);
+        return `
+            SELECT ${columns.join(',')} 
+            FROM ${name}
+            ${conditions.length ? `WHERE ${conditions}` : ''}
+        `
+    }).join(' UNION ');
 
     let sql = querySql + `
         ${params.orderBy ? `ORDER BY ${orderBy} ${order}` : ''}
@@ -308,10 +313,19 @@ async function getVariants(connectionPool, params) {
 
     // determine counts if needed
     if (params.count) {
+        let innerCountSql = tableNames.map(name => `
+            SELECT COUNT(*) as count FROM
+            FROM ${name}
+            ${conditions.length ? `WHERE ${conditions}` : ''}
+        `).join('UNION');
+
+        const countSql = `SELECT SUM(count) FROM (${innerCountSql}) c`;
+
+
         // let countSql = `SELECT COUNT(*) as count FROM (${querySql}) s;`;
         // const [countRows] = await connection.execute(countSql, params);
-        let countSql = `SELECT FOUND_ROWS();`;
-        const [countRows] = await connection.execute(countSql);
+        // let countSql = `SELECT FOUND_ROWS();`;
+        const [countRows] = await connection.execute(countSql, params);
         results.count = pluck(countRows);
     }
 
