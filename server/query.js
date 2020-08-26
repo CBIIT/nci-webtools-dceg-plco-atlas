@@ -285,19 +285,15 @@ async function getVariants(connectionPool, params) {
     let offset = +params.offset || 0;
 
     // sql_calc_found_rows will eventually be deprecated, so we'll need to fall back using a secondary count(*) query at some point
-    let querySql = tableNames.map(name => {
+    let sql = tableNames.map(name => {
         const [phenotype_id, sex] = name.split('_').slice(-2);
         let columns = [...columnNames];
         if (includePhenotypeId) columns.unshift(`${phenotype_id} as phenotype_id`);
         if (includeSex) columns.unshift(`"${sex}" as sex`);
         return `
-            SELECT ${columns.join(',')} 
-            FROM ${name}
-            ${conditions.length ? `WHERE ${conditions}` : ''}
-        `
-    }).join(' UNION ');
-
-    let sql = querySql + `
+            SELECT ${columns.join(',')} FROM ${name} 
+            ${conditions.length ? `WHERE ${conditions}` : ''}`;
+    }).join(' UNION ') + `
         ${params.orderBy ? `ORDER BY ${orderBy} ${order}` : ''}
         ${params.limit ? `LIMIT ${offset}, ${limit}` : ''};
     `;
@@ -314,19 +310,14 @@ async function getVariants(connectionPool, params) {
     // determine counts if needed
     if (params.count) {
         let innerCountSql = tableNames.map(name => `
-            SELECT COUNT(*) as count FROM
-            FROM ${name}
-            ${conditions.length ? `WHERE ${conditions}` : ''}
-        `).join('UNION');
-
+            SELECT COUNT(*) as count FROM ${name}
+            
+            ${conditions.length ? `WHERE ${conditions}` : ''}`).join('UNION');
         const countSql = `SELECT SUM(count) FROM (${innerCountSql}) c`;
+        logger.debug(`countSql sql: ${countSql}`);
 
-
-        // let countSql = `SELECT COUNT(*) as count FROM (${querySql}) s;`;
-        // const [countRows] = await connection.execute(countSql, params);
-        // let countSql = `SELECT FOUND_ROWS();`;
         const [countRows] = await connection.execute(countSql, params);
-        results.count = pluck(countRows);
+        results.count = +pluck(countRows);
     }
 
     // determine counts through metadata
