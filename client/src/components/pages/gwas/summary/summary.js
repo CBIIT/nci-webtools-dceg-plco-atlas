@@ -340,7 +340,8 @@ export function SummaryResults() {
           variant: snp,
           sex: sex
         },
-        submitted: new Date().getTime()
+        submitted: new Date().getTime(),
+        disableSubmit: true
       })
     );
 
