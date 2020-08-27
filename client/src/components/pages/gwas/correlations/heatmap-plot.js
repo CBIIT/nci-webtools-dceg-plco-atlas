@@ -77,6 +77,7 @@ export const Heatmap = forwardRef(({}, ref) => {
           data: phenotype
         },
         submitted: new Date(),
+        disableSubmit: true,
         selectedPlot: 'frequency'
       })
     );
