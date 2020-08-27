@@ -48,6 +48,7 @@ describe('Store Module', function () {
             summaryTables: {
               visible: true,
               loading: false,
+              stackedSex: 'female',
               all: {
                 results: [],
                 resultsCount: 0,
