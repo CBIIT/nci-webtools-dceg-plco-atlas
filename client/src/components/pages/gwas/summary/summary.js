@@ -128,13 +128,22 @@ export function SummaryResults() {
 
     handleReset();
 
-    let sexes = sex === 'stacked' 
-      ? ['female', 'male'] 
-      : [sex];
-
     if (selectedPlot === 'qq-plot'){
       dispatch(drawQQPlot(phenotype, sex));
     }
+
+    drawSummaryManhattanPlots({phenotype, sex});
+
+    setSearchCriteriaSummaryResults({
+      phenotype: [...phenotype.title],
+      sex: sex
+    });
+  };
+
+  const drawSummaryManhattanPlots = ({phenotype, sex}) => {
+    let sexes = sex === 'stacked' 
+      ? ['female', 'male'] 
+      : [sex];
 
     // update summary results filters
     dispatch(
@@ -179,11 +188,7 @@ export function SummaryResults() {
       })
     );
 
-    setSearchCriteriaSummaryResults({
-      phenotype: [...phenotype.title],
-      sex: sex
-    });
-  };
+  }
 
   const clearSummaryTables = () => {
     const initialState = getInitialState();
@@ -215,7 +220,10 @@ export function SummaryResults() {
 
   // resubmit summary results
   const onAllChromosomeSelected = () => {
-    handleSubmit({phenotype: selectedPhenotype, sex: selectedSex});
+    const initialState = getInitialState();
+    dispatch(updateManhattanPlot(initialState.manhattanPlot));
+    clearSummaryTables();
+    drawSummaryManhattanPlots({phenotype: selectedPhenotype, sex: selectedSex});
   };
 
   // redraw plot and update table(s) for single chromosome selection
@@ -500,7 +508,7 @@ export function SummaryResults() {
               <div style={{ display: submitted ? 'block' : 'none' }}>
                 <div style={{minHeight: '635px'}}>
                   <ManhattanPlot
-                    onChromosomeSelected={chr => onChromosomeSelected(chr, stackedSex)}
+                    onChromosomeSelected={onChromosomeSelected}
                     onAllChromosomeSelected={onAllChromosomeSelected}
                     onVariantLookup={handleVariantLookup}
                     onZoom={handleZoom}
