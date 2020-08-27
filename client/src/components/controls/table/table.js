@@ -72,6 +72,7 @@ export const paginationButton = ({
 
   return (
     <li
+      key={`pagination-list-item-${page}`}
       className={['page-item', active ? 'active' : 'text-muted'].join(' ')}
       onClick={e => onPageChange(page)}>
       <a
