@@ -105,6 +105,9 @@ export function SummaryResultsForm({
       <div className="mb-3">
         <label htmlFor="summary-results-sex" className="required">Sex</label>
         <select
+          style={{
+            fontSize: '13.3333px'
+          }}
           id="summary-results-sex"
           className="form-control"
           value={existingSexes.length === 0 ? 'empty-sex' : _sex}
@@ -113,9 +116,10 @@ export function SummaryResultsForm({
             dispatch(updateSummaryResults({ disableSubmit: false }));
           }}
           aria-label="Select sex"
-          disabled={existingSexes.length === 0}>
+          disabled={existingSexes.length === 0}
+          >
             { existingSexes.length === 0 &&
-              <option value="empty-sex" disabled defaultValue>Select a phenotype</option>
+              <option value="empty-sex" disabled defaultValue>Select a Sex</option>
             }
             <SexOptions />
         </select>

@@ -40,6 +40,7 @@ export function SummaryResults() {
     messages,
     selectedSex,
     sharedState,
+    existingSexes
   } = useSelector(state => state.summaryResults);
   const stackedSex = useSelector(state => state.summaryTables.stackedSex);
   const loadingManhattanPlot = useSelector(state => state.manhattanPlot.loadingManhattanPlot);
@@ -126,7 +127,16 @@ export function SummaryResults() {
       ]);
     }
 
-    handleReset();
+    if (existingSexes.length > 0) {
+      const retain = existingSexes;
+      handleReset();
+      dispatch(updateSummaryResults({
+          existingSexes: retain
+        })
+      );
+    } else {
+      handleReset();
+    }
 
     if (selectedPlot === 'qq-plot'){
       dispatch(drawQQPlot(phenotype, sex));
