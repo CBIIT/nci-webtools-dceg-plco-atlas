@@ -106,7 +106,8 @@ export function SummaryResultsForm({
         <label htmlFor="summary-results-sex" className="required">Sex</label>
         <select
           style={{
-            fontSize: '13.3333px'
+            // fontSize: '13.3333px',
+            color: existingSexes.length === 0 ? '#AAAAAA' : 'unset'
           }}
           id="summary-results-sex"
           className="form-control"
