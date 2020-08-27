@@ -48,6 +48,7 @@ export const getInitialState = () => ({
   summaryTables: {
     visible: true,
     loading: false,
+    stackedSex: 'female',
     all: {
       results: [],
       resultsCount: 0,

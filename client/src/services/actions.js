@@ -156,20 +156,28 @@ export function initialize() {
   }
 }
 
-export function fetchSummaryTable(tableKey, params, existingResults) {
-  return async function(dispatch) {
+export function fetchSummaryTable(tableKey, params) {
+  return async function(dispatch, getState) {
     try {
       dispatch(setSummaryTableLoading(true));
-      // fetch variants given parameters
+
+      // previousCount is used when paginating or sorting existing results
+      const previousCount = getState(state => state.summaryTables[tableKey]).resultsCount;
       const response = await query('variants', params);
-      if (response.error) return;
-  
+      if (response.error) throw(response);
+
       dispatch(
         updateSummaryTable(tableKey, {
           results: response.data,
-          resultsCount: (existingResults && existingResults.resultsCount) || response.count || response.data.length,
+          // response.count is populated if params.count or params.metadataCount is set
+          resultsCount: response.count || previousCount || response.data.length,
           page: 1 + Math.floor(params.offset / params.limit),
-          pageSize: params.limit
+          pageSize: params.limit,
+          offset: params.offset,
+          limit: params.limit,
+          orderBy: params.orderBy,
+          order: params.order,
+          chromosome: params.chromosome,
         })
       );
   
@@ -181,7 +189,7 @@ export function fetchSummaryTable(tableKey, params, existingResults) {
   }
 }
 
-export function fetchSummarySnpTable(tableKey, params, existingResults) {
+export function fetchSummarySnpTable(tableKey, params) {
   return async function(dispatch) {
     try {
       dispatch(setSummarySnpLoading(true));
@@ -191,7 +199,6 @@ export function fetchSummarySnpTable(tableKey, params, existingResults) {
   
       dispatch(
         updateSummarySnpTable(tableKey, {
-          ...existingResults,
           results: response.data,
           resultsCount: response.count || response.data.length,
           page: 1 + Math.floor(params.offset / params.limit),
@@ -213,7 +220,7 @@ export function fetchSummarySnpTable(tableKey, params, existingResults) {
  * @param {object} params - database, chr, bpMin, bpMax, nlogpMin, nlogPmax
  */
 export function drawManhattanPlot(plotType, params) {
-  console.log('drawing plot', plotType, params);
+  // console.log('drawing plot', plotType, params);
   return async function(dispatch) {
     try {  
       // retrieve metadata for all sexes provided

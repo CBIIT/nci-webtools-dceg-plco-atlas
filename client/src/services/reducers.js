@@ -49,9 +49,10 @@ export const rootReducer = (state, action) => {
         }
       }
     case UPDATE_SUMMARY_TABLE:
+      let obj = {[action.key]: action.data}
       let summaryTables = {
         ...state.summaryTables,
-        [action.key]: action.data
+        ...obj
       };
       return {
         ...state,
