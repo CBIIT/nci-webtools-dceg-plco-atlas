@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useRef } from 'react';
 import {
   SidebarContainer,
   SidebarPanel,
@@ -113,7 +113,7 @@ export function Downloads() {
                   style={{ pointerEvents: (!selectedPhenotypes || selectedPhenotypes.length < 1 || selectedPhenotypes.length > 5) ? 'none' : 'auto' }}
                   disabled={!selectedPhenotypes.length || selectedPhenotypes.length > 5 || submitted}
                   title={
-                    selectedPhenotypes.length == 0
+                    selectedPhenotypes.length === 0
                       ? 'Please select a phenotype.'
                       : selectedPhenotypes.length > 5
                       ? 'A maximum of five phenotypes may be selected to download.'
@@ -152,7 +152,7 @@ export function Downloads() {
 
             <ul>
               {selectedPhenotypes.map(e => (
-                <li><a href={generateLink(e.value)} target="_blank" download>
+                <li><a href={generateLink(e.value)} target="_blank" rel="noopener noreferrer" download>
                   {e.title}
                 </a></li>
               ))}
