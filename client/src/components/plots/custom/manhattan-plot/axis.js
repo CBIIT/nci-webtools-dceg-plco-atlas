@@ -143,7 +143,7 @@ export function axisLeft(config, ctx) {
 }
 
 export function axisBottom(config, ctx) {
-  console.log('drawing axis', clone(config), ctx);
+  // console.log('drawing axis', clone(config), ctx);
   const margins = config.margins;
   const [xMin, xMax] = config.xAxis.extent;
   const [yMin, yMax] = config.yAxis.extent;
