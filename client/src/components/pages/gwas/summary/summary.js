@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { store } from '../../../../services/store';
 import { Alert, Tab, Tabs } from 'react-bootstrap';
 import { SummaryResultsForm } from './summary-form';
 import { ManhattanPlot } from './manhattan-plot';
@@ -20,9 +21,11 @@ import {
   drawQQPlot,
   drawManhattanPlot,
   fetchSummaryTable,
+  updateSummaryTable,
+  updateKey,
+  updateSummarySnpTable,
 } from '../../../../services/actions';
 import { getInitialState } from '../../../../services/store';
-import { Tooltip } from '../../../controls/tooltip/tooltip';
 import './summary.scss'
 
 
@@ -38,14 +41,9 @@ export function SummaryResults() {
     selectedSex,
     sharedState,
   } = useSelector(state => state.summaryResults);
-
-  const {
-    loadingManhattanPlot,
-  } = useSelector(state => state.manhattanPlot);
-
-  const {
-    qqplotData
-  } = useSelector(state => state.qqPlot);
+  const stackedSex = useSelector(state => state.summaryTables.stackedSex);
+  const loadingManhattanPlot = useSelector(state => state.manhattanPlot.loadingManhattanPlot);
+  const qqplotData = useSelector(state => state.qqPlot.qqplotData);
 
   const [openSidebar, setOpenSidebar] = useState(true);
 
@@ -84,10 +82,18 @@ export function SummaryResults() {
   const fetchVariantTables = (selectedPhenotype, selectedSex, params = {}) => {
     let sexes = {
       all: ['all'],
-      stacked:  ['female'], // ['female', 'male'], // lazy-load options
+      stacked: [stackedSex],
       female: ['female'],
       male: ['male'],
     }[selectedSex];
+
+    if (selectedSex === 'stacked') {
+      ['male', 'female'].forEach(sex => {
+        dispatch(updateSummaryTable(sex, {
+          results: [],
+        }))
+      });
+    }
 
     // fetch variant results tables
     sexes.forEach(sex => {
@@ -110,7 +116,7 @@ export function SummaryResults() {
   // when submitting:
   // 1. Fetch aggregate data for displaying manhattan plot(s)
   // 2. Fetch variant data for each selected sex
-  const handleSubmit = ({phenotype, sex, allChromosomeSelected}) => {
+  const handleSubmit = ({phenotype, sex}) => {
     if (!phenotype) {
       return setMessages([
         {
@@ -119,26 +125,12 @@ export function SummaryResults() {
         }
       ]);
     }
-    // clear Manhattan Plot and QQ-Plot before calculating
-    if (!allChromosomeSelected) {
-      const initialState = getInitialState();
-      dispatch(
-        updateManhattanPlot(initialState.manhattanPlot)
-      );
-      dispatch(
-        updateQQPlot(initialState.qqPlot)
-      );
-    }
 
-    let sexes = {
-      all: ['all'],
-      stacked: ['female', 'male'],
-      female: ['female'],
-      male: ['male'],
-    }[sex];
+    handleReset();
 
-    // determine which tables to use for manhattan plot
-    // const aggregateTable = getAggregateTable(sex);
+    let sexes = sex === 'stacked' 
+      ? ['female', 'male'] 
+      : [sex];
 
     if (selectedPlot === 'qq-plot'){
       dispatch(drawQQPlot(phenotype, sex));
@@ -155,14 +147,10 @@ export function SummaryResults() {
         nlogpMax: null,
         bpMin: null,
         bpMax: null,
-        submitted: new Date(),
+        submitted: new Date().getTime(),
         disableSubmit: true
       })
     );
-
-    dispatch(updateManhattanPlot({
-      manhattanPlotConfig: {},
-    }))
 
     // draw summary plot using aggregate data
     dispatch(
@@ -173,11 +161,22 @@ export function SummaryResults() {
       })
     );
 
-    // // fetch variant results tables
-    fetchVariantTables(
-      phenotype,
-      sex,
-      {metadataCount: true, phenotype_id: phenotype.id}
+    let summarySex = sex === 'stacked' 
+      ? stackedSex 
+      : sex
+
+      // fetch variant results table(s)
+    dispatch(
+      fetchSummaryTable(summarySex, {
+        phenotype_id: phenotype.id,
+        sex: summarySex,
+        columns: ['chromosome', 'position', 'snp', 'allele_reference', 'allele_alternate', 'beta', 'odds_ratio', 'ci_95_low', 'ci_95_high', 'p_value'],
+        offset: 0,
+        limit: 10,
+        orderBy: 'p_value',
+        order: 'asc',
+        metadataCount: true,
+      })
     );
 
     setSearchCriteriaSummaryResults({
@@ -185,6 +184,14 @@ export function SummaryResults() {
       sex: sex
     });
   };
+
+  const clearSummaryTables = () => {
+    const initialState = getInitialState();
+    for (let key of ['all', 'female', 'male']) {
+      dispatch(updateSummaryTable(key, initialState.summaryTables[key]));
+      dispatch(updateSummarySnpTable(key, initialState.summarySnpTables[key]));
+    }
+  }
 
   const handleReset = () => {
     const initialState = getInitialState();
@@ -197,101 +204,110 @@ export function SummaryResults() {
     dispatch(
       updateQQPlot(initialState.qqPlot)
     );
-
-    // reset summary results tables
-/*
-    for (let i = 0; i < 2; i++) {
-      dispatch(
-        updateSummaryTable(
-          {
-            results: [],
-            resultsCount: 0,
-            page: 1,
-            pageSize: 10
-          },
-          i
-        )
-      );
-    }
-*/
+    dispatch(
+      updateKey('summaryTables', initialState.summaryTables)
+    );
+    dispatch(
+      updateKey('summarySnpTables', initialState.summarySnpTables)
+    );    
   };
+
 
   // resubmit summary results
   const onAllChromosomeSelected = () => {
-    handleSubmit({phenotype: selectedPhenotype, sex: selectedSex, allChromosomeSelected: true});
+    handleSubmit({phenotype: selectedPhenotype, sex: selectedSex});
   };
 
   // redraw plot and update table(s) for single chromosome selection
-  const onChromosomeSelected = chromosome => {
+  const onChromosomeSelected = (chromosome)=> {
+    // useSelector does not pick up stackedSex, since it is referring to a property of an object
+    let stackedSex = store.getState().summaryTables.stackedSex;
     const range = ranges.find(r => r.chromosome === chromosome);
-    const sexes = {
-      all: ['all'],
-      stacked: ['female', 'male'],
-      female: ['female'],
-      male: ['male'],
-    }[selectedSex];
-
     // update form parameters
     dispatch(
       updateSummaryResults({
         manhattanPlotView: 'variants',
         selectedChromosome: chromosome,
-        selectedSex,
-        bpMin: range.position_min,
-        bpMax: range.position_max,
-        nlogpMin: 2,
+        bpMin: null,
+        bpMax: null,
+        nlogpMin: null,
         nlogpMax: null
       })
     );
 
+    // fetch variants for both sexes if stacked
+    const plotSexes = selectedSex === 'stacked' 
+      ? ['female', 'male'] 
+      : [selectedSex]
+
     dispatch(
       drawManhattanPlot('variants', {
         phenotype_id: selectedPhenotype.id,
-        sex: sexes,
+        sex: plotSexes,
         chromosome: chromosome,
-        position_min: range.position_min,
-        position_max: range.position_max,
         p_value_nlog_min: 2,
         p_value_nlog_max: null,
         columns: ['id', 'chromosome', 'position', 'p_value_nlog'],
       })
     );
 
-    // fetch variant results tables
-    fetchVariantTables(
-      selectedPhenotype,
-      selectedSex,
-      {chromosome, metadataCount: true, phenotype_id: selectedPhenotype.id}
+    // fetch single table for variant results (lazy load non-visible tables)
+    let summarySex = selectedSex === 'stacked' 
+      ? stackedSex 
+      : selectedSex;
+
+    clearSummaryTables();
+    dispatch(
+      fetchSummaryTable(summarySex, {
+        phenotype_id: selectedPhenotype.id,
+        sex: summarySex,
+        chromosome,
+        offset: 0,
+        limit: 10,
+        columns: ['chromosome', 'position', 'snp', 'allele_reference', 'allele_alternate', 'beta', 'odds_ratio', 'ci_95_low', 'ci_95_high', 'p_value'],
+        orderBy: 'p_value',
+        order: 'asc',
+        metadataCount: true,
+      })
     );
   };
 
   // zoom is only initiated from the chromosome view
   const handleZoom = ({ bounds }) => {
-    const zoomParams = {
-      position_min: bounds.xMin,
-      position_max: bounds.xMax,
-      p_value_nlog_min: bounds.yMin,
-      p_value_nlog_max: bounds.yMax
-    };
+    // useSelector does not pick up stackedSex, since it is referring to a property of an object
+    let stackedSex = store.getState().summaryTables.stackedSex;
 
     // update zoom params
     dispatch(updateSummaryResults({
-      ...zoomParams,
       bpMin: bounds.xMin,
       bpMax: bounds.xMax,
       nlogpMin: bounds.yMin,
       nlogpMax: bounds.yMax
     }));
 
-    // fetch variant results tables
-    fetchVariantTables(
-      selectedPhenotype,
-      selectedSex,
-      {
-        ...zoomParams,
+    // fetch single table for variant results (lazy load non-visible tables)
+    let summarySex = selectedSex === 'stacked'
+      ? stackedSex
+      : selectedSex;
+
+    // clear both tables before fetching data for variant table
+    clearSummaryTables();
+    dispatch(
+      fetchSummaryTable(summarySex, {
+        phenotype_id: selectedPhenotype.id,
+        sex: summarySex,
         chromosome: selectedChromosome,
-        count: true
-      }
+        offset: 0,
+        limit: 10,
+        columns: ['chromosome', 'position', 'snp', 'allele_reference', 'allele_alternate', 'beta', 'odds_ratio', 'ci_95_low', 'ci_95_high', 'p_value'],
+        orderBy: 'p_value',
+        order: 'asc',
+        position_min: bounds.xMin,
+        position_max: bounds.xMax,
+        p_value_nlog_min: bounds.yMin,
+        p_value_nlog_max: bounds.yMax,
+        count: true,
+      })
     );
   };
 
@@ -306,7 +322,7 @@ export function SummaryResults() {
           variant: snp,
           sex: sex
         },
-        submitted: new Date()
+        submitted: new Date().getTime()
       })
     );
 
@@ -484,7 +500,7 @@ export function SummaryResults() {
               <div style={{ display: submitted ? 'block' : 'none' }}>
                 <div style={{minHeight: '635px'}}>
                   <ManhattanPlot
-                    onChromosomeSelected={onChromosomeSelected}
+                    onChromosomeSelected={chr => onChromosomeSelected(chr, stackedSex)}
                     onAllChromosomeSelected={onAllChromosomeSelected}
                     onVariantLookup={handleVariantLookup}
                     onZoom={handleZoom}
