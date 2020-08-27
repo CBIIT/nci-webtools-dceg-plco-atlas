@@ -225,7 +225,7 @@ async function getVariants(connectionPool, params) {
     if (params.sex && !/^(all|female|male)(,(all|female|male))*$/.test(params.sex))
         throw('Sex must be all, male, or female');
 
-    if (params.id) {
+    if (params.id && !params.sex) {
         params.sex = [null, 'all', 'female', 'male'][+params.id[0]]
     }
 
@@ -251,6 +251,11 @@ async function getVariants(connectionPool, params) {
         .map(row => row.TABLE_NAME)
         .filter(name => !params.sex || (params.sex && name.includes(`_${params.sex}`)))
 
+    const partitionNames = tableNames.map(tableName => {
+        let name = tableName.replace('phenotype_variant_', '');
+        return params.chromosome ? `\`${name}_${params.chromosome}\`` : ''
+    })
+
     let columnNames = getValidColumns('variant', params.columns).map(quote);
     let includePhenotypeId = !params.columns || params.columns.includes('phenotype_id');
     let includeSex = !params.columns || params.columns.includes('sex');
@@ -258,7 +263,7 @@ async function getVariants(connectionPool, params) {
     const conditions = [
         coalesce(params.id, `id = :id`),
         coalesce(params.snp, `snp = :snp`),
-        coalesce(params.chromosome, `chromosome = :chromosome`),
+        // coalesce(params.chromosome, `chromosome = :chromosome`),
         coalesce(params.position, `position = :position`),
         coalesce(params.position_min, `position >= :position_min`),
         coalesce(params.position_max, `position <= :position_max`),
@@ -285,13 +290,15 @@ async function getVariants(connectionPool, params) {
     let offset = +params.offset || 0;
 
     // sql_calc_found_rows will eventually be deprecated, so we'll need to fall back using a secondary count(*) query at some point
-    let sql = tableNames.map(name => {
+    let sql = tableNames.map((name, i) => {
         const [phenotype_id, sex] = name.split('_').slice(-2);
         let columns = [...columnNames];
         if (includePhenotypeId) columns.unshift(`${phenotype_id} as phenotype_id`);
         if (includeSex) columns.unshift(`"${sex}" as sex`);
         return `
-            SELECT ${columns.join(',')} FROM ${name} 
+            SELECT ${columns.join(',')} 
+            FROM ${name} 
+            ${partitionNames[i] ? `PARTITION(${partitionNames[i]})` : ''}
             ${conditions.length ? `WHERE ${conditions}` : ''}`;
     }).join(' UNION ') + `
         ${params.orderBy ? `ORDER BY ${orderBy} ${order}` : ''}
@@ -309,9 +316,9 @@ async function getVariants(connectionPool, params) {
 
     // determine counts if needed
     if (params.count) {
-        let innerCountSql = tableNames.map(name => `
+        let innerCountSql = tableNames.map((name, i) => `
             SELECT COUNT(*) as count FROM ${name}
-            
+            ${partitionNames[i] ? `PARTITION(${partitionNames[i]})` : ''}
             ${conditions.length ? `WHERE ${conditions}` : ''}`).join('UNION');
         const countSql = `SELECT SUM(count) FROM (${innerCountSql}) c`;
         logger.debug(`countSql sql: ${countSql}`);
