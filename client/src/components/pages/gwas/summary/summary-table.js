@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   updateKey,
+  updateSummaryTable,
   updateSummarySnp,
   fetchSummaryTable,
   fetchSummarySnpTable,
@@ -30,16 +31,10 @@ export function SummaryResultsTable() {
     bpMin,
     bpMax,
   } = useSelector(state => state.summaryResults);
-
-  let [sex, setSex] = useState('female');
-
-  // reset stacked sex to female when phenotype changes
-  useEffect(() => {
-    setSex('female');
-  }, [selectedPhenotype, selectedSex])
+  const stackedSex = useSelector(state => state.summaryTables.stackedSex);
 
   const defaultSorted = [{
-    dataField: 'p',
+    dataField: 'p_value',
     order: 'asc'
   }];
 
@@ -94,57 +89,62 @@ export function SummaryResultsTable() {
     }
   ].filter(Boolean);
 
-  const updateSummaryTable = (key, params) => {
+  const updateSummaryTableData = (key, params) => {
     if (!selectedPhenotype || !selectedPhenotype.value) return;
     // console.log({ order, orderBy, limit, page, bpMin, bpMax });
+    let hasRangeFilter = Boolean(nlogpMin && nlogpMax && bpMin && bpMax);
+    let summaryParams = {
+      phenotype_id: selectedPhenotype.id,
+      sex: key,
+      chromosome: selectedChromosome,
+      offset: 0,
+      limit: 10,
+      orderBy: 'p_value',
+      order: 'asc',
+      p_value_nlog_min: nlogpMin,
+      p_value_nlog_max: nlogpMax,
+      position_min: bpMin,
+      position_max: bpMax,
+      ...params
+    };
 
-    // run a count query against the results only if results have been filtered
-    let shouldCount = !!(nlogpMin || nlogpMax || bpMin || bpMax);
+    // determine if we should use regular counts (for small datasets) or metadata counts (large datasets)
+    if (selectedChromosome && hasRangeFilter) {
+      summaryParams.count = true;
+    } else {
+      summaryParams.metadataCount = true;
+    }
 
-    dispatch(
-      fetchSummaryTable(key, {
-        offset: 0,
-        phenotype_id: selectedPhenotype.id,
-        sex: selectedSex === 'stacked' ? key : selectedSex,
-        chromosome: selectedChromosome,
-        count: shouldCount,
-        // key: shouldCount ? null : countKey,
-        limit: 10,
-        p_value_nlog_min: nlogpMin,
-        p_value_nlog_max: nlogpMax,
-        position_min: bpMin,
-        position_max: bpMax,
-        ...params
-      },
-        shouldCount ? {} : { resultsCount: summaryTables[key].resultsCount }
-      )
-    );
+    // console.log('summary table params', key, summaryParams)
+
+    dispatch(fetchSummaryTable(key, summaryParams));
   }
 
   const handleTableChange = async (
     key,
     type,
-    { page, sizePerPage: limit, sortField: orderBy, sortOrder: order },
+    pagination,
   ) => {
     if (!selectedPhenotype || !selectedPhenotype.value) return;
-    // console.log({ order, orderBy, limit, page, bpMin, bpMax });
+    const { page, sizePerPage, sortField, sortOrder } = pagination;
+    const cachedTable = summaryTables[key];
+    const paginationParams = {
+      offset: sizePerPage * (page - 1),
+      limit: sizePerPage,
+      orderBy: sortField,
+      order: sortOrder,
+    };
 
-    // run a count query against the results only if results have been filtered
-    let shouldCount = !!(nlogpMin || nlogpMax || bpMin || bpMax);
-
-    // otherwise, determine the metadata key we should use to retrieve aggregate counts
-    // let countKey = selectedChromosome
-    //     ? `count_${key}_${selectedChromosome}`
-    //     : `count_${key}`;
-
-    // console.log('counts', { ...summaryTables[key] })
-
-    updateSummaryTable(key, {
-      offset: limit * (page - 1),
-      limit,
-      orderBy,
-      order,
-    })
+    // only update table data if cached parameters do not match 
+    if (
+      cachedTable.offset != paginationParams.offset ||
+      cachedTable.limit != paginationParams.limit ||
+      cachedTable.orderBy != paginationParams.orderBy ||
+      cachedTable.order != paginationParams.order || 
+      cachedTable.chromosome != selectedChromosome
+    ) {
+      updateSummaryTableData(key, paginationParams);
+    }
   };
 
   const setSnp = snp => {
@@ -170,6 +170,11 @@ export function SummaryResultsTable() {
       }))
     })
   };
+
+  const updateStackedSex = (sex) => {
+    // updating stacked sex
+    dispatch(updateSummaryTable('stackedSex', sex));
+  }
 
   const handleSnpReset = () => {
     const { summarySnpTables } = getInitialState();
@@ -199,6 +204,8 @@ export function SummaryResultsTable() {
     })
   });
 
+
+
   return (
     <div className="mt-3">
 
@@ -207,13 +214,13 @@ export function SummaryResultsTable() {
           {selectedSex === 'stacked' &&
             <div className="btn-group" role="group">
               <button
-                className={`btn btn-sm ${sex === 'female' ? 'btn-primary btn-primary-gradient active' : 'btn-silver'}`}
-                onClick={e => setSex('female')}>
+                className={`btn btn-sm ${stackedSex === 'female' ? 'btn-primary btn-primary-gradient active' : 'btn-silver'}`}
+                onClick={e => updateStackedSex('female')}>
                 Female
               </button>
               <button
-                className={`btn btn-sm ${sex === 'male' ? 'btn-primary btn-primary-gradient active' : 'btn-silver'}`}
-                onClick={e => {setSex('male'); updateSummaryTable('male', {metadataCount: true})}}>
+                className={`btn btn-sm ${stackedSex === 'male' ? 'btn-primary btn-primary-gradient active' : 'btn-silver'}`}
+                onClick={e => updateStackedSex('male')}>
                 Male
               </button>
             </div>}
@@ -244,25 +251,25 @@ export function SummaryResultsTable() {
 
       {!summarySnpTables.visible && <>
         {/^(all|male|female)$/.test(selectedSex) &&
-          <Table key={`single-variant-table${sex}`} {...getVariantTableProps(selectedSex)} />}
+          <Table key={`single-variant-table${selectedSex}`} {...getVariantTableProps(selectedSex)} />}
 
         {/^stacked$/.test(selectedSex) &&
-          <Table key={`stacked-variant-table${sex}`} {...getVariantTableProps(sex)} />}
+          <Table key={`stacked-variant-table${stackedSex}`} {...getVariantTableProps(stackedSex)} />}
       </>}
 
       {summarySnpTables.visible && <>
         {/^(all|male|female)$/.test(selectedSex) &&
           <Table
-            key={`single-snp-table${sex}`}
+            key={`single-snp-table${selectedSex}`}
             keyField="variant_id"
             data={summarySnpTables[selectedSex].results}
             columns={columns} />}
 
         {/^stacked$/.test(selectedSex) &&
           <Table
-            key={`stacked-snp-table${sex}`}
+            key={`stacked-snp-table${stackedSex}`}
             keyField="variant_id"
-            data={summarySnpTables[sex].results}
+            data={summarySnpTables[stackedSex].results}
             columns={columns} />}
 
       </>}
