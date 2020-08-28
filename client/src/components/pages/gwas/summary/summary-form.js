@@ -9,6 +9,7 @@ import {
 export function SummaryResultsForm({
   phenotype = null,
   sex = 'all',
+  ancestry = 'all',
   onSubmit = any => {},
   onReset = any => {}
 }) {
@@ -20,6 +21,7 @@ export function SummaryResultsForm({
   // private members prefixed with _
   const [_phenotype, _setPhenotype] = useState(null);
   const [_sex, _setSex] = useState('all');
+  const [_ancestry, _setAncestry] = useState('all');
   // const submitRef = useRef(null);
 
   // update state when props change
@@ -27,14 +29,18 @@ export function SummaryResultsForm({
     _setPhenotype(phenotype)
     handleExistingSex(phenotype);
   }, [phenotype]);
+
   useEffect(() => _setSex(sex), [sex]);
+
+  useEffect(() => _setAncestry(ancestry), [ancestry]);
 
   // select store members
   const phenotypes = useSelector(state => state.phenotypes);
   const { 
     submitted, 
     disableSubmit, 
-    existingSexes 
+    existingSexes,
+    existingAncestries
   } = useSelector(state => state.summaryResults);
 
   const treeRef = useRef();
@@ -84,6 +90,48 @@ export function SummaryResultsForm({
     )
   }
 
+  const ancestries = {
+    all: {
+      value: 'all',
+      name: 'All'
+    },
+    white: {
+      value: 'white',
+      name: 'White'
+    },
+    black: {
+      value: 'black',
+      name: 'Black'
+    },
+    hispanic: {
+      value: 'hispanic',
+      name: 'Hispanic'
+    },
+    asian: {
+      value: 'asian',
+      name: 'Asian'
+    },
+    pacific_islander: {
+      value: 'pacific_islander',
+      name: 'Pacific Islander'
+    },
+    american_indian: {
+      value: 'american_indian',
+      name: 'American Indian'
+    },
+  };
+
+  const AncestryOptions = () => {
+    let displayOptions = existingAncestries.map((item) => ancestries[item]);
+    return (
+      <>
+        {displayOptions.map((item) => 
+          <option key={item.value} value={item.value}>{item.name}</option>
+        )}
+      </>
+    )
+  }
+
   return (
     <>
       {/* <pre>{JSON.stringify({_phenotype, _sex}, null, 2)}</pre> */}
@@ -116,13 +164,41 @@ export function SummaryResultsForm({
             _setSex(e.target.value);
             dispatch(updateSummaryResults({ disableSubmit: false }));
           }}
-          aria-label="Select sex"
+          aria-label="Select a sex"
           disabled={existingSexes.length === 0}
           >
             { existingSexes.length === 0 &&
               <option value="empty-sex" disabled defaultValue>Select a Sex</option>
             }
-            <SexOptions />
+            { existingSexes.length > 0 &&
+              <SexOptions />
+            }
+        </select>
+      </div>
+
+      <div className="mb-3">
+        <label htmlFor="summary-results-ancestry" className="required">Ancestry</label>
+        <select
+          style={{
+            // fontSize: '13.3333px',
+            color: existingAncestries.length === 0 ? '#AAAAAA' : 'unset'
+          }}
+          id="summary-results-ancestry"
+          className="form-control"
+          value={existingAncestries.length === 0 ? 'empty-ancestry' : _ancestry}
+          onChange={e => {
+            _setAncestry(e.target.value);
+            dispatch(updateSummaryResults({ disableSubmit: false }));
+          }}
+          aria-label="Select a ancestry"
+          disabled={existingAncestries.length === 0}
+          >
+            { existingAncestries.length === 0 &&
+              <option value="empty-ancestry" disabled defaultValue>Select an Ancestry</option>
+            }
+            { existingAncestries.length > 0 &&
+              <AncestryOptions />
+            }
         </select>
       </div>
 
