@@ -247,6 +247,7 @@ async function getVariants(connectionPool, params) {
             table_name like 'phenotype_variant_${id}_%'
         `).join(' UNION ')
     );
+
     const tableNames = tableNameRows
         .map(row => row.TABLE_NAME)
         .filter(name => !params.sex || (params.sex && name.includes(`_${params.sex}`)))
@@ -306,6 +307,12 @@ async function getVariants(connectionPool, params) {
     `;
 
     logger.debug(`getVariants sql: ${sql}`);
+
+    if (tableNames.length === 0) {
+        // throw('No data exists for the selected phenotype(s) stratification(s)');
+        console.log("No data exists for the selected phenotype(s)");
+        return { columns: [...columnNames], data: [] };
+    }
 
     // query database
     const [data, columns] = await connection.execute({
