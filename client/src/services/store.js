@@ -14,6 +14,8 @@ export const getInitialState = () => ({
     selectedTable: '',
     selectedSex: '',
     existingSexes: [],
+    selectedAncestry: '',
+    existingAncestries: ['all'],
     manhattanPlotView: '',
     nlogpMin: null,
     nlogpMax: null,
