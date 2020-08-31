@@ -229,6 +229,13 @@ async function getVariants(connectionPool, params) {
         params.sex = [null, 'all', 'female', 'male'][+params.id[0]]
     }
 
+    if (params.ancestry && !/^(all|white|black|hispanic|asian|pacific_islander|american_indian)(,(all|white|black|hispanic|asian|pacific_islander|american_indian))*$/.test(params.ancestry))
+        throw('Ancestry must be all, white, black, hispanic, asian, pacific_islander, or american_indian');
+
+    if (params.id && !params.ancestry) {
+        params.ancestry = [null, 'all', 'white', 'black', 'hispanic', 'asian', 'pacific_islander', 'american_indian'][+params.id[0]]
+    }
+
     const connection = await connectionPool.getConnection();
     const [phenotypes] = await connection.query(
         `SELECT * FROM phenotype WHERE id IN (?)`,
@@ -248,14 +255,19 @@ async function getVariants(connectionPool, params) {
         `).join(' UNION ')
     );
 
+    // const tableNames = tableNameRows
+    //     .map(row => row.TABLE_NAME)
+    //     .filter(name => !params.sex || (params.sex && name.includes(`_${params.sex}`)))
+
     const tableNames = tableNameRows
         .map(row => row.TABLE_NAME)
-        .filter(name => !params.sex || (params.sex && name.includes(`_${params.sex}`)))
+        .filter(name => !params.sex || (params.sex && name.includes(`_${params.sex}`)) || (params.ancestry && name.includes(`_${params.ancestry}`)));
+
 
     const partitionNames = tableNames.map(tableName => {
         let name = tableName.replace('phenotype_variant_', '');
         return params.chromosome ? `\`${name}_${params.chromosome}\`` : ''
-    })
+    });
 
     let columnNames = getValidColumns('variant', params.columns).map(quote);
     let includePhenotypeId = !params.columns || params.columns.includes('phenotype_id');
@@ -339,6 +351,7 @@ async function getVariants(connectionPool, params) {
         const countRows = await getMetadata(connection, {
             phenotype_id: params.phenotype_id,
             sex: params.sex,
+            ancestry: params.ancestry,
             chromosome: params.chromosome || 'all'
         });
         if (countRows.length) 
@@ -440,18 +453,21 @@ async function getMetadata(connection, params) {
     // validate parameters
     if ((params.phenotype_id && !/^\d+(,\d+)*$/.test(params.phenotype_id)) ||
         (params.sex && !/^(all|female|male)(,(all|female|male))*$/.test(params.sex)) ||
+        (params.ancestry && !/^(all|white|black|hispanic|asian|pacific_islander|american_indian)(,(all|white|black|hispanic|asian|pacific_islander|american_indian))*$/.test(params.ancestry)) ||
         !/^(all|x|y|\d+)(,(all|x|y|\d+))*$/.test(params.chromosome))
     return null;
 
     // parse parameters as arrays
     const phenotype_id = params.phenotype_id ? params.phenotype_id.split(',') : [];
     const sex = params.sex ? params.sex.split(',') : [];
+    const ancestry = params.ancestry ? params.ancestry.split(',') : [];
     const chromosome = params.chromosome ? params.chromosome.split(',') : [];
     const getPlaceholders = length => new Array(length).fill('?').join(',');
 
     const conditions = [
         coalesce(params.phenotype_id, `m.phenotype_id IN (${getPlaceholders(phenotype_id.length)})`),
         coalesce(params.sex, `sex IN (${getPlaceholders(sex.length)})`),
+        coalesce(params.ancestry, `ancestry IN (${getPlaceholders(ancestry.length)})`),
         coalesce(params.chromosome, `chromosome IN (${getPlaceholders(chromosome.length)})`),
         coalesce(params.countNotNull, `count IS NOT NULL`)
     ].filter(Boolean).join(' AND ');
@@ -479,6 +495,7 @@ async function getMetadata(connection, params) {
     let [metadataRows] = await connection.query(sql, [
         ...phenotype_id,
         ...sex,
+        ...ancestry,
         ...chromosome
     ]);
     return metadataRows;
