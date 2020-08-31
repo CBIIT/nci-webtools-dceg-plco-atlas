@@ -241,8 +241,6 @@ export function SummaryResultsForm({
               disabled={!_phenotype || disableSubmit}
               onClick={e => {
                 e.preventDefault();
-                console.log("_sex", _sex);
-                console.log("_ancestry", _ancestry);
                 onSubmit({phenotype: _phenotype, sex: _sex, ancestry: _ancestry});
               }}>
               Submit
