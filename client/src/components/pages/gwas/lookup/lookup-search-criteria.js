@@ -47,6 +47,17 @@ export const VariantLookupSearchCriteria = () => {
       male: 'Male'
     }[sex]);
 
+  const displayAncestry = ancestry =>
+    ({
+      all: 'All',
+      white: 'White',
+      black: 'Black',
+      hispanic: 'Hispanic',
+      asian: 'Asian',
+      pacific_islander: 'Pacific Islander',
+      american_indian: 'American Indian',
+    }[ancestry]);
+
   return (
     <div className="mb-2">
       <div className="px-3 py-2 bg-white tab-pane-bordered rounded-0">
@@ -153,6 +164,16 @@ export const VariantLookupSearchCriteria = () => {
               <b>Sex</b>:{' '}
               {searchCriteriaVariantLookup && searchCriteriaVariantLookup.sex
                 ? displaySex(searchCriteriaVariantLookup.sex)
+                : 'None'
+              }
+            </span>
+
+            <span className="border-left border-secondary mx-3" style={{maxHeight: '1.6em'}}></span>
+            
+            <span>
+              <b>Ancestry</b>:{' '}
+              {searchCriteriaVariantLookup && searchCriteriaVariantLookup.ancestry
+                ? displayAncestry(searchCriteriaVariantLookup.ancestry)
                 : 'None'
               }
             </span>

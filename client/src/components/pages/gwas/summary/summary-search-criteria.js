@@ -10,6 +10,7 @@ export const SummaryResultsSearchCriteria = () => {
     searchCriteriaSummaryResults,
     selectedPhenotype,
     selectedSex,
+    selectedAncestry,
     shareID,
     disableSubmit
   } = summaryResults;
@@ -25,6 +26,17 @@ export const SummaryResultsSearchCriteria = () => {
       female: 'Female',
       male: 'Male'
     }[sex]);
+
+  const displayAncestry = ancestry =>
+    ({
+      all: 'All',
+      white: 'White',
+      black: 'Black',
+      hispanic: 'Hispanic',
+      asian: 'Asian',
+      pacific_islander: 'Pacific Islander',
+      american_indian: 'American Indian',
+    }[ancestry]);
 
   return (
     <div className="mb-2">
@@ -45,6 +57,15 @@ export const SummaryResultsSearchCriteria = () => {
                 <b>Sex</b>:{' '}
                 {selectedSex
                   ? displaySex(selectedSex)
+                  : 'None'}
+              </span>
+
+              <span className="border-left border-secondary mx-3" style={{maxHeight: '1.6em'}}></span>
+
+              <span>
+                <b>Ancestry</b>:{' '}
+                {selectedAncestry
+                  ? displayAncestry(selectedAncestry)
                   : 'None'}
               </span>
             </div>

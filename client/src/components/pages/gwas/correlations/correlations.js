@@ -89,6 +89,7 @@ export function PhenotypeCorrelations() {
           item.title ? item.title : item.label
         ),
         sex: params.sex,
+        ancestry: params.ancestry,
         totalPhenotypes: params.phenotypes.length
       },
       submitted: new Date(),
@@ -108,7 +109,8 @@ export function PhenotypeCorrelations() {
     dispatch(
       drawHeatmap({
         phenotypes: state.selectedPhenotypes,
-        sex: state.selectedSex
+        sex: state.selectedSex,
+        // ancestry: state.selectedAncestry
       })
     );
     tooltipRef.current.resetTooltip();

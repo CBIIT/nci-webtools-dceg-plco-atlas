@@ -27,12 +27,20 @@ export function SummaryResultsForm({
   // update state when props change
   useEffect(() => {
     _setPhenotype(phenotype)
-    handleExistingSex(phenotype);
   }, [phenotype]);
 
-  useEffect(() => _setSex(sex), [sex]);
+  useEffect(() => {
+    handleExistingSex(_phenotype);
+    handleExistingAncestry(_phenotype);
+  }, [_phenotype]);
 
-  useEffect(() => _setAncestry(ancestry), [ancestry]);
+  useEffect(() => {
+    _setSex(sex);
+  }, [sex]);
+
+  useEffect(() => {
+    _setAncestry(ancestry);
+  }, [ancestry]);
 
   // select store members
   const phenotypes = useSelector(state => state.phenotypes);
@@ -54,6 +62,19 @@ export function SummaryResultsForm({
       }
     } else {
       dispatch(updateSummaryResults({ existingSexes: [] }));
+    }
+  }
+
+  const handleExistingAncestry = (chosen) => {
+    if (chosen) {
+      // const existingAncestries = phenotypes.metadata.filter((item) => item.phenotype_id === chosen.id).map((item) => item.sex).sort();
+      const existingAncestries = ['all'];
+      dispatch(updateSummaryResults({ existingAncestries }));
+      if (existingAncestries.length > 0) {
+        _setAncestry(existingAncestries[0]);
+      }
+    } else {
+      dispatch(updateSummaryResults({ existingAncestries: [] }));
     }
   }
 
@@ -143,7 +164,8 @@ export function SummaryResultsForm({
           onChange={val => {
             _setPhenotype((val && val.length) ? val[0] : null);
             dispatch(updateSummaryResults({ disableSubmit: false }));
-            handleExistingSex((val && val.length) ? val[0] : null);
+            // handleExistingSex((val && val.length) ? val[0] : null);
+            // handleExistingAncestry((val && val.length) ? val[0] : null);
           }}
           singleSelect
           ref={treeRef}
@@ -219,7 +241,9 @@ export function SummaryResultsForm({
               disabled={!_phenotype || disableSubmit}
               onClick={e => {
                 e.preventDefault();
-                onSubmit({phenotype: _phenotype, sex: _sex});
+                console.log("_sex", _sex);
+                console.log("_ancestry", _ancestry);
+                onSubmit({phenotype: _phenotype, sex: _sex, ancestry: _ancestry});
               }}>
               Submit
             </Button>
@@ -233,6 +257,7 @@ export function SummaryResultsForm({
             e.preventDefault();
             _setPhenotype(null);
             _setSex('all');
+            _setAncestry('all');
             onReset();
             treeRef.current.resetSearchFilter();
           }}>

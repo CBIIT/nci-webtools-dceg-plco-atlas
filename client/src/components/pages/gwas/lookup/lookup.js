@@ -67,6 +67,11 @@ export function VariantLookup() {
       hidden: true
     },
     {
+      dataField: 'ancestry',
+      text: 'Ancestry',
+      hidden: true
+    },
+    {
       headerTitle: () => 'Chromosome',
       dataField: 'chromosome',
       text: 'Chr.',
@@ -229,7 +234,8 @@ export function VariantLookup() {
       searchCriteriaVariantLookup: {
         phenotypes: params.phenotypes.map(item => item.title),
         variant: params.variant,
-        sex: params.sex
+        sex: params.sex,
+        ancestry: params.ancestry
       },
       submitted: new Date(),
       disableSubmit: true
@@ -238,7 +244,8 @@ export function VariantLookup() {
     dispatch(lookupVariants({
       phenotypes: params.phenotypes, 
       variant: params.variant, 
-      sex: params.sex
+      sex: params.sex,
+      ancestry: params.ancestry
     }));
   };
 
@@ -253,7 +260,9 @@ export function VariantLookup() {
       lookupVariants({
         phenotypes: state.selectedPhenotypes, 
         variant: state.selectedVariant, 
-        sex: state.selectedSex === 'combined' ? 'all' : state.selectedSex})
+        sex: state.selectedSex === 'combined' ? 'all' : state.selectedSex,
+        ancestry: state.selectedAncestry
+      })
     );
   }
 
