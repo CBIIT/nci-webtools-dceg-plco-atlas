@@ -756,6 +756,9 @@ export function lookupVariants({phenotypes, variant, sex}) {
   return async function(dispatch) {
     try {
       const {variantLookupTable} = getInitialState();
+      dispatch(
+        updateVariantLookupTable(variantLookupTable)
+      );
 //      dispatch(updateVariantLookup())
 //      dispatch(updateHeatmap(variantLookupTable));
       

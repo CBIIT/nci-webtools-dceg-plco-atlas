@@ -39,6 +39,7 @@ export function SummaryResults() {
     ranges,
     messages,
     selectedSex,
+    selectedAncestry,
     sharedState,
     existingSexes
   } = useSelector(state => state.summaryResults);
@@ -487,6 +488,7 @@ export function SummaryResults() {
             <SummaryResultsForm
               phenotype={selectedPhenotype}
               sex={selectedSex}
+              ancestry={selectedAncestry}
               onSubmit={handleSubmit}
               onReset={handleReset}
             />
