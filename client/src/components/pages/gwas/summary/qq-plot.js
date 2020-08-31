@@ -75,7 +75,6 @@ export function QQPlot({ onVariantLookup }) {
         onHover={data => {
           const [point] = data.points;
           if (point.customdata) {
-            // console.log(point.customdata);
             const {xaxis, yaxis} = point;
             const xOffset = xaxis.l2p(point.x) + xaxis._offset + 5;
             const yOffset = yaxis.l2p(point.y) + yaxis._offset + 5;
@@ -198,6 +197,7 @@ export function QQPlot({ onVariantLookup }) {
                     onClick={e => onVariantLookup({
                       phenotype: {id: tooltip.data.phenotype_id},
                       sex: tooltip.data.sex,
+                      ancestry: tooltip.data.ancestry,
                       snp: tooltip.data.snp || `chr${tooltip.data.chromosome}:${tooltip.data.position}`,
                     })}>
                     Go to Variant Lookup

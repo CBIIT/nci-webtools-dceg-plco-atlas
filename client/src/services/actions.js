@@ -270,7 +270,7 @@ export function drawManhattanPlot(plotType, params) {
   };
 }
 
-export function drawQQPlot(phenotype, sex) {
+export function drawQQPlot(phenotype, sex, ancestry) {
   return async function(dispatch) {
     try {
       dispatch(updateQQPlot({ 
@@ -445,6 +445,7 @@ export function drawQQPlot(phenotype, sex) {
             customdata: variants.map(d => ({
               phenotype_id: phenotype.id,
               sex,
+              ancestry,
               // properties below will be undefined for subsetVariants.data
               // we can use this to differentiate between these two datasets in each trace
               p: Math.pow(10, -d[1]),
@@ -752,7 +753,7 @@ export function drawHeatmap({phenotypes, sex}) {
   };
 }
 
-export function lookupVariants({phenotypes, variant, sex}) {
+export function lookupVariants({phenotypes, variant, sex, ancestry}) {
   return async function(dispatch) {
     try {
       const {variantLookupTable} = getInitialState();
@@ -778,6 +779,7 @@ export function lookupVariants({phenotypes, variant, sex}) {
       const {data} = await query('variants', {
         phenotype_id: phenotypes.map(p => p.id),
         sex: sex === 'combined' ? ['female', 'male'] : sex,
+        ancestry,
         chromosome,
         position,
         snp
@@ -806,6 +808,7 @@ export function lookupVariants({phenotypes, variant, sex}) {
           p_value: '-',
           variant_id: `not-found-${p.title || p.label}`,
           sex,
+          ancestry,
           variant
         }));
   

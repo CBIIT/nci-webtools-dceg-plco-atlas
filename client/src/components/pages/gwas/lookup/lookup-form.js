@@ -12,6 +12,7 @@ export function VariantLookupForm({ onChange, onSubmit, onReset }) {
     selectedPhenotypes, 
     selectedVariant, 
     selectedSex, 
+    selectedAncestry,
     submitted, 
     disableSubmit
   } = variantLookup;
@@ -28,7 +29,8 @@ export function VariantLookupForm({ onChange, onSubmit, onReset }) {
       onSubmit({ 
         phenotypes: selectedPhenotypes, 
         variant: selectedVariant,
-        sex: selectedSex
+        sex: selectedSex,
+        ancestry: selectedAncestry
       });
     }
   };
@@ -73,15 +75,53 @@ export function VariantLookupForm({ onChange, onSubmit, onReset }) {
           className="form-control"
           value={selectedSex}
           onChange={e => {
-            dispatch(updateVariantLookup({ 
-              selectedSex: e.target.value,
-              disableSubmit: false
-             }));
+            if (e.target.value === 'all') {
+              dispatch(updateVariantLookup({ 
+                selectedSex: e.target.value,
+                disableSubmit: false
+              }));
+            } else {
+              dispatch(updateVariantLookup({ 
+                selectedSex: e.target.value,
+                selectedAncestry: 'all',
+                disableSubmit: false
+               }));
+            }
           }}
           aria-label="Select sex">
           <option value="all">All</option>
           <option value="female">Female</option>
           <option value="male">Male</option>
+        </select>
+      </div>
+
+      <div className="mb-3">
+        <label className="required">Ancestry</label>
+        <select
+          className="form-control"
+          value={selectedAncestry}
+          onChange={e => {
+            if (e.target.value === 'all') {
+              dispatch(updateVariantLookup({ 
+                selectedAncestry: e.target.value,
+                disableSubmit: false
+               }));
+            } else {
+              dispatch(updateVariantLookup({ 
+                selectedSex: 'all',
+                selectedAncestry: e.target.value,
+                disableSubmit: false
+               }));
+            }
+          }}
+          aria-label="Select ancestry">
+          <option value="all">All</option>
+          <option value="white">White</option>
+          <option value="black">Black</option>
+          <option value="hispanic">Hispanic</option>
+          <option value="asian">Asian</option>
+          <option value="pacific_islander">Pacific Islander</option>
+          <option value="american_indian">American Indian</option>
         </select>
       </div>
 
@@ -131,7 +171,8 @@ export function VariantLookupForm({ onChange, onSubmit, onReset }) {
                 onSubmit({
                   phenotypes: selectedPhenotypes, 
                   variant: selectedVariant,
-                  sex: selectedSex
+                  sex: selectedSex,
+                  ancestry: selectedAncestry
                 });
               }}
               disabled={
