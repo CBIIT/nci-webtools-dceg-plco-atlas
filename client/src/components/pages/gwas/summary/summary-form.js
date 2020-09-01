@@ -38,12 +38,9 @@ export function SummaryResultsForm({
   // update state when props change
   useEffect(() => {
     _setPhenotype(phenotype)
+    handleExistingSex(phenotype);
+    handleExistingAncestry(phenotype);
   }, [phenotype]);
-
-  useEffect(() => {
-    handleExistingSex(_phenotype);
-    handleExistingAncestry(_phenotype);
-  }, [_phenotype]);
 
   useEffect(() => {
     _setSex(sex);
@@ -162,6 +159,8 @@ export function SummaryResultsForm({
           value={_phenotype}
           onChange={val => {
             _setPhenotype((val && val.length) ? val[0] : null);
+            handleExistingSex((val && val.length) ? val[0] : null);
+            handleExistingAncestry((val && val.length) ? val[0] : null);
             dispatch(updateSummaryResults({ disableSubmit: false }));
           }}
           singleSelect
