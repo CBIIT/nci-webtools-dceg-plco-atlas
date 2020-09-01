@@ -338,7 +338,7 @@ async function getVariants(connectionPool, params) {
         let innerCountSql = tableNames.map((name, i) => `
             SELECT COUNT(*) as count FROM ${name}
             ${partitionNames[i] ? `PARTITION(${partitionNames[i]})` : ''}
-            ${conditions.length ? `WHERE ${conditions}` : ''}`).join('UNION');
+            ${conditions.length ? `WHERE ${conditions}` : ''}`).join(' UNION ');
         const countSql = `SELECT SUM(count) FROM (${innerCountSql}) c`;
         logger.debug(`countSql sql: ${countSql}`);
 
@@ -348,10 +348,14 @@ async function getVariants(connectionPool, params) {
 
     // determine counts through metadata
     else if (params.metadataCount) {
+        const sex = /^(all|female|male|stacked)$/.test(params.metadataCount)
+            ? params.metadataCount
+            : params.sex;
+
         const countRows = await getMetadata(connection, {
             phenotype_id: params.phenotype_id,
-            sex: params.sex,
-            ancestry: params.ancestry,
+            sex,
+            // ancestry: params.ancestry,
             chromosome: params.chromosome || 'all'
         });
         if (countRows.length) 
@@ -452,7 +456,7 @@ async function getMetadata(connection, params) {
 
     // validate parameters
     if ((params.phenotype_id && !/^\d+(,\d+)*$/.test(params.phenotype_id)) ||
-        (params.sex && !/^(all|female|male)(,(all|female|male))*$/.test(params.sex)) ||
+        (params.sex && !/^(all|female|male|stacked)(,(all|female|male|stacked))*$/.test(params.sex)) ||
         (params.ancestry && !/^(all|white|black|hispanic|asian|pacific_islander|american_indian)(,(all|white|black|hispanic|asian|pacific_islander|american_indian))*$/.test(params.ancestry)) ||
         !/^(all|x|y|\d+)(,(all|x|y|\d+))*$/.test(params.chromosome))
     return null;
