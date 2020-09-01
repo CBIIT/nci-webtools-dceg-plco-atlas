@@ -197,7 +197,7 @@ export function QQPlot({ onVariantLookup }) {
                     onClick={e => onVariantLookup({
                       phenotype: {id: tooltip.data.phenotype_id},
                       sex: tooltip.data.sex,
-                      ancestry: tooltip.data.ancestry,
+                      // ancestry: tooltip.data.ancestry,
                       snp: tooltip.data.snp || `chr${tooltip.data.chromosome}:${tooltip.data.position}`,
                     })}>
                     Go to Variant Lookup

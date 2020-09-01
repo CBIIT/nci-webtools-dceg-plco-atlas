@@ -18,6 +18,17 @@ export function SummaryResultsForm({
   // been submitted, we should store the state in the component, and then emit
   // this state on submit or reset, allowing the handler to update the store
 
+  // select store members
+  const phenotypes = useSelector(state => state.phenotypes);
+  const { 
+    submitted, 
+    disableSubmit, 
+    existingSexes,
+    existingAncestries
+  } = useSelector(state => state.summaryResults);
+
+  const treeRef = useRef();
+
   // private members prefixed with _
   const [_phenotype, _setPhenotype] = useState(null);
   const [_sex, _setSex] = useState('all');
@@ -42,18 +53,8 @@ export function SummaryResultsForm({
     _setAncestry(ancestry);
   }, [ancestry]);
 
-  // select store members
-  const phenotypes = useSelector(state => state.phenotypes);
-  const { 
-    submitted, 
-    disableSubmit, 
-    existingSexes,
-    existingAncestries
-  } = useSelector(state => state.summaryResults);
-
-  const treeRef = useRef();
-
   const handleExistingSex = (chosen) => {
+    if (!phenotypes || !phenotypes.metadata) return;
     if (chosen) {
       const existingSexes = phenotypes.metadata.filter((item) => item.phenotype_id === chosen.id).map((item) => item.sex).sort();
       dispatch(updateSummaryResults({ existingSexes }));
@@ -66,6 +67,7 @@ export function SummaryResultsForm({
   }
 
   const handleExistingAncestry = (chosen) => {
+    if (!phenotypes || !phenotypes.metadata) return;
     if (chosen) {
       // const existingAncestries = phenotypes.metadata.filter((item) => item.phenotype_id === chosen.id).map((item) => item.sex).sort();
       const existingAncestries = ['all'];
@@ -99,9 +101,6 @@ export function SummaryResultsForm({
 
   const SexOptions = () => {
     let displayOptions = existingSexes.map((item) => sexes[item]);
-    if (existingSexes.includes('female') && existingSexes.includes('male')) {
-      displayOptions.push(sexes['stacked']);
-    }
     return (
       <>
         {displayOptions.map((item) => 
@@ -164,8 +163,6 @@ export function SummaryResultsForm({
           onChange={val => {
             _setPhenotype((val && val.length) ? val[0] : null);
             dispatch(updateSummaryResults({ disableSubmit: false }));
-            // handleExistingSex((val && val.length) ? val[0] : null);
-            // handleExistingAncestry((val && val.length) ? val[0] : null);
           }}
           singleSelect
           ref={treeRef}
