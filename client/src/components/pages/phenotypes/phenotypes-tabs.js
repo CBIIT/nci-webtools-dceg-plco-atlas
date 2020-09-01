@@ -135,12 +135,13 @@ export function PhenotypesTabs(props) {
         let categories = phenotypeData.categoryTypes[distributionKey]
         for (let type of categories) {
           let index = categories.indexOf(type);
-          data.push({
-            value,
-            type,
-            counts: counts[value][index],
-            percentage: percentage[value][index]
-          })
+          if (counts[value] !== undefined)
+            data.push({
+              value,
+              type,
+              counts: counts[value][index],
+              percentage: percentage[value][index]
+            })
         }
       }
     } else {
