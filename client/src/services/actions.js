@@ -227,8 +227,9 @@ export function drawManhattanPlot(plotType, params) {
       const metadata = await query('metadata', {
         phenotype_id: params.phenotype_id,
         chromosome: 'all',
-        sex: params.sex,
+        sex: params.sex.length === 2 ? 'stacked' : params.sex,
       });
+
       dispatch(updateQQPlot({ 
         sampleSize: metadata.reduce((a, b) => a + b.count, 0),
       }));
@@ -287,6 +288,13 @@ export function drawQQPlot(phenotype, sex, ancestry) {
         chromosome: 'all',
         sex: sexes,
       });
+
+      const stackedMetadata = sex === 'stacked'
+        ? await query('metadata', {
+          phenotype_id: phenotype.id,
+          chromosome: 'all',
+          sex: 'stacked',
+        }) : null;
 
       // the title property is only used for non-stacked plots
       // stacked plots use the legend instead as the title
@@ -375,7 +383,7 @@ export function drawQQPlot(phenotype, sex, ancestry) {
         // loadingQQPlot: false,
         // qqplotData: data.flat(),
         qqplotLayout: layout,
-        sampleSize: metadata.reduce((a, b) => a + b.count, 0),
+        sampleSize: (sex === 'stacked' ? stackedMetadata : metadata).reduce((a, b) => a + b.count, 0),
       }));
       
       let data = [];
