@@ -116,12 +116,12 @@ export function VariantLookupForm({ onChange, onSubmit, onReset }) {
           }}
           aria-label="Select ancestry">
           <option value="all">All</option>
-          <option value="white">White</option>
+          {/* <option value="white">White</option>
           <option value="black">Black</option>
           <option value="hispanic">Hispanic</option>
           <option value="asian">Asian</option>
           <option value="pacific_islander">Pacific Islander</option>
-          <option value="american_indian">American Indian</option>
+          <option value="american_indian">American Indian</option> */}
         </select>
       </div>
 

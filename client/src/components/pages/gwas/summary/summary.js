@@ -54,7 +54,7 @@ export function SummaryResults() {
   const setSelectedPlot = selectedPlot => {
     dispatch(updateSummaryResults({ selectedPlot }));
     if (submitted && selectedPlot === 'qq-plot' && qqplotData.length === 0) {
-      dispatch(drawQQPlot(selectedPhenotype, selectedSex, selectedAncestry));
+      dispatch(drawQQPlot(selectedPhenotype, selectedSex));
     }
   };
 
@@ -129,21 +129,23 @@ export function SummaryResults() {
       ]);
     }
 
-    if (existingSexes.length > 0 && existingAncestries.length > 0) {
-      const retainSexes = existingSexes;
-      const retainAncestries = existingAncestries;
-      handleReset();
-      dispatch(updateSummaryResults({
-          existingSexes: retainSexes,
-          existingAncestries: retainAncestries
-        })
-      );
-    } else {
-      handleReset();
-    }
+    // reset results
+    const initialState = getInitialState();
+    dispatch(
+      updateManhattanPlot(initialState.manhattanPlot)
+    );
+    dispatch(
+      updateQQPlot(initialState.qqPlot)
+    );
+    dispatch(
+      updateKey('summaryTables', initialState.summaryTables)
+    );
+    dispatch(
+      updateKey('summarySnpTables', initialState.summarySnpTables)
+    );    
 
     if (selectedPlot === 'qq-plot'){
-      dispatch(drawQQPlot(phenotype, sex, ancestry));
+      dispatch(drawQQPlot(phenotype, sex));
     }
 
     drawSummaryManhattanPlots({phenotype, sex, ancestry});
@@ -335,18 +337,18 @@ export function SummaryResults() {
     );
   };
 
-  const handleVariantLookup = ({snp, sex, ancestry}) => {
+  const handleVariantLookup = ({snp, sex}) => {
     dispatch(
       updateVariantLookup({
         selectedPhenotypes: [selectedPhenotype],
         selectedVariant: snp,
         selectedSex: sex,
-        selectedAncestry: ancestry,
+        selectedAncestry: selectedAncestry,
         searchCriteriaVariantLookup: {
           phenotypes: [selectedPhenotype].map(item => item.title),
           variant: snp,
           sex: sex,
-          ancestry: ancestry
+          ancestry: selectedAncestry
         },
         submitted: new Date().getTime(),
         disableSubmit: true
@@ -357,7 +359,7 @@ export function SummaryResults() {
       phenotypes: [selectedPhenotype], 
       variant: snp, 
       sex,
-      ancestry
+      ancestry: selectedAncestry
     }));    
   };
 
@@ -374,6 +376,7 @@ export function SummaryResults() {
       selectedPhenotype,
       selectedPlot,
       selectedSex,
+      selectedAncestry
     } = state;
 
     const sexes = {
@@ -388,14 +391,14 @@ export function SummaryResults() {
         // handle default submission
         handleSubmit({phenotype: selectedPhenotype, sex: selectedSex, ancestry: selectedAncestry})
         if (selectedPlot === 'qq-plot') {
-          dispatch(drawQQPlot(selectedPhenotype, selectedSex, selectedAncestry));
+          dispatch(drawQQPlot(selectedPhenotype, selectedSex));
         }
       } else {
         // handle chromosome submission
         const range = ranges.find(r => r.chromosome === selectedChromosome);
 
         if (selectedPlot === 'qq-plot') {
-          dispatch(drawQQPlot(selectedPhenotype, selectedSex, selectedAncestry));
+          dispatch(drawQQPlot(selectedPhenotype, selectedSex));
         }
 
         dispatch(
@@ -427,7 +430,7 @@ export function SummaryResults() {
       const range = ranges.find(r => r.chromosome === selectedChromosome);
 
       if (selectedPlot === 'qq-plot') {
-        dispatch(drawQQPlot(selectedPhenotype, selectedSex, selectedAncestry));
+        dispatch(drawQQPlot(selectedPhenotype, selectedSex));
       }
 
       dispatch(
