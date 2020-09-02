@@ -97,7 +97,7 @@ describe('Store Module', function () {
               selectedPhenotypes: [],
               selectedVariant: '',
               selectedSex: 'all',
-              selectedAncestry: 'all',
+              selectedAncestry: 'european',
               messages: [],
               submitted: null,
               disableSubmit: false,
@@ -113,7 +113,7 @@ describe('Store Module', function () {
             phenotypeCorrelations: {
               selectedPhenotypes: [],
               selectedSex: 'combined',
-              selectedAncestry: 'all',
+              selectedAncestry: 'european',
               submitted: null,
               disableSubmit: false,
               messages: [],

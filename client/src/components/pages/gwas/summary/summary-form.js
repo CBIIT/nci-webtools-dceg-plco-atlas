@@ -9,7 +9,7 @@ import {
 export function SummaryResultsForm({
   phenotype = null,
   sex = 'all',
-  ancestry = 'all',
+  ancestry = 'european',
   onSubmit = any => {},
   onReset = any => {}
 }) {
@@ -32,7 +32,7 @@ export function SummaryResultsForm({
   // private members prefixed with _
   const [_phenotype, _setPhenotype] = useState(null);
   const [_sex, _setSex] = useState('all');
-  const [_ancestry, _setAncestry] = useState('all');
+  const [_ancestry, _setAncestry] = useState('european');
   // const submitRef = useRef(null);
 
   // update state when props change
@@ -67,7 +67,7 @@ export function SummaryResultsForm({
     if (!phenotypes || !phenotypes.metadata) return;
     if (chosen) {
       // const existingAncestries = phenotypes.metadata.filter((item) => item.phenotype_id === chosen.id).map((item) => item.sex).sort();
-      const existingAncestries = ['all'];
+      const existingAncestries = ['european'];
       dispatch(updateSummaryResults({ existingAncestries }));
       if (existingAncestries.length > 0) {
         _setAncestry(existingAncestries[0]);
@@ -108,34 +108,10 @@ export function SummaryResultsForm({
   }
 
   const ancestries = {
-    all: {
-      value: 'all',
-      name: 'All'
-    },
-    white: {
-      value: 'white',
-      name: 'White'
-    },
-    black: {
-      value: 'black',
-      name: 'Black'
-    },
-    hispanic: {
-      value: 'hispanic',
-      name: 'Hispanic'
-    },
-    asian: {
-      value: 'asian',
-      name: 'Asian'
-    },
-    pacific_islander: {
-      value: 'pacific_islander',
-      name: 'Pacific Islander'
-    },
-    american_indian: {
-      value: 'american_indian',
-      name: 'American Indian'
-    },
+    european: {
+      value: 'european',
+      name: 'European'
+    }
   };
 
   const AncestryOptions = () => {
@@ -251,7 +227,7 @@ export function SummaryResultsForm({
             e.preventDefault();
             _setPhenotype(null);
             _setSex('all');
-            _setAncestry('all');
+            _setAncestry('european');
             onReset();
             treeRef.current.resetSearchFilter();
           }}>

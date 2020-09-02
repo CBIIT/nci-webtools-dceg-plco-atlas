@@ -29,13 +29,7 @@ export const SummaryResultsSearchCriteria = () => {
 
   const displayAncestry = ancestry =>
     ({
-      all: 'All',
-      white: 'White',
-      black: 'Black',
-      hispanic: 'Hispanic',
-      asian: 'Asian',
-      pacific_islander: 'Pacific Islander',
-      american_indian: 'American Indian',
+      european: 'European'
     }[ancestry]);
 
   return (

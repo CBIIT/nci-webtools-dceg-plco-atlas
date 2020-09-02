@@ -97,7 +97,7 @@ export const getInitialState = () => ({
     selectedPhenotypes: [],
     selectedVariant: '',
     selectedSex: 'all',
-    selectedAncestry: 'all',
+    selectedAncestry: 'european',
     messages: [],
     submitted: null,
     disableSubmit: false,
@@ -113,7 +113,7 @@ export const getInitialState = () => ({
   phenotypeCorrelations: {
     selectedPhenotypes: [],
     selectedSex: 'combined',
-    selectedAncestry: 'all',
+    selectedAncestry: 'european',
     submitted: null,
     disableSubmit: false,
     messages: [],

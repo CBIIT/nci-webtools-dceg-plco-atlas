@@ -53,7 +53,7 @@ export function PhenotypeCorrelationsForm({ onChange, onSubmit, onReset }) {
             } else {
               dispatch(updatePhenotypeCorrelations({ 
                 selectedSex: e.target.value,
-                selectedAncestry: 'all',
+                selectedAncestry: 'european',
                 disableSubmit: false
                }));
             }
@@ -71,7 +71,7 @@ export function PhenotypeCorrelationsForm({ onChange, onSubmit, onReset }) {
           className="form-control"
           value={selectedAncestry}
           onChange={e => {
-            if (e.target.value === 'all') {
+            if (e.target.value === 'european') {
               dispatch(updatePhenotypeCorrelations({ 
                 selectedAncestry: e.target.value,
                 disableSubmit: false
@@ -85,7 +85,7 @@ export function PhenotypeCorrelationsForm({ onChange, onSubmit, onReset }) {
             }
           }}
           aria-label="Select ancestry">
-          <option value="all">All</option>
+          <option value="european">European</option>
           {/* <option value="white">White</option>
           <option value="black">Black</option>
           <option value="hispanic">Hispanic</option>
