@@ -796,6 +796,7 @@ export function lookupVariants({phenotypes, variant, sex, ancestry}) {
       const results = data.map(record => ({
         phenotype: phenotypes.find(p => p.id === record.phenotype_id).title,
         variant,
+        ancestry,
         ...record
       }));
   
