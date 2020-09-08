@@ -1523,6 +1523,7 @@ INSERT INTO phenotype_metadata (phenotype_id, sex, chromosome, average_value, st
 SELECT
     phenotype_id,
     "all" as sex,
+    "all" as ancestry,
     "all" as chromosome,
     avg(value) as average_value,
     std(value) as standard_deviation
