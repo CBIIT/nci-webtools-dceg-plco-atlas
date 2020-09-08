@@ -106,8 +106,8 @@ async function importVariants({
 }) {
 
     const partition = `\`${phenotype.id}\``; // quote partition identifier
-    const variantTableSuffix = `${phenotype.name}_${sex}_${ancestry}`;
-    const variantTable = `phenotype_variant_${variantTableSuffix}`;
+    const variantTableSuffix = `${phenotype.name}__${sex}__${ancestry}`;
+    const variantTable = `phenotype_variant__${variantTableSuffix}`;
     const aggregateTable = `phenotype_aggregate`;
 
     await connection.query(`
