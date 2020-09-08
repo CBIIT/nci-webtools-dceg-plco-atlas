@@ -1,4 +1,5 @@
 /node_modules/
+/database/raw/*
 /database/import/raw/*
 /database/import/hpc/slurm*
 /database/import/hpc/swarm*
