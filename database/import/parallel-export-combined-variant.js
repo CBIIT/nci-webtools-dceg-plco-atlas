@@ -98,16 +98,15 @@ if (/^(.gz)$/.test(fileExtension)) {
 (async function main() {
     
     try {
-        let phenotypeId = validate
-            ? validatePhenotype(phenotypePath, phenotype).id
-            : phenotype;
-
         await exportVariants({
             sqlitePath,
             inputFilePath,
             outputFilePath,
             tmpFilePath,
-            phenotypeId
+            phenotype: validatePhenotype(
+                phenotypePath, 
+                phenotype
+            )
         });
 
         process.exit(0);
@@ -163,11 +162,16 @@ async function exportVariants({
     inputFilePath,
     outputFilePath,
     tmpFilePath,
-    phenotypeId,
+    phenotype,
 }) {
     // const inputDirectory = path.dirname(inputFilePath);
     // const outputDirectory = path.dirname(outputFilePath);
+    const phenotypeId = phenotype.id;
     const databaseFilePath = path.resolve(tmpFilePath, `${phenotypeId}.db`);
+    const calculateOddsRatio = phenotype.type === 'binary';
+
+    if (fs.existsSync(databaseFilePath))
+        fs.unlinkSync(databaseFilePath)
 
     // helper function to get distinct values from an array
     const distinct = array => array.reduce((acc, curr) => 
@@ -176,6 +180,7 @@ async function exportVariants({
     );
     const firstLine = await getFirstLine(inputFilePath);
 
+    // determine ancestry/sex of stratified columns
     const stratifiedColumns = firstLine.split(/\s+/g)
         .filter(originalColumName => !['chr', 'pos', 'snp', 'tested_allele', 'other_allele'].includes(originalColumName.toLowerCase()))
         .map(originalColumName => {
@@ -276,7 +281,8 @@ async function exportVariants({
         databaseFilePath,
         `.mode csv`,
         `.separator '\t'`,
-        `.import '${inputFilePath}' prestage`
+        `.import '${inputFilePath}' prestage`,
+        `delete from prestage where chromosome = 'CHR'`
     ]));
 
     // create table for each ancestry/sex combo
@@ -287,12 +293,12 @@ async function exportVariants({
             if (additionalColumns.length < 2) continue;
 
             const stageTableName = `stage_${sex}_${ancestry}`;
-            const exportVariantFilePath = path.resolve(outputFilePath, `${phenotypeId}.${sex}.${ancestry}.variant.csv`);
-            const exportAggregateFilePath = path.resolve(outputFilePath, `${phenotypeId}.${sex}.${ancestry}.aggregate.csv`);
-            const exportMetadataFilePath = path.resolve(outputFilePath, `${phenotypeId}.${sex}.${ancestry}.metadata.csv`);
-            const exportVariantTmpFilePath = path.resolve(tmpFilePath, `${phenotypeId}.${sex}.${ancestry}.variant.csv`);
-            const exportAggregateTmpFilePath = path.resolve(tmpFilePath, `${phenotypeId}.${sex}.${ancestry}.aggregate.csv`);
-            const exportMetadataTmpFilePath = path.resolve(tmpFilePath, `${phenotypeId}.${sex}.${ancestry}.metadata.csv`);
+            const exportVariantFilePath = path.resolve(outputFilePath, `${phenotype.name}.${sex}.${ancestry}.variant.csv`);
+            const exportAggregateFilePath = path.resolve(outputFilePath, `${phenotype.name}.${sex}.${ancestry}.aggregate.csv`);
+            const exportMetadataFilePath = path.resolve(outputFilePath, `${phenotype.name}.${sex}.${ancestry}.metadata.csv`);
+            const exportVariantTmpFilePath = path.resolve(tmpFilePath, `${phenotype.name}.${sex}.${ancestry}.variant.csv`);
+            const exportAggregateTmpFilePath = path.resolve(tmpFilePath, `${phenotype.name}.${sex}.${ancestry}.aggregate.csv`);
+            const exportMetadataTmpFilePath = path.resolve(tmpFilePath, `${phenotype.name}.${sex}.${ancestry}.metadata.csv`);
             const idPrefix = [null, 'all', 'female', 'male'].indexOf(sex) 
                 + phenotypeId.toString().padStart(5, '0');
 
@@ -301,14 +307,13 @@ async function exportVariants({
                 CREATE TABLE ${stageTableName} (
                     chromosome                  VARCHAR(2),
                     position                    BIGINT,
-                    position_abs_aggregate      BIGINT,
+                    position_abs                BIGINT,
                     snp                         VARCHAR(200),
                     allele_reference            VARCHAR(200),
                     allele_alternate            VARCHAR(200),
                     allele_reference_frequency  DOUBLE,
                     p_value                     DOUBLE,
                     p_value_nlog                DOUBLE, -- negative log10(P)
-                    p_value_nlog_aggregate      DOUBLE, -- -log10(p) grouped by 1e-2
                     p_value_nlog_expected       DOUBLE, -- expected negative log10(P)
                     p_value_heterogenous        BIGINT,
                     beta                        DOUBLE,
@@ -330,14 +335,12 @@ async function exportVariants({
                 INSERT INTO ${stageTableName} (
                     chromosome,
                     position,
-                    position_abs_aggregate,
                     snp,
                     allele_reference,
                     allele_alternate,
                     allele_reference_frequency,
                     p_value,
                     p_value_nlog,
-                    p_value_nlog_aggregate,
                     p_value_heterogenous,
                     beta,
                     standard_error,
@@ -349,23 +352,23 @@ async function exportVariants({
                 SELECT 
                     p.chromosome,
                     p.position,
-                    1e6 * cast(1e-6 * (p.position + cr.position_min_abs) as int) as position_abs_aggregate,
                     p.snp,
                     p.allele_reference,
                     p.allele_alternate,
                     p.${ancestry}_allele_reference_frequency,
                     p.${sex}_${ancestry}_p_value,
                     -LOG10(p.${sex}_${ancestry}_p_value) AS p_value_nlog,
-                    1e-2 * cast(1e2 * -LOG10(p.${sex}_${ancestry}_p_value) as int) AS p_value_nlog_aggregate,
                     p.${sex}_${ancestry}_p_value_heterogenous,
                     p.${sex}_${ancestry}_beta,
                     p.${sex}_${ancestry}_standard_error,
-                    EXP(p.${sex}_${ancestry}_beta) as odds_ratio,
-                    EXP(p.${sex}_${ancestry}_beta - 1.96 * p.${sex}_${ancestry}_standard_error) as ci_95_low,
-                    EXP(p.${sex}_${ancestry}_beta + 1.96 * p.${sex}_${ancestry}_standard_error) as ci_95_high,
+                    ${calculateOddsRatio ? `EXP(p.${sex}_${ancestry}_beta)` : `NULL` } as odds_ratio,
+                    ${calculateOddsRatio ? `EXP(p.${sex}_${ancestry}_beta - 1.96 * p.${sex}_${ancestry}_standard_error)` : `NULL` } as ci_95_low,
+                    ${calculateOddsRatio ? `EXP(p.${sex}_${ancestry}_beta + 1.96 * p.${sex}_${ancestry}_standard_error)` : `NULL` } as ci_95_high,
                     p.${sex}_${ancestry}_n
                 FROM prestage p
                 INNER JOIN chromosome_range cr ON cr.chromosome = p.chromosome
+                WHERE p.${sex}_${ancestry}_p_value != 'NA' 
+                AND p.position BETWEEN cr.position_min AND cr.position_max
                 ORDER BY ${sex}_${ancestry}_p_value;
             `);
             console.log(`[${duration()} s] [${sex}, ${ancestry}] Done`);
@@ -407,10 +410,15 @@ async function exportVariants({
             db.prepare(`UPDATE ${stageTableName} SET p_value_nlog_expected = -LOG10((rowid - 0.5) / ${count})`).run();
             console.log(`[${duration()} s] [${sex}, ${ancestry}] Done`);            
 
+            // get max(-log10(p))
+            const maxPValueNlog = db.prepare(`SELECT MAX(p_value_nlog) as max FROM ${stageTableName}`).pluck().get();
+            const maxPositionAbs = db.prepare(`SELECT MAX(position_max_abs) as max FROM chromosome_range`).pluck().get();
+            const pValueNlogFactor = maxPValueNlog / 400;
+            const positionFactor = maxPositionAbs / 800;
+
             // commit changes
             console.log(`[${duration()} s] [${sex}, ${ancestry}] Committing changes...`);
             db.exec(`COMMIT`);
-
 
             console.log(`[${duration()} s] [${sex}, ${ancestry}] Finished setting up stage table, exporting variants to ${exportVariantTmpFilePath}...`);
             const exportVariantStatus = execSync(sqlitePath + processArgs([
@@ -422,8 +430,6 @@ async function exportVariants({
                     ${idPrefix} || ROW_NUMBER () OVER (
                         ORDER BY cr.rowid, s.p_value
                     ) as id, 
-                    ${phenotypeId} as phenotype_id, 
-                    '${sex}' as sex, 
                     s.chromosome,
                     s.position,
                     s.snp,
@@ -446,7 +452,7 @@ async function exportVariants({
                 ORDER BY cr.rowid, s.p_value`
             ]));
         
-            console.log("exportVariantStatus", exportVariantStatus, 
+            console.log("exportVariantStatus", String(exportVariantStatus), 
                 exportVariantStatus.stdout ? exportVariantStatus.stdout.toString() : "Success", 
                 exportVariantStatus.stderr ? exportVariantStatus.stderr.toString() : "Success");
             
@@ -456,20 +462,18 @@ async function exportVariants({
                 `.mode csv`,
                 `.headers on`,
                 `.output '${exportAggregateTmpFilePath}'`,
-                `SELECT 
-                    DISTINCT ${idPrefix} || ROW_NUMBER () OVER (
-                        ORDER BY cr.rowid, s.p_value_nlog_aggregate
-                    ) as id, 
+                `SELECT DISTINCT
                     ${phenotypeId} as phenotype_id, 
                     '${sex}' as sex, 
+                    '${ancestry}' as ancestry, 
                     s.chromosome, 
-                    s.position_abs_aggregate as position_abs, 
-                    s.p_value_nlog_aggregate as p_value_nlog 
+                    ${positionFactor} * cast((s.position + cr.position_min_abs) / ${positionFactor} as int) as position_abs,
+                    ${pValueNlogFactor} * cast(s.p_value_nlog / ${pValueNlogFactor} as int) as p_value_nlog
                 FROM ${stageTableName} s 
                 JOIN chromosome_range cr ON s.chromosome = cr.chromosome 
-                ORDER BY cr.rowid, p_value_nlog`
-            ]));
-            console.log("exportAggregateStatus", exportAggregateStatus, 
+                ORDER BY p_value_nlog`
+            ])); 
+            console.log("exportAggregateStatus", String(exportAggregateStatus), 
                 exportAggregateStatus.stdout ? exportAggregateStatus.stdout.toString() : "Success", 
                 exportAggregateStatus.stderr ? exportAggregateStatus.stderr.toString() : "Success");
             
@@ -482,24 +486,39 @@ async function exportVariants({
                 `SELECT 
                     ${phenotypeId} as phenotype_id, 
                     '${sex}' as sex, 
+                    '${ancestry}' as ancestry, 
                     'all' as chromosome, 
                     ${lambdaGC === Infinity ? 999 : lambdaGC} as lambda_gc, 
-                    ${count} as count`,
+                    count(*) as count
+                FROM ${stageTableName} s`,
                 `.headers off`,
                 `SELECT 
                     DISTINCT ${phenotypeId} as phenotype_id, 
                     '${sex}' as sex, 
+                    '${ancestry}' as ancestry, 
                     s.chromosome as chromosome, 
                     null as lambda_gc, 
                     count(*) as count 
                 FROM ${stageTableName} s 
                 JOIN chromosome_range cr ON s.chromosome = cr.chromosome 
                 GROUP BY s.chromosome 
-                ORDER BY cr.rowid`
+                ORDER BY cr.rowid`,
+                // run distinct snp query for stacked sex query once per ancestry
+                sexes.includes('male') && sexes.includes('female') && sex === 'female' ? `
+                SELECT 
+                    ${phenotypeId} as phenotype_id, 
+                    'stacked' as sex, 
+                    '${ancestry}' as ancestry, 
+                    'all' as chromosome, 
+                    null as lambda_gc, 
+                    count(distinct snp) as count
+                FROM prestage p
+                WHERE p.female_${ancestry}_p_value != 'NA' OR p.male_${ancestry}_p_value != 'NA'
+                ` : '',
             ]));
-            console.log("exportMetadataStatus", exportMetadataStatus, 
+            console.log("exportMetadataStatus", String(exportMetadataStatus), 
                 exportMetadataStatus.stdout ? exportMetadataStatus.stdout.toString() : "Success", 
-                exportAggregateStatus.stderr ? exportAggregateStatus.stderr.toString() : "Success");
+                exportAggregateStatus.stderr ? exportAggregateStatus.stderr.toString() : "Error");
             
             console.log([
                 `[${duration()} s] Finished exporting, generated the following files:`,
