@@ -50,21 +50,11 @@ importPhenotypes().then(numRows => {
         import-participant-data-category.sql
         import-phenotype-correlation.sql
         update-participant-count.js
-        update-variants-count.js
     `);
     process.exit(0);
 });
 
 async function importPhenotypes() {
-    // save current colors (use both id and display_name as keys in case one of them gets updated)
-    // const [phenotypeRows] = await connection.query(`SELECT * FROM phenotype`);
-    // const colors = phenotypeRows.reduce((colors, record) => ({
-    //     ...colors,
-    //     [record.id]: record.color,
-    //     [record.display_name]: record.color,
-    // }), {});
-
-
     if (!createPartitionsOnly) {
         console.log(`[${duration()} s] Recreating schema...`);
 
@@ -204,12 +194,10 @@ async function importPhenotypes() {
 
     // insert records (preserve color)
     for (let record of orderedRecords) {
-        const variantTable = `phenotype_variant`;
         const aggregateTable = `phenotype_aggregate`;
         const phenotypeId = record.id;
         const partition = `\`${phenotypeId}\``;
 
-        // record.color = colors[record.id] || colors[record.display_name] || null;
         if (!createPartitionsOnly)
             await connection.execute(
                 `INSERT INTO phenotype (id, parent_id, name, age_name, display_name, description, type)
@@ -220,35 +208,16 @@ async function importPhenotypes() {
         // create partitions for each phenotype (if they do not exist)
         const [partitionRows] = await connection.execute(
             `SELECT * FROM INFORMATION_SCHEMA.PARTITIONS
-            WHERE TABLE_NAME IN ('${variantTable}', '${aggregateTable}')
+            WHERE TABLE_NAME = :aggregateTable
             AND PARTITION_NAME = :phenotypeId`,
-            {phenotypeId}
+            {aggregateTable, phenotypeId}
         );
 
-        // There should be 6 subpartitions (3 per table)
-        // If there are not, we have an invalid schema and should drop the specified partitions
-        if (partitionRows.length !== 6) {
-            console.log(`[${duration()} s] (Re)creating partitions for ${record.id}:${record.name}:${record.display_name}...`);
-
-            // clear partitions if needed
-            for (let table of [variantTable, aggregateTable]) {
-                if (partitionRows.find(p => p.PARTITION_NAME == phenotypeId && p.TABLE_NAME == table)) {
-                    console.log(`[${duration()} s] Dropping partition(${partition}) on ${table}...`);
-                    await connection.query(`ALTER TABLE ${table} DROP PARTITION ${partition};`)
-                }
-
-                // create partitions
-                await connection.query(`
-                    ALTER TABLE ${table} ADD PARTITION (PARTITION ${partition} VALUES IN (${phenotypeId}) (
-                        subpartition \`${phenotypeId}_all\`,
-                        subpartition \`${phenotypeId}_female\`,
-                        subpartition \`${phenotypeId}_male\`
-                    ));
-                `);
-            }
-
+        // create partitions
+        if (!partitionRows.length) {
+            console.log(`[${duration()} s] Adding partition ${partition} to ${aggregateTable}...`);
+            await connection.query(`ALTER TABLE ${aggregateTable} ADD PARTITION (PARTITION ${partition} VALUES IN (${phenotypeId}));`);
         }
-        
     };
 
     // add color to phenotype table
