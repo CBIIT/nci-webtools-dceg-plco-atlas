@@ -1,5 +1,5 @@
 
-TRUNCATE lookup_sex;
+-- TRUNCATE lookup_sex;
 ALTER TABLE lookup_sex AUTO_INCREMENT = 1;
 insert into lookup_sex (`value`) values 
     ('all'), 
@@ -7,7 +7,7 @@ insert into lookup_sex (`value`) values
     ('male'), 
     ('stacked');
 
-TRUNCATE lookup_ancestry;
+-- TRUNCATE lookup_ancestry;
 ALTER TABLE lookup_ancestry AUTO_INCREMENT = 1;
 insert into lookup_ancestry (`value`) values 
     ('all'),

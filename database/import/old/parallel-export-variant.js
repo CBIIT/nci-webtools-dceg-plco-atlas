@@ -479,7 +479,7 @@ function exportVariants({
     ]));
     console.log("exportMetadataStatus", exportMetadataStatus, 
         exportMetadataStatus.stdout ? exportMetadataStatus.stdout.toString() : "Success", 
-        exportAggregateStatus.stderr ? exportAggregateStatus.stderr.toString() : "Success");
+        exportMetadataStatus.stderr ? exportMetadataStatus.stderr.toString() : "Success");
     
     console.log([
         `[${duration()} s] Finished exporting, generated the following files:`,

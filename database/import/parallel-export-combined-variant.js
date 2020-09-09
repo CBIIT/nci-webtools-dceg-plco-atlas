@@ -88,8 +88,8 @@ if (/^(.gz)$/.test(fileExtension)) {
     // show full decompress status if needed
     console.log("decompressStatus", 
         decompressStatus, 
-        decompressStatus.stdout ? decompressStatus.stdout.toString() : "Success", 
-        decompressStatus.stderr ? decompressStatus.stderr.toString() : "Error");
+        decompressStatus.stdout ? decompressStatus.stdout.toString() : "No STDOUT", 
+        decompressStatus.stderr ? decompressStatus.stderr.toString() : "No STDERR");
     console.log(`[${duration()} s] Done`);
 
     inputFilePath = unzippedFileDest;
@@ -461,8 +461,8 @@ async function exportVariants({
             ]));
         
             console.log("exportVariantStatus", String(exportVariantStatus), 
-                exportVariantStatus.stdout ? exportVariantStatus.stdout.toString() : "Success", 
-                exportVariantStatus.stderr ? exportVariantStatus.stderr.toString() : "Success");
+                exportVariantStatus.stdout ? exportVariantStatus.stdout.toString() : "No STDOUT", 
+                exportVariantStatus.stderr ? exportVariantStatus.stderr.toString() : "No STDERR");
             
             console.log(`[${duration()} s] [${sex}, ${ancestry}] Exporting aggregated variants to ${exportAggregateTmpFilePath}...`);
             const exportAggregateStatus = execSync(sqlitePath + processArgs([
@@ -482,8 +482,8 @@ async function exportVariants({
                 ORDER BY p_value_nlog`
             ])); 
             console.log("exportAggregateStatus", String(exportAggregateStatus), 
-                exportAggregateStatus.stdout ? exportAggregateStatus.stdout.toString() : "Success", 
-                exportAggregateStatus.stderr ? exportAggregateStatus.stderr.toString() : "Success");
+                exportAggregateStatus.stdout ? exportAggregateStatus.stdout.toString() : "No STDOUT", 
+                exportAggregateStatus.stderr ? exportAggregateStatus.stderr.toString() : "No STDERR");
             
             console.log(`[${duration()} s] [${sex}, ${ancestry}] Exporting variant metadata to ${exportMetadataTmpFilePath}...`);
             const exportMetadataStatus = execSync(sqlitePath + processArgs([
@@ -525,8 +525,8 @@ async function exportVariants({
                 ` : '',
             ]));
             console.log("exportMetadataStatus", String(exportMetadataStatus), 
-                exportMetadataStatus.stdout ? exportMetadataStatus.stdout.toString() : "Success", 
-                exportAggregateStatus.stderr ? exportAggregateStatus.stderr.toString() : "Error");
+                exportMetadataStatus.stdout ? exportMetadataStatus.stdout.toString() : "No STDOUT", 
+                exportMetadataStatus.stderr ? exportMetadataStatus.stderr.toString() : "No STDERR");
             
             console.log([
                 `[${duration()} s] Finished exporting, generated the following files:`,
