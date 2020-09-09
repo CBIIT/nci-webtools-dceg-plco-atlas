@@ -331,7 +331,7 @@ async function exportVariants({
             
             // filter/sort prestage variants into stage table
             console.log(`[${duration()} s] [${sex}, ${ancestry}] Filtering and ordering variants...`);
-            const results = db.exec(`
+            db.exec(`
                 INSERT INTO ${stageTableName} (
                     chromosome,
                     position,
