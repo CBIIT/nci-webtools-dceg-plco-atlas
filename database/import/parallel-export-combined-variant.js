@@ -375,7 +375,7 @@ async function exportVariants({
 
             // ensure p-values that are essentially 0 are set the the correct value
             console.log(`[${duration()} s] [${sex}, ${ancestry}] Correcting for infinite -log10(p)`);
-            const results = db.exec(`
+            db.exec(`
                 UPDATE ${stageTableName} 
                 SET p_value = 0, p_value_nlog = 0
                 WHERE p_value_nlog IN(9e999999, -9e999999)
