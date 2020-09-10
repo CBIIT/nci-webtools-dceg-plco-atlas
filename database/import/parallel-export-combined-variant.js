@@ -88,12 +88,17 @@ if (/^(.gz)$/.test(fileExtension)) {
     console.log(`[${duration()} s] Done`);
 
     console.log(`[${duration()} s] Unzipping...`);
-    const decompressStatus = execSync(`gzip -d ${zippedFileDest}`);
-    // show full decompress status if needed
-    console.log("decompressStatus", 
-        decompressStatus, 
-        decompressStatus.stdout ? decompressStatus.stdout.toString() : "No STDOUT", 
-        decompressStatus.stderr ? decompressStatus.stderr.toString() : "No STDERR");
+    try {
+        const decompressStatus = execSync(`gzip -d ${zippedFileDest}`);
+        // show full decompress status if needed
+        console.log("decompressStatus", 
+            decompressStatus, 
+            decompressStatus.stdout ? decompressStatus.stdout.toString() : "No STDOUT", 
+            decompressStatus.stderr ? decompressStatus.stderr.toString() : "No STDERR");
+    } catch (err) {
+        console.log(err);
+    }
+
     console.log(`[${duration()} s] Done`);
 
     inputFilePath = unzippedFileDest;
@@ -286,33 +291,52 @@ async function exportVariants({
 
     
     // load data into prestaging table
-    console.log(`.mode csv .import ${inputFilePath} prestage`);
-    console.log(`[${duration()} s] Loading data into stage table...`);
-    const importStatus = execSync(sqlitePath + processArgs([
-        databaseFilePath,
-        `.mode csv`,
-        `.separator '\t'`,
-        `.import '${inputFilePath}' prestage`,
-        `delete from prestage where chromosome = 'CHR'`
-    ]));
+    // console.log(`.mode csv .import ${inputFilePath} prestage`);
+    console.log(`[${duration()} s] Loading data into prestage table...`);
+    try {
+        const importStatus = execSync(sqlitePath + processArgs([
+            databaseFilePath,
+            `.mode csv`,
+            `.separator '\t'`,
+            `.import '${inputFilePath}' prestage`,
+            `delete from prestage where chromosome = 'CHR'`
+        ]));
+    } catch (err) {
+        console.log(err);
+    }
+    
 
     // create table for each ancestry/sex combo
     for (let sex of sexes) {
         for (let ancestry of ancestries) {
         
+            // log4js.configure({
+            //     appenders: [
+            //         { 
+            //             type: "file", 
+            //             filename: path.resolve(logpath, `${phenotype.name}.${sex}.${ancestry}.log`),
+            //             category: "stratification"
+            //         } 
+            //     ],
+            //     levels: {
+            //         "stratification": "debug"
+            //     }
+            //     // categories: { default: { appenders: ["cheese"], level: "debug" } }
+            //   });
             log4js.configure({
-                appenders: [
-                    { 
+                appenders: { 
+                    stratification: { 
                         type: "file", 
-                        filename: path.resolve(logpath, `${phenotype.name}.${sex}.${ancestry}.log`),
-                        category: "stratification"
+                        filename: path.resolve(logpath, `${phenotype.name}.${sex}.${ancestry}.log`) 
                     } 
-                ],
-                levels: {
-                    "stratification": "debug"
+                },
+                categories: { 
+                    default: { 
+                        appenders: ["stratification"], 
+                        level: "debug" 
+                    } 
                 }
-                // categories: { default: { appenders: ["cheese"], level: "debug" } }
-              });
+            });
               
             const logger = log4js.getLogger("stratification");
             // Overide console.log console.debug
@@ -576,47 +600,47 @@ async function exportVariants({
             
             console.log(`[${duration()} s] [${sex}, ${ancestry}] Exporting variant metadata to ${exportMetadataTmpFilePath}...`);
             try {
-                    const exportMetadataStatus = execSync(sqlitePath + processArgs([
-                        databaseFilePath,
-                        `.mode csv`,
-                        `.output '${exportMetadataTmpFilePath}'`,
-                        `.headers on`,
-                        `SELECT 
-                            ${phenotypeId} as phenotype_id, 
-                            '${sex}' as sex, 
-                            '${ancestry}' as ancestry, 
-                            'all' as chromosome, 
-                            ${lambdaGC === Infinity ? 999 : lambdaGC} as lambda_gc, 
-                            count(*) as count
-                        FROM ${stageTableName} s`,
-                        `.headers off`,
-                        `SELECT 
-                            DISTINCT ${phenotypeId} as phenotype_id, 
-                            '${sex}' as sex, 
-                            '${ancestry}' as ancestry, 
-                            s.chromosome as chromosome, 
-                            null as lambda_gc, 
-                            count(*) as count 
-                        FROM ${stageTableName} s 
-                        JOIN chromosome_range cr ON s.chromosome = cr.chromosome 
-                        GROUP BY s.chromosome 
-                        ORDER BY cr.rowid`,
-                        // run distinct snp query for stacked sex query once per ancestry
-                        sexes.includes('male') && sexes.includes('female') && sex === 'female' ? `
-                        SELECT 
-                            ${phenotypeId} as phenotype_id, 
-                            'stacked' as sex, 
-                            '${ancestry}' as ancestry, 
-                            'all' as chromosome, 
-                            null as lambda_gc, 
-                            count(distinct snp) as count
-                        FROM prestage p
-                        WHERE p.female_${ancestry}_p_value != 'NA' OR p.male_${ancestry}_p_value != 'NA'
-                        ` : '',
-                    ]));
-                    console.log("exportMetadataStatus", String(exportMetadataStatus), 
-                        exportMetadataStatus.stdout ? exportMetadataStatus.stdout.toString() : "No STDOUT", 
-                        exportMetadataStatus.stderr ? exportMetadataStatus.stderr.toString() : "No STDERR");
+                const exportMetadataStatus = execSync(sqlitePath + processArgs([
+                    databaseFilePath,
+                    `.mode csv`,
+                    `.output '${exportMetadataTmpFilePath}'`,
+                    `.headers on`,
+                    `SELECT 
+                        ${phenotypeId} as phenotype_id, 
+                        '${sex}' as sex, 
+                        '${ancestry}' as ancestry, 
+                        'all' as chromosome, 
+                        ${lambdaGC === Infinity ? 999 : lambdaGC} as lambda_gc, 
+                        count(*) as count
+                    FROM ${stageTableName} s`,
+                    `.headers off`,
+                    `SELECT 
+                        DISTINCT ${phenotypeId} as phenotype_id, 
+                        '${sex}' as sex, 
+                        '${ancestry}' as ancestry, 
+                        s.chromosome as chromosome, 
+                        null as lambda_gc, 
+                        count(*) as count 
+                    FROM ${stageTableName} s 
+                    JOIN chromosome_range cr ON s.chromosome = cr.chromosome 
+                    GROUP BY s.chromosome 
+                    ORDER BY cr.rowid`,
+                    // run distinct snp query for stacked sex query once per ancestry
+                    sexes.includes('male') && sexes.includes('female') && sex === 'female' ? `
+                    SELECT 
+                        ${phenotypeId} as phenotype_id, 
+                        'stacked' as sex, 
+                        '${ancestry}' as ancestry, 
+                        'all' as chromosome, 
+                        null as lambda_gc, 
+                        count(distinct snp) as count
+                    FROM prestage p
+                    WHERE p.female_${ancestry}_p_value != 'NA' OR p.male_${ancestry}_p_value != 'NA'
+                    ` : '',
+                ]));
+                console.log("exportMetadataStatus", String(exportMetadataStatus), 
+                    exportMetadataStatus.stdout ? exportMetadataStatus.stdout.toString() : "No STDOUT", 
+                    exportMetadataStatus.stderr ? exportMetadataStatus.stderr.toString() : "No STDERR");
             } catch (err) {
                 logger.error(err);
             }
