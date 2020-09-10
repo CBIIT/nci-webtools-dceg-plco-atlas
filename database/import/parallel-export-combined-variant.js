@@ -224,7 +224,7 @@ async function exportVariants({
     let sexes = distinct(stratifiedColumns.map(c => c.sex)).filter(Boolean).map(e => e.toLowerCase());
 
     // add user-defined functions
-    const db = new sqlite(databaseFilePath, {verbose: console.log});
+    const db = new sqlite(databaseFilePath);
     db.function('LOG10', {deterministic: true}, v => Math.log10(v));
     db.function('POW', {deterministic: true}, (base, exp) => Math.pow(base, exp));
     db.function('EXP', {deterministic: true}, (exp) => Math.pow(Math.E, exp));
@@ -340,8 +340,8 @@ async function exportVariants({
               
             const logger = log4js.getLogger("stratification");
             // Overide console.log console.debug
-            console.log = (msg) => logger.trace(msg);
-            console.debug = (msg) => logger.trace(msg);
+            // console.log = (msg) => logger.trace(msg);
+            // console.debug = (msg) => logger.trace(msg);
             logger.debug("Start script for " + phenotype.name + " - " + sex + " - " + ancestry);
 
             const additionalColumns = stratifiedColumns.filter(c => c.ancestry === ancestry && (c.sex === sex || c.sex === null));
@@ -386,7 +386,7 @@ async function exportVariants({
                 logger.error(err);
             }
 
-            console.log(`[${duration()} s] [${sex}, ${ancestry}] Beginning transaction...`);
+            logger.info(`[${duration()} s] [${sex}, ${ancestry}] Beginning transaction...`);
             try {
                 db.exec(`BEGIN TRANSACTION`);
             } catch (err) {
@@ -394,7 +394,7 @@ async function exportVariants({
             }
             
             // filter/sort prestage variants into stage table
-            console.log(`[${duration()} s] [${sex}, ${ancestry}] Filtering and ordering variants...`);
+            logger.info(`[${duration()} s] [${sex}, ${ancestry}] Filtering and ordering variants...`);
             try {
                 db.exec(`
                     INSERT INTO ${stageTableName} (
@@ -440,10 +440,10 @@ async function exportVariants({
                 logger.error(err);
             }
             
-            console.log(`[${duration()} s] [${sex}, ${ancestry}] Done`);
+            logger.info(`[${duration()} s] [${sex}, ${ancestry}] Done`);
 
             // ensure p-values that are essentially 0 are set the the correct value
-            console.log(`[${duration()} s] [${sex}, ${ancestry}] Correcting for infinite -log10(p)`);
+            logger.info(`[${duration()} s] [${sex}, ${ancestry}] Correcting for infinite -log10(p)`);
             try {
                 db.exec(`
                     UPDATE ${stageTableName} 
@@ -462,10 +462,10 @@ async function exportVariants({
                 logger.error(err);
             }
             
-            console.log(`[${duration()} s] [${sex}, ${ancestry}] Finished loading ${count} records into stage table...`);
+            logger.info(`[${duration()} s] [${sex}, ${ancestry}] Finished loading ${count} records into stage table...`);
             
             // determine median and lambda gc
-            console.log(`[${duration()} s] [${sex}, ${ancestry}] Determining lambdagc...`);
+            logger.info(`[${duration()} s] [${sex}, ${ancestry}] Determining lambdagc...`);
             const medianRowIds = count % 2 === 0 
                 ? [Math.floor(count / 2), Math.ceil(count / 2)] 
                 : [Math.ceil(count / 2)];
@@ -481,12 +481,12 @@ async function exportVariants({
             }
             
             const lambdaGC = getLambdaGC(median);
-            console.log(`[${duration()} s] [${sex}, ${ancestry}] Done`);
+            logger.info(`[${duration()} s] [${sex}, ${ancestry}] Done`);
             // console.log(`[${duration()} s] [${sex}, ${ancestry}] Median/LambdaGC ${{median, lambdaGC}}`);
             
             // calculate the show_qq_plot flag using -x^2, using rowid as the index parameter
             const numPoints = 5000;
-            console.log(`[${duration()} s] [${sex}, ${ancestry}] Determining show_qq_plot flag for ${numPoints} points...`);
+            logger.info(`[${duration()} s] [${sex}, ${ancestry}] Determining show_qq_plot flag for ${numPoints} points...`);
             try {
                 db.prepare(`
                     WITH ids as (
@@ -500,17 +500,17 @@ async function exportVariants({
                 logger.error(err);
             }
             
-            console.log(`[${duration()} s] [${sex}, ${ancestry}] Done`);
+            logger.info(`[${duration()} s] [${sex}, ${ancestry}] Done`);
             
             // update expected -log10(p) values based on ppoints function
-            console.log(`[${duration()} s] [${sex}, ${ancestry}] Updating expected -log10(p) values...`);
+            logger.info(`[${duration()} s] [${sex}, ${ancestry}] Updating expected -log10(p) values...`);
             try {
                 db.prepare(`UPDATE ${stageTableName} SET p_value_nlog_expected = -LOG10((rowid - 0.5) / ${count})`).run();
             } catch (err) {
                 logger.error(err);
             }
 
-            console.log(`[${duration()} s] [${sex}, ${ancestry}] Done`);            
+            logger.info(`[${duration()} s] [${sex}, ${ancestry}] Done`);            
 
             // get max(-log10(p))
             let maxPValueNlog;
@@ -531,14 +531,14 @@ async function exportVariants({
             const positionFactor = maxPositionAbs / 800;
 
             // commit changes
-            console.log(`[${duration()} s] [${sex}, ${ancestry}] Committing changes...`);
+            logger.info(`[${duration()} s] [${sex}, ${ancestry}] Committing changes...`);
             try {
                 db.exec(`COMMIT`);
             } catch (err) {
                 logger.error(err);
             }
 
-            console.log(`[${duration()} s] [${sex}, ${ancestry}] Finished setting up stage table, exporting variants to ${exportVariantTmpFilePath}...`);
+            logger.info(`[${duration()} s] [${sex}, ${ancestry}] Finished setting up stage table, exporting variants to ${exportVariantTmpFilePath}...`);
             try {
                 const exportVariantStatus = execSync(sqlitePath + processArgs([
                     databaseFilePath,
@@ -570,14 +570,14 @@ async function exportVariants({
                     JOIN chromosome_range cr ON s.chromosome = cr.chromosome 
                     ORDER BY cr.rowid, s.p_value`
                 ]));
-                console.log("exportVariantStatus", String(exportVariantStatus), 
+                logger.info("exportVariantStatus", String(exportVariantStatus), 
                     exportVariantStatus.stdout ? exportVariantStatus.stdout.toString() : "No STDOUT", 
                     exportVariantStatus.stderr ? exportVariantStatus.stderr.toString() : "No STDERR");
             } catch (err) {
                 logger.error(err);
             }
             
-            console.log(`[${duration()} s] [${sex}, ${ancestry}] Exporting aggregated variants to ${exportAggregateTmpFilePath}...`);
+            logger.info(`[${duration()} s] [${sex}, ${ancestry}] Exporting aggregated variants to ${exportAggregateTmpFilePath}...`);
             try {
                 const exportAggregateStatus = execSync(sqlitePath + processArgs([
                     databaseFilePath,
@@ -595,14 +595,14 @@ async function exportVariants({
                     JOIN chromosome_range cr ON s.chromosome = cr.chromosome 
                     ORDER BY p_value_nlog`
                 ])); 
-                console.log("exportAggregateStatus", String(exportAggregateStatus), 
+                logger.info("exportAggregateStatus", String(exportAggregateStatus), 
                     exportAggregateStatus.stdout ? exportAggregateStatus.stdout.toString() : "No STDOUT", 
                     exportAggregateStatus.stderr ? exportAggregateStatus.stderr.toString() : "No STDERR");
             } catch (err) {
                 logger.error(err);
             }
             
-            console.log(`[${duration()} s] [${sex}, ${ancestry}] Exporting variant metadata to ${exportMetadataTmpFilePath}...`);
+            logger.info(`[${duration()} s] [${sex}, ${ancestry}] Exporting variant metadata to ${exportMetadataTmpFilePath}...`);
             try {
                 const exportMetadataStatus = execSync(sqlitePath + processArgs([
                     databaseFilePath,
@@ -642,14 +642,14 @@ async function exportVariants({
                     WHERE p.female_${ancestry}_p_value != 'NA' OR p.male_${ancestry}_p_value != 'NA'
                     ` : '',
                 ]));
-                console.log("exportMetadataStatus", String(exportMetadataStatus), 
+                logger.info("exportMetadataStatus", String(exportMetadataStatus), 
                     exportMetadataStatus.stdout ? exportMetadataStatus.stdout.toString() : "No STDOUT", 
                     exportMetadataStatus.stderr ? exportMetadataStatus.stderr.toString() : "No STDERR");
             } catch (err) {
                 logger.error(err);
             }
             
-            console.log([
+            logger.info([
                 `[${duration()} s] Finished exporting, generated the following files:`,
                 exportVariantTmpFilePath, 
                 exportAggregateTmpFilePath, 
@@ -657,17 +657,17 @@ async function exportVariants({
             ].join('\n'));
         
             if (outputFilePath !== tmpFilePath) {
-                console.log(`[${duration()} s] [${sex}, ${ancestry}] Copying ${exportVariantTmpFilePath} to ${exportVariantFilePath}...`);
+                logger.info(`[${duration()} s] [${sex}, ${ancestry}] Copying ${exportVariantTmpFilePath} to ${exportVariantFilePath}...`);
                 fs.copyFileSync(exportVariantTmpFilePath, exportVariantFilePath);
-                console.log(`[${duration()} s] [${sex}, ${ancestry}] Done`);
+                logger.info(`[${duration()} s] [${sex}, ${ancestry}] Done`);
                 
-                console.log(`[${duration()} s] [${sex}, ${ancestry}] Copying ${exportAggregateTmpFilePath} to ${exportAggregateFilePath}...`);
+                logger.info(`[${duration()} s] [${sex}, ${ancestry}] Copying ${exportAggregateTmpFilePath} to ${exportAggregateFilePath}...`);
                 fs.copyFileSync(exportAggregateTmpFilePath, exportAggregateFilePath);
-                console.log(`[${duration()} s] [${sex}, ${ancestry}] Done`);
+                logger.info(`[${duration()} s] [${sex}, ${ancestry}] Done`);
             
-                console.log(`[${duration()} s] [${sex}, ${ancestry}] Copying ${exportMetadataTmpFilePath} to ${exportMetadataFilePath}...`);
+                logger.info(`[${duration()} s] [${sex}, ${ancestry}] Copying ${exportMetadataTmpFilePath} to ${exportMetadataFilePath}...`);
                 fs.copyFileSync(exportMetadataTmpFilePath, exportMetadataFilePath);
-                console.log(`[${duration()} s] [${sex}, ${ancestry}] Done exporting csv files\n\n`);
+                logger.info(`[${duration()} s] [${sex}, ${ancestry}] Done exporting csv files\n\n`);
             }
         }
     }
