@@ -455,8 +455,9 @@ async function exportVariants({
             }
             
             // determine count
+            let count;
             try {
-                const count = db.prepare(`SELECT last_insert_rowid()`).pluck().get();
+                count = db.prepare(`SELECT last_insert_rowid()`).pluck().get();
             } catch (err) {
                 logger.error(err);
             }
@@ -469,8 +470,9 @@ async function exportVariants({
                 ? [Math.floor(count / 2), Math.ceil(count / 2)] 
                 : [Math.ceil(count / 2)];
             const placeholders = medianRowIds.map(m => '?').join(',');
+            let median;
             try {
-                const median = db
+                median = db
                 .prepare(`SELECT AVG(p_value) FROM ${stageTableName} WHERE rowid IN (${placeholders})`)
                 .pluck()
                 .get(medianRowIds);
@@ -511,14 +513,16 @@ async function exportVariants({
             console.log(`[${duration()} s] [${sex}, ${ancestry}] Done`);            
 
             // get max(-log10(p))
+            let maxPValueNlog;
             try {
-                const maxPValueNlog = db.prepare(`SELECT MAX(p_value_nlog) as max FROM ${stageTableName}`).pluck().get();
+                maxPValueNlog = db.prepare(`SELECT MAX(p_value_nlog) as max FROM ${stageTableName}`).pluck().get();
             } catch (err) {
                 logger.error(err);
             }
 
+            let maxPositionAbs;
             try {
-                const maxPositionAbs = db.prepare(`SELECT MAX(position_max_abs) as max FROM chromosome_range`).pluck().get();
+                maxPositionAbs = db.prepare(`SELECT MAX(position_max_abs) as max FROM chromosome_range`).pluck().get();
             } catch (err) {
                 logger.error(err);
             }
