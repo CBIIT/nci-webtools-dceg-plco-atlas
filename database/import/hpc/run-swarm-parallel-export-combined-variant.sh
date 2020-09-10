@@ -41,6 +41,13 @@ if [ $3 == "--validate" ]
         fi
 fi
 
+CURRENT_DATE=$(date +%F)
+
+mkdir ./swarm_out_$CURRENT_DATE
+
+# Log path
+LOG_PATH="./swarm_out_$CURRENT_DATE"
+
 # Temporary lscatch space directory path
 TMP_DIR="/lscratch/\$SLURM_JOB_ID"
 
@@ -69,23 +76,19 @@ do
         for DFILE in $FILE/*
         do
             echo "Found file: $DFILE"
-            echo "$DEPENDENCIES node $EXPORT_SCRIPT --file $DFILE --output $OUTPUT_DIR --tmp $TMP_DIR $VALIDATE"
-            echo "$DEPENDENCIES node $EXPORT_SCRIPT --file $DFILE --output $OUTPUT_DIR --tmp $TMP_DIR $VALIDATE" >> $SWARM_FILE
+            echo "$DEPENDENCIES node $EXPORT_SCRIPT --file $DFILE --output $OUTPUT_DIR --logdir $LOG_PATH --tmp $TMP_DIR $VALIDATE"
+            echo "$DEPENDENCIES node $EXPORT_SCRIPT --file $DFILE --output $OUTPUT_DIR --logdir $LOG_PATH --tmp $TMP_DIR $VALIDATE" >> $SWARM_FILE
             echo ""
         done
     else
         echo "Found file: $FILE"
-        echo "$DEPENDENCIES node $EXPORT_SCRIPT --file $FILE --output $OUTPUT_DIR --tmp $TMP_DIR $VALIDATE"
-        echo "$DEPENDENCIES node $EXPORT_SCRIPT --file $FILE --output $OUTPUT_DIR --tmp $TMP_DIR $VALIDATE" >> $SWARM_FILE
+        echo "$DEPENDENCIES node $EXPORT_SCRIPT --file $FILE --output $OUTPUT_DIR --logdir $LOG_PATH --tmp $TMP_DIR $VALIDATE"
+        echo "$DEPENDENCIES node $EXPORT_SCRIPT --file $FILE --output $OUTPUT_DIR --logdir $LOG_PATH --tmp $TMP_DIR $VALIDATE" >> $SWARM_FILE
         echo ""
     fi
 done
 
 [ -d $OUTPUT_DIR ] && echo "$OUTPUT_DIR directory already exists" || mkdir $OUTPUT_DIR
-
-CURRENT_DATE=$(date +%F)
-
-mkdir ./swarm_out_$CURRENT_DATE
 
 # Run generated SWARM file
 # -f <filename> = specify .swarm file
@@ -93,4 +96,4 @@ mkdir ./swarm_out_$CURRENT_DATE
 # -g <#> = number of gb for each process subjob
 # --verbose <0-6> = choose verbose level, 6 being the most chatty
 # --gres=lscratch:<#> = number of gb of tmp space for each process subjob
-swarm -f $SWARM_FILE -t 2 -g 4 --verbose 3 --gres=lscratch:60 --merge-output --logdir ./swarm_out_$CURRENT_DATE
+swarm -f $SWARM_FILE -t 2 -g 4 --verbose 3 --gres=lscratch:60 --merge-output --logdir $LOG_PATH
