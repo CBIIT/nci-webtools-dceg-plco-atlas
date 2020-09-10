@@ -38,7 +38,7 @@ const phenotypeFilePath = phenotypeFile || '../raw/phenotype.csv';
 let inputFilePath = path.resolve(file);
 const filename = path.basename(inputFilePath);
 const outputFilePath = path.resolve(output);
-const logdir = path.resolve(logdir);
+const logpath = path.resolve(logdir);
 const tmpFilePath = tmp ? path.resolve(tmp) : outputFilePath;
 
 const phenotypePath = path.resolve(phenotypeFilePath);
@@ -106,7 +106,7 @@ if (/^(.gz)$/.test(fileExtension)) {
             sqlitePath,
             inputFilePath,
             outputFilePath,
-            logdir,
+            logpath,
             tmpFilePath,
             phenotype: validatePhenotype(
                 phenotypePath, 
@@ -166,7 +166,7 @@ async function exportVariants({
     sqlitePath,
     inputFilePath,
     outputFilePath,
-    logdir,
+    logpath,
     tmpFilePath,
     phenotype,
 }) {
@@ -304,7 +304,7 @@ async function exportVariants({
                 appenders: [
                     { 
                         type: "file", 
-                        filename: path.resolve(logdir, `${phenotype.name}.${sex}.${ancestry}.log`),
+                        filename: path.resolve(logpath, `${phenotype.name}.${sex}.${ancestry}.log`),
                         category: "stratification"
                     } 
                 ],
