@@ -6,7 +6,8 @@ const parseCsv = require('csv-parse/lib/sync')
 const { timestamp } = require('./utils/logging');
 const { getLambdaGC } = require('./utils/math');
 const args = require('minimist')(process.argv.slice(2));
-const log4js = require("log4js");
+// const log4js = require("log4js");
+const { configure, getLogger } = require("log4js");
 
 
 /**
@@ -311,34 +312,26 @@ async function exportVariants({
         for (let ancestry of ancestries) {
         
             // log4js.configure({
-            //     appenders: [
-            //         { 
+            //     appenders: { 
+            //         stratification: { 
             //             type: "file", 
-            //             filename: path.resolve(logpath, `${phenotype.name}.${sex}.${ancestry}.log`),
-            //             category: "stratification"
+            //             filename: path.resolve(logpath, `${phenotype.name}.${sex}.${ancestry}.log`) 
             //         } 
-            //     ],
-            //     levels: {
-            //         "stratification": "debug"
+            //     },
+            //     categories: { 
+            //         default: { 
+            //             appenders: ["stratification"], 
+            //             level: "debug" 
+            //         } 
             //     }
-            //     // categories: { default: { appenders: ["cheese"], level: "debug" } }
-            //   });
-            log4js.configure({
-                appenders: { 
-                    stratification: { 
-                        type: "file", 
-                        filename: path.resolve(logpath, `${phenotype.name}.${sex}.${ancestry}.log`) 
-                    } 
-                },
-                categories: { 
-                    default: { 
-                        appenders: ["stratification"], 
-                        level: "debug" 
-                    } 
-                }
-            });
+            // });
               
-            const logger = log4js.getLogger("stratification");
+            // const logger = log4js.getLogger("stratification");
+
+            configure(path.resolve(logpath, `${phenotype.name}.${sex}.${ancestry}.log`));
+            const logger = getLogger();
+            logger.level = "debug";
+
             // Overide console.log console.debug
             // console.log = (msg) => logger.trace(msg);
             // console.debug = (msg) => logger.trace(msg);
