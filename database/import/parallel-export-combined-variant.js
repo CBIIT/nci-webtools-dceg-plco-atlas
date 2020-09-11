@@ -6,8 +6,8 @@ const parseCsv = require('csv-parse/lib/sync')
 const { timestamp } = require('./utils/logging');
 const { getLambdaGC } = require('./utils/math');
 const args = require('minimist')(process.argv.slice(2));
-// const log4js = require("log4js");
-const { configure, getLogger } = require("log4js");
+const winston = require('winston');
+const { format } = winston;
 
 
 /**
@@ -46,8 +46,9 @@ const phenotypePath = path.resolve(phenotypeFilePath);
 let [fileNamePhenotype] = filename.split('.');
 if (!phenotype) phenotype = fileNamePhenotype;
 
-//const errorLog = getLogStream(`./failed-variants-${new Date().toISOString()}.txt`);
-const errorLog = {write: e => console.log(e)};
+// const errorLog = getLogStream(`./failed-variants-${new Date().toISOString()}.txt`);
+// const errorLog = {write: e => console.log(e)};
+
 const getTimestamp = timestamp({includePreviousTime: true});
 const processArgs = args => args.map(arg => ` "${arg.replace(/\n/g, ' ')}"`).join(``);
 const duration = () => {
@@ -96,6 +97,7 @@ if (/^(.gz)$/.test(fileExtension)) {
             decompressStatus, 
             decompressStatus.stdout ? decompressStatus.stdout.toString() : "No STDOUT", 
             decompressStatus.stderr ? decompressStatus.stderr.toString() : "No STDERR");
+        console.log(`[${duration()} s] Finished unzipping data file...`);
     } catch (err) {
         console.log(err);
     }
@@ -289,10 +291,8 @@ async function exportVariants({
     } catch (err) {
         console.log(err);
     }
-
     
     // load data into prestaging table
-    // console.log(`.mode csv .import ${inputFilePath} prestage`);
     console.log(`[${duration()} s] Loading data into prestage table...`);
     try {
         const importStatus = execSync(sqlitePath + processArgs([
@@ -302,6 +302,11 @@ async function exportVariants({
             `.import '${inputFilePath}' prestage`,
             `delete from prestage where chromosome = 'CHR'`
         ]));
+        console.log("importStatus", 
+            importStatus, 
+            importStatus.stdout ? importStatus.stdout.toString() : "No STDOUT", 
+            importStatus.stderr ? importStatus.stderr.toString() : "No STDERR");
+        console.log(`[${duration()} s] Finished loading data into prestage table...`);
     } catch (err) {
         console.log(err);
     }
@@ -310,32 +315,37 @@ async function exportVariants({
     // create table for each ancestry/sex combo
     for (let sex of sexes) {
         for (let ancestry of ancestries) {
-        
-            // log4js.configure({
-            //     appenders: { 
-            //         stratification: { 
-            //             type: "file", 
-            //             filename: path.resolve(logpath, `${phenotype.name}.${sex}.${ancestry}.log`) 
-            //         } 
-            //     },
-            //     categories: { 
-            //         default: { 
-            //             appenders: ["stratification"], 
-            //             level: "debug" 
-            //         } 
-            //     }
-            // });
-              
-            // const logger = log4js.getLogger("stratification");
 
-            configure(path.resolve(logpath, `${phenotype.name}.${sex}.${ancestry}.log`));
-            const logger = getLogger();
-            logger.level = "debug";
+            winston.loggers.add(`${phenotype.name}.${sex}.${ancestry}`, {
+                level: 'info',
+                format: format.combine(
+                  format.errors({ stack: true }), // <-- use errors format
+                  // format.colorize(),
+                  format.timestamp(),
+                  format.prettyPrint(),
+                  format.label({ label: '[PLCO-SERVER]' }),
+                  format.timestamp({
+                    format: 'YYYY-MM-DD HH:mm:ss'
+                  }),
+                  
+                  format.printf(info => {
+                    if (info.level === 'error') {
+                      return `[${info.timestamp}] [${info.level}] ${info.stack}`;
+                    } else {
+                      return `[${info.timestamp}] [${info.level}] ${info.message}`;
+                    }
+                  })
+                ),
+                transports: [
+                    new winston.transports.File( { filename: `${logpath}/${phenotype.name}.${sex}.${ancestry}.log` }),
+                    new winston.transports.Console()
+                ],
+                exitOnError: false
+            });
 
-            // Overide console.log console.debug
-            // console.log = (msg) => logger.trace(msg);
-            // console.debug = (msg) => logger.trace(msg);
-            logger.debug("Start script for " + phenotype.name + " - " + sex + " - " + ancestry);
+            const logger = winston.loggers.get(`${phenotype.name}.${sex}.${ancestry}`);
+
+            logger.info("Exporting " + phenotype.name + " - " + sex + " - " + ancestry);
 
             const additionalColumns = stratifiedColumns.filter(c => c.ancestry === ancestry && (c.sex === sex || c.sex === null));
             // do not continue if we are missing columns
