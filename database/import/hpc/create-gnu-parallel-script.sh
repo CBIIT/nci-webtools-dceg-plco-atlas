@@ -3,7 +3,7 @@
 # GNU Parallel file
 PARALLEL_FILE="gnu-parallel-import-all-phenotypes.txt"
 # Export script path
-IMPORT_SCRIPT="../parallel-import-variant.js"
+IMPORT_SCRIPT="../parallel-import-combined-variant.js"
 
 # ARGUMENT 1: Data directory path
 # DATA_DIR="../raw/output"
