@@ -93,4 +93,4 @@ mkdir ./swarm_out_$CURRENT_DATE
 # -g <#> = number of gb for each process subjob
 # --verbose <0-6> = choose verbose level, 6 being the most chatty
 # --gres=lscratch:<#> = number of gb of tmp space for each process subjob
-swarm -f $SWARM_FILE -t 2 -g 4 --verbose 3 --gres=lscratch:300 --logdir ./swarm_out_$CURRENT_DATE
+swarm -f $SWARM_FILE -t 2 -g 4 --verbose 3 --gres=lscratch:60 --logdir ./swarm_out_$CURRENT_DATE
