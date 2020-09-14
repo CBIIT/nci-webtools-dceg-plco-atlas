@@ -10,7 +10,6 @@ const {
   connection,
   getSummary,
   getVariants,
-  getPoints,
   getMetadata,
   getGenes,
   getCorrelations,
@@ -102,12 +101,6 @@ app.get("/summary", async ({ query }, res) => {
 // retrieves all variants within the specified range
 app.get("/variants", async ({ query }, res) => {
   return getVariants(connection, query);
-});
-
-// retrieves all variants as points within the specified range
-// note: this is faster than /variants since only a subset of variants are stored as points
-app.get("/points", async ({ query }, res) => {
-  return getPoints(connection, query);
 });
 
 // retrieves metadata
