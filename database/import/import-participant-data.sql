@@ -1519,7 +1519,7 @@ ALTER TABLE participant_data
     ADD INDEX idx_participant_data__phenotype_id  (phenotype_id);
 
 -- insert average and standard deviation metadata
-INSERT INTO phenotype_metadata (phenotype_id, sex, chromosome, average_value, standard_deviation)
+INSERT INTO phenotype_metadata (phenotype_id, sex, ancestry, chromosome, average_value, standard_deviation)
 SELECT
     phenotype_id,
     "all" as sex,
