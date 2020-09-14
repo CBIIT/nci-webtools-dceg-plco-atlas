@@ -10,6 +10,7 @@ import { query } from '../../../../services/query';
 export function QQPlot({ onVariantLookup }) {
   const {
     selectedPhenotype,
+    selectedAncestry,
   } = useSelector(state => state.summaryResults);
 
   const {
@@ -105,7 +106,9 @@ export function QQPlot({ onVariantLookup }) {
                 'snp'
               ],
               phenotype_id: selectedPhenotype.id,
-              id: point.customdata.variantId
+              id: point.customdata.variantId,
+              ancestry: selectedAncestry,
+              sex: [null, 'all', 'female', 'male'][+String(point.customdata.variantId)[0]]
             });
             const record = response.data[0];
             const {xaxis, yaxis} = point;
