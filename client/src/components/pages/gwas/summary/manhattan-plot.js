@@ -31,6 +31,7 @@ export function ManhattanPlot({
     selectedPlot,
     manhattanPlotView,
     selectedSex,
+    selectedAncestry,
     selectedPhenotype,
     selectedChromosome,
     ranges,
@@ -410,7 +411,9 @@ export function ManhattanPlot({
             let point = withKeys(data);
             const response = await query('variants', {
               phenotype_id: selectedPhenotype.id,
-              id: point.variantId
+              id: point.variantId,
+              ancestry: selectedAncestry,
+              sex: [null, 'all', 'female', 'male'][+String(point.variantId)[0]]
             });
             const record = response.data[0];
             return h('div', { className: '' }, [
@@ -605,7 +608,9 @@ export function ManhattanPlot({
             let point = withKeys(data);
             const response = await query('variants', {
               phenotype_id: selectedPhenotype.id,
-              id: point.variantId
+              id: point.variantId,
+              ancestry: selectedAncestry,
+              sex: [null, 'all', 'female', 'male'][+String(point.variantId)[0]]
             });
             const record = response.data[0];
             return h('div', { className: '' }, [
