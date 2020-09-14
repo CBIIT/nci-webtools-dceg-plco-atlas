@@ -109,7 +109,7 @@ export function VariantLookup() {
       sort: true,
       headerTitle: _ => 'Odds Ratio [95% Confidence Interval]',
       formatter: (cell, row, rowIndex) => {
-        const isUndefined = value => value === null || value === undefined || isNaN(value);
+        const isUndefined = value => !value || isNaN(value);
         if (isUndefined(cell)) return cell || '-';
         return (+cell).toFixed(3) + (isUndefined(row.ci_95_low) || isUndefined(row.ci_95_high) 
           ? '' 

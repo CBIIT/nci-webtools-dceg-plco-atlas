@@ -74,7 +74,8 @@ export function SummaryResultsTable() {
       text: 'OR [95% CI]',
       headerTitle: _ => 'Odds Ratio [95% Confidence Interval]',
       formatter: (cell, row, rowIndex) => {
-        const isUndefined = value => value === null || value === undefined;
+        const isUndefined = value => !value || isNaN(value);
+        if (isUndefined(cell)) return '-';
         return (+cell).toFixed(3) + (isUndefined(row.ci_95_low) || isUndefined(row.ci_95_high)
           ? ''
           : ` [${+row.ci_95_low.toFixed(3)} - ${+row.ci_95_high.toFixed(3)}]`);
