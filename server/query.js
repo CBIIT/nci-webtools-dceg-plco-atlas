@@ -211,12 +211,10 @@ async function getVariants(connectionPool, params) {
     console.log(params, phenotypeIds,phenotypeIdPlaceholders );
 
     const [phenotypes] = await connection.query(
-        `SELECT id, name, import_date FROM phenotype 
+        `SELECT id, name FROM phenotype 
         WHERE id IN (${phenotypeIdPlaceholders})`,
         phenotypeIds
     );
-
-    console.log(phenotypes);
 
     if (!phenotypes.length)
         throw('Valid phenotype ids must be provided');
@@ -229,14 +227,31 @@ async function getVariants(connectionPool, params) {
     if (!ancestry || !await hasRecord(connection, 'lookup_ancestry', {value: ancestry}))
         throw('A valid ancestry must be provided');
 
-
     // validate chromosome
     if (chromosome && !await hasRecord(connection, 'chromosome_range', {chromosome}))
         throw('A valid chromosome must be provided');
 
+    const [metadata] = await connection.query(
+        `SELECT *  
+        FROM phenotype_metadata 
+        WHERE 
+            ancestry = ? 
+            AND sex = ? 
+            AND chromosome = ? 
+            AND phenotype_id IN (${phenotypeIdPlaceholders})`, 
+        [
+            ancestry,
+            sex,
+            chromosome || 'all',
+            phenotypeIds,
+        ]        
+    );
+
+    console.log(phenotypes, metadata);
+
     // use only phenotypes with data
-    if (phenotypes.filter(p => !p.import_date).length)
-        throw('The specified phenotype(s) do not have an import date');
+    if (metadata.filter(m => !m.count).length)
+        throw('The specified phenotype(s) do not have any variants.');
 
     // determine tables for selected phenotypes
     const [tables] = await connection.query(
