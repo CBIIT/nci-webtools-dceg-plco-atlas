@@ -51,6 +51,10 @@ function coalesce(condition, value) {
     return isDefined(condition) ? value : null;
 }
 
+function getPlaceholders(length) {
+    return new Array(length).fill('?').join(',')
+}
+
 /**
  * Returns any values that are in all of the arrays provided
  */
@@ -145,47 +149,27 @@ async function hasRecord(connection, tableName, conditions, conditionJoiner) {
    }} params - Database query criteria
  * @returns Records in the aggregate summary table which match query criteria
  */
-async function getSummary(connection, {phenotype_id, table, sex, p_value_nlog_min, raw}) {
-    let timestamp = getTimestamp();
-
+async function getSummary(connection, {phenotype_id, table, sex, ancestry, p_value_nlog_min, raw}) {
     // validate parameters
-    if (!/^(all|female|male)$/.test(sex) ||
-        (phenotype_id && !await hasRecord(connection, 'phenotype', {id: phenotype_id})))
+    if (!await hasRecord(connection, 'phenotype', {id: phenotype_id}))
         return null;
 
-    // determine id if table name was supplied (remove once table parameter is no longer used)
-    if (table) {
-        const name = table.replace('aggregate_', '');
-        const [phenotypeRows] = await query(connection, 'phenotype', {name});
-        if (!phenotypeRows.length) return null;
-        phenotype_id = phenotypeRows[0].id;
-    }
-
-    const partition = quote(`${phenotype_id}_${sex}`);
-
     // determine number of variants
-    const [maxPValueNlogRows] = await connection.query(`select max(p_value_nlog) from phenotype_aggregate partition (${partition})`);
-    const maxPValueNlog = pluck(maxPValueNlogRows)
-    const pValueNLogPrecision = maxPValueNlog > 20 ? 1 : 2;
-
     const sql = `
-        SELECT DISTINCT 
-            chromosome, 
-            position_abs,
-            ROUND(p_value_nlog, ${pValueNLogPrecision}) as p_value_nlog
-        FROM phenotype_aggregate partition(${partition})
+        SELECT * FROM phenotype_aggregate partition(${quote(phenotype_id)})
         WHERE p_value_nlog > :p_value_nlog_min
+        AND sex = :sex
+        AND ancestry = :ancestry
     `;
 
     logger.debug(`getSummary sql: ${sql}`);
 
     const [data, columns] = await connection.query({
         rowsAsArray: raw,
-        values: {p_value_nlog_min},//[params.table, params.sex, params.p_value_nlog_min],
+        values: {p_value_nlog_min, sex, ancestry},
         sql,
     });
 
-    // logger.info(`[${process.pid}] /summary: ${timestamp()}s in database`);
     return {data, columns: columns.map(c => c.name)};
 }
 
@@ -219,60 +203,72 @@ async function getSummary(connection, {phenotype_id, table, sex, p_value_nlog_mi
 
 
 async function getVariants(connectionPool, params) {
-    if (!/^\d+(,\d+)*$/.test(params.phenotype_id))
-        throw('Phenotype ID must consist of numeric values');
-
-    if (params.sex && !/^(all|female|male)(,(all|female|male))*$/.test(params.sex))
-        throw('Sex must be all, male, or female');
-
-    if (params.id && !params.sex) {
-        params.sex = [null, 'all', 'female', 'male'][+params.id[0]]
-    }
-
-    // if (params.ancestry && !/^(all|white|black|hispanic|asian|pacific_islander|american_indian)(,(all|white|black|hispanic|asian|pacific_islander|american_indian))*$/.test(params.ancestry))
-    //     throw('Ancestry must be all, white, black, hispanic, asian, pacific_islander, or american_indian');
-
-    // if (params.id && !params.ancestry) {
-    //     params.ancestry = [null, 'all', 'white', 'black', 'hispanic', 'asian', 'pacific_islander', 'american_indian'][+params.id[0]]
-    // }
-
+    const { sex, ancestry, chromosome } = params;
     const connection = await connectionPool.getConnection();
+    const phenotypeIds = params.phenotype_id.split(',');
+    const phenotypeIdPlaceholders = getPlaceholders(phenotypeIds.length);
+
+    console.log(params, phenotypeIds,phenotypeIdPlaceholders );
+
+
     const [phenotypes] = await connection.query(
-        `SELECT * FROM phenotype WHERE id IN (?)`,
-        [params.phenotype_id.split(',')]
+        `SELECT id, name, import_date FROM phenotype 
+        WHERE id IN (${phenotypeIdPlaceholders})`,
+        phenotypeIds
     );
 
-    if (!phenotypes.length) 
-        throw('No phenotypes with the specified id(s) were found');
+    console.log(phenotypes);
 
-    if (!phenotypes.filter(p => p.import_date).length)
+    if (!phenotypes.length)
+        throw('Valid phenotype ids must be provided');
+
+    // validate sex
+    if (!sex || !await hasRecord(connection, 'lookup_sex', {value: sex}))
+        throw('A valid sex must be provided');
+
+    // validate ancestry
+    if (!ancestry || !await hasRecord(connection, 'lookup_ancestry', {value: ancestry}))
+        throw('A valid ancestry must be provided');
+
+
+    // validate chromosome
+    if (chromosome && !await hasRecord(connection, 'chromosome_range', {chromosome}))
+        throw('A valid chromosome must be provided');
+
+    // use only phenotypes with data
+    if (phenotypes.filter(p => !p.import_date).length)
         throw('The specified phenotype(s) do not have an import date');
 
-    const [tableNameRows] = await connection.query(
-        params.phenotype_id.split(',').map(id => `
-            select table_name from information_schema.tables where
-            table_name like 'phenotype_variant_${id}_%'
+    // determine tables for selected phenotypes
+    const [tables] = await connection.query(
+        phenotypes.map(p => `
+            select 
+                TABLE_NAME as table_name, 
+                "${p.id}" as phenotype_id,
+                "${p.name}" as phenotype_name
+            from information_schema.tables 
+            where TABLE_NAME = 'phenotype_variant__${p.name}__${sex}__${ancestry}'
         `).join(' UNION ')
     );
 
-    const tableNames = tableNameRows
-        .map(row => row.TABLE_NAME)
-        .filter(name => !params.sex || (params.sex && name.includes(`_${params.sex}`)));
-        // .filter(name => !params.ancestry || (params.ancestry && name.includes(`_${params.ancestry}`)));
+    let columns = getValidColumns('variant', params.columns);
 
-    const partitionNames = tableNames.map(tableName => {
-        let name = tableName.replace('phenotype_variant_', '');
-        return params.chromosome ? `\`${name}_${params.chromosome}\`` : ''
-    });
+    if (!params.columns || params.columns.includes('ancestry'))
+        columns.unshift(`"${ancestry}" as ancestry`);
 
-    let columnNames = getValidColumns('variant', params.columns).map(quote);
-    let includePhenotypeId = !params.columns || params.columns.includes('phenotype_id');
-    let includeSex = !params.columns || params.columns.includes('sex');
+    if (!params.columns || params.columns.includes('sex'))
+        columns.unshift(`"${sex}" as sex`);
+
+    if (!tables.length) {
+        // throw('No data exists for the selected phenotype(s) stratification(s)');
+        console.log("No data exists for the selected phenotype(s)");
+        return { columns: columns, data: [] };
+    }
 
     const conditions = [
         coalesce(params.id, `id = :id`),
         coalesce(params.snp, `snp = :snp`),
-        // coalesce(params.chromosome, `chromosome = :chromosome`),
+        coalesce(params.chromosome, `chromosome = :chromosome`),
         coalesce(params.position, `position = :position`),
         coalesce(params.position_min, `position >= :position_min`),
         coalesce(params.position_max, `position <= :position_max`),
@@ -285,56 +281,48 @@ async function getVariants(connectionPool, params) {
     ].filter(Boolean).join(' AND ');
 
     // determine valid order and orderBy columns
-    let order = ['asc', 'desc'].includes(params.order) 
+    const order = ['asc', 'desc'].includes(params.order) 
         ? params.order 
         : 'asc';
 
     // orderBy is limited to indexed columns and defaults to p_value
-    let orderBy = ['id', 'snp', 'chromosome', 'position', 'p_value', 'p_value_nlog'].includes(params.orderBy) 
+    const orderBy = ['id', 'snp', 'chromosome', 'position', 'p_value', 'p_value_nlog'].includes(params.orderBy) 
         ? params.orderBy 
         : 'p_value';
 
-    // sets limits and offsets (by default, limit to 100,000 records to prevent memory overflow)
-    let limit = params.limit ? Math.min(params.limit, 1e5) : 1e5; // set hard limit to prevent overflow
-    let offset = +params.offset || 0;
+    // sets limits and offsets (by default, limit to 1,000,000 records to prevent memory overflow)
+    const limit = params.limit ? Math.min(params.limit, 1e6) : 1e6; // set hard limit to prevent overflow
+    const offset = +params.offset || 0;
 
-    // sql_calc_found_rows will eventually be deprecated, so we'll need to fall back using a secondary count(*) query at some point
-    let sql = tableNames.map((name, i) => {
-        const [phenotype_id, sex] = name.split('_').slice(-2);
-        let columns = [...columnNames];
-        if (includePhenotypeId) columns.unshift(`${phenotype_id} as phenotype_id`);
-        if (includeSex) columns.unshift(`"${sex}" as sex`);
-        return `
-            SELECT ${columns.join(',')} 
-            FROM ${name} 
-            ${partitionNames[i] ? `PARTITION(${partitionNames[i]})` : ''}
-            ${conditions.length ? `WHERE ${conditions}` : ''}`;
+    // generate sql to query variants table(s)
+    const sql = tables.map(t => {
+        // add phenotype_id column if needed
+        if (!params.columns || params.columns.includes('phenotype_id'))
+            columns.unshift(`${t.phenotype_id} as phenotype_id`);
+    
+        // generate select statement for current table
+        return `SELECT ${columns.join(',')} FROM ${t.table_name} 
+            ${conditions.length ? `WHERE ${conditions}` : ''}`
     }).join(' UNION ') + `
         ${params.orderBy ? `ORDER BY ${orderBy} ${order}` : ''}
-        ${params.limit ? `LIMIT ${offset}, ${limit}` : ''};
+        LIMIT ${offset}, ${limit}
     `;
 
     logger.debug(`getVariants sql: ${sql}`);
 
-    if (tableNames.length === 0) {
-        // throw('No data exists for the selected phenotype(s) stratification(s)');
-        console.log("No data exists for the selected phenotype(s)");
-        return { columns: [...columnNames], data: [] };
-    }
-
     // query database
-    const [data, columns] = await connection.execute({
+    const [data, metaColumns] = await connection.execute({
         sql, rowsAsArray: params.raw,
     }, params);
 
-    const results = {data, columns: columns.map(c => c.name)};
+    const results = {data, columns: metaColumns.map(c => c.name)};
 
     // determine counts if needed
     if (params.count) {
-        let innerCountSql = tableNames.map((name, i) => `
-            SELECT COUNT(*) as count FROM ${name}
-            ${partitionNames[i] ? `PARTITION(${partitionNames[i]})` : ''}
-            ${conditions.length ? `WHERE ${conditions}` : ''}`).join(' UNION ');
+        let innerCountSql = tables.map(t => `
+            SELECT COUNT(*) as count FROM ${t.table_name}
+            ${conditions.length ? `WHERE ${conditions}` : ''}
+        `).join(' UNION ');
         const countSql = `SELECT SUM(count) FROM (${innerCountSql}) c`;
         logger.debug(`countSql sql: ${countSql}`);
 
@@ -342,97 +330,28 @@ async function getVariants(connectionPool, params) {
         results.count = +pluck(countRows);
     }
 
-    // determine counts through metadata
+    // optionally, determine counts through metadata if the counts query will take a long time
     else if (params.metadataCount) {
-        const sex = /^(all|female|male|stacked)$/.test(params.metadataCount)
-            ? params.metadataCount
-            : params.sex;
-
-        const countRows = await getMetadata(connection, {
-            phenotype_id: params.phenotype_id,
-            sex,
-            // ancestry: params.ancestry,
-            chromosome: params.chromosome || 'all'
-        });
-        if (countRows.length) 
-            results.count = countRows.reduce((a, b) => a + b.count, 0);
+        const [countRows] = await connection.execute(
+            `SELECT SUM(count) as count 
+            FROM phenotype_metadata 
+            WHERE 
+                ancestry = ? 
+                AND sex = ? 
+                AND chromosome = ? 
+                AND phenotype_id IN (${getPlaceholders(tables.length)})`, 
+            [
+                ancestry,
+                sex,
+                chromosome || 'all',
+                ...tables.map(t => t.phenotype_id)
+            ]
+        );
+        results.count = +pluck(countRows);
     }
 
-    await connection.release();
     return results;
 }
-
-async function getPoints(connectionPool, params) {
-    if (!/^\d+(,\d+)*$/.test(params.phenotype_id))
-        throw('Phenotype ID must consist of numeric values');
-    
-    if (params.sex && !/^(all|female|male)(,(all|female|male))*$/.test(params.sex))
-        throw('Sex must be all, male, or female');
-
-    const connection = await connectionPool.getConnection();
-    const [phenotypes] = await connection.query(
-        `SELECT * FROM phenotype WHERE id IN (?)`,
-        [params.phenotype_id.split(',')]
-    );
-
-    if (!phenotypes.length) 
-        throw('No phenotypes with the specified id(s) were found');
-
-    if (!phenotypes.filter(p => p.import_date).length)
-        throw('The specified phenotype(s) do not have an import date');
-
-    const columnNames = getValidColumns('point', params.columns).map(quote);
-    const partitions = phenotypes.map(p => params.sex 
-        ? params.sex.split(',').map(sex => quote(`${p.id}_${sex}`)).join(',')
-        : quote(`${p.id}`)
-    );
-
-    const conditions = [
-        coalesce(params.id, `id = :id`),
-        coalesce(params.chromosome, `chromosome = :chromosome`),
-        coalesce(params.position, `position = :position`),
-        coalesce(params.position_min, `position >= :position_min`),
-        coalesce(params.position_max, `position <= :position_max`),
-        coalesce(params.p_value_nlog_min, `p_value_nlog >= :p_value_nlog_min`),
-        coalesce(params.p_value_nlog_max, `p_value_nlog <= :p_value_nlog_max`)
-    ].filter(Boolean).join(' AND ');
-
-    // determine valid order and orderBy columns
-    let order = ['asc', 'desc'].includes(params.order) 
-        ? params.order 
-        : 'asc';
-
-    // orderBy is limited to indexed columns and defaults to p_value
-    let orderBy = ['id', 'p_value_nlog'].includes(params.orderBy) 
-        ? params.orderBy 
-        : 'p_value_nlog';
-
-    // sets limits and offsets (by default, limit to 100,000 records to prevent memory overflow)
-    let limit = params.limit ? Math.min(params.limit, 1e5) : 1e5; // set hard limit to prevent overflow
-    let offset = +params.offset || 0;
-
-    // sql_calc_found_rows will eventually be deprecated, so we'll need to fall back using a secondary count(*) query at some point
-    const sql = `
-        SELECT ${columnNames.join(',')} 
-        FROM phenotype_point partition(${partitions.join(',')})
-        ${conditions.length ? `WHERE ${conditions}` : ''}
-        ${params.orderBy ? `ORDER BY ${orderBy} ${order}` : ''}
-        ${params.limit ? `LIMIT ${offset}, ${limit}` : ''};
-    `;
-
-    logger.debug(`getPoints sql: ${sql}`);
-
-    // query database
-    const [data, columns] = await connection.execute({
-        sql, rowsAsArray: params.raw,
-    }, params);
-
-    const results = {data, columns: columns.map(c => c.name)};
-
-    await connection.release();
-    return results;
-}
-
 
 /**
  * Retrieves metadata for a phenotype's variants
@@ -442,36 +361,11 @@ async function getPoints(connectionPool, params) {
  * metadata properties if the key is not specified
  */
 async function getMetadata(connection, params) {
-
-    // assign default parameters if needed
-    const defaults = {
-        // sex: 'all',
-        chromosome: 'all'
-    };
-    params = {...defaults, ...params};
-
-    // validate parameters
-    if ((params.phenotype_id && !/^\d+(,\d+)*$/.test(params.phenotype_id)) ||
-        (params.sex && !/^(all|female|male|stacked)(,(all|female|male|stacked))*$/.test(params.sex)) ||
-        // (params.ancestry && !/^(all|white|black|hispanic|asian|pacific_islander|american_indian)(,(all|white|black|hispanic|asian|pacific_islander|american_indian))*$/.test(params.ancestry)) ||
-        !/^(all|x|y|\d+)(,(all|x|y|\d+))*$/.test(params.chromosome))
-    return null;
-
     // parse parameters as arrays
     const phenotype_id = params.phenotype_id ? params.phenotype_id.split(',') : [];
     const sex = params.sex ? params.sex.split(',') : [];
-    // const ancestry = params.ancestry ? params.ancestry.split(',') : [];
+    const ancestry = params.ancestry ? params.ancestry.split(',') : [];
     const chromosome = params.chromosome ? params.chromosome.split(',') : [];
-    const getPlaceholders = length => new Array(length).fill('?').join(',');
-
-    const conditions = [
-        coalesce(params.phenotype_id, `m.phenotype_id IN (${getPlaceholders(phenotype_id.length)})`),
-        coalesce(params.sex, `sex IN (${getPlaceholders(sex.length)})`),
-        // coalesce(params.ancestry, `ancestry IN (${getPlaceholders(ancestry.length)})`),
-        coalesce(params.chromosome, `chromosome IN (${getPlaceholders(chromosome.length)})`),
-        coalesce(params.countNotNull, `count IS NOT NULL`)
-    ].filter(Boolean).join(' AND ');
-    
     const sql = `
         SELECT
             m.id as id,
@@ -486,8 +380,13 @@ async function getMetadata(connection, params) {
             phenotype_metadata m
         JOIN
             phenotype p on m.phenotype_id = p.id
-        WHERE
-            ${conditions}
+        WHERE ${[
+            coalesce(params.phenotype_id, `m.phenotype_id IN (${getPlaceholders(phenotype_id.length)})`),
+            coalesce(params.sex, `sex IN (${getPlaceholders(sex.length)})`),
+            coalesce(params.ancestry, `ancestry IN (${getPlaceholders(ancestry.length)})`),
+            coalesce(params.chromosome, `chromosome IN (${getPlaceholders(chromosome.length)})`),
+            coalesce(params.countNotNull, `count IS NOT NULL`)
+        ].filter(Boolean).join(' AND ')}
     `;
 
     logger.debug(`getMetadata sql: ${sql}`);
@@ -495,7 +394,7 @@ async function getMetadata(connection, params) {
     let [metadataRows] = await connection.query(sql, [
         ...phenotype_id,
         ...sex,
-        // ...ancestry,
+        ...ancestry,
         ...chromosome
     ]);
     return metadataRows;
@@ -512,11 +411,6 @@ async function getMetadata(connection, params) {
  * @returns {any[]} Genes matching the search criteria
  */
 async function getGenes(connection, params) {
-    const splitNumbers = e => (e || '')
-        .split(',')
-        .filter(e => e !== '')
-        .map(e => +e);
-
     let sql = `
         SELECT *
         FROM gene
@@ -528,7 +422,7 @@ async function getGenes(connection, params) {
     logger.debug(`getGenes sql: ${sql}`);
 
     const [results] = await connection.query(sql, params);
-
+    const splitNumbers = e => (e || '').split(',').filter(e => e.length).map(Number);
     return results.map(record => ({
         ...record,
         exon_starts: splitNumbers(record.exon_starts),
@@ -569,8 +463,8 @@ async function getCorrelations(connection, {a, b}) {
     return results;
 }
 
-async function getPhenotypes(connection, params) {
-    let columns = getValidColumns('phenotype', params.columns).map(quote).join(',');
+async function getPhenotypes(connection, params = {}) {
+    let columns = getValidColumns('phenotype', params.columns).map(quote).join(',')
     let sql = `
         SELECT ${columns}
         FROM phenotype
@@ -1033,7 +927,6 @@ module.exports = {
     connection,
     getSummary,
     getVariants,
-    getPoints,
     getMetadata,
     getCorrelations,
     getPhenotype,
