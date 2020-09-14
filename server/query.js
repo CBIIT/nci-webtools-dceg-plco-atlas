@@ -247,10 +247,8 @@ async function getVariants(connectionPool, params) {
         ]        
     );
 
-    console.log(phenotypes, metadata);
-
     // use only phenotypes with data
-    if (metadata.filter(m => !m.count).length)
+    if (!metadata.length || metadata.some(m => !m.count))
         throw('The specified phenotype(s) do not have any variants.');
 
     // determine tables for selected phenotypes
@@ -347,22 +345,7 @@ async function getVariants(connectionPool, params) {
 
     // optionally, determine counts through metadata if the counts query will take a long time
     else if (params.metadataCount) {
-        const [countRows] = await connection.execute(
-            `SELECT SUM(count) as count 
-            FROM phenotype_metadata 
-            WHERE 
-                ancestry = ? 
-                AND sex = ? 
-                AND chromosome = ? 
-                AND phenotype_id IN (${getPlaceholders(tables.length)})`, 
-            [
-                ancestry,
-                sex,
-                chromosome || 'all',
-                ...tables.map(t => t.phenotype_id)
-            ]
-        );
-        results.count = +pluck(countRows);
+        results.count = metadata.reduce((a, b) => a + b.count, 0);
     }
 
     return results;
@@ -533,6 +516,7 @@ async function getPhenotype(connectionPool, params) {
         FROM phenotype_metadata
         WHERE phenotype_id = :id
         AND sex = "all"
+        AND ancestry = "all"
         AND chromosome = "all"`,
         {id}
     );
