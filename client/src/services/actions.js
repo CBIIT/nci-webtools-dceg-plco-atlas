@@ -793,7 +793,7 @@ export function lookupVariants({phenotypes, variant, sex, ancestry}) {
       const {data} = await query('variants', {
         phenotype_id: phenotypes.map(p => p.id),
         sex: sex === 'combined' ? ['female', 'male'] : sex,
-        // ancestry,
+        ancestry,
         chromosome,
         position,
         snp
@@ -805,7 +805,18 @@ export function lookupVariants({phenotypes, variant, sex, ancestry}) {
         variant,
         ancestry,
         ...record
-      }));
+      })).map(p => {
+        if (!p.p_value)
+          p.p_value = '-';
+
+        if (!p.odds_ratio) {
+          p.odds_ratio = '-';
+          p.ci_95_low = null;
+          p.ci_95_high = null;
+        }
+
+        return p;
+      });
   
       // populate empty results
       const emptyResults = phenotypes
