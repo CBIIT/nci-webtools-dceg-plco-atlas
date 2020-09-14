@@ -183,6 +183,7 @@ export function fetchSummaryTable(tableKey, params) {
   
       dispatch(setSummaryTableLoading(false));
     } catch (e) {
+      console.log("ERROR fetchSummaryTable", e);
       dispatch(updateError({visible: true}))
       dispatch(setSummaryTableLoading(false));
     }
@@ -208,6 +209,7 @@ export function fetchSummarySnpTable(tableKey, params) {
   
       dispatch(setSummarySnpLoading(false));
     } catch (e) {
+      console.log("ERROR fetchSummarySnpTable", e);
       dispatch(updateError({visible: true}))
       dispatch(setSummarySnpLoading(false));
     }
@@ -268,6 +270,7 @@ export function drawManhattanPlot(plotType, params) {
   
       dispatch(updateManhattanPlot({ loadingManhattanPlot: false }));
     } catch (e) {
+      console.log("ERROR drawManhattanPlot", e);
       dispatch(updateError({visible: true}))
       dispatch(updateManhattanPlot({ loadingManhattanPlot: false }));
     }

@@ -53,7 +53,7 @@ export function SummaryResultsForm({
   const handleExistingSex = (chosen) => {
     if (!phenotypes || !phenotypes.metadata) return;
     if (chosen) {
-      const existingSexes = phenotypes.metadata.filter((item) => item.phenotype_id === chosen.id).map((item) => item.sex).sort();
+      const existingSexes = [...new Set(phenotypes.metadata.filter((item) => item.phenotype_id === chosen.id && item.count > 0).map((item) => item.sex).sort())];
       dispatch(updateSummaryResults({ existingSexes }));
       if (existingSexes.length > 0) {
         _setSex(existingSexes[0]);
@@ -66,8 +66,8 @@ export function SummaryResultsForm({
   const handleExistingAncestry = (chosen) => {
     if (!phenotypes || !phenotypes.metadata) return;
     if (chosen) {
-      // const existingAncestries = phenotypes.metadata.filter((item) => item.phenotype_id === chosen.id).map((item) => item.sex).sort();
-      const existingAncestries = ['european'];
+      const existingAncestries = [...new Set(phenotypes.metadata.filter((item) => item.phenotype_id === chosen.id && item.count > 0).map((item) => item.ancestry).sort())];
+      // const existingAncestries = ['european'];
       dispatch(updateSummaryResults({ existingAncestries }));
       if (existingAncestries.length > 0) {
         _setAncestry(existingAncestries[0]);
@@ -111,6 +111,10 @@ export function SummaryResultsForm({
     european: {
       value: 'european',
       name: 'European'
+    },
+    east_asian: {
+      value: 'east_asian',
+      name: 'East Asian'
     }
   };
 

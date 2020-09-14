@@ -75,18 +75,18 @@ export function VariantLookupForm({ onChange, onSubmit, onReset }) {
           className="form-control"
           value={selectedSex}
           onChange={e => {
-            if (e.target.value === 'all') {
-              dispatch(updateVariantLookup({ 
-                selectedSex: e.target.value,
-                disableSubmit: false
-              }));
-            } else {
-              dispatch(updateVariantLookup({ 
-                selectedSex: e.target.value,
-                selectedAncestry: 'european',
-                disableSubmit: false
-               }));
-            }
+            // if (e.target.value === 'all') {
+            dispatch(updateVariantLookup({ 
+              selectedSex: e.target.value,
+              disableSubmit: false
+            }));
+            // } else {
+            //   dispatch(updateVariantLookup({ 
+            //     selectedSex: e.target.value,
+            //     selectedAncestry: 'european',
+            //     disableSubmit: false
+            //    }));
+            // }
           }}
           aria-label="Select sex">
           <option value="all">All</option>
@@ -101,21 +101,22 @@ export function VariantLookupForm({ onChange, onSubmit, onReset }) {
           className="form-control"
           value={selectedAncestry}
           onChange={e => {
-            if (e.target.value === 'european') {
-              dispatch(updateVariantLookup({ 
-                selectedAncestry: e.target.value,
-                disableSubmit: false
-               }));
-            } else {
-              dispatch(updateVariantLookup({ 
-                selectedSex: 'all',
-                selectedAncestry: e.target.value,
-                disableSubmit: false
-               }));
-            }
+            // if (e.target.value === 'european') {
+            dispatch(updateVariantLookup({ 
+              selectedAncestry: e.target.value,
+              disableSubmit: false
+            }));
+            // } else {
+            //   dispatch(updateVariantLookup({ 
+            //     selectedSex: 'all',
+            //     selectedAncestry: e.target.value,
+            //     disableSubmit: false
+            //    }));
+            // }
           }}
           aria-label="Select ancestry">
           <option value="european">European</option>
+          <option value="east_asian">East Asian</option>
           {/* <option value="white">White</option>
           <option value="black">Black</option>
           <option value="hispanic">Hispanic</option>

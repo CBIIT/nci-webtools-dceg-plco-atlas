@@ -49,7 +49,8 @@ export const VariantLookupSearchCriteria = () => {
 
   const displayAncestry = ancestry =>
     ({
-      european: 'European'
+      european: 'European',
+      east_asian: 'East Asian'
     }[ancestry]);
 
   return (

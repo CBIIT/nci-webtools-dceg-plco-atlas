@@ -371,6 +371,7 @@ async function getMetadata(connection, params) {
             p.name as phenotype_name,
             p.display_name as phenotype_display_name,
             m.sex as sex,
+            m.ancestry as ancestry,
             m.chromosome as chromosome,
             m.lambda_gc as lambda_gc,
             m.count as count
