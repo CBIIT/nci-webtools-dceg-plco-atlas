@@ -54,7 +54,7 @@ export function SummaryResults() {
   const setSelectedPlot = selectedPlot => {
     dispatch(updateSummaryResults({ selectedPlot }));
     if (submitted && selectedPlot === 'qq-plot' && qqplotData.length === 0) {
-      dispatch(drawQQPlot(selectedPhenotype, selectedSex));
+      dispatch(drawQQPlot(selectedPhenotype, selectedSex, selectedAncestry));
     }
   };
 
@@ -82,7 +82,7 @@ export function SummaryResults() {
    * @param {'all'|'stacked'|'female'|'male'} plotType the selected plot type (under treeview)
    * @param {object} params additional parameters to include in the fetch request
    */
-  const fetchVariantTables = (selectedPhenotype, selectedSex, params = {}) => {
+  const fetchVariantTables = (selectedPhenotype, selectedSex, selectedAncestry, params = {}) => {
     let sexes = {
       all: ['all'],
       stacked: [stackedSex],
@@ -105,6 +105,7 @@ export function SummaryResults() {
           ...params,
           phenotype_id: selectedPhenotype.id,
           sex: sex,
+          ancestry: selectedAncestry,
           offset: 0,
           limit: 10,
           columns: ['chromosome', 'position', 'snp', 'allele_reference', 'allele_alternate', 'beta', 'odds_ratio', 'ci_95_low', 'ci_95_high', 'p_value'],
@@ -145,7 +146,7 @@ export function SummaryResults() {
     );    
 
     if (selectedPlot === 'qq-plot'){
-      dispatch(drawQQPlot(phenotype, sex));
+      dispatch(drawQQPlot(phenotype, sex, ancestry));
     }
 
     drawSummaryManhattanPlots({phenotype, sex, ancestry});
@@ -184,6 +185,7 @@ export function SummaryResults() {
       drawManhattanPlot('summary', {
         phenotype_id: phenotype.id,
         sex: sexes,
+        ancestry,
         p_value_nlog_min: 3,
       })
     );
@@ -197,6 +199,7 @@ export function SummaryResults() {
       fetchSummaryTable(summarySex, {
         phenotype_id: phenotype.id,
         sex: summarySex,
+        ancestry,
         columns: ['chromosome', 'position', 'snp', 'allele_reference', 'allele_alternate', 'beta', 'odds_ratio', 'ci_95_low', 'ci_95_high', 'p_value'],
         offset: 0,
         limit: 10,
@@ -270,6 +273,7 @@ export function SummaryResults() {
       drawManhattanPlot('variants', {
         phenotype_id: selectedPhenotype.id,
         sex: plotSexes,
+        ancestry: selectedAncestry,
         chromosome: chromosome,
         p_value_nlog_min: 2,
         p_value_nlog_max: null,
@@ -287,6 +291,7 @@ export function SummaryResults() {
       fetchSummaryTable(summarySex, {
         phenotype_id: selectedPhenotype.id,
         sex: summarySex,
+        ancestry: selectedAncestry,
         chromosome,
         offset: 0,
         limit: 10,
@@ -322,6 +327,7 @@ export function SummaryResults() {
       fetchSummaryTable(summarySex, {
         phenotype_id: selectedPhenotype.id,
         sex: summarySex,
+        ancestry: selectedAncestry,
         chromosome: selectedChromosome,
         offset: 0,
         limit: 10,
@@ -337,18 +343,21 @@ export function SummaryResults() {
     );
   };
 
-  const handleVariantLookup = ({snp, sex}) => {
+  const handleVariantLookup = ({snp, sex, ancestry}) => {
+    if (!ancestry) 
+      ancestry = selectedAncestry;
+
     dispatch(
       updateVariantLookup({
         selectedPhenotypes: [selectedPhenotype],
         selectedVariant: snp,
         selectedSex: sex,
-        selectedAncestry: selectedAncestry,
+        selectedAncestry: ancestry,
         searchCriteriaVariantLookup: {
           phenotypes: [selectedPhenotype].map(item => item.title),
           variant: snp,
           sex: sex,
-          ancestry: selectedAncestry
+          ancestry: ancestry
         },
         submitted: new Date().getTime(),
         disableSubmit: true
@@ -359,7 +368,7 @@ export function SummaryResults() {
       phenotypes: [selectedPhenotype], 
       variant: snp, 
       sex,
-      ancestry: selectedAncestry
+      ancestry
     }));    
   };
 
@@ -391,14 +400,14 @@ export function SummaryResults() {
         // handle default submission
         handleSubmit({phenotype: selectedPhenotype, sex: selectedSex, ancestry: selectedAncestry})
         if (selectedPlot === 'qq-plot') {
-          dispatch(drawQQPlot(selectedPhenotype, selectedSex));
+          dispatch(drawQQPlot(selectedPhenotype, selectedSex, selectedAncestry));
         }
       } else {
         // handle chromosome submission
         const range = ranges.find(r => r.chromosome === selectedChromosome);
 
         if (selectedPlot === 'qq-plot') {
-          dispatch(drawQQPlot(selectedPhenotype, selectedSex));
+          dispatch(drawQQPlot(selectedPhenotype, selectedSex, selectedAncestry));
         }
 
         dispatch(
@@ -406,6 +415,7 @@ export function SummaryResults() {
             phenotype_id: selectedPhenotype.id,
             sex: sexes,
             chromosome: selectedChromosome,
+            ancestry: selectedAncestry,
             position_min: range.position_min,
             position_max: range.position_max,
             p_value_nlog_min: 2,
@@ -430,13 +440,14 @@ export function SummaryResults() {
       const range = ranges.find(r => r.chromosome === selectedChromosome);
 
       if (selectedPlot === 'qq-plot') {
-        dispatch(drawQQPlot(selectedPhenotype, selectedSex));
+        dispatch(drawQQPlot(selectedPhenotype, selectedSex, selectedAncestry));
       }
 
       dispatch(
         drawManhattanPlot('variants', {
           phenotype_id: selectedPhenotype.id,
           sex: sexes,
+          ancestry: selectedAncestry,
           chromosome: selectedChromosome,
           position_min: range.position_min,
           position_max: range.position_max,

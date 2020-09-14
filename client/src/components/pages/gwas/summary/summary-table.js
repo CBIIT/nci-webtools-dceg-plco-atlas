@@ -24,8 +24,9 @@ export function SummaryResultsTable() {
   const summarySnpTables = useSelector(state => state.summarySnpTables);
   const {
     selectedPhenotype,
-    selectedChromosome,
+    selectedAncestry,
     selectedSex,
+    selectedChromosome,
     nlogpMin,
     nlogpMax,
     bpMin,
@@ -96,6 +97,7 @@ export function SummaryResultsTable() {
     let summaryParams = {
       phenotype_id: selectedPhenotype.id,
       sex: key,
+      ancestry: selectedAncestry,
       chromosome: selectedChromosome,
       offset: 0,
       limit: 10,
@@ -167,6 +169,7 @@ export function SummaryResultsTable() {
         phenotype_id: selectedPhenotype.id,
         snp: summarySnpTables.snp,
         sex: sex,
+        ancestry: selectedAncestry,
       }))
     })
   };

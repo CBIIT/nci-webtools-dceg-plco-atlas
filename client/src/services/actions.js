@@ -228,6 +228,7 @@ export function drawManhattanPlot(plotType, params) {
         phenotype_id: params.phenotype_id,
         chromosome: 'all',
         sex: params.sex.length === 2 ? 'stacked' : params.sex,
+        ancestry: params.ancestry,
       });
 
       dispatch(updateQQPlot({ 
@@ -239,12 +240,14 @@ export function drawManhattanPlot(plotType, params) {
         // if 2 tables are provided, this is a mirrored plot
         const manhattanPlotData = await rawQuery(plotType, {
           ...params,
-          sex: params.sex[0]
+          sex: params.sex[0],
+          ancestry: params.ancestry
         });
   
         const manhattanPlotMirroredData = await rawQuery(plotType, {
           ...params,
-          sex: params.sex[1]
+          sex: params.sex[1],
+          ancestry: params.ancestry
         });
   
         dispatch(
@@ -271,7 +274,7 @@ export function drawManhattanPlot(plotType, params) {
   };
 }
 
-export function drawQQPlot(phenotype, sex) {
+export function drawQQPlot(phenotype, sex, ancestry) {
   return async function(dispatch) {
     try {
       dispatch(updateQQPlot({ 
@@ -286,6 +289,7 @@ export function drawQQPlot(phenotype, sex) {
       const metadata = await query('metadata', {
         phenotype_id: phenotype.id,
         chromosome: 'all',
+        ancestry: ancestry,
         sex: sexes,
       });
 
@@ -293,6 +297,7 @@ export function drawQQPlot(phenotype, sex) {
         ? await query('metadata', {
           phenotype_id: phenotype.id,
           chromosome: 'all',
+          ancestry: ancestry,
           sex: 'stacked',
         }) : null;
 
@@ -395,6 +400,7 @@ export function drawQQPlot(phenotype, sex) {
           phenotype_id: phenotype.id,
           columns: ['p_value_nlog_expected', 'p_value_nlog'],
           sex,
+          ancestry,
           p_value_nlog_max: 3,
           show_qq_plot: true,
           raw: true,
@@ -414,6 +420,7 @@ export function drawQQPlot(phenotype, sex) {
             'id'
           ],
           sex,
+          ancestry,
           p_value_nlog_min: 3,
           raw: true,
         });
