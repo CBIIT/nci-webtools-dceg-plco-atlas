@@ -1,3 +1,4 @@
+const cluster = require('cluster');
 const path = require("path");
 const server = require("fastify");
 const cors = require("fastify-cors");
@@ -6,8 +7,9 @@ const static = require("fastify-static");
 const serverTimeout = require('fastify-server-timeout')
 const logger = require("./logger");
 const { port } = require("./config.json");
+const numCPUs = require('os').cpus().length;
 const {
-  connection,
+  getConnection,
   getSummary,
   getVariants,
   getMetadata,
@@ -21,10 +23,26 @@ const {
   setShareLink
 } = require("./query");
 
-logger.info(`[${process.pid}] Started process`);
+
+
+if (cluster.isMaster) {
+  logger.info(`Master ${process.pid} is running`);
+  for (let i = 0; i < numCPUs; i++) {
+    cluster.fork();
+  }
+  cluster.on('exit', (worker, code, signal) => {
+    // restart workers that die
+    logger.info(`worker ${worker.process.pid} died`);
+    cluster.fork();    
+  });
+  return;
+}
+
+logger.info(`[${process.pid}] Started worker process`);
 
 // create fastify app and register middleware
 const app = server({ ignoreTrailingSlash: true });
+const connection = getConnection();
 app.register(compress);
 app.register(cors);
 app.register(serverTimeout, {serverTimeout: 1000 * 60 * 20}); // 20 min timeout
