@@ -2,16 +2,19 @@ const mysql = require('mysql2');
 const config = require('./config.json');
 const logger = require('./logger');
 const {database} = config;
-const connection = mysql.createPool({
-    host: database.host,
-    database: database.name,
-    user: database.user,
-    password: database.password,
-    waitForConnections: true,
-    connectionLimit: 20,
-    namedPlaceholders: true,
-    multipleStatements: true,
-  }).promise();
+
+function getConnection() {
+    return mysql.createPool({
+        host: database.host,
+        database: database.name,
+        user: database.user,
+        password: database.password,
+        waitForConnections: true,
+        connectionLimit: 10,
+        namedPlaceholders: true,
+        multipleStatements: true,
+      }).promise();
+}
 
 /**
  * Returns a function which can be used to get the elapseed
@@ -924,7 +927,7 @@ async function setShareLink(connection, {route, parameters}) {
 }
 
 module.exports = {
-    connection,
+    getConnection,
     getSummary,
     getVariants,
     getMetadata,
