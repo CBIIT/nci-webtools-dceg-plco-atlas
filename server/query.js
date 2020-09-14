@@ -202,9 +202,9 @@ async function getSummary(connection, {phenotype_id, table, sex, ancestry, p_val
  */
 
 
-async function getVariants(connectionPool, params) {
+async function getVariants(connection, params) {
     const { sex, ancestry, chromosome } = params;
-    const connection = await connectionPool.getConnection();
+    // const connection = await connectionPool.getConnection();
     const phenotypeIds = params.phenotype_id.split(',');
     const phenotypeIdPlaceholders = getPlaceholders(phenotypeIds.length);
 
