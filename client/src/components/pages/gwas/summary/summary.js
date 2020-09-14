@@ -186,7 +186,7 @@ export function SummaryResults() {
         phenotype_id: phenotype.id,
         sex: sexes,
         ancestry,
-        p_value_nlog_min: 3,
+        p_value_nlog_min: 2,
       })
     );
 
