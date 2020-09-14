@@ -210,7 +210,6 @@ async function getVariants(connectionPool, params) {
 
     console.log(params, phenotypeIds,phenotypeIdPlaceholders );
 
-
     const [phenotypes] = await connection.query(
         `SELECT id, name, import_date FROM phenotype 
         WHERE id IN (${phenotypeIdPlaceholders})`,
@@ -297,11 +296,12 @@ async function getVariants(connectionPool, params) {
     // generate sql to query variants table(s)
     const sql = tables.map(t => {
         // add phenotype_id column if needed
+        let queryColumns = columns;
         if (!params.columns || params.columns.includes('phenotype_id'))
-            columns.unshift(`${t.phenotype_id} as phenotype_id`);
+            queryColumns = [...columns, `${t.phenotype_id} as phenotype_id`]
     
         // generate select statement for current table
-        return `SELECT ${columns.join(',')} FROM ${t.table_name} 
+        return `SELECT ${queryColumns.join(',')} FROM ${t.table_name} 
             ${conditions.length ? `WHERE ${conditions}` : ''}`
     }).join(' UNION ') + `
         ${params.orderBy ? `ORDER BY ${orderBy} ${order}` : ''}
