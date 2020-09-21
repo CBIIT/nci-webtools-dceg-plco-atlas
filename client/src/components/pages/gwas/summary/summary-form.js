@@ -53,16 +53,17 @@ export function SummaryResultsForm({
     // console.log("handleInitStratifications");
     if (!phenotypes || !phenotypes.metadata) return;
     if (selectedPhenotype) {
-      const existingSexes = [...new Set(phenotypes.metadata.filter((item) => item.phenotype_id === selectedPhenotype.id && item.count > 0).map((item) => item.sex).sort())];
-      dispatch(updateSummaryResults({ existingSexes }));
-      if (existingSexes.length > 0) {
-        _setSex(existingSexes[0]);
-      }
-      const existingAncestries = [...new Set(phenotypes.metadata.filter((item) => item.phenotype_id === selectedPhenotype.id && item.sex === existingSexes[0] && item.count > 0).map((item) => item.ancestry).sort())];
+      const existingAncestries = [...new Set(phenotypes.metadata.filter((item) => item.phenotype_id === selectedPhenotype.id && item.count > 0).map((item) => item.ancestry).sort())];
       dispatch(updateSummaryResults({ existingAncestries }));
       if (existingAncestries.length > 0) {
         _setAncestry(existingAncestries[0]);
       }
+      const existingSexes = [...new Set(phenotypes.metadata.filter((item) => item.phenotype_id === selectedPhenotype.id && item.ancestry === existingAncestries[0] && item.count > 0).map((item) => item.sex).sort())];
+      dispatch(updateSummaryResults({ existingSexes }));
+      if (existingSexes.length > 0) {
+        _setSex(existingSexes[0]);
+      }
+      
     } else {
       dispatch(updateSummaryResults({ 
         existingSexes: [],
