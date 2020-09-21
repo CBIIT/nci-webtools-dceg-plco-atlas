@@ -38,8 +38,7 @@ export function SummaryResultsForm({
   // update state when props change
   useEffect(() => {
     _setPhenotype(phenotype)
-    handleExistingSex(phenotype);
-    handleExistingAncestry(phenotype);
+    handleInitStratifications(phenotype);
   }, [phenotype]);
 
   useEffect(() => {
@@ -50,30 +49,44 @@ export function SummaryResultsForm({
     _setAncestry(ancestry);
   }, [ancestry]);
 
-  const handleExistingSex = (chosen) => {
+  const handleInitStratifications = (selectedPhenotype) => {
+    // console.log("handleInitStratifications");
     if (!phenotypes || !phenotypes.metadata) return;
-    if (chosen) {
-      const existingSexes = [...new Set(phenotypes.metadata.filter((item) => item.phenotype_id === chosen.id && item.count > 0).map((item) => item.sex).sort())];
+    if (selectedPhenotype) {
+      const existingSexes = [...new Set(phenotypes.metadata.filter((item) => item.phenotype_id === selectedPhenotype.id && item.count > 0).map((item) => item.sex).sort())];
       dispatch(updateSummaryResults({ existingSexes }));
       if (existingSexes.length > 0) {
         _setSex(existingSexes[0]);
       }
-    } else {
-      dispatch(updateSummaryResults({ existingSexes: [] }));
-    }
-  }
-
-  const handleExistingAncestry = (chosen) => {
-    if (!phenotypes || !phenotypes.metadata) return;
-    if (chosen) {
-      const existingAncestries = [...new Set(phenotypes.metadata.filter((item) => item.phenotype_id === chosen.id && item.count > 0).map((item) => item.ancestry).sort())];
-      // const existingAncestries = ['european'];
+      const existingAncestries = [...new Set(phenotypes.metadata.filter((item) => item.phenotype_id === selectedPhenotype.id && item.sex === existingSexes[0] && item.count > 0).map((item) => item.ancestry).sort())];
       dispatch(updateSummaryResults({ existingAncestries }));
       if (existingAncestries.length > 0) {
         _setAncestry(existingAncestries[0]);
       }
     } else {
-      dispatch(updateSummaryResults({ existingAncestries: [] }));
+      dispatch(updateSummaryResults({ 
+        existingSexes: [],
+        existingAncestries: []
+      }));
+    }
+  }
+
+  const handleExistingStratifications = (change) => {
+    // console.log("handleExistingStratifications", change);
+    if (!phenotypes || !phenotypes.metadata) return;
+    if ('sex' in change || 'ancestry' in change) {
+      if ('sex' in change) {
+        const existingAncestries = [...new Set(phenotypes.metadata.filter((item) => item.phenotype_id === _phenotype.id && item.sex === change.sex && item.count > 0).map((item) => item.ancestry).sort())];
+        dispatch(updateSummaryResults({ existingAncestries }));
+      } else {
+        const existingSexes = [...new Set(phenotypes.metadata.filter((item) => item.phenotype_id === _phenotype.id && item.ancestry === change.ancestry && item.count > 0).map((item) => item.sex).sort())];
+        dispatch(updateSummaryResults({ existingSexes }));
+      }
+    } else {
+      dispatch(updateSummaryResults({ 
+        existingSexes: [],
+        existingAncestries: []
+      }));
     }
   }
 
@@ -139,8 +152,7 @@ export function SummaryResultsForm({
           value={_phenotype}
           onChange={val => {
             _setPhenotype((val && val.length) ? val[0] : null);
-            handleExistingSex((val && val.length) ? val[0] : null);
-            handleExistingAncestry((val && val.length) ? val[0] : null);
+            handleInitStratifications((val && val.length) ? val[0] : null);
             dispatch(updateSummaryResults({ disableSubmit: false }));
           }}
           singleSelect
@@ -160,6 +172,7 @@ export function SummaryResultsForm({
           value={existingSexes.length === 0 ? 'empty-sex' : _sex}
           onChange={e => {
             _setSex(e.target.value);
+            handleExistingStratifications({sex: e.target.value});
             dispatch(updateSummaryResults({ disableSubmit: false }));
           }}
           aria-label="Select a sex"
@@ -186,6 +199,7 @@ export function SummaryResultsForm({
           value={existingAncestries.length === 0 ? 'empty-ancestry' : _ancestry}
           onChange={e => {
             _setAncestry(e.target.value);
+            handleExistingStratifications({ancestry: e.target.value});
             dispatch(updateSummaryResults({ disableSubmit: false }));
           }}
           aria-label="Select a ancestry"
