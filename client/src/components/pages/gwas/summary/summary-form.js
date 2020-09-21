@@ -77,7 +77,7 @@ export function SummaryResultsForm({
     if (!phenotypes || !phenotypes.metadata) return;
     if ('sex' in change || 'ancestry' in change) {
       if ('sex' in change) {
-        const existingAncestries = [...new Set(phenotypes.metadata.filter((item) => item.phenotype_id === _phenotype.id && item.sex === change.sex && item.count > 0).map((item) => item.ancestry).sort())];
+        const existingAncestries = [...new Set(phenotypes.metadata.filter((item) => item.phenotype_id === _phenotype.id && (change.sex === 'stacked' ? (item.sex === 'male' || item.sex === 'female') : item.sex === change.sex) && item.count > 0).map((item) => item.ancestry).sort())];
         dispatch(updateSummaryResults({ existingAncestries }));
       } else {
         const existingSexes = [...new Set(phenotypes.metadata.filter((item) => item.phenotype_id === _phenotype.id && item.ancestry === change.ancestry && item.count > 0).map((item) => item.sex).sort())];
