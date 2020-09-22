@@ -140,6 +140,22 @@ async function importVariants({
             .replace(/\${table_name}/g, `${variantTable}`)
             .replace(/\${table_name_suffix}/g, `${variantTableSuffix}`)
     );
+
+    // get data directory
+    const [dataDirRows] = await connection.query(`select @@datadir`);
+    const dataDir = pluck(dataDirRows);
+    const variantDir = path.dirname(exportVariantFilePath);
+
+    await connection.query(`ALTER TABLE ${variantTable} DISCARD TABLESPACE`)
+    await fs.promises.copyFile(
+        path.resolve(variantDir, `${variantTable}.ibd`),
+        path.resolve(dataDir, `${variantTable}.ibd`)
+    );
+    await fs.promises.copyFile(
+        path.resolve(variantDir, `${variantTable}.cfg`),
+        path.resolve(dataDir, `${variantTable}.cfg`)
+    );
+    await connection.query(`ALTER TABLE ${variantTable} IMPORT TABLESPACE`)
             
     console.log(`[${duration()} s] Loading variants into table...`);
     await connection.query({
