@@ -112,6 +112,14 @@ export function SummaryResultsForm({
 
   const SexOptions = () => {
     let displayOptions = existingSexes.map((item) => sexes[item]);
+    let displayOptionsValues = existingSexes.map((item) => sexes[item].value);
+    displayOptions = displayOptions.filter((item) => { 
+      if (item.value === 'stacked') {
+        return displayOptionsValues.includes('female') && displayOptionsValues.includes('male');
+      } else {
+        return true;
+      }
+    });
     return (
       <>
         {displayOptions.map((item) => 
