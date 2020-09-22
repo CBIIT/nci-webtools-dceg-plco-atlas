@@ -73,6 +73,23 @@ function readFirstLine(filepath) {
     return contents.substring(0, contents.indexOf('\n')).trim();
 }
 
+function readFirstLineAsync(filePath) {
+    return new Promise(function (resolve, reject) {
+        let rs = fs.createReadStream(filePath, {encoding: 'utf8'});
+        let acc = '';
+        let pos = 0;
+        let index;
+        rs
+          .on('data', chunk => {
+            index = chunk.indexOf('\n');
+            acc += chunk;
+            index !== -1 ? rs.close() : pos += chunk.length;
+          })
+          .on('close', () => resolve(acc.slice(0, pos + index)))
+          .on('error', err => reject(err))
+      });
+}
+
 // parses each line in the file
 function parseLine(line) {
     return line.trim().split(/,|\s+/).map(value => {
@@ -93,5 +110,6 @@ module.exports = {
     mappedStream,
     parseLine,
     readFile,
+    readFirstLineAsync,
     validateHeaders,
 };
