@@ -1,45 +1,42 @@
 const fs = require('fs');
 const path = require('path');
 const { execSync } = require('child_process');
-const sqlite = require('better-sqlite3');
 const mysql = require('mysql2');
 
 const parseCsv = require('csv-parse/lib/sync')
 const { timestamp } = require('./utils/logging');
 const { getLambdaGC } = require('./utils/math');
-const args = require('minimist')(process.argv.slice(2));
-const winston = require('winston');
 const { pluck } = require('./utils/query');
+const { getFirstLineAsync } = require('./utils/file');
+const winston = require('winston');
 const { format } = winston;
 
-
 // display help if needed
-if (!(args.file) || !(args.output) || !(args.logdir)) {
+const args = require('minimist')(process.argv.slice(2));
+let {host, port, db_name, user, password, file, phenotype_file: phenotypeFile, phenotype, validate, output, logdir, tmp } = args;
+
+if (!file || !output || !logdir) {
     console.log(`USAGE: node export-variants.js 
         --host "MySQL hostname" 
         --port "MySQL port" 
         --db_name "MySQL database name" 
         --user "MySQL username" 
         --password "MySQL password"
-        --file "phenotype.sex.csv" [REQUIRED]
+        --file "phenotype_name.variants.csv" [REQUIRED]
         --phenotype_file "raw/phenotype.csv" [OPTIONAL, use raw/phenotype.csv by default]
         --phenotype "test_melanoma" or 10002 [OPTIONAL, use filename by default]
         --validate [REQUIRED only if phenotype name is used as identifier]
         --output "../raw/output" [REQUIRED]
         --logdir "./" [REQUIRED]
         --tmp "/lscratch/\$SLURM_JOB_ID" [OPTIONAL, use output filepath by default]
-        
     `);
     process.exit(0);
 }
 
-// parse arguments and set defaults
-let {host, port, db_name, user, password, file, phenotype_file: phenotypeFile, phenotype, validate, output, logdir, tmp } = args;
-
 const connection = mysql.createConnection({
-    host: host,
-    port: port,
-    database: db_name,
+    host: host || 'localhost',
+    port: port || 3306,
+    database: db_name || 'plcogwas',
     user: user,
     password: password,
     namedPlaceholders: true,
@@ -47,28 +44,19 @@ const connection = mysql.createConnection({
     // debug: true,
 }).promise();
 
-const phenotypeFilePath = phenotypeFile || '../raw/phenotype.csv';
-
 let inputFilePath = path.resolve(file);
 const filename = path.basename(inputFilePath);
 const outputFilePath = path.resolve(output);
 const logpath = path.resolve(logdir);
 const tmpFilePath = tmp ? path.resolve(tmp) : outputFilePath;
 
-const phenotypePath = path.resolve(phenotypeFilePath);
+const phenotypePath = path.resolve(phenotypeFile || '../raw/phenotype.csv');
 let [fileNamePhenotype] = filename.split('.');
 if (!phenotype) phenotype = fileNamePhenotype;
 
-// const errorLog = getLogStream(`./failed-variants-${new Date().toISOString()}.txt`);
-// const errorLog = {write: e => console.log(e)};
-
+// shows total elapsed time, as well as elapsed time since previous step
 const getTimestamp = timestamp({includePreviousTime: true});
-const processArgs = args => args.map(arg => ` "${arg.replace(/\n/g, ' ')}"`).join(``);
-const duration = () => {
-    // shows total elapsed time, as well as elapsed time since previous step
-    let [current, previous] = getTimestamp();
-    return `${current}, +${previous}`
-}
+const duration = () => getTimestamp().join(', ');
 
 // input file should exist
 if (!fs.existsSync(inputFilePath)) {
@@ -166,23 +154,6 @@ function validatePhenotype(phenotypePath, phenotype) {
     return phenotypes[0];
 }
 
-function getFirstLine(filePath) {
-    return new Promise(function (resolve, reject) {
-        let rs = fs.createReadStream(filePath, {encoding: 'utf8'});
-        let acc = '';
-        let pos = 0;
-        let index;
-        rs
-          .on('data', chunk => {
-            index = chunk.indexOf('\n');
-            acc += chunk;
-            index !== -1 ? rs.close() : pos += chunk.length;
-          })
-          .on('close', () => resolve(acc.slice(0, pos + index)))
-          .on('error', err => reject(err))
-      });
-}
-
 async function exportVariants({
     sqlitePath,
     inputFilePath,
@@ -205,7 +176,7 @@ async function exportVariants({
         !acc.includes(curr) ? acc.concat([curr]) : acc, 
         []
     );
-    const firstLine = await getFirstLine(inputFilePath);
+    const firstLine = await getFirstLineAsync(inputFilePath);
 
     // determine ancestry/sex of stratified columns
     const stratifiedColumns = firstLine.split(/\s+/g)
