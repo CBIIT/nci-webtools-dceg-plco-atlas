@@ -242,12 +242,6 @@ async function exportVariants({
     const [dataDirRows] = await connection.query(`select @@datadir`);
     const dataDir = pluck(dataDirRows);
 
-    // add user-defined functions
-    // const db = new sqlite(databaseFilePath);
-    // db.function('LOG10', {deterministic: true}, v => Math.log10(v));
-    // db.function('POW', {deterministic: true}, (base, exp) => Math.pow(base, exp));
-    // db.function('EXP', {deterministic: true}, (exp) => Math.pow(Math.E, exp));
-    
     try {
 
 
@@ -364,11 +358,19 @@ async function exportVariants({
             // do not continue if we are missing columns
             if (additionalColumns.length < 2) continue;
 
+            const variantTableSuffix = `${phenotype.name}__${sex}__${ancestry}`;
+            const variantTable = `phenotype_variant__${variantTableSuffix}`;
+
             const stageTableName = `stage_${sex}_${ancestry}`;
             const exportVariantFilePath = path.resolve(outputFilePath, `${phenotype.name}.${sex}.${ancestry}.variant.csv`);
+            const exportVariantTableFilePath = path.resolve(outputFilePath, `${variantTable}.ibd`);
+            const exportVariantTableCfgFilePath = path.resolve(outputFilePath, `${variantTable}.cfg`);
             const exportAggregateFilePath = path.resolve(outputFilePath, `${phenotype.name}.${sex}.${ancestry}.aggregate.csv`);
             const exportMetadataFilePath = path.resolve(outputFilePath, `${phenotype.name}.${sex}.${ancestry}.metadata.csv`);
             const exportVariantTmpFilePath = path.resolve(tmpFilePath, `${phenotype.name}.${sex}.${ancestry}.variant.csv`);
+            const exportVariantTmpTableFilePath = path.resolve(outputFilePath, `${variantTable}.ibd`);
+            const exportVariantTmpTableCfgFilePath = path.resolve(outputFilePath, `${variantTable}.cfg`);
+
             const exportAggregateTmpFilePath = path.resolve(tmpFilePath, `${phenotype.name}.${sex}.${ancestry}.aggregate.csv`);
             const exportMetadataTmpFilePath = path.resolve(tmpFilePath, `${phenotype.name}.${sex}.${ancestry}.metadata.csv`);
             const idPrefix = [null, 'all', 'female', 'male'].indexOf(sex) 
@@ -556,10 +558,8 @@ async function exportVariants({
                 logger.error(err);
             }
 
-            logger.info(`[${duration()} s] [${sex}, ${ancestry}] Finished setting up stage table, exporting variants to ${exportVariantTmpFilePath}...`);
+            logger.info(`[${duration()} s] [${sex}, ${ancestry}] Finished setting up stage table, exporting variants to ${exportVariantTmpTableFilePath}...`);
             try {
-                const variantTableSuffix = `${phenotype.name}__${sex}__${ancestry}`;
-                const variantTable = `phenotype_variant__${variantTableSuffix}`;
 
                 // create variant table
                 await connection.query(
@@ -595,7 +595,14 @@ async function exportVariants({
                     JOIN chromosome_range cr ON s.chromosome = cr.chromosome 
                     ORDER BY cr.rowid, s.p_value`);
 
+
+                    await connection.query(`FLUSH TABLES ${variantTable} FOR EXPORT`);
+                    const tablePath = path.resolve(dataDir, `${variantTable}.ibd`);
+                    const configPath = path.resolve(dataDir, `${variantTable}.cfg`);
+
                     // copy variant table to tmp directory
+                    await fs.promises.copyFile(tablePath, exportVariantTmpTableFilePath);
+                    await fs.promises.copyFile(configPath, exportVariantTmpTableCfgFilePath);
 
             } catch (err) {
                 logger.error(err);
@@ -672,7 +679,7 @@ async function exportVariants({
                     ESCAPED BY '"' 
                     LINES TERMINATED BY '\n'                    
                 `);
-                
+
             } catch (err) {
                 logger.error(err);
             }
@@ -685,8 +692,13 @@ async function exportVariants({
             ].join('\n'));
         
             if (outputFilePath !== tmpFilePath) {
-                logger.info(`[${duration()} s] [${sex}, ${ancestry}] Copying ${exportVariantTmpFilePath} to ${exportVariantFilePath}...`);
-                fs.copyFileSync(exportVariantTmpFilePath, exportVariantFilePath);
+
+                logger.info(`[${duration()} s] [${sex}, ${ancestry}] Copying ${exportVariantTmpTableFilePath} to ${exportVariantTableFilePath}...`);
+                fs.copyFileSync(exportVariantTmpTableFilePath, exportVariantTableFilePath);
+                logger.info(`[${duration()} s] [${sex}, ${ancestry}] Done`);
+
+                logger.info(`[${duration()} s] [${sex}, ${ancestry}] Copying ${exportVariantTmpTableCfgFilePath} to ${exportVariantTableCfgFilePath}...`);
+                fs.copyFileSync(exportVariantTmpTableCfgFilePath, exportVariantTableCfgFilePath);
                 logger.info(`[${duration()} s] [${sex}, ${ancestry}] Done`);
                 
                 logger.info(`[${duration()} s] [${sex}, ${ancestry}] Copying ${exportAggregateTmpFilePath} to ${exportAggregateFilePath}...`);
@@ -701,7 +713,6 @@ async function exportVariants({
     }
 
     console.log(`[${duration()} s] Done`);
-    db.close();
 
     return;
 }
