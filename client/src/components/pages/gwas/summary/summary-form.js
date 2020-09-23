@@ -9,8 +9,6 @@ import {
 
 export function SummaryResultsForm({
   phenotype = null,
-  // sex = 'all',
-  // ancestry = 'european',
   stratification = null,
   onSubmit = any => {},
   onReset = any => {}
@@ -40,11 +38,6 @@ export function SummaryResultsForm({
     _setPhenotype(phenotype)
     handleInitStratifications(phenotype);
   }, [phenotype]);
-
-  // useEffect(() => {
-  //   console.log("useEffect _setStratification", stratification);
-  //   _setStratification(stratification);
-  // }, [stratification]);
 
   const handleInitStratifications = (selectedPhenotype) => {
     if (!phenotypes || !phenotypes.metadata) return;
@@ -186,7 +179,6 @@ export function SummaryResultsForm({
           components={{ Option }}
           value={_stratification}
           onChange={item => {
-            console.log("onChange", item);
             _setStratification(item);
             dispatch(updateSummaryResults({ disableSubmit: false }));
           }}
@@ -226,8 +218,6 @@ export function SummaryResultsForm({
           onClick={e => {
             e.preventDefault();
             _setPhenotype(null);
-            // _setSex('all');
-            // _setAncestry('european');
             _setStratification(null);
             onReset();
             treeRef.current.resetSearchFilter();
