@@ -155,7 +155,7 @@ async function importVariants({
                 snp,
                 allele_reference,
                 allele_alternate,
-                allele_reference_frequency,
+                allele_frequency,
                 p_value,
                 p_value_nlog,
                 p_value_nlog_expected,
