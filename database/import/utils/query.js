@@ -4,6 +4,7 @@ const fs = require('fs');
 module.exports = {
     getMedian,
     getRecords,
+    getPlaceholders,
     pluck,
     tableExists,
     exportInnoDBTable,
@@ -62,6 +63,10 @@ async function getRecords(connection, tableName, query) {
     );
 
     return records;
+}
+
+function getPlaceholders(array) {
+    return new Array(array.length).fill('?').join();
 }
 
 async function getDataDirectory(connection) {
