@@ -41,8 +41,8 @@ export function SummaryResults() {
     selectedSex,
     selectedAncestry,
     sharedState,
-    existingSexes,
-    existingAncestries
+    // existingSexes,
+    // existingAncestries
   } = useSelector(state => state.summaryResults);
   const stackedSex = useSelector(state => state.summaryTables.stackedSex);
   const loadingManhattanPlot = useSelector(state => state.manhattanPlot.loadingManhattanPlot);
@@ -497,6 +497,36 @@ export function SummaryResults() {
     </div>
   );
 
+  const sexStratificationLabels = {
+    all: {
+      value: 'all',
+      name: 'All'
+    },
+    stacked: {
+      value: 'stacked',
+      name: 'Female/Male (Stacked)'
+    },
+    female: {
+      value: 'female',
+      name: 'Female'
+    },
+    male: {
+      value: 'male',
+      name: 'Male'
+    }
+  };
+
+  const ancestryStratificationLabels = {
+    european: {
+      value: 'european',
+      name: 'European'
+    },
+    east_asian: {
+      value: 'east_asian',
+      name: 'East Asian'
+    }
+  };
+  
   return (
     <div className="position-relative">
       <h1 className="sr-only">GWAS Results - Visualize summary results</h1>
@@ -509,8 +539,12 @@ export function SummaryResults() {
           <div className="px-2 pt-2 pb-3 bg-white tab-pane-bordered rounded-0">
             <SummaryResultsForm
               phenotype={selectedPhenotype}
-              sex={selectedSex}
-              ancestry={selectedAncestry}
+              // sex={selectedSex}
+              // ancestry={selectedAncestry}
+              stratification={selectedAncestry && selectedSex ? {
+                label: `${ancestryStratificationLabels[selectedAncestry].name} - ${sexStratificationLabels[selectedSex].name}`,
+                value: `${selectedAncestry}__${selectedSex}`
+              } : null}
               onSubmit={handleSubmit}
               onReset={handleReset}
             />

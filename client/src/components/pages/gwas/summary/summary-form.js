@@ -2,14 +2,14 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { Button, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import { TreeSelect } from '../../../controls/tree-select/tree-select';
+import Select, { components } from 'react-select';
 import {
   updateSummaryResults
 } from '../../../../services/actions';
 
 export function SummaryResultsForm({
   phenotype = null,
-  sex = 'all',
-  ancestry = 'european',
+  stratification = null,
   onSubmit = any => {},
   onReset = any => {}
 }) {
@@ -23,16 +23,14 @@ export function SummaryResultsForm({
   const { 
     submitted, 
     disableSubmit, 
-    existingSexes,
-    existingAncestries
+    existingStratifications
   } = useSelector(state => state.summaryResults);
 
   const treeRef = useRef();
 
   // private members prefixed with _
   const [_phenotype, _setPhenotype] = useState(null);
-  const [_sex, _setSex] = useState('all');
-  const [_ancestry, _setAncestry] = useState('european');
+  const [_stratification, _setStratification] = useState(null);
   // const submitRef = useRef(null);
 
   // update state when props change
@@ -41,52 +39,78 @@ export function SummaryResultsForm({
     handleInitStratifications(phenotype);
   }, [phenotype]);
 
-  useEffect(() => {
-    _setSex(sex);
-  }, [sex]);
-
-  useEffect(() => {
-    _setAncestry(ancestry);
-  }, [ancestry]);
-
   const handleInitStratifications = (selectedPhenotype) => {
-    // console.log("handleInitStratifications");
     if (!phenotypes || !phenotypes.metadata) return;
     if (selectedPhenotype) {
+      let existingStratifications  = [];
       const existingAncestries = [...new Set(phenotypes.metadata.filter((item) => item.phenotype_id === selectedPhenotype.id && item.count > 0).map((item) => item.ancestry).sort())];
-      dispatch(updateSummaryResults({ existingAncestries }));
-      if (existingAncestries.length > 0) {
-        _setAncestry(existingAncestries[0]);
+      existingAncestries.map((ancestry) => {
+        const existingSexes = [...new Set(phenotypes.metadata.filter((item) => item.phenotype_id === selectedPhenotype.id && item.ancestry === ancestry && item.count > 0).map((item) => item.sex).sort())];
+        const existingSexesChecked = existingSexes.filter((item) => {
+            if (item === "stacked") {
+              return existingSexes.includes('female') && existingSexes.includes('male');
+            } else {
+              return true;
+            }
+          })
+          .map((sex) => {
+            return {
+              label: `${ancestries[ancestry].name} - ${sexes[sex].name}`,
+              value: `${ancestry}__${sex}`
+            }
+          });
+
+        existingStratifications.push({
+          label: ancestries[ancestry].name,
+          options: existingSexesChecked
+        })
+      })
+      dispatch(updateSummaryResults({ existingStratifications }));
+      if (!stratification && existingStratifications.length > 0) {
+        _setStratification(existingStratifications[0].options[0]);
+      } else {
+        _setStratification(stratification);
       }
-      const existingSexes = [...new Set(phenotypes.metadata.filter((item) => item.phenotype_id === selectedPhenotype.id && item.ancestry === existingAncestries[0] && item.count > 0).map((item) => item.sex).sort())];
-      dispatch(updateSummaryResults({ existingSexes }));
-      if (existingSexes.length > 0) {
-        _setSex(existingSexes[0]);
-      }
-      
     } else {
       dispatch(updateSummaryResults({ 
-        existingSexes: [],
-        existingAncestries: []
+        existingStratifications: []
       }));
     }
   }
 
-  const handleExistingStratifications = (change) => {
-    // console.log("handleExistingStratifications", change);
+  const handleChangeStratifications = (selectedPhenotype) => {
     if (!phenotypes || !phenotypes.metadata) return;
-    if ('sex' in change || 'ancestry' in change) {
-      if ('sex' in change) {
-        const existingAncestries = [...new Set(phenotypes.metadata.filter((item) => item.phenotype_id === _phenotype.id && (change.sex === 'stacked' ? (item.sex === 'male' || item.sex === 'female') : item.sex === change.sex) && item.count > 0).map((item) => item.ancestry).sort())];
-        dispatch(updateSummaryResults({ existingAncestries }));
-      } else {
-        const existingSexes = [...new Set(phenotypes.metadata.filter((item) => item.phenotype_id === _phenotype.id && item.ancestry === change.ancestry && item.count > 0).map((item) => item.sex).sort())];
-        dispatch(updateSummaryResults({ existingSexes }));
+    if (selectedPhenotype) {
+      let existingStratifications  = [];
+      const existingAncestries = [...new Set(phenotypes.metadata.filter((item) => item.phenotype_id === selectedPhenotype.id && item.count > 0).map((item) => item.ancestry).sort())];
+      existingAncestries.map((ancestry) => {
+        const existingSexes = [...new Set(phenotypes.metadata.filter((item) => item.phenotype_id === selectedPhenotype.id && item.ancestry === ancestry && item.count > 0).map((item) => item.sex).sort())];
+        const existingSexesChecked = existingSexes.filter((item) => {
+            if (item === "stacked") {
+              return existingSexes.includes('female') && existingSexes.includes('male');
+            } else {
+              return true;
+            }
+          })
+          .map((sex) => {
+            return {
+              label: `${ancestries[ancestry].name} - ${sexes[sex].name}`,
+              value: `${ancestry}__${sex}`
+            }
+          });
+
+        existingStratifications.push({
+          label: ancestries[ancestry].name,
+          options: existingSexesChecked
+        })
+      })
+      dispatch(updateSummaryResults({ existingStratifications }));
+      if (existingStratifications.length > 0) {
+        _setStratification(existingStratifications[0].options[0]);
       }
     } else {
       dispatch(updateSummaryResults({ 
-        existingSexes: [],
-        existingAncestries: []
+        existingStratifications: []
       }));
     }
   }
@@ -110,25 +134,6 @@ export function SummaryResultsForm({
     }
   };
 
-  const SexOptions = () => {
-    let displayOptions = existingSexes.map((item) => sexes[item]);
-    let displayOptionsValues = existingSexes.map((item) => sexes[item].value);
-    displayOptions = displayOptions.filter((item) => { 
-      if (item.value === 'stacked') {
-        return displayOptionsValues.includes('female') && displayOptionsValues.includes('male');
-      } else {
-        return true;
-      }
-    });
-    return (
-      <>
-        {displayOptions.map((item) => 
-          <option key={item.value} value={item.value}>{item.name}</option>
-        )}
-      </>
-    )
-  }
-
   const ancestries = {
     european: {
       value: 'european',
@@ -140,16 +145,13 @@ export function SummaryResultsForm({
     }
   };
 
-  const AncestryOptions = () => {
-    let displayOptions = existingAncestries.map((item) => ancestries[item]);
+  const Option = props => {
     return (
-      <>
-        {displayOptions.map((item) => 
-          <option key={item.value} value={item.value}>{item.name}</option>
-        )}
-      </>
-    )
-  }
+      <components.Option {...props}>
+        {props && props.label && props.label.split('-')[1]}
+      </components.Option>
+    );
+  };
 
   return (
     <>
@@ -161,7 +163,7 @@ export function SummaryResultsForm({
           value={_phenotype}
           onChange={val => {
             _setPhenotype((val && val.length) ? val[0] : null);
-            handleInitStratifications((val && val.length) ? val[0] : null);
+            handleChangeStratifications((val && val.length) ? val[0] : null);
             dispatch(updateSummaryResults({ disableSubmit: false }));
           }}
           singleSelect
@@ -170,58 +172,21 @@ export function SummaryResultsForm({
       </div>
 
       <div className="mb-3">
-        <label htmlFor="summary-results-sex" className="required">Sex</label>
-        <select
-          style={{
-            // fontSize: '13.3333px',
-            color: existingSexes.length === 0 ? '#AAAAAA' : 'unset'
-          }}
-          id="summary-results-sex"
-          className="form-control"
-          value={existingSexes.length === 0 ? 'empty-sex' : _sex}
-          onChange={e => {
-            _setSex(e.target.value);
-            handleExistingStratifications({sex: e.target.value});
+        <label htmlFor="summary-results-stratification" className="required">Stratification</label>
+        <Select 
+          id="summary-results-stratification" 
+          options={existingStratifications} 
+          components={{ Option }}
+          value={_stratification}
+          onChange={item => {
+            _setStratification(item);
             dispatch(updateSummaryResults({ disableSubmit: false }));
           }}
-          aria-label="Select a sex"
-          disabled={existingSexes.length === 0}
-          >
-            { existingSexes.length === 0 &&
-              <option value="empty-sex" disabled defaultValue>Select a Sex</option>
-            }
-            { existingSexes.length > 0 &&
-              <SexOptions />
-            }
-        </select>
+          placeholder={"Select a Stratification"}
+          isDisabled={existingStratifications.length === 0}
+        />
       </div>
-
-      <div className="mb-3">
-        <label htmlFor="summary-results-ancestry" className="required">Ancestry</label>
-        <select
-          style={{
-            // fontSize: '13.3333px',
-            color: existingAncestries.length === 0 ? '#AAAAAA' : 'unset'
-          }}
-          id="summary-results-ancestry"
-          className="form-control"
-          value={existingAncestries.length === 0 ? 'empty-ancestry' : _ancestry}
-          onChange={e => {
-            _setAncestry(e.target.value);
-            handleExistingStratifications({ancestry: e.target.value});
-            dispatch(updateSummaryResults({ disableSubmit: false }));
-          }}
-          aria-label="Select a ancestry"
-          disabled={existingAncestries.length === 0}
-          >
-            { existingAncestries.length === 0 &&
-              <option value="empty-ancestry" disabled defaultValue>Select an Ancestry</option>
-            }
-            { existingAncestries.length > 0 &&
-              <AncestryOptions />
-            }
-        </select>
-      </div>
+      
 
       <div>
         <OverlayTrigger
@@ -240,7 +205,7 @@ export function SummaryResultsForm({
               disabled={!_phenotype || disableSubmit}
               onClick={e => {
                 e.preventDefault();
-                onSubmit({phenotype: _phenotype, sex: _sex, ancestry: _ancestry});
+                onSubmit({phenotype: _phenotype, ancestry: _stratification.value.split('__')[0], sex: _stratification.value.split('__')[1], });
               }}>
               Submit
             </Button>
@@ -253,8 +218,7 @@ export function SummaryResultsForm({
           onClick={e => {
             e.preventDefault();
             _setPhenotype(null);
-            _setSex('all');
-            _setAncestry('european');
+            _setStratification(null);
             onReset();
             treeRef.current.resetSearchFilter();
           }}>
