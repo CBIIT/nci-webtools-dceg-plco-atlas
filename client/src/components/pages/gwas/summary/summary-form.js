@@ -145,7 +145,7 @@ export function SummaryResultsForm({
           id="summary-results-stratification" 
           options={existingStratifications} 
           components={{ Option }}
-          value={_stratification}
+          value={existingStratifications.length === 0 ? null : _stratification}
           onChange={item => {
             _setStratification(item);
             dispatch(updateSummaryResults({ disableSubmit: false }));
