@@ -4,28 +4,26 @@ const { execSync } = require('child_process');
 const mysql = require('mysql2');
 
 const parseCsv = require('csv-parse/lib/sync')
-const { timestamp } = require('./utils/logging');
+const { getLogger } = require('./utils/logging');
 const { getLambdaGC } = require('./utils/math');
-const { pluck } = require('./utils/query');
-const { getFirstLineAsync } = require('./utils/file');
-const winston = require('winston');
-const { format } = winston;
+const { pluck, exportInnoDBTable } = require('./utils/query');
+const { readFile, readFirstLineAsync } = require('./utils/file');
+
 
 // display help if needed
 const args = require('minimist')(process.argv.slice(2));
-let {host, port, db_name, user, password, file, phenotype_file: phenotypeFile, phenotype, validate, output, logdir, tmp } = args;
+let {host, port, db_name: databaseName, user, password, file, phenotype_file: phenotypeFile, phenotype, validate, output, logdir, tmp } = args;
 
 if (!file || !output || !logdir) {
     console.log(`USAGE: node export-variants.js 
-        --host "MySQL hostname" 
-        --port "MySQL port" 
-        --db_name "MySQL database name" 
+        --host "MySQL hostname [OPTIONAL, localhost by default]" 
+        --port "MySQL port [OPTIONAL, 3306 by default]" 
+        --db_name "MySQL database name [OPTIONAL, plcogwas by default]" 
         --user "MySQL username" 
         --password "MySQL password"
         --file "phenotype_name.variants.csv" [REQUIRED]
         --phenotype_file "raw/phenotype.csv" [OPTIONAL, use raw/phenotype.csv by default]
         --phenotype "test_melanoma" or 10002 [OPTIONAL, use filename by default]
-        --validate [REQUIRED only if phenotype name is used as identifier]
         --output "../raw/output" [REQUIRED]
         --logdir "./" [REQUIRED]
         --tmp "/lscratch/\$SLURM_JOB_ID" [OPTIONAL, use output filepath by default]
@@ -33,10 +31,13 @@ if (!file || !output || !logdir) {
     process.exit(0);
 }
 
+host = host || 'localhost';
+port = port || 3306;
+databaseName = databaseName || 'plcogwas';
 const connection = mysql.createConnection({
-    host: host || 'localhost',
-    port: port || 3306,
-    database: db_name || 'plcogwas',
+    host: host,
+    port: port,
+    database: databaseName,
     user: user,
     password: password,
     namedPlaceholders: true,
@@ -44,19 +45,20 @@ const connection = mysql.createConnection({
     // debug: true,
 }).promise();
 
+// initialize folders
 let inputFilePath = path.resolve(file);
-const filename = path.basename(inputFilePath);
-const outputFilePath = path.resolve(output);
-const logpath = path.resolve(logdir);
-const tmpFilePath = tmp ? path.resolve(tmp) : outputFilePath;
+let inputFileName = path.basename(inputFilePath);
+const outputFolder = path.resolve(output);
+const logFolder = path.resolve(logdir);
+const tempFolder = tmp ? path.resolve(tmp) : outputFolder;
+const phenotypeFilePath = path.resolve(phenotypeFile || '../raw/phenotype.csv');
 
-const phenotypePath = path.resolve(phenotypeFile || '../raw/phenotype.csv');
-let [fileNamePhenotype] = filename.split('.');
-if (!phenotype) phenotype = fileNamePhenotype;
+// set phenotype from filename
+if (!phenotype) phenotype = inputFileName.split('.')[0];
 
-// shows total elapsed time, as well as elapsed time since previous step
-const getTimestamp = timestamp({includePreviousTime: true});
-const duration = () => getTimestamp().join(', ');
+// create global logger for initial log messages
+const logFilePath = path.resolve(logFolder, `${phenotype}.log`);
+const logger = getLogger(logFilePath, 'export');
 
 // input file should exist
 if (!fs.existsSync(inputFilePath)) {
@@ -64,82 +66,67 @@ if (!fs.existsSync(inputFilePath)) {
     process.exit(1);
 }
 
-if (validate && !fs.existsSync(phenotypePath)) {
-    console.error(`ERROR: ${phenotypePath} does not exist.`);
+// phenotype file should exist
+if (!fs.existsSync(phenotypeFilePath)) {
+    console.error(`ERROR: ${inputFilePath} does not exist.`);
     process.exit(1);
-}
-
-if (!validate && !/^\d+$/.test(phenotype)) {
-    console.error(`ERROR: Association names must be validated. Please use the --validate flag.`);
-    process.exit(1);
-}
-
-const fileExtension = path.extname(inputFilePath);
-// if input file is compressed, copy to tmpFilePath and unzip
-// change inputFilePath to unzipped file path
-if (/^(.gz)$/.test(fileExtension)) {
-    const zippedFileDest = path.resolve(tmpFilePath, filename);
-    const unzippedFileDest = zippedFileDest.slice(0, -3);
-
-    if (fs.existsSync(unzippedFileDest)) {
-        console.warn(`WARNING: File already exists. ${unzippedFileDest} will be deleted.`);
-        fs.unlinkSync(unzippedFileDest);
-    }
-
-    console.log(`[${duration()} s] Copying zipped data file to ${zippedFileDest}...`);
-    fs.copyFileSync(inputFilePath, zippedFileDest);
-    console.log(`[${duration()} s] Done`);
-
-    console.log(`[${duration()} s] Unzipping...`);
-    try {
-        const decompressStatus = execSync(`gzip -d ${zippedFileDest}`);
-        // show full decompress status if needed
-        console.log("decompressStatus", 
-            decompressStatus, 
-            decompressStatus.stdout ? decompressStatus.stdout.toString() : "No STDOUT", 
-            decompressStatus.stderr ? decompressStatus.stderr.toString() : "No STDERR");
-        console.log(`[${duration()} s] Finished unzipping data file...`);
-    } catch (err) {
-        console.log(err);
-    }
-
-    console.log(`[${duration()} s] Done`);
-
-    inputFilePath = unzippedFileDest;
 }
 
 (async function main() {
     
     try {
+        if (/\.gz$/i.test(inputFilePath)) {
+            logger.info(`Unzipping ${inputFilePath} to ${tempFolder}...`)
+            inputFilePath = await unzipFile(inputFilePath, tempFolder);
+            inputFileName = path.basename(inputFilePath);
+        }
+
         await exportVariants({
-            sqlitePath,
             inputFilePath,
-            outputFilePath,
-            logpath,
-            tmpFilePath,
-            phenotype: validatePhenotype(
-                phenotypePath, 
+            logFolder,
+            tempFolder,
+            outputFolder,
+            phenotype: getPhenotype(
+                phenotypeFilePath, 
                 phenotype
             )
         });
 
+        logger.info('Finished export');
         process.exit(0);
     }
     catch (e) {
-        console.error(e);
+        logger.error(e);
         process.exit(1);
     }
 })();
 
+async function unzipFile(inputFilePath, targetFolder) {
+    const inputFileName = path.basename(inputFilePath);
+    const unzippedFileName = inputFileName.replace(/\.gz$/i, '');
+    const unzippedFilePath = path.resolve(targetFolder, unzippedFileName);
+
+    // synchronously check if unzipped file exists and delete it 
+    // (do not use async, as it introduces a race condition between checking for existence and deletion)
+    if (fs.existsSync(unzippedFilePath)) {
+        logger.warn(`File already exists. ${unzippedFilePath} will be deleted.`);
+        fs.unlinkSync(unzippedFilePath);
+    }
+
+    // stream gunzip to target folder (does not require copying input file)
+    await gunzip(inputFileName, unzippedFilePath);
+    return unzippedFilePath;
+}
+
 // validates a phenotype by name or id and returns both if found
-function validatePhenotype(phenotypePath, phenotype) {
+function getPhenotype(phenotypeFilePath, phenotype) {
     // if a numeric phenotype was provided, assume we're looking up by id
     // otherwise, look up phenotype by association name
     const phenotypeKey = /^\d+$/.test(phenotype) ? 'id' : 'name';
 
     // read the phenotypes file and attempt to find the specified phenotype
     const phenotypes = parseCsv(    
-        fs.readFileSync(phenotypePath),
+        fs.readFileSync(phenotypeFilePath),
         {columns: ['id', 'parent_id', 'display_name', 'name', 'description', 'type', 'age']}
     ).filter(p => p[phenotypeKey] == phenotype.toLowerCase());
     
@@ -155,113 +142,49 @@ function validatePhenotype(phenotypePath, phenotype) {
 }
 
 async function exportVariants({
-    sqlitePath,
     inputFilePath,
-    outputFilePath,
-    logpath,
-    tmpFilePath,
+    logFolder,
+    tempFolder,
+    outputFolder,
     phenotype,
 }) {
-    // const inputDirectory = path.dirname(inputFilePath);
-    // const outputDirectory = path.dirname(outputFilePath);
-    const phenotypeId = phenotype.id;
-    const databaseFilePath = path.resolve(tmpFilePath, `${phenotypeId}.db`);
-    const calculateOddsRatio = phenotype.type === 'binary';
-
-    if (fs.existsSync(databaseFilePath))
-        fs.unlinkSync(databaseFilePath)
-
-    // helper function to get distinct values from an array
-    const distinct = array => array.reduce((acc, curr) => 
-        !acc.includes(curr) ? acc.concat([curr]) : acc, 
-        []
-    );
-    const firstLine = await getFirstLineAsync(inputFilePath);
-
-    // determine ancestry/sex of stratified columns
-    const stratifiedColumns = firstLine.split(/\s+/g)
-        .filter(originalColumName => !['chr', 'pos', 'snp', 'tested_allele', 'other_allele'].includes(originalColumName.toLowerCase()))
-        .map(originalColumName => {
-            let [columnName, ...ancestrySex] = originalColumName.split('_');
-            let sex = ancestrySex[ancestrySex.length - 1];
-            let ancestry = ancestrySex.slice(0, ancestrySex.length - 1).join('_');
-            if (!/^(all|female|male)$/.test(sex)) {
-                sex = null
-                ancestry = ancestrySex.join('_');
-            }
-            if (sex) sex = sex.toLowerCase()
-            if (ancestry) ancestry = ancestry.toLowerCase();
-            const mappedColumnName = [
-                sex, 
-                ancestry, 
-                {
-                    freq: `allele_reference_frequency`, 
-                    beta: `beta`,
-                    se: `standard_error`,
-                    p: `p_value`,
-                    n: `n`,
-                    phet: `p_value_heterogenous`,
-                }[columnName.toLowerCase()]
-            ].filter(Boolean).join('_')
-            return {originalColumName, columnName, mappedColumnName, ancestry, sex}
-        });
-
-    // define ancestry and sex values
-    let ancestries = distinct(stratifiedColumns.map(c => c.ancestry)).filter(Boolean).map(e => e.toLowerCase());
-    let sexes = distinct(stratifiedColumns.map(c => c.sex)).filter(Boolean).map(e => e.toLowerCase());
-
-    const [dataDirRows] = await connection.query(`select @@datadir`);
-    const dataDir = pluck(dataDirRows);
-
     try {
+        // determine ancestry/sex for stratified columns
+        const firstLine = await readFirstLineAsync(inputFilePath);
+        const stratifiedColumns = firstLine.split(/\s+/g)
+            .filter(originalColumName => !['chr', 'pos', 'snp', 'tested_allele', 'other_allele'].includes(originalColumName.toLowerCase()))
+            .map(originalColumName => {
+                // original column names may or may not contain ancestry and/or sex, parsing rules are brittle and may require changes
+                let [columnName, ...ancestrySex] = originalColumName.split('_');
+                let sex = ancestrySex[ancestrySex.length - 1];
+                let ancestry = ancestrySex.slice(0, ancestrySex.length - 1).join('_');
+                if (!/^(all|female|male)$/.test(sex)) {
+                    sex = null
+                    ancestry = ancestrySex.join('_');
+                }
+                if (sex) sex = sex.toLowerCase()
+                if (ancestry) ancestry = ancestry.toLowerCase();
+                const mappedColumnName = [
+                    sex, 
+                    ancestry, 
+                    {
+                        freq: `allele_frequency`, 
+                        beta: `beta`,
+                        se: `standard_error`,
+                        p: `p_value`,
+                        n: `n`,
+                        phet: `p_value_heterogenous`,
+                    }[columnName.toLowerCase()]
+                ].filter(Boolean).join('_')
+                return {originalColumName, columnName, mappedColumnName, ancestry, sex}
+            });
 
-
-        await connection.query(`
-            -- set up chromosome ranges
-            DROP TABLE IF EXISTS chromosome_range;
-            CREATE TABLE chromosome_range (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                chromosome VARCHAR(2),
-                position_min BIGINT NOT NULL,
-                position_max BIGINT NOT NULL,
-                position_min_abs BIGINT NOT NULL,
-                position_max_abs BIGINT NOT NULL
-            );
-        
-            INSERT INTO chromosome_range (
-                chromosome,
-                position_min,
-                position_max,
-                position_min_abs,
-                position_max_abs
-            ) VALUES
-                ('1', 0, 249698942, 0, 249698942),
-                ('2', 0, 242508799, 249698942, 492207741),
-                ('3', 0, 198450956, 492207741, 690658697),
-                ('4', 0, 190424264, 690658697, 881082961),
-                ('5', 0, 181630948, 881082961, 1062713909),
-                ('6', 0, 170805979, 1062713909, 1233519888),
-                ('7', 0, 159345973, 1233519888, 1392865861),
-                ('8', 0, 145138636, 1392865861, 1538004497),
-                ('9', 0, 138688728, 1538004497, 1676693225),
-                ('10', 0, 133797422, 1676693225, 1810490647),
-                ('11', 0, 135186938, 1810490647, 1945677585),
-                ('12', 0, 133275309, 1945677585, 2078952894),
-                ('13', 0, 114364328, 2078952894, 2193317222),
-                ('14', 0, 108136338, 2193317222, 2301453560),
-                ('15', 0, 102439437, 2301453560, 2403892997),
-                ('16', 0, 92211104, 2403892997, 2496104101),
-                ('17', 0, 83836422, 2496104101, 2579940523),
-                ('18', 0, 80373285, 2579940523, 2660313808),
-                ('19', 0, 58617616, 2660313808, 2718931424),
-                ('20', 0, 64444167, 2718931424, 2783375591),
-                ('21', 0, 46709983, 2783375591, 2830085574),
-                ('22', 0, 51857516, 2830085574, 2881943090),
-                ('X', 0, 156040895, 2881943090, 3037983985),
-                ('Y', 0, 57264655, 3037983985, 3095248640);
-            
-            -- create prestage table for importing raw variants
-            DROP TABLE IF EXISTS prestage;
+        // set up database for import
+        logger.info('Setting up database');
+        await connection.query([
+            readFile(path.resolve(__dirname, '../schema/tables/main.sql')),
+            readFile(path.resolve(__dirname, 'import-chromosome-range.sql')),
+            `DROP TABLE IF EXISTS prestage;
             CREATE TABLE prestage (
                 chromosome                  VARCHAR(2),
                 position                    BIGINT,
@@ -269,422 +192,311 @@ async function exportVariants({
                 allele_reference            VARCHAR(200),
                 allele_alternate            VARCHAR(200),
                 ${stratifiedColumns.map(c => `${c.mappedColumnName} DOUBLE`).join(',')}
-            );
-        `);
-    } catch (err) {
-        console.log(err);
-    }
-    
-    // load data into prestaging table
-    console.log(`[${duration()} s] Loading data into prestage table...`);
-    try {
+            );`
+        ].join('\n'));
+
+        logger.info('Loading data into prestage table');
         await connection.query({
             infileStreamFactory: path => fs.createReadStream(inputFilePath),
             sql: `LOAD DATA LOCAL INFILE "${inputFilePath}"
                 INTO TABLE prestage
-                FIELDS TERMINATED BY ','
+                FIELDS TERMINATED BY '\t'
                 IGNORE 1 LINES`
         });
-        console.log(`[${duration()} s] Finished loading data into prestage table...`);
-    } catch (err) {
-        console.log(err);
-    }
 
-    // create table for each ancestry/sex combo
-    for (let sex of sexes) {
-        for (let ancestry of ancestries) {
+        // determine distinct ancestries and sexes
+        const distinct = arr => arr.reduce((acc, curr) => 
+            !acc.includes(curr) ? acc.concat([curr]) : acc, []);
+        const ancestries = distinct(stratifiedColumns.map(c => c.ancestry)).filter(Boolean);
+        const sexes = distinct(stratifiedColumns.map(c => c.sex)).filter(Boolean);
 
-            winston.loggers.add(`${phenotype.name}.${sex}.${ancestry}`, {
-                level: 'info',
-                format: format.combine(
-                  format.errors({ stack: true }), // <-- use errors format
-                  // format.colorize(),
-                  format.timestamp(),
-                  format.prettyPrint(),
-                  format.label({ label: '[PLCO-SERVER]' }),
-                  format.timestamp({
-                    format: 'YYYY-MM-DD HH:mm:ss'
-                  }),
-                  
-                  format.printf(info => {
-                    if (info.level === 'error') {
-                      return `[${info.timestamp}] [${info.level}] ${info.stack}`;
-                    } else {
-                      return `[${info.timestamp}] [${info.level}] ${info.message}`;
-                    }
-                  })
-                ),
-                transports: [
-                    new winston.transports.File( { filename: `${logpath}/${phenotype.name}.${sex}.${ancestry}.log` }),
-                    new winston.transports.Console()
-                ],
-                exitOnError: false
-            });
+        // iterate through each ancestry/sex
+        for (let sex of sexes) {
+            for (let ancestry of ancestries) {
+                // get columns specific to each ancestry/sex combo
+                const additionalColumns = stratifiedColumns.filter(c => c.ancestry === ancestry && (c.sex === sex || c.sex === null));
 
-            const logger = winston.loggers.get(`${phenotype.name}.${sex}.${ancestry}`);
+                // do not continue if we are missing columns
+                if (additionalColumns.length < 2) continue;
 
-            logger.info("Exporting " + phenotype.name + " - " + sex + " - " + ancestry);
+                // create logger for specific ancestry/sex export
+                const importLogFilePath = path.resolve(logFolder, `${phenotype.name}.${sex}.${ancestry}.log`);
+                const logger = getLogger(importLogFilePath, `${sex}.${ancestry}`);
 
-            const additionalColumns = stratifiedColumns.filter(c => c.ancestry === ancestry && (c.sex === sex || c.sex === null));
-            // do not continue if we are missing columns
-            if (additionalColumns.length < 2) continue;
+                try {
+                    // specify table names
+                    const tableSuffix = `${phenotype.name}__${sex}__${ancestry}`;
+                    const stageTable = `stage__${tableSuffix}`;
+                    const variantTable = `phenotype_variant__${tableSuffix}`;
+                    const aggregateTable = `phenotype_aggregate__${tableSuffix}`;
+                    const metadataTable = `phenotype_metadata__${tableSuffix}`;
+                    const calculateOddsRatio = phenotype.type === 'binary';
 
-            const variantTableSuffix = `${phenotype.name}__${sex}__${ancestry}`;
-            const variantTable = `phenotype_variant__${variantTableSuffix}`;
+                    // create stage, variant, aggregate, and metadata tables
+                    logger.info('Creating tables');
+                    await connection.query([
+                        `DROP TABLE IF EXISTS ${stageTable};`,
+                        `DROP TABLE IF EXISTS ${variantTable};`,
+                        `DROP TABLE IF EXISTS ${aggregateTable};`,
+                        `DROP TABLE IF EXISTS ${metadataTable};`,
+                        `CREATE TABLE ${stageTable} (
+                            id                          BIGINT PRIMARY KEY NOT NULL AUTO_INCREMENT,
+                            chromosome                  VARCHAR(2),
+                            position                    BIGINT,
+                            snp                         VARCHAR(200),
+                            allele_reference            VARCHAR(200),
+                            allele_alternate            VARCHAR(200),
+                            allele_frequency            DOUBLE,
+                            p_value                     DOUBLE,
+                            p_value_nlog                DOUBLE, -- negative log10(P)
+                            p_value_nlog_expected       DOUBLE, -- expected negative log10(P)
+                            p_value_heterogenous        BIGINT,
+                            beta                        DOUBLE,
+                            standard_error              DOUBLE,
+                            odds_ratio                  DOUBLE,
+                            ci_95_low                   DOUBLE,
+                            ci_95_high                  DOUBLE,
+                            n                           BIGINT,
+                            show_qq_plot                BOOLEAN
+                        );`,
+                        // create variant, aggregate, and metadata tables
+                        readFile(path.resolve(__dirname, '../schema/tables/variant.sql'))
+                            .replace(/\${table_name}/g, `${variantTable}`),
+                        `CREATE TABLE ${aggregateTable} LIKE phenotype_aggregate;`,
+                        `ALTER TABLE ${aggregateTable} ADD PARTITION (PARTITION \`${phenotype.id}\` VALUES IN (${phenotype.id}));`,
+                        `CREATE TABLE ${metadataTable} LIKE phenotype_metadata;`,
+                    ].join('\n'));
 
-            const stageTableName = `stage_${sex}_${ancestry}`;
-            const exportVariantFilePath = path.resolve(outputFilePath, `${phenotype.name}.${sex}.${ancestry}.variant.csv`);
-            const exportVariantTableFilePath = path.resolve(outputFilePath, `${variantTable}.ibd`);
-            const exportVariantTableCfgFilePath = path.resolve(outputFilePath, `${variantTable}.cfg`);
-            const exportAggregateFilePath = path.resolve(outputFilePath, `${phenotype.name}.${sex}.${ancestry}.aggregate.csv`);
-            const exportMetadataFilePath = path.resolve(outputFilePath, `${phenotype.name}.${sex}.${ancestry}.metadata.csv`);
-            const exportVariantTmpFilePath = path.resolve(tmpFilePath, `${phenotype.name}.${sex}.${ancestry}.variant.csv`);
-            const exportVariantTmpTableFilePath = path.resolve(outputFilePath, `${variantTable}.ibd`);
-            const exportVariantTmpTableCfgFilePath = path.resolve(outputFilePath, `${variantTable}.cfg`);
+                    logger.info('Filtering and ordering data into stage table');
+                    await connection.query(`
+                        INSERT INTO ${stageTable} (
+                            chromosome,
+                            position,
+                            snp,
+                            allele_reference,
+                            allele_alternate,
+                            allele_frequency,
+                            p_value,
+                            p_value_nlog,
+                            p_value_heterogenous,
+                            beta,
+                            standard_error,
+                            odds_ratio,
+                            ci_95_low,
+                            ci_95_high,
+                            n
+                        ) 
+                        SELECT 
+                            p.chromosome,
+                            p.position,
+                            p.snp,
+                            p.allele_reference,
+                            p.allele_alternate,
+                            p.${ancestry}_allele_frequency,
+                            p.${sex}_${ancestry}_p_value,
+                            -LOG10(p.${sex}_${ancestry}_p_value) AS p_value_nlog,
+                            p.${sex}_${ancestry}_p_value_heterogenous,
+                            p.${sex}_${ancestry}_beta,
+                            p.${sex}_${ancestry}_standard_error,
+                            ${calculateOddsRatio ? `EXP(p.${sex}_${ancestry}_beta)` : `NULL` } as odds_ratio,
+                            ${calculateOddsRatio ? `EXP(p.${sex}_${ancestry}_beta - 1.96 * p.${sex}_${ancestry}_standard_error)` : `NULL` } as ci_95_low,
+                            ${calculateOddsRatio ? `EXP(p.${sex}_${ancestry}_beta + 1.96 * p.${sex}_${ancestry}_standard_error)` : `NULL` } as ci_95_high,
+                            p.${sex}_${ancestry}_n
+                        FROM prestage p
+                        INNER JOIN chromosome_range cr ON cr.chromosome = p.chromosome
+                        WHERE p.${sex}_${ancestry}_p_value > 1e-10000
+                        AND p.position BETWEEN cr.position_min AND cr.position_max
+                        ORDER BY ${sex}_${ancestry}_p_value;
+                    `);
 
-            const exportAggregateTmpFilePath = path.resolve(tmpFilePath, `${phenotype.name}.${sex}.${ancestry}.aggregate.csv`);
-            const exportMetadataTmpFilePath = path.resolve(tmpFilePath, `${phenotype.name}.${sex}.${ancestry}.metadata.csv`);
-            const idPrefix = [null, 'all', 'female', 'male'].indexOf(sex) 
-                + phenotypeId.toString().padStart(5, '0');
+                    // determine count
+                    const [countRows] = await connection.query(`SELECT COUNT(*) FROM ${stageTable}`);
+                    const count = pluck(countRows);
+                    logger.info(`Loaded ${count} rows into stage table`)
 
-            try {
-                await connection.query(`
-                    DROP TABLE IF EXISTS ${stageTableName};
-                    CREATE TABLE ${stageTableName} (
-                        chromosome                  VARCHAR(2),
-                        position                    BIGINT,
-                        position_abs                BIGINT,
-                        snp                         VARCHAR(200),
-                        allele_reference            VARCHAR(200),
-                        allele_alternate            VARCHAR(200),
-                        allele_reference_frequency  DOUBLE,
-                        p_value                     DOUBLE,
-                        p_value_nlog                DOUBLE, -- negative log10(P)
-                        p_value_nlog_expected       DOUBLE, -- expected negative log10(P)
-                        p_value_heterogenous        BIGINT,
-                        beta                        DOUBLE,
-                        standard_error              DOUBLE,
-                        odds_ratio                  DOUBLE,
-                        ci_95_low                   DOUBLE,
-                        ci_95_high                  DOUBLE,
-                        n                           BIGINT,
-                        show_qq_plot                BOOLEAN
+                    const getPlaceholders = array => new Array(array.length).fill('?').join();
+
+                    // determine lambdagc
+                    logger.info('Calculating lambdaGC')
+                    const medianRowIds = count % 2 === 0 
+                        ? [Math.floor(count / 2), Math.ceil(count / 2)] 
+                        : [Math.ceil(count / 2)];
+                    const [medianRows] = await connection.execute(
+                        `SELECT AVG(p_value) FROM ${stageTable} WHERE id IN (${getPlaceholders(medianRowIds)})`,
+                        medianRowIds
                     );
-                `);
-            } catch (err) {
-                logger.error(err);
-            }
+                    const median = pluck(medianRows);
+                    const lambdaGC = getLambdaGC(median);
+                    logger.info(`LambdaGC: ${lambdaGC} FROM ${median}`)
 
-            logger.info(`[${duration()} s] [${sex}, ${ancestry}] Beginning transaction...`);
-            try {
-                await connection.query(`BEGIN TRANSACTION`);
-            } catch (err) {
-                logger.error(err);
-            }
-            
-            // filter/sort prestage variants into stage table
-            logger.info(`[${duration()} s] [${sex}, ${ancestry}] Filtering and ordering variants...`);
-            try {
-                await connection.query(`
-                    INSERT INTO ${stageTableName} (
+                    // determine qq plot points
+                    const numPoints = 5000;
+                    logger.info(`Determining show_qq_plot flag for up to ${numPoints} points`);
+                    const qqRowIds = new Array(numPoints)
+                        .fill(0)
+                        .map((_, i) => i + 1)
+                        .map(n => count - Math.round(count * (1 - Math.pow(n / count - 1, 2))))
+                        .filter(n => !isNaN(n));
+
+                    if (qqRowIds.length) {
+                        await connection.execute(
+                            `UPDATE ${stageTable} SET show_qq_plot = 1 WHERE id IN (${getPlaceholders(qqRowIds)})`,
+                            qqRowIds
+                        );
+                    }
+
+                    // determine expected p-value
+                    logger.info(`Determining expected p-values`);
+                    await connection.query(
+                        `UPDATE ${stageTable} 
+                        SET p_value_nlog_expected = -LOG10((id - 0.5) / ${count})
+                    `);
+
+                    // determine max p-value and position 
+                    const [maxPositionAbsRows] = await connection.query(`SELECT MAX(position_abs_max) FROM chromosome_range`);
+                    const maxPositionAbs = pluck(maxPositionAbsRows);
+
+                    const [maxPValueNlogRows] = await connection.query(`SELECT MAX(p_value_nlog) FROM ${stageTable}`);
+                    const maxPValueNlog = pluck(maxPValueNlogRows);
+    
+                    // get aggregation bin size (800x, 400y)
+                    const positionFactor = maxPositionAbs / 800;
+                    const pValueNlogFactor = maxPValueNlog / 400;
+                    
+                    // populate variants table
+                    logger.info(`Creating variants table ${variantTable}`);
+                    await connection.query(`
+                        INSERT INTO ${variantTable} (
+                            chromosome,
+                            position,
+                            snp,
+                            allele_reference,
+                            allele_alternate,
+                            allele_frequency,
+                            p_value,
+                            p_value_nlog,
+                            p_value_nlog_expected,
+                            p_value_heterogenous,
+                            beta,
+                            standard_error,
+                            odds_ratio,
+                            ci_95_low,
+                            ci_95_high,
+                            n,
+                            show_qq_plot 
+                        )
+                        SELECT 
+                            chromosome,
+                            position,
+                            snp,
+                            allele_reference,
+                            allele_alternate,
+                            allele_frequency,
+                            p_value,
+                            p_value_nlog,
+                            p_value_nlog_expected,
+                            p_value_heterogenous,
+                            beta,
+                            standard_error,
+                            odds_ratio,
+                            ci_95_low,
+                            ci_95_high,
+                            n,
+                            show_qq_plot 
+                        FROM ${stageTable}
+                        ORDER BY chromosome, p_value
+                    `);
+                    logger.info(`Indexing variants table ${variantTable}`);
+                    await connection.query(
+                        readFile(path.resolve(__dirname, '../schema/indexes/variant.sql'))
+                            .replace(/\${table_name}/g, `${variantTable}`)
+                    );
+
+                    logger.info(`Creating aggregate table ${aggregateTable}`);
+                    await connection.query(`
+                        INSERT INTO ${aggregateTable} (
+                            phenotype_id,
+                            sex,
+                            ancestry,
+                            chromosome,
+                            position_abs,
+                            p_value_nlog
+                        )
+                        SELECT DISTINCT
+                            ${phenotype.id} as phenotype_id, 
+                            '${sex}' as sex, 
+                            '${ancestry}' as ancestry, 
+                            s.chromosome, 
+                            ${positionFactor} * (s.position + cr.position_abs_min) / ${positionFactor}  as position_abs,
+                            ${pValueNlogFactor} * (s.p_value_nlog / ${pValueNlogFactor}) as p_value_nlog
+                        FROM ${stageTable} s
+                        JOIN chromosome_range cr ON s.chromosome = cr.chromosome
+                        ORDER BY p_value_nlog
+                    `);
+
+                    logger.info(`Creating metadata table ${metadataTable}`);
+                    const insertMetadata = `INSERT INTO ${metadataTable} (
+                        phenotype_id,
+                        sex,
+                        ancestry,
                         chromosome,
-                        position,
-                        snp,
-                        allele_reference,
-                        allele_alternate,
-                        allele_reference_frequency,
-                        p_value,
-                        p_value_nlog,
-                        p_value_heterogenous,
-                        beta,
-                        standard_error,
-                        odds_ratio,
-                        ci_95_low,
-                        ci_95_high,
-                        n
-                    ) 
-                    SELECT 
-                        p.chromosome,
-                        p.position,
-                        p.snp,
-                        p.allele_reference,
-                        p.allele_alternate,
-                        p.${ancestry}_allele_reference_frequency,
-                        p.${sex}_${ancestry}_p_value,
-                        -LOG10(p.${sex}_${ancestry}_p_value) AS p_value_nlog,
-                        p.${sex}_${ancestry}_p_value_heterogenous,
-                        p.${sex}_${ancestry}_beta,
-                        p.${sex}_${ancestry}_standard_error,
-                        ${calculateOddsRatio ? `EXP(p.${sex}_${ancestry}_beta)` : `NULL` } as odds_ratio,
-                        ${calculateOddsRatio ? `EXP(p.${sex}_${ancestry}_beta - 1.96 * p.${sex}_${ancestry}_standard_error)` : `NULL` } as ci_95_low,
-                        ${calculateOddsRatio ? `EXP(p.${sex}_${ancestry}_beta + 1.96 * p.${sex}_${ancestry}_standard_error)` : `NULL` } as ci_95_high,
-                        p.${sex}_${ancestry}_n
-                    FROM prestage p
-                    INNER JOIN chromosome_range cr ON cr.chromosome = p.chromosome
-                    WHERE p.${sex}_${ancestry}_p_value > 1e-1000
-                    AND p.position BETWEEN cr.position_min AND cr.position_max
-                    ORDER BY ${sex}_${ancestry}_p_value;
-                `);
-            } catch (err) {
-                logger.error(err);
-            }
-            
-            logger.info(`[${duration()} s] [${sex}, ${ancestry}] Done`);
-
-            // ensure p-values that are essentially 0 are set the the correct value
-            logger.info(`[${duration()} s] [${sex}, ${ancestry}] Correcting for infinite -log10(p)`);
-            try {
-                await connection.query(`
-                    DELETE FROM ${stageTableName} 
-                    WHERE p_value_nlog IN(9e999999, -9e999999)
-                `);
-            } catch (err) {
-                logger.error(err);
-            }
-            
-            // determine count
-            let count;
-            try {
-                const [countRows] = await connection.query(`SELECT COUNT(*) FROM ${stageTableName}`);
-                count = pluck(countRows);
-            } catch (err) {
-                logger.error(err);
-            }
-            
-            logger.info(`[${duration()} s] [${sex}, ${ancestry}] Finished loading ${count} records into stage table...`);
-            
-            // determine median and lambda gc
-            logger.info(`[${duration()} s] [${sex}, ${ancestry}] Determining lambdagc...`);
-            const medianRowIds = count % 2 === 0 
-                ? [Math.floor(count / 2), Math.ceil(count / 2)] 
-                : [Math.ceil(count / 2)];
-            const placeholders = medianRowIds.map(m => '?').join(',');
-            let median;
-            try {
-                const [medianRows] = await connection.execute(
-                    `SELECT AVG(p_value) FROM ${stageTableName} WHERE rowid IN (${placeholders})`,
-                    medianRowIds
-                );
-                median = pluck(medianRows);
-            } catch (err) {
-                logger.error(err);
-            }
-            
-            const lambdaGC = getLambdaGC(median);
-            logger.info(`[${duration()} s] [${sex}, ${ancestry}] Done`);
-            // console.log(`[${duration()} s] [${sex}, ${ancestry}] Median/LambdaGC ${{median, lambdaGC}}`);
-            
-            // calculate the show_qq_plot flag using -x^2, using rowid as the index parameter
-            const numPoints = 5000;
-            logger.info(`[${duration()} s] [${sex}, ${ancestry}] Determining show_qq_plot flag for ${numPoints} points...`);
-            try {
-                await connection.query(`
-                    WITH ids as (
-                        SELECT ${count} - ROUND(${count} * (1 - POW(CAST(rowid as double) / ${numPoints} - 1, 2)))
-                        FROM ${stageTableName} WHERE rowid <= ${numPoints}
-                    ) UPDATE ${stageTableName} SET
-                        show_qq_plot = 1
-                        WHERE rowid IN (SELECT * FROM ids)`);
-            } catch (err) {
-                logger.error(err);
-            }
-            
-            logger.info(`[${duration()} s] [${sex}, ${ancestry}] Done`);
-            
-            // update expected -log10(p) values based on ppoints function
-            logger.info(`[${duration()} s] [${sex}, ${ancestry}] Updating expected -log10(p) values...`);
-            try {
-                await connection.query(`UPDATE ${stageTableName} SET p_value_nlog_expected = -LOG10((rowid - 0.5) / ${count})`).run();
-            } catch (err) {
-                logger.error(err);
-            }
-
-            logger.info(`[${duration()} s] [${sex}, ${ancestry}] Done`);            
-
-            // get max(-log10(p))
-            let maxPValueNlog;
-            try {
-                const [maxPValueNlogRows] = await connection.query(`SELECT MAX(p_value_nlog) as max FROM ${stageTableName}`);
-                maxPValueNlog = pluck(maxPValueNlogRows);
-            } catch (err) {
-                logger.error(err);
-            }
-
-            let maxPositionAbs;
-            try {
-                const [maxPositionAbsRows] = await connection.query(`SELECT MAX(position_max_abs) as max FROM chromosome_range`);
-                maxPositionAbs = pluck(maxPositionAbsRows);
-            } catch (err) {
-                logger.error(err);
-            }
-            
-            const pValueNlogFactor = maxPValueNlog / 400;
-            const positionFactor = maxPositionAbs / 800;
-
-            // commit changes
-            logger.info(`[${duration()} s] [${sex}, ${ancestry}] Committing changes...`);
-            try {
-                await connection.query(`COMMIT`);
-            } catch (err) {
-                logger.error(err);
-            }
-
-            logger.info(`[${duration()} s] [${sex}, ${ancestry}] Finished setting up stage table, exporting variants to ${exportVariantTmpTableFilePath}...`);
-            try {
-
-                // create variant table
-                await connection.query(
-                    readFile('../../schema/tables/variant.sql')
-                        .replace(/\${table_name}/g, `${variantTable}`)
-                        .replace(/\${table_name_suffix}/g, `${variantTableSuffix}`)
-                );
-
-                await connection.query(`
-                    INSERT INTO ${variantTable}
-                    SELECT 
-                        ${idPrefix} || ROW_NUMBER () OVER (
-                            ORDER BY cr.rowid, s.p_value
-                        ) as id, 
-                        s.chromosome,
-                        s.position,
-                        s.snp,
-                        s.allele_reference,
-                        s.allele_alternate,
-                        s.allele_reference_frequency,
-                        s.p_value,
-                        s.p_value_nlog,
-                        s.p_value_nlog_expected,
-                        s.p_value_heterogenous,
-                        s.beta,
-                        s.standard_error,
-                        s.odds_ratio,
-                        s.ci_95_low,
-                        s.ci_95_high,
-                        s.n,
-                        s.show_qq_plot 
-                    FROM ${stageTableName} s 
-                    JOIN chromosome_range cr ON s.chromosome = cr.chromosome 
-                    ORDER BY cr.rowid, s.p_value`);
-
-
-                    await connection.query(`FLUSH TABLES ${variantTable} FOR EXPORT`);
-                    const tablePath = path.resolve(dataDir, `${variantTable}.ibd`);
-                    const configPath = path.resolve(dataDir, `${variantTable}.cfg`);
-
-                    // copy variant table to tmp directory
-                    await fs.promises.copyFile(tablePath, exportVariantTmpTableFilePath);
-                    await fs.promises.copyFile(configPath, exportVariantTmpTableCfgFilePath);
-
-            } catch (err) {
-                logger.error(err);
-            }
-            
-            logger.info(`[${duration()} s] [${sex}, ${ancestry}] Exporting aggregated variants to ${exportAggregateTmpFilePath}...`);
-            try {
-                // output file will not contain headers
-                await connection.query(`
-                    SELECT DISTINCT
-                    ${phenotypeId} as phenotype_id, 
-                    '${sex}' as sex, 
-                    '${ancestry}' as ancestry, 
-                    s.chromosome, 
-                    ${positionFactor} * cast((s.position + cr.position_min_abs) / ${positionFactor} as int) as position_abs,
-                    ${pValueNlogFactor} * cast(s.p_value_nlog / ${pValueNlogFactor} as int) as p_value_nlog
-                FROM ${stageTableName} s 
-                JOIN chromosome_range cr ON s.chromosome = cr.chromosome 
-                ORDER BY p_value_nlog
-                INTO OUTFILE ${exportAggregateTmpFilePath}
-                FIELDS ENCLOSED BY '"' 
-                TERMINATED BY ',' 
-                ESCAPED BY '"' 
-                LINES TERMINATED BY '\n'`);
-            } catch (err) {
-                logger.error(err);
-            }
-            
-            logger.info(`[${duration()} s] [${sex}, ${ancestry}] Exporting variant metadata to ${exportMetadataTmpFilePath}...`);
-            try {
-                // output file will not contain headers
-                const metadataSql = [
-                    `SELECT 
-                        ${phenotypeId} as phenotype_id, 
-                        '${sex}' as sex, 
-                        '${ancestry}' as ancestry, 
-                        'all' as chromosome, 
-                        ${lambdaGC === Infinity ? 999 : lambdaGC} as lambda_gc, 
-                        count(*) as count
-                    FROM ${stageTableName} s`,
-
-                    `SELECT 
-                        DISTINCT ${phenotypeId} as phenotype_id, 
-                        '${sex}' as sex, 
-                        '${ancestry}' as ancestry, 
-                        s.chromosome as chromosome, 
-                        null as lambda_gc, 
-                        count(*) as count 
-                    FROM ${stageTableName} s 
-                    JOIN chromosome_range cr ON s.chromosome = cr.chromosome 
-                    GROUP BY s.chromosome 
-                    ORDER BY cr.rowid`,
-
+                        lambda_gc,
+                        count
+                    )`;
+                    await connection.query(`
+                        ${insertMetadata}
+                        SELECT 
+                            ${phenotype.id} as phenotype_id, 
+                            '${sex}' as sex, 
+                            '${ancestry}' as ancestry, 
+                            'all' as chromosome, 
+                            ${lambdaGC === Infinity ? 999 : lambdaGC} as lambda_gc, 
+                            count(*) as count
+                        FROM ${stageTable}
+                    `);
+                    await connection.query(`
+                        ${insertMetadata}
+                        SELECT 
+                            DISTINCT ${phenotype.id} as phenotype_id, 
+                            '${sex}' as sex, 
+                            '${ancestry}' as ancestry, 
+                            s.chromosome as chromosome, 
+                            null as lambda_gc, 
+                            count(*) as count 
+                        FROM ${stageTable} s 
+                        GROUP BY s.chromosome 
+                        ORDER BY s.chromosome
+                    `);
                     // run distinct snp query for stacked sex query once per ancestry
-                    sexes.includes('male') && sexes.includes('female') && sex === 'female' ? `
-                    SELECT 
-                        ${phenotypeId} as phenotype_id, 
-                        'stacked' as sex, 
-                        '${ancestry}' as ancestry, 
-                        'all' as chromosome, 
-                        null as lambda_gc, 
-                        count(distinct snp) as count
-                    FROM prestage p
-                    WHERE p.female_${ancestry}_p_value != 'NA' OR p.male_${ancestry}_p_value != 'NA'
-                    ` : ''
-                ].filter(e => e.length).join(' UNION ')
+                    if (sexes.includes('male') && sexes.includes('female') && sex === 'female') {
+                        await connection.query(`
+                            ${insertMetadata}
+                            SELECT 
+                                ${phenotype.id} as phenotype_id, 
+                                'stacked' as sex, 
+                                '${ancestry}' as ancestry, 
+                                'all' as chromosome, 
+                                null as lambda_gc, 
+                                count(distinct snp) as count
+                            FROM prestage p
+                            WHERE p.female_${ancestry}_p_value IS NOT NULL OR p.male_${ancestry}_p_value IS NOT NULL
+                        `);
+                    };
 
-                // output file will not contain headers
-                await connection.query(`
-                    ${metadataSql}
-                    INTO OUTFILE ${exportMetadataTmpFilePath}
-                    FIELDS ENCLOSED BY '"' 
-                    TERMINATED BY ',' 
-                    ESCAPED BY '"' 
-                    LINES TERMINATED BY '\n'                    
-                `);
+                    // export tables to output folder
+                    logger.info('Exporting tables');
+                    await exportInnoDBTable(connection, databaseName, variantTable, outputFolder);
+                    await exportInnoDBTable(connection, databaseName, aggregateTable, outputFolder);
+                    await exportInnoDBTable(connection, databaseName, metadataTable, outputFolder);
 
-            } catch (err) {
-                logger.error(err);
-            }
-            
-            logger.info([
-                `[${duration()} s] Finished exporting, generated the following files:`,
-                exportVariantTmpFilePath, 
-                exportAggregateTmpFilePath, 
-                exportMetadataTmpFilePath
-            ].join('\n'));
-        
-            if (outputFilePath !== tmpFilePath) {
-
-                logger.info(`[${duration()} s] [${sex}, ${ancestry}] Copying ${exportVariantTmpTableFilePath} to ${exportVariantTableFilePath}...`);
-                fs.copyFileSync(exportVariantTmpTableFilePath, exportVariantTableFilePath);
-                logger.info(`[${duration()} s] [${sex}, ${ancestry}] Done`);
-
-                logger.info(`[${duration()} s] [${sex}, ${ancestry}] Copying ${exportVariantTmpTableCfgFilePath} to ${exportVariantTableCfgFilePath}...`);
-                fs.copyFileSync(exportVariantTmpTableCfgFilePath, exportVariantTableCfgFilePath);
-                logger.info(`[${duration()} s] [${sex}, ${ancestry}] Done`);
-                
-                logger.info(`[${duration()} s] [${sex}, ${ancestry}] Copying ${exportAggregateTmpFilePath} to ${exportAggregateFilePath}...`);
-                fs.copyFileSync(exportAggregateTmpFilePath, exportAggregateFilePath);
-                logger.info(`[${duration()} s] [${sex}, ${ancestry}] Done`);
-            
-                logger.info(`[${duration()} s] [${sex}, ${ancestry}] Copying ${exportMetadataTmpFilePath} to ${exportMetadataFilePath}...`);
-                fs.copyFileSync(exportMetadataTmpFilePath, exportMetadataFilePath);
-                logger.info(`[${duration()} s] [${sex}, ${ancestry}] Done exporting csv files\n\n`);
+                } catch (e) {
+                    logger.error(e);
+                }
             }
         }
+
+    } catch (e) {
+        logger.error(e);
+        process.exit(1);
     }
-
-    console.log(`[${duration()} s] Done`);
-
-    return;
 }
-
