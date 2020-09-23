@@ -6,7 +6,7 @@ const mysql = require('mysql2');
 const parseCsv = require('csv-parse/lib/sync')
 const { getLogger } = require('./utils/logging');
 const { getLambdaGC } = require('./utils/math');
-const { pluck, exportInnoDBTable } = require('./utils/query');
+const { pluck, getPlaceholders, exportInnoDBTable } = require('./utils/query');
 const { readFile, readFirstLineAsync } = require('./utils/file');
 
 
@@ -182,8 +182,22 @@ async function exportVariants({
         // set up database for import
         logger.info('Setting up database');
         await connection.query([
+            `DROP TABLE IF EXISTS 
+                participant_data_category,
+                participant_data,
+                participant,
+                phenotype_correlation,
+                phenotype_metadata,
+                phenotype,
+                variant_aggregate, 
+                variant_metadata, 
+                chromosome_range, 
+                lookup_sex, 
+                lookup_ancestry;`,
             readFile(path.resolve(__dirname, '../schema/tables/main.sql')),
             readFile(path.resolve(__dirname, 'import-chromosome-range.sql')),
+            readFile(path.resolve(__dirname, 'import-lookup-tables.sql')),
+
             `DROP TABLE IF EXISTS prestage;
             CREATE TABLE prestage (
                 chromosome                  VARCHAR(2),
@@ -314,8 +328,6 @@ async function exportVariants({
                     const count = pluck(countRows);
                     logger.info(`Loaded ${count} rows into stage table`)
 
-                    const getPlaceholders = array => new Array(array.length).fill('?').join();
-
                     // determine lambdagc
                     logger.info('Calculating lambdaGC')
                     const medianRowIds = count % 2 === 0 
@@ -364,7 +376,7 @@ async function exportVariants({
                     const pValueNlogFactor = maxPValueNlog / 400;
                     
                     // populate variants table
-                    logger.info(`Creating variants table ${variantTable}`);
+                    logger.info(`Generating variants table ${variantTable}`);
                     await connection.query(`
                         INSERT INTO ${variantTable} (
                             chromosome,
@@ -412,7 +424,7 @@ async function exportVariants({
                             .replace(/\${table_name}/g, `${variantTable}`)
                     );
 
-                    logger.info(`Creating aggregate table ${aggregateTable}`);
+                    logger.info(`Generating aggregate table ${aggregateTable}`);
                     await connection.query(`
                         INSERT INTO ${aggregateTable} (
                             phenotype_id,
@@ -434,7 +446,7 @@ async function exportVariants({
                         ORDER BY p_value_nlog
                     `);
 
-                    logger.info(`Creating metadata table ${metadataTable}`);
+                    logger.info(`Generating metadata table ${metadataTable}`);
                     const insertMetadata = `INSERT INTO ${metadataTable} (
                         phenotype_id,
                         sex,
@@ -443,6 +455,8 @@ async function exportVariants({
                         lambda_gc,
                         count
                     )`;
+
+                    // insert variant counts
                     await connection.query(`
                         ${insertMetadata}
                         SELECT 
@@ -450,14 +464,15 @@ async function exportVariants({
                             '${sex}' as sex, 
                             '${ancestry}' as ancestry, 
                             'all' as chromosome, 
-                            ${lambdaGC === Infinity ? 999 : lambdaGC} as lambda_gc, 
-                            count(*) as count
-                        FROM ${stageTable}
+                            ${lambdaGC} as lambda_gc, 
+                            ${count} as count
                     `);
+
+                    // insert chromosome-specific variant counts
                     await connection.query(`
                         ${insertMetadata}
-                        SELECT 
-                            DISTINCT ${phenotype.id} as phenotype_id, 
+                        SELECT DISTINCT 
+                            ${phenotype.id} as phenotype_id, 
                             '${sex}' as sex, 
                             '${ancestry}' as ancestry, 
                             s.chromosome as chromosome, 
@@ -467,6 +482,7 @@ async function exportVariants({
                         GROUP BY s.chromosome 
                         ORDER BY s.chromosome
                     `);
+
                     // run distinct snp query for stacked sex query once per ancestry
                     if (sexes.includes('male') && sexes.includes('female') && sex === 'female') {
                         await connection.query(`
@@ -478,8 +494,10 @@ async function exportVariants({
                                 'all' as chromosome, 
                                 null as lambda_gc, 
                                 count(distinct snp) as count
-                            FROM prestage p
-                            WHERE p.female_${ancestry}_p_value IS NOT NULL OR p.male_${ancestry}_p_value IS NOT NULL
+                            FROM prestage
+                            WHERE 
+                                female_${ancestry}_p_value > 1e-10000 OR 
+                                male_${ancestry}_p_value > 1e-10000
                         `);
                     };
 
@@ -492,8 +510,8 @@ async function exportVariants({
                 } catch (e) {
                     logger.error(e);
                 }
-            }
-        }
+            } // end ancestry
+        } // end sex
 
     } catch (e) {
         logger.error(e);
