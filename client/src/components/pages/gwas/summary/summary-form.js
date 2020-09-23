@@ -11,7 +11,7 @@ export function SummaryResultsForm({
   phenotype = null,
   // sex = 'all',
   // ancestry = 'european',
-  stratifiation = 'european__all',
+  stratification = null,
   onSubmit = any => {},
   onReset = any => {}
 }) {
@@ -32,7 +32,7 @@ export function SummaryResultsForm({
 
   // private members prefixed with _
   const [_phenotype, _setPhenotype] = useState(null);
-  const [_stratification, _setStratification] = useState({label: 'European - All', value: 'european__all'});
+  const [_stratification, _setStratification] = useState(null);
   // const submitRef = useRef(null);
 
   // update state when props change
@@ -41,12 +41,51 @@ export function SummaryResultsForm({
     handleInitStratifications(phenotype);
   }, [phenotype]);
 
-  useEffect(() => {
-    _setStratification(stratifiation);
-  }, [stratifiation]);
+  // useEffect(() => {
+  //   console.log("useEffect _setStratification", stratification);
+  //   _setStratification(stratification);
+  // }, [stratification]);
 
   const handleInitStratifications = (selectedPhenotype) => {
-    // console.log("handleInitStratifications");
+    if (!phenotypes || !phenotypes.metadata) return;
+    if (selectedPhenotype) {
+      let existingStratifications  = [];
+      const existingAncestries = [...new Set(phenotypes.metadata.filter((item) => item.phenotype_id === selectedPhenotype.id && item.count > 0).map((item) => item.ancestry).sort())];
+      existingAncestries.map((ancestry) => {
+        const existingSexes = [...new Set(phenotypes.metadata.filter((item) => item.phenotype_id === selectedPhenotype.id && item.ancestry === ancestry && item.count > 0).map((item) => item.sex).sort())];
+        const existingSexesChecked = existingSexes.filter((item) => {
+            if (item === "stacked") {
+              return existingSexes.includes('female') && existingSexes.includes('male');
+            } else {
+              return true;
+            }
+          })
+          .map((sex) => {
+            return {
+              label: `${ancestries[ancestry].name} - ${sexes[sex].name}`,
+              value: `${ancestry}__${sex}`
+            }
+          });
+
+        existingStratifications.push({
+          label: ancestries[ancestry].name,
+          options: existingSexesChecked
+        })
+      })
+      dispatch(updateSummaryResults({ existingStratifications }));
+      if (!stratification && existingStratifications.length > 0) {
+        _setStratification(existingStratifications[0].options[0]);
+      } else {
+        _setStratification(stratification);
+      }
+    } else {
+      dispatch(updateSummaryResults({ 
+        existingStratifications: []
+      }));
+    }
+  }
+
+  const handleChangeStratifications = (selectedPhenotype) => {
     if (!phenotypes || !phenotypes.metadata) return;
     if (selectedPhenotype) {
       let existingStratifications  = [];
@@ -131,7 +170,7 @@ export function SummaryResultsForm({
           value={_phenotype}
           onChange={val => {
             _setPhenotype((val && val.length) ? val[0] : null);
-            handleInitStratifications((val && val.length) ? val[0] : null);
+            handleChangeStratifications((val && val.length) ? val[0] : null);
             dispatch(updateSummaryResults({ disableSubmit: false }));
           }}
           singleSelect
@@ -145,8 +184,9 @@ export function SummaryResultsForm({
           id="summary-results-stratification" 
           options={existingStratifications} 
           components={{ Option }}
-          value={existingStratifications.length === 0 ? null : _stratification}
+          value={_stratification}
           onChange={item => {
+            console.log("onChange", item);
             _setStratification(item);
             dispatch(updateSummaryResults({ disableSubmit: false }));
           }}
@@ -188,7 +228,7 @@ export function SummaryResultsForm({
             _setPhenotype(null);
             // _setSex('all');
             // _setAncestry('european');
-            _setStratification({label: 'European - All', value: 'european__all'})
+            _setStratification(null);
             onReset();
             treeRef.current.resetSearchFilter();
           }}>

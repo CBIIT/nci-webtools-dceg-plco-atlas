@@ -541,10 +541,10 @@ export function SummaryResults() {
               phenotype={selectedPhenotype}
               // sex={selectedSex}
               // ancestry={selectedAncestry}
-              stratification={{
-                label: selectedSex ? `${ancestryStratificationLabels[selectedAncestry].name} - ${sexStratificationLabels[selectedSex].name}` : selectedSex,
+              stratification={selectedAncestry && selectedSex ? {
+                label: `${ancestryStratificationLabels[selectedAncestry].name} - ${sexStratificationLabels[selectedSex].name}`,
                 value: `${selectedAncestry}__${selectedSex}`
-              }}
+              } : null}
               onSubmit={handleSubmit}
               onReset={handleReset}
             />
