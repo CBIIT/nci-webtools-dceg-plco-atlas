@@ -182,6 +182,17 @@ CREATE TABLE IF NOT EXISTS `phenotype_aggregate` (
     PRIMARY KEY (id, phenotype_id)
 ) PARTITION BY list(phenotype_id) (PARTITION `0` VALUES IN (0));
 
+CREATE TABLE IF NOT EXISTS phenotype_point
+(
+    id bigint auto_increment,
+    phenotype_id int not null,
+    sex VARCHAR(20),
+    ancestry VARCHAR(20),
+    p_value_nlog double null,
+    p_value_nlog_expected double null,
+    primary key (id, phenotype_id)
+) PARTITION BY list(phenotype_id) (PARTITION `0` VALUES IN (0));
+
 -- reported ancestry is different from genetic ancestry
 CREATE TABLE IF NOT EXISTS `participant` (
     `id` INTEGER PRIMARY KEY NOT NULL AUTO_INCREMENT,

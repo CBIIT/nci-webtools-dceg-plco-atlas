@@ -97,7 +97,7 @@ CREATE PROCEDURE update_phenotype_point()
         (phenotype_id, sex, ancestry, p_value_nlog, p_value_nlog_expected)
         SELECT ', phenotype_id, ', "', sex, '", "', ancestry, '", p_value_nlog, p_value_nlog_expected
         FROM phenotype_variant__', phenotype_name, '__', sex, '__', ancestry, 
-        WHERE show_qq_plot = 1'
+        'WHERE show_qq_plot = 1'
     ));
   UNTIL done END REPEAT;
   CLOSE phenotype_cursor;

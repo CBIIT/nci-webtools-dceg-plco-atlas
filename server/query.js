@@ -354,6 +354,32 @@ async function getVariants(connection, params) {
     return results;
 }
 
+async function getPoints(connection, { phenotype_id, sex, ancestry, raw }) {
+    // validate phenotype id
+    if (!phenotype_id || !await hasRecord(connection, 'phenotype', {id: phenotype_id}))
+        throw('A valid phenotype id must be provided');
+
+    // validate sex
+    if (!sex || !await hasRecord(connection, 'lookup_sex', {value: sex}))
+        throw('A valid sex must be provided');
+
+    // validate ancestry
+    if (!ancestry || !await hasRecord(connection, 'lookup_ancestry', {value: ancestry}))
+        throw('A valid ancestry must be provided');
+
+    // query database
+    const [data, columns] = await connection.execute({
+        sql: `SELECT p_value_nlog, p_value_nlog_expected
+            FROM phenotype_point 
+            WHERE phenotype_id = :phenotype_id
+                AND sex = :sex 
+                AND ancestry = :ancestry`, 
+        rowsAsArray: raw,
+    }, { phenotype_id, sex, ancestry, raw });
+    
+    return {data, columns: columns.map(c => c.name)};
+}
+
 /**
  * Retrieves metadata for a phenotype's variants
  * @param {string} filepath - Path to the sqlite database file
@@ -930,6 +956,7 @@ module.exports = {
     getConnection,
     getSummary,
     getVariants,
+    getPoints,
     getMetadata,
     getCorrelations,
     getPhenotype,
