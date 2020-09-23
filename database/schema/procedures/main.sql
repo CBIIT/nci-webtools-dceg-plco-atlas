@@ -101,7 +101,7 @@ BEGIN
     ));
   UNTIL done END REPEAT;
   CLOSE phenotype_cursor;
-END; $$
+END $$
 
 
 DROP PROCEDURE IF EXISTS migrate_phenotype_variants $$
