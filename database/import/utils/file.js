@@ -1,6 +1,7 @@
 const assert = require('assert');
 const fs = require('fs');
 const path = require('path');
+const { createGunzip } = require('zlib');
 const { Transform } = require('stream');
 
 // chunks an input stream into lines
@@ -105,6 +106,20 @@ function validateHeaders(filepath, headers) {
     assert.deepStrictEqual(firstLine, headers, `Headers do not match expected values: ${headers}`, firstLine);
 }
 
+function gunzip(sourceFilePath, targetFilePath) {
+    return new Promise((resolve, reject) => {
+        const source = fs.createReadStream(sourceFilePath);
+        const target = fs.createWriteStream(targetFilePath);
+        source
+            .pipe(createGunzip())
+            .pipe(target)
+            .on('finish', error => {
+              if (error) reject(error);
+              else resolve(true);  
+            });
+    });
+}
+
 module.exports = {
     lineStream,
     mappedStream,
@@ -112,4 +127,5 @@ module.exports = {
     readFile,
     readFirstLineAsync,
     validateHeaders,
+    gunzip,
 };

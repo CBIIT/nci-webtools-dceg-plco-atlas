@@ -49,6 +49,7 @@ function getIntervals(maxValue, length) {
 
 // retrieves labmda gc value from median
 function getLambdaGC(pMedian) {
+    if (pMedian === null) return null;
     return precision4((qchisq(1 - pMedian, 1) / qchisq(0.5, 1)));
 }
 
