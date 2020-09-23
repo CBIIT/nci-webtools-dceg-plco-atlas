@@ -1,6 +1,7 @@
 const assert = require('assert');
 const fs = require('fs');
 const path = require('path');
+const { createGunzip } = require('zlib');
 const { Transform } = require('stream');
 
 // chunks an input stream into lines
@@ -73,6 +74,23 @@ function readFirstLine(filepath) {
     return contents.substring(0, contents.indexOf('\n')).trim();
 }
 
+function readFirstLineAsync(filePath) {
+    return new Promise(function (resolve, reject) {
+        let rs = fs.createReadStream(filePath, {encoding: 'utf8'});
+        let acc = '';
+        let pos = 0;
+        let index;
+        rs
+          .on('data', chunk => {
+            index = chunk.indexOf('\n');
+            acc += chunk;
+            index !== -1 ? rs.close() : pos += chunk.length;
+          })
+          .on('close', () => resolve(acc.slice(0, pos + index)))
+          .on('error', err => reject(err))
+      });
+}
+
 // parses each line in the file
 function parseLine(line) {
     return line.trim().split(/,|\s+/).map(value => {
@@ -88,10 +106,26 @@ function validateHeaders(filepath, headers) {
     assert.deepStrictEqual(firstLine, headers, `Headers do not match expected values: ${headers}`, firstLine);
 }
 
+function gunzip(sourceFilePath, targetFilePath) {
+    return new Promise((resolve, reject) => {
+        const source = fs.createReadStream(sourceFilePath);
+        const target = fs.createWriteStream(targetFilePath);
+        source
+            .pipe(createGunzip())
+            .pipe(target)
+            .on('finish', error => {
+              if (error) reject(error);
+              else resolve(true);  
+            });
+    });
+}
+
 module.exports = {
     lineStream,
     mappedStream,
     parseLine,
     readFile,
+    readFirstLineAsync,
     validateHeaders,
+    gunzip,
 };

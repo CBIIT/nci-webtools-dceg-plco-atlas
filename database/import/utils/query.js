@@ -1,3 +1,16 @@
+const path = require('path');
+const fs = require('fs');
+
+module.exports = {
+    getMedian,
+    getRecords,
+    getPlaceholders,
+    pluck,
+    tableExists,
+    exportInnoDBTable,
+    importInnoDBTable,
+}
+
 function pluck(rows) {
     if (!rows) return null;
     let [firstRow] = rows;
@@ -52,9 +65,38 @@ async function getRecords(connection, tableName, query) {
     return records;
 }
 
-module.exports = {
-    getMedian,
-    getRecords,
-    pluck,
-    tableExists,
+function getPlaceholders(array) {
+    return new Array(array.length).fill('?').join();
+}
+
+async function getDataDirectory(connection) {
+    const [rows] = await connection.query(`SELECT @@datadir`);
+    return pluck(rows);
+}
+
+async function copyInnoDBTable(tableName, sourceDirectory, targetDirectory) {
+    // select table files (including partitioned tables) which can be copied
+    const filenames = (await fs.promises.readdir(sourceDirectory))
+        .filter(name => new RegExp(`${tableName}(#p#.*)?(\.ibd|\.cfg)$`).test(name));
+
+    for (let filename of filenames) {
+        await fs.promises.copyFile(
+            path.resolve(sourceDirectory, filename),
+            path.resolve(targetDirectory, filename)
+        )
+    }
+}
+
+async function exportInnoDBTable(connection, database, tableName, targetDirectory) {
+    const dataDirectory = path.resolve(await getDataDirectory(connection), database);
+    await connection.query(`FLUSH TABLES ${tableName} FOR EXPORT`);
+    await copyInnoDBTable(tableName, dataDirectory, targetDirectory);
+    await connection.query(`UNLOCK TABLES`);
+}
+
+async function importInnoDBTable(connection, database, tableName, sourceDirectory) {
+    const dataDirectory = path.resolve(await getDataDirectory(connection), database);
+    await connection.query(`ALTER TABLE ${tableName} DISCARD TABLESPACE`);
+    await copyInnoDBTable(tableName, sourceDirectory, dataDirectory);
+    await connection.query(`ALTER TABLE ${tableName} IMPORT TABLESPACE`);
 }
