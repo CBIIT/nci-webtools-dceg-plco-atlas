@@ -60,8 +60,7 @@ CREATE PROCEDURE insert_participant_data()
 END $$
 
 DROP PROCEDURE IF EXISTS update_phenotype_point $$
-CREATE PROCEDURE update_phenotype_point()
-  BEGIN
+BEGIN
   DECLARE done INT;
   DECLARE phenotype_id INT;
   DECLARE phenotype_name VARCHAR(100);
@@ -71,8 +70,9 @@ CREATE PROCEDURE update_phenotype_point()
 
   DECLARE phenotype_cursor CURSOR FOR
     select distinct p.id, p.name, pm.sex as sex, pm.ancestry as ancestry from phenotype p
-    join phenotype_metadata pm on pm.phenotype_id = p.id
-    where pm.count > 0 and pm.chromosome = 'all';
+    inner join phenotype_metadata pm on pm.phenotype_id = p.id
+    inner join information_schema.tables t on t.TABLE_NAME = concat('phenotype_variant__', p.name, '__', pm.sex, '__', pm.ancestry)
+    where pm.count > 0 and pm.chromosome = 'all' and pm.sex != 'stacked';
   DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = 1;
 
   OPEN phenotype_cursor;
@@ -85,19 +85,19 @@ CREATE PROCEDURE update_phenotype_point()
     WHERE TABLE_NAME = "phenotype_point" AND PARTITION_NAME = phenotype_id;
 
     IF partitions_exist = 0 THEN
-        call execute_sql(CONCAT('
-          ALTER TABLE phenotype_point 
-          ADD PARTITION (PARTITION `', phenotype_id, '` VALUES IN (', phenotype_id, ')'
+        call execute_sql(concat('
+          ALTER TABLE phenotype_point
+          ADD PARTITION (PARTITION `', phenotype_id, '` VALUES IN (', phenotype_id, '))'
         ));
     END IF;
 
     -- insert variants into partition
-    call execute_sql(CONCAT('
+    call execute_sql(concat('
         INSERT INTO phenotype_point PARTITION (`', phenotype_id, '`)
         (phenotype_id, sex, ancestry, p_value_nlog, p_value_nlog_expected)
         SELECT ', phenotype_id, ', "', sex, '", "', ancestry, '", p_value_nlog, p_value_nlog_expected
-        FROM phenotype_variant__', phenotype_name, '__', sex, '__', ancestry, 
-        'WHERE show_qq_plot = 1'
+        FROM phenotype_variant__', phenotype_name, '__', sex, '__', ancestry, '
+        WHERE show_qq_plot = 1'
     ));
   UNTIL done END REPEAT;
   CLOSE phenotype_cursor;
