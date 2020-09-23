@@ -2,268 +2,139 @@ const fs = require('fs');
 const path = require('path');
 const mysql = require('mysql2');
 const args = require('minimist')(process.argv.slice(2));
-const { getRecords } = require('./utils/query');
+const { getRecords, importInnoDBTable } = require('./utils/query');
 const { readFile } = require('./utils/file');
 // const { database } = require('../../server/config.json');
-const { timestamp } = require('./utils/logging');
+const { timestamp, getLogger } = require('./utils/logging');
+const { dirname } = require('path');
 
 // display help if needed
-if (!args.file) {
+if (!args.folder) {
     console.log(`USAGE: node parallel-import-variant.js
-            --file "path to file prefix. eg: phenotype_id.sex"
+            --folder "path to folder"
             --host "MySQL hostname" 
             --port "MySQL port" 
             --db_name "MySQL database name" 
             --user "MySQL username" 
-            --password "MySQL password" `);
+            --password "MySQL password"
+            --logdir "./" [REQUIRED]`);
     process.exit(0);
 }
 
 // parse arguments and set defaults
-const {file, reset, host, port, db_name, user, password} = args;
-const filepath = path.resolve(file);
-const [phenotypeName, sex, ancestry] = path.basename(filepath).split('.');
-const exportVariantFilePath = filepath + '.variant.csv';
-const exportAggregateFilePath = filepath + '.aggregate.csv';
-const exportMetadataFilePath = filepath + '.metadata.csv';
-
-//const errorLog = getLogStream(`./failed-variants-${new Date().toISOString()}.txt`);
-const errorLog = {write: e => console.log(e)};
-const duration = timestamp();
+const {folder: folderPath, host, port, db_name: database, user, password, logdir: logFolder} = args;
+const logger = getLogger(path.resolve(logFolder || __dirname, 'import.log'), 'import');
 const connection = mysql.createConnection({
-    host: host,
-    port: port,
-    database: db_name,
-    user: user,
-    password: password,
+    host,
+    port,
+    database,
+    user,
+    password,
     namedPlaceholders: true,
     multipleStatements: true,
     // debug: true,
-  }).promise();
-
-// input file should exist
-if (!fs.existsSync(exportVariantFilePath)) {
-    console.error(`ERROR: ${exportVariantFilePath} does not exist.`);
-    process.exit(1);
-}
-
-// sex should be male, female, or all
-if (!/^(all|female|male)$/.test(sex)) {
-    console.error(`ERROR: Sex must be all, female, or male`);
-    process.exit(1);
-}
+}).promise();
 
 (async function main() {
     try {
-        const phenotype = await validatePhenotype(connection, phenotypeName);
-
-        await importVariants({
-            connection,
-            exportVariantFilePath, 
-            exportAggregateFilePath, 
-            exportMetadataFilePath,
-            phenotype,
-            sex,
-            ancestry,
-            reset,    
+        // retrieve information on each phenotype in the data folder
+        const phenotypes = await getPhenotypes({
+            connection, 
+            folderPath
         });
-    
-        console.log(`[${duration()} s] Imported variants`);
+
+        // import each phenotype's variants, aggregated variants, and metadata
+        for (const phenotype of phenotypes) {
+            logger.info(`Started importing ${phenotype.name}.${phenotype.sex}.${phenotype.ancestry}`);
+            await importVariants({
+                connection, 
+                database, 
+                folderPath, 
+                phenotype
+            });
+            logger.info(`Finished importing ${phenotype.name}.${phenotype.sex}.${phenotype.ancestry}`);
+        }
+
+        logger.info(`Imported variants`);
         process.exit(0);
     } catch (e) {
-        console.error(e);
+        console.log(e);
+        for (let key in e) console.log(e, e[key]);
+        console.log(typeof e.stack)
+        logger.error(String(e));
         process.exit(1);
     }
 })();
 
-// validates a phenotype by name or id
-async function validatePhenotype(connection, phenotype) {
-    const phenotypeKey = /^\d+$/.test(phenotype) ? 'id' : 'name';
-    const phenotypes = await getRecords(connection, 'phenotype', {
-        [phenotypeKey]: phenotype
-    });
+async function getPhenotypes({connection, folderPath}) {
+    const databaseFiles = await fs.promises.readdir(folderPath);
+    const [phenotypeRows] = await connection.query(`SELECT id, name FROM phenotype`);
 
-    if (phenotypes.length === 0) {
-        throw(`Phenotype does not exist`);
-    }
-
-    if (phenotypes.length > 1) {
-        throw(`More than one phenotype was found with the same name. Please specify the phenotype id instead of the name.`)
-    }
-
-    return phenotypes[0];
+    return databaseFiles
+        .filter(filename => /\.ibd$/i.test(filename))
+        .map(filename => filename.replace(/(#.*)?\.ibd$/i, ''))
+        .map(filename => filename.split('__').slice(1).join('__'))
+        .reduce((acc, curr) => !acc.includes(curr) ? acc.concat([curr]) : acc, [])
+        .reduce((phenotypes, tableSuffix) => {
+            const [name, sex, ancestry] = tableSuffix.split('__');
+            const {id} = phenotypeRows.find(p => p.name === name);
+            phenotypes.push({id, name, tableSuffix, sex, ancestry});
+            return phenotypes;
+        }, []);
 }
 
-async function importVariants({
-    connection,
-    exportVariantFilePath, 
-    exportAggregateFilePath, 
-    exportMetadataFilePath,
-    phenotype,
-    sex,
-    ancestry,
-    reset,
-}) {
+function getSql(filepath, args) {
+    let sql = readFile(path.resolve(__dirname, filepath));
+    for (let key in args)
+        // regex for simulating es6-interpolated strings
+        sql = sql.replace(new RegExp(`\\\${${key}}`, 'g'), args[key]);
+    return sql;
+}
 
-    const partition = `\`${phenotype.id}\``; // quote partition identifier
-    const variantTableSuffix = `${phenotype.name}__${sex}__${ancestry}`;
-    const variantTable = `phenotype_variant__${variantTableSuffix}`;
-    const aggregateTable = `phenotype_aggregate`;
-
-    await connection.query(`
-        START TRANSACTION;
-        -- SET UNIQUE_CHECKS = 0;
-        SET AUTOCOMMIT = 0;
-    `);
-
-    if (reset) {
-
-        // create partitions for each phenotype (if they do not exist)
-        const [partitionRows] = await connection.execute(
-            `SELECT * FROM INFORMATION_SCHEMA.PARTITIONS
-            WHERE TABLE_NAME = :aggregateTable
-            AND PARTITION_NAME = :phenotypeId`,
-            {aggregateTable, phenotypeId: phenotype.id}
-        );
-
-        // drop partitions
-        if (partitionRows.length) {
-            await connection.query(`ALTER TABLE ${aggregateTable} DROP PARTITION ${partition}`);
-        }
-
-        await connection.query(`ALTER TABLE ${aggregateTable} ADD PARTITION (PARTITION ${partition} VALUES IN (${phenotype.id}));`);
-    }
+async function importVariants({connection, database, folderPath, phenotype}) {
+    const { tableSuffix, sex, ancestry } = phenotype;
+    const variantTable = `phenotype_variant__${tableSuffix}`;
+    const aggregateTable = `phenotype_aggregate__${tableSuffix}`;
+    const metadataTable = `phenotype_metadata__${tableSuffix}`;
 
     // create variant table
-    await connection.query(
-        readFile('../../schema/tables/variant.sql')
-            .replace(/\${table_name}/g, `${variantTable}`)
-            .replace(/\${table_name_suffix}/g, `${variantTableSuffix}`)
-    );
+    await connection.query([
+        `DROP TABLE IF EXISTS ${variantTable}, ${aggregateTable}, ${metadataTable};`,
+        getSql('../schema/tables/variant.sql', {table_name: variantTable}),
+        getSql('../schema/indexes/variant.sql', {table_name: variantTable}),
+        getSql('../schema/tables/aggregate.sql', {table_name: aggregateTable}),
+        `ALTER TABLE ${aggregateTable} ADD PARTITION (PARTITION \`${phenotype.id}\` VALUES IN (${phenotype.id}));`,
+        `CREATE TABLE ${metadataTable} LIKE phenotype_metadata;`,
+    ].join('\n'));
+   
+    logger.info('Importing variant table');
+    await importInnoDBTable(connection, database, variantTable, folderPath);
 
-    // get data directory
-    const [dataDirRows] = await connection.query(`select @@datadir`);
-    const dataDir = pluck(dataDirRows);
-    const variantDir = path.dirname(exportVariantFilePath);
+    logger.info('Importing temporary InnoDB tables');
+    await importInnoDBTable(connection, database, aggregateTable, folderPath);
+    await importInnoDBTable(connection, database, metadataTable, folderPath);
 
-    await connection.query(`ALTER TABLE ${variantTable} DISCARD TABLESPACE`)
-    await fs.promises.copyFile(
-        path.resolve(variantDir, `${variantTable}.ibd`),
-        path.resolve(dataDir, `${variantTable}.ibd`)
-    );
-    await fs.promises.copyFile(
-        path.resolve(variantDir, `${variantTable}.cfg`),
-        path.resolve(dataDir, `${variantTable}.cfg`)
-    );
-    await connection.query(`ALTER TABLE ${variantTable} IMPORT TABLESPACE`)
-            
-    console.log(`[${duration()} s] Loading variants into table...`);
-    await connection.query({
-        infileStreamFactory: path => fs.createReadStream(exportVariantFilePath),
-        sql: `LOAD DATA LOCAL INFILE "${exportVariantFilePath}"
-            INTO TABLE ${variantTable}
-            FIELDS TERMINATED BY ','
-            IGNORE 1 LINES
-            (
-                id, 
-                chromosome,
-                position,
-                snp,
-                allele_reference,
-                allele_alternate,
-                allele_reference_frequency,
-                p_value,
-                p_value_nlog,
-                p_value_nlog_expected,
-                p_value_heterogenous,
-                beta,
-                standard_error,
-                odds_ratio,
-                ci_95_low,
-                ci_95_high,
-                n,
-                show_qq_plot
-            )`
-    });
-
-    console.log(`[${duration()} s] Indexing variants table (${variantTable})...`);
-    // index variant table
-    await connection.query(
-        readFile('../../schema/indexes/variant.sql').replace(/\${table_name}/g, `${variantTable}`)
-    );
-
-    console.log(`[${duration()} s] Loading aggregate variants into table...`);
-    await connection.query({
-        infileStreamFactory: path => fs.createReadStream(exportAggregateFilePath),
-        sql: `LOAD DATA LOCAL INFILE "${exportAggregateFilePath}"
-            INTO TABLE ${aggregateTable} partition (${partition})
-            FIELDS TERMINATED BY ','
-            IGNORE 1 LINES
-            (
-                phenotype_id,
-                sex,
-                ancestry, 
-                chromosome,
-                position_abs,
-                p_value_nlog
-            )`
-    });
-
-    console.log(`[${duration()} s] Loading metadata into table...`);
-    await connection.query(`CREATE TEMPORARY TABLE metadata_stage LIKE phenotype_metadata`);
-    await connection.query({
-        infileStreamFactory: path => fs.createReadStream(exportMetadataFilePath),
-        sql: `LOAD DATA LOCAL INFILE "${exportMetadataFilePath}"
-            INTO TABLE metadata_stage
-            FIELDS TERMINATED BY ','
-            IGNORE 1 LINES
-            (
-                phenotype_id, 
-                sex, 
-                ancestry, 
-                chromosome, 
-                lambda_gc, 
-                count
-            )`
-    });
-
-    // upsert metadata
+    logger.info('Selecting from temporary InnoDB tables');
+    await connection.query(`
+        INSERT INTO phenotype_aggregate 
+            (phenotype_id, sex, ancestry, chromosome, position_abs, p_value_nlog)
+        SELECT
+            phenotype_id, sex, ancestry, chromosome, position_abs, p_value_nlog
+        FROM ${aggregateTable}
+    `);
+    
     await connection.query(`
         INSERT INTO phenotype_metadata 
             (phenotype_id, sex, ancestry, chromosome, lambda_gc, count)
-        SELECT 
-            phenotype_id, sex, ancestry, chromosome, lambda_gc, count 
-        FROM 
-            metadata_stage
+        SELECT
+            phenotype_id, sex, ancestry, chromosome, lambda_gc, count
+        FROM ${metadataTable}
         ON DUPLICATE KEY UPDATE
             lambda_gc = VALUES(lambda_gc),
             count = VALUES(count);
     `);
 
-    await connection.query(`COMMIT`);
-
-    // log imported variants
-    console.log(`[${duration()} s] Storing import log...`);
-    connection.execute(`
-        UPDATE phenotype SET
-            import_count = (
-                SELECT count from phenotype_metadata
-                WHERE
-                    phenotype_id = :phenotypeId AND
-                    sex = :sex AND
-                    ancestry = :ancestry AND
-                    chromosome = :chromosome
-            ),
-            import_date = NOW()
-        WHERE
-            id = :phenotypeId`,
-        {phenotypeId: phenotype.id, sex, ancestry, chromosome: 'all'}
-    );
-
-    await connection.query(`COMMIT`);
-    
-    await connection.end();
-
-    console.log(`[${duration()} s] Done importing`);
-    return 0;
+    logger.info('Removing temporary InnoDB tables');
+    // await connection.query(`DROP TABLE ${aggregateTable}`);
+    // await connection.query(`DROP TABLE ${metadataTable}`);
 }

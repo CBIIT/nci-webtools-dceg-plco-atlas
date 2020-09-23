@@ -141,6 +141,13 @@ function getPhenotype(phenotypeFilePath, phenotype) {
     return phenotypes[0];
 }
 
+function getSql(filepath, args) {
+    const sql = readFile(path.resolve(__dirname, filepath));
+    for (let key of args)
+        sql = sql.replace(new RegExp(`\${${key}}`, 'g'), args[key]);
+    return sql;
+}
+
 async function exportVariants({
     inputFilePath,
     logFolder,
@@ -249,10 +256,7 @@ async function exportVariants({
                     // create stage, variant, aggregate, and metadata tables
                     logger.info('Creating tables');
                     await connection.query([
-                        `DROP TABLE IF EXISTS ${stageTable};`,
-                        `DROP TABLE IF EXISTS ${variantTable};`,
-                        `DROP TABLE IF EXISTS ${aggregateTable};`,
-                        `DROP TABLE IF EXISTS ${metadataTable};`,
+                        `DROP TABLE IF EXISTS ${stageTable}, ${variantTable}, ${aggregateTable}, ${metadataTable};`,
                         `CREATE TABLE ${stageTable} (
                             id                          BIGINT PRIMARY KEY NOT NULL AUTO_INCREMENT,
                             chromosome                  VARCHAR(2),
@@ -276,7 +280,8 @@ async function exportVariants({
                         // create variant, aggregate, and metadata tables
                         readFile(path.resolve(__dirname, '../schema/tables/variant.sql'))
                             .replace(/\${table_name}/g, `${variantTable}`),
-                        `CREATE TABLE ${aggregateTable} LIKE phenotype_aggregate;`,
+                        readFile(path.resolve(__dirname, '../schema/tables/aggregate.sql'))
+                            .replace(/\${table_name}/g, `${aggregateTable}`),
                         `ALTER TABLE ${aggregateTable} ADD PARTITION (PARTITION \`${phenotype.id}\` VALUES IN (${phenotype.id}));`,
                         `CREATE TABLE ${metadataTable} LIKE phenotype_metadata;`,
                     ].join('\n'));
