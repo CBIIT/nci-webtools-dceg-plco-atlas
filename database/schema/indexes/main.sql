@@ -22,4 +22,9 @@ ALTER TABLE phenotype_metadata
 
 -- aggregated variants
 ALTER TABLE phenotype_aggregate
-    ADD INDEX idx_phenotype_aggregate_query  (sex, ancestry, p_value_nlog);
+    ADD INDEX idx_phenotype_aggregate_query (sex, ancestry, p_value_nlog);
+
+-- aggregated variants
+ALTER TABLE phenotype_point
+    ADD INDEX idx_phenotype_point_query (sex, ancestry, p_value_nlog);
+
