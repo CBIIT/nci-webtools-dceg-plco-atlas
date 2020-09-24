@@ -30,7 +30,7 @@
     "fastify-static": "^2.5.0",
     "lib-r-math.js": "^1.0.86",
     "minimist": "^1.2.5",
-    "mysql2": "^2.1.0",
+    "mysql2": "^2.2.5",
     "npm": "^6.14.7",
     "winston": "^3.2.1",
     "winston-daily-rotate-file": "^4.2.1"
