@@ -7,7 +7,7 @@ const parseCsv = require('csv-parse/lib/sync')
 const { getLogger } = require('./utils/logging');
 const { getLambdaGC } = require('./utils/math');
 const { pluck, getPlaceholders, exportInnoDBTable } = require('./utils/query');
-const { readFile, readFirstLineAsync } = require('./utils/file');
+const { readFile, readFirstLineAsync, gunzip } = require('./utils/file');
 
 
 // display help if needed
@@ -114,7 +114,7 @@ async function unzipFile(inputFilePath, targetFolder) {
     }
 
     // stream gunzip to target folder (does not require copying input file)
-    await gunzip(inputFileName, unzippedFilePath);
+    await gunzip(inputFilePath, unzippedFilePath);
     return unzippedFilePath;
 }
 
@@ -142,9 +142,10 @@ function getPhenotype(phenotypeFilePath, phenotype) {
 }
 
 function getSql(filepath, args) {
-    const sql = readFile(path.resolve(__dirname, filepath));
-    for (let key of args)
-        sql = sql.replace(new RegExp(`\${${key}}`, 'g'), args[key]);
+    let sql = readFile(path.resolve(__dirname, filepath));
+    for (let key in args)
+        // regex for simulating es6-interpolated strings
+        sql = sql.replace(new RegExp(`\\\${${key}}`, 'g'), args[key]);
     return sql;
 }
 
@@ -204,7 +205,6 @@ async function exportVariants({
             readFile(path.resolve(__dirname, '../schema/tables/main.sql')),
             readFile(path.resolve(__dirname, 'import-chromosome-range.sql')),
             readFile(path.resolve(__dirname, 'import-lookup-tables.sql')),
-
             `DROP TABLE IF EXISTS prestage;
             CREATE TABLE prestage (
                 chromosome                  VARCHAR(2),
@@ -278,11 +278,11 @@ async function exportVariants({
                             show_qq_plot                BOOLEAN
                         );`,
                         // create variant, aggregate, and metadata tables
-                        readFile(path.resolve(__dirname, '../schema/tables/variant.sql'))
-                            .replace(/\${table_name}/g, `${variantTable}`),
-                        readFile(path.resolve(__dirname, '../schema/tables/aggregate.sql'))
-                            .replace(/\${table_name}/g, `${aggregateTable}`),
-                        `ALTER TABLE ${aggregateTable} ADD PARTITION (PARTITION \`${phenotype.id}\` VALUES IN (${phenotype.id}));`,
+                        getSql('../schema/tables/variant.sql', {table_name: variantTable}),
+                        getSql('../schema/tables/aggregate.sql', {table_name: aggregateTable}),
+                        `ALTER TABLE ${aggregateTable} ADD PARTITION (
+                            PARTITION \`${phenotype.id}\` VALUES IN (${phenotype.id})
+                        );`,
                         `CREATE TABLE ${metadataTable} LIKE phenotype_metadata;`,
                     ].join('\n'));
 
@@ -444,8 +444,8 @@ async function exportVariants({
                             '${sex}' as sex, 
                             '${ancestry}' as ancestry, 
                             s.chromosome, 
-                            ${positionFactor} * (s.position + cr.position_abs_min) / ${positionFactor}  as position_abs,
-                            ${pValueNlogFactor} * (s.p_value_nlog / ${pValueNlogFactor}) as p_value_nlog
+                            ${positionFactor} * FLOOR((s.position + cr.position_abs_min) / ${positionFactor})  as position_abs,
+                            ${pValueNlogFactor} * FLOOR(s.p_value_nlog / ${pValueNlogFactor}) as p_value_nlog
                         FROM ${stageTable} s
                         JOIN chromosome_range cr ON s.chromosome = cr.chromosome
                         ORDER BY p_value_nlog
@@ -487,24 +487,6 @@ async function exportVariants({
                         GROUP BY s.chromosome 
                         ORDER BY s.chromosome
                     `);
-
-                    // run distinct snp query for stacked sex query once per ancestry
-                    if (sexes.includes('male') && sexes.includes('female') && sex === 'female') {
-                        await connection.query(`
-                            ${insertMetadata}
-                            SELECT 
-                                ${phenotype.id} as phenotype_id, 
-                                'stacked' as sex, 
-                                '${ancestry}' as ancestry, 
-                                'all' as chromosome, 
-                                null as lambda_gc, 
-                                count(distinct snp) as count
-                            FROM prestage
-                            WHERE 
-                                female_${ancestry}_p_value > 1e-10000 OR 
-                                male_${ancestry}_p_value > 1e-10000
-                        `);
-                    };
 
                     // export tables to output folder
                     logger.info('Exporting tables');
