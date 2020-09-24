@@ -347,7 +347,7 @@ async function exportVariants({
                     logger.info(`LambdaGC: ${lambdaGC} FROM ${median}`)
 
                     // determine qq plot points
-                    const numPoints = 5000;
+                    const numPoints = 10000;
                     logger.info(`Determining show_qq_plot flag for up to ${numPoints} points`);
                     const qqRowIds = new Array(numPoints)
                         .fill(0)
