@@ -19,7 +19,8 @@ CREATE TABLE IF NOT EXISTS ${table_name} (
     n int NULL,
     show_qq_plot BOOLEAN NULL,
     PRIMARY KEY (id, chromosome)
-) PARTITION BY list(chromosome) (
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci
+PARTITION BY list(chromosome) (
     PARTITION `1` VALUES IN (1),
     PARTITION `2` VALUES IN (2),
     PARTITION `3` VALUES IN (3),
@@ -45,3 +46,4 @@ CREATE TABLE IF NOT EXISTS ${table_name} (
     PARTITION `23` VALUES IN (23),
     PARTITION `24` VALUES IN (24)
 );
+
