@@ -135,6 +135,6 @@ async function importVariants({connection, database, folderPath, phenotype}) {
     `);
 
     logger.info('Removing temporary InnoDB tables');
-    // await connection.query(`DROP TABLE ${aggregateTable}`);
-    // await connection.query(`DROP TABLE ${metadataTable}`);
+    await connection.query(`DROP TABLE ${aggregateTable}`);
+    await connection.query(`DROP TABLE ${metadataTable}`);
 }
