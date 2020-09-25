@@ -349,7 +349,11 @@ async function exportVariants({
                     // determine qq plot points
                     const numPoints = 10000;
                     logger.info(`Determining show_qq_plot flag for up to ${numPoints} points`);
-                    const qqRowIds = new Array(numPoints)
+                    const getQQPoints = (numPoints, maxValue) => new Array(numPoints)
+                        .fill(0).map((_, i) => i)
+                        .map(x => (x * maxValue ** 0.5 / numPoints) ** 2);
+                    const qqRowIds = getQQPoints(numPoints, count);
+                    new Array(numPoints)
                         .fill(0)
                         .map((_, i) => i + 1)
                         .map(n => count - Math.round(count * (1 - Math.pow(n / count - 1, 2))))
