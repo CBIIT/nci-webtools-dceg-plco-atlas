@@ -494,13 +494,30 @@ async function getCorrelations(connection, {a, b}) {
 
 async function getPhenotypes(connection, params = {}) {
     let columns = getValidColumns('phenotype', params.columns).map(quote).join(',')
+    if (params.q) {
+        columns = ['id', 'name', 'display_name', 'description'];
+        params.q = `%${params.q}%`.toLowerCase();
+    }
+
+    const conditions = [
+        coalesce(params.id, `id = :id`),
+        coalesce(params.q, `
+            name IS NOT NULL AND (
+                LOWER(name) like :q OR
+                LOWER(display_name) like :q OR
+                LOWER(description) like :q
+            )`),
+    ].filter(Boolean).join(' OR ');
+
     let sql = `
         SELECT ${columns}
         FROM phenotype
-        ${params.id ? 'WHERE id = :id' : ''}
+        ${conditions.length ? `WHERE ${conditions}` : ``}
     `;
     logger.debug(`getPhenotypes sql: ${sql}`);
     let [phenotypes] = await connection.execute(sql, params);
+
+    if (params.q) return phenotypes;
 
     phenotypes.forEach(phenotype => {
         let parent = phenotypes.find(parent => parent.id === phenotype.parent_id);
