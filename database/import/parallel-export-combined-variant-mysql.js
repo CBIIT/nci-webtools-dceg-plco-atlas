@@ -353,12 +353,6 @@ async function exportVariants({
                         .fill(0).map((_, i) => i)
                         .map(x => (x * maxValue ** 0.5 / numPoints) ** 2);
                     const qqRowIds = getQQPoints(numPoints, count);
-                    new Array(numPoints)
-                        .fill(0)
-                        .map((_, i) => i + 1)
-                        .map(n => count - Math.round(count * (1 - Math.pow(n / count - 1, 2))))
-                        .filter(n => !isNaN(n));
-
                     if (qqRowIds.length) {
                         await connection.execute(
                             `UPDATE ${stageTable} SET show_qq_plot = 1 WHERE id IN (${getPlaceholders(qqRowIds)})`,
