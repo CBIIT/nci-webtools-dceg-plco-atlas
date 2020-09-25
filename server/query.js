@@ -9,11 +9,12 @@ function getConnection() {
         database: database.name,
         user: database.user,
         password: database.password,
+        port: database.port,
         waitForConnections: true,
         connectionLimit: 10,
         namedPlaceholders: true,
         multipleStatements: true,
-      }).promise();
+    }).promise();
 }
 
 /**
