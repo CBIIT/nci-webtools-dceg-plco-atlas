@@ -4,10 +4,13 @@ const server = require("fastify");
 const cors = require("fastify-cors");
 const compress = require("fastify-compress");
 const static = require("fastify-static");
-const serverTimeout = require('fastify-server-timeout')
+const serverTimeout = require('fastify-server-timeout');
+const { UAParser } = require('ua-parser-js');
 const logger = require("./logger");
 const { port } = require("./config.json");
+const args = require('minimist')(process.argv.slice(2));
 const numCPUs = require('os').cpus().length;
+
 const {
   getConnection,
   getSummary,
@@ -44,6 +47,7 @@ logger.info(`[${process.pid}] Started worker process`);
 // create fastify app and register middleware
 const app = server({ ignoreTrailingSlash: true });
 const connection = getConnection();
+const isApi = args.api;
 app.register(compress);
 app.register(cors);
 app.register(serverTimeout, {serverTimeout: 1000 * 60 * 20}); // 20 min timeout
@@ -63,6 +67,11 @@ app.addHook('onError', async (req, reply, error) => {
 
 // execute before handling request
 app.addHook("onRequest", (req, res, done) => {
+  const browser = new UAParser(req.headers['user-agent']).getBrowser();
+  if (!isApi && !browser.name) {
+    res.send('Please use the PLCO Atlas Public API to perform queries outside the browser.');
+    done();
+  }
   let pathname = req.raw.url.replace(/\?.*$/, "");
   res.header("Timestamp", new Date().getTime());
   logger.info(`[${process.pid}] ${pathname}: Started Request`, req.query);
