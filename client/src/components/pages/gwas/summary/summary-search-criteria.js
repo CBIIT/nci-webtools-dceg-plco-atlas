@@ -66,7 +66,10 @@ export const SummaryResultsSearchCriteria = () => {
             </div>
 
             <div className="d-flex">
-              <span className="py-1">
+              <span className="py-1"
+                style={{
+                  display: selectedSex === 'stacked' ? 'none' : 'block'
+                }}>
                 <b>Total Variants:</b> {' '}
                 <span>
                   {/* <LoadingOverlay active={true} /> */}
