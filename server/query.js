@@ -370,7 +370,7 @@ async function getPoints(connection, { phenotype_id, sex, ancestry, raw }) {
 
     // query database
     const [data, columns] = await connection.execute({
-        sql: `SELECT p_value_nlog, p_value_nlog_expected
+        sql: `SELECT p_value_nlog_expected, p_value_nlog
             FROM phenotype_point 
             WHERE phenotype_id = :phenotype_id
                 AND sex = :sex 
