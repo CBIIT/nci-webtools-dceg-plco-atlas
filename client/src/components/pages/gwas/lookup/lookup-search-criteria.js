@@ -139,9 +139,9 @@ export const VariantLookupSearchCriteria = () => {
               <b>Variant</b>:{' '}
               {searchCriteriaVariantLookup &&
                 searchCriteriaVariantLookup.variant
-                  ? searchCriteriaVariantLookup && searchCriteriaVariantLookup.variant.includes('rs')
+                  ? searchCriteriaVariantLookup && searchCriteriaVariantLookup.variant.split(':')[0].substring(0,2) === 'rs'
                   ? <a
-                    href={'https://www.ncbi.nlm.nih.gov/snp/' + searchCriteriaVariantLookup.variant}
+                    href={'https://www.ncbi.nlm.nih.gov/snp/' + searchCriteriaVariantLookup.variant.split(':')[0]}
                     target="_blank"
                     style={{
                       textDecoration: 'underline',

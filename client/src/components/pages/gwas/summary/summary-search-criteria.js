@@ -48,19 +48,19 @@ export const SummaryResultsSearchCriteria = () => {
 
               <span className="border-left border-secondary mx-3" style={{maxHeight: '1.6em'}}></span>
 
-              <span>
+              {/* <span>
                 <b>Sex</b>:{' '}
                 {selectedSex
                   ? displaySex(selectedSex)
                   : 'None'}
               </span>
 
-              <span className="border-left border-secondary mx-3" style={{maxHeight: '1.6em'}}></span>
+              <span className="border-left border-secondary mx-3" style={{maxHeight: '1.6em'}}></span> */}
 
               <span>
-                <b>Ancestry</b>:{' '}
+                <b>Stratification</b>:{' '}
                 {selectedAncestry
-                  ? displayAncestry(selectedAncestry)
+                  ? `${displayAncestry(selectedAncestry)} - ${displaySex(selectedSex)}`
                   : 'None'}
               </span>
             </div>

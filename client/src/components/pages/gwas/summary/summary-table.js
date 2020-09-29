@@ -39,6 +39,27 @@ export function SummaryResultsTable() {
     order: 'asc'
   }];
 
+  const snpFormatter = (cell, row) => {
+    if (cell.split(':')[0].substring(0,2) === 'rs') {
+      return (
+        <span>
+          <a 
+            href={'https://www.ncbi.nlm.nih.gov/snp/' + cell.split(':')[0]}
+            target="_blank"
+            style={{
+              textDecoration: 'underline',
+            }}>
+            { cell }
+          </a>
+        </span>
+      );
+    } else {
+      return (
+        <span>{ cell }</span>
+      );
+    }
+  }
+
   const columns = [
     {
       dataField: 'chromosome',
@@ -54,6 +75,7 @@ export function SummaryResultsTable() {
       dataField: 'snp',
       text: 'SNP',
       sort: true,
+      formatter: snpFormatter
     },
     {
       dataField: 'allele_reference',
