@@ -191,7 +191,7 @@ CREATE TABLE IF NOT EXISTS phenotype_point
     ancestry VARCHAR(20),
     p_value_nlog double null,
     p_value_nlog_expected double null,
-    primary key (id, phenotype_id)
+    primary key (id, phenotype_id, sex, ancestry)
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci
 PARTITION BY list(phenotype_id) (PARTITION `0` VALUES IN (0));
 
