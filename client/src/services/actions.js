@@ -399,7 +399,7 @@ export function drawQQPlot(phenotype, sex, ancestry) {
       await Promise.all(sexes.map(async sex => {
   
         // retrieve a subset of variants where show_qq_plot is true, and nlog_p is <= 3
-        const subsetVariants = await query('variants', {
+        const subsetVariants = await query('points', {
           phenotype_id: phenotype.id,
           columns: ['p_value_nlog_expected', 'p_value_nlog'],
           sex,
