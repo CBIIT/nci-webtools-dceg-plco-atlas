@@ -95,6 +95,7 @@ async function importVariants({connection, database, folderPath, phenotype}) {
     const { tableSuffix, sex, ancestry } = phenotype;
     const variantTable = `phenotype_variant__${tableSuffix}`;
     const aggregateTable = `phenotype_aggregate__${tableSuffix}`;
+    const pointTable = `phenotype_point__${tableSuffix}`;
     const metadataTable = `phenotype_metadata__${tableSuffix}`;
 
     // create variant table
@@ -103,7 +104,7 @@ async function importVariants({connection, database, folderPath, phenotype}) {
         getSql('../schema/tables/variant.sql', {table_name: variantTable}),
         getSql('../schema/indexes/variant.sql', {table_name: variantTable}),
         getSql('../schema/tables/aggregate.sql', {table_name: aggregateTable}),
-        `ALTER TABLE ${aggregateTable} ADD PARTITION (PARTITION \`${phenotype.id}\` VALUES IN (${phenotype.id}));`,
+        getSql('../schema/tables/point.sql', {table_name: pointTable}),
         `CREATE TABLE ${metadataTable} LIKE phenotype_metadata;`,
     ].join('\n'));
    
@@ -112,6 +113,7 @@ async function importVariants({connection, database, folderPath, phenotype}) {
 
     logger.info('Importing temporary InnoDB tables');
     await importInnoDBTable(connection, database, aggregateTable, folderPath);
+    await importInnoDBTable(connection, database, pointTable, folderPath);
     await importInnoDBTable(connection, database, metadataTable, folderPath);
 
     logger.info('Selecting from temporary InnoDB tables');
@@ -122,7 +124,12 @@ async function importVariants({connection, database, folderPath, phenotype}) {
             phenotype_id, sex, ancestry, chromosome, position_abs, p_value_nlog
         FROM ${aggregateTable}
     `);
-    
+
+    // preserve ids from point table
+    await connection.query(`
+        INSERT INTO phenotype_point SELECT * FROM ${pointTable}
+    `);
+
     await connection.query(`
         INSERT INTO phenotype_metadata 
             (phenotype_id, sex, ancestry, chromosome, lambda_gc, count)

@@ -250,6 +250,7 @@ async function exportVariants({
                     const stageTable = `stage__${tableSuffix}`;
                     const variantTable = `phenotype_variant__${tableSuffix}`;
                     const aggregateTable = `phenotype_aggregate__${tableSuffix}`;
+                    const pointTable = `phenotype_point__${tableSuffix}`;
                     const metadataTable = `phenotype_metadata__${tableSuffix}`;
                     const calculateOddsRatio = phenotype.type === 'binary';
 
@@ -280,9 +281,7 @@ async function exportVariants({
                         // create variant, aggregate, and metadata tables
                         getSql('../schema/tables/variant.sql', {table_name: variantTable}),
                         getSql('../schema/tables/aggregate.sql', {table_name: aggregateTable}),
-                        `ALTER TABLE ${aggregateTable} ADD PARTITION (
-                            PARTITION \`${phenotype.id}\` VALUES IN (${phenotype.id})
-                        );`,
+                        getSql('../schema/tables/point.sql', {table_name: pointTable}),
                         `CREATE TABLE ${metadataTable} LIKE phenotype_metadata;`,
                     ].join('\n'));
 
@@ -449,6 +448,33 @@ async function exportVariants({
                         ORDER BY p_value_nlog
                     `);
 
+                    logger.info(`Generating point table ${pointTable}`);
+                    // determine 10,000th smallest p value
+                    const [pValueThresholdRows] = await connection.query(
+                        `SELECT p_value_nlog FROM ${stageTable} ORDER BY p_value_nlog DESC LIMIT 10000,1`,
+                    );
+                    const pValueThreshold = pluck(pValueThresholdRows);
+                    await connection.query(`
+                        INSERT INTO ${pointTable} (
+                            id,
+                            phenotype_id,
+                            sex,
+                            ancestry,
+                            p_value_nlog,
+                            p_value_nlog_expected
+                        )
+                        SELECT DISTINCT
+                            id,
+                            ${phenotype.id} as phenotype_id, 
+                            '${sex}' as sex, 
+                            '${ancestry}' as ancestry, 
+                            p_value_nlog,
+                            p_value_nlog_expected
+                        FROM ${variantTable} v
+                        WHERE show_qq_plot = 1 
+                        OR p_value_nlog > :pValueThreshold
+                    `, {pValueThreshold});
+
                     logger.info(`Generating metadata table ${metadataTable}`);
                     const insertMetadata = `INSERT INTO ${metadataTable} (
                         phenotype_id,
@@ -490,6 +516,7 @@ async function exportVariants({
                     logger.info('Exporting tables');
                     await exportInnoDBTable(connection, databaseName, variantTable, outputFolder);
                     await exportInnoDBTable(connection, databaseName, aggregateTable, outputFolder);
+                    await exportInnoDBTable(connection, databaseName, pointTable, outputFolder);
                     await exportInnoDBTable(connection, databaseName, metadataTable, outputFolder);
 
                 } catch (e) {

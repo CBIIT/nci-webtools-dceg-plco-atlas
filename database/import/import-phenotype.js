@@ -195,6 +195,7 @@ async function importPhenotypes() {
     // insert records (preserve color)
     for (let record of orderedRecords) {
         const aggregateTable = `phenotype_aggregate`;
+        const pointTable = `phenotype_point`;
         const phenotypeId = record.id;
         const partition = `\`${phenotypeId}\``;
 
@@ -205,18 +206,20 @@ async function importPhenotypes() {
                 record
             );
 
-        // create partitions for each phenotype (if they do not exist)
-        const [partitionRows] = await connection.execute(
-            `SELECT * FROM INFORMATION_SCHEMA.PARTITIONS
-            WHERE TABLE_NAME = :aggregateTable
-            AND PARTITION_NAME = :phenotypeId`,
-            {aggregateTable, phenotypeId}
-        );
+        for (let table of [aggregateTable, pointTable]) {
+            // create partitions for each phenotype (if they do not exist)
+            const [partitionRows] = await connection.execute(
+                `SELECT * FROM INFORMATION_SCHEMA.PARTITIONS
+                WHERE TABLE_NAME = :table
+                AND PARTITION_NAME = :phenotypeId`,
+                {table, phenotypeId}
+            );
 
-        // create partitions
-        if (!partitionRows.length) {
-            console.log(`[${duration()} s] Adding partition ${partition} to ${aggregateTable}...`);
-            await connection.query(`ALTER TABLE ${aggregateTable} ADD PARTITION (PARTITION ${partition} VALUES IN (${phenotypeId}));`);
+            // create partitions
+            if (!partitionRows.length) {
+                console.log(`[${duration()} s] Adding partition ${partition} to ${table}...`);
+                await connection.query(`ALTER TABLE ${table} ADD PARTITION (PARTITION ${partition} VALUES IN (${phenotypeId}));`);
+            }
         }
     };
 
