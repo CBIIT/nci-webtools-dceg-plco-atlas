@@ -90,13 +90,19 @@ export function VariantLookup() {
     },
     {
       dataField: 'allele_reference',
-      text: 'Ref. Allele',
-      headerTitle: _ => 'Reference Allele',
+      text: 'Eff. Allele',
+      headerTitle: _ => 'Effect Allele [Frequency]',
+      formatter: (cell, row) => {
+        return `${cell} [${row.allele_frequency}]`
+      }
     },
     {
       dataField: 'allele_alternate',
-      text: 'Alt. Allele',
-      headerTitle: _ => 'Alternate Allele',
+      text: 'Non-Eff. Allele',
+      headerTitle: _ => 'Non-Effect Allele [Frequency]',
+      formatter: (cell, row) => {
+        return `${cell} [${(1 - row.allele_frequency).toPrecision(4)}]`;
+      }
     },
     {
       dataField: 'beta',
@@ -129,7 +135,17 @@ export function VariantLookup() {
         }
         return b - a; // desc
       }
-    }
+    },
+    {
+      dataField: 'p_value_heterogenous',
+      text: 'P-Value Het.',
+      headerTitle: _ => 'P-Value Heterogenous',
+    },
+    {
+      dataField: 'n',
+      text: 'N',
+      headerTitle: _ => 'Sample Size',
+    },
   ];
   // add filter to column headers
   // .map(c => {

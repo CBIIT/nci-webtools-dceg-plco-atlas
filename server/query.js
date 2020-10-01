@@ -95,7 +95,7 @@ function getValidColumns(tableName, columns) {
     columns = columns.filter(e => /^\w+$/.test(e));
 
     let validColumns = {
-        variant: ['id', 'chromosome', 'position', 'snp', 'allele_reference', 'allele_alternate', 'p_value', 'p_value_nlog', 'p_value_nlog_expected', 'beta', 'odds_ratio', 'ci_95_low', 'ci_95_high', 'show_qq_plot'],
+        variant: ['id', 'chromosome', 'position', 'snp', 'allele_reference', 'allele_alternate', 'allele_frequency', 'p_value', 'p_value_heterogenous', 'p_value_nlog', 'p_value_nlog_expected', 'beta', 'odds_ratio', 'ci_95_low', 'ci_95_high', 'show_qq_plot', 'n'],
         point: ['id', 'phenotype_id', 'sex', 'chromosome', 'position', 'snp', 'p_value_nlog', 'p_value_nlog_expected'],
         aggregate: ['id', 'phenotype_id', 'sex', 'chromosome', 'position_abs', 'p_value_nlog'],
         phenotype: ['id', 'parent_id', 'name', 'age_name', 'display_name', 'description', 'color', 'type', 'participant_count', 'import_count', 'import_date'],
