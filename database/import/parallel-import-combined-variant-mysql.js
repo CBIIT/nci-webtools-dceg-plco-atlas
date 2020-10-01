@@ -55,6 +55,8 @@ const connection = mysql.createConnection({
             logger.info(`Finished importing ${phenotype.name}.${phenotype.sex}.${phenotype.ancestry}`);
         }
 
+        await connection.close();
+
         logger.info(`Imported variants`);
         process.exit(0);
     } catch (e) {
