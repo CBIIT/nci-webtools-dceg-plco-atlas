@@ -225,7 +225,7 @@ CREATE TABLE IF NOT EXISTS `participant_data_category` (
     `phenotype_id` INTEGER NOT NULL,
     `value` DOUBLE,
     `label` TEXT,
-    `display_distribution` BOOLEAN,
+    `show_distribution` BOOLEAN,
     `order` INTEGER,
     FOREIGN KEY (phenotype_id) REFERENCES phenotype(id)
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
