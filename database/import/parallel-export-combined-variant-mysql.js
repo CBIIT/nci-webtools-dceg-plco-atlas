@@ -453,27 +453,29 @@ async function exportVariants({
                     const [pValueThresholdRows] = await connection.query(
                         `SELECT p_value_nlog FROM ${stageTable} ORDER BY p_value_nlog DESC LIMIT 10000,1`,
                     );
-                    const pValueThreshold = pluck(pValueThresholdRows);
-                    await connection.query(`
-                        INSERT INTO ${pointTable} (
-                            id,
-                            phenotype_id,
-                            sex,
-                            ancestry,
-                            p_value_nlog,
-                            p_value_nlog_expected
-                        )
-                        SELECT DISTINCT
-                            id,
-                            ${phenotype.id} as phenotype_id, 
-                            '${sex}' as sex, 
-                            '${ancestry}' as ancestry, 
-                            p_value_nlog,
-                            p_value_nlog_expected
-                        FROM ${variantTable} v
-                        WHERE show_qq_plot = 1 
-                        OR p_value_nlog > :pValueThreshold
-                    `, {pValueThreshold});
+                    if (pValueThresholdRows.length) {
+                        const pValueThreshold = pluck(pValueThresholdRows);
+                        await connection.query(`
+                            INSERT INTO ${pointTable} (
+                                id,
+                                phenotype_id,
+                                sex,
+                                ancestry,
+                                p_value_nlog,
+                                p_value_nlog_expected
+                            )
+                            SELECT DISTINCT
+                                id,
+                                ${phenotype.id} as phenotype_id, 
+                                '${sex}' as sex, 
+                                '${ancestry}' as ancestry, 
+                                p_value_nlog,
+                                p_value_nlog_expected
+                            FROM ${variantTable} v
+                            WHERE show_qq_plot = 1 
+                            OR p_value_nlog > :pValueThreshold
+                        `, {pValueThreshold});
+                    }
 
                     logger.info(`Generating metadata table ${metadataTable}`);
                     const insertMetadata = `INSERT INTO ${metadataTable} (
