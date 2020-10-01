@@ -16,8 +16,7 @@ CREATE TABLE IF NOT EXISTS ${table_name} (
     odds_ratio double NULL,
     ci_95_low double NULL,
     ci_95_high double NULL,
-    n int NULL,
-    show_qq_plot BOOLEAN NULL,
+    n int NULL
     PRIMARY KEY (id, chromosome)
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci
 PARTITION BY list(chromosome) (
