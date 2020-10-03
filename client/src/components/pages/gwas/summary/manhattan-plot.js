@@ -28,12 +28,12 @@ export function ManhattanPlot({
   const plot = useRef(null);
 
   const {
+    selectedPhenotypes,
+    selectedStratifications,
+    selectedChromosome,
     selectedPlot,
     manhattanPlotView,
-    selectedSex,
-    selectedAncestry,
-    selectedPhenotype,
-    selectedChromosome,
+    isPairwise,
     ranges,
   } = useSelector(state => state.summaryResults);
 
@@ -49,7 +49,12 @@ export function ManhattanPlot({
   const hasData = () =>
     manhattanPlotData &&
     manhattanPlotData.data &&
-    manhattanPlotData.data.length;
+    manhattanPlotData.data.length &&
+    (!isPairwise || isPairwise && 
+      manhattanPlotMirroredData &&
+      manhattanPlotMirroredData.data &&
+      manhattanPlotMirroredData.data.length
+    );
 
   const setManhattanPlotConfig = manhattanPlotConfig => {
     dispatch(updateManhattanPlot({ manhattanPlotConfig }))
@@ -64,28 +69,35 @@ export function ManhattanPlot({
   }
 
   const colors = {
-    all: {
+    single: {
       light: '#F2990D',
       dark: '#A76909',
     },
-    male: {
+    bottom: {
       light: '#006bb8',
       dark: '#002a47'
     },
-    female: {
+    top: {
       light: '#f41c52',
       dark: '#a2173a'
     }
   }
 
+  const asTitleCase = snakeCase => snakeCase
+    .replace(/_+/g, ' ')
+    .replace(/\w+/g, word => word[0].toUpperCase() + word.substr(1).toLowerCase());
 
   const getTitle = bounds => {
-    if (!bounds)
-      return `${selectedPhenotype.title} - Chromosome ${selectedChromosome}`;
-    let boundsText = `(${(bounds.xMin / 1e6).toPrecision(4)} MB - ${(
-      bounds.xMax / 1e6
-    ).toPrecision(4)} MB)`;
-    return `${selectedPhenotype.title} - Chromosome ${selectedChromosome} ${boundsText}`;
+    const phenotypes = selectedPhenotypes.map(p => p.display_name).join(', ');
+    return `${phenotypes} ${selectedChromosome ? `- Chromosome ${selectedChromosome}` : ``} ${!bounds ? '' : 
+      [bounds.xMin, bounds.xMax]
+        .map(n => `${(n / 1e6).toPrecision(4)} MB`)
+        .join(' - ')}`;
+  };
+
+  const getPairwiseTitles = () => {
+    return selectedStratifications.map(s => 
+      asTitleCase(s.sex === 'all' ? `${s.ancestry}s` : `${s.ancestry} ${s.sex}s`));
   }
 
   useEffect(() => {
@@ -94,7 +106,7 @@ export function ManhattanPlot({
     plotContainer.current.innerHTML = '';
 
     let params;
-    if (selectedSex === 'stacked') {
+    if (isPairwise) {
       params =
         manhattanPlotView === 'summary'
           ? getMirroredSummaryPlot(manhattanPlotData, manhattanPlotMirroredData)
@@ -152,12 +164,13 @@ export function ManhattanPlot({
 
   useEffect(() => {
     let plot;
+    // Create placeholder plot for when we have no data
     if (loading && !hasData()) {
       let config = {
-        data: [{x: 0, y: 0}, {x: 1, y: 1}],
+        data: [{ x: 0, y: 0 }, { x: 1, y: 1 }],
         title: [
           {
-            text: selectedPhenotype.title,
+            text: getTitle(),
             font: `600 16px ${systemFont}`
           }
         ],
@@ -189,11 +202,11 @@ export function ManhattanPlot({
 
       let stackedConfig = {
         mirrored: true,
-        data: [{x: 0, y: 0}, {x: 1, y: 1}],
-        data2: [{x: 0, y: 0}, {x: 1, y: 1}],
+        data: [{ x: 0, y: 0 }, { x: 1, y: 1 }],
+        data2: [{ x: 0, y: 0 }, { x: 1, y: 1 }],
         title: [
           {
-            text: selectedPhenotype.title,
+            text: selectedPhenotypes.map(p => p.title).join(', ').title,
             font: `600 16px ${systemFont}`
           }
         ],
@@ -214,22 +227,24 @@ export function ManhattanPlot({
             },
             { text: `(p)`, font: `600 14px ${systemFont}` }
           ],
-          secondaryTitle: [{ text: `Female`, font: `600 11px ${systemFont}` }],
+          secondaryTitle: [{text: getPairwiseTitles()[0], font: `600 11px ${systemFont}` }],
         },
         yAxis2: {
           key: 'x',
           ticks: [],
-          secondaryTitle: [{ text: `Male`, font: `600 11px ${systemFont}` }]
+          secondaryTitle: [{
+            text: getPairwiseTitles()[1], font: `600 11px ${systemFont}`
+          }]
         },
         lines: [{ y: 0, style: 'dashed' }],
         point: {
           size: 1,
           interactiveSize: 1,
           opacity: 0,
-        }  
+        }
       }
 
-      let plotConfig = selectedSex === 'stacked'
+      let plotConfig = isPairwise
         ? stackedConfig
         : config;
 
@@ -255,7 +270,7 @@ export function ManhattanPlot({
       genes: plotData.genes,
       title: [
         {
-          text: selectedPhenotype.title,
+          text: getTitle(),
           font: `600 16px ${systemFont}`
         }
       ],
@@ -281,21 +296,21 @@ export function ManhattanPlot({
           },
           { text: `(p)`, font: `600 14px ${systemFont}` }
         ],
-        secondaryTitle: [{ text: `Female`, font: `600 11px ${systemFont}` }],
+        secondaryTitle: [{ text: getPairwiseTitles()[0], font: `600 11px ${systemFont}` }],
         key: columnIndexes.nLogP,
         tickFormat: tick => tick.toPrecision(3),
         extent: yExtent
       },
       yAxis2: {
-        secondaryTitle: [{ text: `Male`, font: `600 11px ${systemFont}` }]
+        secondaryTitle: [{ text: getPairwiseTitles()[1], font: `600 11px ${systemFont}` }]
       },
       point: {
         size: 2,
         opacity: 1,
-        color: (d, i) => (+d[columnIndexes.chr] % 2 ? colors.female.light : colors.female.dark)
+        color: (d, i) => (+d[columnIndexes.chr] % 2 ? colors.top.light : colors.top.dark)
       },
       point2: {
-        color: (d, i) => (+d[columnIndexes.chr] % 2 ? colors.male.light : colors.male.dark) //#e47833')
+        color: (d, i) => (+d[columnIndexes.chr] % 2 ? colors.bottom.light : colors.bottom.dark)
       },
       lines: [{ y: -Math.log10(5e-8), style: 'dashed' }]
     };
@@ -306,17 +321,19 @@ export function ManhattanPlot({
       variantId: plotData.columns.indexOf('id'),
       chr: plotData.columns.indexOf('chromosome'),
       bp: plotData.columns.indexOf('position'),
-      nLogP: plotData.columns.indexOf('p_value_nlog')
+      nLogP: plotData.columns.indexOf('p_value_nlog'),
+      index: plotData.columns.indexOf('index')
     };
 
     let withKeys = data => ({
       variantId: data[columnIndexes.variantId],
       chr: data[columnIndexes.chr],
       bp: data[columnIndexes.bp],
-      nLogP: data[columnIndexes.nLogP]
+      nLogP: data[columnIndexes.nLogP],
+      index: data[columnIndexes.index],
     });
 
-    let title = `${selectedPhenotype.title} - Chromosome ${selectedChromosome}`;
+    let title = `${selectedPhenotypes.map(p => p.title).join(', ')} - Chromosome ${selectedChromosome}`;
 
     let range = ranges.find(r => r.chromosome == selectedChromosome);
 
@@ -390,30 +407,31 @@ export function ManhattanPlot({
           },
           { text: `(p)`, font: `600 14px ${systemFont}` }
         ],
-        secondaryTitle: [{ text: `Female`, font: `600 11px ${systemFont}` }],
+        secondaryTitle: [{ text: getPairwiseTitles()[0], font: `600 11px ${systemFont}` }],
         key: columnIndexes.nLogP,
         tickFormat: tick => tick.toPrecision(3),
         extent: yExtent,
       },
       yAxis2: {
-        secondaryTitle: [{ text: `Male`, font: `600 11px ${systemFont}` }]
+        secondaryTitle: [{ text: getPairwiseTitles()[1], font: `600 11px ${systemFont}` }]
       },
       point: {
         size: 2,
         interactiveSize: 3,
         opacity: 1,
-        color: selectedChromosome % 2 ? colors.female.light : colors.female.dark,
+        color: selectedChromosome % 2 ? colors.top.light : colors.top.dark,
         tooltip: {
           trigger: 'hover',
           class: 'custom-tooltip',
           style: 'width: 300px;',
-          content: async data => {
+          content: async (data, index) => {
             let point = withKeys(data);
+            console.log(point);
             const response = await query('variants', {
-              phenotype_id: selectedPhenotype.id,
+              phenotype_id: (selectedPhenotypes[point.index] || selectedPhenotypes[0]).id,
               id: point.variantId,
-              ancestry: selectedAncestry,
-              sex: [null, 'all', 'female', 'male'][+String(point.variantId)[0]]
+              ancestry: selectedStratifications[point.index].ancestry,
+              sex: selectedStratifications[point.index].sex,
             });
             const record = response.data[0];
             return h('div', { className: '' }, [
@@ -440,7 +458,7 @@ export function ManhattanPlot({
         }
       },
       point2: {
-        color: selectedChromosome % 2 ? colors.male.light : colors.male.dark
+        color: selectedChromosome % 2 ? colors.bottom.light : colors.bottom.dark
       },
       lines: [{ y: -Math.log10(5e-8), style: 'dashed' }],
       zoomStack: (plot.current && plot.current.zoomStack) || []
@@ -463,7 +481,7 @@ export function ManhattanPlot({
       genes: plotData.genes,
       title: [
         {
-          text: selectedPhenotype.title,
+          text: selectedPhenotypes.map(p => p.title).join(', ').title,
           font: `600 16px ${systemFont}`
         }
       ],
@@ -497,8 +515,8 @@ export function ManhattanPlot({
         size: 2,
         opacity: 1,
         color: (d, i) => (d[columnIndexes.chr] % 2
-          ? colors[selectedSex].light
-          : colors[selectedSex].dark) //#e47833')
+          ? colors.single.light
+          : colors.single.dark) //#e47833')
       },
       lines: [{ y: -Math.log10(5e-8) }]
     };
@@ -509,17 +527,19 @@ export function ManhattanPlot({
       variantId: plotData.columns.indexOf('id'),
       chr: plotData.columns.indexOf('chromosome'),
       bp: plotData.columns.indexOf('position'),
-      nLogP: plotData.columns.indexOf('p_value_nlog')
+      nLogP: plotData.columns.indexOf('p_value_nlog'),
+      index: plotData.columns.indexOf('index'),
     };
 
     let withKeys = data => ({
       variantId: data[columnIndexes.variantId],
       chr: data[columnIndexes.chr],
       bp: data[columnIndexes.bp],
-      nLogP: data[columnIndexes.nLogP]
+      nLogP: data[columnIndexes.nLogP],
+      index: data[columnIndexes.index],
     });
 
-    let title = `${selectedPhenotype.title} - Chromosome ${selectedChromosome}`;
+    let title = `${selectedPhenotypes.map(p => p.title).join(', ')} - Chromosome ${selectedChromosome}`;
     let range = ranges.find(r => r.chromosome == selectedChromosome);
     let yExtent = extent([...plotData.data].map(d => d[columnIndexes.nLogP]));
     yExtent[1] *= 1.1;
@@ -598,19 +618,19 @@ export function ManhattanPlot({
         interactiveSize: 3,
         opacity: 1,
         color: selectedChromosome % 2
-          ? colors[selectedSex].light
-          : colors[selectedSex].dark,
+          ? colors.single.light
+          : colors.single.dark,
         tooltip: {
           trigger: 'hover',
           class: 'custom-tooltip',
           style: 'width: 300px;',
-          content: async data => {
+          content: async (data, index) => {
             let point = withKeys(data);
             const response = await query('variants', {
-              phenotype_id: selectedPhenotype.id,
+              phenotype_id: (selectedPhenotypes[point.index] || selectedPhenotypes[0]).id,
               id: point.variantId,
-              ancestry: selectedAncestry,
-              sex: [null, 'all', 'female', 'male'][+String(point.variantId)[0]]
+              ancestry: selectedStratifications[point.index].ancestry,
+              sex: selectedStratifications[point.index].sex,
             });
             const record = response.data[0];
             return h('div', { className: '' }, [
@@ -702,14 +722,13 @@ export function ManhattanPlot({
   function getFilename() {
     const titlecase = str => str[0].toUpperCase() + str.substring(1, str.length)
     const formatTitle = str => str.split(' ').map(titlecase).join('-');
-    let title = formatTitle(selectedPhenotype.title);
-    let plotType = formatTitle(selectedSex);
+    let title = formatTitle(selectedPhenotypes.map(p => p.title).join(', '));
+    // let plotType = formatTitle(selectedSex);
     let chr = selectedChromosome ? formatTitle(`Chr${selectedChromosome}`) : '';
     let range = getXRangeTitle();
 
     return [
       title,
-      plotType,
       chr,
       range
     ].filter(Boolean).join('-') + '.png'
