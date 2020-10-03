@@ -8,13 +8,11 @@ export const getInitialState = () => ({
   phenotypes: null,
 
   summaryResults: {
-    selectedPhenotype: null,
+    selectedPhenotypes: [],
+    selectedStratifications: [],
     selectedChromosome: null,
     selectedPlot: 'manhattan-plot',
-    selectedTable: '',
-    selectedSex: '',
-    selectedAncestry: '',
-    existingStratifications: [],
+    isPairwise: false,
     manhattanPlotView: '',
     nlogpMin: null,
     nlogpMax: null,
@@ -22,8 +20,6 @@ export const getInitialState = () => ({
     bpMax: null,
     messages: [],
     submitted: null,
-    disableSubmit: false,
-    searchCriteriaSummaryResults: null,
     shareID: null,
     sharedState: null
   },
@@ -40,7 +36,6 @@ export const getInitialState = () => ({
     loadingManhattanPlot: false,
     manhattanPlotData: {},
     manhattanMirroredData: {},
-    loadingManhattanTable: false,
     manhattanPlotConfig: {},
     restoredZoomLevel: null,
     zoomStack: [],
@@ -49,48 +44,40 @@ export const getInitialState = () => ({
   summaryTables: {
     visible: true,
     loading: false,
-    stackedSex: 'female',
-    all: {
-      results: [],
-      resultsCount: 0,
-      page: 1,
-      pageSize: 10,
-    },
-    female: {
-      results: [],
-      resultsCount: 0,
-      page: 1,
-      pageSize: 10,
-    },
-    male: {
-      results: [],
-      resultsCount: 0,
-      page: 1,
-      pageSize: 10,
-    },
+    selectedTable: 0,
+    tables: [
+      {
+        results: [],
+        resultsCount: 0,
+        page: 1,
+        pageSize: 10,
+      },
+      {
+        results: [],
+        resultsCount: 0,
+        page: 1,
+        pageSize: 10,
+      }
+    ]
   },
   summarySnpTables: {
     snp: '',
     visible: false,
     loading: false,
-    all: {
-      results: [],
-      resultsCount: 0,
-      page: 1,
-      pageSize: 10,
-    },
-    female: {
-      results: [],
-      resultsCount: 0,
-      page: 1,
-      pageSize: 10,
-    },
-    male: {
-      results: [],
-      resultsCount: 0,
-      page: 1,
-      pageSize: 10,
-    },
+    tables: [
+      {
+        results: [],
+        resultsCount: 0,
+        page: 1,
+        pageSize: 10,
+      },
+      {
+        results: [],
+        resultsCount: 0,
+        page: 1,
+        pageSize: 10,
+      }
+    ]
   },
   variantLookup: {
     selectedPhenotypes: [],
