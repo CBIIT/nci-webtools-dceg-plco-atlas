@@ -9,8 +9,8 @@ import { query } from '../../../../services/query';
 
 export function QQPlot({ onVariantLookup }) {
   const {
-    selectedPhenotype,
-    selectedAncestry,
+    selectedPhenotypes,
+    selectedStratifications,
   } = useSelector(state => state.summaryResults);
 
   const {
@@ -105,10 +105,10 @@ export function QQPlot({ onVariantLookup }) {
                 'position',
                 'snp'
               ],
-              phenotype_id: selectedPhenotype.id,
+              phenotype_id: point.customdata.phenotypeId,
               id: point.customdata.variantId,
-              ancestry: selectedAncestry,
-              sex: [null, 'all', 'female', 'male'][+String(point.customdata.variantId)[0]]
+              ancestry: point.customdata.ancestry,
+              sex: point.customdata.sex,
             });
             const record = response.data[0];
             const {xaxis, yaxis} = point;
@@ -175,9 +175,12 @@ export function QQPlot({ onVariantLookup }) {
                             'position',
                             'snp'
                           ],
-                          phenotype_id: selectedPhenotype.id,
-                          id: tooltip.data.variantId
+                          phenotype_id: tooltip.data.phenotypeId,
+                          id: tooltip.data.variantId,
+                          ancestry: tooltip.data.ancestry,
+                          sex: tooltip.data.sex,
                         });
+
                         const record = response.data[0];
                         updateTooltip({
                           data: {
@@ -198,9 +201,9 @@ export function QQPlot({ onVariantLookup }) {
                     href="#/gwas/lookup" 
                     className="font-weight-bold" 
                     onClick={e => onVariantLookup({
-                      phenotype: {id: tooltip.data.phenotype_id},
+                      phenotype: {id: tooltip.data.phenotypeId},
                       sex: tooltip.data.sex,
-                      // ancestry: tooltip.data.ancestry,
+                      ancestry: tooltip.data.ancestry,
                       snp: tooltip.data.snp || `chr${tooltip.data.chromosome}:${tooltip.data.position}`,
                     })}>
                     Go to Variant Lookup
