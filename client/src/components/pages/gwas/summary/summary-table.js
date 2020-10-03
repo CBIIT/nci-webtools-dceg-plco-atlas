@@ -17,65 +17,51 @@ import {
   loadingOverlay
 } from '../../../controls/table/table';
 import paginationFactory from 'react-bootstrap-table2-paginator';
+import { asTitleCase } from './utils';
 
 export function SummaryResultsTable() {
   const dispatch = useDispatch();
   const summaryTables = useSelector(state => state.summaryTables);
   const summarySnpTables = useSelector(state => state.summarySnpTables);
   const {
-    selectedPhenotype,
-    selectedAncestry,
-    selectedSex,
+    selectedPhenotypes,
+    selectedStratifications,
     selectedChromosome,
+    isPairwise,
     nlogpMin,
     nlogpMax,
     bpMin,
     bpMax,
   } = useSelector(state => state.summaryResults);
-  const stackedSex = useSelector(state => state.summaryTables.stackedSex);
+  const selectedTable = useSelector(state => state.summaryTables.selectedTable);
+  const setSelectedTable = selectedTable => dispatch(updateSummaryTable('selectedTable', selectedTable));
 
   const defaultSorted = [{
     dataField: 'p_value',
     order: 'asc'
   }];
 
-  const snpFormatter = (cell, row) => {
-    if (cell.split(':')[0].substring(0,2) === 'rs') {
-      return (
-        <span>
-          <a 
-            href={'https://www.ncbi.nlm.nih.gov/snp/' + cell.split(':')[0]}
-            target="_blank"
-            style={{
-              textDecoration: 'underline',
-            }}>
-            { cell }
-          </a>
-        </span>
-      );
-    } else {
-      return (
-        <span>{ cell }</span>
-      );
-    }
-  }
-
   const columns = [
     {
       dataField: 'chromosome',
-      text: 'Chromosome',
-      sort: true
+      text: 'Chr.',
+      headerTitle: _ => 'Chromosome',
+      sort: true,
+      headerStyle: { width: '90px' },
     },
     {
       dataField: 'position',
-      text: 'Position',
+      text: 'Pos.',
+      headerTitle: _ => 'Position',
       sort: true
     },
     {
       dataField: 'snp',
       text: 'SNP',
       sort: true,
-      formatter: snpFormatter
+      formatter: cell => !/^rs\d+:/.test(cell) ? cell : 
+        <a href={`https://www.ncbi.nlm.nih.gov/snp/${cell.split(':')[0]}`} target="_blank">{cell}</a>,
+      headerStyle: { width: '180px' },
     },
     {
       dataField: 'allele_reference',
@@ -93,11 +79,11 @@ export function SummaryResultsTable() {
         return `${cell} [${(1 - row.allele_frequency).toPrecision(4)}]`;
       }
     },
-    selectedPhenotype && selectedPhenotype.type === 'continuous' && {
+    {
       dataField: 'beta',
       text: 'Beta'
     },
-    selectedPhenotype && selectedPhenotype.type === 'binary' && {
+    {
       dataField: 'odds_ratio',
       text: 'OR [95% CI]',
       headerTitle: _ => 'Odds Ratio [95% Confidence Interval]',
@@ -127,17 +113,18 @@ export function SummaryResultsTable() {
       text: 'N',
       headerTitle: _ => 'Sample Size',
     },
-
   ].filter(Boolean);
 
   const updateSummaryTableData = (key, params) => {
-    if (!selectedPhenotype || !selectedPhenotype.value) return;
+    const phenotype = selectedPhenotypes[key] || selectedPhenotypes[0];
+    const {ancestry, sex} = selectedStratifications[key] || selectedStratifications[0];
+    if (!phenotype || !phenotype.value) return;
     // console.log({ order, orderBy, limit, page, bpMin, bpMax });
     let hasRangeFilter = Boolean(nlogpMin && nlogpMax && bpMin && bpMax);
     let summaryParams = {
-      phenotype_id: selectedPhenotype.id,
-      sex: key,
-      ancestry: selectedAncestry,
+      phenotype_id: phenotype.id,
+      sex,
+      ancestry,
       chromosome: selectedChromosome,
       offset: 0,
       limit: 10,
@@ -167,9 +154,10 @@ export function SummaryResultsTable() {
     type,
     pagination,
   ) => {
-    if (!selectedPhenotype || !selectedPhenotype.value) return;
+    if (!selectedPhenotypes || !selectedPhenotypes.length) return;
+    // console.log('handleTableChange', key, type, pagination);
     const { page, sizePerPage, sortField, sortOrder } = pagination;
-    const cachedTable = summaryTables[key];
+    const cachedTable = summaryTables.tables[key];
     const paginationParams = {
       offset: sizePerPage * (page - 1),
       limit: sizePerPage,
@@ -197,19 +185,13 @@ export function SummaryResultsTable() {
     if (!summarySnpTables.snp) return;
     dispatch(updateSummarySnp('visible', true));
 
-    const sexes = {
-      all: ['all'],
-      stacked: ['female', 'male'],
-      female: ['female'],
-      male: ['male']
-    }[selectedSex];
-
-    sexes.forEach(sex => {
-      dispatch(fetchSummarySnpTable(sex, {
-        phenotype_id: selectedPhenotype.id,
+    selectedStratifications.forEach((s, i) => {
+      const phenotype = selectedPhenotypes[i] || selectedPhenotypes[0];
+      dispatch(fetchSummarySnpTable(i, {
+        phenotype_id: phenotype.id,
         snp: summarySnpTables.snp,
-        sex: sex,
-        ancestry: selectedAncestry,
+        ancestry: s.ancestry,
+        sex: s.sex,
       }))
     })
   };
@@ -230,16 +212,16 @@ export function SummaryResultsTable() {
     remote: true,
     keyField: 'id',
     loading: summaryTables.loading,
-    data: summaryTables[key].results,
+    data: summaryTables.tables[key].results,
     columns: columns,
     onTableChange: (type, ev) => handleTableChange(key, type, ev),
     overlay: loadingOverlay,
     defaultSorted,
     pagination: paginationFactory({
-      page: summaryTables[key].page,
-      sizePerPage: summaryTables[key].pageSize,
-      totalSize: summaryTables[key].resultsCount,
-      showTotal: summaryTables[key].results.length > 0,
+      page: summaryTables.tables[key].page,
+      sizePerPage: summaryTables.tables[key].pageSize,
+      totalSize: summaryTables.tables[key].resultsCount,
+      showTotal: summaryTables.tables[key].results.length > 0,
       sizePerPageList: [10, 25, 50, 100],
       paginationTotalRenderer: paginationText('variant', 'variants'),
       sizePerPageRenderer: paginationSizeSelector,
@@ -247,25 +229,26 @@ export function SummaryResultsTable() {
     })
   });
 
-
+  const showPhenotypeNames = isPairwise && selectedPhenotypes.length == 2;
 
   return (
     <div className="mt-3">
 
       <div key="controls" className="d-flex align-items-center justify-content-between">
         <div className="d-flex align-items-center">
-          {selectedSex === 'stacked' &&
-            <div className="btn-group" role="group">
-              <button
-                className={`btn btn-sm ${stackedSex === 'female' ? 'btn-primary btn-primary-gradient active' : 'btn-silver'}`}
-                onClick={e => updateStackedSex('female')}>
-                Female
-              </button>
-              <button
-                className={`btn btn-sm ${stackedSex === 'male' ? 'btn-primary btn-primary-gradient active' : 'btn-silver'}`}
-                onClick={e => updateStackedSex('male')}>
-                Male
-              </button>
+          {isPairwise && <div className="btn-group" role="group">
+              {selectedStratifications.map((s, i) => 
+                <button
+                  key={`select-table-${i}`}
+                  className={`btn btn-sm ${selectedTable == i ? 'btn-primary btn-primary-gradient active' : 'btn-silver'}`}
+                  onClick={e => setSelectedTable(i)}>
+                    {[
+                      showPhenotypeNames && selectedPhenotypes[i].display_name,
+                      asTitleCase(s.ancestry),
+                      asTitleCase(s.sex),
+                    ].filter(Boolean).join(' - ')}
+                </button>
+              )}
             </div>}
         </div>
 
@@ -292,30 +275,17 @@ export function SummaryResultsTable() {
         </div>
       </div>
 
-      {!summarySnpTables.visible && <>
-        {/^(all|male|female)$/.test(selectedSex) &&
-          <Table key={`single-variant-table${selectedSex}`} {...getVariantTableProps(selectedSex)} />}
-
-        {/^stacked$/.test(selectedSex) &&
-          <Table key={`stacked-variant-table${stackedSex}`} {...getVariantTableProps(stackedSex)} />}
-      </>}
-
-      {summarySnpTables.visible && <>
-        {/^(all|male|female)$/.test(selectedSex) &&
-          <Table
-            key={`single-snp-table${selectedSex}`}
-            keyField="variant_id"
-            data={summarySnpTables[selectedSex].results}
-            columns={columns} />}
-
-        {/^stacked$/.test(selectedSex) &&
-          <Table
-            key={`stacked-snp-table${stackedSex}`}
-            keyField="variant_id"
-            data={summarySnpTables[stackedSex].results}
-            columns={columns} />}
-
-      </>}
+      {/* Do not filter beforehand, as that resets indexes  */}
+      {selectedStratifications.map((s, i) => 
+          selectedTable === i && (!summarySnpTables.visible
+            ? <Table key={`variant-table-${i}`} {...getVariantTableProps(i)} />
+            : <Table
+                key={`snp-table-${i}`}
+                keyField="variant_id"
+                data={summarySnpTables.tables[i].results}
+                columns={columns} />
+          )
+      )}
     </div>
   );
 }
