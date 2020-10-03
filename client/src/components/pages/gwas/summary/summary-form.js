@@ -1,178 +1,163 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
+import React, { useState, useRef } from 'react';
+import { useSelector } from 'react-redux';
 import { Button, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import { TreeSelect } from '../../../controls/tree-select/tree-select';
-import Select, { components } from 'react-select';
-import {
-  updateSummaryResults
-} from '../../../../services/actions';
+import { asTitleCase } from './utils';
+// import Select, { components } from 'react-select';
 
 export function SummaryResultsForm({
-  phenotype = null,
-  stratification = null,
-  onSubmit = any => {},
-  onReset = any => {}
+  selectedPhenotypes = [],
+  selectedStratifications = [],
+  isPairwise = false,
+  onSubmit = any => { },
+  onReset = any => { }
 }) {
-  const dispatch = useDispatch();
   // in order to prevent updating the redux store until after the form has
   // been submitted, we should store the state in the component, and then emit
   // this state on submit or reset, allowing the handler to update the store
 
-  // select store members
-  const phenotypes = useSelector(state => state.phenotypes);
-  const { 
-    submitted, 
-    disableSubmit, 
-    existingStratifications
-  } = useSelector(state => state.summaryResults);
-
   const treeRef = useRef();
 
+  // select store members
+  const phenotypes = useSelector(state => state.phenotypes);
+  const { submitted } = useSelector(state => state.summaryResults);
+
   // private members prefixed with _
-  const [_phenotype, _setPhenotype] = useState(null);
-  const [_stratification, _setStratification] = useState(null);
-  // const submitRef = useRef(null);
+  const [_selectedPhenotypes, _setSelectedPhenotypes] = useState(selectedPhenotypes);
+  const [_selectedStratifications, _setSelectedStratifications] = useState(selectedStratifications.map(s => `${s.ancestry}__${s.sex}`));
+  const [_isPairwise, _setIsPairwise] = useState(isPairwise);
+  const [_isModified, _setIsModified] = useState(false);
 
-  // update state when props change
-  useEffect(() => {
-    _setPhenotype(phenotype)
-    handleInitStratifications(phenotype);
-  }, [phenotype]);
+  // stratification options can always be recalculated
+  const [stratificationOptions, setStratificationOptions] = useState(getStratificationOptions(_selectedPhenotypes, _isPairwise));
 
-  const handleInitStratifications = (selectedPhenotype) => {
-    if (!phenotypes || !phenotypes.metadata) return;
-    if (selectedPhenotype) {
-      let existingStratifications  = [];
-      const existingAncestries = [...new Set(phenotypes.metadata.filter((item) => item.phenotype_id === selectedPhenotype.id && item.count > 0).map((item) => item.ancestry).sort())];
-      existingAncestries.map((ancestry) => {
-        const existingSexes = [...new Set(phenotypes.metadata.filter((item) => item.phenotype_id === selectedPhenotype.id && item.ancestry === ancestry && item.count > 0).map((item) => item.sex).sort())];
-        const existingSexesChecked = existingSexes.filter((item) => {
-            if (item === "stacked") {
-              return existingSexes.includes('female') && existingSexes.includes('male');
-            } else {
-              return true;
-            }
-          })
-          .map((sex) => {
-            return {
-              label: `${ancestries[ancestry].name} - ${sexes[sex].name}`,
-              value: `${ancestry}__${sex}`
-            }
-          });
+  const isValid = _selectedPhenotypes[0]
+    && _selectedStratifications[0]
+    && (!_isPairwise || (_isPairwise && _selectedStratifications[1]));
 
-        existingStratifications.push({
-          label: ancestries[ancestry].name,
-          options: existingSexesChecked
-        })
-      })
-      dispatch(updateSummaryResults({ existingStratifications }));
-      if (!stratification && existingStratifications.length > 0) {
-        _setStratification(existingStratifications[0].options[0]);
-      } else {
-        _setStratification(stratification);
+  const showPhenotypesLabels = _isPairwise && _selectedPhenotypes[1];
+
+  /**
+   * Retrieves stratification option groups for each phenotype supplied
+   * If isPairwise is passed in, and the second phenotype is not defined the first
+   * phenotype will be used for both sets of options
+   * @param {*} phenotypes 
+   */
+  function getStratificationOptions (selectedPhenotypes, isPairwise) {
+    if (!phenotypes || !phenotypes.metadata) return [];
+    const stratificationGroups = [];
+
+    for (const phenotype of selectedPhenotypes) {
+      const stratifications = [];
+      const records = phenotypes.metadata.filter(item =>
+        item.phenotype_id === phenotype.id &&
+        item.chromosome === 'all' &&
+        item.count > 0
+      );
+      for (const ancestry of records.map(p => p.ancestry)) {
+        const sexes = records.filter(p => p.ancestry === ancestry).map(p => p.sex);
+        stratifications.push({
+          label: asTitleCase(ancestry),
+          options: sexes.map(sex => ({
+            label: asTitleCase(sex),
+            value: `${ancestry}__${sex}`
+          }))
+        });
       }
-    } else {
-      dispatch(updateSummaryResults({ 
-        existingStratifications: []
-      }));
+      stratificationGroups.push(stratifications);
     }
+
+    // if only one phenotype is selected, both option groups will have the same options
+    if (isPairwise && !stratificationGroups[1]) {
+      stratificationGroups[1] = stratificationGroups[0];
+    }
+
+    return stratificationGroups;
   }
 
-  const handleChangeStratifications = (selectedPhenotype) => {
-    if (!phenotypes || !phenotypes.metadata) return;
-    if (selectedPhenotype) {
-      let existingStratifications  = [];
-      const existingAncestries = [...new Set(phenotypes.metadata.filter((item) => item.phenotype_id === selectedPhenotype.id && item.count > 0).map((item) => item.ancestry).sort())];
-      existingAncestries.map((ancestry) => {
-        const existingSexes = [...new Set(phenotypes.metadata.filter((item) => item.phenotype_id === selectedPhenotype.id && item.ancestry === ancestry && item.count > 0).map((item) => item.sex).sort())];
-        const existingSexesChecked = existingSexes.filter((item) => {
-            if (item === "stacked") {
-              return existingSexes.includes('female') && existingSexes.includes('male');
-            } else {
-              return true;
-            }
-          })
-          .map((sex) => {
-            return {
-              label: `${ancestries[ancestry].name} - ${sexes[sex].name}`,
-              value: `${ancestry}__${sex}`
-            }
-          });
-
-        existingStratifications.push({
-          label: ancestries[ancestry].name,
-          options: existingSexesChecked
-        })
-      })
-      dispatch(updateSummaryResults({ existingStratifications }));
-      if (existingStratifications.length > 0) {
-        _setStratification(existingStratifications[0].options[0]);
-      }
-    } else {
-      dispatch(updateSummaryResults({ 
-        existingStratifications: []
-      }));
-    }
+  function mergeSelectedStratification (index, value) {
+    const selectedStratifications = [..._selectedStratifications];
+    selectedStratifications[index] = value;
+    _setSelectedStratifications(selectedStratifications);
+    _setIsModified(true);
   }
 
-  const sexes = {
-    all: {
-      value: 'all',
-      name: 'All'
-    },
-    stacked: {
-      value: 'stacked',
-      name: 'Female/Male (Stacked)'
-    },
-    female: {
-      value: 'female',
-      name: 'Female'
-    },
-    male: {
-      value: 'male',
-      name: 'Male'
-    }
-  };
+  function setSelectedPhenotypesAndOptions (selectedPhenotypes, pairwise) {
+    if (pairwise === undefined) pairwise = _isPairwise;
+    selectedPhenotypes = selectedPhenotypes.slice(0, pairwise ? 2 : 1);
+    setStratificationOptions(getStratificationOptions(selectedPhenotypes, pairwise));
+    _setSelectedPhenotypes(selectedPhenotypes);
+    _setSelectedStratifications(['', '']);
+    _setIsPairwise(pairwise);
+    _setIsModified(true);
+  }
 
-  const ancestries = {
-    european: {
-      value: 'european',
-      name: 'European'
-    },
-    east_asian: {
-      value: 'east_asian',
-      name: 'East Asian'
-    }
-  };
+  function handleReset (ev) {
+    ev.preventDefault();
+    _setSelectedPhenotypes([]);
+    _setSelectedStratifications([]);
+    _setIsPairwise(false);
+    onReset();
+  }
 
-  const Option = props => {
-    return (
-      <components.Option {...props}>
-        {props && props.label && props.label.split('-')[1]}
-      </components.Option>
-    );
-  };
+  function handleSubmit(ev) {
+    ev.preventDefault();
+    _setIsModified(false);
+    onSubmit({
+      isPairwise: _isPairwise,
+      phenotypes: _selectedPhenotypes,
+      stratifications: _selectedStratifications
+        .filter(s => s.length)
+        .map(s => {
+          const [ancestry, sex] = s.split('__')
+          return { ancestry, sex };
+        }),
+    });
+  }
 
   return (
     <>
-      {/* <pre>{JSON.stringify({_phenotype, _sex}, null, 2)}</pre> */}
+      {/* <pre>{JSON.stringify({ _selectedPhenotypes, _selectedStratifications }, null, 2)}</pre> */}
       <div className="mb-2">
         <label className="required">Phenotypes</label>
         <TreeSelect
           data={phenotypes}
-          value={_phenotype}
-          onChange={val => {
-            _setPhenotype((val && val.length) ? val[0] : null);
-            handleChangeStratifications((val && val.length) ? val[0] : null);
-            dispatch(updateSummaryResults({ disableSubmit: false }));
-          }}
-          singleSelect
+          value={_selectedPhenotypes}
+          onChange={setSelectedPhenotypesAndOptions}
           ref={treeRef}
         />
       </div>
 
-      <div className="mb-3">
-        <label htmlFor="summary-results-stratification" className="required">Stratification</label>
+      <div className="custom-control custom-checkbox mb-3">
+        <input
+          type="checkbox"
+          className="custom-control-input"
+          id="is-pairwise"
+          checked={_isPairwise}
+          onChange={e => setSelectedPhenotypesAndOptions(_selectedPhenotypes, e.target.checked)}
+        />
+        <label className="custom-control-label" htmlFor="is-pairwise">Pairwise Plots</label>
+      </div>
+
+      {(_isPairwise ? [0, 1] : [0]).map(i => stratificationOptions[i]).map((optionGroup, i) =>
+        <div className="mb-3" key={`stratification-option-group-${i}`}>
+          <label htmlFor={`summary-results-stratification-${i}`} className="required">
+            Ancestry/Sex {showPhenotypesLabels && `for ${_selectedPhenotypes[i].display_name}`}
+          </label>
+            <select
+            id={`summary-results-stratification-${i}`}
+            className="form-control"
+            value={_selectedStratifications[i]}
+            onChange={e => mergeSelectedStratification(i, e.target.value)}
+            disabled={!optionGroup || optionGroup.length === 0}>
+            <option value="" hidden>Select Ancestry/Sex</option>
+            {optionGroup && optionGroup.map(e => <optgroup key={`${i}-${e.label}`} label={e.label}>
+              {e.options.map(o => <option key={`${i}-${e.label}-${o.value}`} value={o.value}>{o.label}</option>)}
+            </optgroup>)}
+          </select>
+        </div>)}
+
+      {/* Todo: replace selects with react-select if needed
         <Select 
           id="summary-results-stratification" 
           options={existingStratifications} 
@@ -184,29 +169,20 @@ export function SummaryResultsForm({
           }}
           placeholder={"Select a Stratification"}
           isDisabled={existingStratifications.length === 0}
-        />
-      </div>
-      
+        /> */}
 
       <div>
         <OverlayTrigger
-          overlay={
-            <Tooltip
-              style={{display: _phenotype ? 'none' : 'block'}}
-              id="submit-summary-results">
-              Please select a phenotype.
-          </Tooltip>}>
-          <span className={`d-inline-block ${!_phenotype && 'c-not-allowed'}`}>
+          overlay={isValid ? <span /> : <Tooltip id="submit-summary-results">
+            Please select phenotype(s) and/or stratification(s).
+            </Tooltip>}>
+          <span className={!isValid ? 'c-not-allowed' : undefined}>
             <Button
               type="submit"
               variant="silver"
-              className={!_phenotype && 'pointer-events-none'}
-              // disabled={!_phenotype || submitted}
-              disabled={!_phenotype || disableSubmit}
-              onClick={e => {
-                e.preventDefault();
-                onSubmit({phenotype: _phenotype, ancestry: _stratification.value.split('__')[0], sex: _stratification.value.split('__')[1], });
-              }}>
+              className={!isValid ? 'pointer-events-none' : undefined}
+              disabled={!isValid || (!_isModified && submitted)}
+              onClick={handleSubmit}>
               Submit
             </Button>
           </span>
@@ -215,13 +191,7 @@ export function SummaryResultsForm({
         <Button
           className="ml-2"
           variant="silver"
-          onClick={e => {
-            e.preventDefault();
-            _setPhenotype(null);
-            _setStratification(null);
-            onReset();
-            treeRef.current.resetSearchFilter();
-          }}>
+          onClick={handleReset}>
           Reset
         </Button>
       </div>
