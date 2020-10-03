@@ -7,7 +7,9 @@ export const UPDATE_SUMMARY_RESULTS = 'UPDATE_SUMMARY_RESULTS';
 export const UPDATE_QQ_PLOT = 'UPDATE_QQ_PLOT';
 export const UPDATE_MANHATTAN_PLOT = 'UPDATE_MANHATTAN_PLOT';
 export const UPDATE_SUMMARY_TABLE = 'UPDATE_SUMMARY_TABLE';
+export const UPDATE_SUMMARY_TABLE_INDEX = 'UPDATE_SUMMARY_TABLE_INDEX';
 export const UPDATE_SUMMARY_SNP_TABLE = 'UPDATE_SUMMARY_SNP_TABLE';
+export const UPDATE_SUMMARY_SNP_TABLE_INDEX = 'UPDATE_SUMMARY_SNP_TABLE_INDEX';
 export const UPDATE_SUMMARY_SNP = 'UPDATE_SUMMARY_SNP';
 export const UPDATE_VARIANT_LOOKUP = 'UPDATE_VARIANT_LOOKUP';
 export const UPDATE_VARIANT_LOOKUP_TABLE = 'UPDATE_VARIANT_LOOKUP_TABLE';
@@ -44,6 +46,10 @@ export function updateSummaryTable(key, data) {
   return { type: UPDATE_SUMMARY_TABLE, key, data };
 }
 
+export function updateSummaryTableByIndex(key, data) {
+  return { type: UPDATE_SUMMARY_TABLE_INDEX, key, data };
+}
+
 export function setSummaryTableLoading(loading) {
   return updateSummaryTable('loading', loading);
 }
@@ -54,6 +60,10 @@ export function updateSummarySnp(key, data) {
 
 export function updateSummarySnpTable(key, data) {
   return { type: UPDATE_SUMMARY_SNP_TABLE, key, data };
+}
+
+export function updateSummarySnpTableByIndex(key, data) {
+  return { type: UPDATE_SUMMARY_SNP_TABLE_INDEX, key, data };
 }
 
 export function setSummarySnpLoading(loading) {
@@ -167,7 +177,7 @@ export function fetchSummaryTable(tableKey, params) {
       if (response.error) throw(response);
 
       dispatch(
-        updateSummaryTable(tableKey, {
+        updateSummaryTableByIndex(tableKey, {
           results: response.data,
           // response.count is populated if params.count or params.metadataCount is set
           resultsCount: response.count || previousCount || response.data.length,
@@ -199,7 +209,7 @@ export function fetchSummarySnpTable(tableKey, params) {
       if (response.error) return;
   
       dispatch(
-        updateSummarySnpTable(tableKey, {
+        updateSummarySnpTableByIndex(tableKey, {
           results: response.data,
           resultsCount: response.count || response.data.length,
           page: 1 + Math.floor(params.offset / params.limit),
@@ -225,41 +235,49 @@ export function drawManhattanPlot(plotType, params) {
   // console.log('drawing plot', plotType, params);
   return async function(dispatch) {
     try {  
-      // retrieve metadata for all sexes provided
-      const metadata = await query('metadata', {
-        phenotype_id: params.phenotype_id,
-        chromosome: 'all',
-        sex: params.sex.length === 2 ? 'stacked' : params.sex,
-        ancestry: params.ancestry,
-      });
+      const { phenotypes, stratifications, isPairwise } = params;
 
-      dispatch(updateQQPlot({ 
-        sampleSize: metadata.reduce((a, b) => a + b.count, 0),
-      }));
 
       dispatch(updateManhattanPlot({ loadingManhattanPlot: true }));
-      if (params.sex.length === 2) {
-        // if 2 tables are provided, this is a mirrored plot
+
+      const appendIndex = (index, record) => {
+        record.columns.push('index');
+        record.data.forEach(e => e.push(index));
+      }
+
+      if (isPairwise) {
         const manhattanPlotData = await rawQuery(plotType, {
           ...params,
-          sex: params.sex[0],
-          ancestry: params.ancestry
+          phenotype_id: phenotypes[0].id,
+          sex: stratifications[0].sex,
+          ancestry: stratifications[0].ancestry,
         });
+        appendIndex(0, manhattanPlotData);
   
         const manhattanPlotMirroredData = await rawQuery(plotType, {
           ...params,
-          sex: params.sex[1],
-          ancestry: params.ancestry
+          phenotype_id: (phenotypes[1] || phenotypes[0]).id,
+          sex: stratifications[1].sex,
+          ancestry: stratifications[1].ancestry,
         });
-  
+        appendIndex(1, manhattanPlotMirroredData);
+
         dispatch(
           updateManhattanPlot({
             manhattanPlotData,
             manhattanPlotMirroredData
           })
-        );
+        );        
+
       } else {
-        const manhattanPlotData = await rawQuery(plotType, params);
+        const manhattanPlotData = await rawQuery(plotType, {
+          ...params,
+          phenotype_id: phenotypes[0].id,
+          sex: stratifications[0].sex,
+          ancestry: stratifications[0].ancestry,
+        });
+        appendIndex(0, manhattanPlotData);
+
         dispatch(
           updateManhattanPlot({
             manhattanPlotData,
@@ -267,7 +285,7 @@ export function drawManhattanPlot(plotType, params) {
           })
         );
       }
-  
+
       dispatch(updateManhattanPlot({ loadingManhattanPlot: false }));
     } catch (e) {
       console.log("ERROR drawManhattanPlot", e);
@@ -277,7 +295,7 @@ export function drawManhattanPlot(plotType, params) {
   };
 }
 
-export function drawQQPlot(phenotype, sex, ancestry) {
+export function drawQQPlot({ phenotypes, stratifications, isPairwise }) {
   return async function(dispatch) {
     try {
       dispatch(updateQQPlot({ 
@@ -286,29 +304,22 @@ export function drawQQPlot(phenotype, sex, ancestry) {
         qqplotLayout: {},
       }));
   
-      const sexes = sex === 'stacked' ? ['female', 'male'] : [sex];
-  
       // retrieve metadata for all sexes provided
       const metadata = await query('metadata', {
-        phenotype_id: phenotype.id,
+        phenotype_id: phenotypes.map(p => p.id),
         chromosome: 'all',
-        ancestry: ancestry,
-        sex: sexes,
       });
 
-      const stackedMetadata = sex === 'stacked'
-        ? await query('metadata', {
-          phenotype_id: phenotype.id,
-          chromosome: 'all',
-          ancestry: ancestry,
-          sex: 'stacked',
-        }) : null;
+      stratifications = stratifications.map(s => ({
+        ...s,
+        metadata: metadata.find(m => m.sex === s.sex && m.ancestry === s.ancestry)
+      }))
 
       // the title property is only used for non-stacked plots
       // stacked plots use the legend instead as the title
-      const title = sex === 'stacked' ? undefined : [
-        `<b>\u03BB</b> = ${metadata[0].lambda_gc}`,
-        `<b>Number of Variants</b> = ${metadata[0].count.toLocaleString()}`,
+      const title = isPairwise ? undefined : [
+        `<b>\u03BB</b> = ${stratifications[0].metadata.lambda_gc}`,
+        `<b>Number of Variants</b> = ${stratifications[0].metadata.count.toLocaleString()}`,
       ].join(' '.repeat(5));
   
       const layout = {
@@ -377,7 +388,7 @@ export function drawQQPlot(phenotype, sex, ancestry) {
             color: 'black'
           }
         },
-        showlegend: sex === 'stacked',
+        showlegend: isPairwise,
         legend: {
           itemclick: false,
           itemdoubleclick: false,
@@ -391,16 +402,16 @@ export function drawQQPlot(phenotype, sex, ancestry) {
         // loadingQQPlot: false,
         // qqplotData: data.flat(),
         qqplotLayout: layout,
-        sampleSize: (sex === 'stacked' ? stackedMetadata : metadata).reduce((a, b) => a + b.count, 0),
+        sampleSize: 0,
       }));
       
       let data = [];
 
-      await Promise.all(sexes.map(async sex => {
+      await Promise.all(stratifications.map(async ({sex, ancestry, metadata}, i) => {
   
         // retrieve a subset of variants where show_qq_plot is true, and nlog_p is <= 3
         const subsetVariants = await query('points', {
-          phenotype_id: phenotype.id,
+          phenotype_id: (phenotypes[i] || phenotypes[0]).id,
           columns: ['p_value_nlog_expected', 'p_value_nlog'],
           sex,
           ancestry,
@@ -415,8 +426,8 @@ export function drawQQPlot(phenotype, sex, ancestry) {
         );
   
         // retrieve all variants where nlog_p >= 3
-        const topVariants = await query('variants', {
-          phenotype_id: phenotype.id,
+        let topVariants = await query('variants', {
+          phenotype_id: (phenotypes[i] || phenotypes[0]).id,
           columns: [
             'p_value_nlog_expected', 
             'p_value_nlog', 
@@ -427,13 +438,13 @@ export function drawQQPlot(phenotype, sex, ancestry) {
           p_value_nlog_min: 3,
           raw: true,
         });
-  
+
         console.log(
           `${sex}.topVariants.length`,
           topVariants.data.length
         );
   
-        const {lambda_gc, count} = metadata.find(m => m.sex === sex);
+        const {lambda_gc, count} = metadata;
         const variants = subsetVariants.data.concat(topVariants.data);
         const maxExpectedNLogP = variants.reduce((a, b) => Math.max(a, b[0]), 0);
         const titleCase = str => str[0].toUpperCase() + str.substring(1, str.length).toLowerCase();
@@ -461,12 +472,13 @@ export function drawQQPlot(phenotype, sex, ancestry) {
             x: variants.map(d => d[0]), // expected -log10(p)
             y: variants.map(d => d[1]), // observed -log10(p)
             customdata: variants.map(d => ({
-              phenotype_id: phenotype.id,
+              phenotypeId: (phenotypes[i] || phenotypes[0]).id,
               sex,
+              ancestry,
               // properties below will be undefined for subsetVariants.data
               // we can use this to differentiate between these two datasets in each trace
               p: Math.pow(10, -d[1]),
-              variantId: d[2]
+              variantId: d[2],
               // expected_p: Math.pow(10, -d[0])
             })),
             name: `${titleCase(sex)}     <b>\u03BB</b> = ${lambda_gc}     <b>Number of Variants</b> = ${count.toLocaleString()}`,
@@ -609,161 +621,6 @@ export function drawHeatmap({phenotypes, sex}) {
         heatmapLayout
       }));
   
-      /*
-  
-      const filterCorrelationData = (phenotype1, phenotype2, correlationData) => {
-        return correlationData.filter((data) => {
-          return (data.phenotype_a === phenotype1.id && data.phenotype_b === phenotype2.id) ||
-            (data.phenotype_a === phenotype2.id && data.phenotype_b === phenotype1.id);
-        });
-      };
-  
-      const getZ = (phenotype1, phenotype2, correlationData) => {
-        var r2 = 0.0;
-        var results = filterCorrelationData(phenotype1, phenotype2, correlationData);
-        if (results.length > 0) {
-          r2 = results[0].value;
-        } else {
-          r2 = 0.0;
-        }
-        var r2Color;
-        if (r2 === -1.0 || r2 === 1.0) {
-          r2Color = 0.0;
-        } else {
-          r2Color = r2;
-        }
-  
-        return {
-          r2Color,
-          r2Text: {
-            x: phenotype2.display_name,
-            y: phenotype1.display_name,
-            z: r2
-          }
-        };
-      };
-  
-      const initialState = getInitialState();
-      dispatch(updateHeatmap(initialState.heatmap));
-  
-      var phenotypesID = phenotypes.map((phenotype) =>
-        phenotype.id
-      );
-  
-      const correlationData = await query('correlations', {
-        a: phenotypesID,
-        b: phenotypesID
-      });
-  
-      let n = phenotypes.length;
-      let x = phenotypes;
-      let y = phenotypes;
-      let z = {
-        zColor: [],
-        zText: []
-      };
-  
-      for (var xidx = 0; xidx < n; xidx++) {
-        let rowColor = [];
-        let rowText = [];
-        for (var yidx = 0; yidx < n; yidx++) {
-          let zData = getZ(x[xidx], y[yidx], correlationData)
-          rowColor.push(zData['r2Color']);
-          rowText.push(zData['r2Text']);
-        }
-        z.zColor.push(rowColor);
-        z.zText.push(rowText);
-      }
-  
-  
-      let heatmapData = {
-        x: phenotypes.map(phenotype => JSON.stringify(phenotype)),
-        y: phenotypes.map(phenotype => JSON.stringify(phenotype)),
-        z: z.zColor,
-        zmin: -1.0,
-        zmax: 1.0,
-        text: z.zText,
-        xgap: 1,
-        ygap: 1,
-        type: 'heatmap',
-        colorscale: [
-          ['0.0', 'rgb(0,0,255)'],
-          ['0.49999999', 'rgb(255,255,255)'],
-          ['0.5', 'rgb(204,204,204)'],
-          ['0.50000001', 'rgb(255,255,255)'],
-          ['1.0', 'rgb(255,0,0)']
-        ],
-        colorbar: {
-          tickvals: [-1, -0.75, -0.5, -0.25, 0, 0.25, 0.5, 0.75, 1],
-          tickmode: "array",
-          thickness: 15,
-          title: {
-            text: 'Correlation',
-            side: 'right'
-          }
-        },
-        showscale: true,
-        hoverinfo: 'text',
-        hovertemplate:
-          '%{text.x}<br>' +
-          '%{text.y}<br>' +
-          '<b>Correlation:</b> %{text.z}' +
-          '<extra></extra>'
-      };
-      let heatmapLayout = {
-        hoverlabel: {
-          bgcolor: "#fff",
-          bordercolor: '#bbb',
-          font: {
-            size: 14,
-            color: '#212529',
-            family: systemFont
-          },
-        },
-        // width: 1000,
-        // height: 1000,
-        autosize: true,
-        margin: {
-          t: 120
-        },
-        // title: 'Example Heatmap',
-        xaxis: {
-          automargin: true,
-          // autorange: 'reversed',
-          side: 'top',
-          tickangle: -45,
-          tickfont: {
-            family: 'Arial',
-            size: 10,
-            color: 'black'
-          },
-          tickvals: phenotypes.map(phenotype => JSON.stringify(phenotype)),
-          ticktext: phenotypes.map(phenotype =>
-            phenotype.display_name.length > 20 ? phenotype.display_name.substring(0, 20) + '...' : phenotype.display_name
-          )
-          // dtick: 5,
-        },
-        yaxis: {
-          automargin: true,
-          autorange: 'reversed',
-          tickangle: 'auto',
-          tickfont: {
-            family: 'Arial',
-            size: 10,
-            color: 'black'
-          },
-          tickvals: phenotypes.map(phenotype => JSON.stringify(phenotype)),
-          ticktext: phenotypes.map(phenotype =>
-            phenotype.display_name.length > 20 ? phenotype.display_name.substring(0, 20) + '...' : phenotype.display_name
-          )
-          // dtick: 5
-        }
-      };
-      dispatch(updateHeatmap({
-        heatmapData: [heatmapData],
-        heatmapLayout
-      }));
-      */
     } catch (e) {
       dispatch(updateError({visible: true}))
     }
@@ -785,7 +642,7 @@ export function lookupVariants({phenotypes, variant, sex, ancestry}) {
       let snp = null;
   
       // determine if we should query by snp or chromosome/position
-      const coordinates = variant.match(/^chr(x|y|\d+):(\d+)$/i);
+      const coordinates = variant.match(/^chr(x|y|\d+):\d+$/i);
       if (coordinates) {
         [, chromosome, position] = coordinates;
       } else {
