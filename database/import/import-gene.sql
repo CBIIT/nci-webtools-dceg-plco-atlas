@@ -13,16 +13,42 @@ SET autocommit = 0;
 
 -- recreate gene table
 DROP TABLE IF EXISTS gene;
-CREATE TABLE gene (
-    `id`                    INTEGER PRIMARY KEY NOT NULL AUTO_INCREMENT,
-    `name`                  VARCHAR(200) NOT NULL,
-    `chromosome`            VARCHAR(2) NOT NULL,
-    `strand`                CHAR NOT NULL,
-    `transcription_start`   INTEGER NOT NULL,
-    `transcription_end`     INTEGER NOT NULL,
-    `exon_starts`           MEDIUMTEXT,
-    `exon_ends`             MEDIUMTEXT
-);
+
+CREATE TABLE IF NOT EXISTS `gene` (
+    `id` INTEGER PRIMARY KEY NOT NULL AUTO_INCREMENT,
+    `name` VARCHAR(200) NOT NULL,
+    `chromosome` ENUM(
+        '1',
+        '2',
+        '3',
+        '4',
+        '5',
+        '6',
+        '7',
+        '8',
+        '9',
+        '10',
+        '11',
+        '12',
+        '13',
+        '14',
+        '15',
+        '16',
+        '17',
+        '18',
+        '19',
+        '20',
+        '21',
+        '22',
+        'X',
+        'Y'
+    ) NOT NULL,
+    `strand` CHAR NOT NULL,
+    `transcription_start` INTEGER NOT NULL,
+    `transcription_end` INTEGER NOT NULL,
+    `exon_starts` MEDIUMTEXT,
+    `exon_ends` MEDIUMTEXT
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
 
 -- create staging table
 DROP TEMPORARY TABLE IF EXISTS gene_stage;
@@ -40,7 +66,7 @@ CREATE TEMPORARY TABLE gene_stage (
     `exonEnds`      TEXT,
     `score`         TEXT,
     `name2`         TEXT
-);
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
 
 -- load data into staging table
 LOAD DATA LOCAL INFILE "../raw/genes.tsv" INTO TABLE gene_stage
