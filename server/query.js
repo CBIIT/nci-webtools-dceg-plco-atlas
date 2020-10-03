@@ -95,7 +95,7 @@ function getValidColumns(tableName, columns) {
     columns = columns.filter(e => /^\w+$/.test(e));
 
     let validColumns = {
-        variant: ['id', 'chromosome', 'position', 'snp', 'allele_reference', 'allele_alternate', 'allele_frequency', 'p_value', 'p_value_heterogenous', 'p_value_nlog', 'p_value_nlog_expected', 'beta', 'odds_ratio', 'ci_95_low', 'ci_95_high', 'show_qq_plot', 'n'],
+        variant: ['id', 'chromosome', 'position', 'snp', 'allele_reference', 'allele_alternate', 'allele_frequency', 'p_value', 'p_value_heterogenous', 'p_value_nlog', 'p_value_nlog_expected', 'beta', 'odds_ratio', 'ci_95_low', 'ci_95_high', 'n'],
         point: ['id', 'phenotype_id', 'sex', 'chromosome', 'position', 'snp', 'p_value_nlog', 'p_value_nlog_expected'],
         aggregate: ['id', 'phenotype_id', 'sex', 'chromosome', 'position_abs', 'p_value_nlog'],
         phenotype: ['id', 'parent_id', 'name', 'age_name', 'display_name', 'description', 'color', 'type', 'participant_count', 'import_count', 'import_date'],
@@ -293,7 +293,6 @@ async function getVariants(connection, params) {
         coalesce(params.p_value_min, `p_value >= :p_value_min`),
         coalesce(params.p_value_max, `p_value <= :p_value_max`),
         coalesce(params.mod, `(id % :mod) = 0`),
-        coalesce(params.show_qq_plot, `show_qq_plot = 1`)
     ].filter(Boolean).join(' AND ');
 
     // determine valid order and orderBy columns
