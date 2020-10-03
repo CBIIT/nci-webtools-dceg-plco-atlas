@@ -4,8 +4,10 @@ import {
   UPDATE_MANHATTAN_PLOT,
   UPDATE_QQ_PLOT,
   UPDATE_SUMMARY_TABLE,
+  UPDATE_SUMMARY_TABLE_INDEX,
   UPDATE_SUMMARY_SNP,
   UPDATE_SUMMARY_SNP_TABLE,
+  UPDATE_SUMMARY_SNP_TABLE_INDEX,
   UPDATE_VARIANT_LOOKUP,
   UPDATE_VARIANT_LOOKUP_TABLE,
   UPDATE_PHENOTYPE_CORRELATIONS,
@@ -58,6 +60,16 @@ export const rootReducer = (state, action) => {
         ...state,
         summaryTables
       };
+    case UPDATE_SUMMARY_TABLE_INDEX:
+        let tables = [...state.summaryTables.tables];
+        tables[action.key] = action.data;
+        return {
+          ...state,
+          summaryTables: {
+            ...state.summaryTables,
+            tables
+          }
+        };
     case UPDATE_SUMMARY_SNP:
     case UPDATE_SUMMARY_SNP_TABLE:
       let summarySnpTables = {
@@ -67,6 +79,16 @@ export const rootReducer = (state, action) => {
       return {
         ...state,
         summarySnpTables
+      };
+    case UPDATE_SUMMARY_SNP_TABLE_INDEX:
+      let snpTables = [...state.summarySnpTables.tables];
+      snpTables[action.key] = action.data;
+      return {
+        ...state,
+        summarySnpTables: {
+          ...state.summarySnpTables,
+          tables: snpTables
+        }
       };
     case UPDATE_VARIANT_LOOKUP:
       return {
