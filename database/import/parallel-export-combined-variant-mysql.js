@@ -72,6 +72,11 @@ if (!fs.existsSync(phenotypeFilePath)) {
     process.exit(1);
 }
 
+for (let folder of [outputFolder, logFolder, tempFolder]) {
+    if (!fs.existsSync(folder))
+        fs.mkdirSync(folder);
+}
+
 (async function main() {
     
     try {
@@ -257,7 +262,7 @@ async function exportVariants({
                     // create stage, variant, aggregate, and metadata tables
                     logger.info('Creating tables');
                     await connection.query([
-                        `DROP TABLE IF EXISTS ${stageTable}, ${variantTable}, ${aggregateTable}, ${metadataTable};`,
+                        `DROP TABLE IF EXISTS ${stageTable}, ${variantTable}, ${aggregateTable}, ${pointTable}, ${metadataTable};`,
                         `CREATE TABLE ${stageTable} (
                             id                          BIGINT PRIMARY KEY NOT NULL AUTO_INCREMENT,
                             chromosome                  VARCHAR(2),
@@ -275,8 +280,7 @@ async function exportVariants({
                             odds_ratio                  DOUBLE,
                             ci_95_low                   DOUBLE,
                             ci_95_high                  DOUBLE,
-                            n                           BIGINT,
-                            show_qq_plot                BOOLEAN
+                            n                           BIGINT
                         );`,
                         // create variant, aggregate, and metadata tables
                         getSql('../schema/tables/variant.sql', {table_name: variantTable}),
@@ -345,19 +349,13 @@ async function exportVariants({
                     const lambdaGC = getLambdaGC(median);
                     logger.info(`LambdaGC: ${lambdaGC} FROM ${median}`)
 
-                    // determine qq plot points
-                    const numPoints = 10000;
-                    logger.info(`Determining show_qq_plot flag for up to ${numPoints} points`);
-                    const getQQPoints = (numPoints, maxValue) => new Array(numPoints)
-                        .fill(0).map((_, i) => i)
-                        .map(x => (x * maxValue ** 0.5 / numPoints) ** 2);
-                    const qqRowIds = getQQPoints(numPoints, count);
-                    if (qqRowIds.length) {
-                        await connection.execute(
-                            `UPDATE ${stageTable} SET show_qq_plot = 1 WHERE id IN (${getPlaceholders(qqRowIds)})`,
-                            qqRowIds
-                        );
-                    }
+
+                    // if (qqRowIds.length) {
+                    //     await connection.execute(
+                    //         `UPDATE ${stageTable} SET show_qq_plot = 1 WHERE id IN (${getPlaceholders(qqRowIds)})`,
+                    //         qqRowIds
+                    //     );
+                    // }
 
                     // determine expected p-value
                     logger.info(`Determining expected p-values`);
@@ -365,6 +363,21 @@ async function exportVariants({
                         `UPDATE ${stageTable} 
                         SET p_value_nlog_expected = -LOG10((id - 0.5) / ${count})
                     `);
+
+                    // determine qq plot points
+                    const numPoints = 10000;
+                    logger.info(`Determining ids for ${numPoints} qq plot points`);
+                    const getQQPoints = (numPoints, maxValue) => new Array(numPoints)
+                        .fill(0).map((_, i) => i + 1)
+                        .map(x => Math.floor((x * maxValue ** 0.5 / numPoints) ** 2))
+                        .reduce((acc, curr) => !acc.includes(curr) ? acc.concat([curr]) : acc, []);
+                    const qqRowIds = count ? getQQPoints(numPoints, count) : [];
+
+                    // determine 10,000th smallest p value
+                    const [pValueThresholdRows] = await connection.query(
+                        `SELECT p_value_nlog FROM ${stageTable} ORDER BY p_value_nlog DESC LIMIT 10000,1`,
+                    );
+                    const pValueThreshold = pluck(pValueThresholdRows);
 
                     // determine max p-value and position 
                     const [maxPositionAbsRows] = await connection.query(`SELECT MAX(position_abs_max) FROM chromosome_range`);
@@ -381,6 +394,7 @@ async function exportVariants({
                     logger.info(`Generating variants table ${variantTable}`);
                     await connection.query(`
                         INSERT INTO ${variantTable} (
+                            id,
                             chromosome,
                             position,
                             snp,
@@ -396,10 +410,10 @@ async function exportVariants({
                             odds_ratio,
                             ci_95_low,
                             ci_95_high,
-                            n,
-                            show_qq_plot 
+                            n
                         )
                         SELECT 
+                            id,
                             chromosome,
                             position,
                             snp,
@@ -415,8 +429,7 @@ async function exportVariants({
                             odds_ratio,
                             ci_95_low,
                             ci_95_high,
-                            n,
-                            show_qq_plot 
+                            n
                         FROM ${stageTable}
                         ORDER BY chromosome, p_value
                     `);
@@ -449,12 +462,7 @@ async function exportVariants({
                     `);
 
                     logger.info(`Generating point table ${pointTable}`);
-                    // determine 10,000th smallest p value
-                    const [pValueThresholdRows] = await connection.query(
-                        `SELECT p_value_nlog FROM ${stageTable} ORDER BY p_value_nlog DESC LIMIT 10000,1`,
-                    );
-                    if (pValueThresholdRows.length) {
-                        const pValueThreshold = pluck(pValueThresholdRows);
+                    if (pValueThreshold && qqRowIds.length) {
                         await connection.query(`
                             INSERT INTO ${pointTable} (
                                 id,
@@ -464,17 +472,17 @@ async function exportVariants({
                                 p_value_nlog,
                                 p_value_nlog_expected
                             )
-                            SELECT DISTINCT
+                            SELECT
                                 id,
                                 ${phenotype.id} as phenotype_id, 
                                 '${sex}' as sex, 
                                 '${ancestry}' as ancestry, 
                                 p_value_nlog,
-                                p_value_nlog_expected
-                            FROM ${variantTable} v
-                            WHERE show_qq_plot = 1 
-                            OR p_value_nlog > :pValueThreshold
-                        `, {pValueThreshold});
+                                -LOG10((id - 0.5) / ${count}) as p_value_nlog_expected
+                            FROM ${stageTable}
+                            WHERE id IN (${getPlaceholders(qqRowIds)})
+                            OR p_value_nlog > ?
+                        `, [...qqRowIds, pValueThreshold]);
                     }
 
                     logger.info(`Generating metadata table ${metadataTable}`);
@@ -522,12 +530,14 @@ async function exportVariants({
                     await exportInnoDBTable(connection, databaseName, metadataTable, outputFolder);
 
                 } catch (e) {
+                    console.log(e);
                     logger.error(e);
                 }
             } // end ancestry
         } // end sex
 
     } catch (e) {
+        console.log(e);
         logger.error(e);
         process.exit(1);
     }

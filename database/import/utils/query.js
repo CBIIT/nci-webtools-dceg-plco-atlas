@@ -12,7 +12,7 @@ module.exports = {
 }
 
 function pluck(rows) {
-    if (!rows) return null;
+    if (!rows || !rows.length) return null;
     let [firstRow] = rows;
     let [firstKey] = Object.keys(firstRow);
     return firstRow[firstKey];

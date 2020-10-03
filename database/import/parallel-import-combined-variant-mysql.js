@@ -94,7 +94,7 @@ function getSql(filepath, args) {
 }
 
 async function importVariants({connection, database, folderPath, phenotype}) {
-    const { tableSuffix, sex, ancestry } = phenotype;
+    const { tableSuffix, id, sex, ancestry } = phenotype;
     const variantTable = `phenotype_variant__${tableSuffix}`;
     const aggregateTable = `phenotype_aggregate__${tableSuffix}`;
     const pointTable = `phenotype_point__${tableSuffix}`;
@@ -119,6 +119,13 @@ async function importVariants({connection, database, folderPath, phenotype}) {
     await importInnoDBTable(connection, database, metadataTable, folderPath);
 
     logger.info('Selecting from temporary InnoDB tables');
+    await connection.query(`
+        DELETE FROM phenotype_aggregate 
+        WHERE
+            phenotype_id = :id 
+            AND sex = :sex
+            AND ancestry = :ancestry;
+    `, {id, sex, ancestry});
     await connection.query(`
         INSERT INTO phenotype_aggregate 
             (phenotype_id, sex, ancestry, chromosome, position_abs, p_value_nlog)
@@ -147,4 +154,20 @@ async function importVariants({connection, database, folderPath, phenotype}) {
     await connection.query(`DROP TABLE ${aggregateTable}`);
     await connection.query(`DROP TABLE ${metadataTable}`);
     await connection.query(`DROP TABLE ${pointTable}`);
+
+    // log imported variants
+    logger.info(`Storing import log...`);
+    await connection.execute(`
+        UPDATE phenotype SET
+            import_count = (
+                SELECT SUM(count) from phenotype_metadata
+                WHERE
+                    phenotype_id = :id AND
+                    chromosome = 'all'
+            ),
+            import_date = NOW()
+        WHERE
+            id = :id`,
+        {id}
+    );
 }
