@@ -1,37 +1,20 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
 import { ShareLink } from '../../../controls/share-link/share-link';
+import { asTitleCase } from './utils';
 // import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
 
 
 export const SummaryResultsSearchCriteria = () => {
   const summaryResults = useSelector(state => state.summaryResults);
+  const sampleSize = useSelector(state => state.summaryTables.tables[0].resultsCount)
   const {
-    searchCriteriaSummaryResults,
-    selectedPhenotype,
-    selectedSex,
-    selectedAncestry,
+    selectedPhenotypes,
+    selectedStratifications,
+    isPairwise,
     shareID,
-    disableSubmit
+    submitted,
   } = summaryResults;
-
-  const {
-    sampleSize
-  } = useSelector(state => state.qqPlot);
-
-  const displaySex = sex =>
-    ({
-      all: 'All',
-      stacked: 'Female/Male (Stacked)',
-      female: 'Female',
-      male: 'Male'
-    }[sex]);
-
-  const displayAncestry = ancestry =>
-    ({
-      european: 'European',
-      east_asian: 'East Asian'
-    }[ancestry]);
 
   return (
     <div className="mb-2">
@@ -39,47 +22,32 @@ export const SummaryResultsSearchCriteria = () => {
         <div className="d-flex justify-content-between">
             <div className="py-1">
               <span>
-                <b>Phenotype</b>:{' '}
-                {selectedPhenotype &&
-                selectedPhenotype.display_name
-                  ? selectedPhenotype.display_name
-                  : 'None'}
+                <b>Phenotype(s): </b>
+                  {selectedPhenotypes.length 
+                    ? selectedPhenotypes.map(p => p.display_name).join(', ') 
+                    : 'None'}
               </span>
 
               <span className="border-left border-secondary mx-3" style={{maxHeight: '1.6em'}}></span>
 
               <span>
-                <b>Stratification</b>:{' '}
-                {selectedAncestry && selectedSex
-                  ? `${displayAncestry(selectedAncestry)} - ${displaySex(selectedSex)}`
-                  : 'None'}
+                <b>Stratification(s): </b>
+                    {selectedStratifications.length
+                      ? selectedStratifications.map(s => asTitleCase(`${s.ancestry} - ${s.sex}`)).join(', ')
+                      : 'None'}
               </span>
             </div>
 
             <div className="d-flex">
-              <span className="py-1"
-                style={{
-                  display: selectedSex === 'stacked' ? 'none' : 'block'
-                }}>
-                <b>Total Variants:</b> {' '}
-                <span>
-                  {/* <LoadingOverlay active={true} /> */}
-                  {sampleSize
-                    ? sampleSize.toLocaleString() :
-                    'None'}
-                </span>
-              </span>
+              {submitted && !isPairwise && <span className="py-1 mr-3">
+                <b>Total Variants:</b> {sampleSize.toLocaleString()}
+              </span>}
 
-              <span className="ml-3" style={{maxHeight: '1.6em'}}></span>
-
-              <div className="d-flex justify-content-end">
-                <ShareLink
-                  disabled={!searchCriteriaSummaryResults || !disableSubmit}
-                  shareID={shareID}
-                  params={summaryResults}
-                />
-              </div>
-
+              <ShareLink
+                disabled={!submitted}
+                shareID={shareID}
+                params={summaryResults}
+              />
             </div>
         </div>
       </div>
