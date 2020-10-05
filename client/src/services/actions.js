@@ -310,10 +310,18 @@ export function drawQQPlot({ phenotypes, stratifications, isPairwise }) {
         chromosome: 'all',
       });
 
-      stratifications = stratifications.map(s => ({
+      stratifications = stratifications.map((s, i) => ({
         ...s,
-        metadata: metadata.find(m => m.sex === s.sex && m.ancestry === s.ancestry)
-      }))
+        metadata: metadata.find(m => 
+            m.phenotype_id === (phenotypes[i] || phenotypes[0]).id &&
+            m.sex === s.sex && 
+            m.ancestry === s.ancestry)
+      }));
+
+
+      console.log(metadata, stratifications, phenotypes);
+
+
 
       // the title property is only used for non-stacked plots
       // stacked plots use the legend instead as the title
@@ -447,12 +455,15 @@ export function drawQQPlot({ phenotypes, stratifications, isPairwise }) {
         const {lambda_gc, count} = metadata;
         const variants = subsetVariants.data.concat(topVariants.data);
         const maxExpectedNLogP = variants.reduce((a, b) => Math.max(a, b[0]), 0);
-        const titleCase = str => str[0].toUpperCase() + str.substring(1, str.length).toLowerCase();
-        const markerColor = {
-          all: '#f2990d',
-          female: '#f41c52',
-          male: '#006bb8'
-        }[sex];
+        const titleCase = str => str.replace(/\w+/g, str => 
+          str[0].toUpperCase() + str.substring(1, str.length).toLowerCase());
+        const markerColor = isPairwise ? ['#f41c52', '#006bb8'][i] : '#f2990d';
+        const titlePrefix = isPairwise && phenotypes[1] ? `${phenotypes[i].display_name} - ` : '';
+        // const markerColor = {
+        //   all: '#f2990d',
+        //   female: '#f41c52',
+        //   male: '#006bb8'
+        // }[sex];
   
         const newData =  [
           {
@@ -481,7 +492,7 @@ export function drawQQPlot({ phenotypes, stratifications, isPairwise }) {
               variantId: d[2],
               // expected_p: Math.pow(10, -d[0])
             })),
-            name: `${titleCase(sex)}     <b>\u03BB</b> = ${lambda_gc}     <b>Number of Variants</b> = ${count.toLocaleString()}`,
+            name: `${titlePrefix + titleCase(`${ancestry} - ${sex}`)}     <b>\u03BB</b> = ${lambda_gc}     <b>Number of Variants</b> = ${count.toLocaleString()}`,
             mode: 'markers',
             type: 'scattergl',
             hoverinfo: 'none',
