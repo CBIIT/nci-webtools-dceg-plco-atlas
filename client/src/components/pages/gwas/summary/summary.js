@@ -28,6 +28,7 @@ import {
   updateSummarySnpTableByIndex
 } from '../../../../services/actions';
 import { getInitialState } from '../../../../services/store';
+import { query } from '../../../../services/query';
 import './summary.scss'
 
 
@@ -223,11 +224,12 @@ export function SummaryResults() {
     }
   }
 
-  const handleReset = () => {
+  const handleReset = async () => {
     const initialState = getInitialState();
     for (let key of ['summaryResults', 'manhattanPlot', 'qqPlot', 'summaryTables', 'summarySnpTables'])
       dispatch(updateKey(key, initialState[key]));
-
+    const ranges = await query('ranges')
+      dispatch(updateSummaryResults({ranges}));
   };
 
   // resubmit summary results
