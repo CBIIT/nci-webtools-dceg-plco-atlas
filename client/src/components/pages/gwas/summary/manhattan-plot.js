@@ -88,7 +88,7 @@ export function ManhattanPlot({
     .replace(/\w+/g, word => word[0].toUpperCase() + word.substr(1).toLowerCase());
 
   const getTitle = bounds => {
-    const phenotypes = selectedPhenotypes.map(p => p.display_name).join(', ');
+    const phenotypes = selectedPhenotypes.map(p => p.display_name).join(' / ');
     return `${phenotypes} ${selectedChromosome ? `- Chromosome ${selectedChromosome}` : ``} ${!bounds ? '' : 
       [bounds.xMin, bounds.xMax]
         .map(n => `${(n / 1e6).toPrecision(4)} MB`)
@@ -97,7 +97,7 @@ export function ManhattanPlot({
 
   const getPairwiseTitles = () => {
     return selectedStratifications.map(s => 
-      asTitleCase(s.sex === 'all' ? `${s.ancestry}s` : `${s.ancestry} ${s.sex}s`));
+      asTitleCase(`${s.ancestry} - ${s.sex}`));
   }
 
   useEffect(() => {
@@ -206,7 +206,7 @@ export function ManhattanPlot({
         data2: [{ x: 0, y: 0 }, { x: 1, y: 1 }],
         title: [
           {
-            text: selectedPhenotypes.map(p => p.title).join(', ').title,
+            text: getTitle(),
             font: `600 16px ${systemFont}`
           }
         ],
