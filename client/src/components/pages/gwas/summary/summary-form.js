@@ -43,27 +43,33 @@ export function SummaryResultsForm({
    * phenotype will be used for both sets of options
    * @param {*} phenotypes 
    */
-  function getStratificationOptions (selectedPhenotypes, isPairwise) {
+  function getStratificationOptions(selectedPhenotypes, isPairwise) {
     if (!phenotypes || !phenotypes.metadata) return [];
     const stratificationGroups = [];
 
     for (const phenotype of selectedPhenotypes) {
       const stratifications = [];
-      const records = phenotypes.metadata.filter(item =>
+      phenotypes.metadata.filter(item =>
         item.phenotype_id === phenotype.id &&
         item.chromosome === 'all' &&
-        item.count > 0
-      );
-      for (const ancestry of records.map(p => p.ancestry)) {
-        const sexes = records.filter(p => p.ancestry === ancestry).map(p => p.sex);
-        stratifications.push({
+        item.count > 0 &&
+        item.sex != 'stacked'
+      ).forEach(({ sex, ancestry }) => {
+        let stratification = stratifications.find(s => s.ancestry === ancestry) || {
           label: asTitleCase(ancestry),
-          options: sexes.map(sex => ({
-            label: asTitleCase(sex),
-            value: `${ancestry}__${sex}`
-          }))
+          options: [],
+          ancestry,
+        };
+
+        stratification.options.push({
+          label: asTitleCase(`${ancestry} - ${sex}`),
+          value: `${ancestry}__${sex}`
         });
-      }
+
+        if (!stratifications.includes(stratification)) {
+          stratifications.push(stratification);
+        }
+      })
       stratificationGroups.push(stratifications);
     }
 
@@ -75,14 +81,14 @@ export function SummaryResultsForm({
     return stratificationGroups;
   }
 
-  function mergeSelectedStratification (index, value) {
+  function mergeSelectedStratification(index, value) {
     const selectedStratifications = [..._selectedStratifications];
     selectedStratifications[index] = value;
     _setSelectedStratifications(selectedStratifications);
     _setIsModified(true);
   }
 
-  function setSelectedPhenotypesAndOptions (selectedPhenotypes, pairwise) {
+  function setSelectedPhenotypesAndOptions(selectedPhenotypes, pairwise) {
     if (pairwise === undefined) pairwise = _isPairwise;
     selectedPhenotypes = selectedPhenotypes.slice(0, pairwise ? 2 : 1);
     setStratificationOptions(getStratificationOptions(selectedPhenotypes, pairwise));
@@ -92,7 +98,7 @@ export function SummaryResultsForm({
     _setIsModified(true);
   }
 
-  function handleReset (ev) {
+  function handleReset(ev) {
     ev.preventDefault();
     _setSelectedPhenotypes([]);
     _setSelectedStratifications([]);
@@ -119,7 +125,20 @@ export function SummaryResultsForm({
     <>
       {/* <pre>{JSON.stringify({ _selectedPhenotypes, _selectedStratifications }, null, 2)}</pre> */}
       <div className="mb-2">
-        <label className="required">Phenotypes</label>
+        <div className="d-flex justify-content-between">
+          <label className="required">Phenotypes</label>
+          <div className="custom-control custom-checkbox">
+            <input
+              type="checkbox"
+              className="custom-control-input"
+              id="is-pairwise"
+              checked={_isPairwise}
+              onChange={e => setSelectedPhenotypesAndOptions(_selectedPhenotypes, e.target.checked)}
+            />
+            <label className="custom-control-label" htmlFor="is-pairwise">Pairwise Plots</label>
+          </div>
+        </div>
+
         <TreeSelect
           data={phenotypes}
           value={_selectedPhenotypes}
@@ -128,23 +147,13 @@ export function SummaryResultsForm({
         />
       </div>
 
-      <div className="custom-control custom-checkbox mb-3">
-        <input
-          type="checkbox"
-          className="custom-control-input"
-          id="is-pairwise"
-          checked={_isPairwise}
-          onChange={e => setSelectedPhenotypesAndOptions(_selectedPhenotypes, e.target.checked)}
-        />
-        <label className="custom-control-label" htmlFor="is-pairwise">Pairwise Plots</label>
-      </div>
 
       {(_isPairwise ? [0, 1] : [0]).map(i => stratificationOptions[i]).map((optionGroup, i) =>
         <div className="mb-3" key={`stratification-option-group-${i}`}>
           <label htmlFor={`summary-results-stratification-${i}`} className="required">
             Ancestry/Sex {showPhenotypesLabels && `for ${_selectedPhenotypes[i].display_name}`}
           </label>
-            <select
+          <select
             id={`summary-results-stratification-${i}`}
             className="form-control"
             value={_selectedStratifications[i]}
