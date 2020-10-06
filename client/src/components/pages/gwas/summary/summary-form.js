@@ -151,15 +151,16 @@ export function SummaryResultsForm({
       {(_isPairwise ? [0, 1] : [0]).map(i => stratificationOptions[i]).map((optionGroup, i) =>
         <div className="mb-3" key={`stratification-option-group-${i}`}>
           <label htmlFor={`summary-results-stratification-${i}`} className="required">
-            Ancestry/Sex {showPhenotypesLabels && `for ${_selectedPhenotypes[i].display_name}`}
+            Ancestry/Sex {_isPairwise && ['(Top)', '(Bottom)'][i]}
           </label>
           <select
             id={`summary-results-stratification-${i}`}
             className="form-control"
+            style={{color: _selectedStratifications[i] ? '#000' : '#ccc'}}
             value={_selectedStratifications[i]}
             onChange={e => mergeSelectedStratification(i, e.target.value)}
             disabled={!optionGroup || optionGroup.length === 0}>
-            <option value="" hidden>Select Ancestry/Sex</option>
+            <option value="" hidden>Select Ancestry/Sex {showPhenotypesLabels && `for ${_selectedPhenotypes[i].display_name}`}</option>
             {optionGroup && optionGroup.map(e => <optgroup key={`${i}-${e.label}`} label={e.label}>
               {e.options.map(o => <option key={`${i}-${e.label}-${o.value}`} value={o.value}>{o.label}</option>)}
             </optgroup>)}
