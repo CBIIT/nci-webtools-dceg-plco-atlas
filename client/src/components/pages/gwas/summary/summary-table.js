@@ -59,8 +59,10 @@ export function SummaryResultsTable() {
       dataField: 'snp',
       text: 'SNP',
       sort: true,
-      formatter: cell => !/^rs\d+:/.test(cell) ? cell : 
-        <a href={`https://www.ncbi.nlm.nih.gov/snp/${cell.split(':')[0]}`} target="_blank">{cell}</a>,
+      formatter: cell => !/^rs\d+:/.test(cell) ? 
+        (!/^chr[\d+|x|X|y|Y]:\d+/.test(cell) ? cell : 
+        cell.split(':')[0] + ':' + cell.split(':')[1]) : 
+        <a href={`https://www.ncbi.nlm.nih.gov/snp/${cell.split(':')[0]}`} target="_blank">{cell.split(':')[0]}</a>,
       headerStyle: { width: '180px' },
     },
     {

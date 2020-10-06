@@ -146,8 +146,10 @@ export const VariantLookupSearchCriteria = () => {
                     style={{
                       textDecoration: 'underline',
                     }}>
-                      {searchCriteriaVariantLookup.variant}
+                      {searchCriteriaVariantLookup.variant.split(':')[0]}
                     </a>
+                  : searchCriteriaVariantLookup.variant.split(':')[0].substring(0,3) === 'chr'
+                  ? <span>{searchCriteriaVariantLookup.variant.split[0] + ":" + searchCriteriaVariantLookup.variant.split[1]}</span>
                   : <span>{searchCriteriaVariantLookup.variant}</span>
                   : 'None'
               }
