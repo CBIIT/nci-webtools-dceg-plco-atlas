@@ -44,6 +44,10 @@ select:disabled {
   cursor: not-allowed;
 }
 
+select {
+  text-overflow: ellipsis;
+}
+
 a:hover, a:focus {
   text-decoration: underline;
 }
