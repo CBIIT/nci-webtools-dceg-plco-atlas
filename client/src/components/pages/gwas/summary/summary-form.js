@@ -160,7 +160,10 @@ export function SummaryResultsForm({
             value={_selectedStratifications[i]}
             onChange={e => mergeSelectedStratification(i, e.target.value)}
             disabled={!optionGroup || optionGroup.length === 0}>
-            <option value="" hidden>Select Ancestry/Sex {showPhenotypesLabels && `for ${_selectedPhenotypes[i].display_name}`}</option>
+            <option value="" hidden>Select Ancestry/Sex {
+              _isPairwise && (_selectedPhenotypes[i] || _selectedPhenotypes[0]) &&
+              `for ${(_selectedPhenotypes[i] || _selectedPhenotypes[0]).display_name}`
+            }</option>
             {optionGroup && optionGroup.map(e => <optgroup key={`${i}-${e.label}`} label={e.label}>
               {e.options.map(o => <option key={`${i}-${e.label}-${o.value}`} value={o.value}>{o.label}</option>)}
             </optgroup>)}
