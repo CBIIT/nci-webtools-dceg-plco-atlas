@@ -88,9 +88,12 @@ export function ManhattanPlot({
     .replace(/\w+/g, word => word[0].toUpperCase() + word.substr(1).toLowerCase());
 
   const getTitle = bounds => {
-    const phenotypes = selectedPhenotypes.map(p => p.display_name).join(' / ');
+    const phenotypes = selectedPhenotypes.map((p, i) => 
+      (isPairwise && selectedPhenotypes[1] ? ['Top: ', 'Bottom: '][i] : '') + p.display_name).join(' / ');
+
+
     return `${phenotypes} ${selectedChromosome ? `- Chromosome ${selectedChromosome}` : ``} ${!bounds ? '' : 
-      [bounds.xMin, bounds.xMax]
+      ' - ' + [bounds.xMin, bounds.xMax]
         .map(n => `${(n / 1e6).toPrecision(4)} MB`)
         .join(' - ')}`;
   };
@@ -333,8 +336,7 @@ export function ManhattanPlot({
       index: data[columnIndexes.index],
     });
 
-    let title = `${selectedPhenotypes.map(p => p.title).join(', ')} - Chromosome ${selectedChromosome}`;
-
+    let title = getTitle();
     let range = ranges.find(r => r.chromosome == selectedChromosome);
 
     let yExtent = extent([...plotData.data, ...mirroredPlotData.data].map(d => d[columnIndexes.nLogP]));
@@ -481,7 +483,7 @@ export function ManhattanPlot({
       genes: plotData.genes,
       title: [
         {
-          text: selectedPhenotypes.map(p => p.title).join(', ').title,
+          text: getTitle(),
           font: `600 16px ${systemFont}`
         }
       ],
@@ -539,7 +541,7 @@ export function ManhattanPlot({
       index: data[columnIndexes.index],
     });
 
-    let title = `${selectedPhenotypes.map(p => p.title).join(', ')} - Chromosome ${selectedChromosome}`;
+    let title = getTitle();
     let range = ranges.find(r => r.chromosome == selectedChromosome);
     let yExtent = extent([...plotData.data].map(d => d[columnIndexes.nLogP]));
     yExtent[1] *= 1.1;
