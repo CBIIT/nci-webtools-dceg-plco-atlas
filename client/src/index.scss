@@ -40,6 +40,10 @@ label.disabled {
   cursor: not-allowed;
 }
 
+select:disabled {
+  cursor: not-allowed;
+}
+
 a:hover, a:focus {
   text-decoration: underline;
 }
@@ -106,6 +110,10 @@ a:hover, a:focus {
   background-image: linear-gradient(#ffffff, #e4e4e4) !important;
   color: black !important;
   border-color: #dee2e6 !important;
+}
+
+.btn-silver:disabled {
+  color: #bbb;
 }
 
 .btn-collapse {
