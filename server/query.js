@@ -892,6 +892,31 @@ async function getPhenotype(connectionPool, params) {
         phenotype.relatedPhenotypes = relatedPhenotypeRows;
     }
 
+    const asTitleCase = str => str
+        .replace(/_/g, ' ')
+        .replace(/\w+/g, str => str[0].toUpperCase() + str.substr(1).toLowerCase());
+
+    // TitleCase phenotype labels
+    for (let key in phenotype.categoryTypes) {
+        phenotype.categoryTypes[key] = phenotype.categoryTypes[key].map(asTitleCase);
+    }
+
+    // Binary phenotypes have counts/percentages with category keys
+    if (phenotype.type === 'binary') {
+        for (let type of ['frequencyBySex', 'frequencyByAncestry', 'frequencyByAge']) {
+            for (let key of ['counts', 'percentage']) {
+                if (phenotype[type][key]) {
+                    for (let subkey of Object.keys(phenotype[type][key])) {
+                        if (!/[a-z]/.test(subkey)) continue;
+                        phenotype[type][key][asTitleCase(subkey)] = phenotype[type][key][subkey];
+                        delete phenotype[type][key][subkey];
+                    }
+                }
+            }
+        }
+    }
+
+
     await connection.release();
     return phenotype;
 }
