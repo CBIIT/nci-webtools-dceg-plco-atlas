@@ -174,7 +174,7 @@ export function Phenotypes() {
         'related-phenotypes': 'related',
       }[plot] || 'all'
     });
-
+    
     dispatch(
       updateBrowsePhenotypesPlots({
         phenotypeData: data,
@@ -375,9 +375,13 @@ export function Phenotypes() {
                   className="mt-5 bubble-chart text-center"
                   id="bubble-chart-div"
                   style={{ minHeight: '50vh', 
-                  position: 'relative'
-                }}
+                    position: 'relative'
+                  }}
                 />
+
+                <div className="small text-center text-muted my-4">
+                  * Bubbles are representative of the sample size of each phenotype, not the inter-relationship between phenotypes.
+                </div>
               </div>
             </div>
         }

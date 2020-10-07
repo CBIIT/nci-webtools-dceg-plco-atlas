@@ -62,7 +62,6 @@ export const BarChart = ({ data, categories, distributionCategories, xTitle, yTi
     className="w-100 disable-x-axis-tooltip override-cursor"
     style={{ minHeight: "600px", width: "600px" }}
     data={categories.map((name, i) => {
-      console.log('drawing category', name, categories, data);
 
       let x = [];
       let y = [];
@@ -193,6 +192,7 @@ export const AreaChart = ({data, categories, xTitle, yTitle, formatPercent}) => 
     return {x, y}
   })
   */
+//  console.log('drawing area chart', {data, categories, xTitle, yTitle, formatPercent});
 
   return <Plot
       className="w-100 disable-x-axis-tooltip override-cursor"
@@ -251,6 +251,7 @@ export const GroupedAreaChart = ({data, categories, xTitle, yTitle, fill, yMax, 
     return {x, y}
   });
   */
+ console.log('drawing grouped chart', {data, categories, xTitle, yTitle, fill, yMax, formatPercent, categoryPrefix, type});
 
   if (!yMax) {
     for (let key in data) {
@@ -307,6 +308,12 @@ export const GroupedAreaChart = ({data, categories, xTitle, yTitle, fill, yMax, 
         hoverinfo: i === 0 ? 'y' : 'skip',
         hovertemplate: i === 0 ? '%{text}<extra></extra>' : null,
         text: i > 0 ? '' : Object.entries(data).map(([key, value]) => {
+          if (value.length === 1) {
+            return [
+              `<b>${categoryPrefix}</b>: ${key}`,
+              `<b>Participants</b>: ${formatPercent ? percentFormatter(value[0]) : value[0].toLocaleString()}`
+            ].join('<br>');
+          }
           return [
             `<b>${xTitle}</b>: ${key}`,
             categories.length === 1 
@@ -384,7 +391,7 @@ export const PieChart = ({ data, categories }) => (
 
 
 
-export function PhenotypesRelated({relatedData, onClick}) {
+export function PhenotypesRelated({title, relatedData, onClick}) {
   relatedData = relatedData.sort((a, b) => b.correlation - a.correlation);
 
   const data = [
@@ -419,7 +426,7 @@ export function PhenotypesRelated({relatedData, onClick}) {
 
   const layout = {
     // ...hoverLayout,
-    // title: `Phenotypes Related to ${selectedPhenotype.title}`,
+    title: {text: title},
     showlegend: false,
     xaxis: {
       showticklabels: false,

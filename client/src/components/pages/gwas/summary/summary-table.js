@@ -102,13 +102,14 @@ export function SummaryResultsTable() {
     },
     {
       dataField: 'p_value',
-      text: 'P-Value',
+      text: 'Assoc. P-Value',
+      headerTitle: _ => 'Association P-Values',
       sort: true
     },
     {
       dataField: 'p_value_heterogenous',
-      text: 'P-Value Het.',
-      headerTitle: _ => 'P-Value Heterogenous',
+      text: ' Het. P-Value',
+      headerTitle: _ => 'Heterogenous P-Values',
     },
     {
       dataField: 'n',

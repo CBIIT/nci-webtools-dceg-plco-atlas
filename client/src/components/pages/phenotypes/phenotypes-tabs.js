@@ -45,6 +45,7 @@ export function PhenotypesTabs(props) {
       dispatch(updateBrowsePhenotypesPlots({
         loading: true,
       }));
+      
       dispatch(updateBrowsePhenotypesPlots({
         loading: false,
         phenotypeData: {
@@ -52,7 +53,7 @@ export function PhenotypesTabs(props) {
           ...await query('phenotype', {
             id: phenotypeData.id,
             type: selectedPlot || 'all'
-          })
+          }),
         }
       }));
     }
@@ -251,7 +252,7 @@ export function PhenotypesTabs(props) {
         {[
           phenotypeData.ageName && { key: 'frequencyByAge', title: 'Frequency By Age' },
           { key: 'frequencyBySex', title: 'Frequency By Sex' },
-          { key: 'frequencyByAncestry', title: 'Frequency By Ancestry' },
+          { key: 'frequencyByAncestry', title: 'Frequency By Self-Reported Race' },
         ].filter(Boolean).map(t =>
           <Tab
             key={t.key}
@@ -326,6 +327,7 @@ export function PhenotypesTabs(props) {
           style={{ minHeight: '50vh' }}>
           {!loading && selectedPlot === 'related-phenotypes' && phenotypeData && phenotypeData.relatedPhenotypes &&
             <PhenotypesRelated
+              title="Top genetically correlated phenotypes"
               relatedData={phenotypeData.relatedPhenotypes}
               onClick={e => {
                 if (props.onSubmit) {
