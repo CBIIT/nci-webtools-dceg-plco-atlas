@@ -18,6 +18,7 @@ import {
 } from '../../../controls/table/table';
 import paginationFactory from 'react-bootstrap-table2-paginator';
 import { asTitleCase } from './utils';
+import { asQueryString, query } from '../../../../services/query';
 
 export function SummaryResultsTable() {
   const dispatch = useDispatch();
@@ -35,6 +36,12 @@ export function SummaryResultsTable() {
   } = useSelector(state => state.summaryResults);
   const selectedTable = useSelector(state => state.summaryTables.selectedTable);
   const setSelectedTable = selectedTable => dispatch(updateSummaryTable('selectedTable', selectedTable));
+  const [exportRowLimit, setExportRowLimit] = useState(1e5);
+
+  useEffect(() => {
+    query('config', {key: 'exportRowLimit'})
+      .then(({exportRowLimit}) => setExportRowLimit(exportRowLimit))
+  })
 
   const defaultSorted = [{
     dataField: 'p_value',
@@ -211,6 +218,34 @@ export function SummaryResultsTable() {
     );
   };
 
+  const getExportLink = () => {
+    if (!selectedStratifications.length || !selectedPhenotypes.length)
+      return null;
+
+    const phenotype = isPairwise && selectedPhenotypes[1]
+      ? selectedPhenotypes[selectedTable]
+      : selectedPhenotypes[0];
+
+    const {sex, ancestry} = isPairwise
+      ? selectedStratifications[selectedTable]
+      : selectedStratifications[0]
+
+    const exportParams = {
+      phenotype_id: phenotype.id,
+      sex,
+      ancestry,
+      chromosome: selectedChromosome,
+      orderBy: 'p_value',
+      order: 'asc',
+      p_value_nlog_min: nlogpMin,
+      p_value_nlog_max: nlogpMax,
+      position_min: bpMin,
+      position_max: bpMax,
+    }
+
+    return `${process.env.REACT_APP_API_ROOT}/export-variants${asQueryString(exportParams)}`;
+  }
+
   const getVariantTableProps = (key) => ({
     remote: true,
     keyField: 'id',
@@ -253,6 +288,14 @@ export function SummaryResultsTable() {
                 </button>
               )}
             </div>}
+
+            <a
+              disabled={summaryTables.tables[selectedTable].resultsCount > exportRowLimit}
+              target="_blank"
+              className="btn btn-sm btn-silver flex-shrink-auto mx-2"
+              href={getExportLink()}>
+              Export
+            </a>
         </div>
 
         <div key="snpSearch" className="d-flex mb-2">
