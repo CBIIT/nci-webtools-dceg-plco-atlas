@@ -48,8 +48,19 @@ select {
   text-overflow: ellipsis;
 }
 
+option {
+  color: black;
+  background-color: white;
+}
+
 a:hover, a:focus {
   text-decoration: underline;
+}
+
+a[disabled] {
+  pointer-events: none;
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 /** Bootstrap Overrides **/
