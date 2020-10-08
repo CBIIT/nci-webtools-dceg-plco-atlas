@@ -75,7 +75,7 @@ EXPORT_SCRIPT="../parallel-export-combined-variant-mysql.js"
 DEPENDENCIES="module load mysql/5.7.22 nodejs;"
 
 # Start local mysql instance in compute node
-START_MYSQL="local_mysql --basedir $TMP_DIR create; local_mysql --basedir $TMP_DIR start; mysql -u root -p$PASSWORD --socket=$TMP_DIR/mysql.sock --execute=\"CREATE USER '$USER'@'localhost' IDENTIFIED BY '$PASSWORD'; GRANT ALL PRIVILEGES ON *.* TO '$USER'@'localhost' WITH GRANT OPTION; CREATE USER '$USER'@'%' IDENTIFIED BY '$PASSWORD';GRANT ALL PRIVILEGES ON *.* TO '$USER'@'%' WITH GRANT OPTION; CREATE DATABASE plcogwas;\";"
+START_MYSQL="local_mysql --basedir $TMP_DIR create; local_mysql --basedir $TMP_DIR start; mysql -u root -p$PASSWORD --socket=$TMP_DIR/mysql.sock --execute=\"CREATE USER '$USER'@'localhost' IDENTIFIED BY '$PASSWORD'; GRANT ALL PRIVILEGES ON *.* TO '$USER'@'localhost' WITH GRANT OPTION; CREATE USER '$USER'@'%' IDENTIFIED BY '$PASSWORD';GRANT ALL PRIVILEGES ON *.* TO '$USER'@'%' WITH GRANT OPTION; CREATE DATABASE plcogwas; SET GLOBAL innodb_file_per_table=ON;\";"
 
 # Delete existing SWARM file if exists
 if [ -e $SWARM_FILE ] 

@@ -77,7 +77,7 @@ async function getDataDirectory(connection) {
 async function copyInnoDBTable(tableName, sourceDirectory, targetDirectory) {
     // select table files (including partitioned tables) which can be copied
     const filenames = (await fs.promises.readdir(sourceDirectory))
-        .filter(name => new RegExp(`${tableName}(#p#.*)?(\.ibd|\.cfg)$`).test(name));
+        .filter(name => new RegExp(`${tableName}(#[p|P]#.*)?(\.ibd|\.cfg)$`).test(name));
 
     for (let filename of filenames) {
         await fs.promises.copyFile(
