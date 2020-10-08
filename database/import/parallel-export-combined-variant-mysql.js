@@ -311,7 +311,7 @@ async function exportVariants({
                         SELECT 
                             p.chromosome,
                             p.position,
-                            p.snp,
+                            IF(p.snp like 'rs%', SUBSTRING_INDEX(p.snp, ':', 1), SUBSTRING_INDEX(p.snp, ':', 2)) as snp,
                             p.allele_reference,
                             p.allele_alternate,
                             p.${ancestry}_allele_frequency,
