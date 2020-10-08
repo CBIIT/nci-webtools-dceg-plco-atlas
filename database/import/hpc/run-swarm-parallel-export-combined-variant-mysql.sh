@@ -74,8 +74,11 @@ EXPORT_SCRIPT="../parallel-export-combined-variant-mysql.js"
 # Append requirements
 DEPENDENCIES="module load mysql/5.7.22 nodejs;"
 
+# Inject custom MySQL my.cnf
+MYSQL_CONFIG="envsubst < mysql-lscratch.config > my.cnf; rm $TMP_DIR/my.cnf; cp ./my.cnf $TMP_DIR/;"
+
 # Start local mysql instance in compute node
-START_MYSQL="local_mysql --basedir $TMP_DIR create; local_mysql --basedir $TMP_DIR start; mysql -u root -p$PASSWORD --socket=$TMP_DIR/mysql.sock --execute=\"CREATE USER '$USER'@'localhost' IDENTIFIED BY '$PASSWORD'; GRANT ALL PRIVILEGES ON *.* TO '$USER'@'localhost' WITH GRANT OPTION; CREATE USER '$USER'@'%' IDENTIFIED BY '$PASSWORD';GRANT ALL PRIVILEGES ON *.* TO '$USER'@'%' WITH GRANT OPTION; CREATE DATABASE plcogwas; SET GLOBAL innodb_file_per_table=ON;\";"
+START_MYSQL="local_mysql --basedir $TMP_DIR create; $MYSQL_CONFIG local_mysql --basedir $TMP_DIR start; mysql -u root -p$PASSWORD --socket=$TMP_DIR/mysql.sock --execute=\"CREATE USER '$USER'@'localhost' IDENTIFIED BY '$PASSWORD'; GRANT ALL PRIVILEGES ON *.* TO '$USER'@'localhost' WITH GRANT OPTION; CREATE USER '$USER'@'%' IDENTIFIED BY '$PASSWORD';GRANT ALL PRIVILEGES ON *.* TO '$USER'@'%' WITH GRANT OPTION; CREATE DATABASE plcogwas; SET GLOBAL innodb_file_per_table=ON;\";"
 
 # Delete existing SWARM file if exists
 if [ -e $SWARM_FILE ] 
@@ -116,4 +119,4 @@ done
 # -g <#> = number of gb for each process subjob
 # --verbose <0-6> = choose verbose level, 6 being the most chatty
 # --gres=lscratch:<#> = number of gb of tmp space for each process subjob
-swarm -f $SWARM_FILE -t 4 -g 16 --verbose 3 --gres=lscratch:300 --merge-output --logdir $LOG_PATH
+swarm -f $SWARM_FILE -t 4 -g 24 --verbose 3 --gres=lscratch:300 --merge-output --logdir $LOG_PATH
