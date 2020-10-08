@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { Overlay, OverlayTrigger, Tooltip } from 'react-bootstrap'
 import {
   updateKey,
   updateSummaryTable,
@@ -18,6 +19,7 @@ import {
 } from '../../../controls/table/table';
 import paginationFactory from 'react-bootstrap-table2-paginator';
 import { asTitleCase } from './utils';
+import { asQueryString, query } from '../../../../services/query';
 
 export function SummaryResultsTable() {
   const dispatch = useDispatch();
@@ -35,6 +37,12 @@ export function SummaryResultsTable() {
   } = useSelector(state => state.summaryResults);
   const selectedTable = useSelector(state => state.summaryTables.selectedTable);
   const setSelectedTable = selectedTable => dispatch(updateSummaryTable('selectedTable', selectedTable));
+  const [exportRowLimit, setExportRowLimit] = useState(1e5);
+
+  useEffect(() => {
+    query('config', { key: 'exportRowLimit' })
+      .then(({ exportRowLimit }) => setExportRowLimit(exportRowLimit))
+  })
 
   const defaultSorted = [{
     dataField: 'p_value',
@@ -59,9 +67,9 @@ export function SummaryResultsTable() {
       dataField: 'snp',
       text: 'SNP',
       sort: true,
-      formatter: cell => !/^rs\d+:/.test(cell) ? 
-        (!/^chr[\d+|x|X|y|Y]:\d+/.test(cell) ? cell : 
-        cell.split(':')[0] + ':' + cell.split(':')[1]) : 
+      formatter: cell => !/^rs\d+:/.test(cell) ?
+        (!/^chr[\d+|x|X|y|Y]:\d+/.test(cell) ? cell :
+          cell.split(':')[0] + ':' + cell.split(':')[1]) :
         <a href={`https://www.ncbi.nlm.nih.gov/snp/${cell.split(':')[0]}`} target="_blank">{cell.split(':')[0]}</a>,
       headerStyle: { width: '180px' },
     },
@@ -120,7 +128,7 @@ export function SummaryResultsTable() {
 
   const updateSummaryTableData = (key, params) => {
     const phenotype = selectedPhenotypes[key] || selectedPhenotypes[0];
-    const {ancestry, sex} = selectedStratifications[key] || selectedStratifications[0];
+    const { ancestry, sex } = selectedStratifications[key] || selectedStratifications[0];
     if (!phenotype || !phenotype.value) return;
     // console.log({ order, orderBy, limit, page, bpMin, bpMax });
     let hasRangeFilter = Boolean(nlogpMin && nlogpMax && bpMin && bpMax);
@@ -173,7 +181,7 @@ export function SummaryResultsTable() {
       cachedTable.offset != paginationParams.offset ||
       cachedTable.limit != paginationParams.limit ||
       cachedTable.orderBy != paginationParams.orderBy ||
-      cachedTable.order != paginationParams.order || 
+      cachedTable.order != paginationParams.order ||
       cachedTable.chromosome != selectedChromosome
     ) {
       updateSummaryTableData(key, paginationParams);
@@ -211,6 +219,34 @@ export function SummaryResultsTable() {
     );
   };
 
+  const getExportLink = () => {
+    if (!selectedStratifications.length || !selectedPhenotypes.length)
+      return null;
+
+    const phenotype = isPairwise && selectedPhenotypes[1]
+      ? selectedPhenotypes[selectedTable]
+      : selectedPhenotypes[0];
+
+    const { sex, ancestry } = isPairwise
+      ? selectedStratifications[selectedTable]
+      : selectedStratifications[0]
+
+    const exportParams = {
+      phenotype_id: phenotype.id,
+      sex,
+      ancestry,
+      chromosome: selectedChromosome,
+      orderBy: 'p_value',
+      order: 'asc',
+      p_value_nlog_min: nlogpMin,
+      p_value_nlog_max: nlogpMax,
+      position_min: bpMin,
+      position_max: bpMax,
+    }
+
+    return `${process.env.REACT_APP_API_ROOT}/export-variants${asQueryString(exportParams)}`;
+  }
+
   const getVariantTableProps = (key) => ({
     remote: true,
     keyField: 'id',
@@ -233,6 +269,7 @@ export function SummaryResultsTable() {
   });
 
   const showPhenotypeNames = isPairwise && selectedPhenotypes.length == 2;
+  const aboveExportLimit = summaryTables.tables[selectedTable].resultsCount > exportRowLimit;
 
   return (
     <div className="mt-3">
@@ -240,19 +277,35 @@ export function SummaryResultsTable() {
       <div key="controls" className="d-flex align-items-center justify-content-between">
         <div className="d-flex align-items-center">
           {isPairwise && <div className="btn-group" role="group">
-              {selectedStratifications.map((s, i) => 
-                <button
-                  key={`select-table-${i}`}
-                  className={`btn btn-sm ${selectedTable == i ? 'btn-primary btn-primary-gradient active' : 'btn-silver'}`}
-                  onClick={e => setSelectedTable(i)}>
-                    {[
-                      showPhenotypeNames && selectedPhenotypes[i].display_name,
-                      asTitleCase(s.ancestry),
-                      asTitleCase(s.sex),
-                    ].filter(Boolean).join(' - ')}
-                </button>
-              )}
-            </div>}
+            {selectedStratifications.map((s, i) =>
+              <button
+                key={`select-table-${i}`}
+                className={`btn btn-sm ${selectedTable == i ? 'btn-primary btn-primary-gradient active' : 'btn-silver'}`}
+                onClick={e => setSelectedTable(i)}>
+                {[
+                  showPhenotypeNames && selectedPhenotypes[i].display_name,
+                  asTitleCase(s.ancestry),
+                  asTitleCase(s.sex),
+                ].filter(Boolean).join(' - ')}
+              </button>
+            )}
+          </div>}
+
+
+          <OverlayTrigger
+            overlay={!aboveExportLimit ? <span /> : <Tooltip id="submit-summary-results">
+              Please select under {exportRowLimit} rows to export variants.
+            </Tooltip>}>
+            <span>
+              <a
+                disabled={aboveExportLimit}
+                // target="_blank"
+                className="btn btn-sm btn-silver flex-shrink-auto mx-2"
+                href={getExportLink()}>
+                Export
+                </a>
+            </span>
+          </OverlayTrigger>
         </div>
 
         <div key="snpSearch" className="d-flex mb-2">
@@ -279,15 +332,15 @@ export function SummaryResultsTable() {
       </div>
 
       {/* Do not filter beforehand, as that resets indexes  */}
-      {selectedStratifications.map((s, i) => 
-          selectedTable === i && (!summarySnpTables.visible
-            ? <Table key={`variant-table-${i}`} {...getVariantTableProps(i)} />
-            : <Table
-                key={`snp-table-${i}`}
-                keyField="variant_id"
-                data={summarySnpTables.tables[i].results}
-                columns={columns} />
-          )
+      {selectedStratifications.map((s, i) =>
+        selectedTable === i && (!summarySnpTables.visible
+          ? <Table key={`variant-table-${i}`} {...getVariantTableProps(i)} />
+          : <Table
+            key={`snp-table-${i}`}
+            keyField="variant_id"
+            data={summarySnpTables.tables[i].results}
+            columns={columns} />
+        )
       )}
     </div>
   );

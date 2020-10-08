@@ -15,6 +15,7 @@ const {
   getConnection,
   getSummary,
   getVariants,
+  exportVariants,
   getPoints,
   getMetadata,
   getGenes,
@@ -92,6 +93,7 @@ app.addHook("onSend", (req, res, payload, done) => {
     '/ping',
     '/summary',
     '/variants',
+    '/export-variants',
     '/metadata',
     '/genes',
     '/phenotypes',
@@ -129,6 +131,13 @@ app.get("/summary", async ({ query }, res) => {
 // retrieves all variants within the specified range
 app.get("/variants", async ({ query }, res) => {
   return getVariants(connection, query);
+});
+
+// retrieves all variants within the specified range
+app.get("/export-variants", async ({ query }, res) => {
+  const { filename, contents } = await exportVariants(connection, query);
+  res.header("Content-Disposition", `attachment; filename="${filename}"`);
+  return contents;
 });
 
 // note: this is faster than /variants since only a subset of variants are stored as points
@@ -178,6 +187,18 @@ app.post("/share-link", async ({ body }, res) => {
 app.get("/config", async ({ query }, res) => {
   return getConfig(query.key);
 });
+
+if (isApi) {
+  // retrieves phenotypes
+  app.get("/api/phenotypes", async ({ query }, res) => {
+    return getPhenotypes(connection, query);
+  });
+
+  // retrieves all variants within the specified range
+  app.get("/api/variants", async ({ query }, res) => {
+    return getVariants(connection, query);
+  });
+}
 
 app
   .listen(port, "0.0.0.0")

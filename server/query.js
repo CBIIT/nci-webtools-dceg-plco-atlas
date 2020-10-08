@@ -1,7 +1,7 @@
 const mysql = require('mysql2');
 const config = require('./config.json');
 const logger = require('./logger');
-const {database} = config;
+const {database, exportRowLimit} = config;
 
 function getConnection() {
     return mysql.createPool({
@@ -314,7 +314,7 @@ async function getVariants(connection, params) {
         // add phenotype_id column if needed
         let queryColumns = columns;
         if (!params.columns || params.columns.includes('phenotype_id'))
-            queryColumns = [...columns, `${t.phenotype_id} as phenotype_id`]
+            queryColumns = [`${t.phenotype_id} as phenotype_id`, ...columns]
     
         // generate select statement for current table
         return `SELECT ${queryColumns.join(',')} FROM ${t.table_name} 
@@ -352,6 +352,44 @@ async function getVariants(connection, params) {
     }
 
     return results;
+}
+
+async function exportVariants(connection, params) {
+    let rowLimit = exportRowLimit || 1e5;
+
+    const phenotypeIds = params.phenotype_id.split(',');
+    const phenotypeIdPlaceholders = getPlaceholders(phenotypeIds.length);
+
+    console.log(params, phenotypeIds,phenotypeIdPlaceholders );
+
+    const [phenotypes] = await connection.query(
+        `SELECT id, name FROM phenotype 
+        WHERE id IN (${phenotypeIdPlaceholders})`,
+        phenotypeIds
+    );
+
+    if (!phenotypes.length)
+        throw('Valid phenotype ids must be provided');
+
+    const { data, columns } = await getVariants(connection, {
+        ...params, 
+        raw: true,
+        limit: Math.min(params.limit, rowLimit)
+    });
+    const rows = [columns].concat(data);
+
+    return {
+        filename: [
+            'plco',
+            phenotypes.map(p => p.name).join('_'),
+            params.ancestry,
+            params.sex,
+            params.p_value_min && params.p_value_max && `p_value_${params.p_value_min}_${params.p_value_max}`,
+            params.p_value_nlog_min && params.p_value_nlog_max && `p_value_${10 ** -params.p_value_nlog_min}_${10 ** -params.p_value_nlog_max}`,
+            params.position_min && params.position_max && `mb_range_${params.position_min / 1e6}_${params.position_max / 1e6}`,
+        ].filter(Boolean).join('_') + '.csv',
+        contents: rows.map(r => r.join()).join('\r\n'),
+    }
 }
 
 async function getPoints(connection, { phenotype_id, sex, ancestry, raw }) {
@@ -938,7 +976,7 @@ async function getRanges(connection) {
  * @returns {any} The specified key and its value
  */
 function getConfig(key) {
-    const allowedKeys = ['downloadRoot'];
+    const allowedKeys = ['downloadRoot', 'exportRowLimit'];
     return allowedKeys.includes(key)
         ? {[key]: config[key]}
         : null;
@@ -1007,5 +1045,6 @@ module.exports = {
     getGenes,
     getConfig,
     getShareLink,
-    setShareLink
+    setShareLink,
+    exportVariants,
 };
