@@ -66,7 +66,7 @@ mkdir ./swarm_out_$CURRENT_DATE
 LOG_PATH="./swarm_out_$CURRENT_DATE/"
 
 # Temporary lscatch space directory path
-TMP_DIR="/lscratch/\$SLURM_JOB_ID"
+TMP_DIR="/lscratch/\$SLURM_JOB_ID/mysql/"
 
 # Export script path
 EXPORT_SCRIPT="../parallel-export-combined-variant-mysql.js"
