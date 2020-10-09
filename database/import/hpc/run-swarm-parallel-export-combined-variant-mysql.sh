@@ -72,7 +72,7 @@ TMP_DIR="/lscratch/\$SLURM_JOB_ID/mysql/"
 EXPORT_SCRIPT="../parallel-export-combined-variant-mysql.js"
 
 # Inject custom MySQL my.cnf and start local mysql instance in compute node and 
-START_MYSQL="echo 'Starting export script...' && local_mysql create && echo 'Created MySQL instance...' && envsubst < mysql-lscratch.config > my.cnf && echo 'Injected variables to my.cnf...' && rm $TMP_DIR/my.cnf && cp ./my.cnf $TMP_DIR/ && echo 'Placed custom my.cnf...' &&  local_mysql start && echo 'Started MySQL instance...' && mysql -u root -p$PASSWORD --socket=$TMP_DIR/mysql.sock --execute=\"CREATE USER '$USER'@'localhost' IDENTIFIED BY '$PASSWORD'; GRANT ALL PRIVILEGES ON *.* TO '$USER'@'localhost' WITH GRANT OPTION; CREATE USER '$USER'@'%' IDENTIFIED BY '$PASSWORD';GRANT ALL PRIVILEGES ON *.* TO '$USER'@'%' WITH GRANT OPTION; CREATE DATABASE plcogwas;\" && echo 'Created MySQL user...' &&"
+START_MYSQL="echo 'Starting export script...' ; local_mysql create ; echo 'Created MySQL instance...' ; envsubst < mysql-lscratch.config > my.cnf ; echo 'Injected variables to my.cnf...' ; rm $TMP_DIR/my.cnf ; cp ./my.cnf $TMP_DIR/ ; echo 'Placed custom my.cnf...' ;  local_mysql start ; echo 'Started MySQL instance...' ; mysql -u root -p$PASSWORD --socket=$TMP_DIR/mysql.sock --execute=\"CREATE USER '$USER'@'localhost' IDENTIFIED BY '$PASSWORD'; GRANT ALL PRIVILEGES ON *.* TO '$USER'@'localhost' WITH GRANT OPTION; CREATE USER '$USER'@'%' IDENTIFIED BY '$PASSWORD';GRANT ALL PRIVILEGES ON *.* TO '$USER'@'%' WITH GRANT OPTION; CREATE DATABASE plcogwas;\" ; echo 'Created MySQL user...' ; "
 
 # Delete existing SWARM file if exists
 if [ -e $SWARM_FILE ] 
@@ -113,4 +113,4 @@ done
 # -g <#> = number of gb for each process subjob
 # --verbose <0-6> = choose verbose level, 6 being the most chatty
 # --gres=lscratch:<#> = number of gb of tmp space for each process subjob
-swarm -f $SWARM_FILE -t 4 -g 32 --time 48:00:00 --verbose 3 --gres=lscratch:300 --logdir $LOG_PATH --module mysql/5.7.22,nodejs
+swarm -f $SWARM_FILE -t 4 -g 32 --time 48:00:00 --verbose 6 --gres=lscratch:300 --logdir $LOG_PATH --module mysql/5.7.22,nodejs --usecsh
