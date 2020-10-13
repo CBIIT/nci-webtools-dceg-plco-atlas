@@ -26,7 +26,7 @@ let {folder: folderPath, host, port, db_name, user, password, logdir: logFolder}
 
 host = host || 'localhost';
 port = port || 3306;
-db_name = db_name || 'plcogwas';
+let database = db_name || 'plcogwas';
 
 const logger = getLogger(path.resolve(logFolder || __dirname, 'import.log'), 'import');
 const connection = mysql.createConnection({
