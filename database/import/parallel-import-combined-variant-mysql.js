@@ -22,7 +22,7 @@ if (!args.folder) {
 }
 
 // parse arguments and set defaults
-let {folder: folderPath, host, port, db_name: database, user, password, logdir: logFolder} = args;
+let {folder: folderPath, host, port, db_name, user, password, logdir: logFolder} = args;
 
 host = host || 'localhost';
 port = port || 3306;
