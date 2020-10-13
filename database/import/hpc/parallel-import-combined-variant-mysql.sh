@@ -17,20 +17,8 @@ echo
 
 echo "LOGGING INTO MYSQL WITH DB_USER=$USER, DB_PASS=$PASSWORD, HOST=$SLURM_NODELIST, PORT=55555..."
 echo "DROPPING EXISTING STAGE TABLES..."
-time mysql -u $DB_USER -p$DB_PASS --host=$SLURM_NODELIST --port=55555 plcogwas --execute="SET GLOBAL innodb_file_per_table=ON; SELECT @@innodb_file_per_table; SELECT @@key_buffer_size; DROP TABLE participant_data_stage; DROP TABLE participant_data_category_stage;"
+time mysql -u $USER -p$PASSWORD --host=$SLURM_NODELIST --port=55555 plcogwas --execute="SET GLOBAL innodb_file_per_table=ON; SELECT @@innodb_file_per_table; SELECT @@key_buffer_size; DROP TABLE participant_data_stage; DROP TABLE participant_data_category_stage;"
 echo
-
-if (!args.folder) {
-    console.log(`USAGE: node parallel-import-combined-variant-mysql.js 
-            --folder "path to folder"
-            --host "MySQL hostname [OPTIONAL, localhost by default]" 
-            --port "MySQL port [OPTIONAL, 3306 by default]" 
-            --db_name "MySQL database name [OPTIONAL, plcogwas by default]" 
-            --user "MySQL username" 
-            --password "MySQL password"
-            --logdir "./" [REQUIRED]`);
-    process.exit(0);
-}
 
 echo "STARTING SCRIPT ..."
 time node ../parallel-import-combined-variant-mysql.js --folder $INPUT_DIR --port 55555 --user $USER --password $PASSWORD --logdir $LOG_PATH
