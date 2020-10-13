@@ -15,7 +15,7 @@ const args = require('minimist')(process.argv.slice(2));
 let {host, port, db_name: databaseName, user, password, file, phenotype_file: phenotypeFile, phenotype, validate, output, logdir, tmp } = args;
 
 if (!file || !output || !logdir) {
-    console.log(`USAGE: node export-variants.js 
+    console.log(`USAGE: node parallel-export-combined-variant-mysql.js 
         --host "MySQL hostname [OPTIONAL, localhost by default]" 
         --port "MySQL port [OPTIONAL, 3306 by default]" 
         --db_name "MySQL database name [OPTIONAL, plcogwas by default]" 

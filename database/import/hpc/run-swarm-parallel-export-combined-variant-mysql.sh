@@ -76,7 +76,7 @@ EXPORT_SCRIPT="../parallel-export-combined-variant-mysql.js"
 CONFIG_MYSQL="echo '\n[mysqld]\ndefault_storage_engine = InnoDB\ndefault_tmp_storage_engine = InnoDB\ninnodb_buffer_pool_size = 8G\ninnodb_file_per_table = ON' >> $TMP_DIR/my.cnf"
 
 # Inject custom MySQL my.cnf and start local mysql instance in compute node and 
-START_MYSQL="echo 'Starting export script...' ; local_mysql create ; echo 'Created MySQL instance...' ; $CONFIG_MYSQL ;  local_mysql start ; echo 'Started MySQL instance...' ; mysql -u root -p$PASSWORD --socket=$TMP_DIR/mysql.sock --execute=\"CREATE USER '$USER'@'localhost' IDENTIFIED BY '$PASSWORD'; GRANT ALL PRIVILEGES ON *.* TO '$USER'@'localhost' WITH GRANT OPTION; CREATE USER '$USER'@'%' IDENTIFIED BY '$PASSWORD';GRANT ALL PRIVILEGES ON *.* TO '$USER'@'%' WITH GRANT OPTION; CREATE DATABASE plcogwas;\" ; echo 'Created MySQL user...'"
+START_MYSQL="echo 'Starting export script...' ; local_mysql create ; echo 'Created MySQL instance...' ; $CONFIG_MYSQL ; echo 'Injected MySQL configurations...' ;  local_mysql start ; echo 'Started MySQL instance...' ; mysql -u root -p$PASSWORD --socket=$TMP_DIR/mysql.sock --execute=\"CREATE USER '$USER'@'localhost' IDENTIFIED BY '$PASSWORD'; GRANT ALL PRIVILEGES ON *.* TO '$USER'@'localhost' WITH GRANT OPTION; CREATE USER '$USER'@'%' IDENTIFIED BY '$PASSWORD';GRANT ALL PRIVILEGES ON *.* TO '$USER'@'%' WITH GRANT OPTION; CREATE DATABASE plcogwas;\" ; echo 'Created MySQL user...'"
 
 # Delete existing SWARM file if exists
 if [ -e $SWARM_FILE ] 

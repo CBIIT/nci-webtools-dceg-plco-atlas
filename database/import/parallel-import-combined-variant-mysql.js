@@ -10,11 +10,11 @@ const { dirname } = require('path');
 
 // display help if needed
 if (!args.folder) {
-    console.log(`USAGE: node parallel-import-variant.js
+    console.log(`USAGE: node parallel-import-combined-variant-mysql.js 
             --folder "path to folder"
-            --host "MySQL hostname" 
-            --port "MySQL port" 
-            --db_name "MySQL database name" 
+            --host "MySQL hostname [OPTIONAL, localhost by default]" 
+            --port "MySQL port [OPTIONAL, 3306 by default]" 
+            --db_name "MySQL database name [OPTIONAL, plcogwas by default]" 
             --user "MySQL username" 
             --password "MySQL password"
             --logdir "./" [REQUIRED]`);
@@ -22,7 +22,12 @@ if (!args.folder) {
 }
 
 // parse arguments and set defaults
-const {folder: folderPath, host, port, db_name: database, user, password, logdir: logFolder} = args;
+let {folder: folderPath, host, port, db_name: database, user, password, logdir: logFolder} = args;
+
+host = host || 'localhost';
+port = port || 3306;
+databaseName = databaseName || 'plcogwas';
+
 const logger = getLogger(path.resolve(logFolder || __dirname, 'import.log'), 'import');
 const connection = mysql.createConnection({
     host,

@@ -7,7 +7,7 @@
 /database/import/hpc/nohup*
 /database/import/hpc/my.cnf
 /database/import/hpc/export-all-phenotypes.swarm
-/database/import/hpc/gnu-parallel-import-*.txt
+/database/import/old/gnu-parallel-import-*.txt
 /server/logs/
 /server/data/
 /www/
