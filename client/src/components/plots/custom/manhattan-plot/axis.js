@@ -1,4 +1,4 @@
-import { renderText, measureWidth } from '../text.js';
+import { renderText, measureWidth, scaleTextDefs } from '../text.js';
 import { interpolateTicks } from './scale.js';
 import * as clone from 'lodash.clonedeep';
 
@@ -12,13 +12,13 @@ export function axisLeft(config, ctx) {
   if (config.yAxis2) yScale2 = config.yAxis2.scale;
 
   let axisWidth = config.xAxis.width || 1;
-  let title = config.yAxis.title || 'Y Axis';
+  let title = scaleTextDefs(config.yAxis.title || 'Y Axis', config.scaleSize || 1);
   let ticks = config.yAxis.ticks;
   let interpolatedTicks = interpolateTicks(ticks);
   let labelsBetweenTicks = config.yAxis.labelsBetweenTicks;
   let tickFormat = config.yAxis.tickFormat;
-  let tickLength = 10;
-  let labelPadding = 15;
+  let tickLength = 10 * Math.ceil(config.scaleSize || 1);
+  let labelPadding = 20 * Math.ceil(config.scaleSize || 1);
   let maxLabelWidth = 0;
 
   ctx.save();
@@ -30,7 +30,7 @@ export function axisLeft(config, ctx) {
   ctx.fillRect(
     xScale(xMin),
     yScale(yMin),
-    axisWidth,
+    axisWidth * Math.ceil(config.scaleSize || 1),
     yScale(yMax) - yScale(yMin)
   );
 
@@ -43,12 +43,23 @@ export function axisLeft(config, ctx) {
     const yInterpolated = yScale(interpolatedTicks[i]);
 
     ctx.globalAlpha = 0.5;
-    ctx.fillRect(0, y, -tickLength, 1);
+    ctx.fillRect(0, y, -tickLength, 1 * Math.ceil(config.scaleSize || 1));
 
     ctx.globalAlpha = 1;
     let label = tickFormat ? tickFormat(tick, i) : tick;
     let labelOffset = labelsBetweenTicks ? yInterpolated : y;
-    ctx.fillText(label, -tickLength - 2, labelOffset + 1);
+
+    label = scaleTextDefs(label, config.scaleSize || 1, {
+      textAlign: 'right',
+      textBaseline: 'middle',
+    });
+
+    ctx.save();
+    ctx.translate(-tickLength - 2, labelOffset + 1)
+    renderText(ctx, label);
+    ctx.restore();
+
+    // ctx.fillText(label, -tickLength - 2, labelOffset + 1);
 
     // update maximum tick label width (for determining title offset)
     maxLabelWidth = Math.max(maxLabelWidth, measureWidth(ctx, label));
@@ -56,10 +67,12 @@ export function axisLeft(config, ctx) {
 
   if (yScale2) {
     // draw axis line
+    ctx.globalAlpha = 0.5;
+
     ctx.fillRect(
       xScale(xMin),
       yScale2(yMin),
-      axisWidth,
+      axisWidth * Math.ceil(config.scaleSize || 1),
       yScale2(yMax) - yScale2(yMin)
     );
 
@@ -68,12 +81,23 @@ export function axisLeft(config, ctx) {
       const y = yScale2(tick);
 
       ctx.globalAlpha = 0.5;
-      ctx.fillRect(0, y, -tickLength, 1);
+      ctx.fillRect(0, y, -tickLength, 1 * Math.ceil(config.scaleSize || 1));
 
       ctx.globalAlpha = 1;
       let label = tickFormat ? tickFormat(tick, i) : tick;
       let labelOffset = y;
-      ctx.fillText(label, -tickLength - 2, labelOffset + 1);
+
+      label = scaleTextDefs(label, config.scaleSize || 1, {
+        textAlign: 'right',
+        textBaseline: 'middle',
+      });
+
+      ctx.save();
+      ctx.translate(-tickLength - 2, labelOffset + 1)
+      renderText(ctx, label);
+      ctx.restore();
+
+      // ctx.fillText(label, -tickLength - 2, labelOffset + 1);
 
       // update maximum tick label width (for determining title offset)
       maxLabelWidth = Math.max(maxLabelWidth, measureWidth(ctx, label));
@@ -81,7 +105,7 @@ export function axisLeft(config, ctx) {
   }
 
   if (config.mirrored) {
-    if (config.yAxis.title) {
+    if (title) {
       ctx.save();
       ctx.translate(0, yScale2(yMin) / 2);
       let titleWidth = measureWidth(ctx, title);
@@ -89,30 +113,34 @@ export function axisLeft(config, ctx) {
       ctx.rotate(Math.PI / -2);
       ctx.translate(
         midpoint - titleWidth / 2,
-        -(tickLength + labelPadding + maxLabelWidth)
+        -(tickLength + labelPadding + maxLabelWidth) * (config.scaleSize || 1)
       );
       ctx.textAlign = 'center';
-      renderText(ctx, config.yAxis.title);
-
+      renderText(ctx, title);
       ctx.restore();
     }
 
     if (config.yAxis.secondaryTitle) {
+      let secondaryTitle = scaleTextDefs(config.yAxis.secondaryTitle, config.scaleSize || 1, {
+        textAlign: 'center'
+      });
       ctx.save();
       let titleWidth = measureWidth(ctx, title);
       let midpoint = (yScale(yMax) - yScale(yMin)) / 2;
       ctx.rotate(Math.PI / -2);
       ctx.translate(
         midpoint - titleWidth / 2,
-        -(tickLength + labelPadding + maxLabelWidth)
+        -(tickLength + labelPadding + maxLabelWidth) * (config.scaleSize || 1)
       );
       ctx.textAlign = 'center';
-      renderText(ctx, config.yAxis.secondaryTitle);
-
+      renderText(ctx, secondaryTitle);
       ctx.restore();
     }
 
     if (config.yAxis2.secondaryTitle) {
+      let secondaryTitle = scaleTextDefs(config.yAxis2.secondaryTitle, config.scaleSize || 1, {
+        textAlign: 'center'
+      });
       ctx.save();
       ctx.translate(0, yScale2(yMin));
       let titleWidth = measureWidth(ctx, title);
@@ -120,10 +148,10 @@ export function axisLeft(config, ctx) {
       ctx.rotate(Math.PI / -2);
       ctx.translate(
         midpoint - titleWidth / 2,
-        -(tickLength + labelPadding + maxLabelWidth)
+        -(tickLength + labelPadding + maxLabelWidth) * (config.scaleSize || 1)
       );
       ctx.textAlign = 'center';
-      renderText(ctx, config.yAxis2.secondaryTitle);
+      renderText(ctx, secondaryTitle);
       ctx.restore();
     }
   } else {
@@ -133,7 +161,7 @@ export function axisLeft(config, ctx) {
     ctx.rotate(Math.PI / -2);
     ctx.translate(
       midpoint - titleWidth / 2,
-      -(tickLength + labelPadding + maxLabelWidth)
+      -(tickLength + maxLabelWidth + labelPadding)
     );
     ctx.textAlign = 'center';
     renderText(ctx, title);
@@ -158,14 +186,14 @@ export function axisBottom(config, ctx) {
     yScale = config.yAxis2.scale;
   }
 
-  let axisWidth = config.yAxis.width || 1;
+  let axisWidth = (config.yAxis.width || 1) *  Math.ceil(config.scaleSize || 1);
   let title = config.xAxis.title;
   let ticks = config.xAxis.ticks;
   let interpolatedTicks = interpolateTicks(ticks);
   let labelsBetweenTicks = config.xAxis.labelsBetweenTicks;
   let tickFormat = config.xAxis.tickFormat;
-  let tickPadding = 10;
-  let tickLength = 10;
+  let tickPadding = 10 * Math.ceil(config.scaleSize || 1);
+  let tickLength = 10 * Math.ceil(config.scaleSize || 1);
   let labelPadding = 20;
 
   ctx.save();
@@ -190,13 +218,25 @@ export function axisBottom(config, ctx) {
     const xInterpolated = xScale(interpolatedTicks[i]);
 
     ctx.globalAlpha = 0.5;
-    ctx.fillRect(x, 0, 1, tickLength);
+    ctx.fillRect(x, 0, axisWidth, tickLength);
 
     ctx.globalAlpha = 1;
     ctx.textAlign = 'center';
     let label = tickFormat ? tickFormat(tick, i) : tick;
     let labelOffset = labelsBetweenTicks ? xInterpolated : x;
-    ctx.fillText(label, labelOffset, tickLength + tickPadding);
+    let showLabel = !isNaN(label) || typeof label === 'string';
+
+    label = scaleTextDefs(label, config.scaleSize || 1, {
+      textAlign: 'center',
+    });
+
+    ctx.save();
+    ctx.translate(labelOffset, tickLength + tickPadding);
+    showLabel && renderText(ctx, label);
+    ctx.restore();
+
+
+    // ctx.fillText(label, labelOffset, tickLength + tickPadding);
   }
 
   // draw axis title

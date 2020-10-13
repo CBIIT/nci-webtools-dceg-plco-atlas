@@ -19,7 +19,7 @@ export function drawPoints(config, ctx, hiddenCtx) {
   hiddenCtx.translate(margins.left, margins.top);
 
   // draw points on canvas and backing canvas
-  const pointSize = config.point.size;
+  const pointSize = config.point.size * (config.scaleSize || 1);
   const pointColor = config.point.color;
   const interactivePointSize = config.point.interactiveSize || pointSize;
   ctx.globalAlpha = config.point.opacity;
@@ -53,7 +53,7 @@ export function drawPoints(config, ctx, hiddenCtx) {
     const yKey2 = config.yAxis2.key;
     const xScale2 = config.xAxis2.scale;
     const yScale2 = config.yAxis2.scale;
-    const pointSize = config.point2.size;
+    const pointSize = config.point2.size * (config.scaleSize || 1);
     const pointColor = config.point2.color;
 
     for (let j = 0; j < data2.length; j++) {
@@ -105,7 +105,7 @@ export function drawMirroredPoints(config, ctx, hiddenCtx) {
   hiddenCtx.translate(margins.left, margins.top);
 
   // draw points on canvas and backing canvas
-  const pointSize = config.point.size;
+  const pointSize = config.point.size * (config.scaleSize || 1);
   const pointColor = config.point.color;
   const interactivePointSize = config.point.interactiveSize || pointSize;
   ctx.globalAlpha = config.point.opacity;
