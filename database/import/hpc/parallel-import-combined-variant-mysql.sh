@@ -12,7 +12,7 @@ module load mysql/5.7.22 nodejs
 echo
 
 echo "STARTING MYSQL DATABASE FROM BASE DIR $BASE_DIR..."
-time local_mysql --basedir $BASE_DIR start
+time local_mysql --basedir $BASE_DIR start --force
 echo
 
 echo "LOGGING INTO MYSQL WITH DB_USER=$USER, DB_PASS=$PASSWORD, HOST=$SLURM_NODELIST, PORT=55555..."
