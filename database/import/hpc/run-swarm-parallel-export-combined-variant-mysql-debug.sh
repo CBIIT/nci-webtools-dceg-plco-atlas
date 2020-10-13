@@ -25,7 +25,7 @@ LOG_PATH="./DEBUG_swarm_out_$CURRENT_DATE/"
 START_MYSQL="echo 'Starting export script...' ; local_mysql create ; echo 'Created MySQL instance...' ; local_mysql start ; echo 'Started MySQL instance...'"
 
 # Stop MySQL instance
-STOP_MYSQL="local_mysql start ; echo 'Stopped MySQL instance...'"
+STOP_MYSQL="local_mysql stop ; echo 'Stopped MySQL instance...'"
 
 # Delete existing SWARM file if exists
 if [ -e $SWARM_FILE ] 
