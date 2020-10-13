@@ -16,7 +16,7 @@ import {
   removeEventListeners,
   getElementOffset,
 } from '../utils.js';
-import { measureWidth, renderText, systemFont } from '../text.js';
+import { measureWidth, renderText, scaleTextDefs, systemFont } from '../text.js';
 import { getScale, getTicks } from './scale.js';
 import { axisLeft, axisBottom } from './axis.js';
 import { drawPoints } from './points.js';
@@ -271,6 +271,7 @@ export class ManhattanPlot {
       ctx.fillRect(0, 0, width, height);
     })
 
+    this.setTitle(config.title);
     drawPoints(config, ctx, hiddenCtx);
     axisLeft(config, ctx);
     axisBottom(config, ctx);
@@ -283,7 +284,6 @@ export class ManhattanPlot {
       this.drawLine(line);
     }
 
-    this.setTitle(config.title);
     // console.log(config);
   }
 
@@ -313,16 +313,21 @@ export class ManhattanPlot {
     let ctx = this.ctx;
     config.title = title;
 
+    title = scaleTextDefs(title, config.scaleSize || 1,  {
+      textAlign: 'center',
+      textBaseline: 'top',
+      fillStyle: 'black'
+    });
+
 //    ctx.clearRect(0, 0, this.canvas.width, margins.top);
     withSavedContext(ctx, ctx => {
       ctx.fillStyle = this.defaultConfig.backgroundColor;
-      ctx.fillRect(0, 0, this.canvas.width, margins.top - 5);
+      ctx.fillRect(margins.left, 0, this.canvas.width, margins.top);
     })
-
 
     let midpoint = margins.left + width / 2;
     ctx.save();
-    ctx.translate(midpoint, 10);
+    ctx.translate(midpoint, 5 * (config.scaleSize || 1));
     renderText(ctx, title, {
       textAlign: 'center',
       textBaseline: 'top',
@@ -342,8 +347,15 @@ export class ManhattanPlot {
     let config = clone(this.config);
     config.manhattanPlotMaxHeight = height;
     config.height = height;
-    config.point.size = Math.floor(Math.log10(width * height) - 2);
+    // config.point.size = Math.floor(Math.log10(width * height) - 2);
     config.export = true;
+    config.scaleSize = Math.sqrt(width * height) / Math.sqrt(1000 * 1000);
+    config.margins = {
+      ...config.margins,
+      left: config.margins.left * config.scaleSize,
+      top: config.margins.top * config.scaleSize,
+      bottom: config.margins.bottom * config.scaleSize,
+    };
 
     setStyles(container, {
       width: `${width}px`,
@@ -400,8 +412,8 @@ export class ManhattanPlot {
     let getName = gene =>
       gene.strand === '+' ? `${gene.name} →` : `← ${gene.name}`;
 
-    let labelPadding = 5;
-    let labelHeight = 10;
+    let labelPadding = 5 * (config.scaleSize || 1);
+    let labelHeight = 10 * (config.scaleSize || 1);
     let labelConfig = {
       font: `${labelHeight}px ${systemFont}`,
       textAlign: 'center',
@@ -409,7 +421,7 @@ export class ManhattanPlot {
       fillStyle: 'black'
     };
 
-    let rowHeight = 40 + labelHeight + labelPadding;
+    let rowHeight = (40 * (config.scaleSize || 1)) + labelHeight + labelPadding;
 
     geneCtx.textAlign = 'center';
     geneCtx.textBaseline = 'top';
@@ -425,7 +437,7 @@ export class ManhattanPlot {
     let genePositions = genes.map(gene => {
       let originalName = gene.name;
       let name = getName(gene);
-      let padding = 5; // horiz. padding between name and gene
+      let padding = 5 * (config.scaleSize || 1); // horiz. padding between name and gene
 
       let geneStart = xAxis.scale(gene.transcription_start);
       let geneEnd = xAxis.scale(gene.transcription_end);
@@ -463,7 +475,7 @@ export class ManhattanPlot {
     let packedGeneRanges = packRanges(geneRanges);
     let currentBounds = this.config.zoomWindow.bounds;
     let numRows = packedGeneRanges.length;
-    let txColor = '#ddd';
+    let txColor = '#aaa';
     let exonColor = '#049372';
     let geneOverlayPositions = [];
     let padding = 10;
@@ -583,14 +595,14 @@ export class ManhattanPlot {
         //ctx.globalAlpha = 0.25;
         geneCtx.fillStyle = txColor;
         geneCtx.strokeStyle = txColor;
-        geneCtx.strokeWidth = 2;
+        geneCtx.strokeWidth = 2 * (config.scaleSize || 1);
         geneCtx.beginPath();
-        let lineY = 14.5;
+        let lineY = 14.5 * (config.scaleSize || 1);
         geneOverlayPositions.push({
           x1: Math.min(geneLabel.pxStart, start),
           x2: Math.max(geneLabel.pxEnd, start + width),
           y1: yOffset + exonOffsetY - labelHeight,
-          y2: yOffset + exonOffsetY + 30,
+          y2: yOffset + exonOffsetY + (30 * (config.scaleSize || 1)),
           gene: gene
         });
 
@@ -606,7 +618,7 @@ export class ManhattanPlot {
           let start = config.xAxis.scale(exon[0]);
           let end = config.xAxis.scale(exon[1]);
           let width = Math.ceil(Math.abs(end - start));
-          geneCtx.fillRect(start, exonOffsetY, width, 30);
+          geneCtx.fillRect(start, exonOffsetY, width, 30 * (config.scaleSize || 1));
         });
       }
 
@@ -678,7 +690,7 @@ export class ManhattanPlot {
       this.ctx.beginPath();
       this.ctx.globalAlpha = 0.6;
       this.ctx.strokeStyle = '#444';
-      this.ctx.lineWidth = 0.5;
+      this.ctx.lineWidth = 0.5 * (this.config.scaleSize || 1);
 
       if (style === 'dashed') this.ctx.setLineDash([6, 4]);
 
