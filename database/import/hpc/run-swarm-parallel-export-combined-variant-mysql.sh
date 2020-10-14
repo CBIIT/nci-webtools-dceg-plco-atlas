@@ -60,23 +60,28 @@ PHENOTYPE_FILE=$5
 
 CURRENT_DATE=$(date +%F)
 
-mkdir ./swarm_out_$CURRENT_DATE
+mkdir ./swarm_export_out_$CURRENT_DATE
 
 # Log path
-LOG_PATH="./swarm_out_$CURRENT_DATE/"
+LOG_PATH="./swarm_export_out_$CURRENT_DATE/"
 
 # Temporary lscatch space directory path
 TMP_DIR="/lscratch/\$SLURM_JOB_ID/mysql/"
+
+# Initialize MySQL port (incremented per job)
+PORT=55550
 
 # Export script path
 EXPORT_SCRIPT="../parallel-export-combined-variant-mysql.js"
 
 # Edit my.cnf
-# CONFIG_MYSQL="envsubst < mysql-lscratch.config > my.cnf ; echo 'Injected variables to my.cnf...' ; rm $TMP_DIR/my.cnf ; cp ./my.cnf $TMP_DIR/ ; echo 'Placed custom my.cnf...'"
-CONFIG_MYSQL="echo '\n[mysqld]\ndefault_storage_engine = InnoDB\ndefault_tmp_storage_engine = InnoDB\ninnodb_buffer_pool_size = 8G\ninnodb_file_per_table = ON' >> $TMP_DIR/my.cnf"
+CONFIG_MYSQL="echo 'Configuring MySQL instance...' ; echo '\n[mysqld]\ndefault_storage_engine = InnoDB\ndefault_tmp_storage_engine = InnoDB\ninnodb_buffer_pool_size = 8G\ninnodb_file_per_table = ON' >> $TMP_DIR/my.cnf ; echo 'Configured MySQL instance.'"
 
-# Inject custom MySQL my.cnf and start local mysql instance in compute node and 
-START_MYSQL="echo 'Starting export script...' ; local_mysql create ; echo 'Created MySQL instance...' ; $CONFIG_MYSQL ; echo 'Injected MySQL configurations...' ;  local_mysql start ; echo 'Started MySQL instance...' ; mysql -u root -p$PASSWORD --socket=$TMP_DIR/mysql.sock --execute=\"CREATE USER '$USER'@'localhost' IDENTIFIED BY '$PASSWORD'; GRANT ALL PRIVILEGES ON *.* TO '$USER'@'localhost' WITH GRANT OPTION; CREATE USER '$USER'@'%' IDENTIFIED BY '$PASSWORD';GRANT ALL PRIVILEGES ON *.* TO '$USER'@'%' WITH GRANT OPTION; CREATE DATABASE plcogwas;\" ; echo 'Created MySQL user...'"
+# Start local MySQL instance in compute node 
+START_MYSQL="echo 'Creating MySQL instance...' ; local_mysql create --port $PORT ; echo 'Created MySQL instance.' ; $CONFIG_MYSQL ; echo 'Starting MySQL instance...' ; local_mysql start --port $PORT ; echo 'Started MySQL instance.' ; echo 'Creating MySQL user...' ; mysql -u root -p$PASSWORD --socket=$TMP_DIR/mysql.sock --execute=\"CREATE USER '$USER'@'localhost' IDENTIFIED BY '$PASSWORD'; GRANT ALL PRIVILEGES ON *.* TO '$USER'@'localhost' WITH GRANT OPTION; CREATE USER '$USER'@'%' IDENTIFIED BY '$PASSWORD';GRANT ALL PRIVILEGES ON *.* TO '$USER'@'%' WITH GRANT OPTION; CREATE DATABASE plcogwas;\" ; echo 'Created MySQL user.'"
+
+# Stop local MySQL instance
+STOP_MYSQL="echo 'Stopping MySQL instance...' ; local_mysql stop --port $PORT ; echo 'Stopped MySQL instance.'"
 
 # Delete existing SWARM file if exists
 if [ -e $SWARM_FILE ] 
@@ -97,15 +102,17 @@ do
         for DFILE in $FILE/*
         do
             echo "Found file: $DFILE"
-            echo "$START_MYSQL ; node $EXPORT_SCRIPT --port 55555 --user $USER --password $PASSWORD --file $DFILE --phenotype_file $PHENOTYPE_FILE --output $OUTPUT_DIR --logdir $LOG_PATH --tmp $TMP_DIR"
-            echo "$START_MYSQL ; node $EXPORT_SCRIPT --port 55555 --user $USER --password $PASSWORD --file $DFILE --phenotype_file $PHENOTYPE_FILE --output $OUTPUT_DIR --logdir $LOG_PATH --tmp $TMP_DIR" >> $SWARM_FILE
+            echo "$START_MYSQL ; node $EXPORT_SCRIPT --port $PORT --user $USER --password $PASSWORD --file $DFILE --phenotype_file $PHENOTYPE_FILE --output $OUTPUT_DIR --logdir $LOG_PATH --tmp $TMP_DIR ; $STOP_MYSQL ;"
+            echo "$START_MYSQL ; node $EXPORT_SCRIPT --port $PORT --user $USER --password $PASSWORD --file $DFILE --phenotype_file $PHENOTYPE_FILE --output $OUTPUT_DIR --logdir $LOG_PATH --tmp $TMP_DIR ; $STOP_MYSQL ;" >> $SWARM_FILE
             echo ""
+            ((PORT=PORT+1))
         done
     else
         echo "Found file: $FILE"
-        echo "$START_MYSQL ; node $EXPORT_SCRIPT --port 55555 --user $USER --password $PASSWORD --file $FILE --phenotype_file $PHENOTYPE_FILE --output $OUTPUT_DIR --logdir $LOG_PATH --tmp $TMP_DIR"
-        echo "$START_MYSQL ; node $EXPORT_SCRIPT --port 55555 --user $USER --password $PASSWORD --file $FILE --phenotype_file $PHENOTYPE_FILE --output $OUTPUT_DIR --logdir $LOG_PATH --tmp $TMP_DIR" >> $SWARM_FILE
+        echo "$START_MYSQL ; node $EXPORT_SCRIPT --port $PORT --user $USER --password $PASSWORD --file $FILE --phenotype_file $PHENOTYPE_FILE --output $OUTPUT_DIR --logdir $LOG_PATH --tmp $TMP_DIR ; $STOP_MYSQL ;"
+        echo "$START_MYSQL ; node $EXPORT_SCRIPT --port $PORT --user $USER --password $PASSWORD --file $FILE --phenotype_file $PHENOTYPE_FILE --output $OUTPUT_DIR --logdir $LOG_PATH --tmp $TMP_DIR ; $STOP_MYSQL ;" >> $SWARM_FILE
         echo ""
+        ((PORT=PORT+1))
     fi
 done
 

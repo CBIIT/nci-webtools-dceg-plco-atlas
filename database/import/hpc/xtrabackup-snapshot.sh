@@ -15,15 +15,6 @@ module load mysql/5.7.22
 module use ~/mymodules
 module load xtrabackup_2.4.20
 
-# echo "INJECTING BASE_DIR ENV VAR TO MYSQL CONFIGURATION FILE..."
-# envsubst < mysql-basedir.config > my.cnf
-# echo 
-
-# echo "COPYING OVER NEW MYSQL CONFIGURATION FILE..."
-# rm $BASE_DIR/my.cnf
-# cp ./my.cnf $BASE_DIR
-# echo
-
 [ -d $TARGET_DIR ] && echo "$TARGET_DIR directory already exists" || mkdir $TARGET_DIR
 
 echo "STARTING MYSQL SERVER..."
