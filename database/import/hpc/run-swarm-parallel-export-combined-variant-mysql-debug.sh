@@ -21,12 +21,6 @@ mkdir ./DEBUG_swarm_out_$CURRENT_DATE
 # Log path
 LOG_PATH="./DEBUG_swarm_out_$CURRENT_DATE/"
 
-# Inject custom MySQL my.cnf and start local mysql instance in compute node and 
-START_MYSQL="echo 'Starting export script...' ; local_mysql create ; echo 'Created MySQL instance...' ; local_mysql start ; echo 'Started MySQL instance...'"
-
-# Stop MySQL instance
-STOP_MYSQL="local_mysql stop ; echo 'Stopped MySQL instance...'"
-
 # Delete existing SWARM file if exists
 if [ -e $SWARM_FILE ] 
 then 
@@ -35,6 +29,9 @@ then
 else
     echo "Creating new SWARM file..."
 fi
+
+# Initialize MySQL port (counter)
+PORT=55550
 
 # Generate SWARM file
 echo "Generating SWARM script..."
@@ -46,14 +43,16 @@ do
         for DFILE in $FILE/*
         do
             echo "Found file: $DFILE"
-            echo "$START_MYSQL ; $STOP_MYSQL"
-            echo "$START_MYSQL ; $STOP_MYSQL" >> $SWARM_FILE
+            echo "echo 'Starting export script...' ; local_mysql create --port $PORT ; echo 'Created MySQL instance...' ; local_mysql start --port $PORT ; echo 'Started MySQL instance...' ; local_mysql stop --port $PORT ; echo 'Stopped MySQL instance...'"
+            echo "echo 'Starting export script...' ; local_mysql create --port $PORT ; echo 'Created MySQL instance...' ; local_mysql start --port $PORT ; echo 'Started MySQL instance...' ; local_mysql stop --port $PORT ; echo 'Stopped MySQL instance...'" >> $SWARM_FILE
+            ((PORT=PORT+1))
             echo ""
         done
     else
         echo "Found file: $FILE"
-        echo "$START_MYSQL ; $STOP_MYSQL"
-        echo "$START_MYSQL ; $STOP_MYSQL" >> $SWARM_FILE
+        echo "echo 'Starting export script...' ; local_mysql create --port $PORT ; echo 'Created MySQL instance...' ; local_mysql start --port $PORT ; echo 'Started MySQL instance...' ; local_mysql stop --port $PORT ; echo 'Stopped MySQL instance...'"
+        echo "echo 'Starting export script...' ; local_mysql create --port $PORT ; echo 'Created MySQL instance...' ; local_mysql start --port $PORT ; echo 'Started MySQL instance...' ; local_mysql stop --port $PORT ; echo 'Stopped MySQL instance...'" >> $SWARM_FILE
+        ((PORT=PORT+1))
         echo ""
     fi
 done
