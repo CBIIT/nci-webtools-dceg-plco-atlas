@@ -42,3 +42,14 @@ export function measureWidth(ctx, textDefs, defaultDef) {
   });
   return lastOffset;
 }
+
+export function scaleTextDefs(textDefs, scale, textDefProps) {
+  if (typeof textDefs === 'string' || typeof textDefs === 'number') 
+    textDefs = [{ text: textDefs }];
+
+  return textDefs.map(textDef => {
+    textDef = {...defaultTextDef, ...textDef, ...textDefProps};
+    textDef.font = textDef.font.replace(/\s?(\d+)px/, (v, e) => v.replace(/\d+/, e * scale))
+    return textDef;
+  })
+}

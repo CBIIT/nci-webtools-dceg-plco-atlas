@@ -520,7 +520,7 @@ export function ManhattanPlot({
           ? colors.single.light
           : colors.single.dark) //#e47833')
       },
-      lines: [{ y: -Math.log10(5e-8) }]
+      lines: [{ y: -Math.log10(5e-8), style: 'dashed' }]
     };
   }
 

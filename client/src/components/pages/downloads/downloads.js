@@ -52,7 +52,7 @@ export function Downloads() {
   }
 
   function generateLink(resource) {
-    return `${downloadRoot}${resource}.txt.gz`;
+    return `${downloadRoot}${resource}.tsv.gz`;
   }
 
   function download(url, newWindow) {
