@@ -1013,7 +1013,7 @@ async function setShareLink(connection, {route, parameters}) {
     `;
 
     logger.debug(`setShareLink generate id sql: ${sql1}`)
-
+    
     let [results] = await connection.execute(
         sql1,
         {route, parameters: JSON.stringify(parameters)}

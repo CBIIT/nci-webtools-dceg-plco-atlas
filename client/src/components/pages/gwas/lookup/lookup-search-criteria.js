@@ -139,17 +139,17 @@ export const VariantLookupSearchCriteria = () => {
               <b>Variant</b>:{' '}
               {searchCriteriaVariantLookup &&
                 searchCriteriaVariantLookup.variant
-                  ? searchCriteriaVariantLookup && searchCriteriaVariantLookup.variant.split(':')[0].substring(0,2) === 'rs'
+                  ? searchCriteriaVariantLookup && searchCriteriaVariantLookup.variant.substring(0,2) === 'rs'
                   ? <a
-                    href={'https://www.ncbi.nlm.nih.gov/snp/' + searchCriteriaVariantLookup.variant.split(':')[0]}
+                    href={'https://www.ncbi.nlm.nih.gov/snp/' + searchCriteriaVariantLookup.variant}
                     target="_blank"
                     style={{
                       textDecoration: 'underline',
                     }}>
-                      {searchCriteriaVariantLookup.variant.split(':')[0]}
+                      {searchCriteriaVariantLookup.variant}
                     </a>
-                  : searchCriteriaVariantLookup.variant.split(':')[0].substring(0,3) === 'chr'
-                  ? <span>{searchCriteriaVariantLookup.variant.split[0] + ":" + searchCriteriaVariantLookup.variant.split[1]}</span>
+                  : searchCriteriaVariantLookup.variant.substring(0,3) === 'chr'
+                  ? <span>{searchCriteriaVariantLookup.variant.split(":")[0] + ":" + searchCriteriaVariantLookup.variant.split(":")[1]}</span>
                   : <span>{searchCriteriaVariantLookup.variant}</span>
                   : 'None'
               }
