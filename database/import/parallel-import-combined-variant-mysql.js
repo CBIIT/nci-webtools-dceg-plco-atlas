@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const mysql = require('mysql2');
 const args = require('minimist')(process.argv.slice(2));
-const { getRecords, importInnoDBTable } = require('./utils/query');
+const { getRecords, importInnoDBTable, pluck } = require('./utils/query');
 const { readFile } = require('./utils/file');
 // const { database } = require('../../server/config.json');
 const { timestamp, getLogger } = require('./utils/logging');
@@ -50,6 +50,8 @@ const connection = mysql.createConnection({
 
         // import each phenotype's variants, aggregated variants, and metadata
         for (const phenotype of phenotypes) {
+
+            const startTime = new Date().getTime();
             logger.info(`Started importing ${phenotype.name}.${phenotype.sex}.${phenotype.ancestry}`);
             await importVariants({
                 connection, 
@@ -57,7 +59,12 @@ const connection = mysql.createConnection({
                 folderPath, 
                 phenotype
             });
+            const endTime = new Date().getTime();
+            const durationSeconds = (endTime - startTime) / 1000;
+            const duration = `${Math.floor(durationSeconds / 60)}m ${durationSeconds % 60}s`;
+
             logger.info(`Finished importing ${phenotype.name}.${phenotype.sex}.${phenotype.ancestry}`);
+            logger.info(`=============== Elapsed Time: ${duration} ===============\n\n`);
         }
 
         await connection.close();
@@ -175,4 +182,25 @@ async function importVariants({connection, database, folderPath, phenotype}) {
             id = :id`,
         {id}
     );
+
+    // verifying import counts
+    const [variantCountRows] = await connection.execute(`SELECT count(*) FROM ${variantTable}`)
+    const variantCount = pluck(variantCountRows);
+
+    const [metadataCountRows] = await connection.execute(`
+        SELECT count FROM phenotype_metadata
+        WHERE 
+            phenotype_id = :id AND
+            ancestry = :ancestry AND
+            sex = :sex
+        `, {id, ancestry, sex});
+    const [metadataCount] = pluck(metadataCountRows);
+
+    // do not stop the import process, as we will want to collect warnings for all phenotypes
+    if (metadataCount === null || variantCount === 0) {
+        logger.warn('WARNING: No variants were imported');
+    } else if (variantCount !== metadataCount) {
+        logger.warn(`WARNING: Imported variants count (${variantCount}) does not match expected value (${metadataCount})`);
+    }
+
 }
