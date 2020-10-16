@@ -15,42 +15,33 @@ export const SummaryResultsSearchCriteria = () => {
     shareID,
     submitted,
   } = summaryResults;
+  
+
+  const summaryTables = useSelector(state => state.summaryTables);
+  const phenotypes = submitted ? (isPairwise ? [0, 1] : [0]).map(index => ({
+    ...(selectedPhenotypes[index] || selectedPhenotypes[0]), 
+    stratification: [
+      selectedStratifications[index].ancestry,
+      selectedStratifications[index].sex,
+    ].filter(str => str !== 'all').map(asTitleCase).join(' '),
+    resultsCount: summaryTables.tables[index].resultsCount,
+  })) : [];
 
   return (
-    <div className="mb-2">
-      <div className="px-3 py-2 bg-white tab-pane-bordered rounded-0">
-        <div className="d-flex justify-content-between">
-            <div className="py-1">
-              <span>
-                <b>Phenotype(s): </b>
-                  {selectedPhenotypes.length 
-                    ? selectedPhenotypes.map(p => p.display_name).join(', ') 
-                    : 'None'}
-              </span>
-
-              <span className="border-left border-secondary mx-3" style={{maxHeight: '1.6em'}}></span>
-
-              <span>
-                <b>Stratification(s): </b>
-                    {selectedStratifications.length
-                      ? selectedStratifications.map(s => asTitleCase(`${s.ancestry} - ${s.sex}`)).join(', ')
-                      : 'None'}
-              </span>
-            </div>
-
-            <div className="d-flex">
-              {submitted && !isPairwise && <span className="py-1 mr-3">
-                <b>Total Variants:</b> {sampleSize.toLocaleString()}
-              </span>}
-
-              <ShareLink
-                disabled={!submitted}
-                shareID={shareID}
-                params={summaryResults}
-              />
-            </div>
-        </div>
-      </div>
+    <div className="p-3 mb-2 bg-white border rounded-0 d-flex justify-content-between">
+        {!submitted 
+          ? <strong className="d-flex align-items-center text-muted">No phenotype(s) selected.</strong>
+          : <div>
+            {phenotypes.map((p, i) => <p className={(isPairwise && i == 0) ? 'mb-2' : 'mb-0'}>
+              <strong>{p.display_name} ({p.stratification}) - <small>{p.resultsCount.toLocaleString()} variants</small></strong>
+              <div className="small muted">{p.description}</div>
+            </p>)}
+          </div>}
+        <ShareLink
+          disabled={!submitted}
+          shareID={shareID}
+          params={summaryResults}
+        />
     </div>
   );
 };
