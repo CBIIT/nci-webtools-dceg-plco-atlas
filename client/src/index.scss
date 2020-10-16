@@ -263,6 +263,15 @@ a[disabled] {
   pointer-events: none;
 }
 
+.overflow-ellipsis {
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+.mw-500px {
+  min-width: 500px !important;
+}
+
 .link {
   cursor: pointer;
   text-decoration: underline;
@@ -332,4 +341,8 @@ select.form-control-sm {
 
 .hovertext {
   opacity: 0.8;
+}
+
+.react-bootstrap-table table {
+  table-layout: auto;
 }
