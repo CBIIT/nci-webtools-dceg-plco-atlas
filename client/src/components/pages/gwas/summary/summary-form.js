@@ -93,7 +93,7 @@ export function SummaryResultsForm({
     selectedPhenotypes = selectedPhenotypes.slice(0, pairwise ? 2 : 1);
     setStratificationOptions(getStratificationOptions(selectedPhenotypes, pairwise));
     _setSelectedPhenotypes(selectedPhenotypes);
-    _setSelectedStratifications(['', '']);
+    _setSelectedStratifications(pairwise ? [_selectedStratifications[0], ''] : ['', '']);
     _setIsPairwise(pairwise);
     _setIsModified(true);
   }
