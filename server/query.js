@@ -356,6 +356,7 @@ async function getVariants(connection, params) {
 
 async function exportVariants(connection, params) {
     let rowLimit = exportRowLimit || 1e5;
+    params.limit = params.limit || rowLimit;
 
     const phenotypeIds = params.phenotype_id.split(',');
     const phenotypeIdPlaceholders = getPlaceholders(phenotypeIds.length);
@@ -373,8 +374,10 @@ async function exportVariants(connection, params) {
 
     const { data, columns } = await getVariants(connection, {
         ...params, 
+        columns: ['phenotype_id', 'ancestry', 'sex', 'chromosome', 'position', 'snp', 'allele_reference', 'allele_alternate', 'allele_frequency', 'p_value', 'p_value_heterogenous', 'beta', 'odds_ratio', 'ci_95_low', 'ci_95_high', 'n'],
         raw: true,
-        limit: Math.min(params.limit, rowLimit)
+        limit: Math.min(params.limit, rowLimit),
+        offset: 0,
     });
     const rows = [columns].concat(data);
 
@@ -385,7 +388,7 @@ async function exportVariants(connection, params) {
             params.ancestry,
             params.sex,
             params.p_value_min && params.p_value_max && `p_value_${params.p_value_min}_${params.p_value_max}`,
-            params.p_value_nlog_min && params.p_value_nlog_max && `p_value_${10 ** -params.p_value_nlog_min}_${10 ** -params.p_value_nlog_max}`,
+            params.p_value_nlog_min && params.p_value_nlog_max && `p_value_${10 ** -params.p_value_nlog_max}_${10 ** -params.p_value_nlog_min}`,
             params.position_min && params.position_max && `mb_range_${params.position_min / 1e6}_${params.position_max / 1e6}`,
         ].filter(Boolean).join('_') + '.csv',
         contents: rows.map(r => r.join()).join('\r\n'),

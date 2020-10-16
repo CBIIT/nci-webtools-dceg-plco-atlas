@@ -265,8 +265,8 @@ export function SummaryResultsTable() {
       sex,
       ancestry,
       chromosome: selectedChromosome,
-      orderBy: 'p_value',
-      order: 'asc',
+      orderBy: summaryTables.tables[selectedTable].orderBy || 'p_value',
+      order: summaryTables.tables[selectedTable].order || 'asc',
       p_value_nlog_min: nlogpMin,
       p_value_nlog_max: nlogpMax,
       position_min: bpMin,
@@ -322,12 +322,11 @@ export function SummaryResultsTable() {
 
 
           <OverlayTrigger
-            overlay={!aboveExportLimit ? <span /> : <Tooltip id="submit-summary-results">
-              Please select under {exportRowLimit} rows to export variants.
-            </Tooltip>}>
+            overlay={<Tooltip id="submit-summary-results">
+              Export {Math.min(exportRowLimit, summaryTables.tables[selectedTable].resultsCount).toLocaleString()} variants.
+              </Tooltip>}>
             <span>
               <a
-                disabled={aboveExportLimit}
                 // target="_blank"
                 className="btn btn-sm btn-silver flex-shrink-auto mx-2"
                 href={getExportLink()}>
