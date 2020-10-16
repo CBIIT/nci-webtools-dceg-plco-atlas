@@ -54,75 +54,104 @@ export function SummaryResultsTable() {
       dataField: 'chromosome',
       text: 'Chr.',
       headerTitle: _ => 'Chromosome',
+      title: true,
       sort: true,
-      headerStyle: { width: '90px' },
+      headerStyle: { width: '65px' },
+      headerClasses: 'overflow-ellipsis',
+      classes: 'overflow-ellipsis',
     },
     {
       dataField: 'position',
       text: 'Pos.',
       headerTitle: _ => 'Position',
-      sort: true
+      title: true,
+      sort: true,
+      headerStyle: { width: '100px' },
+      headerClasses: 'overflow-ellipsis',
+      classes: 'overflow-ellipsis',
     },
     {
       dataField: 'snp',
       text: 'SNP',
       sort: true,
       formatter: cell => !/^rs\d+:/.test(cell) ?
-        (!/^chr[\d+|x|X|y|Y]:\d+/.test(cell) ? cell :
+        (!/^chr[\d+|x|y]:\d+/i.test(cell) ? cell :
           cell.split(':')[0] + ':' + cell.split(':')[1]) :
-        <a href={`https://www.ncbi.nlm.nih.gov/snp/${cell.split(':')[0]}`} target="_blank">{cell.split(':')[0]}</a>,
-      headerStyle: { width: '180px' },
+        <a className="overflow-ellipsis" href={`https://www.ncbi.nlm.nih.gov/snp/${cell.split(':')[0]}`} target="_blank">{cell.split(':')[0]}</a>,
+      title: true,
+      headerStyle: {width: '180px'},
+      headerClasses: 'overflow-ellipsis',
+      classes: 'overflow-ellipsis  text-nowrap',
     },
     {
       dataField: 'allele_reference',
       text: 'Eff. Allele',
       headerTitle: _ => 'Effect Allele [Frequency]',
-      formatter: (cell, row) => {
-        return `${cell} [${row.allele_frequency}]`
-      }
+      formatter: (cell, row) => `${cell} [${row.allele_frequency.toPrecision(4)}]`,
+      title: (cell, row) => `${cell} [${row.allele_frequency.toPrecision(4)}]`,
+      headerStyle: { width: '200px' },
+      headerClasses: 'overflow-ellipsis',
+      classes: 'overflow-ellipsis text-nowrap',
+
     },
     {
       dataField: 'allele_alternate',
       text: 'Non-Eff. Allele',
       headerTitle: _ => 'Non-Effect Allele [Frequency]',
-      formatter: (cell, row) => {
-        return `${cell} [${(1 - row.allele_frequency).toPrecision(4)}]`;
-      }
+      formatter: (cell, row) => `${cell} [${(1 - row.allele_frequency).toPrecision(4)}]`,
+      title: (cell, row) => `${cell} [${(1 - row.allele_frequency).toPrecision(4)}]`,
+      headerStyle: { width: '200px' },
+      headerClasses: 'overflow-ellipsis',
+      classes: 'overflow-ellipsis  text-nowrap',
     },
     {
       dataField: 'beta',
-      text: 'Beta'
+      text: 'Beta',
+      title: true,
+      headerStyle: {width: '80px'},
+      headerClasses: 'overflow-ellipsis',
+      classes: 'overflow-ellipsis',
     },
     {
       dataField: 'odds_ratio',
       text: 'OR [95% CI]',
       headerTitle: _ => 'Odds Ratio [95% Confidence Interval]',
-      formatter: (cell, row, rowIndex) => {
-        const isUndefined = value => !value || isNaN(value);
-        if (isUndefined(cell)) return '-';
-        return (+cell).toFixed(3) + (isUndefined(row.ci_95_low) || isUndefined(row.ci_95_high)
-          ? ''
-          : ` [${+row.ci_95_low.toFixed(3)} - ${+row.ci_95_high.toFixed(3)}]`);
-      },
-      headerStyle: {
-        width: '200px'
-      }
+      formatter: (cell, row) => (!cell || isNaN(cell)) ? '-' : 
+        `${(+cell).toFixed(3)} [${row.ci_95_low.toFixed(3)} - ${+row.ci_95_high.toFixed(3)}]`,
+      title: (cell, row) => (!cell || isNaN(cell)) ? '-' : 
+        `${(+cell).toFixed(3)} [${row.ci_95_low.toFixed(3)} - ${+row.ci_95_high.toFixed(3)}]`,
+      headerStyle: { minWidth: '200px',  width: '200px' },
+      classes: 'overflow-ellipsis',
+      headerClasses: 'overflow-ellipsis',
     },
     {
       dataField: 'p_value',
       text: 'Assoc. P-Value',
       headerTitle: _ => 'Association P-Values',
-      sort: true
+      formatter: cell => cell < 1e-2 ? (+cell).toExponential() : cell,
+      title: true,
+      sort: true,
+      headerStyle: {width: '80px'},
+      headerClasses: 'overflow-ellipsis',
+      classes: 'overflow-ellipsis',
     },
     {
       dataField: 'p_value_heterogenous',
       text: ' Het. P-Value',
       headerTitle: _ => 'Heterogenous P-Values',
+      title: true,
+      headerStyle: {width: '80px'},
+      headerClasses: 'overflow-ellipsis',
+      classes: 'overflow-ellipsis',
     },
     {
       dataField: 'n',
       text: 'N',
       headerTitle: _ => 'Sample Size',
+      title: true,
+      headerStyle: {width: '80px'},
+      headerClasses: 'overflow-ellipsis',
+      classes: 'overflow-ellipsis',
     },
   ].filter(Boolean);
 
@@ -332,16 +361,21 @@ export function SummaryResultsTable() {
       </div>
 
       {/* Do not filter beforehand, as that resets indexes  */}
-      {selectedStratifications.map((s, i) =>
-        selectedTable === i && (!summarySnpTables.visible
-          ? <Table key={`variant-table-${i}`} {...getVariantTableProps(i)} />
-          : <Table
-            key={`snp-table-${i}`}
-            keyField="variant_id"
-            data={summarySnpTables.tables[i].results}
-            columns={columns} />
-        )
-      )}
+
+        {selectedStratifications.map((s, i) =>
+          selectedTable === i && (!summarySnpTables.visible
+            ? <Table 
+                wrapperClasses="table-responsive" 
+                key={`variant-table-${i}`} 
+                {...getVariantTableProps(i)} />
+            : <Table
+                wrapperClasses="table-responsive"
+                key={`snp-table-${i}`}
+                keyField="variant_id"
+                data={summarySnpTables.tables[i].results}
+                columns={columns} />
+          )
+        )}
     </div>
   );
 }

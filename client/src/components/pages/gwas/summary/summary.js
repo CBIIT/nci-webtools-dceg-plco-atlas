@@ -402,11 +402,7 @@ export function SummaryResults() {
             <Tab
               eventKey="manhattan-plot"
               title="Manhattan Plot"
-              className={
-                selectedPlot === 'manhattan-plot' ?
-                "p-2 bg-white tab-pane-bordered rounded-0 d-flex justify-content-center align-items-center" :
-                "p-2 bg-white tab-pane-bordered rounded-0"
-              }
+              className="p-2 bg-white tab-pane-bordered rounded-0"
               style={{ minHeight: '365px' }}>
               <div style={{ display: submitted ? 'block' : 'none' }}>
                 <div style={{minHeight: '635px'}}>

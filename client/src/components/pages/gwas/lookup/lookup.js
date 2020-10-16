@@ -44,14 +44,9 @@ export function VariantLookup() {
       dataField: 'phenotype',
       text: 'Phenotype',
       sort: true,
-      style: {
-        overflowX: 'hidden',
-        textOverflow: 'ellipsis',
-        whiteSpace: 'nowrap'
-      },
-      headerStyle: {
-        width: '290px'
-      }
+      headerStyle: { width: '290px' },
+      headerClasses: 'overflow-ellipsis',
+      classes: 'overflow-ellipsis',      
       // events: {
       //   onClick: (e, column, columnIndex, row, rowIndex) => { console.log(e.target.title) },
       // }
@@ -72,79 +67,94 @@ export function VariantLookup() {
       hidden: true
     },
     {
-      headerTitle: () => 'Chromosome',
       dataField: 'chromosome',
       text: 'Chr.',
-      // headerAlign: 'center',
-      // align: 'center'
-      headerStyle: {
-        width: '50px'
-      }
+      headerTitle: _ => 'Chromosome',
+      title: true,
+      sort: true,
+      headerStyle: { width: '65px' },
+      headerClasses: 'overflow-ellipsis',
+      classes: 'overflow-ellipsis',
     },
     {
       dataField: 'position',
-      text: 'Position',
-      headerStyle: {
-        width: '100px'
-      }
+      text: 'Pos.',
+      headerTitle: _ => 'Position',
+      title: true,
+      sort: true,
+      headerStyle: { width: '100px' },
+      headerClasses: 'overflow-ellipsis',
+      classes: 'overflow-ellipsis',
     },
     {
       dataField: 'allele_reference',
       text: 'Eff. Allele',
       headerTitle: _ => 'Effect Allele [Frequency]',
-      formatter: (cell, row) => {
-        return `${cell} [${row.allele_frequency}]`
-      }
+      formatter: (cell, row) => `${cell} [${row.allele_frequency.toPrecision(4)}]`,
+      title: (cell, row) => `${cell} [${row.allele_frequency.toPrecision(4)}]`,
+      headerStyle: { width: '200px' },
+      headerClasses: 'overflow-ellipsis',
+      classes: 'overflow-ellipsis text-nowrap',
+
     },
     {
       dataField: 'allele_alternate',
       text: 'Non-Eff. Allele',
       headerTitle: _ => 'Non-Effect Allele [Frequency]',
-      formatter: (cell, row) => {
-        return `${cell} [${(1 - row.allele_frequency).toPrecision(4)}]`;
-      }
+      formatter: (cell, row) => `${cell} [${(1 - row.allele_frequency).toPrecision(4)}]`,
+      title: (cell, row) => `${cell} [${(1 - row.allele_frequency).toPrecision(4)}]`,
+      headerStyle: { width: '200px' },
+      headerClasses: 'overflow-ellipsis',
+      classes: 'overflow-ellipsis  text-nowrap',
     },
     {
       dataField: 'beta',
       text: 'Beta',
-      sort: true,
+      title: true,
+      headerStyle: {width: '80px'},
+      headerClasses: 'overflow-ellipsis',
+      classes: 'overflow-ellipsis',
     },
     {
       dataField: 'odds_ratio',
       text: 'OR [95% CI]',
-      sort: true,
       headerTitle: _ => 'Odds Ratio [95% Confidence Interval]',
-      formatter: (cell, row, rowIndex) => {
-        const isUndefined = value => !value || isNaN(value);
-        if (isUndefined(cell)) return cell || '-';
-        return (+cell).toFixed(3) + (isUndefined(row.ci_95_low) || isUndefined(row.ci_95_high) 
-          ? '' 
-          : ` [${+row.ci_95_low.toFixed(3)} - ${+row.ci_95_high.toFixed(3)}]`);
-      },
-      headerStyle: {
-        width: '200px'
-      }
+      formatter: (cell, row) => (!cell || isNaN(cell)) ? '-' : 
+        `${(+cell).toFixed(3)} [${row.ci_95_low.toFixed(3)} - ${+row.ci_95_high.toFixed(3)}]`,
+      title: (cell, row) => (!cell || isNaN(cell)) ? '-' : 
+        `${(+cell).toFixed(3)} [${row.ci_95_low.toFixed(3)} - ${+row.ci_95_high.toFixed(3)}]`,
+      headerStyle: { minWidth: '200px',  width: '200px' },
+      classes: 'overflow-ellipsis',
+      headerClasses: 'overflow-ellipsis',
     },
     {
       dataField: 'p_value',
-      text: 'P-value',
+      text: 'Assoc. P-Value',
+      headerTitle: _ => 'Association P-Values',
+      formatter: cell => cell < 1e-2 ? (+cell).toExponential() : cell,
+      title: true,
       sort: true,
-      sortFunc: (a, b, order, dataField, rowA, rowB) => {
-        if (order === 'asc') {
-          return a - b;
-        }
-        return b - a; // desc
-      }
+      headerStyle: {width: '80px'},
+      headerClasses: 'overflow-ellipsis',
+      classes: 'overflow-ellipsis',
     },
     {
       dataField: 'p_value_heterogenous',
-      text: 'P-Value Het.',
-      headerTitle: _ => 'P-Value Heterogenous',
+      text: ' Het. P-Value',
+      headerTitle: _ => 'Heterogenous P-Values',
+      title: true,
+      headerStyle: {width: '80px'},
+      headerClasses: 'overflow-ellipsis',
+      classes: 'overflow-ellipsis',
     },
     {
       dataField: 'n',
       text: 'N',
       headerTitle: _ => 'Sample Size',
+      title: true,
+      headerStyle: {width: '80px'},
+      headerClasses: 'overflow-ellipsis',
+      classes: 'overflow-ellipsis',
     },
   ];
   // add filter to column headers
@@ -364,6 +374,7 @@ export function VariantLookup() {
                         </ExportCSVButton>
                         <br />
                         <Table
+                          wrapperClasses="table-responsive" 
                           {...props.baseProps}
                           bootstrap4
                           // keyField="variant_id"
