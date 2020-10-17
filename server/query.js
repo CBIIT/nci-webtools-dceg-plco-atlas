@@ -410,11 +410,12 @@ async function getPoints(connection, { phenotype_id, sex, ancestry, raw }) {
 
     // query database
     const [data, columns] = await connection.execute({
-        sql: `SELECT p_value_nlog_expected, p_value_nlog
+        sql: `SELECT id, p_value_nlog_expected, p_value_nlog
             FROM phenotype_point 
             WHERE phenotype_id = :phenotype_id
                 AND sex = :sex 
-                AND ancestry = :ancestry`, 
+                AND ancestry = :ancestry
+            ORDER BY p_value_nlog DESC`, 
         rowsAsArray: raw,
     }, { phenotype_id, sex, ancestry, raw });
     
