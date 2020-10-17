@@ -28,8 +28,9 @@ export function PhenotypeCorrelations() {
     submitted,
     messages,
     sharedState,
-    selectedPhenotypes
+    selectedPhenotypes,
   } = phenotypeCorrelations;
+
 
   const phenotypes = useSelector(state => state.phenotypes);
 

@@ -5,12 +5,12 @@ import { Spinner } from 'react-bootstrap';
 import { PlotlyWrapper as Plot } from '../../../plots/plotly/plotly-wrapper';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
 import { Tooltip } from '../../../controls/tooltip/tooltip';
-
-import {
-  viewportToLocalCoordinates,
-  createElement as h
-} from '../../../plots/custom/utils';
-import { updateBrowsePhenotypes, updateBrowsePhenotypesPlots } from '../../../../services/actions';
+import { 
+  submitSummaryResultsQuery,
+  updateBrowsePhenotypes, 
+  updateBrowsePhenotypesPlots,
+  updateSummaryResults,
+} from '../../../../services/actions';
 
 
 export const Heatmap = forwardRef(({}, ref) => {
@@ -28,6 +28,13 @@ export const Heatmap = forwardRef(({}, ref) => {
     heatmapLayout
   } = useSelector(state => state.heatmap);
 
+  const {
+    selectedSex,
+    selectedAncestry,
+  } = useSelector(
+    state => state.phenotypeCorrelations
+  );
+
   const plotContainer = useRef(null);
 
   // use local state to reset tooltip when this component unmounts
@@ -40,6 +47,37 @@ export const Heatmap = forwardRef(({}, ref) => {
     ...tooltip,
     ...state
   });  
+
+   const handleSummaryResultsQuery = async(a, b) => {
+    // verify that both phenotypes have data for the specified sex/ancestry combination
+    const metadata = await query('metadata', {
+      phenotype_id: [a, b], 
+      sex: selectedSex,
+      ancestry: selectedAncestry,
+      chromosome: 'all', 
+    });
+
+    if (metadata.find(m => m.phenotype_id == a) && metadata.find(m => m.phenotype_id == b)) {
+      const phenotypePair = [
+        phenotypes.flat.find(p => p.id === a),
+        phenotypes.flat.find(p => p.id === b),
+      ];
+      const stratification = {sex: selectedSex, ancestry: selectedAncestry};
+      const stratifications = [stratification, stratification];
+      dispatch(submitSummaryResultsQuery({
+        phenotypes: phenotypePair, 
+        stratifications, 
+        isPairwise: true
+      }));
+    } else {
+      dispatch(updateSummaryResults({
+        messages: [{
+        type: 'danger',
+        content: 'One of the phenotypes selected does not have data for the specified ancestry and sex.'
+        }]
+      }));
+    }
+  }
 
   const handlePhenotypeLookup = async (id) => {
     const phenotype = phenotypes.flat.find(p => p.id === id);
@@ -162,6 +200,11 @@ export const Heatmap = forwardRef(({}, ref) => {
               Go to {tooltip.data.phenotype_b_display_name} details
             </a>
           </div>
+          {<div>
+            <a className="font-weight-bold" href="#/gwas/summary" onClick={e => handleSummaryResultsQuery(tooltip.data.phenotype_a, tooltip.data.phenotype_b)}>
+              Go to Pairwise Summary Results
+            </a>
+          </div>}
       </Tooltip>
     </div>
 

@@ -59,7 +59,7 @@ export function PhenotypeCorrelationsForm({ onChange, onSubmit, onReset }) {
             // }
           }}
           aria-label="Select sex">
-          <option value="combined">All</option>
+          <option value="all">All</option>
           <option value="female">Female</option>
           <option value="male">Male</option>
         </select>

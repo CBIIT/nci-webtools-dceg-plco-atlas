@@ -226,6 +226,58 @@ export function fetchSummarySnpTable(tableKey, params) {
   };
 }
 
+export function submitSummaryResultsQuery({phenotypes, stratifications, isPairwise}) {
+  return async function (dispatch) {
+    const initialState = getInitialState();
+    for (let key of ['manhattanPlot', 'qqPlot', 'summaryTables', 'summarySnpTables'])
+      dispatch(updateKey(key, initialState[key]));
+
+    dispatch(drawQQPlot({phenotypes, stratifications, isPairwise}));
+    dispatch(
+      drawManhattanPlot('summary', {
+        phenotypes,
+        stratifications,
+        isPairwise,
+        p_value_nlog_min: 2,
+      })
+    );
+
+    // fetch both summary results tables
+    stratifications.filter(s => s.sex && s.ancestry).forEach((stratification, i) => {
+      const {sex, ancestry} = stratification;
+      const phenotype = phenotypes[i] || phenotypes[0];
+      dispatch(
+        fetchSummaryTable(i, {
+          phenotype_id: phenotype.id,
+          sex,
+          ancestry,
+          offset: 0,
+          limit: 10,
+          orderBy: 'p_value',
+          order: 'asc',
+          metadataCount: true,
+        })
+      );
+    });
+
+    // update summary results filters
+    dispatch(
+      updateSummaryResults({
+        selectedPhenotypes: phenotypes,
+        selectedStratifications: stratifications,
+        manhattanPlotView: 'summary',
+        selectedChromosome: null,
+        isPairwise,
+        nlogpMin: null,
+        nlogpMax: null,
+        bpMin: null,
+        bpMax: null,
+        submitted: new Date().getTime(),
+      })
+    );
+  }
+}
+
 /**
  *
  * @param {'summary'|'variants'} plotType

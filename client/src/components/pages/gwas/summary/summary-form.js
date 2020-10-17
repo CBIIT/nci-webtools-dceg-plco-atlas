@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { Button, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import { TreeSelect } from '../../../controls/tree-select/tree-select';
@@ -30,6 +30,14 @@ export function SummaryResultsForm({
 
   // stratification options can always be recalculated
   const [stratificationOptions, setStratificationOptions] = useState(getStratificationOptions(_selectedPhenotypes, _isPairwise));
+
+
+  useEffect(() => {
+    _setSelectedPhenotypes(selectedPhenotypes);
+    _setSelectedStratifications(selectedStratifications.map(s => `${s.ancestry}__${s.sex}`));
+    _setIsPairwise(isPairwise);
+    setStratificationOptions(getStratificationOptions(selectedPhenotypes, isPairwise));
+  }, [selectedPhenotypes, selectedStratifications, isPairwise])
 
   const isValid = _selectedPhenotypes[0]
     && _selectedStratifications[0]

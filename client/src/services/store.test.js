@@ -99,7 +99,7 @@ describe('Store Module', function () {
       },
       phenotypeCorrelations: {
         selectedPhenotypes: [],
-        selectedSex: 'combined',
+        selectedSex: 'all',
         selectedAncestry: 'european',
         submitted: null,
         disableSubmit: false,
