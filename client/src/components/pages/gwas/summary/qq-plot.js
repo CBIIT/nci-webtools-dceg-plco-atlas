@@ -33,7 +33,7 @@ export function QQPlot({ onVariantLookup }) {
   });
 
   useEffect(() => updateTooltip({visible: false}), [qqplotData]);
-  
+
   const config = {
     responsive: true,
     toImageButtonOptions: {
@@ -58,18 +58,13 @@ export function QQPlot({ onVariantLookup }) {
 
   return (
     <div 
-      className="text-center my-3 position-relative" 
+      className="text-center my-3 position-relative mw-100" 
+      style={{width: '800px', margin: '1rem auto'}}
       ref={plotContainer}>
       <LoadingOverlay active={loadingQQPlot} />
 
-      { <Plot
-        className="override-cursor-default"
-        style={{
-          // display: !loadingQQPlot ? 'block' : 'none',
-          position: 'relative',
-          height: '800px',
-          width: '800px'
-        }}
+      <Plot
+        className="override-cursor-default position-relative"
         data={qqplotData}
         layout={qqplotLayout}
         config={config}
@@ -137,7 +132,7 @@ export function QQPlot({ onVariantLookup }) {
         onRelayout={relayout => {
           updateTooltip({visible: false})
         }}
-      />}
+      />
 
       <Tooltip 
         closeButton 
@@ -147,15 +142,11 @@ export function QQPlot({ onVariantLookup }) {
         onClose={e => updateTooltip({visible: false})}
         style={{
           width: '240px', 
-          border: `1px solid ${tooltip.data ? {
-            all: '#f2990d',
-            female: '#f41c52',
-            male: '#006bb8'
-          }[tooltip.data.sex] : '#ddd'}`
+          border: `1px solid ${tooltip.data.color}`
         }}
         className="text-left qq-plot-tooltip">
-        {(!tooltip.data || (tooltip.data && -Math.log10(tooltip.data.p) < 3))
-          ? <div>No information displayed for variants with -log<sub>10</sub>(p) &lt; 3.</div> 
+        {(!tooltip.data || !tooltip.data.showData)
+          ? <div>Only the top 10,000 variants are selectable.</div> 
           : <div>
               {tooltip.data.chromosome && tooltip.data.position && <div><b>position:</b> {tooltip.data.chromosome}:{tooltip.data.position}</div>}
               {/* {tooltip.data.expected_p && <div><b>expected p-value:</b> {(+tooltip.data.expected_p || 0).toPrecision(5)}</div>} */}
