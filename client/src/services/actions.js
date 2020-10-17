@@ -318,10 +318,7 @@ export function drawQQPlot({ phenotypes, stratifications, isPairwise }) {
             m.ancestry === s.ancestry)
       }));
 
-
-      console.log(metadata, stratifications, phenotypes);
-
-
+      // console.log(metadata, stratifications, phenotypes);
 
       // the title property is only used for non-stacked plots
       // stacked plots use the legend instead as the title
@@ -343,8 +340,8 @@ export function drawQQPlot({ phenotypes, stratifications, isPairwise }) {
         dragmode: 'pan',
         clickmode: 'event',
         hovermode: 'closest',
-        // width: 800,
-        // height: 800,
+        width: 800,
+        height: 800,
         autosize: true,
         title: {
           text: title,
@@ -362,7 +359,7 @@ export function drawQQPlot({ phenotypes, stratifications, isPairwise }) {
           title: {
             text: '<b>Expected -log<sub>10</sub>(p)</b>',
             font: {
-              family: 'Arial',
+              family: systemFont,
               size: 14,
               color: 'black'
             }
@@ -407,68 +404,35 @@ export function drawQQPlot({ phenotypes, stratifications, isPairwise }) {
       };
 
       dispatch(updateQQPlot({ 
-        // loadingQQPlot: false,
-        // qqplotData: data.flat(),
         qqplotLayout: layout,
         sampleSize: 0,
       }));
       
-      let data = [];
+      let qqplotData = [];
 
       await Promise.all(stratifications.map(async ({sex, ancestry, metadata}, i) => {
-  
-        // retrieve a subset of variants where show_qq_plot is true, and nlog_p is <= 3
-        const subsetVariants = await query('points', {
+        const {lambda_gc, count} = metadata;
+
+        const {data, columns} = await query('points', {
           phenotype_id: (phenotypes[i] || phenotypes[0]).id,
-          columns: ['p_value_nlog_expected', 'p_value_nlog'],
           sex,
           ancestry,
-          p_value_nlog_max: 3,
-          show_qq_plot: true,
-          raw: true,
-        });
-  
-        console.log(
-          `${sex}.subsetVariants.length`,
-          subsetVariants.data.length
-        );
-  
-        // retrieve all variants where nlog_p >= 3
-        let topVariants = await query('variants', {
-          phenotype_id: (phenotypes[i] || phenotypes[0]).id,
-          columns: [
-            'p_value_nlog_expected', 
-            'p_value_nlog', 
-            'id'
-          ],
-          sex,
-          ancestry,
-          p_value_nlog_min: 3,
           raw: true,
         });
 
-        console.log(
-          `${sex}.topVariants.length`,
-          topVariants.data.length
-        );
-  
-        const {lambda_gc, count} = metadata;
-        const variants = subsetVariants.data.concat(topVariants.data);
-        const maxExpectedNLogP = variants.reduce((a, b) => Math.max(a, b[0]), 0);
+        const expectedValues = data.map(d => d[columns.indexOf('p_value_nlog_expected')]);
+        const observedValues = data.map(d => d[columns.indexOf('p_value_nlog')]);
+        const ids = data.map(d => d[columns.indexOf('id')]);
+        const maxExpectedValue = observedValues.reduce((a, b) => b > a ? b : a);
         const titleCase = str => str.replace(/\w+/g, str => 
           str[0].toUpperCase() + str.substring(1, str.length).toLowerCase());
         const markerColor = isPairwise ? ['#f41c52', '#006bb8'][i] : '#f2990d';
         const titlePrefix = isPairwise && phenotypes[1] ? `${phenotypes[i].display_name} - ` : '';
-        // const markerColor = {
-        //   all: '#f2990d',
-        //   female: '#f41c52',
-        //   male: '#006bb8'
-        // }[sex];
-  
-        const newData =  [
+
+        qqplotData = qqplotData.concat([
           {
-            x: [0, maxExpectedNLogP], // expected -log10(p)
-            y: [0, maxExpectedNLogP], // expected -log10(p)
+            x: [0, maxExpectedValue], // expected -log10(p)
+            y: [0, maxExpectedValue], // expected -log10(p)
             hoverinfo: 'none',
             mode: 'lines',
             type: 'scattergl',
@@ -480,17 +444,16 @@ export function drawQQPlot({ phenotypes, stratifications, isPairwise }) {
             showlegend: false
           },
           {
-            x: variants.map(d => d[0]), // expected -log10(p)
-            y: variants.map(d => d[1]), // observed -log10(p)
-            customdata: variants.map(d => ({
+            x: expectedValues, // expected -log10(p)
+            y: observedValues, // observed -log10(p)
+            customdata: data.map((d, i) => ({
               phenotypeId: (phenotypes[i] || phenotypes[0]).id,
               sex,
               ancestry,
-              // properties below will be undefined for subsetVariants.data
-              // we can use this to differentiate between these two datasets in each trace
-              p: Math.pow(10, -d[1]),
-              variantId: d[2],
-              // expected_p: Math.pow(10, -d[0])
+              variantId: ids[i],
+              p: Math.pow(10, -observedValues[i]),
+              showData: i <= 10000,
+              color: markerColor,
             })),
             name: `${titlePrefix + titleCase(`${ancestry} - ${sex}`)}     <b>\u03BB</b> = ${lambda_gc}     <b>Number of Variants</b> = ${count.toLocaleString()}`,
             mode: 'markers',
@@ -503,11 +466,9 @@ export function drawQQPlot({ phenotypes, stratifications, isPairwise }) {
               opacity: 0.65
             },
           }
-        ];
-        data.push(newData);
-        dispatch(updateQQPlot({ 
-          qqplotData: data.flat()
-        }));
+        ]);
+
+        dispatch(updateQQPlot({ qqplotData }));
       }));
 
       dispatch(updateQQPlot({ 
