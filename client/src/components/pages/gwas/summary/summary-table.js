@@ -260,18 +260,24 @@ export function SummaryResultsTable() {
       ? selectedStratifications[selectedTable]
       : selectedStratifications[0]
 
-    const exportParams = {
-      phenotype_id: phenotype.id,
-      sex,
-      ancestry,
-      chromosome: selectedChromosome,
-      orderBy: summaryTables.tables[selectedTable].orderBy || 'p_value',
-      order: summaryTables.tables[selectedTable].order || 'asc',
-      p_value_nlog_min: nlogpMin,
-      p_value_nlog_max: nlogpMax,
-      position_min: bpMin,
-      position_max: bpMax,
-    }
+    let exportParams = summarySnpTables.visible ? {
+        phenotype_id: phenotype.id,
+        sex,
+        ancestry,
+        snp: summarySnpTables.snp
+      } : 
+      {
+        phenotype_id: phenotype.id,
+        sex,
+        ancestry,
+        chromosome: selectedChromosome,
+        orderBy: summaryTables.tables[selectedTable].orderBy || 'p_value',
+        order: summaryTables.tables[selectedTable].order || 'asc',
+        p_value_nlog_min: nlogpMin,
+        p_value_nlog_max: nlogpMax,
+        position_min: bpMin,
+        position_max: bpMax,
+      }
 
     return `${process.env.REACT_APP_API_ROOT}/export-variants${asQueryString(exportParams)}`;
   }
@@ -298,7 +304,6 @@ export function SummaryResultsTable() {
   });
 
   const showPhenotypeNames = isPairwise && selectedPhenotypes.length == 2;
-  const aboveExportLimit = summaryTables.tables[selectedTable].resultsCount > exportRowLimit;
 
   return (
     <div className="mt-3">
@@ -320,20 +325,11 @@ export function SummaryResultsTable() {
             )}
           </div>}
 
-
-          <OverlayTrigger
-            overlay={<Tooltip id="submit-summary-results">
-              Export {Math.min(exportRowLimit, summaryTables.tables[selectedTable].resultsCount).toLocaleString()} variants.
-              </Tooltip>}>
-            <span>
-              <a
-                // target="_blank"
-                className="btn btn-sm btn-silver flex-shrink-auto mx-2"
-                href={getExportLink()}>
-                Export
-                </a>
-            </span>
-          </OverlayTrigger>
+          <a
+            className="btn btn-sm btn-silver ml-2"
+            href={getExportLink()}>
+            Export Variants
+          </a>
         </div>
 
         <div key="snpSearch" className="d-flex mb-2">
