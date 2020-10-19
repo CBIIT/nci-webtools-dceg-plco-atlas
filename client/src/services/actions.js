@@ -475,7 +475,7 @@ export function drawQQPlot({ phenotypes, stratifications, isPairwise }) {
         const expectedValues = data.map(d => d[columns.indexOf('p_value_nlog_expected')]);
         const observedValues = data.map(d => d[columns.indexOf('p_value_nlog')]);
         const ids = data.map(d => d[columns.indexOf('id')]);
-        const maxExpectedValue = observedValues.reduce((a, b) => b > a ? b : a);
+        const maxExpectedValue = expectedValues.reduce((a, b) => b > a ? b : a);
         const titleCase = str => str.replace(/\w+/g, str => 
           str[0].toUpperCase() + str.substring(1, str.length).toLowerCase());
         const markerColor = isPairwise ? ['#f41c52', '#006bb8'][i] : '#f2990d';
