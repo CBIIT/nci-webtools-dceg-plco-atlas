@@ -113,7 +113,7 @@ export function axisLeft(config, ctx) {
       ctx.rotate(Math.PI / -2);
       ctx.translate(
         midpoint - titleWidth / 2,
-        -(tickLength + labelPadding + maxLabelWidth) * (config.scaleSize || 1)
+        -(tickLength + labelPadding + maxLabelWidth) 
       );
       ctx.textAlign = 'center';
       renderText(ctx, title);
@@ -130,7 +130,7 @@ export function axisLeft(config, ctx) {
       ctx.rotate(Math.PI / -2);
       ctx.translate(
         midpoint - titleWidth / 2,
-        -(tickLength + labelPadding + maxLabelWidth) * (config.scaleSize || 1)
+        -(tickLength + labelPadding + maxLabelWidth) 
       );
       ctx.textAlign = 'center';
       renderText(ctx, secondaryTitle);
@@ -148,7 +148,7 @@ export function axisLeft(config, ctx) {
       ctx.rotate(Math.PI / -2);
       ctx.translate(
         midpoint - titleWidth / 2,
-        -(tickLength + labelPadding + maxLabelWidth) * (config.scaleSize || 1)
+        -(tickLength + labelPadding + maxLabelWidth) 
       );
       ctx.textAlign = 'center';
       renderText(ctx, secondaryTitle);
