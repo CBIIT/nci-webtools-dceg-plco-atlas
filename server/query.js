@@ -235,6 +235,11 @@ async function getVariants(connection, params) {
     if (chromosome && !await hasRecord(connection, 'chromosome_range', {chromosome}))
         throw('A valid chromosome must be provided');
 
+    // validate/sanitize snps
+    if (params.snp) {
+        params.snp = params.snp.match(/[\w:]+/g)
+    }
+
     const [metadata] = await connection.query(
         `SELECT *  
         FROM phenotype_metadata 
@@ -283,7 +288,7 @@ async function getVariants(connection, params) {
 
     const conditions = [
         coalesce(params.id, `id = :id`),
-        coalesce(params.snp, `snp = :snp`),
+        coalesce(params.snp, `snp IN (${(params.snp || []).map(s => `"${s}"`).join(',')})`),
         coalesce(params.chromosome, `chromosome = :chromosome`),
         coalesce(params.position, `position = :position`),
         coalesce(params.position_min, `position >= :position_min`),
