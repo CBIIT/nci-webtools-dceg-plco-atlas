@@ -273,7 +273,6 @@ async function exportVariants({
                             allele_frequency            DOUBLE,
                             p_value                     DOUBLE,
                             p_value_nlog                DOUBLE, -- negative log10(P)
-                            p_value_nlog_expected       DOUBLE, -- expected negative log10(P)
                             p_value_heterogenous        BIGINT,
                             beta                        DOUBLE,
                             standard_error              DOUBLE,
@@ -349,21 +348,6 @@ async function exportVariants({
                     const lambdaGC = getLambdaGC(median);
                     logger.info(`LambdaGC: ${lambdaGC} FROM ${median}`)
 
-
-                    // if (qqRowIds.length) {
-                    //     await connection.execute(
-                    //         `UPDATE ${stageTable} SET show_qq_plot = 1 WHERE id IN (${getPlaceholders(qqRowIds)})`,
-                    //         qqRowIds
-                    //     );
-                    // }
-
-                    // determine expected p-value
-                    logger.info(`Determining expected p-values`);
-                    await connection.query(
-                        `UPDATE ${stageTable} 
-                        SET p_value_nlog_expected = -LOG10((id - 0.5) / ${count})
-                    `);
-
                     // determine qq plot points
                     const numPoints = 10000;
                     logger.info(`Determining ids for ${numPoints} qq plot points`);
@@ -403,7 +387,6 @@ async function exportVariants({
                             allele_frequency,
                             p_value,
                             p_value_nlog,
-                            p_value_nlog_expected,
                             p_value_heterogenous,
                             beta,
                             standard_error,
@@ -422,7 +405,6 @@ async function exportVariants({
                             allele_frequency,
                             p_value,
                             p_value_nlog,
-                            p_value_nlog_expected,
                             p_value_heterogenous,
                             beta,
                             standard_error,

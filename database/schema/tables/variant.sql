@@ -9,7 +9,6 @@ CREATE TABLE IF NOT EXISTS ${table_name} (
     allele_frequency double NULL,
     p_value double NULL,
     p_value_nlog double NULL,
-    p_value_nlog_expected double NULL,
     p_value_heterogenous double NULL,
     beta double NULL,
     standard_error double NULL,
