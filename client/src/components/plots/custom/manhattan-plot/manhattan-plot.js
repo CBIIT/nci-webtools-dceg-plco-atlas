@@ -838,6 +838,8 @@ export class ManhattanPlot {
         config.xAxis.extent =  extent(xData);
         config.yAxis.extent =  extent(yData.concat(yData2));
 
+        config.yAxis.extent[1] *= 1.1;
+
         config.zoomStack = [];
         this.draw();
         if (config.onZoom) {
