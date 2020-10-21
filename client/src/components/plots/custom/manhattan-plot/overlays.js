@@ -162,12 +162,14 @@ export function drawZoomOverlay(config, ctx, overlayCtx) {
     config.zoomOverlayActive = false;
     mouseDown = false;
 
-    // order coordinates so that x1 < x2, y2 < y2, and subtract margins
-    let x1 = Math.min(zoomArea.x1, zoomArea.x2) - margins.left; // left value (xMin)
-    let x2 = Math.max(zoomArea.x1, zoomArea.x2) - margins.left; // right value (xMax)
+    let zoomPadding = 10;
 
-    let y1 = Math.min(zoomArea.y1, zoomArea.y2) - margins.top; // top value (yMax)
-    let y2 = Math.max(zoomArea.y1, zoomArea.y2) - margins.top; // bottom value (yMin)
+    // order coordinates so that x1 < x2, y2 < y2, and subtract margins
+    let x1 = Math.min(zoomArea.x1, zoomArea.x2) - margins.left - zoomPadding; // left value (xMin)
+    let x2 = Math.max(zoomArea.x1, zoomArea.x2) - margins.left + zoomPadding; // right value (xMax)
+
+    let y1 = Math.min(zoomArea.y1, zoomArea.y2) - margins.top - zoomPadding; // top value (yMax)
+    let y2 = Math.max(zoomArea.y1, zoomArea.y2) - margins.top + zoomPadding; // bottom value (yMin)
     if ((x2 - x1) * (y2 - y1) < 100) return false;
 
     // make sure coordinates are within bounds
