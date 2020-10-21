@@ -131,7 +131,7 @@ export function SummaryResultsTable() {
       formatter: cell => cell < 1e-2 ? (+cell).toExponential() : cell,
       title: true,
       sort: true,
-      headerStyle: {width: '100px', minWidth: '100px'},
+      headerStyle: {width: '120px', minWidth: '120px'},
       headerClasses: 'overflow-ellipsis',
       classes: 'overflow-ellipsis',
     },
