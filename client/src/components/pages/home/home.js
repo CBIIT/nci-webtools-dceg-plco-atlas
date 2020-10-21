@@ -75,7 +75,7 @@ export function Home({ links }) {
         style={{ marginTop: '70px' }}>
         <CardDeck>
           {links
-            .slice(1, 4)
+            .filter((item) => item.cardTitle)
             .map(({ exact, route, action, title, cardTitle, cardText, image }, index) => (
               <>
                 <Card

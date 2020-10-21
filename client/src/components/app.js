@@ -3,6 +3,7 @@ import { HashRouter as Router, Route } from 'react-router-dom';
 import { Navbar } from './controls/navbar/navbar';
 import { Home } from './pages/home/home';
 import { About } from './pages/about/about';
+import { Api } from './pages/api/api';
 import { Gwas } from './pages/gwas/gwas';
 import { Phenotypes } from './pages/phenotypes/phenotypes';
 import { Downloads } from './pages/downloads/downloads';
@@ -17,6 +18,13 @@ function App() {
       route: '/about',
       title: 'About',
       // cardTitle: 'About',
+      image: 'assets/images/about.svg',
+      navIndex: 4
+    },
+    {
+      route: '/api-access',
+      title: 'API Access',
+      // cardTitle: 'API Access',
       image: 'assets/images/about.svg',
       navIndex: 3
     },
@@ -58,6 +66,7 @@ function App() {
       <Navbar links={links} />
       <Route path="/" exact={true} render={_ => <Home links={links} />} />
       <Route path="/about" component={About} />
+      <Route path="/api-access" component={Api} />
       <Route path="/gwas" component={Gwas} />
       <Route path="/phenotypes" component={Phenotypes} />
       <Route path="/downloads" component={Downloads} />
