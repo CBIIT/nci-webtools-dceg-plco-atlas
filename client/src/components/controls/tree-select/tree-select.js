@@ -106,14 +106,14 @@ export const TreeSelect = forwardRef(({
 
   const HighlightText = ({ text, highlighted }) => {
     let index = text.toLowerCase().indexOf(highlighted.toLowerCase());
-    return index == -1 ? text : <span>
+    return index === -1 ? text : <span>
       {text.substr(0, index)}
       <strong>{text.substr(index, highlighted.length)}</strong>
       {text.substr(index + highlighted.length)}
     </span>
   }
 
-  const Node = ({ node }) => (
+  const Node = ({ keyPrefix, node }) => (
     <div style={{ 
       marginLeft: '10px', 
       overflow: 'hidden', 
@@ -139,7 +139,8 @@ export const TreeSelect = forwardRef(({
           onChange={e => setSelected(node, e.target.checked)} />
         <HighlightText text={node.title} highlighted={searchFilter} />
       </label>
-      {isExpanded(node) && (node.children || []).sort(compareTitles).map(node => <Node node={node} />)}
+      {isExpanded(node) && (node.children || []).sort(compareTitles).map((node, i) => 
+        <Node key={`tree-node-${keyPrefix}-${i}`} node={node} />)}
     </div>
   );
 
@@ -156,7 +157,6 @@ export const TreeSelect = forwardRef(({
         </div>
         <div className="border d-flex align-items-center p-1">
           <input
-            className="mr-1"
             type="checkbox"
             checked={isSelected(root.current)}
             ref={current => current && (current.indeterminate = isIndeterminate(root))}
@@ -193,14 +193,14 @@ export const TreeSelect = forwardRef(({
           ? getLeaves(root.current)
             .filter(node => node.title.includes(searchFilter))
             .sort(compareTitles)
-            .map((node, i) => <Node key={`flat-tree-node-${i}`} node={node} />)
+            .map((node, i) => <Node key={`flat-tree-node-${i}`} keyPrefix={i} node={node} />)
           : data.tree
             .sort(compareTitles)
-            .map((node, i) => <Node key={`tree-node-${i}`} node={node} />)}
+            .map((node, i) => <Node key={`tree-node-${i}`} keyPrefix={i} node={node} />)}
       </div>
     </div>
   );
-})
+});
 
 export const TreeSelect2 = forwardRef(({
   onChange,
