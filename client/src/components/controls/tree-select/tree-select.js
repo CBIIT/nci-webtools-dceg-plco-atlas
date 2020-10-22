@@ -25,19 +25,16 @@ export const TreeSelect = forwardRef(({
       setExpandedNodes([]);
     },
     expandSelectedPhenotype(displayTreeParent) {
-      setExpandedNodes([displayTreeParent]);
-    },
-    collapseAll() {
-      setExpandedNodes([]);
+      // setExpandedNodes([displayTreeParent]);
     }
   }));
 
-  const root = { children: data ? data.tree : [] };
+  const root = useRef({ children: data ? data.tree : [] });
   const [selectedNodes, setSelectedNodes] = useState([]);
   const [expandedNodes, setExpandedNodes] = useState([]);
   const [searchFilter, setSearchFilter] = useState('');
-  useEffect(_ => setSelectedNodes(value || []), [value]);
-
+  useEffect(_ => {setSelectedNodes(value || [])}, [value]);
+  useEffect(_ => {root.current.children = data ? data.tree : []}, [data]);
 
   const arrayWithElements = (elements, shouldInclude, array) =>
     shouldInclude
@@ -53,10 +50,11 @@ export const TreeSelect = forwardRef(({
     return accumulator;
   }
 
-  const getNodes = node => reduceChildren(node, (acc, curr) =>
-    acc.concat([curr]),
-    [node]
-  );
+  const getIntermediateNodes = node => reduceChildren(node, (acc, curr) => {
+    if (curr.children && curr.children.length)
+      acc.push(curr);
+    return acc;
+  }, []);
 
   const getLeaves = node => reduceChildren(node, (acc, curr) => {
     if (!curr.children || !curr.children.length)
@@ -76,12 +74,11 @@ export const TreeSelect = forwardRef(({
   };
 
   const setSelected = (node, isSelected) => {
-    let selection;
-    if (singleSelect) {
-      selection = [node];
-    } else {
-      let leaves = getLeaves(node).filter(enabled)
-      if (limit > 0) leaves = leaves.slice(0, limit);
+    let selection = [node];
+    if (!singleSelect) {
+      let leaves = getLeaves(node)
+        .filter(enabled)
+        .filter((_, i) => limit > 0 || i < limit);
       selection = arrayWithElements(leaves, isSelected, selectedNodes);
     }
     setSelectedNodes(selection);
@@ -95,12 +92,17 @@ export const TreeSelect = forwardRef(({
     return selectedLeaves.length && selectedLeaves.length !== getLeaves(node).length;
   }
 
-  const isExpanded = node => expandedNodes.includes(node);
+  const isExpanded = node => {
+    return expandedNodes.includes(node);
+  }
   const toggleExpanded = (node, recursive = false) => {
-    const nodes = recursive ? getNodes(node) : [node];
-    console.log(nodes);
+    console.log(getIntermediateNodes(node));
     setExpandedNodes(
-      arrayWithElements(recursive ? getNodes(node) : [node], !isExpanded(node), expandedNodes)
+      arrayWithElements(
+        recursive ? getIntermediateNodes(node) : [node], 
+        !isExpanded(node), 
+        expandedNodes
+      )
     );
   }
 
@@ -122,6 +124,7 @@ export const TreeSelect = forwardRef(({
       {!searchFilter && <i role="button"
         onClick={_ => toggleExpanded(node)}
         className={`
+          text-secondary
           fa 
           fa-${isExpanded(node) ? 'minus' : 'plus'}-square 
           ${node.children && node.children.length ? 'visible' : 'invisible'}`} />}
@@ -147,18 +150,19 @@ export const TreeSelect = forwardRef(({
       <div className="d-flex">
         <div className="border d-flex align-items-center p-1">
           <i role="button"
-            onClick={_ => toggleExpanded(root, true)}
+            onClick={_ => toggleExpanded(root.current, true)}
             className={`
+              text-secondary  
               fa 
-              fa-${isExpanded(root) ? 'minus' : 'plus'}-square`} />
+              fa-${isExpanded(root.current) ? 'minus' : 'plus'}-square`} />
         </div>
         <div className="border d-flex align-items-center p-1">
           <input
             className="mr-1"
             type="checkbox"
-            checked={isSelected(root)}
+            checked={isSelected(root.current)}
             ref={current => current && (current.indeterminate = isIndeterminate(root))}
-            onChange={e => setSelected(root, e.target.checked)} />
+            onChange={e => setSelected(root.current, e.target.checked)} />
         </div>
         <div className="input-group">
           <input 
@@ -188,9 +192,9 @@ export const TreeSelect = forwardRef(({
           </Spinner>
         </LoadingOverlay>}
         {searchFilter.length
-          ? getLeaves(root)
-            .sort(compareTitles)
+          ? getLeaves(root.current)
             .filter(node => node.title.includes(searchFilter))
+            .sort(compareTitles)
             .map((node, i) => <Node key={`flat-tree-node-${i}`} node={node} />)
           : data.tree
             .sort(compareTitles)

@@ -112,7 +112,7 @@ export function SummaryResultsForm({
 
   function handleReset(ev) {
     ev.preventDefault();
-    treeRef.current.collapseAll();
+    treeRef.current.resetSearchFilter();
     _setSelectedPhenotypes([]);
     _setSelectedStratifications([]);
     _setIsPairwise(false);
