@@ -327,7 +327,7 @@ export function SummaryResultsTable() {
               
           <OverlayTrigger overlay={
             <Tooltip id="export-info-tooltip" className={summaryTables.tables[selectedTable].resultsCount > exportRowLimit ? 'visible': 'invisible'}>
-              Only the top {exportRowLimit} variants based on the current sort order will be downloaded.
+              Only the top {exportRowLimit.toLocaleString()} variants based on the current sort order will be downloaded.
             </Tooltip>}>
           <a
             className="btn btn-sm btn-silver ml-2"
@@ -341,7 +341,7 @@ export function SummaryResultsTable() {
           <input
             style={{ maxWidth: '400px' }}
             className="form-control form-control-sm"
-            placeholder="Search for a SNP"
+            placeholder="Search for SNPs"
             value={summarySnpTables.snp}
             onChange={e => setSnp(e.target.value)}
             aria-label="Filter SNP"
