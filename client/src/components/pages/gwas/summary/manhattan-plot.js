@@ -454,6 +454,17 @@ export function ManhattanPlot({
                   },
                   'Go to Variant Lookup'
                 )
+              ]),
+              h('div', null, [
+                h(
+                  'a',
+                  {
+                    className: 'font-weight-bold',
+                    href: `https://www.ebi.ac.uk/gwas/search?query=${record.snp}`,
+                    target: '_blank'
+                  },
+                  'Go to GWAS Catalog'
+                )
               ])
             ]);
           }
@@ -652,6 +663,17 @@ export function ManhattanPlot({
                     onclick: () => onVariantLookup && onVariantLookup(record)
                   },
                   'Go to Variant Lookup'
+                )
+              ]),
+              h('div', null, [
+                h(
+                  'a',
+                  {
+                    className: 'font-weight-bold',
+                    href: `https://www.ebi.ac.uk/gwas/search?query=${record.snp}`,
+                    target: '_blank'
+                  },
+                  'Go to GWAS Catalog'
                 )
               ])
             ]);
