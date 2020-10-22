@@ -25,7 +25,7 @@ export const TreeSelect = forwardRef(({
       setExpandedNodes([]);
     },
     expandSelectedPhenotype(displayTreeParent) {
-      // setExpandedNodes([displayTreeParent]);
+      setExpanded(displayTreeParent.data, true);
     }
   }));
 
@@ -98,15 +98,19 @@ export const TreeSelect = forwardRef(({
 
   const isExpanded = node => expandedNodes.includes(node);
 
-  const toggleExpanded = (node, recursive = false) => {
+
+  const setExpanded = (node, isExpanded, recursive = false) => {
     setExpandedNodes(
       arrayWithElements(
         recursive ? getIntermediateNodes(node) : [node], 
-        !isExpanded(node), 
+        isExpanded, 
         expandedNodes
       )
     );
   }
+
+  const toggleExpanded = (node, recursive = false) => 
+    setExpanded(node, !isExpanded(node, recursive));
 
   const HighlightText = ({ text, highlighted }) => {
     let index = text.toLowerCase().indexOf(highlighted.toLowerCase());
