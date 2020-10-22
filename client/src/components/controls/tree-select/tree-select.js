@@ -1,20 +1,213 @@
 import React, { forwardRef, useState, useEffect, useImperativeHandle, useRef } from 'react';
+import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 import { Spinner } from 'react-bootstrap';
-import { 
-  containsVal, 
-  containsAllVals, 
-  removeVal, 
+import {
+  containsVal,
+  containsAllVals,
+  removeVal,
   removeAllVals
 } from './tree-select-utils';
 
+
 export const TreeSelect = forwardRef(({
-    onChange,
-    data,
-    value,
-    singleSelect,
-    alwaysEnabled,
-    id: idProp = 'default-id',
-  }, ref) => {
+  onChange,
+  data,
+  value,
+  limit = 0,
+  singleSelect,
+  enabled = node => true,
+  placeholder = "Search",
+}, ref) => {
+
+  useImperativeHandle(ref, () => ({
+    resetSearchFilter() {
+      setSearchFilter('');
+      setExpandedNodes([]);
+    },
+    expandSelectedPhenotype(displayTreeParent) {
+      setExpandedNodes([displayTreeParent]);
+    },
+    collapseAll() {
+      setExpandedNodes([]);
+    }
+  }));
+
+  const root = { children: data ? data.tree : [] };
+  const [selectedNodes, setSelectedNodes] = useState([]);
+  const [expandedNodes, setExpandedNodes] = useState([]);
+  const [searchFilter, setSearchFilter] = useState('');
+  useEffect(_ => setSelectedNodes(value || []), [value]);
+
+
+  const arrayWithElements = (elements, shouldInclude, array) =>
+    shouldInclude
+      ? array.concat(elements.filter(e => !array.includes(e)))
+      : array.filter(e => !elements.includes(e));
+
+  const compareTitles = (a, b) => a.title.localeCompare(b.title);
+
+  function reduceChildren(node, fn, initialValue) {
+    let accumulator = fn(initialValue || node, node);
+    for (let child of node.children || [])
+      accumulator = reduceChildren(child, fn, accumulator)
+    return accumulator;
+  }
+
+  const getNodes = node => reduceChildren(node, (acc, curr) =>
+    acc.concat([curr]),
+    [node]
+  );
+
+  const getLeaves = node => reduceChildren(node, (acc, curr) => {
+    if (!curr.children || !curr.children.length)
+      acc.push(curr);
+    return acc;
+  }, []);
+
+  const getSelectedLeaves = node => getLeaves(node).filter(node =>
+    selectedNodes.includes(node)
+  );
+
+  const isSelected = node => {
+    const selectedLeaves = getSelectedLeaves(node);
+    return selectedNodes.includes(node) || (
+      selectedLeaves.length && selectedLeaves.length === getLeaves(node).length
+    );
+  };
+
+  const setSelected = (node, isSelected) => {
+    let selection;
+    if (singleSelect) {
+      selection = [node];
+    } else {
+      let leaves = getLeaves(node).filter(enabled)
+      if (limit > 0) leaves = leaves.slice(0, limit);
+      selection = arrayWithElements(leaves, isSelected, selectedNodes);
+    }
+    setSelectedNodes(selection);
+    onChange(selection);
+  }
+
+  const isDisabled = node => !getLeaves(node).some(enabled);
+
+  const isIndeterminate = node => {
+    const selectedLeaves = getSelectedLeaves(node);
+    return selectedLeaves.length && selectedLeaves.length !== getLeaves(node).length;
+  }
+
+  const isExpanded = node => expandedNodes.includes(node);
+  const toggleExpanded = (node, recursive = false) => {
+    const nodes = recursive ? getNodes(node) : [node];
+    console.log(nodes);
+    setExpandedNodes(
+      arrayWithElements(recursive ? getNodes(node) : [node], !isExpanded(node), expandedNodes)
+    );
+  }
+
+  const HighlightText = ({ text, highlighted }) => {
+    let index = text.toLowerCase().indexOf(highlighted.toLowerCase());
+    return index == -1 ? text : <span>
+      {text.substr(0, index)}
+      <strong>{text.substr(index, highlighted.length)}</strong>
+      {text.substr(index + highlighted.length)}
+    </span>
+  }
+
+  const Node = ({ node }) => (
+    <div style={{ 
+      marginLeft: '10px', 
+      overflow: 'hidden', 
+      whiteSpace: 'nowrap' 
+    }}>
+      {!searchFilter && <i role="button"
+        onClick={_ => toggleExpanded(node)}
+        className={`
+          fa 
+          fa-${isExpanded(node) ? 'minus' : 'plus'}-square 
+          ${node.children && node.children.length ? 'visible' : 'invisible'}`} />}
+      <label
+        className={`d-inline-flex align-items-center font-weight-normal ml-1 small ${isDisabled(node) ? 'text-muted c-not-allowed' : ''}`}
+        style={{ whiteSpace: 'nowrap', overflow: 'hidden' }}
+        title={node.title}>
+        <input
+          className={`mr-1`}
+          type="checkbox"
+          checked={isSelected(node)}
+          ref={current => current && (current.indeterminate = isIndeterminate(node))}
+          disabled={isDisabled(node)}
+          onChange={e => setSelected(node, e.target.checked)} />
+        <HighlightText text={node.title} highlighted={searchFilter} />
+      </label>
+      {isExpanded(node) && (node.children || []).sort(compareTitles).map(node => <Node node={node} />)}
+    </div>
+  );
+
+  return (!data || !data.tree.length) ? null : (
+    <div className="border">
+      <div className="d-flex">
+        <div className="border d-flex align-items-center p-1">
+          <i role="button"
+            onClick={_ => toggleExpanded(root, true)}
+            className={`
+              fa 
+              fa-${isExpanded(root) ? 'minus' : 'plus'}-square`} />
+        </div>
+        <div className="border d-flex align-items-center p-1">
+          <input
+            className="mr-1"
+            type="checkbox"
+            checked={isSelected(root)}
+            ref={current => current && (current.indeterminate = isIndeterminate(root))}
+            onChange={e => setSelected(root, e.target.checked)} />
+        </div>
+        <div className="input-group">
+          <input 
+            className="form-control form-control-sm" 
+            value={searchFilter} 
+            onChange={e => setSearchFilter(e.target.value)} 
+            placeholder={placeholder}
+          />
+          <div className="input-group-append">
+            <button className="btn btn-sm btn-silver" onClick={e => setSearchFilter('')}>
+              <i className={`fa fa-${searchFilter.length ? 'times' : 'search'}`} />    
+            </button>
+          </div>
+        </div>
+
+      </div>
+      <div
+        style={{
+          position: 'relative',
+          minHeight: '250px',
+          maxHeight: '500px',
+          overflowY: 'auto',
+        }}>
+        {<LoadingOverlay active={!data}>
+          <Spinner animation="border" variant="primary" role="status">
+            <span className="sr-only">Loading...</span>
+          </Spinner>
+        </LoadingOverlay>}
+        {searchFilter.length
+          ? getLeaves(root)
+            .sort(compareTitles)
+            .filter(node => node.title.includes(searchFilter))
+            .map((node, i) => <Node key={`flat-tree-node-${i}`} node={node} />)
+          : data.tree
+            .sort(compareTitles)
+            .map((node, i) => <Node key={`tree-node-${i}`} node={node} />)}
+      </div>
+    </div>
+  );
+})
+
+export const TreeSelect2 = forwardRef(({
+  onChange,
+  data,
+  value,
+  singleSelect,
+  alwaysEnabled,
+  id: idProp = 'default-id',
+}, ref) => {
 
   useImperativeHandle(ref, () => ({
     resetSearchFilter() {
@@ -45,9 +238,9 @@ export const TreeSelect = forwardRef(({
     }
     parents.map((parent) => checkParents(parent));
     if (singleSelect) {
-      expandParents({data: value});
+      expandParents({ data: value });
     } else {
-      value.forEach((val) => expandParents({data: val}));
+      value.forEach((val) => expandParents({ data: val }));
     }
   }, [data]);
 
@@ -155,7 +348,7 @@ export const TreeSelect = forwardRef(({
         if (
           root.getElementsByClassName(className)[0].style.display &&
           root.getElementsByClassName(className)[0].style.display ===
-            'block'
+          'block'
         ) {
           root.getElementsByClassName(className)[0].style.display = 'none';
           const collapseButton = root.getElementsByClassName(
@@ -180,7 +373,7 @@ export const TreeSelect = forwardRef(({
       if (
         root.getElementsByClassName(className)[0].style.display &&
         root.getElementsByClassName(className)[0].style.display ===
-          'block'
+        'block'
       ) {
         root.getElementsByClassName(className)[0].style.display = 'none';
         const collapseButton = root.getElementsByClassName(
@@ -199,7 +392,7 @@ export const TreeSelect = forwardRef(({
     if (!root) return;
 
     const className = 'children-of-' + name;
-    let node =  root.getElementsByClassName(className)[0];
+    let node = root.getElementsByClassName(className)[0];
     if (!node) return true;
     if (
       root.getElementsByClassName(className)[0].style.display &&
@@ -244,7 +437,7 @@ export const TreeSelect = forwardRef(({
     const itemAllLeafs = getAllLeafs(item);
     // if (!singleSelect) {
     // console.log("itemAllLeafs", itemAllLeafs);
-    const itemImportDates = itemAllLeafs.map(obj => obj.import_date);
+    const itemImportDates = itemAllLeafs.map(obj => obj ? obj.import_date : undefined);
     // console.log("itemImportDates", itemImportDates);
     return itemImportDates.every(element => element === null);
     // }
@@ -419,9 +612,9 @@ export const TreeSelect = forwardRef(({
       if (item.children && item.children.length > 0) {
         return (
           // PARENT
-          <li 
+          <li
             key={'categorical-' + item.id}
-            className="my-1" 
+            className="my-1"
             style={{ display: 'block' }}
           >
             <div className="d-flex align-items-center">
@@ -473,7 +666,7 @@ export const TreeSelect = forwardRef(({
               />
 
               <button
-                title={singleSelect? "Show/hide " + item.title + " phenotypes" : 'Select/deselect all ' + item.title + ' phenotypes'}
+                title={singleSelect ? "Show/hide " + item.title + " phenotypes" : 'Select/deselect all ' + item.title + ' phenotypes'}
                 className="ml-1"
                 style={{
                   all: 'unset',
@@ -485,7 +678,7 @@ export const TreeSelect = forwardRef(({
                 }}
                 disabled={!singleSelect && checkAllChildrenDisabled(item) ? true : false}
                 onClick={e => singleSelect ? toggleHideChildren(item.id) : handleSelect(item)}
-                >
+              >
                 {item.title}
               </button>
             </div>
@@ -517,8 +710,8 @@ export const TreeSelect = forwardRef(({
             />
             <input
               title={singleSelect ? "Select " + item.title + " phenotype" : "Select/deselect " + item.title + " phenotype"}
-              style={{ 
-                cursor: alwaysEnabled || item.import_date ? 'pointer' : 'not-allowed' 
+              style={{
+                cursor: alwaysEnabled || item.import_date ? 'pointer' : 'not-allowed'
               }}
               className={'ml-1 leaf-checkbox-' + item.id}
               // name={'leaf-checkbox-' + item.id}
@@ -557,7 +750,7 @@ export const TreeSelect = forwardRef(({
               }}
               disabled={alwaysEnabled || item.import_date ? false : true}
               onClick={e => handleSelect(item)}
-              >
+            >
               {item.title}
             </button>
           </li>
@@ -625,12 +818,12 @@ export const TreeSelect = forwardRef(({
               {item.title.slice(
                 item.title.toLowerCase().indexOf(searchInput.toLowerCase()),
                 item.title.toLowerCase().indexOf(searchInput.toLowerCase()) +
-                  searchInput.length
+                searchInput.length
               )}
             </b>
             {item.title.slice(
               item.title.toLowerCase().indexOf(searchInput.toLowerCase()) +
-                searchInput.length,
+              searchInput.length,
               item.title.length
             )}
           </button>
@@ -655,9 +848,9 @@ export const TreeSelect = forwardRef(({
 
   // return true if all leafs are selected
   const checkAllLeafsSelected = () => {
-    if (!data) return;
+    if (!data || !data.tree.length) return false;
     let allLeafs = [];
-    data.tree.map(item => allLeafs.push(getAllLeafs(item).filter(obj => alwaysEnabled ? obj : obj.import_date)));
+    data.tree.map(item => allLeafs.push(getAllLeafs(item).filter(obj => alwaysEnabled ? obj : (obj && obj.import_date))));
     allLeafs = allLeafs.flat().map(item => item.id);
     for (var i = 0; i < allLeafs.length; i++) {
       if (value.map(item => item.id).indexOf(allLeafs[i]) === -1)
@@ -665,6 +858,7 @@ export const TreeSelect = forwardRef(({
     }
     return true;
   };
+
 
   return (
     <>
@@ -690,10 +884,10 @@ export const TreeSelect = forwardRef(({
                 onClick={e => toggleExpandAllParents()}
                 disabled={!data}>
                 {expandAll && (
-                  <i className="fa fa-minus-square" style={{cursor: !data ? 'not-allowed' : 'pointer'}}></i>
+                  <i className="fa fa-minus-square" style={{ cursor: !data ? 'not-allowed' : 'pointer' }}></i>
                 )}
                 {!expandAll && (
-                  <i className="fa fa-plus-square" style={{cursor: !data ? 'not-allowed' : 'pointer'}}></i>
+                  <i className="fa fa-plus-square" style={{ cursor: !data ? 'not-allowed' : 'pointer' }}></i>
                 )}
               </button>
 
@@ -756,16 +950,16 @@ export const TreeSelect = forwardRef(({
                   onClick={e => {
                     clearSearchFilter();
                   }}>
-                  <i className="fa fa-times" style={{fontSize: '14px'}}></i>
+                  <i className="fa fa-times" style={{ fontSize: '14px' }}></i>
                 </button>
               ) : (
-                <button 
-                  className="input-group-text bg-white" 
-                  title="Filter tree input icon"
-                  disabled>
-                  <i className="fa fa-search" style={{fontSize: '14px'}}></i>
-                </button>
-              )}
+                  <button
+                    className="input-group-text bg-white"
+                    title="Filter tree input icon"
+                    disabled>
+                    <i className="fa fa-search" style={{ fontSize: '14px' }}></i>
+                  </button>
+                )}
             </div>
           </div>
         </div>
@@ -773,19 +967,19 @@ export const TreeSelect = forwardRef(({
           !data &&
           <div
             className="d-flex align-items-center justify-content-center"
-            style={{ 
+            style={{
               // display: !data ? 'block' : 'none',
               minHeight: '250px',
               maxHeight: '500px'
             }}>
-            {!data && 
+            {!data &&
               <Spinner animation="border" variant="primary" role="status">
                 <span className="sr-only">Loading...</span>
               </Spinner>
             }
           </div>
         }
-        { data &&
+        {data &&
           <>
             <ul
               className="pl-0 ml-1 mr-0 my-0"
@@ -800,7 +994,7 @@ export const TreeSelect = forwardRef(({
                 maxHeight: '500px',
                 fontSize: '10pt'
               }}>
-                {selectTreeCategorical(data.tree)}
+              {selectTreeCategorical(data.tree)}
             </ul>
             <ul
               className="pl-0 ml-1 mr-0 my-0"
@@ -815,11 +1009,11 @@ export const TreeSelect = forwardRef(({
                 maxHeight: '500px',
                 fontSize: '10pt'
               }}>
-                {selectTreeAlphabetical()}
+              {selectTreeAlphabetical()}
             </ul>
           </>
         }
-        
+
       </div>
     </>
   );
