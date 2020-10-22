@@ -77,14 +77,15 @@ export function SummaryResults() {
   // };
 
   const handleSubmit = ({phenotypes, stratifications, isPairwise}) => {
-    
-    if (!phenotypes.length) {
-      return setMessages([
-        {
-          type: 'danger',
-          content: 'Please select a phenotype.'
-        }
-      ]);
+    if (!phenotypes.length || !stratifications.length) {
+      let content = '';
+      if (!phenotypes.length)
+        content += 'Please select a phenotype. ';
+      if (!stratifications.length && !isPairwise)
+        content += 'One ancestry/sex variable must be selected. ';
+      else if (stratifications.length != 2 && isPairwise)
+        content += 'Both ancestry/sex variables must be selected. ';
+      return setMessages([{type: 'danger', content}]);
     }
 
     const initialState = getInitialState();
@@ -382,12 +383,6 @@ export function SummaryResults() {
               onSubmit={handleSubmit}
               onReset={handleReset}
             />
-            {messages &&
-              messages.map(({ type, content }) => (
-                <Alert className="mt-3" variant={type} onClose={clearMessages} dismissible>
-                  {content}
-                </Alert>
-              ))}
           </div>
         </SidebarPanel>
 

@@ -1,8 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { useSelector } from 'react-redux';
-import { Button, OverlayTrigger, Tooltip } from 'react-bootstrap';
+import { useDispatch, useSelector } from 'react-redux';
+import { Button, Alert } from 'react-bootstrap';
 import { TreeSelect } from '../../../controls/tree-select/tree-select';
 import { asTitleCase } from './utils';
+import { updateSummaryResults } from '../../../../services/actions';
 // import Select, { components } from 'react-select';
 
 export function SummaryResultsForm({
@@ -19,8 +20,11 @@ export function SummaryResultsForm({
   const treeRef = useRef();
 
   // select store members
+  const dispatch = useDispatch();
   const phenotypes = useSelector(state => state.phenotypes);
-  const { submitted } = useSelector(state => state.summaryResults);
+  const { submitted, messages } = useSelector(state => state.summaryResults);
+  const setMessages = messages => dispatch(updateSummaryResults({ messages }));
+  const clearMessages = _ => setMessages([]);
 
   // private members prefixed with _
   const [_selectedPhenotypes, _setSelectedPhenotypes] = useState(selectedPhenotypes);
@@ -108,6 +112,7 @@ export function SummaryResultsForm({
 
   function handleReset(ev) {
     ev.preventDefault();
+    treeRef.current.collapseAll();
     _setSelectedPhenotypes([]);
     _setSelectedStratifications([]);
     _setIsPairwise(false);
@@ -192,22 +197,19 @@ export function SummaryResultsForm({
           isDisabled={existingStratifications.length === 0}
         /> */}
 
+
+      {messages && messages.map(({ type, content }) => (
+        <Alert className="mt-3" variant={type} onClose={clearMessages} dismissible>
+          {content}
+        </Alert>
+      ))}
       <div>
-        <OverlayTrigger
-          overlay={isValid ? <span /> : <Tooltip id="submit-summary-results">
-            Please select phenotype(s) and/or stratification(s).
-            </Tooltip>}>
-          <span className={!isValid ? 'c-not-allowed' : undefined}>
-            <Button
-              type="submit"
-              variant="silver"
-              className={!isValid ? 'pointer-events-none' : undefined}
-              disabled={!isValid || (!_isModified && submitted)}
-              onClick={handleSubmit}>
-              Submit
-            </Button>
-          </span>
-        </OverlayTrigger>
+        <Button
+            type="submit"
+            variant="silver"
+            onClick={handleSubmit}>
+            Submit
+        </Button>
 
         <Button
           className="ml-2"
