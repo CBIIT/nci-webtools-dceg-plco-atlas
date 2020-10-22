@@ -42,18 +42,20 @@ export function VariantLookupForm({ onChange, onSubmit, onReset }) {
       <div className="mb-2">
         <label className="required">Phenotypes</label>
         <TreeSelect
+          id="lookup-form-tree-select"
           data={phenotypes}
           value={selectedPhenotypes}
           onChange={handleChangeCustom}
           ref={treeRef}
+          enabled={item => item.import_date}
         />
       </div>
 
       <div className="mb-2">
         <label className="required">Variant</label>
-        <input
+        <textarea
           className="form-control"
-          placeholder="Enter RS Number or Coordinate"
+          placeholder="Enter RS Numbers or Coordinates"
           aria-label="Variant (required)"
           value={selectedVariant}
           onChange={e => {

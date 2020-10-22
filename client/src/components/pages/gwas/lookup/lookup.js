@@ -87,11 +87,24 @@ export function VariantLookup() {
       classes: 'overflow-ellipsis',
     },
     {
+      dataField: 'snp',
+      text: 'SNP',
+      sort: true,
+      formatter: cell => !/^rs\d+/.test(cell) ?
+        (!/^chr[\d+|x|y]:\d+/i.test(cell) ? cell :
+          cell.split(':')[0] + ':' + cell.split(':')[1]) :
+        <a className="overflow-ellipsis" href={`https://www.ncbi.nlm.nih.gov/snp/${cell.split(':')[0]}`} target="_blank">{cell}</a>,
+      title: true,
+      headerStyle: {width: '180px'},
+      headerClasses: 'overflow-ellipsis',
+      classes: 'overflow-ellipsis  text-nowrap',
+    },    
+    {
       dataField: 'allele_reference',
       text: 'Eff. Allele',
       headerTitle: _ => 'Effect Allele [Frequency]',
-      formatter: (cell, row) => `${cell} [${row.allele_frequency.toPrecision(4)}]`,
-      title: (cell, row) => `${cell} [${row.allele_frequency.toPrecision(4)}]`,
+      formatter: (cell, row) => cell === '-' ? '-' : `${cell} [${row.allele_frequency.toPrecision(4)}]`,
+      title: (cell, row) => cell === '-' ? '-' : `${cell} [${row.allele_frequency.toPrecision(4)}]`,
       headerStyle: { width: '200px' },
       headerClasses: 'overflow-ellipsis',
       classes: 'overflow-ellipsis text-nowrap',
@@ -101,8 +114,8 @@ export function VariantLookup() {
       dataField: 'allele_alternate',
       text: 'Non-Eff. Allele',
       headerTitle: _ => 'Non-Effect Allele [Frequency]',
-      formatter: (cell, row) => `${cell} [${(1 - row.allele_frequency).toPrecision(4)}]`,
-      title: (cell, row) => `${cell} [${(1 - row.allele_frequency).toPrecision(4)}]`,
+      formatter: (cell, row) => cell === '-' ? '-' : `${cell} [${(1 - row.allele_frequency).toPrecision(4)}]`,
+      title: (cell, row) => cell === '-' ? '-' : `${cell} [${(1 - row.allele_frequency).toPrecision(4)}]`,
       headerStyle: { width: '200px' },
       headerClasses: 'overflow-ellipsis',
       classes: 'overflow-ellipsis  text-nowrap',
@@ -143,6 +156,7 @@ export function VariantLookup() {
       text: <span>Het. <span className="text-nowrap">P-Value</span></span>,
       headerTitle: _ => 'Heterogenous P-Values',
       title: true,
+      formatter: cell => isNaN(cell) ? '-' : cell,
       headerStyle: {minWidth: '100px'},
       headerClasses: 'overflow-ellipsis',
       classes: 'overflow-ellipsis',
@@ -152,6 +166,7 @@ export function VariantLookup() {
       text: 'N',
       headerTitle: _ => 'Sample Size',
       title: true,
+      formatter: cell => isNaN(cell) ? '-' : cell,
       headerStyle: {width: '80px'},
       headerClasses: 'overflow-ellipsis',
       classes: 'overflow-ellipsis',
@@ -193,9 +208,10 @@ export function VariantLookup() {
 
   const validateVariantInput = variant => {
     if (
-      variant.match(/^rs[0-9]+$/i) != null ||
-      variant.match(
-        /^(chr)?(([1-9]|[1][0-9]|[2][0-2])|[x|y]):[0-9]+/i
+      variant.match(/^rs\d+$/i) != null ||
+      variant.match(/^chr(\d+|x|y):\d/i 
+      
+        // /^(chr)?(([1-9]|[1][0-9]|[2][0-2])|[x|y]):[0-9]+/i
       ) != null
       // ||
       // selectedVariant.match(
@@ -244,15 +260,16 @@ export function VariantLookup() {
       ]);
       return;
     }
-    if (!validateVariantInput(params.variant)) {
-      setMessages([
-        {
-          type: 'danger',
-          content: "Please input a valid variant rsid or coordinate. (Ex. 'rs1234' or 'chr22:25855459')"
-        }
-      ]);
-      return;
-    }
+    // skip variant validation for now
+    // if (!validateVariantInput(params.variant)) {
+    //   setMessages([
+    //     {
+    //       type: 'danger',
+    //       content: "Please input a valid variant rsid or coordinate. (Ex. 'rs1234' or 'chr22:25855459')"
+    //     }
+    //   ]);
+    //   return;
+    // }
     // close sidebar on submit
     // setOpenSidebar(false);
 

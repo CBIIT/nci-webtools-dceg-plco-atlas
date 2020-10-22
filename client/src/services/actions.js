@@ -663,20 +663,20 @@ export function lookupVariants({phenotypes, variant, sex, ancestry}) {
       
       let chromosome = null;
       let position = null;
-      let snp = null;
+      let snp = variant;
   
-      // determine if we should query by snp or chromosome/position
-      const coordinates = variant.match(/^chr(x|y|\d+):\d+$/i);
-      if (coordinates) {
-        [, chromosome, position] = coordinates;
-      } else {
-        snp = variant;
-      }
+      // // determine if we should query by snp or chromosome/position
+      // const coordinates = variant.match(/^chr(x|y|\d+):\d+$/i);
+      // if (coordinates) {
+      //   [, chromosome, position] = coordinates;
+      // } else {
+      //   snp = variant;
+      // }
   
       // null properties are not included in query
       const {data} = await query('variants', {
         phenotype_id: phenotypes.map(p => p.id),
-        sex: sex === 'combined' ? ['female', 'male'] : sex,
+        sex,
         ancestry,
         chromosome,
         position,
