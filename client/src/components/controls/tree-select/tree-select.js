@@ -98,7 +98,6 @@ export const TreeSelect = forwardRef(({
 
   const isExpanded = node => expandedNodes.includes(node);
 
-
   const setExpanded = (node, isExpanded, recursive = false) => {
     setExpandedNodes(
       arrayWithElements(
@@ -110,7 +109,7 @@ export const TreeSelect = forwardRef(({
   }
 
   const toggleExpanded = (node, recursive = false) => 
-    setExpanded(node, !isExpanded(node, recursive));
+    setExpanded(node, !isExpanded(node), recursive);
 
   const HighlightText = ({ text, highlighted }) => {
     let index = text.toLowerCase().indexOf(highlighted.toLowerCase());
