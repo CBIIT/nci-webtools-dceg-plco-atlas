@@ -78,7 +78,7 @@ export const TreeSelect = forwardRef(({
     if (!singleSelect) {
       let leaves = getLeaves(node)
         .filter(enabled)
-        .filter((_, i) => limit > 0 || i < limit);
+        .filter((_, i) => limit === 0 || i < limit);
       selection = arrayWithElements(leaves, isSelected, selectedNodes);
     }
     setSelectedNodes(selection);
@@ -92,11 +92,9 @@ export const TreeSelect = forwardRef(({
     return selectedLeaves.length && selectedLeaves.length !== getLeaves(node).length;
   }
 
-  const isExpanded = node => {
-    return expandedNodes.includes(node);
-  }
+  const isExpanded = node => expandedNodes.includes(node);
+
   const toggleExpanded = (node, recursive = false) => {
-    console.log(getIntermediateNodes(node));
     setExpandedNodes(
       arrayWithElements(
         recursive ? getIntermediateNodes(node) : [node], 
