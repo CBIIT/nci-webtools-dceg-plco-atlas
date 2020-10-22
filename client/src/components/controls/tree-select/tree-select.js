@@ -198,7 +198,7 @@ export const TreeSelect = forwardRef(({
         </LoadingOverlay>}
         {searchFilter.length
           ? getLeaves(root.current)
-            .filter(node => node.title.includes(searchFilter))
+            .filter(node => node.title.toLowerCase().includes(searchFilter.toLowerCase()))
             .sort(compareTitles)
             .map((node, i) => <Node key={`flat-tree-node-${i}`} keyPrefix={i} node={node} />)
           : data.tree
