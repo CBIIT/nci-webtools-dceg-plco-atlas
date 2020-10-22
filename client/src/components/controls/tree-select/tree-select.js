@@ -1,4 +1,4 @@
-import React, { forwardRef, useState, useEffect, useImperativeHandle } from 'react';
+import React, { forwardRef, useState, useEffect, useImperativeHandle, useRef } from 'react';
 import { Spinner } from 'react-bootstrap';
 import { 
   containsVal, 
@@ -12,7 +12,8 @@ export const TreeSelect = forwardRef(({
     data,
     value,
     singleSelect,
-    alwaysEnabled
+    alwaysEnabled,
+    id: idProp = 'default-id',
   }, ref) => {
 
   useImperativeHandle(ref, () => ({
@@ -23,8 +24,14 @@ export const TreeSelect = forwardRef(({
     expandSelectedPhenotype(displayTreeParent) {
       collapseAllParents();
       expandParents(displayTreeParent);
+    },
+    collapseAll() {
+      collapseAllParents()
     }
   }));
+
+  const [id, setId] = useState(`default-id-${Math.random()}`);
+  useEffect(() => setId(`${idProp}-${Math.random()}`), [idProp]);
 
   // check parent checked/indeterminate state when tree is loaded/reloaded
   useEffect(() => {
@@ -56,12 +63,15 @@ export const TreeSelect = forwardRef(({
 
   // given child, expand all parent tree nodes leading to child in tree
   const expandParents = (displayTreeParent) => {
+    var root = document.getElementById(id);
+    if (!root) return;
+
     var parents = getParents(displayTreeParent.data);
     parents.push(displayTreeParent.data);
     parents.map((item) => {
-      if (document.getElementsByClassName('collapse-button-text-' + item.id)[0]) {
-        if (document.getElementsByClassName('collapse-button-text-' + item.id)[0].classList.contains("fa-plus-square")) {
-          document.getElementsByClassName('collapse-button-text-' + item.id)[0].click();
+      if (root.getElementsByClassName('collapse-button-text-' + item.id)[0]) {
+        if (root.getElementsByClassName('collapse-button-text-' + item.id)[0].classList.contains("fa-plus-square")) {
+          root.getElementsByClassName('collapse-button-text-' + item.id)[0].click();
         }
       }
     });
@@ -85,8 +95,11 @@ export const TreeSelect = forwardRef(({
     if (!node.children || node.children.length === 0) {
       allLeafs.push(node);
     } else {
-      if (document.getElementsByClassName('parent-checkbox-' + node.id)[0]) {
-        document.getElementsByClassName(
+      let root = document.getElementById(id);
+      if (!root) return;
+
+      if (root.getElementsByClassName('parent-checkbox-' + node.id)[0]) {
+        root.getElementsByClassName(
           'parent-checkbox-' + node.id
         )[0].checked = true;
       }
@@ -117,15 +130,18 @@ export const TreeSelect = forwardRef(({
 
   // expand all parent nodes in tree
   const toggleExpandAllParents = () => {
+    let root = document.getElementById(id);
+    if (!root) return;
+
     if (!expandAll) {
       for (let i = 0; i < data.categories.length; i++) {
         const className = 'children-of-' + data.categories[i].id;
         if (
-          document.getElementsByClassName(className)[0].style.display &&
-          document.getElementsByClassName(className)[0].style.display === 'none'
+          root.getElementsByClassName(className)[0].style.display &&
+          root.getElementsByClassName(className)[0].style.display === 'none'
         ) {
-          document.getElementsByClassName(className)[0].style.display = 'block';
-          const collapseButton = document.getElementsByClassName(
+          root.getElementsByClassName(className)[0].style.display = 'block';
+          const collapseButton = root.getElementsByClassName(
             'collapse-button-text-' + data.categories[i].id
           )[0];
           collapseButton.classList.toggle('fa-plus-square', false);
@@ -137,12 +153,12 @@ export const TreeSelect = forwardRef(({
       for (let i = 0; i < data.categories.length; i++) {
         const className = 'children-of-' + data.categories[i].id;
         if (
-          document.getElementsByClassName(className)[0].style.display &&
-          document.getElementsByClassName(className)[0].style.display ===
+          root.getElementsByClassName(className)[0].style.display &&
+          root.getElementsByClassName(className)[0].style.display ===
             'block'
         ) {
-          document.getElementsByClassName(className)[0].style.display = 'none';
-          const collapseButton = document.getElementsByClassName(
+          root.getElementsByClassName(className)[0].style.display = 'none';
+          const collapseButton = root.getElementsByClassName(
             'collapse-button-text-' + data.categories[i].id
           )[0];
           collapseButton.classList.toggle('fa-plus-square', true);
@@ -156,15 +172,18 @@ export const TreeSelect = forwardRef(({
   // collapse all parent nodes in tree
   const collapseAllParents = () => {
     if (!data) return;
+    let root = document.getElementById(id);
+    if (!root) return;
+
     for (let i = 0; i < data.categories.length; i++) {
       const className = 'children-of-' + data.categories[i].id;
       if (
-        document.getElementsByClassName(className)[0].style.display &&
-        document.getElementsByClassName(className)[0].style.display ===
+        root.getElementsByClassName(className)[0].style.display &&
+        root.getElementsByClassName(className)[0].style.display ===
           'block'
       ) {
-        document.getElementsByClassName(className)[0].style.display = 'none';
-        const collapseButton = document.getElementsByClassName(
+        root.getElementsByClassName(className)[0].style.display = 'none';
+        const collapseButton = root.getElementsByClassName(
           'collapse-button-text-' + data.categories[i].id
         )[0];
         collapseButton.classList.toggle('fa-plus-square', true);
@@ -176,23 +195,26 @@ export const TreeSelect = forwardRef(({
 
   // hide children of specified node in tree
   const toggleHideChildren = name => {
+    let root = document.getElementById(id);
+    if (!root) return;
+
     const className = 'children-of-' + name;
-    let node =  document.getElementsByClassName(className)[0];
+    let node =  root.getElementsByClassName(className)[0];
     if (!node) return true;
     if (
-      document.getElementsByClassName(className)[0].style.display &&
-      document.getElementsByClassName(className)[0].style.display === 'none'
+      root.getElementsByClassName(className)[0].style.display &&
+      root.getElementsByClassName(className)[0].style.display === 'none'
     ) {
-      document.getElementsByClassName(className)[0].style.display = 'block';
-      const collapseButton = document.getElementsByClassName(
+      root.getElementsByClassName(className)[0].style.display = 'block';
+      const collapseButton = root.getElementsByClassName(
         'collapse-button-text-' + name
       )[0];
       collapseButton.classList.toggle('fa-plus-square', false);
       collapseButton.classList.toggle('fa-minus-square', true);
     } else {
-      document.getElementsByClassName(className)[0].style.display = 'none';
+      root.getElementsByClassName(className)[0].style.display = 'none';
       // return true;
-      const collapseButton = document.getElementsByClassName(
+      const collapseButton = root.getElementsByClassName(
         'collapse-button-text-' + name
       )[0];
       collapseButton.classList.toggle('fa-plus-square', true);
@@ -231,6 +253,9 @@ export const TreeSelect = forwardRef(({
   // given parent, determine its checkbox state in tree
   const checkParents = item => {
     if (!item) return false;
+    let root = document.getElementById(id);
+    if (!root) return;
+
     const itemAllLeafs = getAllLeafs(item);
     if (!singleSelect) {
       // multi-select
@@ -239,7 +264,7 @@ export const TreeSelect = forwardRef(({
         value.map(obj => obj.id)
       );
       if (checkAllLeafsSelectedResult) {
-        let checkbox = document.getElementsByClassName(
+        let checkbox = root.getElementsByClassName(
           'parent-checkbox-' + item.id
         )[0];
         if (checkbox) {
@@ -254,7 +279,7 @@ export const TreeSelect = forwardRef(({
         );
         if (checkSomeLeafsSelectedResult) {
           // show indeterminate checkbox if some (at least one) leaf is selected
-          let checkbox = document.getElementsByClassName(
+          let checkbox = root.getElementsByClassName(
             'parent-checkbox-' + item.id
           )[0];
           if (checkbox) {
@@ -263,7 +288,7 @@ export const TreeSelect = forwardRef(({
           }
           return false;
         } else {
-          let checkbox = document.getElementsByClassName(
+          let checkbox = root.getElementsByClassName(
             'parent-checkbox-' + item.id
           )[0];
           if (checkbox) {
@@ -283,7 +308,7 @@ export const TreeSelect = forwardRef(({
         );
         if (checkSomeLeafsSelectedResult) {
           // show indeterminate checkbox if some (at least one) leaf is selected
-          let checkbox = document.getElementsByClassName(
+          let checkbox = root.getElementsByClassName(
             'parent-checkbox-' + item.id
           )[0];
           if (checkbox) {
@@ -292,7 +317,7 @@ export const TreeSelect = forwardRef(({
           }
           return false;
         } else {
-          let checkbox = document.getElementsByClassName(
+          let checkbox = root.getElementsByClassName(
             'parent-checkbox-' + item.id
           )[0];
           if (checkbox) {
@@ -303,7 +328,7 @@ export const TreeSelect = forwardRef(({
         }
         // return false;
       } else {
-        let checkbox = document.getElementsByClassName(
+        let checkbox = root.getElementsByClassName(
           'parent-checkbox-' + item.id
         )[0];
         if (checkbox) {
@@ -317,6 +342,9 @@ export const TreeSelect = forwardRef(({
 
   // handle checkbox behaviors for single and multi-select tree
   const handleSelect = item => {
+    let root = document.getElementById(id);
+    if (!root) return;
+
     if (singleSelect) {
       // if single select
       onChange([item]);
@@ -328,29 +356,29 @@ export const TreeSelect = forwardRef(({
       if (containsAllVals(values, newValues)) {
         // remove all leafs if parent is clicked and all leafs were already selected
         values = removeAllVals(values, newValues);
-        if (document.getElementsByClassName(parentCheckboxClassName)[0]) {
-          // console.log(document.getElementsByClassName(parentCheckboxClassName));
-          document.getElementsByClassName(
+        if (root.getElementsByClassName(parentCheckboxClassName)[0]) {
+          // console.log(root.getElementsByClassName(parentCheckboxClassName));
+          root.getElementsByClassName(
             parentCheckboxClassName
           )[0].checked = false;
         }
         for (let i = 0; i < newValues.length; i++) {
           if (
-            document.getElementsByClassName(
+            root.getElementsByClassName(
               'leaf-checkbox-' + newValues[i].id
             )[0]
           ) {
-            document.getElementsByClassName(
+            root.getElementsByClassName(
               'leaf-checkbox-' + newValues[i].id
             )[0].checked = false;
           }
         }
       } else {
         if (
-          document.getElementsByClassName('children-of-' + item.id) &&
-          document.getElementsByClassName('children-of-' + item.id)[0] &&
-          document.getElementsByClassName('children-of-' + item.id)[0].style.display &&
-          document.getElementsByClassName('children-of-' + item.id)[0].style.display === 'none'
+          root.getElementsByClassName('children-of-' + item.id) &&
+          root.getElementsByClassName('children-of-' + item.id)[0] &&
+          root.getElementsByClassName('children-of-' + item.id)[0].style.display &&
+          root.getElementsByClassName('children-of-' + item.id)[0].style.display === 'none'
         ) {
           toggleHideChildren(item.id);
         }
@@ -358,18 +386,18 @@ export const TreeSelect = forwardRef(({
           if (!containsVal(values, newValues[i].id)) {
             // only add if value did not exist before
             values.push(newValues[i]);
-            if (document.getElementsByClassName(parentCheckboxClassName)[0]) {
-              // console.log(document.getElementsByClassName(parentCheckboxClassName));
-              document.getElementsByClassName(
+            if (root.getElementsByClassName(parentCheckboxClassName)[0]) {
+              // console.log(root.getElementsByClassName(parentCheckboxClassName));
+              root.getElementsByClassName(
                 parentCheckboxClassName
               )[0].checked = true;
             }
             if (
-              document.getElementsByClassName(
+              root.getElementsByClassName(
                 'leaf-checkbox-' + newValues[i].id
               )[0]
             ) {
-              document.getElementsByClassName(
+              root.getElementsByClassName(
                 'leaf-checkbox-' + newValues[i].id
               )[0].checked = true;
             }
@@ -641,6 +669,7 @@ export const TreeSelect = forwardRef(({
   return (
     <>
       <div
+        id={id}
         className="border"
         style={{
           // textOverflow: 'ellipsis',
