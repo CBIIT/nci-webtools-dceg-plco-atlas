@@ -33,7 +33,11 @@ export const TreeSelect = forwardRef(({
   const [selectedNodes, setSelectedNodes] = useState([]);
   const [expandedNodes, setExpandedNodes] = useState([]);
   const [searchFilter, setSearchFilter] = useState('');
-  useEffect(_ => {setSelectedNodes(value || [])}, [value]);
+  useEffect(_ => {
+    if (!value) value = [];
+    if (!Array.isArray(value)) value = [value];
+    setSelectedNodes(value);
+  }, [value]);
   useEffect(_ => {root.current.children = data ? data.tree : []}, [data]);
 
   const arrayWithElements = (elements, shouldInclude, array) =>
