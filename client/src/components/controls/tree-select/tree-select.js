@@ -47,7 +47,7 @@ export const TreeSelect = forwardRef(({
 
   const compareTitles = (a, b) => a.title.localeCompare(b.title);
 
-  function reduceChildren(node, fn, initialValue) {
+  const reduceChildren = (node, fn, initialValue) => {
     let accumulator = fn(initialValue || node, node);
     for (let child of node.children || [])
       accumulator = reduceChildren(child, fn, accumulator)
