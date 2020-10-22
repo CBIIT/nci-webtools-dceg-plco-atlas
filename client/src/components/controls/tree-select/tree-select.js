@@ -54,19 +54,17 @@ export const TreeSelect = forwardRef(({
     return accumulator;
   }
 
-  const getIntermediateNodes = node => reduceChildren(node, (acc, curr) => {
-    if (curr.children && curr.children.length)
-      acc.push(curr);
-    return acc;
-  }, []);
+  const getIntermediateNodes = node => reduceChildren(node, (acc, curr) => 
+    acc.concat(curr.children && curr.children.length ? [curr] : []),
+    []
+  );
 
-  const getLeaves = node => reduceChildren(node, (acc, curr) => {
-    if (!curr.children || !curr.children.length)
-      acc.push(curr);
-    return acc;
-  }, []);
+  const getLeaves = node => reduceChildren(node, (acc, curr) => 
+    acc.concat(!curr.children || !curr.children.length ? [curr] : []),
+    []
+  );
 
-  const getSelectedLeaves = node => getLeaves(node).filter(node =>
+  const getSelectedLeaves = node => getLeaves(node).filter(node => 
     selectedNodes.includes(node)
   );
 
@@ -78,13 +76,15 @@ export const TreeSelect = forwardRef(({
   };
 
   const setSelected = (node, isSelected) => {
-    let selection = [node];
-    if (!singleSelect) {
-      let leaves = getLeaves(node)
-        .filter(enabled)
-        .filter((_, i) => limit === 0 || i < limit);
-      selection = arrayWithElements(leaves, isSelected, selectedNodes);
-    }
+    const selection = singleSelect
+      ? [node]
+      : arrayWithElements(
+          getLeaves(node)
+            .filter(enabled)
+            .filter((_, i) => limit === 0 || i < limit), 
+          isSelected, 
+          selectedNodes
+        );
     setSelectedNodes(selection);
     onChange(selection);
   }
@@ -96,9 +96,10 @@ export const TreeSelect = forwardRef(({
     return selectedLeaves.length && selectedLeaves.length !== getLeaves(node).length;
   }
 
-  const isExpanded = node => expandedNodes.includes(node);
+  const isExpanded = node => 
+    expandedNodes.includes(node);
 
-  const setExpanded = (node, isExpanded, recursive = false) => {
+  const setExpanded = (node, isExpanded, recursive = false) => 
     setExpandedNodes(
       arrayWithElements(
         recursive ? getIntermediateNodes(node) : [node], 
@@ -106,13 +107,12 @@ export const TreeSelect = forwardRef(({
         expandedNodes
       )
     );
-  }
 
   const toggleExpanded = (node, recursive = false) => 
     setExpanded(node, !isExpanded(node), recursive);
 
   const HighlightText = ({ text, highlighted }) => {
-    let index = text.toLowerCase().indexOf(highlighted.toLowerCase());
+    const index = text.toLowerCase().indexOf(highlighted.toLowerCase());
     return index === -1 ? text : <span>
       {text.substr(0, index)}
       <strong>{text.substr(index, highlighted.length)}</strong>
@@ -182,8 +182,8 @@ export const TreeSelect = forwardRef(({
             </button>
           </div>
         </div>
-
       </div>
+      
       <div
         style={{
           position: 'relative',
