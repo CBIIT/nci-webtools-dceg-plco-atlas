@@ -157,6 +157,8 @@ export function SummaryResultsForm({
           value={_selectedPhenotypes}
           onChange={setSelectedPhenotypesAndOptions}
           ref={treeRef}
+          enabled={item => item.import_date}
+          limit={isPairwise ? 2 : 1}
         />
       </div>
 

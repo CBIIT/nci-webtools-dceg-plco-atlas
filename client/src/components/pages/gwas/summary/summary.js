@@ -77,6 +77,7 @@ export function SummaryResults() {
   // };
 
   const handleSubmit = ({phenotypes, stratifications, isPairwise}) => {
+    clearMessages();
     if (!phenotypes.length || !stratifications.length) {
       let content = '';
       if (!phenotypes.length)
