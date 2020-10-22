@@ -324,12 +324,17 @@ export function SummaryResultsTable() {
               </button>
             )}
           </div>}
-
+              
+          <OverlayTrigger overlay={
+            <Tooltip id="export-info-tooltip" className={summaryTables.tables[selectedTable].resultsCount > exportRowLimit ? 'visible': 'invisible'}>
+              Only the top {exportRowLimit} variants based on the current sort order will be downloaded.
+            </Tooltip>}>
           <a
             className="btn btn-sm btn-silver ml-2"
             href={getExportLink()}>
             Export Variants
           </a>
+          </OverlayTrigger>
         </div>
 
         <div key="snpSearch" className="d-flex mb-2">
