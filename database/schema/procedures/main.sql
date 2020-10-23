@@ -99,23 +99,36 @@ CREATE PROCEDURE calculate_ci()
   BEGIN
   DECLARE done INT;
   DECLARE table_name VARCHAR(200);
+  DECLARE phenotype_type VARCHAR(200);
 
   DECLARE phenotype_variant_table_cursor CURSOR FOR
-    select t.TABLE_NAME from INFORMATION_SCHEMA.TABLES t
-    WHERE t.TABLE_NAME LIKE 'phenotype_variant_%';
+    select distinct concat('phenotype_variant', '__', p.name, '__', pm.sex, '__', pm.ancestry), p.type
+        from phenotype_metadata pm
+        join phenotype p on pm.phenotype_id = p.id
+    where chromosome = 'all' and count > 0;
 
   DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = 1;
 
   OPEN phenotype_variant_table_cursor;
   SET done = 0;
   REPEAT
-    FETCH phenotype_variant_table_cursor INTO table_name;
+    FETCH phenotype_variant_table_cursor INTO table_name, phenotype_type;
 
-    call execute_sql(CONCAT('
-      update ', table_name, ' set
-          ci_95_low = exp(beta - 1.96 * standard_error),
-          ci_95_high = exp(beta + 1.96 * standard_error);
-    '));
+    IF(phenotype_type = 'binary') THEN
+      call execute_sql(CONCAT('
+        update ', table_name, ' set
+            ci_95_low = exp(beta - 1.96 * standard_error),
+            ci_95_high = exp(beta + 1.96 * standard_error);
+      '));
+    END IF;
+
+    IF(phenotype_type = 'continuous') THEN
+      call execute_sql(CONCAT('
+        update ', table_name, ' set
+            ci_95_low = beta - 1.96 * standard_error,
+            ci_95_high = beta + 1.96 * standard_error;
+      '));
+    END IF;
 
   UNTIL done END REPEAT;
   CLOSE phenotype_variant_table_cursor;
