@@ -320,8 +320,14 @@ async function exportVariants({
                             p.${sex}_${ancestry}_beta,
                             p.${sex}_${ancestry}_standard_error,
                             ${useOddsRatio ? `EXP(p.${sex}_${ancestry}_beta)` : `NULL` } as odds_ratio,
-                            EXP(p.${sex}_${ancestry}_beta - 1.96 * p.${sex}_${ancestry}_standard_error) as ci_95_low,
-                            EXP(p.${sex}_${ancestry}_beta + 1.96 * p.${sex}_${ancestry}_standard_error) as ci_95_high,
+                            ${useOddsRatio 
+                                ? `EXP(p.${sex}_${ancestry}_beta - 1.96 * p.${sex}_${ancestry}_standard_error)` 
+                                : `p.${sex}_${ancestry}_beta - 1.96 * p.${sex}_${ancestry}_standard_error` 
+                            } as ci_95_low,
+                            ${useOddsRatio 
+                                ? `EXP(p.${sex}_${ancestry}_beta + 1.96 * p.${sex}_${ancestry}_standard_error)` 
+                                : `p.${sex}_${ancestry}_beta + 1.96 * p.${sex}_${ancestry}_standard_error` 
+                            } as ci_95_high,
                             p.${sex}_${ancestry}_n
                         FROM prestage p
                         INNER JOIN chromosome_range cr ON cr.chromosome = p.chromosome
