@@ -134,4 +134,34 @@ CREATE PROCEDURE calculate_ci()
   CLOSE phenotype_variant_table_cursor;
 END $$
 
+DROP PROCEDURE IF EXISTS migrate_ci $$
+CREATE PROCEDURE migrate_ci()
+  BEGIN
+  DECLARE done INT;
+  DECLARE table_name VARCHAR(200);
+
+  DECLARE phenotype_variant_table_cursor CURSOR FOR
+  DECLARE phenotype_variant_table_cursor CURSOR FOR
+    select t.TABLE_NAME from INFORMATION_SCHEMA.TABLES t
+    WHERE t.TABLE_NAME LIKE 'phenotype_variant__%';
+
+  DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = 1;
+
+  OPEN phenotype_variant_table_cursor;
+  SET done = 0;
+  REPEAT
+    FETCH phenotype_variant_table_cursor INTO table_name;
+
+    call execute_sql(concat('alter table ', table_name, ' add column beta_ci_95_low double AS (beta - 1.96 * standard_error) NULL'));
+    call execute_sql(concat('alter table ', table_name, ' add column beta_ci_95_high double AS (beta + 1.96 * standard_error) NULL'));
+    call execute_sql(concat('alter table ', table_name, ' add column odds_ratio_ci_95_low double AS (EXP(beta - 1.96 * standard_error)) NULL'));
+    call execute_sql(concat('alter table ', table_name, ' add column odds_ratio_ci_95_high double AS (EXP(beta + 1.96 * standard_error)) NULL'));
+    call execute_sql(concat('ALTER TABLE ', table_name, ' add column allele_effect varchar(200) as (allele_reference) NULL'));
+    call execute_sql(concat('ALTER TABLE ', table_name, ' add column allele_non_effect varchar(200) as (allele_alternate) NULL'));
+    call execute_sql(concat('ALTER TABLE ', table_name, ' add column allele_effect_frequency double as (allele_frequency) NULL'));
+
+  UNTIL done END REPEAT;
+  CLOSE phenotype_variant_table_cursor;
+END $$
+
 DELIMITER ;
