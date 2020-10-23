@@ -63,6 +63,14 @@ a[disabled] {
   cursor: not-allowed;
 }
 
+[role="button"], input[type="checkbox"] {
+  cursor: pointer;
+}
+
+[role="button"][disabled], input[type="checkbox"][disabled] {
+  cursor: not-allowed;
+}
+
 /** Bootstrap Overrides **/
 
 .bg-primary-lighter {

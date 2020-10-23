@@ -131,7 +131,7 @@ export function SummaryResultsTable() {
       formatter: cell => cell < 1e-2 ? (+cell).toExponential() : cell,
       title: true,
       sort: true,
-      headerStyle: {width: '100px', minWidth: '100px'},
+      headerStyle: {width: '120px', minWidth: '120px'},
       headerClasses: 'overflow-ellipsis',
       classes: 'overflow-ellipsis',
     },
@@ -324,19 +324,24 @@ export function SummaryResultsTable() {
               </button>
             )}
           </div>}
-
+              
+          <OverlayTrigger overlay={
+            <Tooltip id="export-info-tooltip" className={summaryTables.tables[selectedTable].resultsCount > exportRowLimit ? 'visible': 'invisible'}>
+              Only the top {exportRowLimit.toLocaleString()} variants based on the current sort order will be downloaded.
+            </Tooltip>}>
           <a
             className="btn btn-sm btn-silver ml-2"
             href={getExportLink()}>
             Export Variants
           </a>
+          </OverlayTrigger>
         </div>
 
         <div key="snpSearch" className="d-flex mb-2">
           <input
-            style={{ maxWidth: '400px' }}
+            style={{ minWidth: '280px' }}
             className="form-control form-control-sm"
-            placeholder="Search for a SNP"
+            placeholder="Search for a SNP or SNPs (ex/ rs3 rs4)"
             value={summarySnpTables.snp}
             onChange={e => setSnp(e.target.value)}
             aria-label="Filter SNP"

@@ -35,6 +35,7 @@ export function PhenotypeCorrelationsForm({ onChange, onSubmit, onReset }) {
           value={selectedPhenotypes}
           onChange={handleChangeCustom}
           ref={treeRef}
+          enabled={item => item.import_date}
         />
         <small className="text-muted"><i>Up to 120 phenotypes may be selected.</i></small>
       </div>

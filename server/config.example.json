@@ -2,6 +2,7 @@
     "port": 9000,
     "logpath": "server/logs/",
     "loglevel": "debug",
+    "exportRowLimit": 10000,
     "downloadRoot": "http://hostname:8080/downloads/",
     "database": {
         "name": "example-database",

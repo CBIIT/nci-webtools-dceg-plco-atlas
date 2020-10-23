@@ -1,19 +1,222 @@
-import React, { forwardRef, useState, useEffect, useImperativeHandle } from 'react';
+import React, { forwardRef, useState, useEffect, useImperativeHandle, useRef } from 'react';
+import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 import { Spinner } from 'react-bootstrap';
-import { 
-  containsVal, 
-  containsAllVals, 
-  removeVal, 
+import {
+  containsVal,
+  containsAllVals,
+  removeVal,
   removeAllVals
 } from './tree-select-utils';
 
+
 export const TreeSelect = forwardRef(({
-    onChange,
-    data,
-    value,
-    singleSelect,
-    alwaysEnabled
-  }, ref) => {
+  onChange,
+  data,
+  value,
+  limit = 0,
+  singleSelect,
+  enabled = node => true,
+  placeholder = "Search",
+}, ref) => {
+
+  useImperativeHandle(ref, () => ({
+    resetSearchFilter() {
+      setSearchFilter('');
+      setExpandedNodes([]);
+    },
+    expandSelectedPhenotype(displayTreeParent) {
+      setExpanded(displayTreeParent.data, true);
+    }
+  }));
+
+  const root = useRef({ children: data ? data.tree : [] });
+  const [selectedNodes, setSelectedNodes] = useState([]);
+  const [expandedNodes, setExpandedNodes] = useState([]);
+  const [searchFilter, setSearchFilter] = useState('');
+  useEffect(_ => {
+    if (!value) value = [];
+    if (!Array.isArray(value)) value = [value];
+    setSelectedNodes(value);
+  }, [value]);
+  useEffect(_ => {root.current.children = data ? data.tree : []}, [data]);
+
+  const arrayWithElements = (elements, shouldInclude, array) =>
+    shouldInclude
+      ? array.concat(elements.filter(e => !array.includes(e)))
+      : array.filter(e => !elements.includes(e));
+
+  const compareTitles = (a, b) => a.title.localeCompare(b.title);
+
+  const reduceChildren = (node, fn, initialValue) => {
+    let accumulator = fn(initialValue || node, node);
+    for (let child of node.children || [])
+      accumulator = reduceChildren(child, fn, accumulator)
+    return accumulator;
+  }
+
+  const getIntermediateNodes = node => reduceChildren(node, (acc, curr) => 
+    acc.concat(curr.children && curr.children.length ? [curr] : []),
+    []
+  );
+
+  const getLeaves = node => reduceChildren(node, (acc, curr) => 
+    acc.concat(!curr.children || !curr.children.length ? [curr] : []),
+    []
+  );
+
+  const getSelectedLeaves = node => getLeaves(node).filter(node => 
+    selectedNodes.includes(node)
+  );
+
+  const isSelected = node => {
+    const selectedLeaves = getSelectedLeaves(node);
+    return selectedNodes.includes(node) || (
+      selectedLeaves.length && selectedLeaves.length === getLeaves(node).length
+    );
+  };
+
+  const setSelected = (node, isSelected) => {
+    const selection = singleSelect
+      ? [node]
+      : arrayWithElements(
+          getLeaves(node)
+            .filter(enabled)
+            .filter((_, i) => limit === 0 || i < limit), 
+          isSelected, 
+          selectedNodes
+        );
+    setSelectedNodes(selection);
+    onChange(selection);
+  }
+
+  const isDisabled = node => !getLeaves(node).some(enabled);
+
+  const isIndeterminate = node => {
+    const selectedLeaves = getSelectedLeaves(node);
+    return selectedLeaves.length && selectedLeaves.length !== getLeaves(node).length;
+  }
+
+  const isExpanded = node => 
+    expandedNodes.includes(node);
+
+  const setExpanded = (node, isExpanded, recursive = false) => 
+    setExpandedNodes(
+      arrayWithElements(
+        recursive ? getIntermediateNodes(node) : [node], 
+        isExpanded, 
+        expandedNodes
+      )
+    );
+
+  const toggleExpanded = (node, recursive = false) => 
+    setExpanded(node, !isExpanded(node), recursive);
+
+  const HighlightText = ({ text, highlighted }) => {
+    const index = text.toLowerCase().indexOf(highlighted.toLowerCase());
+    return index === -1 ? text : <span>
+      {text.substr(0, index)}
+      <strong>{text.substr(index, highlighted.length)}</strong>
+      {text.substr(index + highlighted.length)}
+    </span>
+  }
+
+  const Node = ({ keyPrefix, node }) => (
+    <div style={{ 
+      marginLeft: '10px', 
+      overflow: 'hidden', 
+      whiteSpace: 'nowrap' 
+    }}>
+      {!searchFilter && <i role="button"
+        onClick={_ => toggleExpanded(node)}
+        className={`
+          text-secondary
+          fa 
+          fa-${isExpanded(node) ? 'minus' : 'plus'}-square 
+          ${node.children && node.children.length ? 'visible' : 'invisible'}`} />}
+      <label
+        className={`d-inline-flex align-items-center font-weight-normal ml-1 small ${isDisabled(node) ? 'text-muted c-not-allowed' : ''}`}
+        style={{ whiteSpace: 'nowrap', overflow: 'hidden' }}
+        title={node.title}>
+        <input
+          className={`mr-1`}
+          type="checkbox"
+          checked={isSelected(node)}
+          ref={current => current && (current.indeterminate = isIndeterminate(node))}
+          disabled={isDisabled(node)}
+          onChange={e => setSelected(node, e.target.checked)} />
+        <HighlightText text={node.title} highlighted={searchFilter} />
+      </label>
+      {isExpanded(node) && (node.children || []).sort(compareTitles).map((node, i) => 
+        <Node key={`tree-node-${keyPrefix}-${i}`} node={node} />)}
+    </div>
+  );
+
+  return (!data || !data.tree.length) ? null : (
+    <div className="border">
+      <div className="d-flex">
+        <div className="border d-flex align-items-center p-1">
+          <i role="button"
+            onClick={_ => toggleExpanded(root.current, true)}
+            className={`
+              text-secondary  
+              fa 
+              fa-${isExpanded(root.current) ? 'minus' : 'plus'}-square`} />
+        </div>
+        <div className="border d-flex align-items-center p-1">
+          <input
+            type="checkbox"
+            checked={isSelected(root.current)}
+            ref={current => current && (current.indeterminate = isIndeterminate(root))}
+            onChange={e => setSelected(root.current, e.target.checked)} />
+        </div>
+        <div className="input-group">
+          <input 
+            className="form-control form-control-sm" 
+            value={searchFilter} 
+            onChange={e => setSearchFilter(e.target.value)} 
+            placeholder={placeholder}
+          />
+          <div className="input-group-append">
+            <button className="btn btn-sm btn-silver" onClick={e => setSearchFilter('')}>
+              <i className={`fa fa-${searchFilter.length ? 'times' : 'search'}`} />    
+            </button>
+          </div>
+        </div>
+      </div>
+      
+      <div
+        style={{
+          position: 'relative',
+          minHeight: '250px',
+          maxHeight: '500px',
+          overflowY: 'auto',
+        }}>
+        {<LoadingOverlay active={!data}>
+          <Spinner animation="border" variant="primary" role="status">
+            <span className="sr-only">Loading...</span>
+          </Spinner>
+        </LoadingOverlay>}
+        {searchFilter.length
+          ? getLeaves(root.current)
+            .filter(node => node.title.toLowerCase().includes(searchFilter.toLowerCase()))
+            .sort(compareTitles)
+            .map((node, i) => <Node key={`flat-tree-node-${i}`} keyPrefix={i} node={node} />)
+          : data.tree
+            .sort(compareTitles)
+            .map((node, i) => <Node key={`tree-node-${i}`} keyPrefix={i} node={node} />)}
+      </div>
+    </div>
+  );
+});
+
+export const TreeSelect2 = forwardRef(({
+  onChange,
+  data,
+  value,
+  singleSelect,
+  alwaysEnabled,
+  id: idProp = 'default-id',
+}, ref) => {
 
   useImperativeHandle(ref, () => ({
     resetSearchFilter() {
@@ -23,8 +226,14 @@ export const TreeSelect = forwardRef(({
     expandSelectedPhenotype(displayTreeParent) {
       collapseAllParents();
       expandParents(displayTreeParent);
+    },
+    collapseAll() {
+      collapseAllParents()
     }
   }));
+
+  const [id, setId] = useState(`default-id-${Math.random()}`);
+  useEffect(() => setId(`${idProp}-${Math.random()}`), [idProp]);
 
   // check parent checked/indeterminate state when tree is loaded/reloaded
   useEffect(() => {
@@ -38,9 +247,9 @@ export const TreeSelect = forwardRef(({
     }
     parents.map((parent) => checkParents(parent));
     if (singleSelect) {
-      expandParents({data: value});
+      expandParents({ data: value });
     } else {
-      value.forEach((val) => expandParents({data: val}));
+      value.forEach((val) => expandParents({ data: val }));
     }
   }, [data]);
 
@@ -56,12 +265,15 @@ export const TreeSelect = forwardRef(({
 
   // given child, expand all parent tree nodes leading to child in tree
   const expandParents = (displayTreeParent) => {
+    var root = document.getElementById(id);
+    if (!root) return;
+
     var parents = getParents(displayTreeParent.data);
     parents.push(displayTreeParent.data);
     parents.map((item) => {
-      if (document.getElementsByClassName('collapse-button-text-' + item.id)[0]) {
-        if (document.getElementsByClassName('collapse-button-text-' + item.id)[0].classList.contains("fa-plus-square")) {
-          document.getElementsByClassName('collapse-button-text-' + item.id)[0].click();
+      if (root.getElementsByClassName('collapse-button-text-' + item.id)[0]) {
+        if (root.getElementsByClassName('collapse-button-text-' + item.id)[0].classList.contains("fa-plus-square")) {
+          root.getElementsByClassName('collapse-button-text-' + item.id)[0].click();
         }
       }
     });
@@ -85,8 +297,11 @@ export const TreeSelect = forwardRef(({
     if (!node.children || node.children.length === 0) {
       allLeafs.push(node);
     } else {
-      if (document.getElementsByClassName('parent-checkbox-' + node.id)[0]) {
-        document.getElementsByClassName(
+      let root = document.getElementById(id);
+      if (!root) return;
+
+      if (root.getElementsByClassName('parent-checkbox-' + node.id)[0]) {
+        root.getElementsByClassName(
           'parent-checkbox-' + node.id
         )[0].checked = true;
       }
@@ -117,15 +332,18 @@ export const TreeSelect = forwardRef(({
 
   // expand all parent nodes in tree
   const toggleExpandAllParents = () => {
+    let root = document.getElementById(id);
+    if (!root) return;
+
     if (!expandAll) {
       for (let i = 0; i < data.categories.length; i++) {
         const className = 'children-of-' + data.categories[i].id;
         if (
-          document.getElementsByClassName(className)[0].style.display &&
-          document.getElementsByClassName(className)[0].style.display === 'none'
+          root.getElementsByClassName(className)[0].style.display &&
+          root.getElementsByClassName(className)[0].style.display === 'none'
         ) {
-          document.getElementsByClassName(className)[0].style.display = 'block';
-          const collapseButton = document.getElementsByClassName(
+          root.getElementsByClassName(className)[0].style.display = 'block';
+          const collapseButton = root.getElementsByClassName(
             'collapse-button-text-' + data.categories[i].id
           )[0];
           collapseButton.classList.toggle('fa-plus-square', false);
@@ -137,12 +355,12 @@ export const TreeSelect = forwardRef(({
       for (let i = 0; i < data.categories.length; i++) {
         const className = 'children-of-' + data.categories[i].id;
         if (
-          document.getElementsByClassName(className)[0].style.display &&
-          document.getElementsByClassName(className)[0].style.display ===
-            'block'
+          root.getElementsByClassName(className)[0].style.display &&
+          root.getElementsByClassName(className)[0].style.display ===
+          'block'
         ) {
-          document.getElementsByClassName(className)[0].style.display = 'none';
-          const collapseButton = document.getElementsByClassName(
+          root.getElementsByClassName(className)[0].style.display = 'none';
+          const collapseButton = root.getElementsByClassName(
             'collapse-button-text-' + data.categories[i].id
           )[0];
           collapseButton.classList.toggle('fa-plus-square', true);
@@ -156,15 +374,18 @@ export const TreeSelect = forwardRef(({
   // collapse all parent nodes in tree
   const collapseAllParents = () => {
     if (!data) return;
+    let root = document.getElementById(id);
+    if (!root) return;
+
     for (let i = 0; i < data.categories.length; i++) {
       const className = 'children-of-' + data.categories[i].id;
       if (
-        document.getElementsByClassName(className)[0].style.display &&
-        document.getElementsByClassName(className)[0].style.display ===
-          'block'
+        root.getElementsByClassName(className)[0].style.display &&
+        root.getElementsByClassName(className)[0].style.display ===
+        'block'
       ) {
-        document.getElementsByClassName(className)[0].style.display = 'none';
-        const collapseButton = document.getElementsByClassName(
+        root.getElementsByClassName(className)[0].style.display = 'none';
+        const collapseButton = root.getElementsByClassName(
           'collapse-button-text-' + data.categories[i].id
         )[0];
         collapseButton.classList.toggle('fa-plus-square', true);
@@ -176,23 +397,26 @@ export const TreeSelect = forwardRef(({
 
   // hide children of specified node in tree
   const toggleHideChildren = name => {
+    let root = document.getElementById(id);
+    if (!root) return;
+
     const className = 'children-of-' + name;
-    let node =  document.getElementsByClassName(className)[0];
+    let node = root.getElementsByClassName(className)[0];
     if (!node) return true;
     if (
-      document.getElementsByClassName(className)[0].style.display &&
-      document.getElementsByClassName(className)[0].style.display === 'none'
+      root.getElementsByClassName(className)[0].style.display &&
+      root.getElementsByClassName(className)[0].style.display === 'none'
     ) {
-      document.getElementsByClassName(className)[0].style.display = 'block';
-      const collapseButton = document.getElementsByClassName(
+      root.getElementsByClassName(className)[0].style.display = 'block';
+      const collapseButton = root.getElementsByClassName(
         'collapse-button-text-' + name
       )[0];
       collapseButton.classList.toggle('fa-plus-square', false);
       collapseButton.classList.toggle('fa-minus-square', true);
     } else {
-      document.getElementsByClassName(className)[0].style.display = 'none';
+      root.getElementsByClassName(className)[0].style.display = 'none';
       // return true;
-      const collapseButton = document.getElementsByClassName(
+      const collapseButton = root.getElementsByClassName(
         'collapse-button-text-' + name
       )[0];
       collapseButton.classList.toggle('fa-plus-square', true);
@@ -222,7 +446,7 @@ export const TreeSelect = forwardRef(({
     const itemAllLeafs = getAllLeafs(item);
     // if (!singleSelect) {
     // console.log("itemAllLeafs", itemAllLeafs);
-    const itemImportDates = itemAllLeafs.map(obj => obj.import_date);
+    const itemImportDates = itemAllLeafs.map(obj => obj ? obj.import_date : undefined);
     // console.log("itemImportDates", itemImportDates);
     return itemImportDates.every(element => element === null);
     // }
@@ -231,6 +455,9 @@ export const TreeSelect = forwardRef(({
   // given parent, determine its checkbox state in tree
   const checkParents = item => {
     if (!item) return false;
+    let root = document.getElementById(id);
+    if (!root) return;
+
     const itemAllLeafs = getAllLeafs(item);
     if (!singleSelect) {
       // multi-select
@@ -239,7 +466,7 @@ export const TreeSelect = forwardRef(({
         value.map(obj => obj.id)
       );
       if (checkAllLeafsSelectedResult) {
-        let checkbox = document.getElementsByClassName(
+        let checkbox = root.getElementsByClassName(
           'parent-checkbox-' + item.id
         )[0];
         if (checkbox) {
@@ -254,7 +481,7 @@ export const TreeSelect = forwardRef(({
         );
         if (checkSomeLeafsSelectedResult) {
           // show indeterminate checkbox if some (at least one) leaf is selected
-          let checkbox = document.getElementsByClassName(
+          let checkbox = root.getElementsByClassName(
             'parent-checkbox-' + item.id
           )[0];
           if (checkbox) {
@@ -263,7 +490,7 @@ export const TreeSelect = forwardRef(({
           }
           return false;
         } else {
-          let checkbox = document.getElementsByClassName(
+          let checkbox = root.getElementsByClassName(
             'parent-checkbox-' + item.id
           )[0];
           if (checkbox) {
@@ -283,7 +510,7 @@ export const TreeSelect = forwardRef(({
         );
         if (checkSomeLeafsSelectedResult) {
           // show indeterminate checkbox if some (at least one) leaf is selected
-          let checkbox = document.getElementsByClassName(
+          let checkbox = root.getElementsByClassName(
             'parent-checkbox-' + item.id
           )[0];
           if (checkbox) {
@@ -292,7 +519,7 @@ export const TreeSelect = forwardRef(({
           }
           return false;
         } else {
-          let checkbox = document.getElementsByClassName(
+          let checkbox = root.getElementsByClassName(
             'parent-checkbox-' + item.id
           )[0];
           if (checkbox) {
@@ -303,7 +530,7 @@ export const TreeSelect = forwardRef(({
         }
         // return false;
       } else {
-        let checkbox = document.getElementsByClassName(
+        let checkbox = root.getElementsByClassName(
           'parent-checkbox-' + item.id
         )[0];
         if (checkbox) {
@@ -317,6 +544,9 @@ export const TreeSelect = forwardRef(({
 
   // handle checkbox behaviors for single and multi-select tree
   const handleSelect = item => {
+    let root = document.getElementById(id);
+    if (!root) return;
+
     if (singleSelect) {
       // if single select
       onChange([item]);
@@ -328,29 +558,29 @@ export const TreeSelect = forwardRef(({
       if (containsAllVals(values, newValues)) {
         // remove all leafs if parent is clicked and all leafs were already selected
         values = removeAllVals(values, newValues);
-        if (document.getElementsByClassName(parentCheckboxClassName)[0]) {
-          // console.log(document.getElementsByClassName(parentCheckboxClassName));
-          document.getElementsByClassName(
+        if (root.getElementsByClassName(parentCheckboxClassName)[0]) {
+          // console.log(root.getElementsByClassName(parentCheckboxClassName));
+          root.getElementsByClassName(
             parentCheckboxClassName
           )[0].checked = false;
         }
         for (let i = 0; i < newValues.length; i++) {
           if (
-            document.getElementsByClassName(
+            root.getElementsByClassName(
               'leaf-checkbox-' + newValues[i].id
             )[0]
           ) {
-            document.getElementsByClassName(
+            root.getElementsByClassName(
               'leaf-checkbox-' + newValues[i].id
             )[0].checked = false;
           }
         }
       } else {
         if (
-          document.getElementsByClassName('children-of-' + item.id) &&
-          document.getElementsByClassName('children-of-' + item.id)[0] &&
-          document.getElementsByClassName('children-of-' + item.id)[0].style.display &&
-          document.getElementsByClassName('children-of-' + item.id)[0].style.display === 'none'
+          root.getElementsByClassName('children-of-' + item.id) &&
+          root.getElementsByClassName('children-of-' + item.id)[0] &&
+          root.getElementsByClassName('children-of-' + item.id)[0].style.display &&
+          root.getElementsByClassName('children-of-' + item.id)[0].style.display === 'none'
         ) {
           toggleHideChildren(item.id);
         }
@@ -358,18 +588,18 @@ export const TreeSelect = forwardRef(({
           if (!containsVal(values, newValues[i].id)) {
             // only add if value did not exist before
             values.push(newValues[i]);
-            if (document.getElementsByClassName(parentCheckboxClassName)[0]) {
-              // console.log(document.getElementsByClassName(parentCheckboxClassName));
-              document.getElementsByClassName(
+            if (root.getElementsByClassName(parentCheckboxClassName)[0]) {
+              // console.log(root.getElementsByClassName(parentCheckboxClassName));
+              root.getElementsByClassName(
                 parentCheckboxClassName
               )[0].checked = true;
             }
             if (
-              document.getElementsByClassName(
+              root.getElementsByClassName(
                 'leaf-checkbox-' + newValues[i].id
               )[0]
             ) {
-              document.getElementsByClassName(
+              root.getElementsByClassName(
                 'leaf-checkbox-' + newValues[i].id
               )[0].checked = true;
             }
@@ -391,9 +621,9 @@ export const TreeSelect = forwardRef(({
       if (item.children && item.children.length > 0) {
         return (
           // PARENT
-          <li 
+          <li
             key={'categorical-' + item.id}
-            className="my-1" 
+            className="my-1"
             style={{ display: 'block' }}
           >
             <div className="d-flex align-items-center">
@@ -445,7 +675,7 @@ export const TreeSelect = forwardRef(({
               />
 
               <button
-                title={singleSelect? "Show/hide " + item.title + " phenotypes" : 'Select/deselect all ' + item.title + ' phenotypes'}
+                title={singleSelect ? "Show/hide " + item.title + " phenotypes" : 'Select/deselect all ' + item.title + ' phenotypes'}
                 className="ml-1"
                 style={{
                   all: 'unset',
@@ -457,7 +687,7 @@ export const TreeSelect = forwardRef(({
                 }}
                 disabled={!singleSelect && checkAllChildrenDisabled(item) ? true : false}
                 onClick={e => singleSelect ? toggleHideChildren(item.id) : handleSelect(item)}
-                >
+              >
                 {item.title}
               </button>
             </div>
@@ -489,8 +719,8 @@ export const TreeSelect = forwardRef(({
             />
             <input
               title={singleSelect ? "Select " + item.title + " phenotype" : "Select/deselect " + item.title + " phenotype"}
-              style={{ 
-                cursor: alwaysEnabled || item.import_date ? 'pointer' : 'not-allowed' 
+              style={{
+                cursor: alwaysEnabled || item.import_date ? 'pointer' : 'not-allowed'
               }}
               className={'ml-1 leaf-checkbox-' + item.id}
               // name={'leaf-checkbox-' + item.id}
@@ -529,7 +759,7 @@ export const TreeSelect = forwardRef(({
               }}
               disabled={alwaysEnabled || item.import_date ? false : true}
               onClick={e => handleSelect(item)}
-              >
+            >
               {item.title}
             </button>
           </li>
@@ -597,12 +827,12 @@ export const TreeSelect = forwardRef(({
               {item.title.slice(
                 item.title.toLowerCase().indexOf(searchInput.toLowerCase()),
                 item.title.toLowerCase().indexOf(searchInput.toLowerCase()) +
-                  searchInput.length
+                searchInput.length
               )}
             </b>
             {item.title.slice(
               item.title.toLowerCase().indexOf(searchInput.toLowerCase()) +
-                searchInput.length,
+              searchInput.length,
               item.title.length
             )}
           </button>
@@ -627,9 +857,9 @@ export const TreeSelect = forwardRef(({
 
   // return true if all leafs are selected
   const checkAllLeafsSelected = () => {
-    if (!data) return;
+    if (!data || !data.tree.length) return false;
     let allLeafs = [];
-    data.tree.map(item => allLeafs.push(getAllLeafs(item).filter(obj => alwaysEnabled ? obj : obj.import_date)));
+    data.tree.map(item => allLeafs.push(getAllLeafs(item).filter(obj => alwaysEnabled ? obj : (obj && obj.import_date))));
     allLeafs = allLeafs.flat().map(item => item.id);
     for (var i = 0; i < allLeafs.length; i++) {
       if (value.map(item => item.id).indexOf(allLeafs[i]) === -1)
@@ -638,9 +868,11 @@ export const TreeSelect = forwardRef(({
     return true;
   };
 
+
   return (
     <>
       <div
+        id={id}
         className="border"
         style={{
           // textOverflow: 'ellipsis',
@@ -661,10 +893,10 @@ export const TreeSelect = forwardRef(({
                 onClick={e => toggleExpandAllParents()}
                 disabled={!data}>
                 {expandAll && (
-                  <i className="fa fa-minus-square" style={{cursor: !data ? 'not-allowed' : 'pointer'}}></i>
+                  <i className="fa fa-minus-square" style={{ cursor: !data ? 'not-allowed' : 'pointer' }}></i>
                 )}
                 {!expandAll && (
-                  <i className="fa fa-plus-square" style={{cursor: !data ? 'not-allowed' : 'pointer'}}></i>
+                  <i className="fa fa-plus-square" style={{ cursor: !data ? 'not-allowed' : 'pointer' }}></i>
                 )}
               </button>
 
@@ -727,16 +959,16 @@ export const TreeSelect = forwardRef(({
                   onClick={e => {
                     clearSearchFilter();
                   }}>
-                  <i className="fa fa-times" style={{fontSize: '14px'}}></i>
+                  <i className="fa fa-times" style={{ fontSize: '14px' }}></i>
                 </button>
               ) : (
-                <button 
-                  className="input-group-text bg-white" 
-                  title="Filter tree input icon"
-                  disabled>
-                  <i className="fa fa-search" style={{fontSize: '14px'}}></i>
-                </button>
-              )}
+                  <button
+                    className="input-group-text bg-white"
+                    title="Filter tree input icon"
+                    disabled>
+                    <i className="fa fa-search" style={{ fontSize: '14px' }}></i>
+                  </button>
+                )}
             </div>
           </div>
         </div>
@@ -744,19 +976,19 @@ export const TreeSelect = forwardRef(({
           !data &&
           <div
             className="d-flex align-items-center justify-content-center"
-            style={{ 
+            style={{
               // display: !data ? 'block' : 'none',
               minHeight: '250px',
               maxHeight: '500px'
             }}>
-            {!data && 
+            {!data &&
               <Spinner animation="border" variant="primary" role="status">
                 <span className="sr-only">Loading...</span>
               </Spinner>
             }
           </div>
         }
-        { data &&
+        {data &&
           <>
             <ul
               className="pl-0 ml-1 mr-0 my-0"
@@ -771,7 +1003,7 @@ export const TreeSelect = forwardRef(({
                 maxHeight: '500px',
                 fontSize: '10pt'
               }}>
-                {selectTreeCategorical(data.tree)}
+              {selectTreeCategorical(data.tree)}
             </ul>
             <ul
               className="pl-0 ml-1 mr-0 my-0"
@@ -786,11 +1018,11 @@ export const TreeSelect = forwardRef(({
                 maxHeight: '500px',
                 fontSize: '10pt'
               }}>
-                {selectTreeAlphabetical()}
+              {selectTreeAlphabetical()}
             </ul>
           </>
         }
-        
+
       </div>
     </>
   );

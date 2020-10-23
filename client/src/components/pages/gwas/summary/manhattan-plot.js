@@ -454,6 +454,17 @@ export function ManhattanPlot({
                   },
                   'Go to Variant Lookup'
                 )
+              ]),
+              h('div', null, [
+                h(
+                  'a',
+                  {
+                    className: 'font-weight-bold',
+                    href: `https://www.ebi.ac.uk/gwas/search?query=${record.snp}`,
+                    target: '_blank'
+                  },
+                  'Go to GWAS Catalog'
+                )
               ])
             ]);
           }
@@ -653,6 +664,17 @@ export function ManhattanPlot({
                   },
                   'Go to Variant Lookup'
                 )
+              ]),
+              h('div', null, [
+                h(
+                  'a',
+                  {
+                    className: 'font-weight-bold',
+                    href: `https://www.ebi.ac.uk/gwas/search?query=${record.snp}`,
+                    target: '_blank'
+                  },
+                  'Go to GWAS Catalog'
+                )
               ])
             ]);
           }
@@ -671,9 +693,9 @@ export function ManhattanPlot({
           h('div', null, [
             h('a', {
               className: 'font-weight-bold',
-              href: `https://www.ncbi.nlm.nih.gov/gene/?term=${gene.originalName}`,
+              href: `https://www.ncbi.nlm.nih.gov/gene/?term=(${gene.originalName}%5BGene+Name%5D)+AND+homo+sapiens%5BOrganism%5D`,
               target: '_blank'
-            }, 'Go to RefSeq'),
+            }, 'Go to NCBI Gene'),
           ]),
 
         ]);

@@ -1,13 +1,13 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { ShareLink } from '../../../controls/share-link/share-link';
 import { asTitleCase } from './utils';
+import { query } from '../../../../services/query';
 // import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
 
 
 export const SummaryResultsSearchCriteria = () => {
   const summaryResults = useSelector(state => state.summaryResults);
-  const sampleSize = useSelector(state => state.summaryTables.tables[0].resultsCount)
   const {
     selectedPhenotypes,
     selectedStratifications,
@@ -15,17 +15,25 @@ export const SummaryResultsSearchCriteria = () => {
     shareID,
     submitted,
   } = summaryResults;
-  
 
   const summaryTables = useSelector(state => state.summaryTables);
-  const phenotypes = submitted ? (isPairwise ? [0, 1] : [0]).map(index => ({
-    ...(selectedPhenotypes[index] || selectedPhenotypes[0]), 
-    stratification: [
-      selectedStratifications[index].ancestry,
-      selectedStratifications[index].sex,
-    ].filter(str => str !== 'all').map(asTitleCase).join(' '),
-    resultsCount: summaryTables.tables[index].resultsCount,
-  })) : [];
+  const [phenotypes, setPhenotypes] = useState([]);
+
+  useEffect(() => {
+      Promise.all(submitted ? (isPairwise ? [0, 1] : [0]).map(async index => ({
+        ...(selectedPhenotypes[index] || selectedPhenotypes[0]), 
+        stratification: [
+          selectedStratifications[index].ancestry,
+          selectedStratifications[index].sex,
+        ].filter(str => str !== 'all').map(asTitleCase).join(' '),
+        resultsCount: (await query('metadata', {
+          phenotype_id: (selectedPhenotypes[index] || selectedPhenotypes[0]).id,
+          ancestry: selectedStratifications[index].ancestry,
+          sex: selectedStratifications[index].sex,
+          chromosome: 'all',
+        }))[0].count,
+      })) : []).then(setPhenotypes);
+  }, [submitted, selectedPhenotypes, selectedStratifications, isPairwise]);
 
   return (
     <div className="p-3 mb-2 bg-white border rounded-0 d-flex justify-content-between">
