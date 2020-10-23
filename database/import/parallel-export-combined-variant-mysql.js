@@ -257,7 +257,7 @@ async function exportVariants({
                     const aggregateTable = `phenotype_aggregate__${tableSuffix}`;
                     const pointTable = `phenotype_point__${tableSuffix}`;
                     const metadataTable = `phenotype_metadata__${tableSuffix}`;
-                    const calculateOddsRatio = phenotype.type === 'binary';
+                    const useOddsRatio = phenotype.type === 'binary';
 
                     // create stage, variant, aggregate, and metadata tables
                     logger.info('Creating tables');
@@ -319,9 +319,9 @@ async function exportVariants({
                             p.${sex}_${ancestry}_p_value_heterogenous,
                             p.${sex}_${ancestry}_beta,
                             p.${sex}_${ancestry}_standard_error,
-                            ${calculateOddsRatio ? `EXP(p.${sex}_${ancestry}_beta)` : `NULL` } as odds_ratio,
-                            ${calculateOddsRatio ? `EXP(p.${sex}_${ancestry}_beta - 1.96 * p.${sex}_${ancestry}_standard_error)` : `NULL` } as ci_95_low,
-                            ${calculateOddsRatio ? `EXP(p.${sex}_${ancestry}_beta + 1.96 * p.${sex}_${ancestry}_standard_error)` : `NULL` } as ci_95_high,
+                            ${useOddsRatio ? `EXP(p.${sex}_${ancestry}_beta)` : `NULL` } as odds_ratio,
+                            EXP(p.${sex}_${ancestry}_beta - 1.96 * p.${sex}_${ancestry}_standard_error) as ci_95_low,
+                            EXP(p.${sex}_${ancestry}_beta + 1.96 * p.${sex}_${ancestry}_standard_error) as ci_95_high,
                             p.${sex}_${ancestry}_n
                         FROM prestage p
                         INNER JOIN chromosome_range cr ON cr.chromosome = p.chromosome
