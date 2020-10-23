@@ -94,5 +94,31 @@ CREATE PROCEDURE warmup_cache()
   CLOSE phenotype_variant_table_cursor;
 END $$
 
-DELIMITER ;
+DROP PROCEDURE IF EXISTS calculate_ci $$
+CREATE PROCEDURE calculate_ci()
+  BEGIN
+  DECLARE done INT;
+  DECLARE table_name VARCHAR(200);
 
+  DECLARE phenotype_variant_table_cursor CURSOR FOR
+    select t.TABLE_NAME from INFORMATION_SCHEMA.TABLES t
+    WHERE t.TABLE_NAME LIKE 'phenotype_variant_%';
+
+  DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = 1;
+
+  OPEN phenotype_variant_table_cursor;
+  SET done = 0;
+  REPEAT
+    FETCH phenotype_variant_table_cursor INTO table_name;
+
+    call execute_sql(CONCAT('
+      update ', table_name, ' set
+          ci_95_low = exp(beta - 1.96 * standard_error),
+          ci_95_high = exp(beta + 1.96 * standard_error);
+    '));
+
+  UNTIL done END REPEAT;
+  CLOSE phenotype_variant_table_cursor;
+END $$
+
+DELIMITER ;
