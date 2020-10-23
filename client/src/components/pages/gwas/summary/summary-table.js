@@ -287,19 +287,21 @@ export function SummaryResultsTable() {
     return `${process.env.REACT_APP_API_ROOT}/export-variants${asQueryString(exportParams)}`;
   }
 
+  const columnFilter = (c, key) => {
+    const phenotype = (selectedPhenotypes[+key] || selectedPhenotypes[0]);
+    if (c.dataField === 'odds_ratio')
+      return phenotype.type === 'binary';
+    else if (c.dataField === 'beta')
+      return phenotype.type === 'continuous';
+    return true;
+  }
+
   const getVariantTableProps = (key) => ({
     remote: true,
     keyField: 'id',
     loading: summaryTables.loading,
     data: summaryTables.tables[key].results,
-    columns: columns.filter(c => {
-      const phenotype = (selectedPhenotypes[+key] || selectedPhenotypes[0]);
-      if (c.dataField === 'odds_ratio')
-        return phenotype.type === 'binary';
-      else if (c.dataField === 'beta')
-        return phenotype.type === 'continuous';
-      return true;
-    }),
+    columns: columns.filter(c => columnFilter(c, key)),
     onTableChange: (type, ev) => handleTableChange(key, type, ev),
     overlay: loadingOverlay,
     defaultSorted,
@@ -330,23 +332,13 @@ export function SummaryResultsTable() {
                 onClick={e => setSelectedTable(i)}>
                 {[
                   showPhenotypeNames && selectedPhenotypes[i].display_name,
-                  asTitleCase(s.ancestry),
-                  asTitleCase(s.sex),
+                  !showPhenotypeNames && asTitleCase(s.ancestry),
+                  !showPhenotypeNames && asTitleCase(s.sex),
                 ].filter(Boolean).join(' - ')}
               </button>
             )}
           </div>}
-              
-          <OverlayTrigger overlay={
-            <Tooltip id="export-info-tooltip" className={summaryTables.tables[selectedTable].resultsCount > exportRowLimit ? 'visible': 'invisible'}>
-              Only the top {exportRowLimit.toLocaleString()} variants based on the current sort order will be downloaded.
-            </Tooltip>}>
-          <a
-            className="btn btn-sm btn-silver ml-2"
-            href={getExportLink()}>
-            Export Variants
-          </a>
-          </OverlayTrigger>
+
         </div>
 
         <div key="snpSearch" className="d-flex mb-2">
@@ -369,6 +361,18 @@ export function SummaryResultsTable() {
             onClick={handleSnpLookup}>
             Search
           </button>
+              
+          <OverlayTrigger overlay={
+            <Tooltip id="export-info-tooltip" className={summaryTables.tables[selectedTable].resultsCount > exportRowLimit ? 'visible': 'invisible'}>
+              Only the top {exportRowLimit.toLocaleString()} variants based on the current sort order will be downloaded.
+            </Tooltip>}>
+            <a
+              className="btn btn-sm btn-link"
+              href={getExportLink()}>
+              Export Variants
+            </a>
+          </OverlayTrigger>
+
         </div>
       </div>
 
@@ -385,7 +389,7 @@ export function SummaryResultsTable() {
                 key={`snp-table-${i}`}
                 keyField="variant_id"
                 data={summarySnpTables.tables[i].results}
-                columns={columns} />
+                columns={columns.filter(c => columnFilter(c, i))} />
           )
         )}
     </div>
