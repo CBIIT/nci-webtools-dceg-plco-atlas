@@ -123,9 +123,14 @@ export function SummaryResultsTable() {
     },
     {
       dataField: 'beta',
-      text: 'Beta',
+      text: 'Beta [95% CI]',
+      headerTitle: _ => 'Beta [95% Confidence Interval]',
       title: true,
-      headerStyle: { width: '80px' },
+      formatter: (cell, row) => (!cell || isNaN(cell)) ? '-' : 
+        `${(+cell).toFixed(3)} [${row.ci_95_low.toFixed(3)} - ${+row.ci_95_high.toFixed(3)}]`,
+      title: (cell, row) => (!cell || isNaN(cell)) ? '-' : 
+        `${(+cell).toFixed(3)} [${row.ci_95_low.toFixed(3)} - ${+row.ci_95_high.toFixed(3)}]`,
+      headerStyle: {width: '80px'},
       headerClasses: 'overflow-ellipsis',
       classes: 'overflow-ellipsis'
     },
@@ -160,7 +165,7 @@ export function SummaryResultsTable() {
       formatter: cell => (cell < 1e-2 ? (+cell).toExponential() : cell),
       title: true,
       sort: true,
-      headerStyle: { width: '120px', minWidth: '120px' },
+      headerStyle: {width: '110px', minWidth: '110px'},
       headerClasses: 'overflow-ellipsis',
       classes: 'overflow-ellipsis'
     },
@@ -316,12 +321,21 @@ export function SummaryResultsTable() {
     )}`;
   };
 
-  const getVariantTableProps = key => ({
+  const columnFilter = (c, key) => {
+    const phenotype = (selectedPhenotypes[+key] || selectedPhenotypes[0]);
+    if (c.dataField === 'odds_ratio')
+      return phenotype.type === 'binary';
+    else if (c.dataField === 'beta')
+      return phenotype.type === 'continuous';
+    return true;
+  }
+
+  const getVariantTableProps = (key) => ({
     remote: true,
     keyField: 'id',
     loading: summaryTables.loading,
     data: summaryTables.tables[key].results,
-    columns: columns,
+    columns: columns.filter(c => columnFilter(c, key)),
     onTableChange: (type, ev) => handleTableChange(key, type, ev),
     overlay: loadingOverlay,
     defaultSorted,
@@ -345,47 +359,21 @@ export function SummaryResultsTable() {
         key="controls"
         className="d-flex align-items-center justify-content-between">
         <div className="d-flex align-items-center">
-          {isPairwise && (
-            <div className="btn-group" role="group">
-              {selectedStratifications.map((s, i) => (
-                <button
-                  key={`select-table-${i}`}
-                  className={`btn btn-sm ${
-                    selectedTable == i
-                      ? 'btn-primary btn-primary-gradient active'
-                      : 'btn-silver'
-                  }`}
-                  onClick={e => setSelectedTable(i)}>
-                  {[
-                    showPhenotypeNames && selectedPhenotypes[i].display_name,
-                    asTitleCase(s.ancestry),
-                    asTitleCase(s.sex)
-                  ]
-                    .filter(Boolean)
-                    .join(' - ')}
-                </button>
-              ))}
-            </div>
-          )}
+          {isPairwise && <div className="btn-group" role="group">
+            {selectedStratifications.map((s, i) =>
+              <button
+                key={`select-table-${i}`}
+                className={`btn btn-sm ${selectedTable == i ? 'btn-primary btn-primary-gradient active' : 'btn-silver'}`}
+                onClick={e => setSelectedTable(i)}>
+                {[
+                  showPhenotypeNames && selectedPhenotypes[i].display_name,
+                  !showPhenotypeNames && asTitleCase(s.ancestry),
+                  !showPhenotypeNames && asTitleCase(s.sex),
+                ].filter(Boolean).join(' - ')}
+              </button>
+            )}
+          </div>}
 
-          <OverlayTrigger
-            overlay={
-              <Tooltip
-                id="export-info-tooltip"
-                className={
-                  summaryTables.tables[selectedTable].resultsCount >
-                  exportRowLimit
-                    ? 'visible'
-                    : 'invisible'
-                }>
-                Only the top {exportRowLimit.toLocaleString()} variants based on
-                the current sort order will be downloaded.
-              </Tooltip>
-            }>
-            <a className="btn btn-sm btn-silver ml-2" href={getExportLink()}>
-              Export Variants
-            </a>
-          </OverlayTrigger>
         </div>
 
         <div key="snpSearch" className="d-flex mb-2">
@@ -408,30 +396,37 @@ export function SummaryResultsTable() {
             onClick={handleSnpLookup}>
             Search
           </button>
+              
+          <OverlayTrigger overlay={
+            <Tooltip id="export-info-tooltip" className={summaryTables.tables[selectedTable].resultsCount > exportRowLimit ? 'visible': 'invisible'}>
+              Only the top {exportRowLimit.toLocaleString()} variants based on the current sort order will be downloaded.
+            </Tooltip>}>
+            <a
+              className="btn btn-sm btn-link"
+              href={getExportLink()}>
+              Export Variants
+            </a>
+          </OverlayTrigger>
+
         </div>
       </div>
 
       {/* Do not filter beforehand, as that resets indexes  */}
 
-      {selectedStratifications.map(
-        (s, i) =>
-          selectedTable === i &&
-          (!summarySnpTables.visible ? (
-            <Table
-              wrapperClasses="table-responsive"
-              key={`variant-table-${i}`}
-              {...getVariantTableProps(i)}
-            />
-          ) : (
-            <Table
-              wrapperClasses="table-responsive"
-              key={`snp-table-${i}`}
-              keyField="variant_id"
-              data={summarySnpTables.tables[i].results}
-              columns={columns}
-            />
-          ))
-      )}
+        {selectedStratifications.map((s, i) =>
+          selectedTable === i && (!summarySnpTables.visible
+            ? <Table 
+                wrapperClasses="table-responsive" 
+                key={`variant-table-${i}`} 
+                {...getVariantTableProps(i)} />
+            : <Table
+                wrapperClasses="table-responsive"
+                key={`snp-table-${i}`}
+                keyField="variant_id"
+                data={summarySnpTables.tables[i].results}
+                columns={columns.filter(c => columnFilter(c, i))} />
+          )
+        )}
     </div>
   );
 }
