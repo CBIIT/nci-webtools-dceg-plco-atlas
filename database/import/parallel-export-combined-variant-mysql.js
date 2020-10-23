@@ -181,7 +181,7 @@ async function exportVariants({
                     sex, 
                     ancestry, 
                     {
-                        freq: `allele_frequency`, 
+                        freq: `allele_effect_frequency`, 
                         beta: `beta`,
                         se: `standard_error`,
                         p: `p_value`,
@@ -215,8 +215,8 @@ async function exportVariants({
                 chromosome                  VARCHAR(2),
                 position                    BIGINT,
                 snp                         VARCHAR(200),
-                allele_reference            VARCHAR(200),
-                allele_alternate            VARCHAR(200),
+                allele_effect               VARCHAR(200),
+                allele_non_effect           VARCHAR(200),
                 ${stratifiedColumns.map(c => `${c.mappedColumnName} DOUBLE`).join(',')}
             );`
         ].join('\n'));
@@ -268,17 +268,15 @@ async function exportVariants({
                             chromosome                  VARCHAR(2),
                             position                    BIGINT,
                             snp                         VARCHAR(200),
-                            allele_reference            VARCHAR(200),
-                            allele_alternate            VARCHAR(200),
-                            allele_frequency            DOUBLE,
+                            allele_effect               VARCHAR(200),
+                            allele_non_effect           VARCHAR(200),
+                            allele_effect_frequency     DOUBLE,
                             p_value                     DOUBLE,
                             p_value_nlog                DOUBLE, -- negative log10(P)
                             p_value_heterogenous        BIGINT,
                             beta                        DOUBLE,
                             standard_error              DOUBLE,
                             odds_ratio                  DOUBLE,
-                            ci_95_low                   DOUBLE,
-                            ci_95_high                  DOUBLE,
                             n                           BIGINT
                         );`,
                         // create variant, aggregate, and metadata tables
@@ -294,41 +292,30 @@ async function exportVariants({
                             chromosome,
                             position,
                             snp,
-                            allele_reference,
-                            allele_alternate,
-                            allele_frequency,
+                            allele_effect,
+                            allele_non_effect,
+                            allele_effect_frequency,
                             p_value,
                             p_value_nlog,
                             p_value_heterogenous,
                             beta,
                             standard_error,
                             odds_ratio,
-                            ci_95_low,
-                            ci_95_high,
                             n
                         ) 
                         SELECT 
                             p.chromosome,
                             p.position,
                             IF(p.snp like 'rs%', SUBSTRING_INDEX(p.snp, ':', 1), SUBSTRING_INDEX(p.snp, ':', 2)) as snp,
-                            p.allele_reference,
-                            p.allele_alternate,
-                            p.${ancestry}_allele_frequency,
+                            p.allele_effect,
+                            p.allele_non_effect,
+                            p.${ancestry}_allele_effect_frequency,
                             p.${sex}_${ancestry}_p_value,
                             -LOG10(p.${sex}_${ancestry}_p_value) AS p_value_nlog,
                             p.${sex}_${ancestry}_p_value_heterogenous,
                             p.${sex}_${ancestry}_beta,
                             p.${sex}_${ancestry}_standard_error,
                             ${useOddsRatio ? `EXP(p.${sex}_${ancestry}_beta)` : `NULL` } as odds_ratio,
-                            ${useOddsRatio 
-                                ? `EXP(p.${sex}_${ancestry}_beta - 1.96 * p.${sex}_${ancestry}_standard_error)` 
-                                : `p.${sex}_${ancestry}_beta - 1.96 * p.${sex}_${ancestry}_standard_error` 
-                            } as ci_95_low,
-                            ${useOddsRatio 
-                                ? `EXP(p.${sex}_${ancestry}_beta + 1.96 * p.${sex}_${ancestry}_standard_error)` 
-                                : `p.${sex}_${ancestry}_beta + 1.96 * p.${sex}_${ancestry}_standard_error` 
-                            } as ci_95_high,
-                            p.${sex}_${ancestry}_n
                         FROM prestage p
                         INNER JOIN chromosome_range cr ON cr.chromosome = p.chromosome
                         WHERE p.${sex}_${ancestry}_p_value > 1e-10000
@@ -388,17 +375,15 @@ async function exportVariants({
                             chromosome,
                             position,
                             snp,
-                            allele_reference,
-                            allele_alternate,
-                            allele_frequency,
+                            allele_effect,
+                            allele_non_effect,
+                            allele_effect_frequency,
                             p_value,
                             p_value_nlog,
                             p_value_heterogenous,
                             beta,
                             standard_error,
                             odds_ratio,
-                            ci_95_low,
-                            ci_95_high,
                             n
                         )
                         SELECT 
@@ -406,17 +391,15 @@ async function exportVariants({
                             chromosome,
                             position,
                             snp,
-                            allele_reference,
-                            allele_alternate,
-                            allele_frequency,
+                            allele_effect,
+                            allele_non_effect,
+                            allele_effect_frequency,
                             p_value,
                             p_value_nlog,
                             p_value_heterogenous,
                             beta,
                             standard_error,
                             odds_ratio,
-                            ci_95_low,
-                            ci_95_high,
                             n
                         FROM ${stageTable}
                         ORDER BY chromosome, p_value
