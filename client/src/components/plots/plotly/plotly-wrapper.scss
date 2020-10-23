@@ -6,11 +6,10 @@
 }
 
 .js-plotly-plot.override-cursor .plotly .cursor-pointer {
-  cursor: default;  
+  cursor: default;
 }
 
 // heatmap override
 .js-plotly-plot.override-cursor-heatmap .plotly .cursor-crosshair {
   cursor: pointer;
 }
-

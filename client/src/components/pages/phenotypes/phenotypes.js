@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect} from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Alert, Spinner } from 'react-bootstrap';
 import { PhenotypesForm } from './phenotypes-form';
@@ -7,9 +7,12 @@ import { PhenotypesSearchCriteria } from './phenotypes-search-criteria';
 import {
   SidebarContainer,
   SidebarPanel,
-  MainPanel,
+  MainPanel
 } from '../../controls/sidebar-container/sidebar-container';
-import { updateBrowsePhenotypes, updateBrowsePhenotypesPlots } from '../../../services/actions';
+import {
+  updateBrowsePhenotypes,
+  updateBrowsePhenotypesPlots
+} from '../../../services/actions';
 import { getInitialState } from '../../../services/store';
 import { query } from '../../../services/query';
 import { BubbleChart as Plot } from '../../plots/custom/bubble-chart/bubble-chart';
@@ -28,9 +31,7 @@ export function Phenotypes() {
     selectedPlot,
     sharedState
   } = useSelector(state => state.browsePhenotypes);
-  const {
-    loading
-  } = useSelector( state => state.browsePhenotypesPlots);
+  const { loading } = useSelector(state => state.browsePhenotypesPlots);
 
   const plotContainer = useRef(null);
 
@@ -47,8 +48,8 @@ export function Phenotypes() {
   };
 
   const setCategoryColor = categoryColor => {
-    dispatch(updateBrowsePhenotypes({ categoryColor}));
-  }
+    dispatch(updateBrowsePhenotypes({ categoryColor }));
+  };
 
   const clearMessages = e => {
     setMessages([]);
@@ -58,10 +59,9 @@ export function Phenotypes() {
     if (item.children && item.children.length > 0) {
       // has children = PARENT
       for (var i = 0; i < item.children.length; i++) {
-        getParent(item.children[i], node, item, found)
+        getParent(item.children[i], node, item, found);
       }
-    }
-    else {
+    } else {
       // no children = LEAF
       if (item.id === node.id) {
         found.push(parent);
@@ -70,20 +70,20 @@ export function Phenotypes() {
     return found;
   };
 
-
   const getParents = (node, parents = []) => {
-    phenotypes && phenotypes.categories.map((item) => {
-      item.children.map((child) => {
-        if (child.id === node.id) {
-          parents.push(item)
-          getParents(item, parents);
-        }
-      })
-    });
+    phenotypes &&
+      phenotypes.categories.map(item => {
+        item.children.map(child => {
+          if (child.id === node.id) {
+            parents.push(item);
+            getParents(item, parents);
+          }
+        });
+      });
     return parents;
-  }
+  };
 
-  const getColor = (node) => {
+  const getColor = node => {
     var color = null;
     if (node.color) {
       // if node has color already, no need to search for it
@@ -91,9 +91,9 @@ export function Phenotypes() {
     } else {
       const parents = getParents(node);
       if (parents && parents.length > 0) {
-        parents.map((item) => {
+        parents.map(item => {
           if (item.color) {
-            color = item.color
+            color = item.color;
           }
         });
         return color;
@@ -101,39 +101,45 @@ export function Phenotypes() {
         return color;
       }
     }
-  }
+  };
 
-  const handleChange = (phenotype) => {
+  const handleChange = phenotype => {
     const color = getColor(phenotype);
     // setCategoryColor(color);
 
     let phenotypesTreeFull = {
-        children: phenotypes.tree
+      children: phenotypes.tree
     };
     const parent = getParent(phenotypesTreeFull, phenotype, null)[0];
     if (parent) {
-      dispatch(updateBrowsePhenotypes({
-        categoryColor: color,
-        currentBubbleData: parent.children,
-        breadCrumb: [{
-            data: {
-              title: parent.title
-            },
-            parent: {
-              data:  {
-                children: phenotypes.tree
+      dispatch(
+        updateBrowsePhenotypes({
+          categoryColor: color,
+          currentBubbleData: parent.children,
+          breadCrumb: [
+            {
+              data: {
+                title: parent.title
+              },
+              parent: {
+                data: {
+                  children: phenotypes.tree
+                }
               }
             }
-          }]
-      }));
+          ]
+        })
+      );
     }
-    dispatch(updateBrowsePhenotypes({
-      selectedPhenotype: phenotype,
-      displayTreeParent: {
-        data: phenotype
-      }
-    }));
-  }
+    dispatch(
+      updateBrowsePhenotypes({
+        selectedPhenotype: phenotype,
+        displayTreeParent: {
+          data: phenotype
+        }
+      })
+    );
+  };
 
   // when submitting:
   // 1. Fetch aggregate data for displaying manhattan plot(s)
@@ -150,7 +156,7 @@ export function Phenotypes() {
 
     dispatch(
       updateBrowsePhenotypes({
-        submitted: false,
+        submitted: false
       })
     );
 
@@ -161,26 +167,25 @@ export function Phenotypes() {
       })
     );
 
-    let plot = preserveTab
-      ? selectedPlot
-      : 'frequency'
+    let plot = preserveTab ? selectedPlot : 'frequency';
 
     const data = await query('phenotype', {
       id: phenotype.id,
-      type: {
-        'frequency': 'frequency',
-        'distribution': 'distribution',
-        'distribution-inverted': 'distributionInverted',
-        'related-phenotypes': 'related',
-      }[plot] || 'all'
+      type:
+        {
+          frequency: 'frequency',
+          distribution: 'distribution',
+          'distribution-inverted': 'distributionInverted',
+          'related-phenotypes': 'related'
+        }[plot] || 'all'
     });
-    
+
     dispatch(
       updateBrowsePhenotypesPlots({
         phenotypeData: data,
         loading: false
       })
-    )
+    );
 
     // update browse phenotypes filters
     dispatch(
@@ -195,18 +200,24 @@ export function Phenotypes() {
 
   const loadState = state => {
     if (!state || !Object.keys(state).length) return;
-    dispatch(updateBrowsePhenotypes({
-      ...state, 
-      submitted: false,
-      sharedState: null
-    }));
+    dispatch(
+      updateBrowsePhenotypes({
+        ...state,
+        submitted: false,
+        sharedState: null
+      })
+    );
     if (state.submitted) {
       handleSubmit(state.selectedPhenotype);
-    } 
-  }
+    }
+  };
 
   useEffect(() => {
-    if (sharedState && sharedState.parameters && sharedState.parameters.params) {
+    if (
+      sharedState &&
+      sharedState.parameters &&
+      sharedState.parameters.params
+    ) {
       loadState(sharedState.parameters.params);
     }
   }, [sharedState]);
@@ -220,13 +231,9 @@ export function Phenotypes() {
 
   const handleReset = () => {
     const initialState = getInitialState();
-    dispatch(
-      updateBrowsePhenotypes(initialState.browsePhenotypes)
-    );
-    dispatch(
-      updateBrowsePhenotypesPlots(initialState.browsePhenotypesPlots)
-    );
-  }
+    dispatch(updateBrowsePhenotypes(initialState.browsePhenotypes));
+    dispatch(updateBrowsePhenotypesPlots(initialState.browsePhenotypesPlots));
+  };
 
   useEffect(() => {
     // console.log("useEffect() triggered!");
@@ -234,53 +241,67 @@ export function Phenotypes() {
     plotContainer.current.innerHTML = '';
     // console.log("currentBubbleData", currentBubbleData);
     drawBubbleChart(currentBubbleData ? currentBubbleData : phenotypes.tree);
-  }, [phenotypes, breadCrumb, currentBubbleData, selectedPhenotype, submitted])
+  }, [phenotypes, breadCrumb, currentBubbleData, selectedPhenotype, submitted]);
 
-  const drawBubbleChart = (data) => {
-    new Plot(plotContainer.current, data, handleSingleClick, handleDoubleClick, handleBackgroundDoubleClick, selectedPhenotype, categoryColor);
-  }
+  const drawBubbleChart = data => {
+    new Plot(
+      plotContainer.current,
+      data,
+      handleSingleClick,
+      handleDoubleClick,
+      handleBackgroundDoubleClick,
+      selectedPhenotype,
+      categoryColor
+    );
+  };
 
-  const handleSingleClick = (e) => {
+  const handleSingleClick = e => {
     if (e) {
       if (e.data.children && e.data.children.length > 0) {
         // parent
         const color = getColor(e.data);
-        dispatch(updateBrowsePhenotypes({
-          selectedPhenotype: null,
-          categoryColor: color,
-          currentBubbleData: e.data.children,
-          breadCrumb: [...breadCrumb, e],
-          displayTreeParent: e
-        }));
+        dispatch(
+          updateBrowsePhenotypes({
+            selectedPhenotype: null,
+            categoryColor: color,
+            currentBubbleData: e.data.children,
+            breadCrumb: [...breadCrumb, e],
+            displayTreeParent: e
+          })
+        );
       } else {
         //leaf
-        dispatch(updateBrowsePhenotypes({
-          selectedPhenotype: e.data,
-          displayTreeParent: e
-        }));
+        dispatch(
+          updateBrowsePhenotypes({
+            selectedPhenotype: e.data,
+            displayTreeParent: e
+          })
+        );
       }
     } else {
       // background is clicked
       setSelectedPhenotype(null);
     }
-  }
+  };
 
-  const handleDoubleClick = (e) => {
+  const handleDoubleClick = e => {
     if (e.data.children && e.data.children.length > 0) {
       // parent
       const color = getColor(e.data);
-      dispatch(updateBrowsePhenotypes({
-        selectedPhenotype: null,
-        categoryColor: color,
-        currentBubbleData: e.data.children,
-        breadCrumb: [...breadCrumb, e],
-        displayTreeParent: e
-      }));
+      dispatch(
+        updateBrowsePhenotypes({
+          selectedPhenotype: null,
+          categoryColor: color,
+          currentBubbleData: e.data.children,
+          breadCrumb: [...breadCrumb, e],
+          displayTreeParent: e
+        })
+      );
     } else {
       // leaf
       handleSubmit(e.data);
     }
-  }
+  };
 
   const handleBackgroundDoubleClick = () => {
     if (breadCrumb.length >= 1) {
@@ -288,12 +309,15 @@ export function Phenotypes() {
         setCategoryColor(null);
       }
       const crumbParents = getParents(breadCrumb[breadCrumb.length - 1].data);
-      dispatch(updateBrowsePhenotypes({
-        breadCrumb: [...breadCrumb.splice(0, breadCrumb.length -  1)],
-        currentBubbleData: crumbParents.length > 0 ? crumbParents[0].children : phenotypes.tree
-      }));
+      dispatch(
+        updateBrowsePhenotypes({
+          breadCrumb: [...breadCrumb.splice(0, breadCrumb.length - 1)],
+          currentBubbleData:
+            crumbParents.length > 0 ? crumbParents[0].children : phenotypes.tree
+        })
+      );
     }
-  }
+  };
 
   const crumbClick = (item, idx) => {
     const crumbParents = getParents(item.data);
@@ -301,12 +325,15 @@ export function Phenotypes() {
       setCategoryColor(null);
     }
     let newBreadCrumb = breadCrumb.splice(0, idx);
-    dispatch(updateBrowsePhenotypes({
-      breadCrumb: newBreadCrumb,
-      currentBubbleData: crumbParents.length > 0 ? crumbParents[0].children : phenotypes.tree,
-      selectedPhenotype: null
-    }));
-  }
+    dispatch(
+      updateBrowsePhenotypes({
+        breadCrumb: newBreadCrumb,
+        currentBubbleData:
+          crumbParents.length > 0 ? crumbParents[0].children : phenotypes.tree,
+        selectedPhenotype: null
+      })
+    );
+  };
 
   return (
     <SidebarContainer
@@ -322,69 +349,69 @@ export function Phenotypes() {
           />
           {messages &&
             messages.map(({ type, content }) => (
-              <Alert className="mt-3" variant={type} onClose={clearMessages} dismissible>
+              <Alert
+                className="mt-3"
+                variant={type}
+                onClose={clearMessages}
+                dismissible>
                 {content}
               </Alert>
-          ))}
+            ))}
         </div>
       </SidebarPanel>
 
       <MainPanel className="col-lg-9">
         <PhenotypesSearchCriteria />
-        {submitted
-          ? <PhenotypesTabs onSubmit={handleSubmit} />
-          : <div
-              className={
-                phenotypes ?
-                "bg-white tab-pane-bordered rounded-0 p-3" :
-                "bg-white tab-pane-bordered rounded-0 p-3 d-flex justify-content-center align-items-center"
-              }
+        {submitted ? (
+          <PhenotypesTabs onSubmit={handleSubmit} />
+        ) : (
+          <div
+            className={
+              phenotypes
+                ? 'bg-white tab-pane-bordered rounded-0 p-3'
+                : 'bg-white tab-pane-bordered rounded-0 p-3 d-flex justify-content-center align-items-center'
+            }
+            style={{
+              position: 'static',
+              minHeight: '324px'
+            }}>
+            <LoadingOverlay active={!phenotypes || loading} />
+            <div
               style={{
-                position: 'static',
-                minHeight: '324px'
-              }}>
-              <LoadingOverlay active={!phenotypes || loading} />
-              <div style={{
-                  display: phenotypes ? 'block' : 'none',
-                  position: 'relative'
-                }}
-                id="browse-phenotypes-container">
-                {
-                  breadCrumb.length > 0 && breadCrumb.map((item, idx) =>
-                    <span className="" key={"crumb-" + item.data.title}>
-                      <a
-                        href="javascript:void(0)"
-                        onClick={_ => crumbClick(item, idx)}
-                      >
-                        { idx === 0 ? 'All Phenotypes' : item.data.title}
-                      </a>
-                      <Icon
-                        name="arrow-left"
-                        className="mx-2 opacity-50"
-                        width="10"
-                      />
-                    </span>
-                  )
-                }
-                {
-                  breadCrumb.length === 0 &&
-                  <br />
-                }
-                <div
-                  ref={plotContainer}
-                  className="mt-5 bubble-chart text-center"
-                  id="bubble-chart-div"
-                  style={{ minHeight: '50vh', 
-                    position: 'relative'
-                  }}
-                />
+                display: phenotypes ? 'block' : 'none',
+                position: 'relative'
+              }}
+              id="browse-phenotypes-container">
+              {breadCrumb.length > 0 &&
+                breadCrumb.map((item, idx) => (
+                  <span className="" key={'crumb-' + item.data.title}>
+                    <a
+                      href="javascript:void(0)"
+                      onClick={_ => crumbClick(item, idx)}>
+                      {idx === 0 ? 'All Phenotypes' : item.data.title}
+                    </a>
+                    <Icon
+                      name="arrow-left"
+                      className="mx-2 opacity-50"
+                      width="10"
+                    />
+                  </span>
+                ))}
+              {breadCrumb.length === 0 && <br />}
+              <div
+                ref={plotContainer}
+                className="mt-5 bubble-chart text-center"
+                id="bubble-chart-div"
+                style={{ minHeight: '50vh', position: 'relative' }}
+              />
 
-                <div className="small text-center text-muted my-4">
-                  * Bubbles are representative of the sample size of each phenotype, not the inter-relationship between phenotypes.
-                </div>
+              <div className="small text-center text-muted my-4">
+                * Bubbles are representative of the sample size of each
+                phenotype, not the inter-relationship between phenotypes.
               </div>
             </div>
-        }
+          </div>
+        )}
       </MainPanel>
     </SidebarContainer>
   );

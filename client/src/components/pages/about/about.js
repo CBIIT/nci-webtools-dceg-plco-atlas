@@ -44,10 +44,10 @@ export function About() {
         collected from questionnaire data, linkage to medical records, cancer
         registries, and the National Death Index. Tools are available to
         visualize association results by interactive Manhattan plots that allow
-        for stratification by sex as well as other diagnostic plots (e.g.,
-        Q-q plots) and resources to compare genetic correlations across
-        phenotypes. Furthermore, descriptive characteristics of PLCO, annotation
-        of phenotypes, and links to other pertinent genomic resources are
+        for stratification by sex as well as other diagnostic plots (e.g., Q-q
+        plots) and resources to compare genetic correlations across phenotypes.
+        Furthermore, descriptive characteristics of PLCO, annotation of
+        phenotypes, and links to other pertinent genomic resources are
         available.
       </p>
     </div>

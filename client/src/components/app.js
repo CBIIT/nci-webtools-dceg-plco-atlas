@@ -10,9 +10,7 @@ import { Downloads } from './pages/downloads/downloads';
 import { LinkWrapper } from './pages/link/link-wrapper';
 import { ErrorModal } from './controls/error-modal/error-modal';
 
-
 function App() {
-
   const links = [
     {
       route: '/about',
@@ -33,7 +31,8 @@ function App() {
       action: 'Explore',
       title: 'GWAS',
       cardTitle: 'GWAS Results',
-      cardText: 'Visualize genome-wide association results with dynamic Manhattan plots and tables',
+      cardText:
+        'Visualize genome-wide association results with dynamic Manhattan plots and tables',
       image: 'assets/images/gwas.svg',
       navIndex: 0
     },
@@ -42,7 +41,8 @@ function App() {
       action: 'Browse',
       title: 'Phenotypes',
       cardTitle: 'Phenotype Characteristics',
-      cardText: 'Browse trait and case definitions, descriptive characteristics and genetic correlations',
+      cardText:
+        'Browse trait and case definitions, descriptive characteristics and genetic correlations',
       image: 'assets/images/phenotypes.svg',
       navIndex: 1
     },
@@ -51,13 +51,14 @@ function App() {
       action: 'Download',
       title: 'Data',
       cardTitle: 'Access Data',
-      cardText: 'Download files of genome-wide association study estimates and summary statistics',
+      cardText:
+        'Download files of genome-wide association study estimates and summary statistics',
       image: 'assets/images/downloads.svg',
       navIndex: 2
     },
     {
       route: '/link'
-    },
+    }
   ];
 
   return (
@@ -71,7 +72,7 @@ function App() {
       <Route path="/phenotypes" component={Phenotypes} />
       <Route path="/downloads" component={Downloads} />
       <Route path="/link/:shareID?" component={LinkWrapper} />
-      </Router>
+    </Router>
   );
 }
 

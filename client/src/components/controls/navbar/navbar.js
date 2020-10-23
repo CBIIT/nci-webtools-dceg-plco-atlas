@@ -12,10 +12,7 @@ export function Navbar({ links }) {
             .filter(link => link.title)
             .sort((a, b) => a.navIndex - b.navIndex)
             .map(({ route, action, title, exact }, index) => (
-              <div
-                data-testid="Navbar"
-                className="d-inline-block"
-                key={title}>
+              <div data-testid="Navbar" className="d-inline-block" key={title}>
                 <NavLink
                   data-testid={`Navbar-NavLink-${index}`}
                   // key={title}

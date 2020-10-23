@@ -4,7 +4,6 @@ import { updateVariantLookup } from '../../../../services/actions';
 import { Button } from 'react-bootstrap';
 import { ShareLink } from '../../../controls/share-link/share-link';
 
-
 export const VariantLookupSearchCriteria = () => {
   const dispatch = useDispatch();
   const variantLookup = useSelector(state => state.variantLookup);
@@ -14,9 +13,7 @@ export const VariantLookupSearchCriteria = () => {
     shareID,
     disableSubmit
   } = variantLookup;
-  const {
-    numResults
-  } = useSelector(state => state.variantLookupTable);
+  const { numResults } = useSelector(state => state.variantLookupTable);
 
   const setCollapseCriteria = collapseCriteria => {
     dispatch(updateVariantLookup({ collapseCriteria }));
@@ -31,7 +28,11 @@ export const VariantLookupSearchCriteria = () => {
   };
 
   const CollapseCaret = () => {
-    if (searchCriteriaVariantLookup && !collapseCriteria && searchCriteriaVariantLookup.phenotypes) {
+    if (
+      searchCriteriaVariantLookup &&
+      !collapseCriteria &&
+      searchCriteriaVariantLookup.phenotypes
+    ) {
       return <i className="fa fa-caret-down fa-lg"></i>;
     } else {
       return <i className="fa fa-caret-right fa-lg"></i>;
@@ -56,7 +57,7 @@ export const VariantLookupSearchCriteria = () => {
   return (
     <div className="mb-2">
       <div className="px-3 py-2 bg-white tab-pane-bordered rounded-0">
-        <div className="d-flex justify-content-between">              
+        <div className="d-flex justify-content-between">
           <div className="py-1 d-flex justify-content-start">
             <span className="mr-1">
               <Button
@@ -74,12 +75,13 @@ export const VariantLookupSearchCriteria = () => {
               </Button>
             </span>
             <span>
-              <b>Phenotypes:</b>{' '}           
+              <b>Phenotypes:</b>{' '}
               {collapseCriteria && (
                 <>
                   <span>
                     {searchCriteriaVariantLookup &&
-                    searchCriteriaVariantLookup.phenotypes && searchCriteriaVariantLookup.phenotypes.length >= 1
+                    searchCriteriaVariantLookup.phenotypes &&
+                    searchCriteriaVariantLookup.phenotypes.length >= 1
                       ? searchCriteriaVariantLookup.phenotypes[0]
                       : 'None'}
                   </span>
@@ -87,7 +89,7 @@ export const VariantLookupSearchCriteria = () => {
                     {searchCriteriaVariantLookup &&
                     searchCriteriaVariantLookup.phenotypes &&
                     searchCriteriaVariantLookup.phenotypes.length > 1 ? (
-                      <span>{' '}and</span>
+                      <span> and</span>
                     ) : (
                       <></>
                     )}
@@ -128,71 +130,97 @@ export const VariantLookupSearchCriteria = () => {
                 searchCriteriaVariantLookup.phenotypes &&
                 searchCriteriaVariantLookup.phenotypes.map(phenotype => (
                   <div title={phenotype}>
-                    {phenotype.length < 50 ? phenotype : phenotype.substring(0, 47) + "..." }
+                    {phenotype.length < 50
+                      ? phenotype
+                      : phenotype.substring(0, 47) + '...'}
                   </div>
-              ))}
+                ))}
             </span>
-            
-            <span className="border-left border-secondary mx-3" style={{maxHeight: '1.6em'}}></span>
+
+            <span
+              className="border-left border-secondary mx-3"
+              style={{ maxHeight: '1.6em' }}></span>
 
             <span>
               <b>Variant</b>:{' '}
               {searchCriteriaVariantLookup &&
-                searchCriteriaVariantLookup.variant
-                  ? searchCriteriaVariantLookup && searchCriteriaVariantLookup.variant.substring(0,2) === 'rs'
-                  ? <a
-                    href={'https://www.ncbi.nlm.nih.gov/snp/' + searchCriteriaVariantLookup.variant}
+              searchCriteriaVariantLookup.variant ? (
+                searchCriteriaVariantLookup &&
+                searchCriteriaVariantLookup.variant.substring(0, 2) === 'rs' ? (
+                  <a
+                    href={
+                      'https://www.ncbi.nlm.nih.gov/snp/' +
+                      searchCriteriaVariantLookup.variant
+                    }
                     target="_blank"
                     style={{
-                      textDecoration: 'underline',
+                      textDecoration: 'underline'
                     }}>
-                      {searchCriteriaVariantLookup.variant}
-                    </a>
-                  : searchCriteriaVariantLookup.variant.substring(0,3) === 'chr'
-                  ? <span>{searchCriteriaVariantLookup.variant.split(":")[0] + ":" + searchCriteriaVariantLookup.variant.split(":")[1]}</span>
-                  : <span>{searchCriteriaVariantLookup.variant}</span>
-                  : 'None'
-              }
+                    {searchCriteriaVariantLookup.variant}
+                  </a>
+                ) : searchCriteriaVariantLookup.variant.substring(0, 3) ===
+                  'chr' ? (
+                  <span>
+                    {searchCriteriaVariantLookup.variant.split(':')[0] +
+                      ':' +
+                      searchCriteriaVariantLookup.variant.split(':')[1]}
+                  </span>
+                ) : (
+                  <span>{searchCriteriaVariantLookup.variant}</span>
+                )
+              ) : (
+                'None'
+              )}
             </span>
 
-            <span className="border-left border-secondary mx-3" style={{maxHeight: '1.6em'}}></span>
-            
+            <span
+              className="border-left border-secondary mx-3"
+              style={{ maxHeight: '1.6em' }}></span>
+
             <span>
               <b>Sex</b>:{' '}
               {searchCriteriaVariantLookup && searchCriteriaVariantLookup.sex
                 ? displaySex(searchCriteriaVariantLookup.sex)
-                : 'None'
-              }
+                : 'None'}
             </span>
 
-            <span className="border-left border-secondary mx-3" style={{maxHeight: '1.6em'}}></span>
-            
+            <span
+              className="border-left border-secondary mx-3"
+              style={{ maxHeight: '1.6em' }}></span>
+
             <span>
               <b>Ancestry</b>:{' '}
-              {searchCriteriaVariantLookup && searchCriteriaVariantLookup.ancestry
+              {searchCriteriaVariantLookup &&
+              searchCriteriaVariantLookup.ancestry
                 ? displayAncestry(searchCriteriaVariantLookup.ancestry)
-                : 'None'
-              }
+                : 'None'}
             </span>
           </div>
 
           <div className="d-flex">
             <span className="py-1">
               <b>Total Results:</b>{' '}
-              {searchCriteriaVariantLookup && numResults ? 
-                numResults.toString() + (searchCriteriaVariantLookup && searchCriteriaVariantLookup.phenotypes
-                ? " of " + searchCriteriaVariantLookup.phenotypes.length + " phenotypes"
-                : "")
-                : 'None' + (searchCriteriaVariantLookup && searchCriteriaVariantLookup.phenotypes
-                ? " of " + searchCriteriaVariantLookup.phenotypes.length + " phenotypes"
-                : "")
-              }
+              {searchCriteriaVariantLookup && numResults
+                ? numResults.toString() +
+                  (searchCriteriaVariantLookup &&
+                  searchCriteriaVariantLookup.phenotypes
+                    ? ' of ' +
+                      searchCriteriaVariantLookup.phenotypes.length +
+                      ' phenotypes'
+                    : '')
+                : 'None' +
+                  (searchCriteriaVariantLookup &&
+                  searchCriteriaVariantLookup.phenotypes
+                    ? ' of ' +
+                      searchCriteriaVariantLookup.phenotypes.length +
+                      ' phenotypes'
+                    : '')}
             </span>
-            
-            <span className="ml-3" style={{maxHeight: '1.6em'}}></span>
+
+            <span className="ml-3" style={{ maxHeight: '1.6em' }}></span>
 
             <div className="d-inline">
-              <ShareLink 
+              <ShareLink
                 disabled={!searchCriteriaVariantLookup || !disableSubmit}
                 shareID={shareID}
                 params={variantLookup}

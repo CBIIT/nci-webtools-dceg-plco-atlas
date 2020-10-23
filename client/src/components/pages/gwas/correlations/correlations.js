@@ -7,7 +7,7 @@ import { PhenotypeCorrelationsSearchCriteria } from './correlations-search-crite
 import {
   SidebarContainer,
   SidebarPanel,
-  MainPanel,
+  MainPanel
 } from '../../../controls/sidebar-container/sidebar-container';
 import {
   updatePhenotypeCorrelations,
@@ -15,7 +15,6 @@ import {
   drawHeatmap
 } from '../../../../services/actions';
 import { getInitialState } from '../../../../services/store';
-
 
 export function PhenotypeCorrelations() {
   const dispatch = useDispatch();
@@ -28,9 +27,8 @@ export function PhenotypeCorrelations() {
     submitted,
     messages,
     sharedState,
-    selectedPhenotypes,
+    selectedPhenotypes
   } = phenotypeCorrelations;
-
 
   const phenotypes = useSelector(state => state.phenotypes);
 
@@ -84,41 +82,49 @@ export function PhenotypeCorrelations() {
 
     // close sidebar on submit
     // setOpenSidebar(false);
-    dispatch(updatePhenotypeCorrelations({
-      searchCriteriaPhenotypeCorrelations: {
-        phenotypes: params.phenotypes.map(item =>
-          item.title ? item.title : item.label
-        ),
-        sex: params.sex,
-        ancestry: params.ancestry,
-        totalPhenotypes: params.phenotypes.length
-      },
-      submitted: new Date(),
-      disableSubmit: true
-    }));
+    dispatch(
+      updatePhenotypeCorrelations({
+        searchCriteriaPhenotypeCorrelations: {
+          phenotypes: params.phenotypes.map(item =>
+            item.title ? item.title : item.label
+          ),
+          sex: params.sex,
+          ancestry: params.ancestry,
+          totalPhenotypes: params.phenotypes.length
+        },
+        submitted: new Date(),
+        disableSubmit: true
+      })
+    );
     dispatch(drawHeatmap(params));
     tooltipRef.current.resetTooltip();
   };
 
   const loadState = state => {
     if (!state || !Object.keys(state).length) return;
-    dispatch(updatePhenotypeCorrelations({
-      ...state, 
-      submitted: new Date(),
-      sharedState: null
-    }));
+    dispatch(
+      updatePhenotypeCorrelations({
+        ...state,
+        submitted: new Date(),
+        sharedState: null
+      })
+    );
     dispatch(
       drawHeatmap({
         phenotypes: state.selectedPhenotypes,
-        sex: state.selectedSex,
+        sex: state.selectedSex
         // ancestry: state.selectedAncestry
       })
     );
     tooltipRef.current.resetTooltip();
-  }
+  };
 
   useEffect(() => {
-    if (sharedState && sharedState.parameters && sharedState.parameters.params) {
+    if (
+      sharedState &&
+      sharedState.parameters &&
+      sharedState.parameters.params
+    ) {
       loadState(sharedState.parameters.params);
     }
   }, [sharedState]);
@@ -132,12 +138,8 @@ export function PhenotypeCorrelations() {
 
   const handleReset = () => {
     const initialState = getInitialState();
-    dispatch(
-      updatePhenotypeCorrelations(initialState.phenotypeCorrelations)
-    );
-    dispatch(
-      updateHeatmap(initialState.heatmap)
-    );
+    dispatch(updatePhenotypeCorrelations(initialState.phenotypeCorrelations));
+    dispatch(updateHeatmap(initialState.heatmap));
     tooltipRef.current.resetTooltip();
   };
 
@@ -145,7 +147,9 @@ export function PhenotypeCorrelations() {
 
   return (
     <div className="position-relative">
-      <h1 className="sr-only">Explore GWAS data - Visualize phenotype correlations</h1>
+      <h1 className="sr-only">
+        Explore GWAS data - Visualize phenotype correlations
+      </h1>
 
       <SidebarContainer className="mx-3">
         <SidebarPanel className="col-lg-3">
@@ -154,31 +158,35 @@ export function PhenotypeCorrelations() {
               onSubmit={handleSubmit}
               onChange={handleChange}
               onReset={handleReset}
-              style={{display: openSidebar ? 'block' : 'none'}}
+              style={{ display: openSidebar ? 'block' : 'none' }}
             />
             {messages &&
               messages.map(({ type, content }) => (
-                <Alert className="mt-3" variant={type} onClose={clearMessages} dismissible>
+                <Alert
+                  className="mt-3"
+                  variant={type}
+                  onClose={clearMessages}
+                  dismissible>
                   {content}
                 </Alert>
               ))}
-            </div>
+          </div>
         </SidebarPanel>
 
         <MainPanel className="col-lg-9">
           <PhenotypeCorrelationsSearchCriteria />
+          <div
+            className={
+              'bg-white tab-pane-bordered rounded-0 p-3 d-flex justify-content-center align-items-center'
+            }
+            style={{ minHeight: '426px' }}>
             <div
-              className={
-                "bg-white tab-pane-bordered rounded-0 p-3 d-flex justify-content-center align-items-center"
-              }
-              style={{ minHeight: '426px' }}>
-              <div
-                className="mw-100 my-4"
-                style={{ display: submitted ? 'block' : 'none' }}>
-                <Heatmap ref={tooltipRef} />
-              </div>
-              {placeholder}
+              className="mw-100 my-4"
+              style={{ display: submitted ? 'block' : 'none' }}>
+              <Heatmap ref={tooltipRef} />
             </div>
+            {placeholder}
+          </div>
         </MainPanel>
       </SidebarContainer>
     </div>

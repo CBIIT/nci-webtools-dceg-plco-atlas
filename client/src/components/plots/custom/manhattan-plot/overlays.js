@@ -1,7 +1,13 @@
-import { viewportToLocalCoordinates, min, max, addEventListener, withSavedContext, extent } from '../utils.js';
+import {
+  viewportToLocalCoordinates,
+  min,
+  max,
+  addEventListener,
+  withSavedContext,
+  extent
+} from '../utils.js';
 import { renderText, systemFont } from '../text.js';
 import { getScale } from './scale.js';
-
 
 export function drawSelectionOverlay(config, ctx, overlayCtx) {
   let canvas = ctx.canvas;
@@ -84,11 +90,7 @@ export function drawZoomOverlay(config, ctx, overlayCtx) {
 
   function startZoom(ev) {
     if (ev.button !== 0) return;
-    let { x, y } = viewportToLocalCoordinates(
-      ev.clientX,
-      ev.clientY,
-      canvas
-    );
+    let { x, y } = viewportToLocalCoordinates(ev.clientX, ev.clientY, canvas);
     let withinMargins = isWithinMargins(x, y, canvas, margins);
     zoomArea = { x1: x, x2: x, y1: y, y2: y };
     if (!withinMargins) return false;
@@ -97,11 +99,7 @@ export function drawZoomOverlay(config, ctx, overlayCtx) {
   }
 
   function updateZoomWindow(ev) {
-    let { x, y } = viewportToLocalCoordinates(
-      ev.clientX,
-      ev.clientY,
-      canvas
-    );
+    let { x, y } = viewportToLocalCoordinates(ev.clientX, ev.clientY, canvas);
     let dx = Math.abs(x - zoomArea.x1);
     let dy = Math.abs(y - zoomArea.y1);
     let createRect = zoomArea => ({
@@ -151,11 +149,7 @@ export function drawZoomOverlay(config, ctx, overlayCtx) {
   function endZoom(ev) {
     if (!mouseDown) return;
 
-    let { x, y } = viewportToLocalCoordinates(
-      ev.clientX,
-      ev.clientY,
-      canvas
-    );
+    let { x, y } = viewportToLocalCoordinates(ev.clientX, ev.clientY, canvas);
 
     let yMidpoint = margins.top + height / 2;
     overlayCtx.clearRect(margins.left, margins.top, width, height);
@@ -225,7 +219,14 @@ export function drawPanOverlay(config, ctx, overlayCtx) {
   let margins = config.margins;
   let width = canvas.width - margins.left - margins.right;
   let height = canvas.height - margins.top - margins.bottom;
-  let panArea = { xStart: 0, xEnd: 0, yStart: 0, yEnd: 0, deltaX: 0, deltaY: 0 };
+  let panArea = {
+    xStart: 0,
+    xEnd: 0,
+    yStart: 0,
+    yEnd: 0,
+    deltaX: 0,
+    deltaY: 0
+  };
   let mouseDown = false;
   let body = window.document.body;
   let xScale, yScale;
@@ -233,12 +234,12 @@ export function drawPanOverlay(config, ctx, overlayCtx) {
     xMin: 0,
     xMax: 0,
     yMin: 0,
-    yMax: 0,
-  }
+    yMax: 0
+  };
 
   addEventListener(canvas, 'contextmenu', ev => {
     ev.preventDefault();
-  })
+  });
 
   addEventListener(canvas, 'mousedown', ev => {
     if (ev.button !== 2 || config.zoomAreaActive || !config.zoomWindow) return;
@@ -250,20 +251,17 @@ export function drawPanOverlay(config, ctx, overlayCtx) {
       ? config.data2.map(d => d[config.yAxis.key])
       : [];
 
-    let xExtent =  extent(xData);
-    let yExtent =  extent(yData.concat(yData2));
+    let xExtent = extent(xData);
+    let yExtent = extent(yData.concat(yData2));
 
     limits = {
       xMin: xExtent[0],
       xMax: xExtent[1],
       yMin: yExtent[0],
-      yMax: yExtent[1],
+      yMax: yExtent[1]
     };
 
-    xScale = getScale(
-      [0, width],
-      [0, currentBounds.xMax - currentBounds.xMin]
-    );
+    xScale = getScale([0, width], [0, currentBounds.xMax - currentBounds.xMin]);
 
     yScale = getScale(
       [0, height],
@@ -272,11 +270,7 @@ export function drawPanOverlay(config, ctx, overlayCtx) {
 
     mouseDown = true;
     canvas.style.cursor = 'move';
-    let { x, y } = viewportToLocalCoordinates(
-      ev.clientX,
-      ev.clientY,
-      canvas
-    );
+    let { x, y } = viewportToLocalCoordinates(ev.clientX, ev.clientY, canvas);
     panArea.xStart = x;
     panArea.yStart = y;
   });
@@ -285,15 +279,11 @@ export function drawPanOverlay(config, ctx, overlayCtx) {
     if (!mouseDown) return;
     canvas.style.cursor = 'move';
     let currentBounds = config.zoomWindow.bounds;
-    let { x, y } = viewportToLocalCoordinates(
-      ev.clientX,
-      ev.clientY,
-      canvas
-    );
+    let { x, y } = viewportToLocalCoordinates(ev.clientX, ev.clientY, canvas);
     panArea.xEnd = x;
     panArea.yEnd = y;
     panArea.deltaX = xScale(panArea.xEnd - panArea.xStart);
-    panArea.deltaY = - yScale(panArea.yEnd - panArea.yStart); // inverse y scale
+    panArea.deltaY = -yScale(panArea.yEnd - panArea.yStart); // inverse y scale
 
     if (currentBounds.xMin + panArea.deltaX < limits.xMin) {
       panArea.deltaX = limits.xMin - currentBounds.xMin;
@@ -319,20 +309,19 @@ export function drawPanOverlay(config, ctx, overlayCtx) {
 
       let center = {
         x: (config.margins.left + width) / 2,
-        y: (config.margins.top + height) / 2,
-      }
+        y: (config.margins.top + height) / 2
+      };
 
       ctx.translate(center.x, center.y);
       let deltaX = (Math.abs(panArea.deltaX) / 1e6).toPrecision(4);
-      let deltaY = Math.abs(panArea.deltaY).toPrecision(4)
+      let deltaY = Math.abs(panArea.deltaY).toPrecision(4);
 
       let titles = [
         `${panArea.deltaY > 0 ? '🡩' : '🡫'} ${deltaY} P`,
-        `${panArea.deltaX > 0 ? '🡪' : '🡨'} ${deltaX} MB`,
+        `${panArea.deltaX > 0 ? '🡪' : '🡨'} ${deltaX} MB`
       ];
 
-      if (panArea.deltaY < 0)
-        titles = [titles[1], titles[0]]
+      if (panArea.deltaY < 0) titles = [titles[1], titles[0]];
 
       titles.forEach(title => {
         let size = 16;
@@ -343,17 +332,16 @@ export function drawPanOverlay(config, ctx, overlayCtx) {
           fillStyle: 'black'
         });
         ctx.translate(0, size);
-      })
-
-    })
+      });
+    });
   });
 
   addEventListener(body, 'mouseup', ev => {
     if (!mouseDown) return;
-    mouseDown  = false;
+    mouseDown = false;
     canvas.style.cursor = 'crosshair';
     let currentBounds = config.zoomWindow.bounds;
-    let {deltaX, deltaY} = panArea;
+    let { deltaX, deltaY } = panArea;
 
     withSavedContext(overlayCtx, ctx => {
       ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
@@ -363,14 +351,14 @@ export function drawPanOverlay(config, ctx, overlayCtx) {
       xMin: currentBounds.xMin + deltaX,
       xMax: currentBounds.xMax + deltaX,
       yMin: currentBounds.yMin + deltaY,
-      yMax: currentBounds.yMax + deltaY,
-    }
+      yMax: currentBounds.yMax + deltaY
+    };
 
-    config.setZoomWindow({bounds});
+    config.setZoomWindow({ bounds });
     if (config.onPan) {
       config.onPan(bounds);
     }
-  })
+  });
 }
 
 function getSectionBounds(value, ticks) {

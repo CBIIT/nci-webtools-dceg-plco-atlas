@@ -222,7 +222,7 @@ export function removeChildren(element) {
 export function canvasToBlob(canvas, mimeType, qualityArgument) {
   return new Promise((resolve, reject) => {
     canvas.toBlob(resolve, mimeType, qualityArgument);
-  })
+  });
 }
 
 export function withSavedContext(context, callback) {
@@ -234,13 +234,12 @@ export function withSavedContext(context, callback) {
 
 export function addEventListener(el, type, callback) {
   el.addEventListener(type, callback);
-  if (!el.hasOwnProperty('listeners'))
-    el.listeners = [];
-  el.listeners.push({type, callback});
+  if (!el.hasOwnProperty('listeners')) el.listeners = [];
+  el.listeners.push({ type, callback });
 }
 
 export function removeEventListeners(el) {
-  (el.listeners || []).forEach(({type, callback}) => {
+  (el.listeners || []).forEach(({ type, callback }) => {
     el.removeEventListener(type, callback);
   });
 }
@@ -248,7 +247,7 @@ export function removeEventListeners(el) {
 export function getElementOffset(el) {
   const rect = el.getBoundingClientRect();
   return {
-    top: rect.top,// + window.pageYOffset,
-    left: rect.left// + window.pageXOffset,
+    top: rect.top, // + window.pageYOffset,
+    left: rect.left // + window.pageXOffset,
   };
 }

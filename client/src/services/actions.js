@@ -106,8 +106,8 @@ export function initialize() {
   return async function initializeAction(dispatch) {
     try {
       // update ranges
-      const ranges = await query('ranges')
-      dispatch(updateSummaryResults({ranges}));
+      const ranges = await query('ranges');
+      dispatch(updateSummaryResults({ ranges }));
 
       const metadata = await query('metadata', {
         chromosome: 'all',
@@ -115,8 +115,8 @@ export function initialize() {
       });
 
       // update download root
-      const { downloadRoot } = await query('config', {key: 'downloadRoot'})
-      dispatch(updateDownloads({downloadRoot}));
+      const { downloadRoot } = await query('config', { key: 'downloadRoot' });
+      dispatch(updateDownloads({ downloadRoot }));
 
       // update phenotypes
       const data = await query('phenotypes');
@@ -147,23 +147,25 @@ export function initialize() {
         }
       };
 
-      if (data && data.statusCode !== 500 ) {
+      if (data && data.statusCode !== 500) {
         data.forEach(populateRecords, 0);
         const alphabetizedRecords = [...records].sort((a, b) =>
           a.title.localeCompare(b.title)
         );
 
-        dispatch(updatePhenotypes({
-          flat: alphabetizedRecords,
-          categories: categories,
-          tree: data,
-          metadata: metadata
-        }));
+        dispatch(
+          updatePhenotypes({
+            flat: alphabetizedRecords,
+            categories: categories,
+            tree: data,
+            metadata: metadata
+          })
+        );
       }
     } catch (e) {
-      dispatch(updateError({visible: true}))
+      dispatch(updateError({ visible: true }));
     }
-  }
+  };
 }
 
 export function fetchSummaryTable(tableKey, params) {
@@ -172,9 +174,10 @@ export function fetchSummaryTable(tableKey, params) {
       dispatch(setSummaryTableLoading(true));
 
       // previousCount is used when paginating or sorting existing results
-      const previousCount = getState(state => state.summaryTables[tableKey]).resultsCount;
+      const previousCount = getState(state => state.summaryTables[tableKey])
+        .resultsCount;
       const response = await query('variants', params);
-      if (response.error) throw(response);
+      if (response.error) throw response;
 
       dispatch(
         updateSummaryTableByIndex(tableKey, {
@@ -187,17 +190,17 @@ export function fetchSummaryTable(tableKey, params) {
           limit: params.limit,
           orderBy: params.orderBy,
           order: params.order,
-          chromosome: params.chromosome,
+          chromosome: params.chromosome
         })
       );
-  
+
       dispatch(setSummaryTableLoading(false));
     } catch (e) {
-      console.log("ERROR fetchSummaryTable", e);
-      dispatch(updateError({visible: true}))
+      console.log('ERROR fetchSummaryTable', e);
+      dispatch(updateError({ visible: true }));
       dispatch(setSummaryTableLoading(false));
     }
-  }
+  };
 }
 
 export function fetchSummarySnpTable(tableKey, params) {
@@ -207,7 +210,7 @@ export function fetchSummarySnpTable(tableKey, params) {
 
       const response = await query('variants', params);
       if (response.error) return;
-  
+
       dispatch(
         updateSummarySnpTableByIndex(tableKey, {
           results: response.data,
@@ -216,49 +219,60 @@ export function fetchSummarySnpTable(tableKey, params) {
           pageSize: params.limit
         })
       );
-  
+
       dispatch(setSummarySnpLoading(false));
     } catch (e) {
-      console.log("ERROR fetchSummarySnpTable", e);
-      dispatch(updateError({visible: true}))
+      console.log('ERROR fetchSummarySnpTable', e);
+      dispatch(updateError({ visible: true }));
       dispatch(setSummarySnpLoading(false));
     }
   };
 }
 
-export function submitSummaryResultsQuery({phenotypes, stratifications, isPairwise}) {
-  return async function (dispatch) {
+export function submitSummaryResultsQuery({
+  phenotypes,
+  stratifications,
+  isPairwise
+}) {
+  return async function(dispatch) {
     const initialState = getInitialState();
-    for (let key of ['manhattanPlot', 'qqPlot', 'summaryTables', 'summarySnpTables'])
+    for (let key of [
+      'manhattanPlot',
+      'qqPlot',
+      'summaryTables',
+      'summarySnpTables'
+    ])
       dispatch(updateKey(key, initialState[key]));
 
-    dispatch(drawQQPlot({phenotypes, stratifications, isPairwise}));
+    dispatch(drawQQPlot({ phenotypes, stratifications, isPairwise }));
     dispatch(
       drawManhattanPlot('summary', {
         phenotypes,
         stratifications,
         isPairwise,
-        p_value_nlog_min: 2,
+        p_value_nlog_min: 2
       })
     );
 
     // fetch both summary results tables
-    stratifications.filter(s => s.sex && s.ancestry).forEach((stratification, i) => {
-      const {sex, ancestry} = stratification;
-      const phenotype = phenotypes[i] || phenotypes[0];
-      dispatch(
-        fetchSummaryTable(i, {
-          phenotype_id: phenotype.id,
-          sex,
-          ancestry,
-          offset: 0,
-          limit: 10,
-          orderBy: 'p_value',
-          order: 'asc',
-          metadataCount: true,
-        })
-      );
-    });
+    stratifications
+      .filter(s => s.sex && s.ancestry)
+      .forEach((stratification, i) => {
+        const { sex, ancestry } = stratification;
+        const phenotype = phenotypes[i] || phenotypes[0];
+        dispatch(
+          fetchSummaryTable(i, {
+            phenotype_id: phenotype.id,
+            sex,
+            ancestry,
+            offset: 0,
+            limit: 10,
+            orderBy: 'p_value',
+            order: 'asc',
+            metadataCount: true
+          })
+        );
+      });
 
     // update summary results filters
     dispatch(
@@ -272,10 +286,10 @@ export function submitSummaryResultsQuery({phenotypes, stratifications, isPairwi
         nlogpMax: null,
         bpMin: null,
         bpMax: null,
-        submitted: new Date().getTime(),
+        submitted: new Date().getTime()
       })
     );
-  }
+  };
 }
 
 /**
@@ -286,31 +300,30 @@ export function submitSummaryResultsQuery({phenotypes, stratifications, isPairwi
 export function drawManhattanPlot(plotType, params) {
   // console.log('drawing plot', plotType, params);
   return async function(dispatch) {
-    try {  
+    try {
       const { phenotypes, stratifications, isPairwise } = params;
-
 
       dispatch(updateManhattanPlot({ loadingManhattanPlot: true }));
 
       const appendIndex = (index, record) => {
         record.columns.push('index');
         record.data.forEach(e => e.push(index));
-      }
+      };
 
       if (isPairwise) {
         const manhattanPlotData = await rawQuery(plotType, {
           ...params,
           phenotype_id: phenotypes[0].id,
           sex: stratifications[0].sex,
-          ancestry: stratifications[0].ancestry,
+          ancestry: stratifications[0].ancestry
         });
         appendIndex(0, manhattanPlotData);
-  
+
         const manhattanPlotMirroredData = await rawQuery(plotType, {
           ...params,
           phenotype_id: (phenotypes[1] || phenotypes[0]).id,
           sex: stratifications[1].sex,
-          ancestry: stratifications[1].ancestry,
+          ancestry: stratifications[1].ancestry
         });
         appendIndex(1, manhattanPlotMirroredData);
 
@@ -319,14 +332,13 @@ export function drawManhattanPlot(plotType, params) {
             manhattanPlotData,
             manhattanPlotMirroredData
           })
-        );        
-
+        );
       } else {
         const manhattanPlotData = await rawQuery(plotType, {
           ...params,
           phenotype_id: phenotypes[0].id,
           sex: stratifications[0].sex,
-          ancestry: stratifications[0].ancestry,
+          ancestry: stratifications[0].ancestry
         });
         appendIndex(0, manhattanPlotData);
 
@@ -340,8 +352,8 @@ export function drawManhattanPlot(plotType, params) {
 
       dispatch(updateManhattanPlot({ loadingManhattanPlot: false }));
     } catch (e) {
-      console.log("ERROR drawManhattanPlot", e);
-      dispatch(updateError({visible: true}))
+      console.log('ERROR drawManhattanPlot', e);
+      dispatch(updateError({ visible: true }));
       dispatch(updateManhattanPlot({ loadingManhattanPlot: false }));
     }
   };
@@ -350,44 +362,50 @@ export function drawManhattanPlot(plotType, params) {
 export function drawQQPlot({ phenotypes, stratifications, isPairwise }) {
   return async function(dispatch) {
     try {
-      dispatch(updateQQPlot({ 
-        loadingQQPlot: true,
-        qqplotData: [],
-        qqplotLayout: {},
-      }));
-  
+      dispatch(
+        updateQQPlot({
+          loadingQQPlot: true,
+          qqplotData: [],
+          qqplotLayout: {}
+        })
+      );
+
       // retrieve metadata for all sexes provided
       const metadata = await query('metadata', {
         phenotype_id: phenotypes.map(p => p.id),
-        chromosome: 'all',
+        chromosome: 'all'
       });
 
       stratifications = stratifications.map((s, i) => ({
         ...s,
-        metadata: metadata.find(m => 
+        metadata: metadata.find(
+          m =>
             m.phenotype_id === (phenotypes[i] || phenotypes[0]).id &&
-            m.sex === s.sex && 
-            m.ancestry === s.ancestry)
+            m.sex === s.sex &&
+            m.ancestry === s.ancestry
+        )
       }));
 
       // console.log(metadata, stratifications, phenotypes);
 
       // the title property is only used for non-stacked plots
       // stacked plots use the legend instead as the title
-      const title = isPairwise ? undefined : [
-        `<b>\u03BB</b> = ${stratifications[0].metadata.lambda_gc}`,
-        `<b>Number of Variants</b> = ${stratifications[0].metadata.count.toLocaleString()}`,
-      ].join(' '.repeat(5));
-  
+      const title = isPairwise
+        ? undefined
+        : [
+            `<b>\u03BB</b> = ${stratifications[0].metadata.lambda_gc}`,
+            `<b>Number of Variants</b> = ${stratifications[0].metadata.count.toLocaleString()}`
+          ].join(' '.repeat(5));
+
       const layout = {
         hoverlabel: {
-          bgcolor: "#fff",
+          bgcolor: '#fff',
           bordercolor: '#bbb',
           font: {
             size: 14,
             color: '#212529',
             family: systemFont
-          },
+          }
         },
         dragmode: 'pan',
         clickmode: 'event',
@@ -449,119 +467,153 @@ export function drawQQPlot({ phenotypes, stratifications, isPairwise }) {
         legend: {
           itemclick: false,
           itemdoubleclick: false,
-          orientation: "v",
+          orientation: 'v',
           x: 0.2,
           y: 1.1
         }
       };
 
-      dispatch(updateQQPlot({ 
-        qqplotLayout: layout,
-        sampleSize: 0,
-      }));
-      
+      dispatch(
+        updateQQPlot({
+          qqplotLayout: layout,
+          sampleSize: 0
+        })
+      );
+
       let qqplotData = [];
 
-      await Promise.all(stratifications.map(async ({sex, ancestry, metadata}, i) => {
-        const {lambda_gc, count} = metadata;
+      await Promise.all(
+        stratifications.map(async ({ sex, ancestry, metadata }, i) => {
+          const { lambda_gc, count } = metadata;
 
-        const {data, columns} = await query('points', {
-          phenotype_id: (phenotypes[i] || phenotypes[0]).id,
-          sex,
-          ancestry,
-          raw: true,
-        });
+          const { data, columns } = await query('points', {
+            phenotype_id: (phenotypes[i] || phenotypes[0]).id,
+            sex,
+            ancestry,
+            raw: true
+          });
 
-        const expectedValues = data.map(d => d[columns.indexOf('p_value_nlog_expected')]);
-        const observedValues = data.map(d => d[columns.indexOf('p_value_nlog')]);
-        const ids = data.map(d => d[columns.indexOf('id')]);
-        const maxExpectedValue = expectedValues.reduce((a, b) => b > a ? b : a);
-        const titleCase = str => str.replace(/\w+/g, str => 
-          str[0].toUpperCase() + str.substring(1, str.length).toLowerCase());
-        const markerColor = isPairwise ? ['#f41c52', '#006bb8'][i] : '#f2990d';
-        const titlePrefix = isPairwise && phenotypes[1] ? `${phenotypes[i].display_name} - ` : '';
+          const expectedValues = data.map(
+            d => d[columns.indexOf('p_value_nlog_expected')]
+          );
+          const observedValues = data.map(
+            d => d[columns.indexOf('p_value_nlog')]
+          );
+          const ids = data.map(d => d[columns.indexOf('id')]);
+          const maxExpectedValue = expectedValues.reduce((a, b) =>
+            b > a ? b : a
+          );
+          const titleCase = str =>
+            str.replace(
+              /\w+/g,
+              str =>
+                str[0].toUpperCase() +
+                str.substring(1, str.length).toLowerCase()
+            );
+          const markerColor = isPairwise
+            ? ['#f41c52', '#006bb8'][i]
+            : '#f2990d';
+          const titlePrefix =
+            isPairwise && phenotypes[1]
+              ? `${phenotypes[i].display_name} - `
+              : '';
 
-        qqplotData = qqplotData.concat([
-          {
-            x: [0, maxExpectedValue], // expected -log10(p)
-            y: [0, maxExpectedValue], // expected -log10(p)
-            hoverinfo: 'none',
-            mode: 'lines',
-            type: 'scattergl',
-            line: {
-              color: 'gray',
-              width: 1
+          qqplotData = qqplotData.concat([
+            {
+              x: [0, maxExpectedValue], // expected -log10(p)
+              y: [0, maxExpectedValue], // expected -log10(p)
+              hoverinfo: 'none',
+              mode: 'lines',
+              type: 'scattergl',
+              line: {
+                color: 'gray',
+                width: 1
+              },
+              opacity: 0.5,
+              showlegend: false
             },
-            opacity: 0.5,
-            showlegend: false
-          },
-          {
-            x: expectedValues, // expected -log10(p)
-            y: observedValues, // observed -log10(p)
-            customdata: data.map((d, i) => ({
-              phenotypeId: (phenotypes[i] || phenotypes[0]).id,
-              sex,
-              ancestry,
-              variantId: ids[i],
-              p: Math.pow(10, -observedValues[i]),
-              showData: i <= 10000,
-              color: markerColor,
-            })),
-            name: `${titlePrefix + titleCase(`${ancestry} - ${sex}`)}     <b>\u03BB</b> = ${lambda_gc}     <b>Number of Variants</b> = ${count.toLocaleString()}`,
-            mode: 'markers',
-            type: 'scattergl',
-            hoverinfo: 'none',
-            text: null,
-            marker: {
-              color: markerColor,
-              size: 8,
-              opacity: 0.65
-            },
-          }
-        ]);
+            {
+              x: expectedValues, // expected -log10(p)
+              y: observedValues, // observed -log10(p)
+              customdata: data.map((d, i) => ({
+                phenotypeId: (phenotypes[i] || phenotypes[0]).id,
+                sex,
+                ancestry,
+                variantId: ids[i],
+                p: Math.pow(10, -observedValues[i]),
+                showData: i <= 10000,
+                color: markerColor
+              })),
+              name: `${titlePrefix +
+                titleCase(
+                  `${ancestry} - ${sex}`
+                )}     <b>\u03BB</b> = ${lambda_gc}     <b>Number of Variants</b> = ${count.toLocaleString()}`,
+              mode: 'markers',
+              type: 'scattergl',
+              hoverinfo: 'none',
+              text: null,
+              marker: {
+                color: markerColor,
+                size: 8,
+                opacity: 0.65
+              }
+            }
+          ]);
 
-        dispatch(updateQQPlot({ qqplotData }));
-      }));
+          dispatch(updateQQPlot({ qqplotData }));
+        })
+      );
 
-      dispatch(updateQQPlot({ 
-        loadingQQPlot: false,
-      }));
+      dispatch(
+        updateQQPlot({
+          loadingQQPlot: false
+        })
+      );
     } catch (e) {
-      dispatch(updateError({visible: true}))
-      dispatch(updateQQPlot({ 
-        loadingQQPlot: true,
-        qqplotData: [],
-        qqplotLayout: {},
-        sampleSize: null,
-      }));
+      dispatch(updateError({ visible: true }));
+      dispatch(
+        updateQQPlot({
+          loadingQQPlot: true,
+          qqplotData: [],
+          qqplotLayout: {},
+          sampleSize: null
+        })
+      );
     }
   };
 }
 
-export function drawHeatmap({phenotypes, sex}) {
+export function drawHeatmap({ phenotypes, sex }) {
   return async function(dispatch) {
     try {
-      const truncate = (str, limit = 20) => str.substring(0, limit) + (str.length > limit ? '...' : '');
+      const truncate = (str, limit = 20) =>
+        str.substring(0, limit) + (str.length > limit ? '...' : '');
       const ids = phenotypes.map(p => p.id);
       const heatmapIds = ids.map(id => `_${id}`); // needed for categorical x and y axes
       const names = phenotypes.map(p => p.display_name);
-      const response = await query('correlations', {a: ids, b: ids});
-  
+      const response = await query('correlations', { a: ids, b: ids });
+
       // match ids to correlation values
-      const zData = ids.map(a => ids.map(b => response.find(p => 
-        (p.phenotype_a == a && p.phenotype_b === b) ||
-        (p.phenotype_a == b && p.phenotype_b === a)
-      )));
-  
+      const zData = ids.map(a =>
+        ids.map(b =>
+          response.find(
+            p =>
+              (p.phenotype_a == a && p.phenotype_b === b) ||
+              (p.phenotype_a == b && p.phenotype_b === a)
+          )
+        )
+      );
+
       const heatmapData = {
         x: heatmapIds,
         y: heatmapIds,
-        z: zData.map(row => row.map(correlation => {
-          // ternary is a bit harder to read
-          if (!correlation || [1, -1].includes(correlation.value)) 
-            return 0;
-          return correlation.value;
-        })),
+        z: zData.map(row =>
+          row.map(correlation => {
+            // ternary is a bit harder to read
+            if (!correlation || [1, -1].includes(correlation.value)) return 0;
+            return correlation.value;
+          })
+        ),
         customdata: zData,
         zmin: -1.0,
         zmax: 1.0,
@@ -578,7 +630,7 @@ export function drawHeatmap({phenotypes, sex}) {
         ],
         colorbar: {
           tickvals: [-1, -0.75, -0.5, -0.25, 0, 0.25, 0.5, 0.75, 1],
-          tickmode: "array",
+          tickmode: 'array',
           thickness: 15,
           title: {
             text: 'Correlation',
@@ -586,7 +638,7 @@ export function drawHeatmap({phenotypes, sex}) {
           }
         },
         showscale: true,
-        hoverinfo: 'none',
+        hoverinfo: 'none'
         // use custom tooltips instead of plotly defaults
         // hoverinfo: 'text',
         // hovertemplate:
@@ -597,13 +649,13 @@ export function drawHeatmap({phenotypes, sex}) {
       };
       let heatmapLayout = {
         hoverlabel: {
-          bgcolor: "#fff",
+          bgcolor: '#fff',
           bordercolor: '#bbb',
           font: {
             size: 14,
             color: '#212529',
             family: systemFont
-          },
+          }
         },
         // width: 1000,
         // height: 1000,
@@ -623,7 +675,7 @@ export function drawHeatmap({phenotypes, sex}) {
             color: 'black'
           },
           tickvals: heatmapIds, // use id to uniquely identify phenotype
-          ticktext: names.map(name => truncate(name, 20)),
+          ticktext: names.map(name => truncate(name, 20))
           // dtick: 5,
         },
         yaxis: {
@@ -636,35 +688,34 @@ export function drawHeatmap({phenotypes, sex}) {
             color: 'black'
           },
           tickvals: heatmapIds,
-          ticktext: names.map(name => truncate(name, 20)),
+          ticktext: names.map(name => truncate(name, 20))
           // dtick: 5
         }
       };
-      dispatch(updateHeatmap({
-        heatmapData: [heatmapData],
-        heatmapLayout
-      }));
-  
+      dispatch(
+        updateHeatmap({
+          heatmapData: [heatmapData],
+          heatmapLayout
+        })
+      );
     } catch (e) {
-      dispatch(updateError({visible: true}))
+      dispatch(updateError({ visible: true }));
     }
   };
 }
 
-export function lookupVariants({phenotypes, variant, sex, ancestry}) {
+export function lookupVariants({ phenotypes, variant, sex, ancestry }) {
   return async function(dispatch) {
     try {
-      const {variantLookupTable} = getInitialState();
-      dispatch(
-        updateVariantLookupTable(variantLookupTable)
-      );
-//      dispatch(updateVariantLookup())
-//      dispatch(updateHeatmap(variantLookupTable));
-      
+      const { variantLookupTable } = getInitialState();
+      dispatch(updateVariantLookupTable(variantLookupTable));
+      //      dispatch(updateVariantLookup())
+      //      dispatch(updateHeatmap(variantLookupTable));
+
       let chromosome = null;
       let position = null;
       let snp = variant;
-  
+
       // // determine if we should query by snp or chromosome/position
       // const coordinates = variant.match(/^chr(x|y|\d+):\d+$/i);
       // if (coordinates) {
@@ -672,9 +723,9 @@ export function lookupVariants({phenotypes, variant, sex, ancestry}) {
       // } else {
       //   snp = variant;
       // }
-  
+
       // null properties are not included in query
-      const {data} = await query('variants', {
+      const { data } = await query('variants', {
         phenotype_id: phenotypes.map(p => p.id),
         sex,
         ancestry,
@@ -682,26 +733,27 @@ export function lookupVariants({phenotypes, variant, sex, ancestry}) {
         position,
         snp
       });
-  
+
       // populate results
-      const results = data.map(record => ({
-        phenotype: phenotypes.find(p => p.id === record.phenotype_id).title,
-        variant,
-        ancestry,
-        ...record
-      })).map(p => {
-        if (!p.p_value)
-          p.p_value = '-';
+      const results = data
+        .map(record => ({
+          phenotype: phenotypes.find(p => p.id === record.phenotype_id).title,
+          variant,
+          ancestry,
+          ...record
+        }))
+        .map(p => {
+          if (!p.p_value) p.p_value = '-';
 
-        if (!p.odds_ratio) {
-          p.odds_ratio = '-';
-          p.ci_95_low = null;
-          p.ci_95_high = null;
-        }
+          if (!p.odds_ratio) {
+            p.odds_ratio = '-';
+            p.ci_95_low = null;
+            p.ci_95_high = null;
+          }
 
-        return p;
-      });
-  
+          return p;
+        });
+
       // populate empty results
       const emptyResults = phenotypes
         .filter(p => !data.find(r => r.phenotype_id === p.id))
@@ -721,7 +773,7 @@ export function lookupVariants({phenotypes, variant, sex, ancestry}) {
           ancestry,
           variant
         }));
-  
+
       dispatch(
         updateVariantLookupTable({
           results: results.concat(emptyResults),
@@ -729,7 +781,7 @@ export function lookupVariants({phenotypes, variant, sex, ancestry}) {
         })
       );
     } catch (e) {
-      dispatch(updateError({visible: true}))
+      dispatch(updateError({ visible: true }));
       dispatch(
         updateVariantLookupTable({
           results: [],
@@ -737,7 +789,7 @@ export function lookupVariants({phenotypes, variant, sex, ancestry}) {
         })
       );
     }
-  }
+  };
 }
 
 // upload user's input parameters to db table share_link
@@ -747,10 +799,10 @@ export function generateShareLink(params) {
     try {
       // figure which store key to update by params route
       const updateStore = {
-        "/gwas/summary": updateSummaryResults,
-        "/gwas/lookup": updateVariantLookup,
-        "/gwas/correlations": updatePhenotypeCorrelations,
-        "/phenotypes": updateBrowsePhenotypes
+        '/gwas/summary': updateSummaryResults,
+        '/gwas/lookup': updateVariantLookup,
+        '/gwas/correlations': updatePhenotypeCorrelations,
+        '/phenotypes': updateBrowsePhenotypes
       }[params.route];
       dispatch(
         updateStore({
@@ -764,8 +816,7 @@ export function generateShareLink(params) {
         })
       );
     } catch (e) {
-      dispatch(updateError({visible: true}))
+      dispatch(updateError({ visible: true }));
     }
   };
 }
-

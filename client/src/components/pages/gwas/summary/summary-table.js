@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Overlay, OverlayTrigger, Tooltip } from 'react-bootstrap'
+import { Overlay, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import {
   updateKey,
   updateSummaryTable,
   updateSummarySnp,
   fetchSummaryTable,
-  fetchSummarySnpTable,
+  fetchSummarySnpTable
 } from '../../../../services/actions';
 import { Icon } from '../../../controls/icon/icon';
 import { getInitialState } from '../../../../services/store';
@@ -33,21 +33,25 @@ export function SummaryResultsTable() {
     nlogpMin,
     nlogpMax,
     bpMin,
-    bpMax,
+    bpMax
   } = useSelector(state => state.summaryResults);
   const selectedTable = useSelector(state => state.summaryTables.selectedTable);
-  const setSelectedTable = selectedTable => dispatch(updateSummaryTable('selectedTable', selectedTable));
+  const setSelectedTable = selectedTable =>
+    dispatch(updateSummaryTable('selectedTable', selectedTable));
   const [exportRowLimit, setExportRowLimit] = useState(1e5);
 
   useEffect(() => {
-    query('config', { key: 'exportRowLimit' })
-      .then(({ exportRowLimit }) => setExportRowLimit(exportRowLimit))
-  })
+    query('config', { key: 'exportRowLimit' }).then(({ exportRowLimit }) =>
+      setExportRowLimit(exportRowLimit)
+    );
+  });
 
-  const defaultSorted = [{
-    dataField: 'p_value',
-    order: 'asc'
-  }];
+  const defaultSorted = [
+    {
+      dataField: 'p_value',
+      order: 'asc'
+    }
+  ];
 
   const columns = [
     {
@@ -58,7 +62,7 @@ export function SummaryResultsTable() {
       sort: true,
       headerStyle: { width: '65px' },
       headerClasses: 'overflow-ellipsis',
-      classes: 'overflow-ellipsis',
+      classes: 'overflow-ellipsis'
     },
     {
       dataField: 'position',
@@ -68,96 +72,126 @@ export function SummaryResultsTable() {
       sort: true,
       headerStyle: { width: '100px' },
       headerClasses: 'overflow-ellipsis',
-      classes: 'overflow-ellipsis',
+      classes: 'overflow-ellipsis'
     },
     {
       dataField: 'snp',
       text: 'SNP',
       sort: true,
-      formatter: cell => !/^rs\d+/.test(cell) ?
-        (!/^chr[\d+|x|y]:\d+/i.test(cell) ? cell :
-          cell.split(':')[0] + ':' + cell.split(':')[1]) :
-        <a className="overflow-ellipsis" href={`https://www.ncbi.nlm.nih.gov/snp/${cell.split(':')[0]}`} target="_blank">{cell}</a>,
+      formatter: cell =>
+        !/^rs\d+/.test(cell) ? (
+          !/^chr[\d+|x|y]:\d+/i.test(cell) ? (
+            cell
+          ) : (
+            cell.split(':')[0] + ':' + cell.split(':')[1]
+          )
+        ) : (
+          <a
+            className="overflow-ellipsis"
+            href={`https://www.ncbi.nlm.nih.gov/snp/${cell.split(':')[0]}`}
+            target="_blank">
+            {cell}
+          </a>
+        ),
       title: true,
-      headerStyle: {width: '180px'},
+      headerStyle: { width: '180px' },
       headerClasses: 'overflow-ellipsis',
-      classes: 'overflow-ellipsis  text-nowrap',
+      classes: 'overflow-ellipsis  text-nowrap'
     },
     {
       dataField: 'allele_reference',
       text: 'Eff. Allele',
       headerTitle: _ => 'Effect Allele [Frequency]',
-      formatter: (cell, row) => `${cell} [${row.allele_frequency.toPrecision(4)}]`,
+      formatter: (cell, row) =>
+        `${cell} [${row.allele_frequency.toPrecision(4)}]`,
       title: (cell, row) => `${cell} [${row.allele_frequency.toPrecision(4)}]`,
       headerStyle: { width: '200px' },
       headerClasses: 'overflow-ellipsis',
-      classes: 'overflow-ellipsis text-nowrap',
-
+      classes: 'overflow-ellipsis text-nowrap'
     },
     {
       dataField: 'allele_alternate',
       text: 'Non-Eff. Allele',
       headerTitle: _ => 'Non-Effect Allele [Frequency]',
-      formatter: (cell, row) => `${cell} [${(1 - row.allele_frequency).toPrecision(4)}]`,
-      title: (cell, row) => `${cell} [${(1 - row.allele_frequency).toPrecision(4)}]`,
+      formatter: (cell, row) =>
+        `${cell} [${(1 - row.allele_frequency).toPrecision(4)}]`,
+      title: (cell, row) =>
+        `${cell} [${(1 - row.allele_frequency).toPrecision(4)}]`,
       headerStyle: { width: '200px' },
       headerClasses: 'overflow-ellipsis',
-      classes: 'overflow-ellipsis  text-nowrap',
+      classes: 'overflow-ellipsis  text-nowrap'
     },
     {
       dataField: 'beta',
       text: 'Beta',
       title: true,
-      headerStyle: {width: '80px'},
+      headerStyle: { width: '80px' },
       headerClasses: 'overflow-ellipsis',
-      classes: 'overflow-ellipsis',
+      classes: 'overflow-ellipsis'
     },
     {
       dataField: 'odds_ratio',
       text: 'OR [95% CI]',
       headerTitle: _ => 'Odds Ratio [95% Confidence Interval]',
-      formatter: (cell, row) => (!cell || isNaN(cell)) ? '-' : 
-        `${(+cell).toFixed(3)} [${row.ci_95_low.toFixed(3)} - ${+row.ci_95_high.toFixed(3)}]`,
-      title: (cell, row) => (!cell || isNaN(cell)) ? '-' : 
-        `${(+cell).toFixed(3)} [${row.ci_95_low.toFixed(3)} - ${+row.ci_95_high.toFixed(3)}]`,
-      headerStyle: { minWidth: '200px',  width: '200px' },
+      formatter: (cell, row) =>
+        !cell || isNaN(cell)
+          ? '-'
+          : `${(+cell).toFixed(3)} [${row.ci_95_low.toFixed(
+              3
+            )} - ${+row.ci_95_high.toFixed(3)}]`,
+      title: (cell, row) =>
+        !cell || isNaN(cell)
+          ? '-'
+          : `${(+cell).toFixed(3)} [${row.ci_95_low.toFixed(
+              3
+            )} - ${+row.ci_95_high.toFixed(3)}]`,
+      headerStyle: { minWidth: '200px', width: '200px' },
       classes: 'overflow-ellipsis',
-      headerClasses: 'overflow-ellipsis',
+      headerClasses: 'overflow-ellipsis'
     },
     {
       dataField: 'p_value',
-      text: <span>Assoc. <span className="text-nowrap">P-Value</span></span>,
+      text: (
+        <span>
+          Assoc. <span className="text-nowrap">P-Value</span>
+        </span>
+      ),
       headerTitle: _ => 'Association P-Values',
-      formatter: cell => cell < 1e-2 ? (+cell).toExponential() : cell,
+      formatter: cell => (cell < 1e-2 ? (+cell).toExponential() : cell),
       title: true,
       sort: true,
-      headerStyle: {width: '120px', minWidth: '120px'},
+      headerStyle: { width: '120px', minWidth: '120px' },
       headerClasses: 'overflow-ellipsis',
-      classes: 'overflow-ellipsis',
+      classes: 'overflow-ellipsis'
     },
     {
       dataField: 'p_value_heterogenous',
-      text: <span>Het. <span className="text-nowrap">P-Value</span></span>,
+      text: (
+        <span>
+          Het. <span className="text-nowrap">P-Value</span>
+        </span>
+      ),
       headerTitle: _ => 'Heterogenous P-Values',
       title: true,
-      headerStyle: {width: '100px', minWidth: '100px'},
+      headerStyle: { width: '100px', minWidth: '100px' },
       headerClasses: 'overflow-ellipsis',
-      classes: 'overflow-ellipsis',
+      classes: 'overflow-ellipsis'
     },
     {
       dataField: 'n',
       text: 'N',
       headerTitle: _ => 'Sample Size',
       title: true,
-      headerStyle: {width: '80px'},
+      headerStyle: { width: '80px' },
       headerClasses: 'overflow-ellipsis',
-      classes: 'overflow-ellipsis',
-    },
+      classes: 'overflow-ellipsis'
+    }
   ].filter(Boolean);
 
   const updateSummaryTableData = (key, params) => {
     const phenotype = selectedPhenotypes[key] || selectedPhenotypes[0];
-    const { ancestry, sex } = selectedStratifications[key] || selectedStratifications[0];
+    const { ancestry, sex } =
+      selectedStratifications[key] || selectedStratifications[0];
     if (!phenotype || !phenotype.value) return;
     // console.log({ order, orderBy, limit, page, bpMin, bpMax });
     let hasRangeFilter = Boolean(nlogpMin && nlogpMax && bpMin && bpMax);
@@ -187,13 +221,9 @@ export function SummaryResultsTable() {
     // console.log('summary table params', key, summaryParams)
 
     dispatch(fetchSummaryTable(key, summaryParams));
-  }
+  };
 
-  const handleTableChange = async (
-    key,
-    type,
-    pagination,
-  ) => {
+  const handleTableChange = async (key, type, pagination) => {
     if (!selectedPhenotypes || !selectedPhenotypes.length) return;
     // console.log('handleTableChange', key, type, pagination);
     const { page, sizePerPage, sortField, sortOrder } = pagination;
@@ -202,10 +232,10 @@ export function SummaryResultsTable() {
       offset: sizePerPage * (page - 1),
       limit: sizePerPage,
       orderBy: sortField,
-      order: sortOrder,
+      order: sortOrder
     };
 
-    // only update table data if cached parameters do not match 
+    // only update table data if cached parameters do not match
     if (
       cachedTable.offset != paginationParams.offset ||
       cachedTable.limit != paginationParams.limit ||
@@ -227,62 +257,66 @@ export function SummaryResultsTable() {
 
     selectedStratifications.forEach((s, i) => {
       const phenotype = selectedPhenotypes[i] || selectedPhenotypes[0];
-      dispatch(fetchSummarySnpTable(i, {
-        phenotype_id: phenotype.id,
-        snp: summarySnpTables.snp,
-        ancestry: s.ancestry,
-        sex: s.sex,
-      }))
-    })
+      dispatch(
+        fetchSummarySnpTable(i, {
+          phenotype_id: phenotype.id,
+          snp: summarySnpTables.snp,
+          ancestry: s.ancestry,
+          sex: s.sex
+        })
+      );
+    });
   };
 
-  const updateStackedSex = (sex) => {
+  const updateStackedSex = sex => {
     // updating stacked sex
     dispatch(updateSummaryTable('stackedSex', sex));
-  }
+  };
 
   const handleSnpReset = () => {
     const { summarySnpTables } = getInitialState();
-    dispatch(
-      updateKey('summarySnpTables', summarySnpTables)
-    );
+    dispatch(updateKey('summarySnpTables', summarySnpTables));
   };
 
   const getExportLink = () => {
     if (!selectedStratifications.length || !selectedPhenotypes.length)
       return null;
 
-    const phenotype = isPairwise && selectedPhenotypes[1]
-      ? selectedPhenotypes[selectedTable]
-      : selectedPhenotypes[0];
+    const phenotype =
+      isPairwise && selectedPhenotypes[1]
+        ? selectedPhenotypes[selectedTable]
+        : selectedPhenotypes[0];
 
     const { sex, ancestry } = isPairwise
       ? selectedStratifications[selectedTable]
-      : selectedStratifications[0]
+      : selectedStratifications[0];
 
-    let exportParams = summarySnpTables.visible ? {
-        phenotype_id: phenotype.id,
-        sex,
-        ancestry,
-        snp: summarySnpTables.snp
-      } : 
-      {
-        phenotype_id: phenotype.id,
-        sex,
-        ancestry,
-        chromosome: selectedChromosome,
-        orderBy: summaryTables.tables[selectedTable].orderBy || 'p_value',
-        order: summaryTables.tables[selectedTable].order || 'asc',
-        p_value_nlog_min: nlogpMin,
-        p_value_nlog_max: nlogpMax,
-        position_min: bpMin,
-        position_max: bpMax,
-      }
+    let exportParams = summarySnpTables.visible
+      ? {
+          phenotype_id: phenotype.id,
+          sex,
+          ancestry,
+          snp: summarySnpTables.snp
+        }
+      : {
+          phenotype_id: phenotype.id,
+          sex,
+          ancestry,
+          chromosome: selectedChromosome,
+          orderBy: summaryTables.tables[selectedTable].orderBy || 'p_value',
+          order: summaryTables.tables[selectedTable].order || 'asc',
+          p_value_nlog_min: nlogpMin,
+          p_value_nlog_max: nlogpMax,
+          position_min: bpMin,
+          position_max: bpMax
+        };
 
-    return `${process.env.REACT_APP_API_ROOT}/export-variants${asQueryString(exportParams)}`;
-  }
+    return `${process.env.REACT_APP_API_ROOT}/export-variants${asQueryString(
+      exportParams
+    )}`;
+  };
 
-  const getVariantTableProps = (key) => ({
+  const getVariantTableProps = key => ({
     remote: true,
     keyField: 'id',
     loading: summaryTables.loading,
@@ -307,33 +341,50 @@ export function SummaryResultsTable() {
 
   return (
     <div className="mt-3">
-
-      <div key="controls" className="d-flex align-items-center justify-content-between">
+      <div
+        key="controls"
+        className="d-flex align-items-center justify-content-between">
         <div className="d-flex align-items-center">
-          {isPairwise && <div className="btn-group" role="group">
-            {selectedStratifications.map((s, i) =>
-              <button
-                key={`select-table-${i}`}
-                className={`btn btn-sm ${selectedTable == i ? 'btn-primary btn-primary-gradient active' : 'btn-silver'}`}
-                onClick={e => setSelectedTable(i)}>
-                {[
-                  showPhenotypeNames && selectedPhenotypes[i].display_name,
-                  asTitleCase(s.ancestry),
-                  asTitleCase(s.sex),
-                ].filter(Boolean).join(' - ')}
-              </button>
-            )}
-          </div>}
-              
-          <OverlayTrigger overlay={
-            <Tooltip id="export-info-tooltip" className={summaryTables.tables[selectedTable].resultsCount > exportRowLimit ? 'visible': 'invisible'}>
-              Only the top {exportRowLimit.toLocaleString()} variants based on the current sort order will be downloaded.
-            </Tooltip>}>
-          <a
-            className="btn btn-sm btn-silver ml-2"
-            href={getExportLink()}>
-            Export Variants
-          </a>
+          {isPairwise && (
+            <div className="btn-group" role="group">
+              {selectedStratifications.map((s, i) => (
+                <button
+                  key={`select-table-${i}`}
+                  className={`btn btn-sm ${
+                    selectedTable == i
+                      ? 'btn-primary btn-primary-gradient active'
+                      : 'btn-silver'
+                  }`}
+                  onClick={e => setSelectedTable(i)}>
+                  {[
+                    showPhenotypeNames && selectedPhenotypes[i].display_name,
+                    asTitleCase(s.ancestry),
+                    asTitleCase(s.sex)
+                  ]
+                    .filter(Boolean)
+                    .join(' - ')}
+                </button>
+              ))}
+            </div>
+          )}
+
+          <OverlayTrigger
+            overlay={
+              <Tooltip
+                id="export-info-tooltip"
+                className={
+                  summaryTables.tables[selectedTable].resultsCount >
+                  exportRowLimit
+                    ? 'visible'
+                    : 'invisible'
+                }>
+                Only the top {exportRowLimit.toLocaleString()} variants based on
+                the current sort order will be downloaded.
+              </Tooltip>
+            }>
+            <a className="btn btn-sm btn-silver ml-2" href={getExportLink()}>
+              Export Variants
+            </a>
           </OverlayTrigger>
         </div>
 
@@ -362,20 +413,25 @@ export function SummaryResultsTable() {
 
       {/* Do not filter beforehand, as that resets indexes  */}
 
-        {selectedStratifications.map((s, i) =>
-          selectedTable === i && (!summarySnpTables.visible
-            ? <Table 
-                wrapperClasses="table-responsive" 
-                key={`variant-table-${i}`} 
-                {...getVariantTableProps(i)} />
-            : <Table
-                wrapperClasses="table-responsive"
-                key={`snp-table-${i}`}
-                keyField="variant_id"
-                data={summarySnpTables.tables[i].results}
-                columns={columns} />
-          )
-        )}
+      {selectedStratifications.map(
+        (s, i) =>
+          selectedTable === i &&
+          (!summarySnpTables.visible ? (
+            <Table
+              wrapperClasses="table-responsive"
+              key={`variant-table-${i}`}
+              {...getVariantTableProps(i)}
+            />
+          ) : (
+            <Table
+              wrapperClasses="table-responsive"
+              key={`snp-table-${i}`}
+              keyField="variant_id"
+              data={summarySnpTables.tables[i].results}
+              columns={columns}
+            />
+          ))
+      )}
     </div>
   );
 }

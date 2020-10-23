@@ -6,7 +6,6 @@ import App from './components/app';
 import './index.scss';
 import 'font-awesome/css/font-awesome.min.css';
 
-
 ReactDOM.render(
   <Provider store={store}>
     <App />

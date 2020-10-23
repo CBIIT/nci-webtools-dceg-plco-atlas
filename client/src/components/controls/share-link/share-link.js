@@ -4,7 +4,6 @@ import { Button, OverlayTrigger, Popover, Spinner } from 'react-bootstrap';
 import { LoadingOverlay } from '../loading-overlay/loading-overlay';
 import { generateShareLink } from '../../../services/actions';
 
-
 export const ShareLink = props => {
   const dispatch = useDispatch();
 
@@ -12,30 +11,32 @@ export const ShareLink = props => {
 
   const copyToClipboard = () => {
     setDisplayedCopied(true);
-    var copyText = document.getElementById("share-link-input");
+    var copyText = document.getElementById('share-link-input');
     copyText.select();
     copyText.setSelectionRange(0, 99999); /*For mobile devices*/
-    document.execCommand("copy");
+    document.execCommand('copy');
     copyText.setSelectionRange(99999, 99999);
     setTimeout(function() {
       setDisplayedCopied(false);
     }, 1000);
-  }
+  };
 
   const shareLink = () => {
     // console.log("do something!", props);
-    dispatch(generateShareLink({
-      route: window.location.hash.replace('#', ''),
-      parameters: props
-    }));
-  }
+    dispatch(
+      generateShareLink({
+        route: window.location.hash.replace('#', ''),
+        parameters: props
+      })
+    );
+  };
 
   const sharePopover = () => {
     return (
       <Popover id="share-link-popover">
-        <LoadingOverlay active={displayCopied} content={"Copied!"}/>
+        <LoadingOverlay active={displayCopied} content={'Copied!'} />
         <Popover.Content>
-          <div 
+          <div
             className="text-center"
             style={{
               display: !props.shareID ? 'block' : 'none',
@@ -45,16 +46,16 @@ export const ShareLink = props => {
               <span className="sr-only">Loading...</span>
             </Spinner>
           </div>
-          <div 
+          <div
             style={{
               display: !props.shareID ? 'none' : 'block'
             }}>
-            <div 
-              className="input-group my-1" 
-              style={{ 
+            <div
+              className="input-group my-1"
+              style={{
                 width: '100%',
-                width: '250px' 
-              }} >
+                width: '250px'
+              }}>
               <input
                 id="share-link-input"
                 className="form-control py-1 h-100 border-right-0"
@@ -62,9 +63,10 @@ export const ShareLink = props => {
                 aria-label="Share link"
                 // value={window.location.href}
                 value={
-                  props.shareID 
-                  ? window.location.origin + '/#/link/' + props.shareID 
-                  : window.location.href}
+                  props.shareID
+                    ? window.location.origin + '/#/link/' + props.shareID
+                    : window.location.href
+                }
                 type="text"
                 // disabled={!data}
                 onChange={_ => _}
@@ -76,7 +78,7 @@ export const ShareLink = props => {
                   onClick={e => {
                     copyToClipboard();
                   }}>
-                  <i className="fa fa-paste" style={{fontSize: '14px'}}></i>
+                  <i className="fa fa-paste" style={{ fontSize: '14px' }}></i>
                 </button>
               </div>
             </div>
@@ -84,7 +86,7 @@ export const ShareLink = props => {
         </Popover.Content>
       </Popover>
     );
-  }
+  };
 
   return (
     <OverlayTrigger
@@ -94,19 +96,19 @@ export const ShareLink = props => {
       shouldUpdatePosition
       overlay={sharePopover()}
       transition={false}>
-    <div>
-      <Button 
-        data-testid="ShareLinkButton"
-        variant="silver"
-        size="sm"
-        onClick={e => {
-          e.preventDefault();
-          shareLink();
-        }}
-        disabled={props.disabled}>
-        Share Link <i className="fa fa-caret-down"></i>
-      </Button>
-    </div>
-  </OverlayTrigger>    
+      <div>
+        <Button
+          data-testid="ShareLinkButton"
+          variant="silver"
+          size="sm"
+          onClick={e => {
+            e.preventDefault();
+            shareLink();
+          }}
+          disabled={props.disabled}>
+          Share Link <i className="fa fa-caret-down"></i>
+        </Button>
+      </div>
+    </OverlayTrigger>
   );
-}
+};

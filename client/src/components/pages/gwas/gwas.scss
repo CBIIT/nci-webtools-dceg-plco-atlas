@@ -1,15 +1,15 @@
 .active-secondary-navlinks {
-    // border-color: #2cc799 !important;
-    // border-width: 3px !important;
-    color: 'black';
+  // border-color: #2cc799 !important;
+  // border-width: 3px !important;
+  color: 'black';
 }
-  
+
 .active-secondary-navlinks:after {
-    content: "";
-    display: block;
-    padding-top: 4px;
-    width: 100%;
-    margin: 0 auto;
-    border-bottom: 3px solid #2cc799 !important;
-    margin-bottom: -5px;
+  content: '';
+  display: block;
+  padding-top: 4px;
+  width: 100%;
+  margin: 0 auto;
+  border-bottom: 3px solid #2cc799 !important;
+  margin-bottom: -5px;
 }

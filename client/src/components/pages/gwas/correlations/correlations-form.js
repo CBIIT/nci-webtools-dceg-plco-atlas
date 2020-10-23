@@ -8,8 +8,8 @@ export function PhenotypeCorrelationsForm({ onChange, onSubmit, onReset }) {
   const dispatch = useDispatch();
   const phenotypes = useSelector(state => state.phenotypes);
 
-  const { 
-    selectedPhenotypes, 
+  const {
+    selectedPhenotypes,
     selectedSex,
     selectedAncestry,
     submitted,
@@ -18,12 +18,13 @@ export function PhenotypeCorrelationsForm({ onChange, onSubmit, onReset }) {
 
   const treeRef = useRef();
 
-
   const handleChangeCustom = items => {
-    dispatch(updatePhenotypeCorrelations({ 
-      selectedPhenotypes: items,
-      disableSubmit: false 
-    }));
+    dispatch(
+      updatePhenotypeCorrelations({
+        selectedPhenotypes: items,
+        disableSubmit: false
+      })
+    );
   };
 
   return (
@@ -37,7 +38,9 @@ export function PhenotypeCorrelationsForm({ onChange, onSubmit, onReset }) {
           ref={treeRef}
           enabled={item => item.import_date}
         />
-        <small className="text-muted"><i>Up to 120 phenotypes may be selected.</i></small>
+        <small className="text-muted">
+          <i>Up to 120 phenotypes may be selected.</i>
+        </small>
       </div>
 
       <div className="mb-3">
@@ -47,12 +50,14 @@ export function PhenotypeCorrelationsForm({ onChange, onSubmit, onReset }) {
           value={selectedSex}
           onChange={e => {
             // if (e.target.value === 'all') {
-            dispatch(updatePhenotypeCorrelations({ 
-              selectedSex: e.target.value,
-              disableSubmit: false
-            }));
+            dispatch(
+              updatePhenotypeCorrelations({
+                selectedSex: e.target.value,
+                disableSubmit: false
+              })
+            );
             // } else {
-            //   dispatch(updatePhenotypeCorrelations({ 
+            //   dispatch(updatePhenotypeCorrelations({
             //     selectedSex: e.target.value,
             //     selectedAncestry: 'european',
             //     disableSubmit: false
@@ -73,12 +78,14 @@ export function PhenotypeCorrelationsForm({ onChange, onSubmit, onReset }) {
           value={selectedAncestry}
           onChange={e => {
             // if (e.target.value === 'european') {
-            dispatch(updatePhenotypeCorrelations({ 
-              selectedAncestry: e.target.value,
-              disableSubmit: false
-            }));
+            dispatch(
+              updatePhenotypeCorrelations({
+                selectedAncestry: e.target.value,
+                disableSubmit: false
+              })
+            );
             // } else {
-            //   dispatch(updatePhenotypeCorrelations({ 
+            //   dispatch(updatePhenotypeCorrelations({
             //     selectedSex: 'all',
             //     selectedAncestry: e.target.value,
             //     disableSubmit: false
@@ -98,41 +105,54 @@ export function PhenotypeCorrelationsForm({ onChange, onSubmit, onReset }) {
       </div>
 
       <div>
-        <OverlayTrigger overlay={
+        <OverlayTrigger
+          overlay={
             <Tooltip
               id="tooltip-disabled"
               style={{
-                display: !selectedPhenotypes || selectedPhenotypes.length < 2 || selectedPhenotypes.length > 120 ?
-                  'block' :
-                  'none'
+                display:
+                  !selectedPhenotypes ||
+                  selectedPhenotypes.length < 2 ||
+                  selectedPhenotypes.length > 120
+                    ? 'block'
+                    : 'none'
               }}>
-              {
-                (!selectedPhenotypes || selectedPhenotypes.length < 2) &&
-                  <>Please select 2 or more phenotypes.</>
-              }
-              {
-                (selectedPhenotypes && selectedPhenotypes.length > 120) &&
-                  <>Please select 120 or less phenotypes.</>
-              }
-
+              {(!selectedPhenotypes || selectedPhenotypes.length < 2) && (
+                <>Please select 2 or more phenotypes.</>
+              )}
+              {selectedPhenotypes && selectedPhenotypes.length > 120 && (
+                <>Please select 120 or less phenotypes.</>
+              )}
             </Tooltip>
           }>
           <span className="d-inline-block">
             <Button
               // ref={target}
               className=""
-              style={{ maxHeight: '38px', pointerEvents: (!selectedPhenotypes || selectedPhenotypes.length < 2 || selectedPhenotypes.length > 120) ? 'none' : 'auto' }}
+              style={{
+                maxHeight: '38px',
+                pointerEvents:
+                  !selectedPhenotypes ||
+                  selectedPhenotypes.length < 2 ||
+                  selectedPhenotypes.length > 120
+                    ? 'none'
+                    : 'auto'
+              }}
               variant="silver"
               onClick={e => {
                 e.preventDefault();
                 onSubmit({
-                  phenotypes: selectedPhenotypes, 
+                  phenotypes: selectedPhenotypes,
                   sex: selectedSex,
                   ancestry: selectedAncestry
                 });
               }}
-              disabled={(!selectedPhenotypes || selectedPhenotypes.length < 2 || selectedPhenotypes.length > 120) || disableSubmit}
-              >
+              disabled={
+                !selectedPhenotypes ||
+                selectedPhenotypes.length < 2 ||
+                selectedPhenotypes.length > 120 ||
+                disableSubmit
+              }>
               Submit
             </Button>
           </span>

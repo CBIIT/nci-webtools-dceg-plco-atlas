@@ -1,19 +1,18 @@
-import React from "react";
+import React from 'react';
 import { PlotlyWrapper as Plot } from '../../plots/plotly/plotly-wrapper';
 import { systemFont } from '../../plots/custom/text';
 
-
 export const hoverLayout = {
   hoverlabel: {
-    bgcolor: "#fff",
+    bgcolor: '#fff',
     bordercolor: '#bbb',
     font: {
       size: 14,
       color: '#212529',
       family: systemFont
-    },
-  },
-}
+    }
+  }
+};
 
 let margin = {
   l: 50,
@@ -33,9 +32,8 @@ export const opaqueColors = [
   `rgba(229, 116, 195, 1)`,
   `rgba(127, 127, 127, 1)`,
   `rgba(188, 191, 0, 1)`,
-  `rgba(0, 190, 209, 1)`,
+  `rgba(0, 190, 209, 1)`
 ];
-
 
 export const colors = [
   `rgba(23, 118, 182, 0.2)`,
@@ -47,7 +45,7 @@ export const colors = [
   `rgba(229, 116, 195, 0.2)`,
   `rgba(127, 127, 127, 0.2)`,
   `rgba(188, 191, 0, 0.2)`,
-  `rgba(0, 190, 209, 0.2)`,
+  `rgba(0, 190, 209, 0.2)`
 ];
 
 const percentFormatter = (value, decimals = 2) => {
@@ -55,28 +53,37 @@ const percentFormatter = (value, decimals = 2) => {
   let cutoff = Math.pow(10, -decimals);
   let label = value >= cutoff ? percent : `<${cutoff}`;
   return `${label}%`;
-}
+};
 
-export const BarChart = ({ data, categories, distributionCategories, xTitle, yTitle, yMax, formatPercent, categoryPrefix, type }) => (
-<Plot
+export const BarChart = ({
+  data,
+  categories,
+  distributionCategories,
+  xTitle,
+  yTitle,
+  yMax,
+  formatPercent,
+  categoryPrefix,
+  type
+}) => (
+  <Plot
     className="w-100 disable-x-axis-tooltip override-cursor"
-    style={{ minHeight: "600px", width: "600px" }}
+    style={{ minHeight: '600px', width: '600px' }}
     data={categories.map((name, i) => {
-
       let x = [];
       let y = [];
       for (let key in data) {
-          x.push(key);
-          y.push(data[key][i]);
+        x.push(key);
+        y.push(data[key][i]);
       }
       // console.log(name, i, x, y);
       let plotData = {
         x,
         y,
         name,
-        type: "bar",
+        type: 'bar',
         marker: {
-          color: opaqueColors[i % opaqueColors.length],
+          color: opaqueColors[i % opaqueColors.length]
         },
         hoverlabel: {
           bgcolor: '#fff',
@@ -85,21 +92,24 @@ export const BarChart = ({ data, categories, distributionCategories, xTitle, yTi
             size: 14,
             color: '#444',
             family: systemFont
-          },
+          }
         },
         // hoverinfo: 'all',
         hovertemplate: formatPercent
           ? [
-              type === 'binary' ? `` : `<b>${categoryPrefix || ''}:</b> ${name}`,
+              type === 'binary'
+                ? ``
+                : `<b>${categoryPrefix || ''}:</b> ${name}`,
               `<b>${type === 'binary' ? categoryPrefix : xTitle}:</b> %{x}`,
               `<b>Participants:</b> %{y:.3f%}%<extra></extra>`
-          ].join('<br>')
+            ].join('<br>')
           : [
-              type === 'binary' ? `` :`<b>${categoryPrefix || ''}:</b> ${name}`,
+              type === 'binary'
+                ? ``
+                : `<b>${categoryPrefix || ''}:</b> ${name}`,
               `<b>${type === 'binary' ? categoryPrefix : xTitle}:</b> %{x}`,
               `<b>Participants:</b> %{y}<extra></extra>`
-          ].join('<br>')
-        
+            ].join('<br>')
 
         // hoverinfo: i === 0 ? 'y' : 'skip',
         // hovertemplate: i === 0 ? '%{text}<extra></extra>' : null,
@@ -124,25 +134,25 @@ export const BarChart = ({ data, categories, distributionCategories, xTitle, yTi
       // ...hoverLayout,
       hovermode: 'closest',
       xaxis: {
-          fixedrange: true,
-          automargin: true,
-          title: xTitle,
-          separatethousands: true,
-          type: 'category',
-          categoryorder: 'array',
-          categoryarray: distributionCategories,
+        fixedrange: true,
+        automargin: true,
+        title: xTitle,
+        separatethousands: true,
+        type: 'category',
+        categoryorder: 'array',
+        categoryarray: distributionCategories
       },
       yaxis: {
-          [yMax ? 'range' : '']: [0, yMax],
-          fixedrange: true,
-          automargin: true,
-          title: {
-            text: yTitle,
-            standoff: 20,
-          },
-          zeroline: true,
-          showline: true,
-          separatethousands: true,
+        [yMax ? 'range' : '']: [0, yMax],
+        fixedrange: true,
+        automargin: true,
+        title: {
+          text: yTitle,
+          standoff: 20
+        },
+        zeroline: true,
+        showline: true,
+        separatethousands: true
       },
       autosize: true
     }}
@@ -150,13 +160,13 @@ export const BarChart = ({ data, categories, distributionCategories, xTitle, yTi
       displayModeBar: false,
       responsive: true
     }}
-/>
+  />
 );
 
 export const HorizontalBarChart = ({ data, categories }) => (
   <Plot
     className="w-100  disable-x-axis-tooltip"
-    style={{ minHeight: "600px" }}
+    style={{ minHeight: '600px' }}
     data={categories.map((name, i) => {
       let x = [],
         y = [];
@@ -164,11 +174,11 @@ export const HorizontalBarChart = ({ data, categories }) => (
         x.push(data[key][i]);
         y.push(key);
       }
-      return { x, y, name, type: "bar", orientation: "h" };
+      return { x, y, name, type: 'bar', orientation: 'h' };
     })}
     layout={{
       xaxis: { automargin: true },
-      yaxis: { automargin: true, zeroline: true},
+      yaxis: { automargin: true, zeroline: true },
       // barmode: 'stack',
       autosize: true
     }}
@@ -180,7 +190,13 @@ export const HorizontalBarChart = ({ data, categories }) => (
   />
 );
 
-export const AreaChart = ({data, categories, xTitle, yTitle, formatPercent}) => {
+export const AreaChart = ({
+  data,
+  categories,
+  xTitle,
+  yTitle,
+  formatPercent
+}) => {
   /*
   let items = categories.map((name, i) => {
     let x = [];
@@ -192,54 +208,70 @@ export const AreaChart = ({data, categories, xTitle, yTitle, formatPercent}) => 
     return {x, y}
   })
   */
-//  console.log('drawing area chart', {data, categories, xTitle, yTitle, formatPercent});
+  //  console.log('drawing area chart', {data, categories, xTitle, yTitle, formatPercent});
 
-  return <Plot
+  return (
+    <Plot
       className="w-100 disable-x-axis-tooltip override-cursor"
-      style={{ minHeight: "600px" }}
-      data={[{
-        x: categories, //data.map((e, i) => i + 1),
-        y: data,
-        hovertemplate: '%{text}<extra></extra>',
-        text: categories.map((name, i) => {
-          let label = formatPercent ? percentFormatter(data[i]) : data[i].toLocaleString()
-          return [
-            `<b>${xTitle}</b>: ${name}`,
-            `<b>${yTitle}</b>: ${label}`
-          ].join('<br>')
-        }),
-        type: 'scatter',
-        fill: 'tonexty',
-        line: {shape: 'spline'},
-      }]}
+      style={{ minHeight: '600px' }}
+      data={[
+        {
+          x: categories, //data.map((e, i) => i + 1),
+          y: data,
+          hovertemplate: '%{text}<extra></extra>',
+          text: categories.map((name, i) => {
+            let label = formatPercent
+              ? percentFormatter(data[i])
+              : data[i].toLocaleString();
+            return [
+              `<b>${xTitle}</b>: ${name}`,
+              `<b>${yTitle}</b>: ${label}`
+            ].join('<br>');
+          }),
+          type: 'scatter',
+          fill: 'tonexty',
+          line: { shape: 'spline' }
+        }
+      ]}
       layout={{
         ...hoverLayout,
         margin,
         xaxis: {
-            fixedrange: true,
-            automargin: true,
-            title: xTitle,
+          fixedrange: true,
+          automargin: true,
+          title: xTitle
         },
         yaxis: {
-            fixedrange: true,
-            automargin: true,
-            title: {
-              text: yTitle,
-              standoff: 20,
-            },
-            zeroline: true,
-            showline: true,
+          fixedrange: true,
+          automargin: true,
+          title: {
+            text: yTitle,
+            standoff: 20
+          },
+          zeroline: true,
+          showline: true
         },
         autosize: true
       }}
       config={{
         displayModeBar: false,
-        responsive: true,
+        responsive: true
       }}
-  />
-}
+    />
+  );
+};
 
-export const GroupedAreaChart = ({data, categories, xTitle, yTitle, fill, yMax, formatPercent, categoryPrefix, type}) => {
+export const GroupedAreaChart = ({
+  data,
+  categories,
+  xTitle,
+  yTitle,
+  fill,
+  yMax,
+  formatPercent,
+  categoryPrefix,
+  type
+}) => {
   /*
   let items = categories.map((name, i) => {
     let x = [];
@@ -251,129 +283,159 @@ export const GroupedAreaChart = ({data, categories, xTitle, yTitle, fill, yMax, 
     return {x, y}
   });
   */
- console.log('drawing grouped chart', {data, categories, xTitle, yTitle, fill, yMax, formatPercent, categoryPrefix, type});
+  console.log('drawing grouped chart', {
+    data,
+    categories,
+    xTitle,
+    yTitle,
+    fill,
+    yMax,
+    formatPercent,
+    categoryPrefix,
+    type
+  });
 
   if (!yMax) {
     for (let key in data) {
       yMax = Math.max(
         yMax,
-        data[key].reduce((acc, curr) => acc > curr ? acc : curr)
+        data[key].reduce((acc, curr) => (acc > curr ? acc : curr))
       );
     }
   }
 
-  return <Plot
-    className="w-100 disable-x-axis-tooltip override-cursor"
-    style={{ minHeight: "600px", width: "600px" }}
-    data={categories.map((name, i) => {
-      let x = [];
-      let y = [];
-      for (let key in data) {
+  return (
+    <Plot
+      className="w-100 disable-x-axis-tooltip override-cursor"
+      style={{ minHeight: '600px', width: '600px' }}
+      data={categories.map((name, i) => {
+        let x = [];
+        let y = [];
+        for (let key in data) {
           x.push(key);
           y.push(data[key][i]);
-      }
-      let plotData = {
-        x,
-        y,
-        name,
-        type: 'scatter',
-        mode: 'none',
-        fill: fill ? 'tozeroy' : '',
-        fillcolor: colors[i],
-        line: {shape: 'spline'},
+        }
+        let plotData = {
+          x,
+          y,
+          name,
+          type: 'scatter',
+          mode: 'none',
+          fill: fill ? 'tozeroy' : '',
+          fillcolor: colors[i],
+          line: { shape: 'spline' },
 
-        hoverlabel: {
-          bgcolor: '#fff',
-          bordercolor: 'black', //opaqueColors[i % opaqueColors.length],
-          font: {
-            size: 14,
-            color: '#444',
-            family: systemFont
+          hoverlabel: {
+            bgcolor: '#fff',
+            bordercolor: 'black', //opaqueColors[i % opaqueColors.length],
+            font: {
+              size: 14,
+              color: '#444',
+              family: systemFont
+            }
           },
-        },
-        // // hoverinfo: 'all',
-        // hovertemplate: formatPercent
-        //   ? [
-        //     type === 'binary' ? `` : `<b>${categoryPrefix || ''}:</b> ${name}`,
-        //     `<b>${type === 'binary' ? categoryPrefix : xTitle}:</b> %{x}`,
-        //     `<b>Participants:</b> %{y:.3f%}%<extra></extra>`
-        //   ].join('<br>')
-        //   : [
-        //     type === 'binary' 
-        //       ? `` 
-        //       : `<b>${categoryPrefix || ''}:</b> ${name}`,
-        //     `<b>${type === 'binary' ? categoryPrefix : xTitle}:</b> %{x}`,
-        //     `<b>Participants:</b> %{y}<extra></extra>`
-        //   ].join('<br>'),        
-        hoverinfo: i === 0 ? 'y' : 'skip',
-        hovertemplate: i === 0 ? '%{text}<extra></extra>' : null,
-        text: i > 0 ? '' : Object.entries(data).map(([key, value]) => {
-          if (value.length === 1) {
-            return [
-              `<b>${categoryPrefix}</b>: ${key}`,
-              `<b>Participants</b>: ${formatPercent ? percentFormatter(value[0]) : value[0].toLocaleString()}`
-            ].join('<br>');
-          }
-          return [
-            `<b>${xTitle}</b>: ${key}`,
-            categories.length === 1 
-              ? `<b>${name}</b>: ${formatPercent ? percentFormatter(value[0]) : value[0].toLocaleString()}`
-              : categories.map((name, i) => `• <b>${categoryPrefix === 'Age' && categoryPrefix || ''} ${name}</b>: ${
-              formatPercent ? percentFormatter(value[i]) : value[i].toLocaleString()
-            }`).join('<br>')
-          ].join('<br>');
-        })
-      };
+          // // hoverinfo: 'all',
+          // hovertemplate: formatPercent
+          //   ? [
+          //     type === 'binary' ? `` : `<b>${categoryPrefix || ''}:</b> ${name}`,
+          //     `<b>${type === 'binary' ? categoryPrefix : xTitle}:</b> %{x}`,
+          //     `<b>Participants:</b> %{y:.3f%}%<extra></extra>`
+          //   ].join('<br>')
+          //   : [
+          //     type === 'binary'
+          //       ? ``
+          //       : `<b>${categoryPrefix || ''}:</b> ${name}`,
+          //     `<b>${type === 'binary' ? categoryPrefix : xTitle}:</b> %{x}`,
+          //     `<b>Participants:</b> %{y}<extra></extra>`
+          //   ].join('<br>'),
+          hoverinfo: i === 0 ? 'y' : 'skip',
+          hovertemplate: i === 0 ? '%{text}<extra></extra>' : null,
+          text:
+            i > 0
+              ? ''
+              : Object.entries(data).map(([key, value]) => {
+                  if (value.length === 1) {
+                    return [
+                      `<b>${categoryPrefix}</b>: ${key}`,
+                      `<b>Participants</b>: ${
+                        formatPercent
+                          ? percentFormatter(value[0])
+                          : value[0].toLocaleString()
+                      }`
+                    ].join('<br>');
+                  }
+                  return [
+                    `<b>${xTitle}</b>: ${key}`,
+                    categories.length === 1
+                      ? `<b>${name}</b>: ${
+                          formatPercent
+                            ? percentFormatter(value[0])
+                            : value[0].toLocaleString()
+                        }`
+                      : categories
+                          .map(
+                            (name, i) =>
+                              `• <b>${(categoryPrefix === 'Age' &&
+                                categoryPrefix) ||
+                                ''} ${name}</b>: ${
+                                formatPercent
+                                  ? percentFormatter(value[i])
+                                  : value[i].toLocaleString()
+                              }`
+                          )
+                          .join('<br>')
+                  ].join('<br>');
+                })
+        };
 
-      return plotData;
-    })}
-    layout={{
-      margin,
-      ...hoverLayout,
-      hovermode: 'x',
-      xaxis: {
+        return plotData;
+      })}
+      layout={{
+        margin,
+        ...hoverLayout,
+        hovermode: 'x',
+        xaxis: {
           type: 'linear',
           fixedrange: true,
           automargin: true,
           title: xTitle,
-          separatethousands: true,
-      },
-      yaxis: {
+          separatethousands: true
+        },
+        yaxis: {
           range: [0, yMax],
           fixedrange: true,
           automargin: true,
           title: {
             text: yTitle,
-            standoff: 20,
+            standoff: 20
           },
           zeroline: true,
           showline: true,
-          separatethousands: true,
-      },
-      autosize: true
-    }}
-    config={{
-      displayModeBar: false,
-      responsive: true
-    }}
-/>
-
-}
-
+          separatethousands: true
+        },
+        autosize: true
+      }}
+      config={{
+        displayModeBar: false,
+        responsive: true
+      }}
+    />
+  );
+};
 
 export const PieChart = ({ data, categories }) => (
   <Plot
-    style={{minHeight: "600px", maxWidth: "80%", margin: "0 auto"}}
+    style={{ minHeight: '600px', maxWidth: '80%', margin: '0 auto' }}
     data={[
       {
         values: data,
         labels: categories,
-        hoverinfo: "label+value+percent",
+        hoverinfo: 'label+value+percent',
         hovertemplate: `<b>%{label}</b><br>%{value} participants (%{percent})<extra></extra>`,
         hole: 0.4,
-        type: "pie",
+        type: 'pie',
         sort: false,
-        direction: 'clockwise',
+        direction: 'clockwise'
       }
     ]}
     layout={{
@@ -389,9 +451,7 @@ export const PieChart = ({ data, categories }) => (
   />
 );
 
-
-
-export function PhenotypesRelated({title, relatedData, onClick}) {
+export function PhenotypesRelated({ title, relatedData, onClick }) {
   relatedData = relatedData.sort((a, b) => b.correlation - a.correlation);
 
   const data = [
@@ -403,41 +463,41 @@ export function PhenotypesRelated({title, relatedData, onClick}) {
           `<b>${e.display_name}</b>`,
           `<b>Correlation:</b> ${(+e.correlation || 0).toPrecision(5)}`,
           `<b>Sample Size:</b> ${e.participant_count.toLocaleString()}`
-        ].join("<br>")
+        ].join('<br>')
       ),
       customdata: relatedData,
-      hoverinfo: "text",
-      mode: "markers",
+      hoverinfo: 'text',
+      mode: 'markers',
       marker: {
         size: relatedData.map(e => 10 * Math.log(e.participant_count)),
         color: opaqueColors
       },
       hoverlabel: {
-        bgcolor: "#fff",
+        bgcolor: '#fff',
         bordercolor: opaqueColors,
         font: {
           size: 14,
           color: '#212529',
           family: systemFont
-        },
-      },
+        }
+      }
     }
   ];
 
   const layout = {
     // ...hoverLayout,
-    title: {text: title},
+    title: { text: title },
     showlegend: false,
     xaxis: {
       showticklabels: false,
       zeroline: true,
       fixedrange: true,
-      automargin: true,
+      automargin: true
     },
     yaxis: {
-      title: "Correlation",
+      title: 'Correlation',
       showline: true,
-      fixedrange: true,
+      fixedrange: true
     },
     autosize: true
   };
@@ -450,7 +510,7 @@ export function PhenotypesRelated({title, relatedData, onClick}) {
   return (
     <Plot
       onClick={onClick}
-      style={{ width: "100%", height: "600px" }}
+      style={{ width: '100%', height: '600px' }}
       data={data}
       layout={layout}
       config={config}

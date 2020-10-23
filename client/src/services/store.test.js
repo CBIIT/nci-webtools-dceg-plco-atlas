@@ -1,9 +1,6 @@
+import { getInitialState } from './store';
 
-import {
-  getInitialState
-} from './store';
-
-describe('Store Module', function () {
+describe('Store Module', function() {
   test('getInitialState() returns correct state', () => {
     expect(getInitialState()).toEqual({
       phenotypes: null,
@@ -40,7 +37,7 @@ describe('Store Module', function () {
         manhattanPlotConfig: {},
         restoredZoomLevel: null,
         zoomStack: [],
-        genes: [],
+        genes: []
       },
       summaryTables: {
         visible: true,
@@ -51,13 +48,13 @@ describe('Store Module', function () {
             results: [],
             resultsCount: 0,
             page: 1,
-            pageSize: 10,
+            pageSize: 10
           },
           {
             results: [],
             resultsCount: 0,
             page: 1,
-            pageSize: 10,
+            pageSize: 10
           }
         ]
       },
@@ -70,13 +67,13 @@ describe('Store Module', function () {
             results: [],
             resultsCount: 0,
             page: 1,
-            pageSize: 10,
+            pageSize: 10
           },
           {
             results: [],
             resultsCount: 0,
             page: 1,
-            pageSize: 10,
+            pageSize: 10
           }
         ]
       },
@@ -95,7 +92,7 @@ describe('Store Module', function () {
       },
       variantLookupTable: {
         results: null,
-        numResults: null,
+        numResults: null
       },
       phenotypeCorrelations: {
         selectedPhenotypes: [],
@@ -111,7 +108,7 @@ describe('Store Module', function () {
       },
       heatmap: {
         heatmapData: null,
-        heatmapLayout: null,
+        heatmapLayout: null
       },
       browsePhenotypes: {
         selectedPhenotype: null,
@@ -133,13 +130,12 @@ describe('Store Module', function () {
       },
       downloads: {
         selectedPhenotypes: [],
-        downloadRoot: '',
+        downloadRoot: ''
       },
       error: {
         visible: false,
         message: `An error occured when requesting data. If this problem persists, please contact the administrator at <a href="mailto:PLCOWebAdmin@cancer.gov">PLCOWebAdmin@cancer.gov</a>.`
-      },
-
+      }
     });
-  })
+  });
 });

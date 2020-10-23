@@ -4,18 +4,11 @@ import { updateBrowsePhenotypes } from '../../../services/actions';
 import { Icon } from '../../controls/icon/icon';
 import { ShareLink } from '../../controls/share-link/share-link';
 
-
 export const PhenotypesSearchCriteria = () => {
   const dispatch = useDispatch();
   const browsePhenotypes = useSelector(state => state.browsePhenotypes);
-  const {
-    submitted,
-    shareID,
-    disableSubmit
-  } = browsePhenotypes;
-  const {
-    phenotypeData
-  } = useSelector(state => state.browsePhenotypesPlots);
+  const { submitted, shareID, disableSubmit } = browsePhenotypes;
+  const { phenotypeData } = useSelector(state => state.browsePhenotypesPlots);
 
   const phenotypes = useSelector(state => state.phenotypes);
 
@@ -28,21 +21,22 @@ export const PhenotypesSearchCriteria = () => {
   );
 
   const setSubmitted = () => {
-    dispatch(updateBrowsePhenotypes({
-      submitted: null,
-     }));
-  }
+    dispatch(
+      updateBrowsePhenotypes({
+        submitted: null
+      })
+    );
+  };
 
   return (
     <div className="mb-2">
       <div className="d-flex justify-content-between px-3 py-2 bg-white tab-pane-bordered rounded-0">
         <div
           className=""
-          style={{ 
+          style={{
             display: !submitted ? 'none' : 'block',
             width: '85%'
           }}>
-
           {/* <div
             className="left">
             <a
@@ -58,20 +52,19 @@ export const PhenotypesSearchCriteria = () => {
           </div> */}
 
           <p className="h5 my-1">
-            {phenotypeData && phenotypeData.displayName || ''}
+            {(phenotypeData && phenotypeData.displayName) || ''}
 
-            <span className="text-muted ml-3" style={{fontSize: '13px'}}>
-              {phenotypeData && phenotypeData.description || ''}
+            <span className="text-muted ml-3" style={{ fontSize: '13px' }}>
+              {(phenotypeData && phenotypeData.description) || ''}
             </span>
           </p>
-
         </div>
         {placeholder}
-        
-        <span className="ml-3" style={{maxHeight: '1.6em'}}></span>
-        
+
+        <span className="ml-3" style={{ maxHeight: '1.6em' }}></span>
+
         <div className="d-inline">
-          <ShareLink 
+          <ShareLink
             disabled={!phenotypes || (!disableSubmit && phenotypeData)}
             shareID={shareID}
             params={browsePhenotypes}

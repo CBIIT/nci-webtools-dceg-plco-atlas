@@ -39,7 +39,7 @@ export const getInitialState = () => ({
     manhattanPlotConfig: {},
     restoredZoomLevel: null,
     zoomStack: [],
-    genes: [],
+    genes: []
   },
   summaryTables: {
     visible: true,
@@ -50,13 +50,13 @@ export const getInitialState = () => ({
         results: [],
         resultsCount: 0,
         page: 1,
-        pageSize: 10,
+        pageSize: 10
       },
       {
         results: [],
         resultsCount: 0,
         page: 1,
-        pageSize: 10,
+        pageSize: 10
       }
     ]
   },
@@ -69,13 +69,13 @@ export const getInitialState = () => ({
         results: [],
         resultsCount: 0,
         page: 1,
-        pageSize: 10,
+        pageSize: 10
       },
       {
         results: [],
         resultsCount: 0,
         page: 1,
-        pageSize: 10,
+        pageSize: 10
       }
     ]
   },
@@ -94,7 +94,7 @@ export const getInitialState = () => ({
   },
   variantLookupTable: {
     results: null,
-    numResults: null,
+    numResults: null
   },
   phenotypeCorrelations: {
     selectedPhenotypes: [],
@@ -110,7 +110,7 @@ export const getInitialState = () => ({
   },
   heatmap: {
     heatmapData: null,
-    heatmapLayout: null,
+    heatmapLayout: null
   },
   browsePhenotypes: {
     selectedPhenotype: null,
@@ -132,12 +132,12 @@ export const getInitialState = () => ({
   },
   downloads: {
     selectedPhenotypes: [],
-    downloadRoot: '',
+    downloadRoot: ''
   },
   error: {
     visible: false,
     message: `An error occured when requesting data. If this problem persists, please contact the administrator at <a href="mailto:PLCOWebAdmin@cancer.gov">PLCOWebAdmin@cancer.gov</a>.`
-  },
+  }
 });
 
 export const store = createStore(

@@ -8,9 +8,16 @@ import { plotOverlayConfig } from '../../../controls/table/table';
 import { rawQuery, query } from '../../../../services/query';
 import { ManhattanPlot as Plot } from '../../../plots/custom/manhattan-plot/manhattan-plot';
 import { Icon } from '../../../controls/icon/icon';
-import { createElement as h, removeChildren, extent } from '../../../plots/custom/utils';
+import {
+  createElement as h,
+  removeChildren,
+  extent
+} from '../../../plots/custom/utils';
 import { systemFont } from '../../../plots/custom/text';
-import { updateSummaryResults, updateManhattanPlot } from '../../../../services/actions';
+import {
+  updateSummaryResults,
+  updateManhattanPlot
+} from '../../../../services/actions';
 import { CHECKBOX_STATUS_CHECKED } from 'react-bootstrap-table-next';
 
 export function ManhattanPlot({
@@ -19,7 +26,7 @@ export function ManhattanPlot({
   onVariantLookup,
   onZoom,
   loading,
-  panelCollapsed,
+  panelCollapsed
 }) {
   const dispatch = useDispatch();
   const [genePlotCollapsed, setGenePlotCollapsed] = useState(false);
@@ -34,7 +41,7 @@ export function ManhattanPlot({
     selectedPlot,
     manhattanPlotView,
     isPairwise,
-    ranges,
+    ranges
   } = useSelector(state => state.summaryResults);
 
   const {
@@ -43,35 +50,35 @@ export function ManhattanPlot({
     manhattanPlotConfig,
     restoredZoomLevel,
     zoomStack,
-    genes,
+    genes
   } = useSelector(state => state.manhattanPlot);
 
   const hasData = () =>
     manhattanPlotData &&
     manhattanPlotData.data &&
     manhattanPlotData.data.length &&
-    (!isPairwise || isPairwise && 
-      manhattanPlotMirroredData &&
-      manhattanPlotMirroredData.data &&
-      manhattanPlotMirroredData.data.length
-    );
+    (!isPairwise ||
+      (isPairwise &&
+        manhattanPlotMirroredData &&
+        manhattanPlotMirroredData.data &&
+        manhattanPlotMirroredData.data.length));
 
   const setManhattanPlotConfig = manhattanPlotConfig => {
-    dispatch(updateManhattanPlot({ manhattanPlotConfig }))
-  }
+    dispatch(updateManhattanPlot({ manhattanPlotConfig }));
+  };
 
   const setZoomStack = zoomStack => {
-    dispatch(updateManhattanPlot({ zoomStack }))
-  }
+    dispatch(updateManhattanPlot({ zoomStack }));
+  };
 
   const setGenes = genes => {
-    dispatch(updateManhattanPlot({ genes }))
-  }
+    dispatch(updateManhattanPlot({ genes }));
+  };
 
   const colors = {
     single: {
       light: '#F2990D',
-      dark: '#A76909',
+      dark: '#A76909'
     },
     bottom: {
       light: '#006bb8',
@@ -81,27 +88,43 @@ export function ManhattanPlot({
       light: '#f41c52',
       dark: '#a2173a'
     }
-  }
+  };
 
-  const asTitleCase = snakeCase => snakeCase
-    .replace(/_+/g, ' ')
-    .replace(/\w+/g, word => word[0].toUpperCase() + word.substr(1).toLowerCase());
+  const asTitleCase = snakeCase =>
+    snakeCase
+      .replace(/_+/g, ' ')
+      .replace(
+        /\w+/g,
+        word => word[0].toUpperCase() + word.substr(1).toLowerCase()
+      );
 
   const getTitle = bounds => {
-    const phenotypes = selectedPhenotypes.map((p, i) => 
-      (isPairwise && selectedPhenotypes[1] ? ['Top: ', 'Bottom: '][i] : '') + p.display_name).join(' / ');
+    const phenotypes = selectedPhenotypes
+      .map(
+        (p, i) =>
+          (isPairwise && selectedPhenotypes[1]
+            ? ['Top: ', 'Bottom: '][i]
+            : '') + p.display_name
+      )
+      .join(' / ');
 
-
-    return `${phenotypes} ${selectedChromosome ? `- Chromosome ${selectedChromosome}` : ``} ${!bounds ? '' : 
-      ' - ' + [bounds.xMin, bounds.xMax]
-        .map(n => `${(n / 1e6).toPrecision(4)} MB`)
-        .join(' - ')}`;
+    return `${phenotypes} ${
+      selectedChromosome ? `- Chromosome ${selectedChromosome}` : ``
+    } ${
+      !bounds
+        ? ''
+        : ' - ' +
+          [bounds.xMin, bounds.xMax]
+            .map(n => `${(n / 1e6).toPrecision(4)} MB`)
+            .join(' - ')
+    }`;
   };
 
   const getPairwiseTitles = () => {
-    return selectedStratifications.map(s => 
-      asTitleCase(`${s.ancestry} - ${s.sex}`));
-  }
+    return selectedStratifications.map(s =>
+      asTitleCase(`${s.ancestry} - ${s.sex}`)
+    );
+  };
 
   useEffect(() => {
     if (selectedPlot != 'manhattan-plot' || !hasData()) return;
@@ -114,9 +137,9 @@ export function ManhattanPlot({
         manhattanPlotView === 'summary'
           ? getMirroredSummaryPlot(manhattanPlotData, manhattanPlotMirroredData)
           : getMirroredChromosomePlot(
-            manhattanPlotData,
-            manhattanPlotMirroredData
-          );
+              manhattanPlotData,
+              manhattanPlotMirroredData
+            );
     } else {
       params =
         manhattanPlotView === 'summary'
@@ -128,8 +151,7 @@ export function ManhattanPlot({
     config.zoomStack = zoomStack;
 
     if (manhattanPlotConfig) {
-      if (manhattanPlotConfig.title)
-        config.title = manhattanPlotConfig.title;
+      if (manhattanPlotConfig.title) config.title = manhattanPlotConfig.title;
 
       if (manhattanPlotConfig.zoomWindow)
         config.zoomWindow = manhattanPlotConfig.zoomWindow;
@@ -151,15 +173,18 @@ export function ManhattanPlot({
     }
 
     plot.current = new Plot(plotContainer.current, config);
-    if (genes && genes.length)
-      plot.current.drawGenes(genes);
-    else
-      plot.current.clearGenes();
+    if (genes && genes.length) plot.current.drawGenes(genes);
+    else plot.current.clearGenes();
     // setZoomStack([]);
     return () => {
       // plot.current.destroy();
     };
-  }, [manhattanPlotData, manhattanPlotMirroredData, selectedPlot, selectedChromosome]);
+  }, [
+    manhattanPlotData,
+    manhattanPlotMirroredData,
+    selectedPlot,
+    selectedChromosome
+  ]);
 
   useEffect(() => {
     plot.current && plot.current.redraw();
@@ -180,7 +205,7 @@ export function ManhattanPlot({
         xAxis: {
           title: [],
           key: 'x',
-          ticks: [],
+          ticks: []
         },
         yAxis: {
           key: 'y',
@@ -193,15 +218,15 @@ export function ManhattanPlot({
               font: `600 10px ${systemFont}`
             },
             { text: `(p)`, font: `600 14px ${systemFont}` }
-          ],
+          ]
         },
         lines: [{ y: -Math.log10(5e-8), style: 'dashed' }],
         point: {
           size: 1,
           interactiveSize: 1,
-          opacity: 0,
-        },
-      }
+          opacity: 0
+        }
+      };
 
       let stackedConfig = {
         mirrored: true,
@@ -216,7 +241,7 @@ export function ManhattanPlot({
         xAxis: {
           key: 'x',
           ticks: [],
-          title: [],
+          title: []
         },
         yAxis: {
           key: 'y',
@@ -230,26 +255,29 @@ export function ManhattanPlot({
             },
             { text: `(p)`, font: `600 14px ${systemFont}` }
           ],
-          secondaryTitle: [{text: getPairwiseTitles()[0], font: `600 11px ${systemFont}` }],
+          secondaryTitle: [
+            { text: getPairwiseTitles()[0], font: `600 11px ${systemFont}` }
+          ]
         },
         yAxis2: {
           key: 'x',
           ticks: [],
-          secondaryTitle: [{
-            text: getPairwiseTitles()[1], font: `600 11px ${systemFont}`
-          }]
+          secondaryTitle: [
+            {
+              text: getPairwiseTitles()[1],
+              font: `600 11px ${systemFont}`
+            }
+          ]
         },
         lines: [{ y: 0, style: 'dashed' }],
         point: {
           size: 1,
           interactiveSize: 1,
-          opacity: 0,
+          opacity: 0
         }
-      }
+      };
 
-      let plotConfig = isPairwise
-        ? stackedConfig
-        : config;
+      let plotConfig = isPairwise ? stackedConfig : config;
 
       plot = new Plot(plotPlaceholderContainer.current, plotConfig);
     }
@@ -263,7 +291,11 @@ export function ManhattanPlot({
       nLogP: plotData.columns.indexOf('p_value_nlog')
     };
 
-    let yExtent = extent([...plotData.data, ...mirroredPlotData.data].map(d => d[columnIndexes.nLogP]));
+    let yExtent = extent(
+      [...plotData.data, ...mirroredPlotData.data].map(
+        d => d[columnIndexes.nLogP]
+      )
+    );
     yExtent[1] *= 1.1;
 
     return {
@@ -281,7 +313,9 @@ export function ManhattanPlot({
         title: null,
         key: columnIndexes.bp,
         tickFormat: tick => (tick / 1e6).toPrecision(3) + ' MB',
-        ticks: ranges.filter(r => !isNaN(r.chromosome)).map(r => +r.position_abs_max),
+        ticks: ranges
+          .filter(r => !isNaN(r.chromosome))
+          .map(r => +r.position_abs_max),
         tickFormat: (tick, i) => +ranges[i].chromosome,
         labelsBetweenTicks: true,
         allowSelection: true,
@@ -299,21 +333,27 @@ export function ManhattanPlot({
           },
           { text: `(p)`, font: `600 14px ${systemFont}` }
         ],
-        secondaryTitle: [{ text: getPairwiseTitles()[0], font: `600 11px ${systemFont}` }],
+        secondaryTitle: [
+          { text: getPairwiseTitles()[0], font: `600 11px ${systemFont}` }
+        ],
         key: columnIndexes.nLogP,
         tickFormat: tick => tick.toPrecision(3),
         extent: yExtent
       },
       yAxis2: {
-        secondaryTitle: [{ text: getPairwiseTitles()[1], font: `600 11px ${systemFont}` }]
+        secondaryTitle: [
+          { text: getPairwiseTitles()[1], font: `600 11px ${systemFont}` }
+        ]
       },
       point: {
         size: 2,
         opacity: 1,
-        color: (d, i) => (+d[columnIndexes.chr] % 2 ? colors.top.light : colors.top.dark)
+        color: (d, i) =>
+          +d[columnIndexes.chr] % 2 ? colors.top.light : colors.top.dark
       },
       point2: {
-        color: (d, i) => (+d[columnIndexes.chr] % 2 ? colors.bottom.light : colors.bottom.dark)
+        color: (d, i) =>
+          +d[columnIndexes.chr] % 2 ? colors.bottom.light : colors.bottom.dark
       },
       lines: [{ y: -Math.log10(5e-8), style: 'dashed' }]
     };
@@ -333,13 +373,17 @@ export function ManhattanPlot({
       chr: data[columnIndexes.chr],
       bp: data[columnIndexes.bp],
       nLogP: data[columnIndexes.nLogP],
-      index: data[columnIndexes.index],
+      index: data[columnIndexes.index]
     });
 
     let title = getTitle();
     let range = ranges.find(r => r.chromosome == selectedChromosome);
 
-    let yExtent = extent([...plotData.data, ...mirroredPlotData.data].map(d => d[columnIndexes.nLogP]));
+    let yExtent = extent(
+      [...plotData.data, ...mirroredPlotData.data].map(
+        d => d[columnIndexes.nLogP]
+      )
+    );
     yExtent[1] *= 1.1;
 
     return {
@@ -368,9 +412,8 @@ export function ManhattanPlot({
         setZoomStack(stack);
         onZoom(e);
 
-        let bounds = zoomStack.length > 0
-          ? zoomStack[zoomStack.length - 1].bounds
-          : null
+        let bounds =
+          zoomStack.length > 0 ? zoomStack[zoomStack.length - 1].bounds : null;
 
         plot.current.setTitle([
           {
@@ -409,13 +452,17 @@ export function ManhattanPlot({
           },
           { text: `(p)`, font: `600 14px ${systemFont}` }
         ],
-        secondaryTitle: [{ text: getPairwiseTitles()[0], font: `600 11px ${systemFont}` }],
+        secondaryTitle: [
+          { text: getPairwiseTitles()[0], font: `600 11px ${systemFont}` }
+        ],
         key: columnIndexes.nLogP,
         tickFormat: tick => tick.toPrecision(3),
-        extent: yExtent,
+        extent: yExtent
       },
       yAxis2: {
-        secondaryTitle: [{ text: getPairwiseTitles()[1], font: `600 11px ${systemFont}` }]
+        secondaryTitle: [
+          { text: getPairwiseTitles()[1], font: `600 11px ${systemFont}` }
+        ]
       },
       point: {
         size: 2,
@@ -430,10 +477,12 @@ export function ManhattanPlot({
             let point = withKeys(data);
             console.log(point);
             const response = await query('variants', {
-              phenotype_id: (selectedPhenotypes[point.index] || selectedPhenotypes[0]).id,
+              phenotype_id: (
+                selectedPhenotypes[point.index] || selectedPhenotypes[0]
+              ).id,
               id: point.variantId,
               ancestry: selectedStratifications[point.index].ancestry,
-              sex: selectedStratifications[point.index].sex,
+              sex: selectedStratifications[point.index].sex
             });
             const record = response.data[0];
             return h('div', { className: '' }, [
@@ -479,7 +528,6 @@ export function ManhattanPlot({
   }
 
   function getSummaryPlot(plotData) {
-
     let columnIndexes = {
       chr: plotData.columns.indexOf('chromosome'),
       bp: plotData.columns.indexOf('position_abs'),
@@ -502,7 +550,9 @@ export function ManhattanPlot({
         title: null,
         key: columnIndexes.bp,
         tickFormat: tick => (tick / 1e6).toPrecision(3) + ' MB',
-        ticks: ranges.filter(r => !isNaN(r.chromosome)).map(r => r.position_abs_max),
+        ticks: ranges
+          .filter(r => !isNaN(r.chromosome))
+          .map(r => r.position_abs_max),
         tickFormat: (tick, i) => +ranges[i].chromosome,
         labelsBetweenTicks: true,
         allowSelection: true,
@@ -527,9 +577,8 @@ export function ManhattanPlot({
       point: {
         size: 2,
         opacity: 1,
-        color: (d, i) => (d[columnIndexes.chr] % 2
-          ? colors.single.light
-          : colors.single.dark) //#e47833')
+        color: (d, i) =>
+          d[columnIndexes.chr] % 2 ? colors.single.light : colors.single.dark //#e47833')
       },
       lines: [{ y: -Math.log10(5e-8), style: 'dashed' }]
     };
@@ -541,7 +590,7 @@ export function ManhattanPlot({
       chr: plotData.columns.indexOf('chromosome'),
       bp: plotData.columns.indexOf('position'),
       nLogP: plotData.columns.indexOf('p_value_nlog'),
-      index: plotData.columns.indexOf('index'),
+      index: plotData.columns.indexOf('index')
     };
 
     let withKeys = data => ({
@@ -549,7 +598,7 @@ export function ManhattanPlot({
       chr: data[columnIndexes.chr],
       bp: data[columnIndexes.bp],
       nLogP: data[columnIndexes.nLogP],
-      index: data[columnIndexes.index],
+      index: data[columnIndexes.index]
     });
 
     let title = getTitle();
@@ -581,9 +630,8 @@ export function ManhattanPlot({
         setZoomStack(stack);
         onZoom(e);
 
-        let bounds = zoomStack.length > 0
-          ? zoomStack[zoomStack.length - 1].bounds
-          : null;
+        let bounds =
+          zoomStack.length > 0 ? zoomStack[zoomStack.length - 1].bounds : null;
 
         plot.current.setTitle([
           {
@@ -630,9 +678,8 @@ export function ManhattanPlot({
         size: 2,
         interactiveSize: 3,
         opacity: 1,
-        color: selectedChromosome % 2
-          ? colors.single.light
-          : colors.single.dark,
+        color:
+          selectedChromosome % 2 ? colors.single.light : colors.single.dark,
         tooltip: {
           trigger: 'hover',
           class: 'custom-tooltip',
@@ -640,10 +687,12 @@ export function ManhattanPlot({
           content: async (data, index) => {
             let point = withKeys(data);
             const response = await query('variants', {
-              phenotype_id: (selectedPhenotypes[point.index] || selectedPhenotypes[0]).id,
+              phenotype_id: (
+                selectedPhenotypes[point.index] || selectedPhenotypes[0]
+              ).id,
               id: point.variantId,
               ancestry: selectedStratifications[point.index].ancestry,
-              sex: selectedStratifications[point.index].sex,
+              sex: selectedStratifications[point.index].sex
             });
             const record = response.data[0];
             return h('div', { className: '' }, [
@@ -682,22 +731,22 @@ export function ManhattanPlot({
       },
       geneTooltipContent: gene => {
         return h('div', { className: '' }, [
-          h('div', null, [
-            h('b', null, 'gene: '),
-            `${gene.originalName}`
-          ]),
+          h('div', null, [h('b', null, 'gene: '), `${gene.originalName}`]),
           h('div', null, [
             h('b', null, 'position: '),
             `chr${selectedChromosome}:${gene.transcription_start}-${gene.transcription_end}`
           ]),
           h('div', null, [
-            h('a', {
-              className: 'font-weight-bold',
-              href: `https://www.ncbi.nlm.nih.gov/gene/?term=(${gene.originalName}%5BGene+Name%5D)+AND+homo+sapiens%5BOrganism%5D`,
-              target: '_blank'
-            }, 'Go to NCBI Gene'),
-          ]),
-
+            h(
+              'a',
+              {
+                className: 'font-weight-bold',
+                href: `https://www.ncbi.nlm.nih.gov/gene/?term=(${gene.originalName}%5BGene+Name%5D)+AND+homo+sapiens%5BOrganism%5D`,
+                target: '_blank'
+              },
+              'Go to NCBI Gene'
+            )
+          ])
         ]);
       },
       lines: [{ y: -Math.log10(5e-8), style: 'dashed' }],
@@ -719,11 +768,10 @@ export function ManhattanPlot({
       } else {
         zoomStack.pop();
         let window = zoomStack[zoomStack.length - 1];
-        plot.current.config.setZoomWindow({ ...window })
+        plot.current.config.setZoomWindow({ ...window });
         setZoomStack([...zoomStack]);
         // plot.current.config.zoomOut();
       }
-
     }
   }
 
@@ -744,36 +792,44 @@ export function ManhattanPlot({
   }
 
   function getFilename() {
-    const titlecase = str => str[0].toUpperCase() + str.substring(1, str.length)
-    const formatTitle = str => str.split(' ').map(titlecase).join('-');
+    const titlecase = str =>
+      str[0].toUpperCase() + str.substring(1, str.length);
+    const formatTitle = str =>
+      str
+        .split(' ')
+        .map(titlecase)
+        .join('-');
     let title = formatTitle(selectedPhenotypes.map(p => p.title).join(', '));
     // let plotType = formatTitle(selectedSex);
     let chr = selectedChromosome ? formatTitle(`Chr${selectedChromosome}`) : '';
     let range = getXRangeTitle();
 
-    return [
-      title,
-      chr,
-      range
-    ].filter(Boolean).join('-') + '.png'
+    return [title, chr, range].filter(Boolean).join('-') + '.png';
   }
-
 
   useEffect(() => {
     if (plot.current && restoredZoomLevel) {
-      plot.current.config.setZoomWindow({ bounds: restoredZoomLevel })
-      dispatch(updateManhattanPlot({
-        restoredZoomLevel: null
-      }))
+      plot.current.config.setZoomWindow({ bounds: restoredZoomLevel });
+      dispatch(
+        updateManhattanPlot({
+          restoredZoomLevel: null
+        })
+      );
     }
-
-  }, [restoredZoomLevel, plot.current])
+  }, [restoredZoomLevel, plot.current]);
 
   if (loading && !hasData()) {
-    return <div style={{ minHeight: '600px', position: 'relative', marginTop: '2.5rem' }}>
-      {loading && <LoadingOverlay active={loading} {...plotOverlayConfig} />}
-      <div className="manhattan-plot" ref={plotPlaceholderContainer} />
-    </div>
+    return (
+      <div
+        style={{
+          minHeight: '600px',
+          position: 'relative',
+          marginTop: '2.5rem'
+        }}>
+        {loading && <LoadingOverlay active={loading} {...plotOverlayConfig} />}
+        <div className="manhattan-plot" ref={plotPlaceholderContainer} />
+      </div>
+    );
   }
 
   return (
@@ -793,14 +849,8 @@ export function ManhattanPlot({
 
           {zoomStack.length ? (
             <>
-              <Icon
-                name="arrow-left"
-                className="mx-2 opacity-50"
-                width="10"
-              />
-              <a
-                href="javascript:void(0)"
-                onClick={resetZoom}>
+              <Icon name="arrow-left" className="mx-2 opacity-50" width="10" />
+              <a href="javascript:void(0)" onClick={resetZoom}>
                 Chromosome {selectedChromosome}
               </a>
             </>
@@ -809,9 +859,7 @@ export function ManhattanPlot({
           {zoomStack.length > 1 ? (
             <>
               <Icon name="arrow-left" className="mx-2 opacity-50" width="10" />
-              <a
-                href="javascript:void(0)"
-                onClick={zoomOut}>
+              <a href="javascript:void(0)" onClick={zoomOut}>
                 Previous Zoom
                 {(() => {
                   let bounds = zoomStack[zoomStack.length - 2].bounds;
@@ -843,7 +891,8 @@ export function ManhattanPlot({
           ref={plotContainer}
           className={[
             `manhattan-plot`,
-            (genePlotCollapsed || getXRange() > 2e6 || !genes.length) && 'gene-plot-collapsed'
+            (genePlotCollapsed || getXRange() > 2e6 || !genes.length) &&
+              'gene-plot-collapsed'
           ].join(' ')}
         />
         {/* <button onClick={e => plot.current.redraw()}>Redraw</button> */}
@@ -856,8 +905,8 @@ export function ManhattanPlot({
                 <div
                   className="p-4 mb-0 text-muted small"
                   style={{ border: '1px solid #eee' }}>
-                  Gene plot is not available at the current zoom level. Please zoom in to a 2MB range
-                  to see genes.
+                  Gene plot is not available at the current zoom level. Please
+                  zoom in to a 2MB range to see genes.
                 </div>
               );
               if (!zoomStack || !zoomStack.length) return zoomMessage;
@@ -872,20 +921,21 @@ export function ManhattanPlot({
                     style={{ border: '1px solid #eee' }}>
                     No genes are available within the current bp range.
                   </div>
-                )
+                );
               }
             })()}
             <button
               className="btn-collapse"
               onClick={e => setGenePlotCollapsed(!genePlotCollapsed)}>
-              {genePlotCollapsed
-                ? <a
+              {genePlotCollapsed ? (
+                <a
                   href="javascript:void(0)"
                   className="d-flex-inline align-items-center mr-5">
                   Show Gene Plot
-                  </a>
-                : <Icon name="angle-up" width="10" title="Hide Gene Plot" />
-              }
+                </a>
+              ) : (
+                <Icon name="angle-up" width="10" title="Hide Gene Plot" />
+              )}
             </button>
           </div>
         )}
