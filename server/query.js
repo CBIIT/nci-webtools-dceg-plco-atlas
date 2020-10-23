@@ -240,6 +240,10 @@ async function getVariants(connection, params) {
         params.snp = params.snp.match(/[\w:]+/g)
     }
 
+    if (params.order_by) {
+        params.orderBy = params.order_by;
+    }
+
     const [metadata] = await connection.query(
         `SELECT *  
         FROM phenotype_metadata 
