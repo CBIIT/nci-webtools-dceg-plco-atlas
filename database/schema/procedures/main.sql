@@ -141,7 +141,6 @@ CREATE PROCEDURE migrate_ci()
   DECLARE table_name VARCHAR(200);
 
   DECLARE phenotype_variant_table_cursor CURSOR FOR
-  DECLARE phenotype_variant_table_cursor CURSOR FOR
     select t.TABLE_NAME from INFORMATION_SCHEMA.TABLES t
     WHERE t.TABLE_NAME LIKE 'phenotype_variant__%';
 
