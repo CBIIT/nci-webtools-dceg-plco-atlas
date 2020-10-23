@@ -106,8 +106,13 @@ export function SummaryResultsTable() {
     },
     {
       dataField: 'beta',
-      text: 'Beta',
+      text: 'Beta [95% CI]',
+      headerTitle: _ => 'Beta [95% Confidence Interval]',
       title: true,
+      formatter: (cell, row) => (!cell || isNaN(cell)) ? '-' : 
+        `${(+cell).toFixed(3)} [${row.ci_95_low.toFixed(3)} - ${+row.ci_95_high.toFixed(3)}]`,
+      title: (cell, row) => (!cell || isNaN(cell)) ? '-' : 
+        `${(+cell).toFixed(3)} [${row.ci_95_low.toFixed(3)} - ${+row.ci_95_high.toFixed(3)}]`,
       headerStyle: {width: '80px'},
       headerClasses: 'overflow-ellipsis',
       classes: 'overflow-ellipsis',
@@ -131,7 +136,7 @@ export function SummaryResultsTable() {
       formatter: cell => cell < 1e-2 ? (+cell).toExponential() : cell,
       title: true,
       sort: true,
-      headerStyle: {width: '120px', minWidth: '120px'},
+      headerStyle: {width: '110px', minWidth: '110px'},
       headerClasses: 'overflow-ellipsis',
       classes: 'overflow-ellipsis',
     },
@@ -287,7 +292,14 @@ export function SummaryResultsTable() {
     keyField: 'id',
     loading: summaryTables.loading,
     data: summaryTables.tables[key].results,
-    columns: columns,
+    columns: columns.filter(c => {
+      const phenotype = (selectedPhenotypes[+key] || selectedPhenotypes[0]);
+      if (c.dataField === 'odds_ratio')
+        return phenotype.type === 'binary';
+      else if (c.dataField === 'beta')
+        return phenotype.type === 'continuous';
+      return true;
+    }),
     onTableChange: (type, ev) => handleTableChange(key, type, ev),
     overlay: loadingOverlay,
     defaultSorted,
