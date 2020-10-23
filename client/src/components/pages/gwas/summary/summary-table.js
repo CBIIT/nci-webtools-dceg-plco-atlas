@@ -339,9 +339,9 @@ export function SummaryResultsTable() {
 
         <div key="snpSearch" className="d-flex mb-2">
           <input
-            style={{ maxWidth: '400px' }}
+            style={{ minWidth: '280px' }}
             className="form-control form-control-sm"
-            placeholder="Search for SNPs"
+            placeholder="Search for a SNP or SNPs (ex/ rs3 rs4)"
             value={summarySnpTables.snp}
             onChange={e => setSnp(e.target.value)}
             aria-label="Filter SNP"
