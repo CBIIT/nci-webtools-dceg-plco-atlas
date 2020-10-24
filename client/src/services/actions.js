@@ -686,40 +686,31 @@ export function lookupVariants({phenotypes, variant, sex, ancestry}) {
       // populate results
       const results = data.map(record => ({
         phenotype: phenotypes.find(p => p.id === record.phenotype_id).title,
+        type: phenotypes.find(p => p.id === record.phenotype_id).type,
         variant,
         ancestry,
+        sex,
         ...record
-      })).map(p => {
-        if (!p.p_value)
-          p.p_value = '-';
-
-        if (!p.odds_ratio) {
-          p.odds_ratio = '-';
-          p.ci_95_low = null;
-          p.ci_95_high = null;
-        }
-
-        return p;
-      });
+      }));
   
       // populate empty results
       const emptyResults = phenotypes
         .filter(p => !data.find(r => r.phenotype_id === p.id))
         .map(p => ({
           phenotype: p.title || p.label,
-          allele_reference: '-',
-          allele_alternate: '-',
-          position: '-',
-          chromosome: '-',
-          beta: '-',
-          odds_ratio: '-',
-          ci_95_low: null,
-          ci_95_high: null,
-          p_value: '-',
-          variant_id: `not-found-${p.title || p.label}`,
           sex,
           ancestry,
-          variant
+          variant,
+          variant_id: `not-found-${p.title || p.label}`,
+          chromosome: null,
+          position: null,
+          allele_effect: null,
+          allele_non_effect: null,
+          beta: null,
+          odds_ratio: null,
+          p_value: null,
+          p_value_heterogenous: null,
+          n: null,
         }));
   
       dispatch(

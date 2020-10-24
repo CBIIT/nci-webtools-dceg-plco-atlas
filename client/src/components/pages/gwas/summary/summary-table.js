@@ -56,7 +56,7 @@ export function SummaryResultsTable() {
       headerTitle: _ => 'Chromosome',
       title: true,
       sort: true,
-      headerStyle: { width: '65px' },
+      headerStyle: { width: '65px', minWidth: '65px' },
       headerClasses: 'overflow-ellipsis',
       classes: 'overflow-ellipsis',
     },
@@ -84,22 +84,22 @@ export function SummaryResultsTable() {
       classes: 'overflow-ellipsis  text-nowrap',
     },
     {
-      dataField: 'allele_reference',
+      dataField: 'allele_effect',
       text: 'Eff. Allele',
       headerTitle: _ => 'Effect Allele [Frequency]',
-      formatter: (cell, row) => `${cell} [${row.allele_frequency.toPrecision(4)}]`,
-      title: (cell, row) => `${cell} [${row.allele_frequency.toPrecision(4)}]`,
+      formatter: (cell, row) => `${cell} [${row.allele_effect_frequency.toPrecision(4)}]`,
+      title: (cell, row) => `${cell} [${row.allele_effect_frequency.toPrecision(4)}]`,
       headerStyle: { width: '200px' },
       headerClasses: 'overflow-ellipsis',
       classes: 'overflow-ellipsis text-nowrap',
 
     },
     {
-      dataField: 'allele_alternate',
+      dataField: 'allele_non_effect',
       text: 'Non-Eff. Allele',
       headerTitle: _ => 'Non-Effect Allele [Frequency]',
-      formatter: (cell, row) => `${cell} [${(1 - row.allele_frequency).toPrecision(4)}]`,
-      title: (cell, row) => `${cell} [${(1 - row.allele_frequency).toPrecision(4)}]`,
+      formatter: (cell, row) => `${cell} [${(1 - row.allele_effect_frequency).toPrecision(4)}]`,
+      title: (cell, row) => `${cell} [${(1 - row.allele_effect_frequency).toPrecision(4)}]`,
       headerStyle: { width: '200px' },
       headerClasses: 'overflow-ellipsis',
       classes: 'overflow-ellipsis  text-nowrap',
@@ -110,11 +110,11 @@ export function SummaryResultsTable() {
       headerTitle: _ => 'Beta [95% Confidence Interval]',
       title: true,
       formatter: (cell, row) => (!cell || isNaN(cell)) ? '-' : 
-        `${(+cell).toFixed(3)} [${row.ci_95_low.toFixed(3)} - ${+row.ci_95_high.toFixed(3)}]`,
+        `${(+cell).toFixed(3)} [${row.beta_ci_95_low.toFixed(3)} - ${+row.beta_ci_95_high.toFixed(3)}]`,
       title: (cell, row) => (!cell || isNaN(cell)) ? '-' : 
-        `${(+cell).toFixed(3)} [${row.ci_95_low.toFixed(3)} - ${+row.ci_95_high.toFixed(3)}]`,
-      headerStyle: {width: '80px'},
-      headerClasses: 'overflow-ellipsis',
+        `${(+cell).toFixed(3)} [${row.beta_ci_95_low.toFixed(3)} - ${+row.beta_ci_95_high.toFixed(3)}]`,
+        headerStyle: { minWidth: '200px',  width: '200px' },
+        headerClasses: 'overflow-ellipsis',
       classes: 'overflow-ellipsis',
     },
     {
@@ -122,9 +122,9 @@ export function SummaryResultsTable() {
       text: 'OR [95% CI]',
       headerTitle: _ => 'Odds Ratio [95% Confidence Interval]',
       formatter: (cell, row) => (!cell || isNaN(cell)) ? '-' : 
-        `${(+cell).toFixed(3)} [${row.ci_95_low.toFixed(3)} - ${+row.ci_95_high.toFixed(3)}]`,
+        `${(+cell).toFixed(3)} [${row.odds_ratio_ci_95_low.toFixed(3)} - ${+row.odds_ratio_ci_95_high.toFixed(3)}]`,
       title: (cell, row) => (!cell || isNaN(cell)) ? '-' : 
-        `${(+cell).toFixed(3)} [${row.ci_95_low.toFixed(3)} - ${+row.ci_95_high.toFixed(3)}]`,
+        `${(+cell).toFixed(3)} [${row.odds_ratio_ci_95_low.toFixed(3)} - ${+row.odds_ratio_ci_95_high.toFixed(3)}]`,
       headerStyle: { minWidth: '200px',  width: '200px' },
       classes: 'overflow-ellipsis',
       headerClasses: 'overflow-ellipsis',
@@ -158,7 +158,7 @@ export function SummaryResultsTable() {
       headerClasses: 'overflow-ellipsis',
       classes: 'overflow-ellipsis',
     },
-  ].filter(Boolean);
+  ];
 
   const updateSummaryTableData = (key, params) => {
     const phenotype = selectedPhenotypes[key] || selectedPhenotypes[0];
@@ -304,7 +304,10 @@ export function SummaryResultsTable() {
     columns: columns.filter(c => columnFilter(c, key)),
     onTableChange: (type, ev) => handleTableChange(key, type, ev),
     overlay: loadingOverlay,
-    defaultSorted,
+    defaultSorted: [{
+      dataField: summaryTables.tables[key].orderBy || 'p_value',
+      order: summaryTables.tables[key].order || 'asc'
+    }],
     pagination: paginationFactory({
       page: summaryTables.tables[key].page,
       sizePerPage: summaryTables.tables[key].pageSize,
@@ -367,7 +370,7 @@ export function SummaryResultsTable() {
               Only the top {exportRowLimit.toLocaleString()} variants based on the current sort order will be downloaded.
             </Tooltip>}>
             <a
-              className="btn btn-sm btn-link"
+              className="btn btn-sm btn-link text-nowrap"
               href={getExportLink()}>
               Export Variants
             </a>

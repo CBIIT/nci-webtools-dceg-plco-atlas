@@ -37,6 +37,8 @@ export function VariantLookup() {
 
   const { ExportCSVButton } = CSVExport;
 
+  const defaultFormatter = cell => cell === null ? '-' : cell;
+
   const columns = [
     {
       // title: true,
@@ -72,7 +74,8 @@ export function VariantLookup() {
       headerTitle: _ => 'Chromosome',
       title: true,
       sort: true,
-      headerStyle: { width: '65px' },
+      formatter: defaultFormatter,
+      headerStyle: { width: '65px', minWidth: '65px' },
       headerClasses: 'overflow-ellipsis',
       classes: 'overflow-ellipsis',
     },
@@ -82,6 +85,7 @@ export function VariantLookup() {
       headerTitle: _ => 'Position',
       title: true,
       sort: true,
+      formatter: defaultFormatter,
       headerStyle: { width: '100px' },
       headerClasses: 'overflow-ellipsis',
       classes: 'overflow-ellipsis',
@@ -90,7 +94,7 @@ export function VariantLookup() {
       dataField: 'snp',
       text: 'SNP',
       sort: true,
-      formatter: cell => !/^rs\d+/.test(cell) ?
+      formatter: cell => cell === null ? '-' : !/^rs\d+/.test(cell) ?
         (!/^chr[\d+|x|y]:\d+/i.test(cell) ? cell :
           cell.split(':')[0] + ':' + cell.split(':')[1]) :
         <a className="overflow-ellipsis" href={`https://www.ncbi.nlm.nih.gov/snp/${cell.split(':')[0]}`} target="_blank">{cell}</a>,
@@ -98,44 +102,49 @@ export function VariantLookup() {
       headerStyle: {width: '180px'},
       headerClasses: 'overflow-ellipsis',
       classes: 'overflow-ellipsis  text-nowrap',
-    },    
+    },
     {
-      dataField: 'allele_reference',
+      dataField: 'allele_effect',
       text: 'Eff. Allele',
       headerTitle: _ => 'Effect Allele [Frequency]',
-      formatter: (cell, row) => cell === '-' ? '-' : `${cell} [${row.allele_frequency.toPrecision(4)}]`,
-      title: (cell, row) => cell === '-' ? '-' : `${cell} [${row.allele_frequency.toPrecision(4)}]`,
+      formatter: (cell, row) => cell === null ? '-' : `${cell} [${row.allele_effect_frequency.toPrecision(4)}]`,
+      title: (cell, row) => cell === null ? '-' : `${cell} [${row.allele_effect_frequency.toPrecision(4)}]`,
       headerStyle: { width: '200px' },
       headerClasses: 'overflow-ellipsis',
       classes: 'overflow-ellipsis text-nowrap',
 
     },
     {
-      dataField: 'allele_alternate',
+      dataField: 'allele_non_effect',
       text: 'Non-Eff. Allele',
       headerTitle: _ => 'Non-Effect Allele [Frequency]',
-      formatter: (cell, row) => cell === '-' ? '-' : `${cell} [${(1 - row.allele_frequency).toPrecision(4)}]`,
-      title: (cell, row) => cell === '-' ? '-' : `${cell} [${(1 - row.allele_frequency).toPrecision(4)}]`,
+      formatter: (cell, row) => cell === null ? '-' : `${cell} [${(1 - row.allele_effect_frequency).toPrecision(4)}]`,
+      title: (cell, row) => cell === null ? '-' : `${cell} [${(1 - row.allele_effect_frequency).toPrecision(4)}]`,
       headerStyle: { width: '200px' },
       headerClasses: 'overflow-ellipsis',
       classes: 'overflow-ellipsis  text-nowrap',
     },
     {
       dataField: 'beta',
-      text: 'Beta',
+      text: 'Beta [95% CI]',
+      headerTitle: _ => 'Beta [95% Confidence Interval]',
       title: true,
-      headerStyle: {width: '80px'},
-      headerClasses: 'overflow-ellipsis',
+      formatter: (cell, row) => (!cell || isNaN(cell) || row.type !== 'continuous') ? '-' : 
+        `${(+cell).toFixed(3)} [${row.beta_ci_95_low.toFixed(3)} - ${+row.beta_ci_95_high.toFixed(3)}]`,
+      title: (cell, row) => (!cell || isNaN(cell)) ? '-' : 
+        `${(+cell).toFixed(3)} [${row.beta_ci_95_low.toFixed(3)} - ${+row.beta_ci_95_high.toFixed(3)}]`,
+        headerStyle: { minWidth: '200px',  width: '200px' },
+        headerClasses: 'overflow-ellipsis',
       classes: 'overflow-ellipsis',
     },
     {
       dataField: 'odds_ratio',
       text: 'OR [95% CI]',
       headerTitle: _ => 'Odds Ratio [95% Confidence Interval]',
-      formatter: (cell, row) => (!cell || isNaN(cell)) ? '-' : 
-        `${(+cell).toFixed(3)} [${row.ci_95_low.toFixed(3)} - ${+row.ci_95_high.toFixed(3)}]`,
+      formatter: (cell, row) => (!cell || isNaN(cell) || row.type !== 'binary') ? '-' : 
+        `${(+cell).toFixed(3)} [${row.odds_ratio_ci_95_low.toFixed(3)} - ${+row.odds_ratio_ci_95_high.toFixed(3)}]`,
       title: (cell, row) => (!cell || isNaN(cell)) ? '-' : 
-        `${(+cell).toFixed(3)} [${row.ci_95_low.toFixed(3)} - ${+row.ci_95_high.toFixed(3)}]`,
+        `${(+cell).toFixed(3)} [${row.odds_ratio_ci_95_low.toFixed(3)} - ${+row.odds_ratio_ci_95_high.toFixed(3)}]`,
       headerStyle: { minWidth: '200px',  width: '200px' },
       classes: 'overflow-ellipsis',
       headerClasses: 'overflow-ellipsis',
@@ -144,10 +153,10 @@ export function VariantLookup() {
       dataField: 'p_value',
       text: <span>Assoc. <span className="text-nowrap">P-Value</span></span>,
       headerTitle: _ => 'Association P-Values',
-      formatter: cell => cell < 1e-2 ? (+cell).toExponential() : cell,
+      formatter: cell => cell === null ? '-' : (cell < 1e-2 ? (+cell).toExponential() : cell),
       title: true,
       sort: true,
-      headerStyle: {minWidth: '100px'},
+      headerStyle: {width: '110px', minWidth: '110px'},
       headerClasses: 'overflow-ellipsis',
       classes: 'overflow-ellipsis',
     },
@@ -156,8 +165,8 @@ export function VariantLookup() {
       text: <span>Het. <span className="text-nowrap">P-Value</span></span>,
       headerTitle: _ => 'Heterogenous P-Values',
       title: true,
-      formatter: cell => isNaN(cell) ? '-' : cell,
-      headerStyle: {minWidth: '100px'},
+      formatter: defaultFormatter,
+      headerStyle: {width: '100px', minWidth: '100px'},
       headerClasses: 'overflow-ellipsis',
       classes: 'overflow-ellipsis',
     },
@@ -166,12 +175,16 @@ export function VariantLookup() {
       text: 'N',
       headerTitle: _ => 'Sample Size',
       title: true,
-      formatter: cell => isNaN(cell) ? '-' : cell,
+      formatter: defaultFormatter,
       headerStyle: {width: '80px'},
       headerClasses: 'overflow-ellipsis',
       classes: 'overflow-ellipsis',
     },
   ];
+
+
+
+
   // add filter to column headers
   // .map(c => {
   //   c.filter = textFilter({ className: 'form-control-sm' });
