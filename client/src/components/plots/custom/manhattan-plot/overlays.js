@@ -148,7 +148,7 @@ export function drawZoomOverlay(config, ctx, overlayCtx) {
 
   function endZoom(ev) {
     if (!mouseDown) return;
-
+    if (Math.abs(zoomArea.x2 - zoomArea.x1) < 5 && Math.abs(zoomArea.y2 - zoomArea.y1) < 5) return;
     let { x, y } = viewportToLocalCoordinates(ev.clientX, ev.clientY, canvas);
 
     let yMidpoint = margins.top + height / 2;
@@ -342,6 +342,7 @@ export function drawPanOverlay(config, ctx, overlayCtx) {
     canvas.style.cursor = 'crosshair';
     let currentBounds = config.zoomWindow.bounds;
     let { deltaX, deltaY } = panArea;
+    
 
     withSavedContext(overlayCtx, ctx => {
       ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
