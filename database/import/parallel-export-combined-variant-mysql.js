@@ -272,7 +272,6 @@ async function exportVariants({
                             allele_non_effect           VARCHAR(200),
                             allele_effect_frequency     DOUBLE,
                             p_value                     DOUBLE,
-                            p_value_nlog                DOUBLE, -- negative log10(P)
                             p_value_heterogenous        BIGINT,
                             beta                        DOUBLE,
                             standard_error              DOUBLE,
@@ -296,7 +295,6 @@ async function exportVariants({
                             allele_non_effect,
                             allele_effect_frequency,
                             p_value,
-                            p_value_nlog,
                             p_value_heterogenous,
                             beta,
                             standard_error,
@@ -311,11 +309,11 @@ async function exportVariants({
                             p.allele_non_effect,
                             p.${ancestry}_allele_effect_frequency,
                             p.${sex}_${ancestry}_p_value,
-                            -LOG10(p.${sex}_${ancestry}_p_value) AS p_value_nlog,
                             p.${sex}_${ancestry}_p_value_heterogenous,
                             p.${sex}_${ancestry}_beta,
                             p.${sex}_${ancestry}_standard_error,
-                            ${useOddsRatio ? `EXP(p.${sex}_${ancestry}_beta)` : `NULL` } as odds_ratio,
+                            ${useOddsRatio ? `EXP(p.${sex}_${ancestry}_beta)` : `NULL`} as odds_ratio,
+                            p.${sex}_${ancestry}_n
                         FROM prestage p
                         INNER JOIN chromosome_range cr ON cr.chromosome = p.chromosome
                         WHERE p.${sex}_${ancestry}_p_value > 1e-10000
@@ -352,7 +350,7 @@ async function exportVariants({
 
                     // determine 10,000th smallest p value
                     const [pValueThresholdRows] = await connection.query(
-                        `SELECT p_value_nlog FROM ${stageTable} ORDER BY p_value_nlog DESC LIMIT 10000,1`,
+                        `SELECT p_value FROM ${stageTable} ORDER BY p_value ASC LIMIT 10000,1`,
                     );
                     const pValueThreshold = pluck(pValueThresholdRows);
 
@@ -360,7 +358,7 @@ async function exportVariants({
                     const [maxPositionAbsRows] = await connection.query(`SELECT MAX(position_abs_max) FROM chromosome_range`);
                     const maxPositionAbs = pluck(maxPositionAbsRows);
 
-                    const [maxPValueNlogRows] = await connection.query(`SELECT MAX(p_value_nlog) FROM ${stageTable}`);
+                    const [maxPValueNlogRows] = await connection.query(`SELECT -LOG10(MIN(p_value)) FROM ${stageTable}`);
                     const maxPValueNlog = pluck(maxPValueNlogRows);
     
                     // get aggregation bin size (800x, 400y)
@@ -379,7 +377,6 @@ async function exportVariants({
                             allele_non_effect,
                             allele_effect_frequency,
                             p_value,
-                            p_value_nlog,
                             p_value_heterogenous,
                             beta,
                             standard_error,
@@ -395,7 +392,6 @@ async function exportVariants({
                             allele_non_effect,
                             allele_effect_frequency,
                             p_value,
-                            p_value_nlog,
                             p_value_heterogenous,
                             beta,
                             standard_error,
@@ -426,10 +422,10 @@ async function exportVariants({
                             '${ancestry}' as ancestry, 
                             s.chromosome, 
                             ${positionFactor} * FLOOR((s.position + cr.position_abs_min) / ${positionFactor})  as position_abs,
-                            ${pValueNlogFactor} * FLOOR(s.p_value_nlog / ${pValueNlogFactor}) as p_value_nlog
+                            ${pValueNlogFactor} * FLOOR(-LOG10(s.p_value) / ${pValueNlogFactor}) as p_value_nlog
                         FROM ${stageTable} s
                         JOIN chromosome_range cr ON s.chromosome = cr.chromosome
-                        ORDER BY p_value_nlog
+                        ORDER BY p_value_nlog DESC
                     `);
 
                     logger.info(`Generating point table ${pointTable}`);
@@ -448,11 +444,11 @@ async function exportVariants({
                                 ${phenotype.id} as phenotype_id, 
                                 '${sex}' as sex, 
                                 '${ancestry}' as ancestry, 
-                                p_value_nlog,
+                                -LOG10(p_value),
                                 -LOG10((id - 0.5) / ${count}) as p_value_nlog_expected
                             FROM ${stageTable}
                             WHERE id IN (${getPlaceholders(qqRowIds)})
-                            OR p_value_nlog > ?
+                            OR p_value < ?
                         `, [...qqRowIds, pValueThreshold]);
                     }
 

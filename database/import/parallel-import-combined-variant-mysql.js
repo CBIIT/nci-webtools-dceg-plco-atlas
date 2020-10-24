@@ -130,7 +130,7 @@ async function importVariants({connection, database, folderPath, phenotype}) {
     await importInnoDBTable(connection, database, pointTable, folderPath);
     await importInnoDBTable(connection, database, metadataTable, folderPath);
 
-    logger.info('Selecting from temporary InnoDB tables');
+    logger.info('Inserting aggregate points');
     await connection.query(`
         DELETE FROM phenotype_aggregate 
         WHERE
@@ -147,10 +147,16 @@ async function importVariants({connection, database, folderPath, phenotype}) {
     `);
 
     // preserve ids from point table
+    logger.info('Inserting qq plot points');
     await connection.query(`
-        INSERT INTO phenotype_point SELECT * FROM ${pointTable}
+        INSERT INTO phenotype_point 
+        SELECT * FROM ${pointTable}
+        ON DUPLICATE KEY UPDATE
+            p_value_nlog = VALUES(p_value_nlog),
+            p_value_nlog_expected = VALUES(p_value_nlog_expected);
     `);
 
+    logger.info('Inserting metadata');
     await connection.query(`
         INSERT INTO phenotype_metadata 
             (phenotype_id, sex, ancestry, chromosome, lambda_gc, count)
@@ -168,7 +174,7 @@ async function importVariants({connection, database, folderPath, phenotype}) {
     await connection.query(`DROP TABLE ${pointTable}`);
 
     // log imported variants
-    logger.info(`Storing import log...`);
+    logger.info(`Storing import log`);
     await connection.execute(`
         UPDATE phenotype SET
             import_count = (
@@ -194,7 +200,7 @@ async function importVariants({connection, database, folderPath, phenotype}) {
             ancestry = :ancestry AND
             sex = :sex
         `, {id, ancestry, sex});
-    const [metadataCount] = pluck(metadataCountRows);
+    const metadataCount = pluck(metadataCountRows);
 
     // do not stop the import process, as we will want to collect warnings for all phenotypes
     if (metadataCount === null || variantCount === 0) {

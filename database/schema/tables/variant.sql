@@ -15,8 +15,8 @@ CREATE TABLE IF NOT EXISTS ${table_name} (
     standard_error double NULL,
     beta_ci_95_low double AS (beta - 1.96 * standard_error) STORED NULL,
     beta_ci_95_high double AS (beta + 1.96 * standard_error) STORED NULL,
-    odds_ratio_ci_95_low double AS EXP(beta - 1.96 * standard_error) STORED NULL,
-    odds_ratio_ci_95_high double AS EXP(beta + 1.96 * standard_error) STORED NULL,
+    odds_ratio_ci_95_low double AS (EXP(beta - 1.96 * standard_error)) STORED NULL,
+    odds_ratio_ci_95_high double AS (EXP(beta + 1.96 * standard_error)) STORED NULL,
     n int NULL,
     PRIMARY KEY (id, chromosome)
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci
