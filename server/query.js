@@ -95,7 +95,7 @@ function getValidColumns(tableName, columns) {
     columns = columns.filter(e => /^\w+$/.test(e));
 
     let validColumns = {
-        variant: ['id', 'chromosome', 'position', 'snp', 'allele_reference', 'allele_alternate', 'allele_frequency', 'p_value', 'p_value_heterogenous', 'p_value_nlog', 'p_value_nlog_expected', 'beta', 'odds_ratio', 'ci_95_low', 'ci_95_high', 'n'],
+        variant: ['id', 'chromosome', 'position', 'snp', 'allele_effect', 'allele_non_effect', 'allele_effect_frequency', 'p_value', 'p_value_heterogenous', 'p_value_nlog', 'beta', 'odds_ratio', 'beta_ci_95_low', 'beta_ci_95_high', 'odds_ratio_ci_95_low', 'odds_ratio_ci_95_high', 'n'],
         point: ['id', 'phenotype_id', 'sex', 'chromosome', 'position', 'snp', 'p_value_nlog', 'p_value_nlog_expected'],
         aggregate: ['id', 'phenotype_id', 'sex', 'chromosome', 'position_abs', 'p_value_nlog'],
         phenotype: ['id', 'parent_id', 'name', 'age_name', 'display_name', 'description', 'color', 'type', 'participant_count', 'import_count', 'import_date'],
@@ -357,7 +357,7 @@ async function getVariants(connection, params) {
     }
 
     // optionally, determine counts through metadata if the counts query will take a long time
-    else if (params.metadataCount) {
+    else if (params.metadataCount || params.metadata_count) {
         results.count = metadata.reduce((a, b) => a + b.count, 0);
     }
 
@@ -384,7 +384,7 @@ async function exportVariants(connection, params) {
 
     const { data, columns } = await getVariants(connection, {
         ...params, 
-        columns: ['phenotype_id', 'ancestry', 'sex', 'chromosome', 'position', 'snp', 'allele_reference', 'allele_alternate', 'allele_frequency', 'p_value', 'p_value_heterogenous', 'beta', 'odds_ratio', 'ci_95_low', 'ci_95_high', 'n'],
+        columns: ['phenotype_id', 'ancestry', 'sex', 'chromosome', 'position', 'snp', 'allele_effect', 'allele_non_effect', 'allele_effect_frequency', 'p_value', 'p_value_heterogenous', 'beta', 'odds_ratio', 'beta_ci_95_high', 'beta_ci_95_low', 'odds_ratio_ci_95_high', 'odds_ratio_ci_95_low', 'n'],
         raw: true,
         limit: Math.min(params.limit, rowLimit),
         offset: 0,
