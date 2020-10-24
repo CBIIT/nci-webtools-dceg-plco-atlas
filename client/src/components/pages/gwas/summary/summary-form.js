@@ -248,13 +248,9 @@ export function SummaryResultsForm({
 
       {messages &&
         messages.map(({ type, content }) => (
-          <Alert
-            className="mt-3"
-            variant={type}
-            onClose={clearMessages}
-            dismissible>
+          <div className={`small my-3 text-${type}`}>
             {content}
-          </Alert>
+          </div>
         ))}
       <div>
         <Button type="submit" variant="silver" onClick={handleSubmit}>

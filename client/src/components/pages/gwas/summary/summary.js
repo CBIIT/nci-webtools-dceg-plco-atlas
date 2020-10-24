@@ -85,14 +85,8 @@ export function SummaryResults() {
 
   const handleSubmit = ({ phenotypes, stratifications, isPairwise }) => {
     clearMessages();
-    if (!phenotypes.length || !stratifications.length) {
-      let content = '';
-      if (!phenotypes.length) content += 'Please select a phenotype. ';
-      if (!stratifications.length && !isPairwise)
-        content += 'One ancestry/sex variable must be selected. ';
-      else if (stratifications.length != 2 && isPairwise)
-        content += 'Both ancestry/sex variables must be selected. ';
-      return setMessages([{ type: 'danger', content }]);
+    if (!phenotypes.length || !stratifications.length || (isPairwise && stratifications.length != 2)) {
+      return setMessages([{ type: 'danger', content: 'Please select phenotype(s) and corresponding stratification(s)' }]);
     }
 
     const initialState = getInitialState();
