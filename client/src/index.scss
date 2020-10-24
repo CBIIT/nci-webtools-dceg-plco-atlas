@@ -48,12 +48,14 @@ select {
   text-overflow: ellipsis;
 }
 
-option, optgroup {
+option,
+optgroup {
   color: black;
   background-color: white;
 }
 
-a:hover, a:focus {
+a:hover,
+a:focus {
   text-decoration: underline;
 }
 
@@ -63,11 +65,13 @@ a[disabled] {
   cursor: not-allowed;
 }
 
-[role="button"], input[type="checkbox"] {
+[role='button'],
+input[type='checkbox'] {
   cursor: pointer;
 }
 
-[role="button"][disabled], input[type="checkbox"][disabled] {
+[role='button'][disabled],
+input[type='checkbox'][disabled] {
   cursor: not-allowed;
 }
 
@@ -113,7 +117,8 @@ a[disabled] {
   color: #fff;
   background: #007bff linear-gradient(180deg, #268fff, #007bff) repeat-x !important;
   border-color: #007bff;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15), 0 1px 1px rgba(0, 0, 0, 0.075);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15),
+    0 1px 1px rgba(0, 0, 0, 0.075);
 }
 
 .btn-silver {
@@ -156,7 +161,7 @@ a[disabled] {
 .btn.btn-link:active,
 .btn.btn-link:not(:disabled):not(.disabled):active {
   border: none;
-  box-shadow: none;  
+  box-shadow: none;
 }
 
 .text-orange {
@@ -220,7 +225,7 @@ a[disabled] {
 }
 
 .nav-tabs .nav-link.active:after {
-  content: "";
+  content: '';
   display: block;
   padding-top: 2px;
   width: 100%;
@@ -344,7 +349,7 @@ select.form-control-sm {
   border-radius: 0.25rem;
   padding: 0.5rem 1rem;
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-  opacity: 0.9,
+  opacity: 0.9;
 }
 
 .hovertext {

@@ -4,12 +4,7 @@ import { Button, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import { TreeSelect } from '../../controls/tree-select/tree-select';
 import { updateBrowsePhenotypes } from '../../../services/actions';
 
-
-export function PhenotypesForm({
-  onSubmit,
-  onChange,
-  onReset,
-}) {
+export function PhenotypesForm({ onSubmit, onChange, onReset }) {
   const dispatch = useDispatch();
 
   // private members prefixed with _
@@ -23,13 +18,13 @@ export function PhenotypesForm({
 
   // select store members
   const phenotypes = useSelector(state => state.phenotypes);
-  const { 
+  const {
     submitted,
-    disableSubmit, 
+    disableSubmit,
     loading,
     displayTreeParent,
     selectedPhenotype
-  }  = useSelector(state => state.browsePhenotypes);
+  } = useSelector(state => state.browsePhenotypes);
 
   useEffect(() => {
     if (!displayTreeParent) return;
@@ -46,7 +41,7 @@ export function PhenotypesForm({
           value={selectedPhenotype}
           // onChange={val => _setPhenotype((val && val.length) ? val[0] : null)}
           onChange={val => {
-            onChange((val && val.length) ? val[0] : null);
+            onChange(val && val.length ? val[0] : null);
             dispatch(updateBrowsePhenotypes({ disableSubmit: false }));
           }}
           singleSelect
@@ -59,11 +54,14 @@ export function PhenotypesForm({
         <OverlayTrigger
           overlay={
             <Tooltip
-              style={{display: selectedPhenotype ? 'none' : 'block'}}
+              style={{ display: selectedPhenotype ? 'none' : 'block' }}
               id="submit-summary-results">
               Please select a phenotype.
-          </Tooltip>}>
-          <span className={`d-inline-block ${!selectedPhenotype && 'c-not-allowed'}`}>
+            </Tooltip>
+          }>
+          <span
+            className={`d-inline-block ${!selectedPhenotype &&
+              'c-not-allowed'}`}>
             <Button
               type="submit"
               variant="silver"

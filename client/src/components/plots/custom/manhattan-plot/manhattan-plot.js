@@ -10,17 +10,27 @@ import {
   setStyles,
   viewportToLocalCoordinates,
   ensureNonStaticPositioning,
-  min, max,
+  min,
+  max,
   withSavedContext,
   addEventListener,
   removeEventListeners,
-  getElementOffset,
+  getElementOffset
 } from '../utils.js';
-import { measureWidth, renderText, scaleTextDefs, systemFont } from '../text.js';
+import {
+  measureWidth,
+  renderText,
+  scaleTextDefs,
+  systemFont
+} from '../text.js';
 import { getScale, getTicks } from './scale.js';
 import { axisLeft, axisBottom } from './axis.js';
 import { drawPoints } from './points.js';
-import { drawSelectionOverlay, drawZoomOverlay, drawPanOverlay } from './overlays.js';
+import {
+  drawSelectionOverlay,
+  drawZoomOverlay,
+  drawPanOverlay
+} from './overlays.js';
 import { createTooltip, showTooltip, hideTooltip } from './tooltip.js';
 
 export class ManhattanPlot {
@@ -32,7 +42,7 @@ export class ManhattanPlot {
       bottom: 40,
       left: 80
     },
-    backgroundColor: '#ffffff',
+    backgroundColor: '#ffffff'
   };
 
   constructor(container, config) {
@@ -45,9 +55,9 @@ export class ManhattanPlot {
     // create a canvas to be used for drawing main plot elements
     [this.canvas, this.ctx] = getCanvasAndContext();
     this.canvas.listeners = [];
-    setStyles(this.canvas, { 
-      display: 'block', 
-      maxWidth: '100%' 
+    setStyles(this.canvas, {
+      display: 'block',
+      maxWidth: '100%'
     });
     this.container.appendChild(this.canvas);
 
@@ -120,9 +130,13 @@ export class ManhattanPlot {
     // draw plot and attach handlers for interactive events
     this.draw();
     this.attachEventHandlers(this.canvas);
-    addEventListener(window, 'resize', debounce(() => {
-      this.redraw();
-    }, 500))
+    addEventListener(
+      window,
+      'resize',
+      debounce(() => {
+        this.redraw();
+      }, 500)
+    );
   }
 
   draw() {
@@ -138,13 +152,9 @@ export class ManhattanPlot {
       container: { clientHeight: canvasHeight }
     } = this;
     const { data, data2, mirrored } = config;
-    canvasHeight = config.export ? max([
-      canvasHeight,
-      this.defaultConfig.manhattanPlotMaxHeight
-    ]) : min([
-      canvasHeight,
-      this.defaultConfig.manhattanPlotMaxHeight
-    ]);
+    canvasHeight = config.export
+      ? max([canvasHeight, this.defaultConfig.manhattanPlotMaxHeight])
+      : min([canvasHeight, this.defaultConfig.manhattanPlotMaxHeight]);
 
     // determine default top, right, bottom, and left margins
     const margins = (config.margins = {
@@ -184,9 +194,19 @@ export class ManhattanPlot {
       yData = data.map(d => d[config.yAxis.key]);
       let isDefined = el => el !== null && el !== undefined;
 
-      if (!config.xAxis.extent || config.xAxis.extent.includes(null) || config.xAxis.extent.includes(undefined)) config.xAxis.extent = extent(xData);
+      if (
+        !config.xAxis.extent ||
+        config.xAxis.extent.includes(null) ||
+        config.xAxis.extent.includes(undefined)
+      )
+        config.xAxis.extent = extent(xData);
 
-      if (!config.yAxis.extent || config.yAxis.extent.includes(null) || config.yAxis.extent.includes(undefined)) config.yAxis.extent = extent(yData);
+      if (
+        !config.yAxis.extent ||
+        config.yAxis.extent.includes(null) ||
+        config.yAxis.extent.includes(undefined)
+      )
+        config.yAxis.extent = extent(yData);
     }
 
     if (data2) {
@@ -265,11 +285,11 @@ export class ManhattanPlot {
       );
     }
 
-//    ctx.clearRect(0, 0, width, height);
+    //    ctx.clearRect(0, 0, width, height);
     withSavedContext(ctx, ctx => {
       ctx.fillStyle = this.defaultConfig.backgroundColor;
       ctx.fillRect(0, 0, width, height);
-    })
+    });
 
     this.setTitle(config.title);
     drawPoints(config, ctx, hiddenCtx);
@@ -292,7 +312,7 @@ export class ManhattanPlot {
       withSavedContext(this.ctx, ctx => {
         ctx.fillStyle = this.defaultConfig.backgroundColor;
         ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-      })
+      });
 
       this.draw();
       removeEventListeners(this.canvas);
@@ -301,8 +321,6 @@ export class ManhattanPlot {
       this.drawGenes();
     }
   }
-
-
 
   setTitle(title) {
     if (!title) return;
@@ -313,17 +331,17 @@ export class ManhattanPlot {
     let ctx = this.ctx;
     config.title = title;
 
-    title = scaleTextDefs(title, config.scaleSize || 1,  {
+    title = scaleTextDefs(title, config.scaleSize || 1, {
       textAlign: 'center',
       textBaseline: 'top',
       fillStyle: 'black'
     });
 
-//    ctx.clearRect(0, 0, this.canvas.width, margins.top);
+    //    ctx.clearRect(0, 0, this.canvas.width, margins.top);
     withSavedContext(ctx, ctx => {
       ctx.fillStyle = this.defaultConfig.backgroundColor;
       ctx.fillRect(margins.left, 0, this.canvas.width, margins.top);
-    })
+    });
 
     let midpoint = margins.left + width / 2;
     ctx.save();
@@ -354,7 +372,7 @@ export class ManhattanPlot {
       ...config.margins,
       left: config.margins.left * config.scaleSize,
       top: config.margins.top * config.scaleSize,
-      bottom: config.margins.bottom * config.scaleSize,
+      bottom: config.margins.bottom * config.scaleSize
     };
 
     setStyles(container, {
@@ -364,7 +382,7 @@ export class ManhattanPlot {
       left: 0,
       bottom: 0,
       cursorEvents: 'none',
-      visibility: 'hidden',
+      visibility: 'hidden'
     });
     window.document.body.appendChild(container);
 
@@ -381,11 +399,15 @@ export class ManhattanPlot {
     withSavedContext(exportCtx, ctx => {
       ctx.fillStyle = this.defaultConfig.backgroundColor;
       ctx.fillRect(0, 0, exportCanvas.width, exportCanvas.height);
-    })
+    });
 
     exportCtx.drawImage(plot.canvas, 0, 0);
     if (plot.geneCanvas.height) {
-      exportCtx.drawImage(plot.geneCanvas, config.margins.left, plot.canvas.height);
+      exportCtx.drawImage(
+        plot.geneCanvas,
+        config.margins.left,
+        plot.canvas.height
+      );
     }
 
     let canvasData = await canvasToBlob(exportCanvas, 'image/png');
@@ -395,15 +417,19 @@ export class ManhattanPlot {
   }
 
   drawGenes(genes) {
-    let { config, geneCanvas, geneCtx, geneOverlayCanvas, geneOverlayCtx } = this;
+    let {
+      config,
+      geneCanvas,
+      geneCtx,
+      geneOverlayCanvas,
+      geneOverlayCtx
+    } = this;
     let { margins, xAxis } = config;
     removeEventListeners(this.geneCanvas);
 
     if (genes) {
-      config.genes = genes
-    }
-
-    else if (config.genes) {
+      config.genes = genes;
+    } else if (config.genes) {
       genes = config.genes;
     }
 
@@ -421,14 +447,14 @@ export class ManhattanPlot {
       fillStyle: 'black'
     };
 
-    let rowHeight = (40 * (config.scaleSize || 1)) + labelHeight + labelPadding;
+    let rowHeight = 40 * (config.scaleSize || 1) + labelHeight + labelPadding;
 
     geneCtx.textAlign = 'center';
     geneCtx.textBaseline = 'top';
 
     setStyles(this.geneCanvasContainer, {
       left: margins.left + 'px',
-      maxHeight: ((rowHeight * 5) + 10) + 'px',
+      maxHeight: rowHeight * 5 + 10 + 'px',
       width: this.canvas.width - margins.left - margins.right + 'px',
       overflowX: 'hidden',
       overflowY: 'auto'
@@ -488,10 +514,11 @@ export class ManhattanPlot {
         [0, this.geneCanvas.width],
         [0, currentBounds.xMax - currentBounds.xMin]
       )
-    }
+    };
 
     geneCanvas.height = rowHeight * numRows;
-    geneCanvas.width = this.canvas.width - config.margins.left - config.margins.right;
+    geneCanvas.width =
+      this.canvas.width - config.margins.left - config.margins.right;
 
     geneOverlayCanvas.height = geneCanvas.height;
     geneOverlayCanvas.width = geneCanvas.width;
@@ -503,23 +530,32 @@ export class ManhattanPlot {
 
     const getGeneAtPosition = (x, y) => {
       return geneOverlayPositions.find(pos => {
-        return x > pos.x1 - padding && x < pos.x2 + padding
-          && y > pos.y1 - padding && y < pos.y2 + padding;
-      })
-    }
+        return (
+          x > pos.x1 - padding &&
+          x < pos.x2 + padding &&
+          y > pos.y1 - padding &&
+          y < pos.y2 + padding
+        );
+      });
+    };
 
-    addEventListener(geneCanvas, 'mousemove', async (ev) => {
+    addEventListener(geneCanvas, 'mousemove', async ev => {
       let { x, y } = viewportToLocalCoordinates(
         ev.clientX,
         ev.clientY,
         geneCanvas
       );
       let gene = getGeneAtPosition(x, y);
-      if (!pan.mouseDown && gene && gene != lastGene && config.geneTooltipContent) {
+      if (
+        !pan.mouseDown &&
+        gene &&
+        gene != lastGene &&
+        config.geneTooltipContent
+      ) {
         lastGene = gene;
         config.tooltipOpen = true;
         let row = Math.floor(y / rowHeight);
-        let showAbove = false;//row > 1 && row > packedGeneRanges.length - 3;
+        let showAbove = false; //row > 1 && row > packedGeneRanges.length - 3;
         // console.log('showAbove', showAbove);
         let yOffset = showAbove
           ? row * rowHeight + padding
@@ -528,10 +564,9 @@ export class ManhattanPlot {
         let canvasOffset = getElementOffset(geneCanvas);
 
         let content = await config.geneTooltipContent(gene.gene, this.tooltip);
-         ev.localX = canvasOffset.left + gene.gene.pxCenter;
-         ev.localY = canvasOffset.top + yOffset;// ev.clientY //yOffset;
-       //  ev.target = document.body;
-
+        ev.localX = canvasOffset.left + gene.gene.pxCenter;
+        ev.localY = canvasOffset.top + yOffset; // ev.clientY //yOffset;
+        //  ev.target = document.body;
 
         //  console.log(ev);
 
@@ -539,8 +574,8 @@ export class ManhattanPlot {
         showTooltip(this.geneTooltip, ev, content, {
           center: true,
           body: true,
-          constraints: {xMin: canvasOffset.left}}
-        );
+          constraints: { xMin: canvasOffset.left }
+        });
 
         /*
         showTooltip(this.geneTooltip, , content);
@@ -551,10 +586,10 @@ export class ManhattanPlot {
         hideTooltip(this.geneTooltip);
       }
 
-     // console.log('found gene', gene);
+      // console.log('found gene', gene);
     });
 
-    addEventListener(document.body, 'click', (ev) => {
+    addEventListener(document.body, 'click', ev => {
       lastGene = null;
       config.tooltipOpen = false;
       hideTooltip(this.geneTooltip);
@@ -602,7 +637,7 @@ export class ManhattanPlot {
           x1: Math.min(geneLabel.pxStart, start),
           x2: Math.max(geneLabel.pxEnd, start + width),
           y1: yOffset + exonOffsetY - labelHeight,
-          y2: yOffset + exonOffsetY + (30 * (config.scaleSize || 1)),
+          y2: yOffset + exonOffsetY + 30 * (config.scaleSize || 1),
           gene: gene
         });
 
@@ -618,7 +653,12 @@ export class ManhattanPlot {
           let start = config.xAxis.scale(exon[0]);
           let end = config.xAxis.scale(exon[1]);
           let width = Math.ceil(Math.abs(end - start));
-          geneCtx.fillRect(start, exonOffsetY, width, 30 * (config.scaleSize || 1));
+          geneCtx.fillRect(
+            start,
+            exonOffsetY,
+            width,
+            30 * (config.scaleSize || 1)
+          );
         });
       }
 
@@ -626,11 +666,11 @@ export class ManhattanPlot {
     });
 
     // add event handlers to pan graph
-    geneCanvas.style.cursor = 'move'
+    geneCanvas.style.cursor = 'move';
 
     addEventListener(geneCanvas, 'mousedown', ev => {
       pan.mouseDown = true;
-      pan.initialX = ev.clientX
+      pan.initialX = ev.clientX;
     });
 
     addEventListener(geneCanvas, 'mousemove', ev => {
@@ -638,10 +678,12 @@ export class ManhattanPlot {
       pan.currentX = ev.clientX;
       pan.deltaX = pan.currentX - pan.initialX;
       let deltaX = Math.abs(pan.scale(pan.deltaX) / 1e6).toPrecision(4);
-      let title = [{
-        text: `${pan.deltaX > 0 ? '+' : '-'} ${deltaX} MB`,
-        font: `24px ${systemFont}`
-      }];
+      let title = [
+        {
+          text: `${pan.deltaX > 0 ? '+' : '-'} ${deltaX} MB`,
+          font: `24px ${systemFont}`
+        }
+      ];
 
       this.geneOverlayCanvas.style.opacity = 0.5;
       this.geneOverlayCtx.fillStyle = 'white';
@@ -655,10 +697,7 @@ export class ManhattanPlot {
       this.geneOverlayCtx.save();
       this.geneOverlayCtx.translate(
         this.geneOverlayCanvas.width / 2,
-        Math.min(
-          this.geneOverlayCanvas.height,
-          (rowHeight * 5) + 10
-        ) / 2
+        Math.min(this.geneOverlayCanvas.height, rowHeight * 5 + 10) / 2
       );
       renderText(this.geneOverlayCtx, title, {
         textAlign: 'center',
@@ -675,9 +714,9 @@ export class ManhattanPlot {
       let bounds = {
         ...currentBounds,
         xMin: currentBounds.xMin + deltaX,
-        xMax: currentBounds.xMax + deltaX,
-      }
-      this.config.setZoomWindow({bounds});
+        xMax: currentBounds.xMax + deltaX
+      };
+      this.config.setZoomWindow({ bounds });
       if (this.config.onPan) {
         this.config.onPan(bounds);
       }
@@ -777,11 +816,7 @@ export class ManhattanPlot {
         }, config.point.tooltipDelay || 100)
       );
 
-      addEventListener(
-          canvas,
-          'mousedown',
-          () => hideTooltip(this.tooltip)
-      )
+      addEventListener(canvas, 'mousedown', () => hideTooltip(this.tooltip));
     }
 
     // call click event callbacks
@@ -835,8 +870,8 @@ export class ManhattanPlot {
           ? config.data2.map(d => d[config.yAxis.key])
           : [];
 
-        config.xAxis.extent =  extent(xData);
-        config.yAxis.extent =  extent(yData.concat(yData2));
+        config.xAxis.extent = extent(xData);
+        config.yAxis.extent = extent(yData.concat(yData2));
 
         config.yAxis.extent[1] *= 1.1;
 

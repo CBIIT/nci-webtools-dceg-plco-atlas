@@ -4,7 +4,6 @@ import { updatePhenotypeCorrelations } from '../../../../services/actions';
 import { Button } from 'react-bootstrap';
 import { ShareLink } from '../../../controls/share-link/share-link';
 
-
 export const PhenotypeCorrelationsSearchCriteria = () => {
   const dispatch = useDispatch();
 
@@ -32,7 +31,11 @@ export const PhenotypeCorrelationsSearchCriteria = () => {
   };
 
   const CollapseCaret = () => {
-    if (searchCriteriaPhenotypeCorrelations && !collapseCriteria && searchCriteriaPhenotypeCorrelations.phenotypes) {
+    if (
+      searchCriteriaPhenotypeCorrelations &&
+      !collapseCriteria &&
+      searchCriteriaPhenotypeCorrelations.phenotypes
+    ) {
       return <i className="fa fa-caret-down fa-lg"></i>;
     } else {
       return <i className="fa fa-caret-right fa-lg"></i>;
@@ -63,12 +66,12 @@ export const PhenotypeCorrelationsSearchCriteria = () => {
               <Button
                 className="p-0"
                 style={{
-                  color: 
-                    searchCriteriaPhenotypeCorrelations && 
-                    searchCriteriaPhenotypeCorrelations.phenotypes && 
+                  color:
+                    searchCriteriaPhenotypeCorrelations &&
+                    searchCriteriaPhenotypeCorrelations.phenotypes &&
                     searchCriteriaPhenotypeCorrelations.phenotypes.length > 1
-                    ? 'rgb(0, 126, 167)'
-                    : ''
+                      ? 'rgb(0, 126, 167)'
+                      : ''
                 }}
                 title="Expand/collapse search criteria panel"
                 variant="link"
@@ -76,8 +79,9 @@ export const PhenotypeCorrelationsSearchCriteria = () => {
                 aria-controls="search-criteria-collapse-panel"
                 aria-expanded={!collapseCriteria}
                 disabled={
-                  !searchCriteriaPhenotypeCorrelations || 
-                  (searchCriteriaPhenotypeCorrelations && searchCriteriaPhenotypeCorrelations.phenotypes.length < 2)
+                  !searchCriteriaPhenotypeCorrelations ||
+                  (searchCriteriaPhenotypeCorrelations &&
+                    searchCriteriaPhenotypeCorrelations.phenotypes.length < 2)
                 }>
                 <CollapseCaret />
               </Button>
@@ -88,7 +92,8 @@ export const PhenotypeCorrelationsSearchCriteria = () => {
                 <>
                   <span>
                     {searchCriteriaPhenotypeCorrelations &&
-                    searchCriteriaPhenotypeCorrelations.phenotypes && searchCriteriaPhenotypeCorrelations.phenotypes.length >= 1
+                    searchCriteriaPhenotypeCorrelations.phenotypes &&
+                    searchCriteriaPhenotypeCorrelations.phenotypes.length >= 1
                       ? searchCriteriaPhenotypeCorrelations.phenotypes[0]
                       : 'None'}
                   </span>
@@ -97,7 +102,7 @@ export const PhenotypeCorrelationsSearchCriteria = () => {
                     searchCriteriaPhenotypeCorrelations.phenotypes &&
                     searchCriteriaPhenotypeCorrelations.phenotypes.length >
                       1 ? (
-                      <span>{' '}and</span>
+                      <span> and</span>
                     ) : (
                       <></>
                     )}
@@ -137,32 +142,39 @@ export const PhenotypeCorrelationsSearchCriteria = () => {
               {!collapseCriteria &&
                 searchCriteriaPhenotypeCorrelations &&
                 searchCriteriaPhenotypeCorrelations.phenotypes &&
-                searchCriteriaPhenotypeCorrelations.phenotypes.map(phenotype => (
-                  <div title={phenotype}>
-                    {phenotype.length < 50 ? phenotype : phenotype.substring(0, 47) + "..." }
-                  </div>
-              ))}
+                searchCriteriaPhenotypeCorrelations.phenotypes.map(
+                  phenotype => (
+                    <div title={phenotype}>
+                      {phenotype.length < 50
+                        ? phenotype
+                        : phenotype.substring(0, 47) + '...'}
+                    </div>
+                  )
+                )}
             </span>
 
-            <span className="border-left border-secondary mx-3" style={{maxHeight: '1.6em'}}></span>
-            
+            <span
+              className="border-left border-secondary mx-3"
+              style={{ maxHeight: '1.6em' }}></span>
+
             <span>
               <b>Sex</b>:{' '}
               {searchCriteriaPhenotypeCorrelations &&
               searchCriteriaPhenotypeCorrelations.sex
                 ? displaySex(searchCriteriaPhenotypeCorrelations.sex)
-                : 'None'
-              }
+                : 'None'}
             </span>
 
-            <span className="border-left border-secondary mx-3" style={{maxHeight: '1.6em'}}></span>
-            
+            <span
+              className="border-left border-secondary mx-3"
+              style={{ maxHeight: '1.6em' }}></span>
+
             <span>
               <b>Ancestry</b>:{' '}
-              {searchCriteriaPhenotypeCorrelations && searchCriteriaPhenotypeCorrelations.ancestry
+              {searchCriteriaPhenotypeCorrelations &&
+              searchCriteriaPhenotypeCorrelations.ancestry
                 ? displayAncestry(searchCriteriaPhenotypeCorrelations.ancestry)
-                : 'None'
-              }
+                : 'None'}
             </span>
           </div>
 
@@ -170,17 +182,18 @@ export const PhenotypeCorrelationsSearchCriteria = () => {
             <span className="py-1">
               <b>Total Phenotypes:</b>{' '}
               {searchCriteriaPhenotypeCorrelations &&
-                searchCriteriaPhenotypeCorrelations.totalPhenotypes
-                  ? searchCriteriaPhenotypeCorrelations.totalPhenotypes
-                  : 'None'
-              }
+              searchCriteriaPhenotypeCorrelations.totalPhenotypes
+                ? searchCriteriaPhenotypeCorrelations.totalPhenotypes
+                : 'None'}
             </span>
-            
-            <span className="ml-3" style={{maxHeight: '1.6em'}}></span>
-            
+
+            <span className="ml-3" style={{ maxHeight: '1.6em' }}></span>
+
             <div className="d-inline">
-              <ShareLink 
-                disabled={!searchCriteriaPhenotypeCorrelations || !disableSubmit}
+              <ShareLink
+                disabled={
+                  !searchCriteriaPhenotypeCorrelations || !disableSubmit
+                }
                 shareID={shareID}
                 params={phenotypeCorrelations}
               />

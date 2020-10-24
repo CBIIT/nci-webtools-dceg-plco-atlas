@@ -10,7 +10,7 @@ import { SummaryResultsSearchCriteria } from './summary-search-criteria';
 import {
   SidebarContainer,
   SidebarPanel,
-  MainPanel,
+  MainPanel
 } from '../../../controls/sidebar-container/sidebar-container';
 import {
   updateSummaryResults,
@@ -24,13 +24,12 @@ import {
   updateSummaryTable,
   updateKey,
   updateSummarySnpTable,
-  updateSummaryTableByIndex, 
+  updateSummaryTableByIndex,
   updateSummarySnpTableByIndex
 } from '../../../../services/actions';
 import { getInitialState } from '../../../../services/store';
 import { query } from '../../../../services/query';
-import './summary.scss'
-
+import './summary.scss';
 
 export function SummaryResults() {
   const dispatch = useDispatch();
@@ -43,9 +42,11 @@ export function SummaryResults() {
     selectedPlot,
     submitted,
     messages,
-    sharedState,
+    sharedState
   } = useSelector(state => state.summaryResults);
-  const loadingManhattanPlot = useSelector(state => state.manhattanPlot.loadingManhattanPlot);
+  const loadingManhattanPlot = useSelector(
+    state => state.manhattanPlot.loadingManhattanPlot
+  );
   const selectedTable = useSelector(state => state.summaryTables.selectedTable);
   const qqplotData = useSelector(state => state.qqPlot.qqplotData);
   const [openSidebar, setOpenSidebar] = useState(true);
@@ -54,7 +55,13 @@ export function SummaryResults() {
   const setSelectedPlot = selectedPlot => {
     dispatch(updateSummaryResults({ selectedPlot }));
     if (submitted && selectedPlot === 'qq-plot' && qqplotData.length === 0) {
-      dispatch(drawQQPlot({phenotypes: selectedPhenotypes, stratifications: selectedStratifications, isPairwise}));
+      dispatch(
+        drawQQPlot({
+          phenotypes: selectedPhenotypes,
+          stratifications: selectedStratifications,
+          isPairwise
+        })
+      );
     }
   };
 
@@ -76,28 +83,32 @@ export function SummaryResults() {
   //   clearMessages();
   // };
 
-  const handleSubmit = ({phenotypes, stratifications, isPairwise}) => {
+  const handleSubmit = ({ phenotypes, stratifications, isPairwise }) => {
     clearMessages();
     if (!phenotypes.length || !stratifications.length) {
       let content = '';
-      if (!phenotypes.length)
-        content += 'Please select a phenotype. ';
+      if (!phenotypes.length) content += 'Please select a phenotype. ';
       if (!stratifications.length && !isPairwise)
         content += 'One ancestry/sex variable must be selected. ';
       else if (stratifications.length != 2 && isPairwise)
         content += 'Both ancestry/sex variables must be selected. ';
-      return setMessages([{type: 'danger', content}]);
+      return setMessages([{ type: 'danger', content }]);
     }
 
     const initialState = getInitialState();
-    for (let key of ['manhattanPlot', 'qqPlot', 'summaryTables', 'summarySnpTables'])
+    for (let key of [
+      'manhattanPlot',
+      'qqPlot',
+      'summaryTables',
+      'summarySnpTables'
+    ])
       dispatch(updateKey(key, initialState[key]));
 
-    if (selectedPlot === 'qq-plot'){
-      dispatch(drawQQPlot({phenotypes, stratifications, isPairwise}));
+    if (selectedPlot === 'qq-plot') {
+      dispatch(drawQQPlot({ phenotypes, stratifications, isPairwise }));
     }
 
-    drawSummaryManhattanPlot({phenotypes, stratifications, isPairwise});
+    drawSummaryManhattanPlot({ phenotypes, stratifications, isPairwise });
 
     // update summary results filters
     dispatch(
@@ -111,62 +122,83 @@ export function SummaryResults() {
         nlogpMax: null,
         bpMin: null,
         bpMax: null,
-        submitted: new Date().getTime(),
+        submitted: new Date().getTime()
       })
     );
   };
 
-  const drawSummaryManhattanPlot = ({phenotypes, stratifications, isPairwise}) => {
+  const drawSummaryManhattanPlot = ({
+    phenotypes,
+    stratifications,
+    isPairwise
+  }) => {
     // draw summary plot using aggregate data
     dispatch(
       drawManhattanPlot('summary', {
         phenotypes,
         stratifications,
         isPairwise,
-        p_value_nlog_min: 2,
+        p_value_nlog_min: 2
       })
     );
 
     // fetch both summary results tables
-    stratifications.filter(s => s.sex && s.ancestry).forEach((stratification, i) => {
-      const {sex, ancestry} = stratification;
-      const phenotype = phenotypes[i] || phenotypes[0];
-      dispatch(
-        fetchSummaryTable(i, {
-          phenotype_id: phenotype.id,
-          sex,
-          ancestry,
-          offset: 0,
-          limit: 10,
-          orderBy: 'p_value',
-          order: 'asc',
-          metadataCount: true,
-        })
-      );
-    });
-  }
+    stratifications
+      .filter(s => s.sex && s.ancestry)
+      .forEach((stratification, i) => {
+        const { sex, ancestry } = stratification;
+        const phenotype = phenotypes[i] || phenotypes[0];
+        dispatch(
+          fetchSummaryTable(i, {
+            phenotype_id: phenotype.id,
+            sex,
+            ancestry,
+            offset: 0,
+            limit: 10,
+            orderBy: 'p_value',
+            order: 'asc',
+            metadataCount: true
+          })
+        );
+      });
+  };
 
-  const updateVariants = ({phenotypes, stratifications, chromosome, bounds, selectedTable, isPairwise, count, metadataCount, updatePlot}) => {
+  const updateVariants = ({
+    phenotypes,
+    stratifications,
+    chromosome,
+    bounds,
+    selectedTable,
+    isPairwise,
+    count,
+    metadataCount,
+    updatePlot
+  }) => {
     let queryBounds = {
       p_value_nlog_min: 2,
-      p_value_nlog_max: null,
+      p_value_nlog_max: null
     };
 
     // determine if we should zoom in to a specific region
     const isInvalidBound = n => n === null || n === undefined || isNaN(n);
-    if (!bounds || [bounds.bpMin, bounds.bpMax, bounds.nlogpMin, bounds.nlogpMax].some(isInvalidBound)) {
+    if (
+      !bounds ||
+      [bounds.bpMin, bounds.bpMax, bounds.nlogpMin, bounds.nlogpMax].some(
+        isInvalidBound
+      )
+    ) {
       bounds = {
-          bpMin: null,
-          bpMax: null,
-          nlogpMin: null,
-          nlogpMax: null,
+        bpMin: null,
+        bpMax: null,
+        nlogpMin: null,
+        nlogpMax: null
       };
     } else {
       queryBounds = {
         position_min: bounds.bpMin,
         position_max: bounds.bpMax,
         p_value_nlog_min: bounds.nlogpMin,
-        p_value_nlog_max: bounds.nlogpMax,
+        p_value_nlog_max: bounds.nlogpMax
       };
     }
 
@@ -177,7 +209,7 @@ export function SummaryResults() {
         selectedPhenotypes: phenotypes,
         selectedStratifications: stratifications,
         selectedChromosome: chromosome,
-        ...bounds,
+        ...bounds
       })
     );
 
@@ -190,57 +222,76 @@ export function SummaryResults() {
           stratifications,
           chromosome,
           isPairwise,
-          ...queryBounds,
+          ...queryBounds
         })
       );
     }
 
     // fetch both summary results tables
     clearSummaryTables();
-    selectedStratifications.filter(s => s.sex && s.ancestry).forEach((stratification, i) => {
-      const {sex, ancestry} = stratification;
-      const phenotype = selectedPhenotypes[i] || selectedPhenotypes[0];
-      dispatch(
-        fetchSummaryTable(i, {
-          phenotype_id: phenotype.id,
-          sex,
-          ancestry,
-          chromosome,
-          offset: 0,
-          limit: 10,
-          orderBy: 'p_value',
-          order: 'asc',
-          count,
-          metadataCount,
-          ...queryBounds,
-        })
-      );
-    });
-  }
+    selectedStratifications
+      .filter(s => s.sex && s.ancestry)
+      .forEach((stratification, i) => {
+        const { sex, ancestry } = stratification;
+        const phenotype = selectedPhenotypes[i] || selectedPhenotypes[0];
+        dispatch(
+          fetchSummaryTable(i, {
+            phenotype_id: phenotype.id,
+            sex,
+            ancestry,
+            chromosome,
+            offset: 0,
+            limit: 10,
+            orderBy: 'p_value',
+            order: 'asc',
+            count,
+            metadataCount,
+            ...queryBounds
+          })
+        );
+      });
+  };
 
   const clearSummaryTables = () => {
     const initialState = getInitialState();
     for (let key of [0, 1]) {
-      dispatch(updateSummaryTableByIndex(key, initialState.summaryTables.tables[key]));
-      dispatch(updateSummarySnpTableByIndex(key, initialState.summarySnpTables.tables[key]));
+      dispatch(
+        updateSummaryTableByIndex(key, initialState.summaryTables.tables[key])
+      );
+      dispatch(
+        updateSummarySnpTableByIndex(
+          key,
+          initialState.summarySnpTables.tables[key]
+        )
+      );
     }
-  }
+  };
 
   const handleReset = async () => {
     const initialState = getInitialState();
-    for (let key of ['summaryResults', 'manhattanPlot', 'qqPlot', 'summaryTables', 'summarySnpTables'])
+    for (let key of [
+      'summaryResults',
+      'manhattanPlot',
+      'qqPlot',
+      'summaryTables',
+      'summarySnpTables'
+    ])
       dispatch(updateKey(key, initialState[key]));
-    const ranges = await query('ranges')
-      dispatch(updateSummaryResults({ranges}));
+    const ranges = await query('ranges');
+    dispatch(updateSummaryResults({ ranges }));
   };
 
   // resubmit summary results
   const onAllChromosomeSelected = () => {
     const initialState = getInitialState();
     dispatch(updateManhattanPlot(initialState.manhattanPlot));
-    
+
     clearSummaryTables();
-    drawSummaryManhattanPlot({phenotypes: selectedPhenotypes, stratifications: selectedStratifications, isPairwise});
+    drawSummaryManhattanPlot({
+      phenotypes: selectedPhenotypes,
+      stratifications: selectedStratifications,
+      isPairwise
+    });
 
     dispatch(
       updateSummaryResults({
@@ -249,7 +300,7 @@ export function SummaryResults() {
         nlogpMin: null,
         nlogpMax: null,
         bpMin: null,
-        bpMax: null,
+        bpMax: null
       })
     );
   };
@@ -262,7 +313,7 @@ export function SummaryResults() {
       chromosome,
       metadataCount: true,
       updatePlot: true,
-      isPairwise,
+      isPairwise
     });
   };
 
@@ -280,11 +331,11 @@ export function SummaryResults() {
       },
       count: true,
       updatePlot: false,
-      isPairwise,
+      isPairwise
     });
   };
 
-  const handleVariantLookup = ({snp, sex, ancestry}) => {
+  const handleVariantLookup = ({ snp, sex, ancestry }) => {
     dispatch(
       updateVariantLookup({
         selectedPhenotypes,
@@ -302,17 +353,19 @@ export function SummaryResults() {
       })
     );
 
-    dispatch(lookupVariants({
-      phenotypes: selectedPhenotypes, 
-      variant: snp, 
-      sex,
-      ancestry
-    }));
+    dispatch(
+      lookupVariants({
+        phenotypes: selectedPhenotypes,
+        variant: snp,
+        sex,
+        ancestry
+      })
+    );
   };
 
   const loadState = state => {
     if (!state || !Object.keys(state).length) return;
-    dispatch(updateSummaryResults({...state, submitted: new Date()}));
+    dispatch(updateSummaryResults({ ...state, submitted: new Date() }));
     const {
       selectedPhenotypes,
       selectedStratifications,
@@ -322,40 +375,52 @@ export function SummaryResults() {
       bpMax,
       bpMin,
       nlogpMax,
-      nlogpMin,
+      nlogpMin
     } = state;
 
     if (manhattanPlotView === 'summary') {
-      handleSubmit({phenotypes: selectedPhenotypes, stratifications: selectedStratifications})
+      handleSubmit({
+        phenotypes: selectedPhenotypes,
+        stratifications: selectedStratifications
+      });
     } else {
       if (selectedPlot === 'qq-plot') {
-        dispatch(drawQQPlot({phenotypes: selectedPhenotypes, stratifications: selectedStratifications, isPairwise}));
+        dispatch(
+          drawQQPlot({
+            phenotypes: selectedPhenotypes,
+            stratifications: selectedStratifications,
+            isPairwise
+          })
+        );
       }
 
       setTimeout(() => {
         const isZoomed = bpMax && bpMax && nlogpMin && nlogpMax;
         updateVariants({
-          phenotype: selectedPhenotypes, 
+          phenotype: selectedPhenotypes,
           stratifications: selectedStratifications,
           chromosome: selectedChromosome,
           bounds: {
             bpMax,
             bpMin,
             nlogpMax,
-            nlogpMin,          
+            nlogpMin
           },
           updatePlot: true,
           metadataCount: !isZoomed,
-          count: isZoomed,
-        })
+          count: isZoomed
+        });
       }, 100);
-
     }
-  }
+  };
 
   useEffect(() => {
-    if (sharedState && sharedState.parameters && sharedState.parameters.params) {
-      loadState(sharedState.parameters.params)
+    if (
+      sharedState &&
+      sharedState.parameters &&
+      sharedState.parameters.params
+    ) {
+      loadState(sharedState.parameters.params);
     }
   }, [sharedState]);
 
@@ -401,7 +466,7 @@ export function SummaryResults() {
               className="p-2 bg-white tab-pane-bordered rounded-0"
               style={{ minHeight: '365px' }}>
               <div style={{ display: submitted ? 'block' : 'none' }}>
-                <div style={{minHeight: '635px'}}>
+                <div style={{ minHeight: '635px' }}>
                   <ManhattanPlot
                     onChromosomeSelected={onChromosomeSelected}
                     onAllChromosomeSelected={onAllChromosomeSelected}
@@ -421,9 +486,9 @@ export function SummaryResults() {
               eventKey="qq-plot"
               title="Q-Q Plot"
               className={
-                selectedPlot === 'qq-plot' ?
-                "p-2 bg-white tab-pane-bordered rounded-0 d-flex justify-content-center align-items-center" :
-                "p-2 bg-white tab-pane-bordered rounded-0"
+                selectedPlot === 'qq-plot'
+                  ? 'p-2 bg-white tab-pane-bordered rounded-0 d-flex justify-content-center align-items-center'
+                  : 'p-2 bg-white tab-pane-bordered rounded-0'
               }
               style={{ minHeight: '365px' }}>
               <div

@@ -12,7 +12,10 @@ export function axisLeft(config, ctx) {
   if (config.yAxis2) yScale2 = config.yAxis2.scale;
 
   let axisWidth = config.xAxis.width || 1;
-  let title = scaleTextDefs(config.yAxis.title || 'Y Axis', config.scaleSize || 1);
+  let title = scaleTextDefs(
+    config.yAxis.title || 'Y Axis',
+    config.scaleSize || 1
+  );
   let ticks = config.yAxis.ticks;
   let interpolatedTicks = interpolateTicks(ticks);
   let labelsBetweenTicks = config.yAxis.labelsBetweenTicks;
@@ -51,11 +54,11 @@ export function axisLeft(config, ctx) {
 
     label = scaleTextDefs(label, config.scaleSize || 1, {
       textAlign: 'right',
-      textBaseline: 'middle',
+      textBaseline: 'middle'
     });
 
     ctx.save();
-    ctx.translate(-tickLength - 2, labelOffset + 1)
+    ctx.translate(-tickLength - 2, labelOffset + 1);
     renderText(ctx, label);
     ctx.restore();
 
@@ -89,11 +92,11 @@ export function axisLeft(config, ctx) {
 
       label = scaleTextDefs(label, config.scaleSize || 1, {
         textAlign: 'right',
-        textBaseline: 'middle',
+        textBaseline: 'middle'
       });
 
       ctx.save();
-      ctx.translate(-tickLength - 2, labelOffset + 1)
+      ctx.translate(-tickLength - 2, labelOffset + 1);
       renderText(ctx, label);
       ctx.restore();
 
@@ -113,7 +116,7 @@ export function axisLeft(config, ctx) {
       ctx.rotate(Math.PI / -2);
       ctx.translate(
         midpoint - titleWidth / 2,
-        -(tickLength + labelPadding + maxLabelWidth) 
+        -(tickLength + labelPadding + maxLabelWidth)
       );
       ctx.textAlign = 'center';
       renderText(ctx, title);
@@ -121,16 +124,20 @@ export function axisLeft(config, ctx) {
     }
 
     if (config.yAxis.secondaryTitle) {
-      let secondaryTitle = scaleTextDefs(config.yAxis.secondaryTitle, config.scaleSize || 1, {
-        textAlign: 'center'
-      });
+      let secondaryTitle = scaleTextDefs(
+        config.yAxis.secondaryTitle,
+        config.scaleSize || 1,
+        {
+          textAlign: 'center'
+        }
+      );
       ctx.save();
       let titleWidth = measureWidth(ctx, title);
       let midpoint = (yScale(yMax) - yScale(yMin)) / 2;
       ctx.rotate(Math.PI / -2);
       ctx.translate(
         midpoint - titleWidth / 2,
-        -(tickLength + labelPadding + maxLabelWidth) 
+        -(tickLength + labelPadding + maxLabelWidth)
       );
       ctx.textAlign = 'center';
       renderText(ctx, secondaryTitle);
@@ -138,9 +145,13 @@ export function axisLeft(config, ctx) {
     }
 
     if (config.yAxis2.secondaryTitle) {
-      let secondaryTitle = scaleTextDefs(config.yAxis2.secondaryTitle, config.scaleSize || 1, {
-        textAlign: 'center'
-      });
+      let secondaryTitle = scaleTextDefs(
+        config.yAxis2.secondaryTitle,
+        config.scaleSize || 1,
+        {
+          textAlign: 'center'
+        }
+      );
       ctx.save();
       ctx.translate(0, yScale2(yMin));
       let titleWidth = measureWidth(ctx, title);
@@ -148,7 +159,7 @@ export function axisLeft(config, ctx) {
       ctx.rotate(Math.PI / -2);
       ctx.translate(
         midpoint - titleWidth / 2,
-        -(tickLength + labelPadding + maxLabelWidth) 
+        -(tickLength + labelPadding + maxLabelWidth)
       );
       ctx.textAlign = 'center';
       renderText(ctx, secondaryTitle);
@@ -186,7 +197,7 @@ export function axisBottom(config, ctx) {
     yScale = config.yAxis2.scale;
   }
 
-  let axisWidth = (config.yAxis.width || 1) *  Math.ceil(config.scaleSize || 1);
+  let axisWidth = (config.yAxis.width || 1) * Math.ceil(config.scaleSize || 1);
   let title = config.xAxis.title;
   let ticks = config.xAxis.ticks;
   let interpolatedTicks = interpolateTicks(ticks);
@@ -227,14 +238,13 @@ export function axisBottom(config, ctx) {
     let showLabel = !isNaN(label) || typeof label === 'string';
 
     label = scaleTextDefs(label, config.scaleSize || 1, {
-      textAlign: 'center',
+      textAlign: 'center'
     });
 
     ctx.save();
     ctx.translate(labelOffset, tickLength + tickPadding);
     showLabel && renderText(ctx, label);
     ctx.restore();
-
 
     // ctx.fillText(label, labelOffset, tickLength + tickPadding);
   }

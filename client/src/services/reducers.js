@@ -16,7 +16,7 @@ import {
   UPDATE_BROWSE_PHENOTYPES_PLOTS,
   UPDATE_HEATMAP,
   UPDATE_DOWNLOADS,
-  UPDATE_ERROR,
+  UPDATE_ERROR
 } from './actions';
 
 export const rootReducer = (state, action) => {
@@ -25,7 +25,7 @@ export const rootReducer = (state, action) => {
       return {
         ...state,
         [action.key]: action.data
-      }
+      };
     case UPDATE_SUMMARY_RESULTS:
       return {
         ...state,
@@ -39,19 +39,19 @@ export const rootReducer = (state, action) => {
         ...state,
         manhattanPlot: {
           ...state.manhattanPlot,
-          ...action.data,
+          ...action.data
         }
-      }
+      };
     case UPDATE_QQ_PLOT:
       return {
         ...state,
         qqPlot: {
           ...state.qqPlot,
-          ...action.data,
+          ...action.data
         }
-      }
+      };
     case UPDATE_SUMMARY_TABLE:
-      let obj = {[action.key]: action.data}
+      let obj = { [action.key]: action.data };
       let summaryTables = {
         ...state.summaryTables,
         ...obj
@@ -61,15 +61,15 @@ export const rootReducer = (state, action) => {
         summaryTables
       };
     case UPDATE_SUMMARY_TABLE_INDEX:
-        let tables = [...state.summaryTables.tables];
-        tables[action.key] = action.data;
-        return {
-          ...state,
-          summaryTables: {
-            ...state.summaryTables,
-            tables
-          }
-        };
+      let tables = [...state.summaryTables.tables];
+      tables[action.key] = action.data;
+      return {
+        ...state,
+        summaryTables: {
+          ...state.summaryTables,
+          tables
+        }
+      };
     case UPDATE_SUMMARY_SNP:
     case UPDATE_SUMMARY_SNP_TABLE:
       let summarySnpTables = {
@@ -105,7 +105,7 @@ export const rootReducer = (state, action) => {
           ...state.variantLookupTable,
           ...action.data
         }
-      }
+      };
     case UPDATE_PHENOTYPE_CORRELATIONS:
       return {
         ...state,

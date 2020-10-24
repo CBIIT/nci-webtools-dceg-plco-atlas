@@ -11,8 +11,7 @@ export function asQueryString(obj) {
     let value = obj[key];
 
     // treat arrays as comma-delineated lists
-    if (Array.isArray(value))
-      value = value.join(',');
+    if (Array.isArray(value)) value = value.join(',');
 
     // exclude undefined, null, or false values
     if (![undefined, null, false].includes(value))
@@ -35,7 +34,6 @@ export const rawQuery = (resource, params) =>
 export const post = (resource, params) =>
   fetch(`${root}/${resource}`, {
     method: 'post',
-    headers: {'content-type': 'application/json'},
-    body: JSON.stringify(params)}
-  ).then(r => r.json());
-
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify(params)
+  }).then(r => r.json());

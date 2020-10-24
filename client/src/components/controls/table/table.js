@@ -2,8 +2,7 @@ import React, { useEffect } from 'react';
 import BootstrapTable from 'react-bootstrap-table-next';
 import overlayFactory from 'react-bootstrap-table2-overlay';
 import { Icon } from '../icon/icon';
-import './table.scss'
-
+import './table.scss';
 
 export const defaultProps = {
   bootstrap4: true,
@@ -21,13 +20,17 @@ export const defaultProps = {
   )
 };
 
-export const paginationText = (singular = 'variant', plural = 'variants') => (from, to, size) => {
+export const paginationText = (singular = 'variant', plural = 'variants') => (
+  from,
+  to,
+  size
+) => {
   return size > 0 ? (
     <span className="react-bootstrap-table-pagination-total ml-2 small text-muted">
       Showing&nbsp;
       {1 + to - from < size && `${from} to ${to} of `}
       {size.toLocaleString()}
-      {size === 1 ? ` ${singular}` : ` ${plural || (singular + 's')}`}
+      {size === 1 ? ` ${singular}` : ` ${plural || singular + 's'}`}
     </span>
   ) : null;
 };
@@ -118,7 +121,7 @@ export const overlayConfig = {
       }
     }),
     wrapper: base => ({
-      ...base,
+      ...base
       // 'pointer-events': 'none'
     }),
     overlay: base => ({

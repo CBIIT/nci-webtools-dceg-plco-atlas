@@ -4,8 +4,7 @@ import { Nav } from 'react-bootstrap';
 import { SummaryResults } from './summary/summary';
 import { VariantLookup } from './lookup/lookup';
 import { PhenotypeCorrelations } from './correlations/correlations';
-import './gwas.scss'
-
+import './gwas.scss';
 
 export function Gwas() {
   const gwasLinks = [
@@ -26,14 +25,11 @@ export function Gwas() {
   return (
     <div className="px-0">
       <div className="mx-3">
-        <div
-          className="mx-3 bg-white border border-top-0">
+        <div className="mx-3 bg-white border border-top-0">
           <div className="">
             <Nav defaultActiveKey="summary">
               {gwasLinks.map(({ name, pathId }) => (
-                <div
-                  key={pathId}
-                  className="d-inline-block">
+                <div key={pathId} className="d-inline-block">
                   <NavLink
                     // key={pathId}
                     className="secondary-navlinks px-3 py-1 d-inline-block"

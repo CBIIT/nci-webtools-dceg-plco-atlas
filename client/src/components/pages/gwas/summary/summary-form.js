@@ -10,8 +10,8 @@ export function SummaryResultsForm({
   selectedPhenotypes = [],
   selectedStratifications = [],
   isPairwise = false,
-  onSubmit = any => { },
-  onReset = any => { }
+  onSubmit = any => {},
+  onReset = any => {}
 }) {
   // in order to prevent updating the redux store until after the form has
   // been submitted, we should store the state in the component, and then emit
@@ -27,25 +27,35 @@ export function SummaryResultsForm({
   const clearMessages = _ => setMessages([]);
 
   // private members prefixed with _
-  const [_selectedPhenotypes, _setSelectedPhenotypes] = useState(selectedPhenotypes);
-  const [_selectedStratifications, _setSelectedStratifications] = useState(selectedStratifications.map(s => `${s.ancestry}__${s.sex}`));
+  const [_selectedPhenotypes, _setSelectedPhenotypes] = useState(
+    selectedPhenotypes
+  );
+  const [_selectedStratifications, _setSelectedStratifications] = useState(
+    selectedStratifications.map(s => `${s.ancestry}__${s.sex}`)
+  );
   const [_isPairwise, _setIsPairwise] = useState(isPairwise);
   const [_isModified, _setIsModified] = useState(false);
 
   // stratification options can always be recalculated
-  const [stratificationOptions, setStratificationOptions] = useState(getStratificationOptions(_selectedPhenotypes, _isPairwise));
-
+  const [stratificationOptions, setStratificationOptions] = useState(
+    getStratificationOptions(_selectedPhenotypes, _isPairwise)
+  );
 
   useEffect(() => {
     _setSelectedPhenotypes(selectedPhenotypes);
-    _setSelectedStratifications(selectedStratifications.map(s => `${s.ancestry}__${s.sex}`));
+    _setSelectedStratifications(
+      selectedStratifications.map(s => `${s.ancestry}__${s.sex}`)
+    );
     _setIsPairwise(isPairwise);
-    setStratificationOptions(getStratificationOptions(selectedPhenotypes, isPairwise));
-  }, [selectedPhenotypes, selectedStratifications, isPairwise])
+    setStratificationOptions(
+      getStratificationOptions(selectedPhenotypes, isPairwise)
+    );
+  }, [selectedPhenotypes, selectedStratifications, isPairwise]);
 
-  const isValid = _selectedPhenotypes[0]
-    && _selectedStratifications[0]
-    && (!_isPairwise || (_isPairwise && _selectedStratifications[1]));
+  const isValid =
+    _selectedPhenotypes[0] &&
+    _selectedStratifications[0] &&
+    (!_isPairwise || (_isPairwise && _selectedStratifications[1]));
 
   const showPhenotypesLabels = _isPairwise && _selectedPhenotypes[1];
 
@@ -53,7 +63,7 @@ export function SummaryResultsForm({
    * Retrieves stratification option groups for each phenotype supplied
    * If isPairwise is passed in, and the second phenotype is not defined the first
    * phenotype will be used for both sets of options
-   * @param {*} phenotypes 
+   * @param {*} phenotypes
    */
   function getStratificationOptions(selectedPhenotypes, isPairwise) {
     if (!phenotypes || !phenotypes.metadata) return [];
@@ -61,27 +71,32 @@ export function SummaryResultsForm({
 
     for (const phenotype of selectedPhenotypes) {
       const stratifications = [];
-      phenotypes.metadata.filter(item =>
-        item.phenotype_id === phenotype.id &&
-        item.chromosome === 'all' &&
-        item.count > 0 &&
-        item.sex != 'stacked'
-      ).forEach(({ sex, ancestry }) => {
-        let stratification = stratifications.find(s => s.ancestry === ancestry) || {
-          label: asTitleCase(ancestry),
-          options: [],
-          ancestry,
-        };
+      phenotypes.metadata
+        .filter(
+          item =>
+            item.phenotype_id === phenotype.id &&
+            item.chromosome === 'all' &&
+            item.count > 0 &&
+            item.sex != 'stacked'
+        )
+        .forEach(({ sex, ancestry }) => {
+          let stratification = stratifications.find(
+            s => s.ancestry === ancestry
+          ) || {
+            label: asTitleCase(ancestry),
+            options: [],
+            ancestry
+          };
 
-        stratification.options.push({
-          label: asTitleCase(`${ancestry} - ${sex}`),
-          value: `${ancestry}__${sex}`
+          stratification.options.push({
+            label: asTitleCase(`${ancestry} - ${sex}`),
+            value: `${ancestry}__${sex}`
+          });
+
+          if (!stratifications.includes(stratification)) {
+            stratifications.push(stratification);
+          }
         });
-
-        if (!stratifications.includes(stratification)) {
-          stratifications.push(stratification);
-        }
-      })
       stratificationGroups.push(stratifications);
     }
 
@@ -103,9 +118,13 @@ export function SummaryResultsForm({
   function setSelectedPhenotypesAndOptions(selectedPhenotypes, pairwise) {
     if (pairwise === undefined) pairwise = _isPairwise;
     selectedPhenotypes = selectedPhenotypes.slice(0, pairwise ? 2 : 1);
-    setStratificationOptions(getStratificationOptions(selectedPhenotypes, pairwise));
+    setStratificationOptions(
+      getStratificationOptions(selectedPhenotypes, pairwise)
+    );
     _setSelectedPhenotypes(selectedPhenotypes);
-    _setSelectedStratifications(pairwise ? [_selectedStratifications[0], ''] : ['', '']);
+    _setSelectedStratifications(
+      pairwise ? [_selectedStratifications[0], ''] : ['', '']
+    );
     _setIsPairwise(pairwise);
     _setIsModified(true);
   }
@@ -128,9 +147,9 @@ export function SummaryResultsForm({
       stratifications: _selectedStratifications
         .filter(s => s.length)
         .map(s => {
-          const [ancestry, sex] = s.split('__')
+          const [ancestry, sex] = s.split('__');
           return { ancestry, sex };
-        }),
+        })
     });
   }
 
@@ -146,9 +165,16 @@ export function SummaryResultsForm({
               className="custom-control-input"
               id="is-pairwise"
               checked={_isPairwise}
-              onChange={e => setSelectedPhenotypesAndOptions(_selectedPhenotypes, e.target.checked)}
+              onChange={e =>
+                setSelectedPhenotypesAndOptions(
+                  _selectedPhenotypes,
+                  e.target.checked
+                )
+              }
             />
-            <label className="custom-control-label" htmlFor="is-pairwise">Pairwise Plots</label>
+            <label className="custom-control-label" htmlFor="is-pairwise">
+              Pairwise Plots
+            </label>
           </div>
         </div>
 
@@ -162,28 +188,49 @@ export function SummaryResultsForm({
         />
       </div>
 
-
-      {(_isPairwise ? [0, 1] : [0]).map(i => stratificationOptions[i]).map((optionGroup, i) =>
-        <div className="mb-3" key={`stratification-option-group-${i}`}>
-          <label htmlFor={`summary-results-stratification-${i}`} className="required">
-            Ancestry/Sex {_isPairwise && ['(Top)', '(Bottom)'][i]}
-          </label>
-          {_isPairwise && (_selectedPhenotypes[i] || _selectedPhenotypes[0]) && <div className="small text-muted">
-            {(_selectedPhenotypes[i] || _selectedPhenotypes[0]).display_name}
-          </div>}
-          <select
-            id={`summary-results-stratification-${i}`}
-            className="form-control"
-            style={{color: _selectedStratifications[i] ? '#000' : '#ccc'}}
-            value={_selectedStratifications[i]}
-            onChange={e => mergeSelectedStratification(i, e.target.value)}
-            disabled={!optionGroup || optionGroup.length === 0}>
-            <option value="" hidden>Select Ancestry/Sex</option>
-            {optionGroup && optionGroup.map(e => <optgroup key={`${i}-${e.label}`} label={e.label}>
-              {e.options.map(o => <option key={`${i}-${e.label}-${o.value}`} value={o.value}>{o.label}</option>)}
-            </optgroup>)}
-          </select>
-        </div>)}
+      {(_isPairwise ? [0, 1] : [0])
+        .map(i => stratificationOptions[i])
+        .map((optionGroup, i) => (
+          <div className="mb-3" key={`stratification-option-group-${i}`}>
+            <label
+              htmlFor={`summary-results-stratification-${i}`}
+              className="required">
+              Ancestry/Sex {_isPairwise && ['(Top)', '(Bottom)'][i]}
+            </label>
+            {_isPairwise &&
+              (_selectedPhenotypes[i] || _selectedPhenotypes[0]) && (
+                <div className="small text-muted">
+                  {
+                    (_selectedPhenotypes[i] || _selectedPhenotypes[0])
+                      .display_name
+                  }
+                </div>
+              )}
+            <select
+              id={`summary-results-stratification-${i}`}
+              className="form-control"
+              style={{ color: _selectedStratifications[i] ? '#000' : '#ccc' }}
+              value={_selectedStratifications[i]}
+              onChange={e => mergeSelectedStratification(i, e.target.value)}
+              disabled={!optionGroup || optionGroup.length === 0}>
+              <option value="" hidden>
+                Select Ancestry/Sex
+              </option>
+              {optionGroup &&
+                optionGroup.map(e => (
+                  <optgroup key={`${i}-${e.label}`} label={e.label}>
+                    {e.options.map(o => (
+                      <option
+                        key={`${i}-${e.label}-${o.value}`}
+                        value={o.value}>
+                        {o.label}
+                      </option>
+                    ))}
+                  </optgroup>
+                ))}
+            </select>
+          </div>
+        ))}
 
       {/* Todo: replace selects with react-select if needed
         <Select 
@@ -199,24 +246,22 @@ export function SummaryResultsForm({
           isDisabled={existingStratifications.length === 0}
         /> */}
 
-
-      {messages && messages.map(({ type, content }) => (
-        <Alert className="mt-3" variant={type} onClose={clearMessages} dismissible>
-          {content}
-        </Alert>
-      ))}
+      {messages &&
+        messages.map(({ type, content }) => (
+          <Alert
+            className="mt-3"
+            variant={type}
+            onClose={clearMessages}
+            dismissible>
+            {content}
+          </Alert>
+        ))}
       <div>
-        <Button
-            type="submit"
-            variant="silver"
-            onClick={handleSubmit}>
-            Submit
+        <Button type="submit" variant="silver" onClick={handleSubmit}>
+          Submit
         </Button>
 
-        <Button
-          className="ml-2"
-          variant="silver"
-          onClick={handleReset}>
+        <Button className="ml-2" variant="silver" onClick={handleReset}>
           Reset
         </Button>
       </div>

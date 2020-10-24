@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { PlotlyWrapper as Plot } from '../../../plots/plotly/plotly-wrapper';
@@ -6,18 +5,14 @@ import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overla
 import { Tooltip } from '../../../controls/tooltip/tooltip';
 import { query } from '../../../../services/query';
 
-
 export function QQPlot({ onVariantLookup }) {
-  const {
-    selectedPhenotypes,
-    selectedStratifications,
-  } = useSelector(state => state.summaryResults);
+  const { selectedPhenotypes, selectedStratifications } = useSelector(
+    state => state.summaryResults
+  );
 
-  const {
-    loadingQQPlot,
-    qqplotData,
-    qqplotLayout,
-  } = useSelector(state => state.qqPlot);
+  const { loadingQQPlot, qqplotData, qqplotLayout } = useSelector(
+    state => state.qqPlot
+  );
 
   const plotContainer = useRef(null);
 
@@ -27,12 +22,13 @@ export function QQPlot({ onVariantLookup }) {
     data: {}
   });
 
-  const updateTooltip = state => setTooltip({
-    ...tooltip,
-    ...state
-  });
+  const updateTooltip = state =>
+    setTooltip({
+      ...tooltip,
+      ...state
+    });
 
-  useEffect(() => updateTooltip({visible: false}), [qqplotData]);
+  useEffect(() => updateTooltip({ visible: false }), [qqplotData]);
 
   const config = {
     responsive: true,
@@ -57,9 +53,9 @@ export function QQPlot({ onVariantLookup }) {
   };
 
   return (
-    <div 
-      className="text-center my-3 position-relative mw-100" 
-      style={{width: '800px', margin: '1rem auto'}}
+    <div
+      className="text-center my-3 position-relative mw-100"
+      style={{ width: '800px', margin: '1rem auto' }}
       ref={plotContainer}>
       <LoadingOverlay active={loadingQQPlot} />
 
@@ -71,7 +67,7 @@ export function QQPlot({ onVariantLookup }) {
         onHover={data => {
           const [point] = data.points;
           if (point.customdata) {
-            const {xaxis, yaxis} = point;
+            const { xaxis, yaxis } = point;
             const xOffset = xaxis.l2p(point.x) + xaxis._offset + 5;
             const yOffset = yaxis.l2p(point.y) + yaxis._offset + 5;
 
@@ -86,27 +82,23 @@ export function QQPlot({ onVariantLookup }) {
             updateTooltip({
               visible: true,
               data: point.customdata,
-              x: xOffset, 
-              y: yOffset,
+              x: xOffset,
+              y: yOffset
             });
           }
         }}
-        onClick={ async data => {
+        onClick={async data => {
           const [point] = data.points;
           if (point.customdata) {
             const response = await query('variants', {
-              columns: [
-                'chromosome',
-                'position',
-                'snp'
-              ],
+              columns: ['chromosome', 'position', 'snp'],
               phenotype_id: point.customdata.phenotypeId,
               id: point.customdata.variantId,
               ancestry: point.customdata.ancestry,
-              sex: point.customdata.sex,
+              sex: point.customdata.sex
             });
             const record = response.data[0];
-            const {xaxis, yaxis} = point;
+            const { xaxis, yaxis } = point;
             const xOffset = xaxis.l2p(point.x) + xaxis._offset + 5;
             const yOffset = yaxis.l2p(point.y) + yaxis._offset + 5;
 
@@ -124,85 +116,101 @@ export function QQPlot({ onVariantLookup }) {
                 ...point.customdata,
                 ...record
               },
-              x: xOffset, 
-              y: yOffset,
+              x: xOffset,
+              y: yOffset
             });
           }
         }}
         onRelayout={relayout => {
-          updateTooltip({visible: false})
+          updateTooltip({ visible: false });
         }}
       />
 
-      <Tooltip 
-        closeButton 
-        visible={tooltip.visible} 
-        x={tooltip.x} 
-        y={tooltip.y} 
-        onClose={e => updateTooltip({visible: false})}
+      <Tooltip
+        closeButton
+        visible={tooltip.visible}
+        x={tooltip.x}
+        y={tooltip.y}
+        onClose={e => updateTooltip({ visible: false })}
         style={{
-          width: '240px', 
+          width: '240px',
           border: `1px solid ${tooltip.data.color}`
         }}
         className="text-left qq-plot-tooltip">
-        {(!tooltip.data || !tooltip.data.showData)
-          ? <div>Only the top 10,000 variants are selectable.</div> 
-          : <div>
-              {tooltip.data.chromosome && tooltip.data.position && <div><b>position:</b> {tooltip.data.chromosome}:{tooltip.data.position}</div>}
-              {/* {tooltip.data.expected_p && <div><b>expected p-value:</b> {(+tooltip.data.expected_p || 0).toPrecision(5)}</div>} */}
-              {tooltip.data.p && <div><b>p-value:</b> {(+tooltip.data.p || 0).toPrecision(5)}</div>}
-              {tooltip.data.snp && <div><b>snp:</b> {tooltip.data.snp || 'N/A'}</div>}
-              {!tooltip.data.snp && 
-                <div className="text-secondary">
-                  <small>
-                    Click on Point or 
-                    <a 
-                      href="javascript:void(0)"
-                      className="mx-1"
-                      onClick={async _ => {
-                        const response = await query('variants', {
-                          columns: [
-                            'chromosome',
-                            'position',
-                            'snp'
-                          ],
-                          phenotype_id: tooltip.data.phenotypeId,
-                          id: tooltip.data.variantId,
-                          ancestry: tooltip.data.ancestry,
-                          sex: tooltip.data.sex,
-                        });
+        {!tooltip.data || !tooltip.data.showData ? (
+          <div>Only the top 10,000 variants are selectable.</div>
+        ) : (
+          <div>
+            {tooltip.data.chromosome && tooltip.data.position && (
+              <div>
+                <b>position:</b> {tooltip.data.chromosome}:
+                {tooltip.data.position}
+              </div>
+            )}
+            {/* {tooltip.data.expected_p && <div><b>expected p-value:</b> {(+tooltip.data.expected_p || 0).toPrecision(5)}</div>} */}
+            {tooltip.data.p && (
+              <div>
+                <b>p-value:</b> {(+tooltip.data.p || 0).toPrecision(5)}
+              </div>
+            )}
+            {tooltip.data.snp && (
+              <div>
+                <b>snp:</b> {tooltip.data.snp || 'N/A'}
+              </div>
+            )}
+            {!tooltip.data.snp && (
+              <div className="text-secondary">
+                <small>
+                  Click on Point or
+                  <a
+                    href="javascript:void(0)"
+                    className="mx-1"
+                    onClick={async _ => {
+                      const response = await query('variants', {
+                        columns: ['chromosome', 'position', 'snp'],
+                        phenotype_id: tooltip.data.phenotypeId,
+                        id: tooltip.data.variantId,
+                        ancestry: tooltip.data.ancestry,
+                        sex: tooltip.data.sex
+                      });
 
-                        const record = response.data[0];
-                        updateTooltip({
-                          data: {
-                            ...tooltip.data,
-                            ...record
-                          }
-                        });
-                      }}>
-                      here
-                    </a> 
-                    for details
-                  </small>
-                </div>
-              }
-              {(tooltip.data.snp || (tooltip.data.chromosome && tooltip.data.position)) && 
-                <div>
-                  <a 
-                    href="#/gwas/lookup" 
-                    className="font-weight-bold" 
-                    onClick={e => onVariantLookup({
-                      phenotype: {id: tooltip.data.phenotypeId},
+                      const record = response.data[0];
+                      updateTooltip({
+                        data: {
+                          ...tooltip.data,
+                          ...record
+                        }
+                      });
+                    }}>
+                    here
+                  </a>
+                  for details
+                </small>
+              </div>
+            )}
+            {(tooltip.data.snp ||
+              (tooltip.data.chromosome && tooltip.data.position)) && (
+              <div>
+                <a
+                  href="#/gwas/lookup"
+                  className="font-weight-bold"
+                  onClick={e =>
+                    onVariantLookup({
+                      phenotype: { id: tooltip.data.phenotypeId },
                       sex: tooltip.data.sex,
                       ancestry: tooltip.data.ancestry,
-                      snp: tooltip.data.snp || `chr${tooltip.data.chromosome}:${tooltip.data.position}`,
-                    })}>
-                    Go to Variant Lookup
-                  </a>
-                </div>}
-            </div>}
+                      snp:
+                        tooltip.data.snp ||
+                        `chr${tooltip.data.chromosome}:${tooltip.data.position}`
+                    })
+                  }>
+                  Go to Variant Lookup
+                </a>
+              </div>
+            )}
+          </div>
+        )}
       </Tooltip>
     </div>
   );
-
 }
