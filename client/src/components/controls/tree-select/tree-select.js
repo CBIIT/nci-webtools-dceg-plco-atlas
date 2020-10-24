@@ -45,7 +45,16 @@ export const TreeSelect = forwardRef(
       _ => {
         if (!value) value = [];
         if (!Array.isArray(value)) value = [value];
-        setSelectedNodes(value);
+        
+        // ensure that any items passed in are references to internal nodes
+        const leaves = getLeaves(root.current);
+        const nodes = value
+          .map(item => leaves.includes(item)
+            ? item
+            : leaves.find(node => node.id == item.id))
+          .filter(Boolean);
+
+        setSelectedNodes(nodes);
       },
       [value]
     );
