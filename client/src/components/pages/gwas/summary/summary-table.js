@@ -33,18 +33,12 @@ export function SummaryResultsTable() {
     nlogpMin,
     nlogpMax,
     bpMin,
-    bpMax
+    bpMax,
+    exportRowLimit
   } = useSelector(state => state.summaryResults);
   const selectedTable = useSelector(state => state.summaryTables.selectedTable);
   const setSelectedTable = selectedTable =>
     dispatch(updateSummaryTable('selectedTable', selectedTable));
-  const [exportRowLimit, setExportRowLimit] = useState(1e5);
-
-  useEffect(() => {
-    query('config', { key: 'exportRowLimit' }).then(({ exportRowLimit }) =>
-      setExportRowLimit(exportRowLimit)
-    );
-  });
 
   const defaultSorted = [
     {
