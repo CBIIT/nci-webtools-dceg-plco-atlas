@@ -102,66 +102,27 @@ export function updateError(data) {
   return { type: UPDATE_ERROR, data };
 }
 
+
+async function getInitialPhenotypes() {
+  return {
+    tree: await query('phenotypes'),
+    metadata: await query('metadata', {chromosome: 'all'}),
+  }
+}
+
+async function getInitialSummaryResults() {
+  return {
+    ranges: await query('ranges'),
+    ...await query('config', { key: 'exportRowLimit' }),
+  }
+}
+
 export function initialize() {
   return async function initializeAction(dispatch) {
     try {
-      // update ranges
-      const ranges = await query('ranges');
-      dispatch(updateSummaryResults({ ranges }));
-
-      const metadata = await query('metadata', {
-        chromosome: 'all',
-        countNotNull: true
-      });
-
-      // update download root
-      const { downloadRoot } = await query('config', { key: 'downloadRoot' });
-      dispatch(updateDownloads({ downloadRoot }));
-
-      // update phenotypes
-      const data = await query('phenotypes');
-      const records = [];
-      const categories = [];
-      const populateRecords = node => {
-        node.title = node.display_name;
-        node.value = node.name;
-
-        // only populate alphabetic phenotype list with leaf nodes
-        if (node.children === undefined) {
-          records.push({
-            ...node
-            // title: node.title,
-            // value: node.value
-          });
-        } else {
-          categories.push({
-            ...node
-            // title: node.title,
-            // value: node.value,
-            // color: node.color || '#444',
-            // children: node.children
-          });
-        }
-        if (node.children) {
-          node.children.forEach(populateRecords);
-        }
-      };
-
-      if (data && data.statusCode !== 500) {
-        data.forEach(populateRecords, 0);
-        const alphabetizedRecords = [...records].sort((a, b) =>
-          a.title.localeCompare(b.title)
-        );
-
-        dispatch(
-          updatePhenotypes({
-            flat: alphabetizedRecords,
-            categories: categories,
-            tree: data,
-            metadata: metadata
-          })
-        );
-      }
+      dispatch(updatePhenotypes(await getInitialPhenotypes()));
+      dispatch(updateSummaryResults(await getInitialSummaryResults()));
+      dispatch(updateDownloads(await query('config', { key: 'downloadRoot' })));
     } catch (e) {
       dispatch(updateError({ visible: true }));
     }

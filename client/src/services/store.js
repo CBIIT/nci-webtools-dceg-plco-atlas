@@ -5,8 +5,10 @@ import ReduxThunk from 'redux-thunk';
 
 // returns a reference to a new object
 export const getInitialState = () => ({
-  phenotypes: null,
-
+  phenotypes: {
+    tree: [],
+    metadata: [],
+  },
   summaryResults: {
     selectedPhenotypes: [],
     selectedStratifications: [],
@@ -20,6 +22,7 @@ export const getInitialState = () => ({
     bpMax: null,
     messages: [],
     submitted: null,
+    exportRowLimit: 1e5,
     shareID: null,
     sharedState: null
   },
@@ -92,19 +95,12 @@ export const getInitialState = () => ({
     shareID: null,
     sharedState: null
   },
-  variantLookupTable: {
-    results: null,
-    numResults: null
-  },
   phenotypeCorrelations: {
     selectedPhenotypes: [],
     selectedSex: 'all',
     selectedAncestry: 'european',
     submitted: null,
-    disableSubmit: false,
     messages: [],
-    searchCriteriaPhenotypeCorrelations: null,
-    collapseCriteria: true,
     shareID: null,
     sharedState: null
   },

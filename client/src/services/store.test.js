@@ -3,8 +3,10 @@ import { getInitialState } from './store';
 describe('Store Module', function() {
   test('getInitialState() returns correct state', () => {
     expect(getInitialState()).toEqual({
-      phenotypes: null,
-
+      phenotypes: {
+        tree: [],
+        metadata: [],
+      },
       summaryResults: {
         selectedPhenotypes: [],
         selectedStratifications: [],
@@ -18,6 +20,7 @@ describe('Store Module', function() {
         bpMax: null,
         messages: [],
         submitted: null,
+        exportRowLimit: 1e5,
         shareID: null,
         sharedState: null
       },
@@ -90,19 +93,12 @@ describe('Store Module', function() {
         shareID: null,
         sharedState: null
       },
-      variantLookupTable: {
-        results: null,
-        numResults: null
-      },
       phenotypeCorrelations: {
         selectedPhenotypes: [],
         selectedSex: 'all',
         selectedAncestry: 'european',
         submitted: null,
-        disableSubmit: false,
         messages: [],
-        searchCriteriaPhenotypeCorrelations: null,
-        collapseCriteria: true,
         shareID: null,
         sharedState: null
       },
