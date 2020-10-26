@@ -23,7 +23,8 @@ export const TreeSelect = forwardRef(
       limit = 0,
       singleSelect,
       enabled = node => true,
-      placeholder = 'Search'
+      placeholder = 'Search',
+      titleKey = 'display_name',
     },
     ref
   ) => {
@@ -70,7 +71,7 @@ export const TreeSelect = forwardRef(
         ? array.concat(elements.filter(e => !array.includes(e)))
         : array.filter(e => !elements.includes(e));
 
-    const compareTitles = (a, b) => a.title.localeCompare(b.title);
+    const compareTitles = (a, b) => a[titleKey].localeCompare(b[titleKey]);
 
     const reduceChildren = (node, fn, initialValue) => {
       let accumulator = fn(initialValue || node, node);
@@ -181,7 +182,7 @@ export const TreeSelect = forwardRef(
             isDisabled(node) ? 'text-muted c-not-allowed' : ''
           }`}
           style={{ whiteSpace: 'nowrap', overflow: 'hidden' }}
-          title={node.title}>
+          title={node[titleKey]}>
           <input
             className={`mr-1`}
             type="checkbox"
@@ -192,7 +193,7 @@ export const TreeSelect = forwardRef(
             disabled={isDisabled(node)}
             onChange={e => setSelected(node, e.target.checked)}
           />
-          <HighlightText text={node.title} highlighted={searchFilter} />
+          <HighlightText text={node[titleKey]} highlighted={searchFilter} />
         </label>
         {isExpanded(node) &&
           (node.children || [])
@@ -264,7 +265,7 @@ export const TreeSelect = forwardRef(
           {searchFilter.length
             ? getLeaves(root.current)
                 .filter(node =>
-                  node.title.toLowerCase().includes(searchFilter.toLowerCase())
+                  node[titleKey].toLowerCase().includes(searchFilter.toLowerCase())
                 )
                 .sort(compareTitles)
                 .map((node, i) => (
