@@ -2,14 +2,14 @@ import React from 'react';
 import { Provider } from 'react-redux';
 import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom/extend-expect';
-import { store } from '../../../services/store';
+import { getStore } from '../../../services/store';
 import { ShareLink } from './share-link';
 
 describe('ShareLink Module', function() {
-  test('ShareLink renders correctly', () => {
+  test('ShareLink renders correctly', async () => {
     // render share-link using default store
     render(
-      <Provider store={store}>
+      <Provider store={await getStore(true)}>
         <ShareLink />
       </Provider>
     );
