@@ -102,33 +102,6 @@ export function updateError(data) {
   return { type: UPDATE_ERROR, data };
 }
 
-
-async function getInitialPhenotypes() {
-  return {
-    tree: await query('phenotypes'),
-    metadata: await query('metadata', {chromosome: 'all'}),
-  }
-}
-
-async function getInitialSummaryResults() {
-  return {
-    ranges: await query('ranges'),
-    ...await query('config', { key: 'exportRowLimit' }),
-  }
-}
-
-export function initialize() {
-  return async function initializeAction(dispatch) {
-    try {
-      dispatch(updatePhenotypes(await getInitialPhenotypes()));
-      dispatch(updateSummaryResults(await getInitialSummaryResults()));
-      dispatch(updateDownloads(await query('config', { key: 'downloadRoot' })));
-    } catch (e) {
-      dispatch(updateError({ visible: true }));
-    }
-  };
-}
-
 export function fetchSummaryTable(tableKey, params) {
   return async function(dispatch, getState) {
     try {

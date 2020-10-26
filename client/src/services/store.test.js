@@ -1,8 +1,8 @@
 import { getInitialState } from './store';
 
 describe('Store Module', function() {
-  test('getInitialState() returns correct state', () => {
-    expect(getInitialState()).toEqual({
+  test('getInitialState() returns correct state', async () => {
+    expect(await getInitialState(true)).toEqual({
       phenotypes: {
         tree: [],
         metadata: [],
