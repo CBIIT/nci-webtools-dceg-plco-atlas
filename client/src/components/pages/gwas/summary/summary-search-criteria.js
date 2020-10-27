@@ -3,19 +3,23 @@ import { useSelector } from 'react-redux';
 import { ShareLink } from '../../../controls/share-link/share-link';
 import { asTitleCase } from './utils';
 import { query } from '../../../../services/query';
-// import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
 
 export const SummaryResultsSearchCriteria = () => {
-  const summaryResults = useSelector(state => state.summaryResults);
   const {
     selectedPhenotypes,
     selectedStratifications,
+    selectedChromosome,
+    selectedPlot,
     isPairwise,
+    manhattanPlotView,
+    nlogpMin,
+    nlogpMax,
+    bpMin,
+    bpMax,
+    submitted,
     shareID,
-    submitted
-  } = summaryResults;
+  } = useSelector(state => state.summaryResults);
 
-  const summaryTables = useSelector(state => state.summaryTables);
   const [phenotypes, setPhenotypes] = useState([]);
 
   useEffect(() => {
@@ -64,7 +68,18 @@ export const SummaryResultsSearchCriteria = () => {
       <ShareLink
         disabled={!submitted}
         shareID={shareID}
-        params={summaryResults}
+        params={{
+          selectedPhenotypes,
+          selectedStratifications,
+          selectedChromosome,
+          selectedPlot,
+          isPairwise,
+          manhattanPlotView,
+          nlogpMin,
+          nlogpMax,
+          bpMin,
+          bpMax,
+        }}
       />
     </div>
   );

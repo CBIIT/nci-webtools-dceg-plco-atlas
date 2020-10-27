@@ -1,175 +1,122 @@
-import React, { useState, useRef } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
-import { Button, OverlayTrigger, Tooltip } from 'react-bootstrap';
-import { updatePhenotypeCorrelations } from '../../../../services/actions';
+import React, { useState, useRef, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { Button } from 'react-bootstrap';
 import { TreeSelect } from '../../../controls/tree-select/tree-select';
+import { updatePhenotypeCorrelations } from '../../../../services/actions';
 
-export function PhenotypeCorrelationsForm({ onChange, onSubmit, onReset }) {
-  const dispatch = useDispatch();
-  const phenotypes = useSelector(state => state.phenotypes);
-
-  const {
-    selectedPhenotypes,
-    selectedSex,
-    selectedAncestry,
-    submitted,
-    disableSubmit
-  } = useSelector(state => state.phenotypeCorrelations);
-
+export function PhenotypeCorrelationsForm({
+  selectedPhenotypes = [],
+  selectedAncestry = '',
+  selectedSex = '',
+  onSubmit = any => {},
+  onReset = any => {}
+}) {
   const treeRef = useRef();
 
-  const handleChangeCustom = items => {
-    dispatch(
-      updatePhenotypeCorrelations({
-        selectedPhenotypes: items,
-        disableSubmit: false
-      })
-    );
-  };
+  // select store members
+  const dispatch = useDispatch();
+  const phenotypes = useSelector(state => state.phenotypes);
+  const messages = useSelector(state => state.phenotypeCorrelations.messages);
+  const setMessages = messages => dispatch(updatePhenotypeCorrelations({ messages }));
+  const clearMessages = _ => setMessages([]);
+
+  // private members prefixed with _
+  const [_selectedPhenotypes, _setSelectedPhenotypes] = useState([]);
+  const [_selectedAncestry, _setSelectedAncestry] = useState('');
+  const [_selectedSex, _setSelectedSex] = useState('');
+
+  useEffect(() => {
+    _setSelectedPhenotypes(selectedPhenotypes);
+    _setSelectedAncestry(selectedAncestry);
+    _setSelectedSex(selectedSex);
+  }, [selectedPhenotypes, selectedAncestry, selectedSex]);
+
+  function handleReset(ev) {
+    console.log(ev);
+    ev.preventDefault();
+    treeRef.current.resetSearchFilter();
+    _setSelectedPhenotypes([]);
+    _setSelectedAncestry('');
+    _setSelectedSex('');
+    clearMessages();
+    onReset();
+  }
+
+  function handleSubmit(ev) {
+    ev.preventDefault();
+    clearMessages();
+
+    if (_selectedPhenotypes.length < 2) {
+      setMessages([{type: 'danger', content: 'Please select 2 or more phenotypes.'}])
+    } else if (!_selectedPhenotypes.length || !_selectedAncestry || !_selectedSex) {
+      setMessages([{type: 'danger', content: 'Please select phenotype(s) and corresponding ancestry/sex'}])
+    } else {
+      onSubmit({
+        phenotypes: _selectedPhenotypes,
+        ancestry: _selectedAncestry,
+        sex: _selectedSex
+      });
+    }
+  }
 
   return (
-    <>
-      <div className="mb-2">
+    <form onSubmit={handleSubmit} onReset={handleReset}>
+      <div className="form-group">
         <label className="required">Phenotypes</label>
         <TreeSelect
           data={phenotypes.tree}
-          value={selectedPhenotypes}
-          onChange={handleChangeCustom}
+          value={_selectedPhenotypes}
+          onChange={ev => _setSelectedPhenotypes(ev)}
           ref={treeRef}
           enabled={item => item.import_date}
+          limit={120}
         />
-        <small className="text-muted">
-          <i>Up to 120 phenotypes may be selected.</i>
-        </small>
+        <small className="text-muted">Up to 120 phenotypes may be selected.</small>
       </div>
 
-      <div className="mb-3">
-        <label className="required">Sex</label>
-        <select
-          className="form-control"
-          value={selectedSex}
-          onChange={e => {
-            // if (e.target.value === 'all') {
-            dispatch(
-              updatePhenotypeCorrelations({
-                selectedSex: e.target.value,
-                disableSubmit: false
-              })
-            );
-            // } else {
-            //   dispatch(updatePhenotypeCorrelations({
-            //     selectedSex: e.target.value,
-            //     selectedAncestry: 'european',
-            //     disableSubmit: false
-            //    }));
-            // }
-          }}
-          aria-label="Select sex">
+      <div className="form-group">
+        <label className="required" htmlFor="correlations-form-ancestry">Ancestry</label>
+        <select 
+          id="correlations-form-ancestry" 
+          className="form-control" 
+          value={_selectedAncestry}
+          onChange={ev => _setSelectedAncestry(ev.target.value)}>
+          <option value="" hidden>Select Ancestry</option>
+          <option value="east_asian">East Asian</option>
+          <option value="european">European</option>
+        </select>
+      </div>
+
+      <div className="form-group">
+        <label className="required" htmlFor="correlations-form-sex">Sex</label>
+        <select 
+          id="correlations-form-sex" 
+          className="form-control" 
+          value={_selectedSex}
+          onChange={ev => _setSelectedSex(ev.target.value)}>
+          <option value="" hidden>Select Sex</option>
           <option value="all">All</option>
           <option value="female">Female</option>
           <option value="male">Male</option>
         </select>
       </div>
 
-      <div className="mb-3">
-        <label className="required">Ancestry</label>
-        <select
-          className="form-control"
-          value={selectedAncestry}
-          onChange={e => {
-            // if (e.target.value === 'european') {
-            dispatch(
-              updatePhenotypeCorrelations({
-                selectedAncestry: e.target.value,
-                disableSubmit: false
-              })
-            );
-            // } else {
-            //   dispatch(updatePhenotypeCorrelations({
-            //     selectedSex: 'all',
-            //     selectedAncestry: e.target.value,
-            //     disableSubmit: false
-            //    }));
-            // }
-          }}
-          aria-label="Select ancestry">
-          <option value="european">European</option>
-          <option value="east_asian">East Asian</option>
-          {/* <option value="white">White</option>
-          <option value="black">Black</option>
-          <option value="hispanic">Hispanic</option>
-          <option value="asian">Asian</option>
-          <option value="pacific_islander">Pacific Islander</option>
-          <option value="american_indian">American Indian</option> */}
-        </select>
-      </div>
-
+      {messages.map(({ type, content }, i) => (
+        <div 
+          key={`correlations-form-message-${i}`} 
+          className={`small my-3 text-${type}`}>
+          {content}
+        </div>
+      ))}
       <div>
-        <OverlayTrigger
-          overlay={
-            <Tooltip
-              id="tooltip-disabled"
-              style={{
-                display:
-                  !selectedPhenotypes ||
-                  selectedPhenotypes.length < 2 ||
-                  selectedPhenotypes.length > 120
-                    ? 'block'
-                    : 'none'
-              }}>
-              {(!selectedPhenotypes || selectedPhenotypes.length < 2) && (
-                <>Please select 2 or more phenotypes.</>
-              )}
-              {selectedPhenotypes && selectedPhenotypes.length > 120 && (
-                <>Please select 120 or less phenotypes.</>
-              )}
-            </Tooltip>
-          }>
-          <span className="d-inline-block">
-            <Button
-              // ref={target}
-              className=""
-              style={{
-                maxHeight: '38px',
-                pointerEvents:
-                  !selectedPhenotypes ||
-                  selectedPhenotypes.length < 2 ||
-                  selectedPhenotypes.length > 120
-                    ? 'none'
-                    : 'auto'
-              }}
-              variant="silver"
-              onClick={e => {
-                e.preventDefault();
-                onSubmit({
-                  phenotypes: selectedPhenotypes,
-                  sex: selectedSex,
-                  ancestry: selectedAncestry
-                });
-              }}
-              disabled={
-                !selectedPhenotypes ||
-                selectedPhenotypes.length < 2 ||
-                selectedPhenotypes.length > 120 ||
-                disableSubmit
-              }>
-              Submit
-            </Button>
-          </span>
-        </OverlayTrigger>
+        <Button type="submit" variant="silver">
+          Submit
+        </Button>
 
-        <Button
-          className="ml-2"
-          style={{ maxHeight: '38px' }}
-          variant="silver"
-          onClick={e => {
-            e.preventDefault();
-            onReset(e);
-            treeRef.current.resetSearchFilter();
-          }}>
+        <Button type="reset" className="ml-2" variant="silver">
           Reset
         </Button>
       </div>
-    </>
+    </form>
   );
 }

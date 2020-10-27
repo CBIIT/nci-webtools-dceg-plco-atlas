@@ -1,217 +1,136 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Button, OverlayTrigger, Tooltip } from 'react-bootstrap';
-import { updateVariantLookup } from '../../../../services/actions';
+import { Button } from 'react-bootstrap';
 import { TreeSelect } from '../../../controls/tree-select/tree-select';
+import { updatePhenotypeCorrelations } from '../../../../services/actions';
 
-export function VariantLookupForm({ onChange, onSubmit, onReset }) {
-  const dispatch = useDispatch();
-  const phenotypes = useSelector(state => state.phenotypes);
-  const variantLookup = useSelector(state => state.variantLookup);
-  const {
-    selectedPhenotypes,
-    selectedVariant,
-    selectedSex,
-    selectedAncestry,
-    submitted,
-    disableSubmit
-  } = variantLookup;
-
-  const handleChangeCustom = items => {
-    dispatch(
-      updateVariantLookup({
-        selectedPhenotypes: items,
-        disableSubmit: false
-      })
-    );
-  };
-
-  const handleKeyPress = e => {
-    if (e.key === 'Enter') {
-      onSubmit({
-        phenotypes: selectedPhenotypes,
-        variant: selectedVariant,
-        sex: selectedSex,
-        ancestry: selectedAncestry
-      });
-    }
-  };
-
+export function VariantLookupForm({
+  selectedPhenotypes = [],
+  selectedVariant = '',
+  selectedAncestry = '',
+  selectedSex = '',
+  onSubmit = any => {},
+  onReset = any => {}
+}) {
   const treeRef = useRef();
 
+  // select store members
+  const dispatch = useDispatch();
+  const phenotypes = useSelector(state => state.phenotypes);
+  const messages = useSelector(state => state.phenotypeCorrelations.messages);
+  const setMessages = messages => dispatch(updatePhenotypeCorrelations({ messages }));
+  const clearMessages = _ => setMessages([]);
+
+  // private members prefixed with _
+  const [_selectedPhenotypes, _setSelectedPhenotypes] = useState([]);
+  const [_selectedVariant, _setSelectedVariant] = useState('');
+  const [_selectedAncestry, _setSelectedAncestry] = useState('');
+  const [_selectedSex, _setSelectedSex] = useState('');
+
+  useEffect(() => {
+    _setSelectedPhenotypes(selectedPhenotypes);
+    _setSelectedVariant(selectedVariant);
+    _setSelectedAncestry(selectedAncestry);
+    _setSelectedSex(selectedSex);
+  }, [selectedPhenotypes, selectedVariant, selectedAncestry, selectedSex]);
+
+  function handleReset(ev) {
+    console.log(ev);
+    ev.preventDefault();
+    treeRef.current.resetSearchFilter();
+    _setSelectedPhenotypes([]);
+    _setSelectedAncestry('');
+    _setSelectedSex('');
+    clearMessages();
+    onReset();
+  }
+
+  function handleSubmit(ev) {
+    ev.preventDefault();
+    clearMessages();
+    
+    if (!_selectedPhenotypes.length || !_selectedAncestry || !_selectedSex) {
+      setMessages([{type: 'danger', content: 'Please select phenotype(s) and corresponding ancestry/sex'}])
+    } else if (!_selectedVariant.length) {
+      setMessages([{type: 'danger', content: 'Please specify variants to search for'}])
+    } else {
+      onSubmit({
+        phenotypes: _selectedPhenotypes,
+        variant: _selectedVariant,
+        ancestry: _selectedAncestry,
+        sex: _selectedSex
+      });
+    }
+  }
+
   return (
-    <>
-      <div className="mb-2">
+    <form onSubmit={handleSubmit} onReset={handleReset}>
+      <div className="form-group">
         <label className="required">Phenotypes</label>
         <TreeSelect
-          id="lookup-form-tree-select"
           data={phenotypes.tree}
-          value={selectedPhenotypes}
-          onChange={handleChangeCustom}
+          value={_selectedPhenotypes}
+          onChange={ev => _setSelectedPhenotypes(ev)}
           ref={treeRef}
           enabled={item => item.import_date}
         />
       </div>
-
-      <div className="mb-2">
-        <label className="required">Variant</label>
+      
+      <div className="form-group">
+        <label className="required" htmlFor="looup-form-variant">Variant</label>
         <textarea
+          id="lookup-form-variant" 
           className="form-control"
-          placeholder="Enter RS Numbers or Coordinates"
-          aria-label="Variant (required)"
-          value={selectedVariant}
-          onChange={e => {
-            dispatch(
-              updateVariantLookup({
-                selectedVariant: e.target.value,
-                disableSubmit: false
-              })
-            );
-            onChange(e.target.value);
-          }}
-          onKeyPress={e => handleKeyPress(e)}
-          type="text"
+          placeholder="Enter RS Numbers"
+          value={_selectedVariant}
+          onChange={ev => _setSelectedVariant(ev.target.value)}
           required
         />
       </div>
 
-      <div className="mb-3">
-        <label className="required">Sex</label>
-        <select
-          className="form-control"
-          value={selectedSex}
-          onChange={e => {
-            // if (e.target.value === 'all') {
-            dispatch(
-              updateVariantLookup({
-                selectedSex: e.target.value,
-                disableSubmit: false
-              })
-            );
-            // } else {
-            //   dispatch(updateVariantLookup({
-            //     selectedSex: e.target.value,
-            //     selectedAncestry: 'european',
-            //     disableSubmit: false
-            //    }));
-            // }
-          }}
-          aria-label="Select sex">
+      <div className="form-group">
+        <label className="required" htmlFor="lookup-form-ancestry">Ancestry</label>
+        <select 
+          id="lookup-form-ancestry" 
+          className="form-control" 
+          value={_selectedAncestry}
+          onChange={ev => _setSelectedAncestry(ev.target.value)}>
+          <option value="" hidden>Select Ancestry</option>
+          <option value="east_asian">East Asian</option>
+          <option value="european">European</option>
+        </select>
+      </div>
+
+      <div className="form-group">
+        <label className="required" htmlFor="lookup-form-sex">Sex</label>
+        <select 
+          id="lookup-form-sex" 
+          className="form-control" 
+          value={_selectedSex}
+          onChange={ev => _setSelectedSex(ev.target.value)}>
+          <option value="" hidden>Select Sex</option>
           <option value="all">All</option>
           <option value="female">Female</option>
           <option value="male">Male</option>
         </select>
       </div>
 
-      <div className="mb-3">
-        <label className="required">Ancestry</label>
-        <select
-          className="form-control"
-          value={selectedAncestry}
-          onChange={e => {
-            // if (e.target.value === 'european') {
-            dispatch(
-              updateVariantLookup({
-                selectedAncestry: e.target.value,
-                disableSubmit: false
-              })
-            );
-            // } else {
-            //   dispatch(updateVariantLookup({
-            //     selectedSex: 'all',
-            //     selectedAncestry: e.target.value,
-            //     disableSubmit: false
-            //    }));
-            // }
-          }}
-          aria-label="Select ancestry">
-          <option value="european">European</option>
-          <option value="east_asian">East Asian</option>
-          {/* <option value="white">White</option>
-          <option value="black">Black</option>
-          <option value="hispanic">Hispanic</option>
-          <option value="asian">Asian</option>
-          <option value="pacific_islander">Pacific Islander</option>
-          <option value="american_indian">American Indian</option> */}
-        </select>
-      </div>
-
+      {messages.map(({ type, content }, i) => (
+        <div 
+          key={`lookup-form-message-${i}`} 
+          className={`small my-3 text-${type}`}>
+          {content}
+        </div>
+      ))}
       <div>
-        <OverlayTrigger
-          overlay={
-            <Tooltip
-              id="tooltip-disabled"
-              style={{
-                display:
-                  !selectedPhenotypes ||
-                  selectedPhenotypes.length < 1 ||
-                  (!selectedVariant || selectedVariant.length < 1)
-                    ? 'block'
-                    : 'none'
-              }}>
-              {(!selectedPhenotypes || selectedPhenotypes.length < 1) &&
-                (!selectedVariant || selectedVariant.length < 1) && (
-                  <>
-                    Please select one or more phenotypes and input a search
-                    variant.
-                  </>
-                )}
-              {(!selectedPhenotypes || selectedPhenotypes.length < 1) &&
-                (selectedVariant && selectedVariant.length > 0) && (
-                  <>Please select one or more phenotypes.</>
-                )}
-              {selectedPhenotypes &&
-                selectedPhenotypes.length >= 1 &&
-                (!selectedVariant || selectedVariant.length < 1) && (
-                  <>Please input a search variant.</>
-                )}
-            </Tooltip>
-          }>
-          <span className="d-inline-block">
-            <Button
-              className=""
-              style={{
-                maxHeight: '38px',
-                pointerEvents:
-                  !selectedPhenotypes ||
-                  selectedPhenotypes.length < 1 ||
-                  (!selectedVariant || selectedVariant.length < 1)
-                    ? 'none'
-                    : 'auto'
-              }}
-              variant="silver"
-              onClick={e => {
-                e.preventDefault();
-                onSubmit({
-                  phenotypes: selectedPhenotypes,
-                  variant: selectedVariant,
-                  sex: selectedSex,
-                  ancestry: selectedAncestry
-                });
-              }}
-              disabled={
-                !selectedPhenotypes ||
-                selectedPhenotypes.length < 1 ||
-                (!selectedVariant || selectedVariant.length < 1) ||
-                disableSubmit
-              }>
-              Submit
-            </Button>
-          </span>
-        </OverlayTrigger>
+        <Button type="submit" variant="silver" >
+          Submit
+        </Button>
 
-        <Button
-          className="ml-2"
-          style={{ maxHeight: '38px' }}
-          variant="silver"
-          onClick={e => {
-            e.preventDefault();
-            onReset(e);
-            treeRef.current.resetSearchFilter();
-          }}>
+        <Button type="reset" className="ml-2" variant="silver">
           Reset
         </Button>
       </div>
-    </>
+    </form>
   );
 }

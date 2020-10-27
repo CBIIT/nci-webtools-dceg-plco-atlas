@@ -1,206 +1,91 @@
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { updatePhenotypeCorrelations } from '../../../../services/actions';
-import { Button } from 'react-bootstrap';
 import { ShareLink } from '../../../controls/share-link/share-link';
 
 export const PhenotypeCorrelationsSearchCriteria = () => {
   const dispatch = useDispatch();
-
-  const phenotypeCorrelations = useSelector(
+  const {
+    selectedPhenotypes,
+    selectedSex,
+    selectedAncestry,
+    shareID,
+    submitted
+  } = useSelector(
     state => state.phenotypeCorrelations
   );
+  const [collapsed, setCollapsed] = useState(true);
+  const canCollapse = submitted && selectedPhenotypes.length > 1;
+  const toggleCollapsed = _ =>  canCollapse && setCollapsed(!collapsed);
 
-  const {
-    searchCriteriaPhenotypeCorrelations,
-    collapseCriteria,
-    shareID,
-    disableSubmit
-  } = phenotypeCorrelations;
+  const asTitleCase = str => str.replace(/_+/g, ' ').replace(/\w+/g, word =>
+    word[0].toUpperCase() + word.substr(1).toLowerCase());
 
-  const setCollapseCriteria = collapseCriteria => {
-    dispatch(updatePhenotypeCorrelations({ collapseCriteria }));
-  };
+  const pluralize = (count, singular, plural) => count === 1
+    ? singular
+    : (plural || `${singular}s`);
 
-  const toggleCollapseCriteria = () => {
-    if (collapseCriteria) {
-      setCollapseCriteria(false);
-    } else {
-      setCollapseCriteria(true);
-    }
-  };
-
-  const CollapseCaret = () => {
-    if (
-      searchCriteriaPhenotypeCorrelations &&
-      !collapseCriteria &&
-      searchCriteriaPhenotypeCorrelations.phenotypes
-    ) {
-      return <i className="fa fa-caret-down fa-lg"></i>;
-    } else {
-      return <i className="fa fa-caret-right fa-lg"></i>;
-    }
-  };
-
-  const displaySex = sex =>
-    ({
-      all: 'All',
-      combined: 'All',
-      stacked: 'Female/Male (Stacked)',
-      female: 'Female',
-      male: 'Male'
-    }[sex]);
-
-  const displayAncestry = ancestry =>
-    ({
-      european: 'European',
-      east_asian: 'East Asian'
-    }[ancestry]);
+  const truncate = (str, limit = 50) => str.length > limit 
+    ? (str.substring(0, limit) + '...')
+    : str;
 
   return (
-    <div className="mb-2">
-      <div className="px-3 py-2 bg-white tab-pane-bordered rounded-0">
-        <div className="d-flex justify-content-between">
-          <div className="py-1 d-flex justify-content-start">
-            <span className="mr-1">
-              <Button
-                className="p-0"
-                style={{
-                  color:
-                    searchCriteriaPhenotypeCorrelations &&
-                    searchCriteriaPhenotypeCorrelations.phenotypes &&
-                    searchCriteriaPhenotypeCorrelations.phenotypes.length > 1
-                      ? 'rgb(0, 126, 167)'
-                      : ''
-                }}
-                title="Expand/collapse search criteria panel"
-                variant="link"
-                onClick={e => toggleCollapseCriteria()}
-                aria-controls="search-criteria-collapse-panel"
-                aria-expanded={!collapseCriteria}
-                disabled={
-                  !searchCriteriaPhenotypeCorrelations ||
-                  (searchCriteriaPhenotypeCorrelations &&
-                    searchCriteriaPhenotypeCorrelations.phenotypes.length < 2)
-                }>
-                <CollapseCaret />
-              </Button>
-            </span>
-            <span>
-              <b>Phenotypes:</b>{' '}
-              {collapseCriteria && (
-                <>
-                  <span>
-                    {searchCriteriaPhenotypeCorrelations &&
-                    searchCriteriaPhenotypeCorrelations.phenotypes &&
-                    searchCriteriaPhenotypeCorrelations.phenotypes.length >= 1
-                      ? searchCriteriaPhenotypeCorrelations.phenotypes[0]
-                      : 'None'}
-                  </span>
-                  <span className="">
-                    {searchCriteriaPhenotypeCorrelations &&
-                    searchCriteriaPhenotypeCorrelations.phenotypes &&
-                    searchCriteriaPhenotypeCorrelations.phenotypes.length >
-                      1 ? (
-                      <span> and</span>
-                    ) : (
-                      <></>
-                    )}
-                    <button
-                      className="ml-1 p-0 text-primary"
-                      style={{
-                        all: 'unset',
-                        textDecoration: 'underline',
-                        cursor: 'pointer'
-                      }}
-                      title="Expand/collapse search criteria panel"
-                      onClick={e => toggleCollapseCriteria()}
-                      aria-controls="search-criteria-collapse-panel"
-                      aria-expanded={!collapseCriteria}>
-                      <span style={{ color: 'rgb(0, 126, 167)' }}>
-                        {searchCriteriaPhenotypeCorrelations &&
-                        searchCriteriaPhenotypeCorrelations.phenotypes
-                          ? searchCriteriaPhenotypeCorrelations.phenotypes
-                              .length -
-                            1 +
-                            ` other${
-                              searchCriteriaPhenotypeCorrelations.phenotypes
-                                .length -
-                                1 ===
-                              1
-                                ? ''
-                                : 's'
-                            }`
-                          : ''}
-                      </span>
-                    </button>
-                  </span>
-                </>
-              )}
-            </span>
-            <span className="ml-1">
-              {!collapseCriteria &&
-                searchCriteriaPhenotypeCorrelations &&
-                searchCriteriaPhenotypeCorrelations.phenotypes &&
-                searchCriteriaPhenotypeCorrelations.phenotypes.map(
-                  phenotype => (
-                    <div title={phenotype}>
-                      {phenotype.length < 50
-                        ? phenotype
-                        : phenotype.substring(0, 47) + '...'}
-                    </div>
-                  )
-                )}
-            </span>
+    <div className={`mb-2 px-3 py-2 bg-white tab-pane-bordered rounded-0 d-flex align-items-${collapsed ? 'center' : 'start'} justify-content-between`}>
+      <div className="d-flex align-items-start">
+        <button 
+            className="btn btn-link btn-sm p-0 outline-none"
+            onClick={toggleCollapsed}
+            title="Expand/collapse search criteria panel"
+            disabled={!canCollapse}>
+          <i
+            className={
+              `fa fa-lg
+              fa-caret-${collapsed ? 'right' : 'down'} 
+              ${canCollapse ? 'text-secondary' : 'text-muted'}`} /> 
+        </button>
 
-            <span
-              className="border-left border-secondary mx-3"
-              style={{ maxHeight: '1.6em' }}></span>
+        <b className="pl-2">{pluralize(selectedPhenotypes.length, 'Phenotype')}: </b>
+        <span className="ml-1 pr-4 border-right border-dark">
+          {!selectedPhenotypes.length  ? 'None' : collapsed 
+            ? <>
+              {selectedPhenotypes[0].display_name}
+              {selectedPhenotypes.length > 1 && <> 
+                {` and `}
+                <span className="btn-link" role="button" onClick={toggleCollapsed}>
+                  {selectedPhenotypes.length - 1}
+                  {pluralize(selectedPhenotypes.length - 1, ' other')}
+                </span>
+              </>}
+            </> 
+            : selectedPhenotypes.map((phenotype, i) => 
+              <div key={`correlation-phenotype-${i}`} title={phenotype.display_name}>
+                {truncate(phenotype.display_name, 50)}
+              </div>
+            )}
+        </span>
 
-            <span>
-              <b>Sex</b>:{' '}
-              {searchCriteriaPhenotypeCorrelations &&
-              searchCriteriaPhenotypeCorrelations.sex
-                ? displaySex(searchCriteriaPhenotypeCorrelations.sex)
-                : 'None'}
-            </span>
+        <span className="px-4 border-right border-dark">
+          <b>Sex: </b>
+          {selectedSex ? asTitleCase(selectedSex) : 'None'}
+        </span>
 
-            <span
-              className="border-left border-secondary mx-3"
-              style={{ maxHeight: '1.6em' }}></span>
-
-            <span>
-              <b>Ancestry</b>:{' '}
-              {searchCriteriaPhenotypeCorrelations &&
-              searchCriteriaPhenotypeCorrelations.ancestry
-                ? displayAncestry(searchCriteriaPhenotypeCorrelations.ancestry)
-                : 'None'}
-            </span>
-          </div>
-
-          <div className="d-flex">
-            <span className="py-1">
-              <b>Total Phenotypes:</b>{' '}
-              {searchCriteriaPhenotypeCorrelations &&
-              searchCriteriaPhenotypeCorrelations.totalPhenotypes
-                ? searchCriteriaPhenotypeCorrelations.totalPhenotypes
-                : 'None'}
-            </span>
-
-            <span className="ml-3" style={{ maxHeight: '1.6em' }}></span>
-
-            <div className="d-inline">
-              <ShareLink
-                disabled={
-                  !searchCriteriaPhenotypeCorrelations || !disableSubmit
-                }
-                shareID={shareID}
-                params={phenotypeCorrelations}
-              />
-            </div>
-          </div>
-        </div>
+        <span className="px-4">
+          <b>Ancestry: </b>
+          {selectedAncestry ? asTitleCase(selectedAncestry) : 'None'}
+        </span>
       </div>
+
+      <div className="d-flex align-items-center">
+        <span className="mr-2">
+          <b>Total Results: </b>
+          {selectedPhenotypes.length ? selectedPhenotypes.length.toLocaleString() : 'None'}
+        </span>
+        <ShareLink
+          disabled={!submitted}
+          shareID={shareID}
+          params={{ selectedPhenotypes, selectedSex, selectedAncestry }}
+        />
+      </div>
+
     </div>
   );
 };

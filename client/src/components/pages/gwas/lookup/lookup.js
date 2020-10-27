@@ -18,21 +18,26 @@ import {
   paginationButton
 } from '../../../controls/table/table';
 import paginationFactory from 'react-bootstrap-table2-paginator';
-import filterFactory, { textFilter } from 'react-bootstrap-table2-filter';
+import filterFactory from 'react-bootstrap-table2-filter';
 import ToolkitProvider, { CSVExport } from 'react-bootstrap-table2-toolkit';
-import { Alert, Spinner } from 'react-bootstrap';
+import { Spinner } from 'react-bootstrap';
 import { VariantLookupSearchCriteria } from './lookup-search-criteria';
-import { RootContext } from '../../../..';
+import { RootContext } from '../../../../index';
 
 export function VariantLookup() {
   const dispatch = useDispatch();
   const { getInitialState } = useContext(RootContext);
-  const { messages, submitted, sharedState, selectedPhenotypes } = useSelector(
+  const { 
+    selectedPhenotypes,
+    selectedAncestry,
+    selectedSex,
+    selectedVariant,
+    submitted, 
+    sharedState, 
+  } = useSelector(
     state => state.variantLookup
   );
-  const { results } = useSelector(state => state.variantLookupTable);
-
-  const phenotypes = useSelector(state => state.phenotypes);
+  const results = useSelector(state => state.variantLookupTable.results);
 
   const { ExportCSVButton } = CSVExport;
 
@@ -42,7 +47,7 @@ export function VariantLookup() {
     {
       // title: true,
       title: (cell, row, rowIndex, colIndex) => cell,
-      dataField: 'phenotype',
+      dataField: 'phenotype.display_name',
       text: 'Phenotype',
       sort: true,
       headerStyle: { width: '290px' },
@@ -93,9 +98,7 @@ export function VariantLookup() {
       dataField: 'snp',
       text: 'SNP',
       sort: true,
-      formatter: cell => cell === null ? '-' : !/^rs\d+/.test(cell) ?
-        (!/^chr[\d+|x|y]:\d+/i.test(cell) ? cell :
-          cell.split(':')[0] + ':' + cell.split(':')[1]) :
+      formatter: cell => cell === null ? '-' : !/^rs\d+/.test(cell) ? cell :
         <a className="overflow-ellipsis" href={`https://www.ncbi.nlm.nih.gov/snp/${cell.split(':')[0]}`} target="_blank">{cell}</a>,
       title: true,
       headerStyle: { width: '180px' },
@@ -188,121 +191,23 @@ export function VariantLookup() {
     }
   ];
 
-
-
-
-  // add filter to column headers
-  // .map(c => {
-  //   c.filter = textFilter({ className: 'form-control-sm' });
-  //   return c;
-  // });
-
-  const placeholder = (
-    <div style={{ display: submitted ? 'none' : 'block' }}>
-      <p className="h4 text-center text-secondary my-5">
-        Please select phenotypes and input variant to view this table
-      </p>
-    </div>
-  );
-
-  const setMessages = messages => {
-    dispatch(updateVariantLookup({ messages }));
-  };
-
-  const clearMessages = e => {
-    setMessages([]);
-  };
-
-  const setSelectedPhenotypes = selectedPhenotypes => {
-    dispatch(updateVariantLookup({ selectedPhenotypes }));
-  };
-
-  const setSubmitted = submitted => {
-    dispatch(updateVariantLookup({ submitted }));
-  };
-
-  const setSearchCriteriaVariantLookup = searchCriteriaVariantLookup => {
-    dispatch(updateVariantLookup({ searchCriteriaVariantLookup }));
-  };
-
-  const validateVariantInput = variant => {
+  useEffect(() => {
     if (
-      variant.match(/^rs\d+$/i) != null ||
-      variant.match(
-        /^chr(\d+|x|y):\d/i
-
-        // /^(chr)?(([1-9]|[1][0-9]|[2][0-2])|[x|y]):[0-9]+/i
-      ) != null
-      // ||
-      // selectedVariant.match(
-      //   /^([c|C][h|H][r|R])?(([1-9]|[1][0-9]|[2][0-2])|[x|X|y|Y]):[0-9]+$/
-      // ) != null
+      sharedState &&
+      sharedState.parameters &&
+      sharedState.parameters.params
     ) {
-      return true;
-    } else {
-      return false;
+      const state = sharedState.parameters.params;
+      handleSubmit({
+        phenotypes: state.selectedPhenotypes,
+        variant: state.selectedVariant,
+        sex: state.selectedSex,
+        ancestry: state.selectedAncestry,
+      });
     }
-  };
-
-  const handleChange = () => {
-    clearMessages();
-    // setSubmitted(null);
-  };
+  }, [sharedState]);
 
   const handleSubmit = params => {
-    if (params.phenotypes.length < 1 && params.variant.length < 1) {
-      setMessages([
-        {
-          type: 'danger',
-          content: 'Please select one or more phenotypes and input a variant.'
-        }
-      ]);
-      return;
-    }
-    if (params.phenotypes.length < 1) {
-      setMessages([
-        {
-          type: 'danger',
-          content: 'Please select one or more phenotypes.'
-        }
-      ]);
-      return;
-    }
-    if (params.variant.length < 1) {
-      setMessages([
-        {
-          type: 'danger',
-          content: 'Please input a variant.'
-        }
-      ]);
-      return;
-    }
-    // skip variant validation for now
-    // if (!validateVariantInput(params.variant)) {
-    //   setMessages([
-    //     {
-    //       type: 'danger',
-    //       content: "Please input a valid variant rsid or coordinate. (Ex. 'rs1234' or 'chr22:25855459')"
-    //     }
-    //   ]);
-    //   return;
-    // }
-    // close sidebar on submit
-    // setOpenSidebar(false);
-
-    dispatch(
-      updateVariantLookup({
-        searchCriteriaVariantLookup: {
-          phenotypes: params.phenotypes.map(item => item.title),
-          variant: params.variant,
-          sex: params.sex,
-          ancestry: params.ancestry
-        },
-        submitted: new Date(),
-        disableSubmit: true
-      })
-    );
-
     dispatch(
       lookupVariants({
         phenotypes: params.phenotypes,
@@ -313,47 +218,19 @@ export function VariantLookup() {
     );
   };
 
-  const loadState = state => {
-    if (!state || !Object.keys(state).length) return;
-    dispatch(
-      updateVariantLookup({
-        ...state,
-        submitted: new Date(),
-        sharedState: null
-      })
-    );
-    dispatch(
-      lookupVariants({
-        phenotypes: state.selectedPhenotypes,
-        variant: state.selectedVariant,
-        sex: state.selectedSex === 'combined' ? 'all' : state.selectedSex,
-        ancestry: state.selectedAncestry
-      })
-    );
-  };
-
-  useEffect(() => {
-    if (
-      sharedState &&
-      sharedState.parameters &&
-      sharedState.parameters.params
-    ) {
-      loadState(sharedState.parameters.params);
-    }
-  }, [sharedState]);
-
-  useEffect(() => {
-    if (sharedState) return;
-    if (selectedPhenotypes) {
-      setSelectedPhenotypes(selectedPhenotypes);
-    }
-  }, [selectedPhenotypes]);
-
   const handleReset = () => {
     const { variantLookup, variantLookupTable } = getInitialState();
     dispatch(updateVariantLookup(variantLookup));
     dispatch(updateVariantLookupTable(variantLookupTable));
   };
+
+  const placeholder = (
+    <div style={{ display: submitted ? 'none' : 'block' }}>
+      <p className="h4 text-center text-secondary my-5">
+        Please select phenotypes and input variant to view this table
+      </p>
+    </div>
+  );
 
   return (
     <div className="position-relative">
@@ -365,19 +242,12 @@ export function VariantLookup() {
           <div className="px-2 pt-2 pb-3 bg-white tab-pane-bordered rounded-0">
             <VariantLookupForm
               onSubmit={handleSubmit}
-              onChange={handleChange}
               onReset={handleReset}
+              selectedPhenotypes={selectedPhenotypes}
+              selectedAncestry={selectedAncestry}
+              selectedSex={selectedSex}
+              selectedVariant={selectedVariant}
             />
-            {(messages || []).map(({ type, content }) => (
-              <Alert
-                className="mt-3"
-                key={content}
-                variant={type}
-                onClose={clearMessages}
-                dismissible>
-                {content}
-              </Alert>
-            ))}
           </div>
         </SidebarPanel>
         <MainPanel className="col-lg-9">

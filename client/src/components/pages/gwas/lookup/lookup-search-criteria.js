@@ -1,234 +1,117 @@
-import React from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { updateVariantLookup } from '../../../../services/actions';
-import { Button } from 'react-bootstrap';
+import React, { useState } from 'react';
+import { useSelector } from 'react-redux';
 import { ShareLink } from '../../../controls/share-link/share-link';
 
 export const VariantLookupSearchCriteria = () => {
-  const dispatch = useDispatch();
-  const variantLookup = useSelector(state => state.variantLookup);
   const {
-    searchCriteriaVariantLookup,
-    collapseCriteria,
+    selectedPhenotypes,
+    selectedSex,
+    selectedAncestry,
+    selectedVariant,
     shareID,
-    disableSubmit
-  } = variantLookup;
-  const { numResults } = useSelector(state => state.variantLookupTable);
+    submitted
+  } = useSelector(
+    state => state.variantLookup
+  );
+  const [collapsed, setCollapsed] = useState(true);
+  const canCollapse = submitted && selectedPhenotypes.length > 1;
+  const toggleCollapsed = _ =>  canCollapse && setCollapsed(!collapsed);
+  const selectedVariants = (selectedVariant || '').split(/\s+/g).filter(e => e.trim().length);
 
-  const setCollapseCriteria = collapseCriteria => {
-    dispatch(updateVariantLookup({ collapseCriteria }));
-  };
+  const asTitleCase = str => str.replace(/_+/g, ' ').replace(/\w+/g, word =>
+    word[0].toUpperCase() + word.substr(1).toLowerCase());
 
-  const toggleCollapseCriteria = () => {
-    if (collapseCriteria) {
-      setCollapseCriteria(false);
-    } else {
-      setCollapseCriteria(true);
-    }
-  };
+  const pluralize = (count, singular, plural) => count === 1
+    ? singular
+    : (plural || `${singular}s`);
 
-  const CollapseCaret = () => {
-    if (
-      searchCriteriaVariantLookup &&
-      !collapseCriteria &&
-      searchCriteriaVariantLookup.phenotypes
-    ) {
-      return <i className="fa fa-caret-down fa-lg"></i>;
-    } else {
-      return <i className="fa fa-caret-right fa-lg"></i>;
-    }
-  };
+  const truncate = (str, limit = 50) => str.length > limit 
+    ? (str.substring(0, limit) + '...')
+    : str;
 
-  const displaySex = sex =>
-    ({
-      all: 'All',
-      combined: 'All',
-      stacked: 'Female/Male (Stacked)',
-      female: 'Female',
-      male: 'Male'
-    }[sex]);
-
-  const displayAncestry = ancestry =>
-    ({
-      european: 'European',
-      east_asian: 'East Asian'
-    }[ancestry]);
+  const VariantLink = ({variant}) => !/^rs\d+/.test(variant) ? variant : 
+    <a href={`https://www.ncbi.nlm.nih.gov/snp/${variant}`} target="_blank">
+      {variant}
+    </a>;
 
   return (
-    <div className="mb-2">
-      <div className="px-3 py-2 bg-white tab-pane-bordered rounded-0">
-        <div className="d-flex justify-content-between">
-          <div className="py-1 d-flex justify-content-start">
-            <span className="mr-1">
-              <Button
-                className="p-0"
-                title="Expand/collapse search criteria panel"
-                style={{
-                  color: searchCriteriaVariantLookup ? 'rgb(0, 126, 167)' : ''
-                }}
-                variant="link"
-                onClick={e => toggleCollapseCriteria()}
-                aria-controls="search-criteria-collapse-panel"
-                aria-expanded={!collapseCriteria}
-                disabled={!searchCriteriaVariantLookup}>
-                <CollapseCaret />
-              </Button>
-            </span>
-            <span>
-              <b>Phenotypes:</b>{' '}
-              {collapseCriteria && (
-                <>
-                  <span>
-                    {searchCriteriaVariantLookup &&
-                    searchCriteriaVariantLookup.phenotypes &&
-                    searchCriteriaVariantLookup.phenotypes.length >= 1
-                      ? searchCriteriaVariantLookup.phenotypes[0]
-                      : 'None'}
-                  </span>
-                  <span className="">
-                    {searchCriteriaVariantLookup &&
-                    searchCriteriaVariantLookup.phenotypes &&
-                    searchCriteriaVariantLookup.phenotypes.length > 1 ? (
-                      <span> and</span>
-                    ) : (
-                      <></>
-                    )}
-                    <button
-                      className="ml-1 p-0 text-primary"
-                      style={{
-                        all: 'unset',
-                        textDecoration: 'underline',
-                        cursor: 'pointer'
-                      }}
-                      title="Expand/collapse search criteria panel"
-                      onClick={e => toggleCollapseCriteria()}
-                      aria-controls="search-criteria-collapse-panel"
-                      aria-expanded={!collapseCriteria}>
-                      <span style={{ color: 'rgb(0, 126, 167)' }}>
-                        {searchCriteriaVariantLookup &&
-                        searchCriteriaVariantLookup.phenotypes &&
-                        searchCriteriaVariantLookup.phenotypes.length > 1
-                          ? searchCriteriaVariantLookup.phenotypes.length -
-                            1 +
-                            ` other${
-                              searchCriteriaVariantLookup.phenotypes.length -
-                                1 ===
-                              1
-                                ? ''
-                                : 's'
-                            }`
-                          : ''}
-                      </span>
-                    </button>
-                  </span>
-                </>
-              )}
-            </span>
-            <span className="ml-1">
-              {!collapseCriteria &&
-                searchCriteriaVariantLookup &&
-                searchCriteriaVariantLookup.phenotypes &&
-                searchCriteriaVariantLookup.phenotypes.map(phenotype => (
-                  <div title={phenotype}>
-                    {phenotype.length < 50
-                      ? phenotype
-                      : phenotype.substring(0, 47) + '...'}
-                  </div>
-                ))}
-            </span>
+    <div className={`mb-2 px-3 py-2 bg-white tab-pane-bordered rounded-0 d-flex align-items-${collapsed ? 'center' : 'start'} justify-content-between`}>
+      <div className="d-flex align-items-start">
+        <button 
+            className="btn btn-link btn-sm p-0 outline-none"
+            onClick={toggleCollapsed}
+            title="Expand/collapse search criteria panel"
+            disabled={!canCollapse}>
+          <i
+            className={
+              `fa fa-lg
+              fa-caret-${collapsed ? 'right' : 'down'} 
+              ${canCollapse ? 'text-secondary' : 'text-muted'}`} /> 
+        </button>
 
-            <span
-              className="border-left border-secondary mx-3"
-              style={{ maxHeight: '1.6em' }}></span>
+        <b className="pl-2">{pluralize(selectedPhenotypes.length, 'Phenotype')}: </b>
+        <span className="ml-1 pr-4 border-right border-dark">
+          {!selectedPhenotypes.length  ? 'None' : collapsed 
+            ? <>
+              {selectedPhenotypes[0].display_name}
+              {selectedPhenotypes.length > 1 && <> 
+                {` and `}
+                <span className="btn-link" role="button" onClick={toggleCollapsed}>
+                  {selectedPhenotypes.length - 1}
+                  {pluralize(selectedPhenotypes.length - 1, ' other')}
+                </span>
+              </>}
+            </> 
+            : selectedPhenotypes.map((phenotype, i) => 
+              <div key={`lookup-phenotype-${i}`} title={phenotype.display_name}>
+                {truncate(phenotype.display_name, 50)}
+              </div>
+            )}
+        </span>
 
-            <span>
-              <b>Variant</b>:{' '}
-              {searchCriteriaVariantLookup &&
-              searchCriteriaVariantLookup.variant ? (
-                searchCriteriaVariantLookup &&
-                searchCriteriaVariantLookup.variant.substring(0, 2) === 'rs' ? (
-                  <a
-                    href={
-                      'https://www.ncbi.nlm.nih.gov/snp/' +
-                      searchCriteriaVariantLookup.variant
-                    }
-                    target="_blank"
-                    style={{
-                      textDecoration: 'underline'
-                    }}>
-                    {searchCriteriaVariantLookup.variant}
-                  </a>
-                ) : searchCriteriaVariantLookup.variant.substring(0, 3) ===
-                  'chr' ? (
-                  <span>
-                    {searchCriteriaVariantLookup.variant.split(':')[0] +
-                      ':' +
-                      searchCriteriaVariantLookup.variant.split(':')[1]}
-                  </span>
-                ) : (
-                  <span>{searchCriteriaVariantLookup.variant}</span>
-                )
-              ) : (
-                'None'
-              )}
-            </span>
+        <b className="pl-4">{pluralize(selectedPhenotypes.length, 'Variant')}: </b>
+        <span className="ml-1 pr-4 border-right border-dark">
+          {!selectedVariants.length  ? 'None' : collapsed 
+            ? <>
+              <VariantLink variant={selectedVariants[0]} />
+              {selectedVariants.length > 1 && <> 
+                {` and `}
+                <span className="btn-link" role="button" onClick={toggleCollapsed}>
+                  {selectedVariants.length - 1}
+                  {pluralize(selectedVariants.length - 1, ' other')}
+                </span>
+              </>}
+            </> 
+            : selectedVariants.map((variant, i) => 
+              <div key={`lookup-variant-${i}`} title={variant}>
+                <VariantLink variant={variant} />
+              </div>
+            )}
+        </span>
 
-            <span
-              className="border-left border-secondary mx-3"
-              style={{ maxHeight: '1.6em' }}></span>
+        <span className="px-4 border-right border-dark">
+          <b>Sex: </b>
+          {selectedSex ? asTitleCase(selectedSex) : 'None'}
+        </span>
 
-            <span>
-              <b>Sex</b>:{' '}
-              {searchCriteriaVariantLookup && searchCriteriaVariantLookup.sex
-                ? displaySex(searchCriteriaVariantLookup.sex)
-                : 'None'}
-            </span>
-
-            <span
-              className="border-left border-secondary mx-3"
-              style={{ maxHeight: '1.6em' }}></span>
-
-            <span>
-              <b>Ancestry</b>:{' '}
-              {searchCriteriaVariantLookup &&
-              searchCriteriaVariantLookup.ancestry
-                ? displayAncestry(searchCriteriaVariantLookup.ancestry)
-                : 'None'}
-            </span>
-          </div>
-
-          <div className="d-flex">
-            <span className="py-1">
-              <b>Total Results:</b>{' '}
-              {searchCriteriaVariantLookup && numResults
-                ? numResults.toString() +
-                  (searchCriteriaVariantLookup &&
-                  searchCriteriaVariantLookup.phenotypes
-                    ? ' of ' +
-                      searchCriteriaVariantLookup.phenotypes.length +
-                      ' phenotypes'
-                    : '')
-                : 'None' +
-                  (searchCriteriaVariantLookup &&
-                  searchCriteriaVariantLookup.phenotypes
-                    ? ' of ' +
-                      searchCriteriaVariantLookup.phenotypes.length +
-                      ' phenotypes'
-                    : '')}
-            </span>
-
-            <span className="ml-3" style={{ maxHeight: '1.6em' }}></span>
-
-            <div className="d-inline">
-              <ShareLink
-                disabled={!searchCriteriaVariantLookup || !disableSubmit}
-                shareID={shareID}
-                params={variantLookup}
-              />
-            </div>
-          </div>
-        </div>
+        <span className="px-4">
+          <b>Ancestry: </b>
+          {selectedAncestry ? asTitleCase(selectedAncestry) : 'None'}
+        </span>
       </div>
+
+      <div className="d-flex align-items-center">
+        <span className="mr-2">
+          <b>Total Results: </b>
+          {selectedPhenotypes.length ? selectedPhenotypes.length.toLocaleString() : 'None'}
+        </span>
+        <ShareLink
+          disabled={!submitted}
+          shareID={shareID}
+          params={{ selectedPhenotypes, selectedSex, selectedAncestry, selectedVariant }}
+        />
+      </div>
+
     </div>
   );
 };

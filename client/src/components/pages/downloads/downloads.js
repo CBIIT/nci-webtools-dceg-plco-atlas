@@ -1,4 +1,4 @@
-import React, { useRef, useContext } from 'react';
+import React, { useState, useRef, useContext } from 'react';
 import {
   SidebarContainer,
   SidebarPanel,
@@ -12,39 +12,48 @@ import { RootContext } from '../../../index';
 
 export function Downloads() {
   const dispatch = useDispatch();
-  const phenotypes = useSelector(state => state.phenotypes);
   const { getInitialState } = useContext(RootContext);
+  const phenotypes = useSelector(state => state.phenotypes);
+  const [messages, setMessages] = useState([]);
+  const treeRef = useRef();
 
   const { selectedPhenotypes, downloadRoot, submitted } = useSelector(
     state => state.downloads
   );
 
-  function handleSubmit() {
-    if (!selectedPhenotypes.length || selectedPhenotypes.length > 5) {
-      return;
-    }
+  function handleSubmit(ev) {
+    ev.preventDefault();
+    setMessages([]);
+
+    if (!selectedPhenotypes.length)
+      return setMessages([{type: 'danger', content: 'Please select phenotypes to download.'}]);
+
+    if (selectedPhenotypes.length > 5)
+      return setMessages([{type: 'danger', content: 'Please select five or less phenotypes to download.'}]);
 
     dispatch(
       updateDownloads({
-        submitted: new Date()
+        submitted: true
       })
     );
 
     selectedPhenotypes.forEach((e, i) => {
       setTimeout(() => {
-        download(generateLink(e.value, true));
+        download(generateLink(e.name, true));
       }, i * 250);
     });
   }
 
-  function handleReset() {
+  function handleReset(ev) {
+    ev.preventDefault();
+    treeRef.current.resetSearchFilter();
     dispatch(updateDownloads(getInitialState().downloads));
   }
 
   function handleChange(items) {
     dispatch(
       updateDownloads({
-        selectedPhenotypes: items, //.slice(0, 5),
+        selectedPhenotypes: items,
         submitted: false
       })
     );
@@ -64,12 +73,10 @@ export function Downloads() {
     document.body.removeChild(a);
   }
 
-  const treeRef = useRef();
-
   return (
     <SidebarContainer className="m-3">
       <SidebarPanel className="col-lg-3">
-        <div className="px-2 pt-2 pb-3 bg-white tab-pane-bordered rounded-0">
+        <form className="px-2 pt-2 pb-3 bg-white tab-pane-bordered rounded-0" onSubmit={handleSubmit} onReset={handleReset}>
           <div className="mb-2">
             <b>Phenotypes</b>
             <span style={{ color: 'red' }}>*</span>
@@ -78,77 +85,26 @@ export function Downloads() {
               value={selectedPhenotypes}
               onChange={handleChange}
               ref={treeRef}
+              enabled={node => node.import_date}
             />
             <small className="text-muted">
-              <i>Up to 5 phenotypes may be selected for download.</i>
+              <i>Up to 5 phenotypes may be selected for download. You have currently selected {selectedPhenotypes.length} phenotype(s).</i>
             </small>
           </div>
 
-          <div>
-            <OverlayTrigger
-              overlay={
-                <Tooltip
-                  id="tooltip-disabled"
-                  style={{
-                    display:
-                      !selectedPhenotypes ||
-                      selectedPhenotypes.length < 1 ||
-                      selectedPhenotypes.length > 5
-                        ? 'block'
-                        : 'none'
-                  }}>
-                  {(!selectedPhenotypes || selectedPhenotypes.length < 1) && (
-                    <>Please select a phenotype.</>
-                  )}
-                  {selectedPhenotypes && selectedPhenotypes.length > 5 && (
-                    <>Please select 5 or less phenotypes.</>
-                  )}
-                </Tooltip>
-              }>
-              <span className="d-inline-block">
-                <Button
-                  variant="silver"
-                  onClick={e => {
-                    e.preventDefault();
-                    handleSubmit();
-                  }}
-                  style={{
-                    pointerEvents:
-                      !selectedPhenotypes ||
-                      selectedPhenotypes.length < 1 ||
-                      selectedPhenotypes.length > 5
-                        ? 'none'
-                        : 'auto'
-                  }}
-                  disabled={
-                    !selectedPhenotypes.length ||
-                    selectedPhenotypes.length > 5 ||
-                    submitted
-                  }
-                  title={
-                    selectedPhenotypes.length === 0
-                      ? 'Please select a phenotype.'
-                      : selectedPhenotypes.length > 5
-                      ? 'A maximum of five phenotypes may be selected to download.'
-                      : ''
-                  }>
-                  Download
-                </Button>
-              </span>
-            </OverlayTrigger>
+          {messages.map(({ type, content }, i) => (
+            <div 
+              key={`download-form-message-${i}`} 
+              className={`small my-3 text-${type}`}>
+              {content}
+            </div>
+          ))}
 
-            <Button
-              className="ml-2"
-              variant="silver"
-              onClick={e => {
-                e.preventDefault();
-                handleReset();
-                treeRef.current.resetSearchFilter();
-              }}>
-              Reset
-            </Button>
+          <div>
+            <Button type="submit" variant="silver">Submit</Button>
+            <Button type="reset" variant="silver" className="ml-1">Reset</Button>
           </div>
-        </div>
+        </form>
       </SidebarPanel>
 
       <MainPanel className="col-lg-9">
@@ -176,11 +132,11 @@ export function Downloads() {
                 {selectedPhenotypes.map(e => (
                   <li>
                     <a
-                      href={generateLink(e.value)}
+                      href={generateLink(e.name)}
                       target="_blank"
                       rel="noopener noreferrer"
                       download>
-                      {e.title}
+                      {e.display_name}
                     </a>
                   </li>
                 ))}

@@ -18,106 +18,40 @@ import { RootContext } from '../../../..';
 
 export function PhenotypeCorrelations() {
   const dispatch = useDispatch();
+  const tooltipRef = useRef();
+
   const { getInitialState } = useContext(RootContext);
 
-  const phenotypeCorrelations = useSelector(
+  const {
+    selectedPhenotypes,
+    selectedAncestry,
+    selectedSex,
+    submitted,
+    sharedState,
+  } = useSelector(
     state => state.phenotypeCorrelations
   );
 
-  const {
-    submitted,
-    messages,
-    sharedState,
-    selectedPhenotypes
-  } = phenotypeCorrelations;
-
-  const phenotypes = useSelector(state => state.phenotypes);
-
-  const tooltipRef = useRef();
-
-  // const setSubmitted = submitted => {
-  //   dispatch(updatePhenotypeCorrelations({ submitted }));
-  // };
-
-  const setMessages = messages => {
-    dispatch(updatePhenotypeCorrelations({ messages }));
+  const handleSubmit = ({phenotypes, ancestry, sex}) => {
+    dispatch(updatePhenotypeCorrelations({
+      selectedPhenotypes: phenotypes,
+      selectedAncestry: ancestry,
+      selectedSex: sex,
+      submitted: true,
+    }))
+    dispatch(drawHeatmap({
+      phenotypes,
+      ancestry,
+      sex
+    }));
+    tooltipRef.current && tooltipRef.current.resetTooltip();
   };
 
-  const setSelectedPhenotypes = selectedPhenotypes => {
-    dispatch(updatePhenotypeCorrelations({ selectedPhenotypes }));
-  };
-
-  const clearMessages = e => {
-    setMessages([]);
-  };
-
-  const setSearchCriteriaPhenotypeCorrelations = searchCriteriaPhenotypeCorrelations => {
-    dispatch(
-      updatePhenotypeCorrelations({ searchCriteriaPhenotypeCorrelations })
-    );
-  };
-
-  const placeholder = (
-    <div style={{ display: submitted ? 'none' : 'block' }}>
-      <p className="h4 text-center text-secondary my-5">
-        Please select phenotypes to view this plot
-      </p>
-    </div>
-  );
-
-  const handleChange = () => {
-    clearMessages();
-    // setSubmitted(null);
-  };
-
-  const handleSubmit = params => {
-    if (params.length < 2) {
-      setMessages([
-        {
-          type: 'danger',
-          content: 'Please select 2 or more phenotypes.'
-        }
-      ]);
-      return;
-    }
-
-    // close sidebar on submit
-    // setOpenSidebar(false);
-    dispatch(
-      updatePhenotypeCorrelations({
-        searchCriteriaPhenotypeCorrelations: {
-          phenotypes: params.phenotypes.map(item =>
-            item.title ? item.title : item.label
-          ),
-          sex: params.sex,
-          ancestry: params.ancestry,
-          totalPhenotypes: params.phenotypes.length
-        },
-        submitted: new Date(),
-        disableSubmit: true
-      })
-    );
-    dispatch(drawHeatmap(params));
-    tooltipRef.current.resetTooltip();
-  };
-
-  const loadState = state => {
-    if (!state || !Object.keys(state).length) return;
-    dispatch(
-      updatePhenotypeCorrelations({
-        ...state,
-        submitted: new Date(),
-        sharedState: null
-      })
-    );
-    dispatch(
-      drawHeatmap({
-        phenotypes: state.selectedPhenotypes,
-        sex: state.selectedSex
-        // ancestry: state.selectedAncestry
-      })
-    );
-    tooltipRef.current.resetTooltip();
+  const handleReset = async () => {
+    const initialState = getInitialState();
+    dispatch(updatePhenotypeCorrelations(initialState.phenotypeCorrelations));
+    dispatch(updateHeatmap(initialState.heatmap));
+    tooltipRef.current && tooltipRef.current.resetTooltip();
   };
 
   useEffect(() => {
@@ -126,25 +60,20 @@ export function PhenotypeCorrelations() {
       sharedState.parameters &&
       sharedState.parameters.params
     ) {
-      loadState(sharedState.parameters.params);
+      const state = sharedState.parameters.params;
+      handleSubmit({
+        phenotypes: state.selectedPhenotypes,
+        ancestry: state.selectedAncestry,
+        sex: state.selectedSex,
+      });
     }
   }, [sharedState]);
 
-  useEffect(() => {
-    if (sharedState) return;
-    if (selectedPhenotypes) {
-      setSelectedPhenotypes(selectedPhenotypes);
-    }
-  }, [selectedPhenotypes]);
-
-  const handleReset = async () => {
-    const initialState = getInitialState();
-    dispatch(updatePhenotypeCorrelations(initialState.phenotypeCorrelations));
-    dispatch(updateHeatmap(initialState.heatmap));
-    tooltipRef.current.resetTooltip();
-  };
-
-  const [openSidebar, setOpenSidebar] = useState(true);
+  const placeholder = (
+    <p className="h4 text-center text-secondary my-5">
+      Please select phenotypes to view this plot
+    </p>
+  );
 
   return (
     <div className="position-relative">
@@ -157,20 +86,11 @@ export function PhenotypeCorrelations() {
           <div className="px-2 pt-2 pb-3 bg-white tab-pane-bordered rounded-0">
             <PhenotypeCorrelationsForm
               onSubmit={handleSubmit}
-              onChange={handleChange}
               onReset={handleReset}
-              style={{ display: openSidebar ? 'block' : 'none' }}
+              selectedPhenotypes={selectedPhenotypes}
+              selectedAncestry={selectedAncestry}
+              selectedSex={selectedSex}
             />
-            {messages &&
-              messages.map(({ type, content }) => (
-                <Alert
-                  className="mt-3"
-                  variant={type}
-                  onClose={clearMessages}
-                  dismissible>
-                  {content}
-                </Alert>
-              ))}
           </div>
         </SidebarPanel>
 
@@ -181,12 +101,12 @@ export function PhenotypeCorrelations() {
               'bg-white tab-pane-bordered rounded-0 p-3 d-flex justify-content-center align-items-center'
             }
             style={{ minHeight: '426px' }}>
-            <div
-              className="mw-100 my-4"
-              style={{ display: submitted ? 'block' : 'none' }}>
-              <Heatmap ref={tooltipRef} />
-            </div>
-            {placeholder}
+            {!submitted ? placeholder : 
+              <div
+                className="mw-100 my-4"
+                style={{ display: submitted ? 'block' : 'none' }}>
+                <Heatmap ref={tooltipRef} />
+              </div>}
           </div>
         </MainPanel>
       </SidebarContainer>

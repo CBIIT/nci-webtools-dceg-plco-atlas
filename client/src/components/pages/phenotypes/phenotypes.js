@@ -73,7 +73,7 @@ export function Phenotypes() {
 
   const getParents = (node, parents = []) => {
     phenotypes &&
-      phenotypes.categories.map(item => {
+      phenotypes.tree.map(item => {
         item.children.map(child => {
           if (child.id === node.id) {
             parents.push(item);

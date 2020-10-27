@@ -66,21 +66,12 @@ export function SummaryResultsTable() {
       dataField: 'snp',
       text: 'SNP',
       sort: true,
-      formatter: cell =>
-        !/^rs\d+/.test(cell) ? (
-          !/^chr[\d+|x|y]:\d+/i.test(cell) ? (
-            cell
-          ) : (
-            cell.split(':')[0] + ':' + cell.split(':')[1]
-          )
-        ) : (
-          <a
-            className="overflow-ellipsis"
-            href={`https://www.ncbi.nlm.nih.gov/snp/${cell.split(':')[0]}`}
-            target="_blank">
-            {cell}
-          </a>
-        ),
+      formatter: cell => !/^rs\d+/.test(cell) ? cell : <a
+        className="overflow-ellipsis"
+        href={`https://www.ncbi.nlm.nih.gov/snp/${cell}`}
+        target="_blank">
+        {cell}
+      </a>,
       title: true,
       headerStyle: { width: '180px' },
       headerClasses: 'overflow-ellipsis',
@@ -174,7 +165,7 @@ export function SummaryResultsTable() {
     const phenotype = selectedPhenotypes[key] || selectedPhenotypes[0];
     const { ancestry, sex } =
       selectedStratifications[key] || selectedStratifications[0];
-    if (!phenotype || !phenotype.value) return;
+    if (!phenotype) return;
     // console.log({ order, orderBy, limit, page, bpMin, bpMax });
     let hasRangeFilter = Boolean(nlogpMin && nlogpMax && bpMin && bpMax);
     let summaryParams = {
@@ -199,15 +190,11 @@ export function SummaryResultsTable() {
     } else {
       summaryParams.metadataCount = true;
     }
-
-    // console.log('summary table params', key, summaryParams)
-
     dispatch(fetchSummaryTable(key, summaryParams));
   };
 
-  const handleTableChange = async (key, type, pagination) => {
+  const handleTableChange = (key, type, pagination) => {
     if (!selectedPhenotypes || !selectedPhenotypes.length) return;
-    // console.log('handleTableChange', key, type, pagination);
     const { page, sizePerPage, sortField, sortOrder } = pagination;
     const cachedTable = summaryTables.tables[key];
     const paginationParams = {
@@ -256,7 +243,7 @@ export function SummaryResultsTable() {
   };
 
   const handleSnpReset = async () => {
-    const { summarySnpTables } = getInitialState(); // skip querying
+    const { summarySnpTables } = getInitialState();
     dispatch(updateKey('summarySnpTables', summarySnpTables));
   };
 
