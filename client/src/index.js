@@ -11,11 +11,13 @@ export const RootContext = createContext({
 });
 
 getStore().then(store => {
-  console.log(store.getState());
+  // disconnect initialState from store state
+  const initialState = clonedeep(store.getState());
 
   ReactDOM.render(
     <RootContext.Provider value={{
-      getInitialState: _ => clonedeep(store.getState())
+      // always return new references
+      getInitialState: _ => clonedeep(initialState)
     }}>
       <Provider store={store}>
         <App />
