@@ -7,6 +7,7 @@ export const getInitialState = async (skipQuery) => {
   let initialState = {
     phenotypes: {
       tree: [],
+      flat: [],
       metadata: [],
     },
     summaryResults: {
@@ -101,8 +102,8 @@ export const getInitialState = async (skipQuery) => {
     },
     phenotypeCorrelations: {
       selectedPhenotypes: [],
-      selectedSex: 'all',
-      selectedAncestry: 'european',
+      selectedAncestry: '',
+      selectedSex: '',
       submitted: null,
       messages: [],
       shareID: null,
@@ -145,12 +146,13 @@ export const getInitialState = async (skipQuery) => {
 
   try {
     initialState.phenotypes.tree = await query('phenotypes');
+    initialState.phenotypes.flat = await query('phenotypes', {flat: true});
     initialState.phenotypes.metadata = await query('metadata', {chromosome: 'all'});
     initialState.summaryResults.exportRowLimit = (await query('config', { key: 'exportRowLimit' })).exportRowLimit;
     initialState.summaryResults.ranges = await query('ranges');
     initialState.downloads.downloadRoot = (await query('config', {key: 'downloadRoot'})).downloadRoot;
   } catch (e) {
-    initialState.visible = true;
+    initialState.error.visible = true;
   }
 
   return initialState;

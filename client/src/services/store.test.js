@@ -5,6 +5,7 @@ describe('Store Module', function() {
     expect(await getInitialState(true)).toEqual({
       phenotypes: {
         tree: [],
+        flat: [],
         metadata: [],
       },
       summaryResults: {
@@ -93,10 +94,14 @@ describe('Store Module', function() {
         shareID: null,
         sharedState: null
       },
+      variantLookupTable: {
+        results: [],
+        resultsCount: 0,
+      },
       phenotypeCorrelations: {
         selectedPhenotypes: [],
-        selectedSex: 'all',
-        selectedAncestry: 'european',
+        selectedAncestry: '',
+        selectedSex: '',
         submitted: null,
         messages: [],
         shareID: null,

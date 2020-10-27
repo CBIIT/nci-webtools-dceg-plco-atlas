@@ -517,9 +517,11 @@ export function drawQQPlot({ phenotypes, stratifications, isPairwise }) {
   };
 }
 
-export function drawHeatmap({ phenotypes, sex }) {
+export function drawHeatmap({ phenotypes, ancestry, sex }) {
   return async function(dispatch) {
     try {
+      console.log({phenotypes, ancestry, sex})
+
       const truncate = (str, limit = 20) =>
         str.substring(0, limit) + (str.length > limit ? '...' : '');
       const ids = phenotypes.map(p => p.id);
@@ -641,10 +643,18 @@ export function drawHeatmap({ phenotypes, sex }) {
 export function lookupVariants({ phenotypes, variant, sex, ancestry }) {
   return async function(dispatch) {
     try {
-      const { variantLookupTable } = await getInitialState(true);
-      dispatch(updateVariantLookupTable(variantLookupTable));
-      //      dispatch(updateVariantLookup())
-      //      dispatch(updateHeatmap(variantLookupTable));
+      dispatch(updateVariantLookupTable({
+        results: [],
+        numResults: 0
+      }));
+
+      dispatch(updateVariantLookup({
+        selectedPhenotypes: phenotypes,
+        selectedVariant: variant,
+        selectedAncestry: ancestry,
+        selectedSex: sex,
+        submitted: true
+      }));
 
       let chromosome = null;
       let position = null;
@@ -670,8 +680,7 @@ export function lookupVariants({ phenotypes, variant, sex, ancestry }) {
 
       // populate results
       const results = data.map(record => ({
-        phenotype: phenotypes.find(p => p.id === record.phenotype_id).title,
-        type: phenotypes.find(p => p.id === record.phenotype_id).type,
+        phenotype: phenotypes.find(p => p.id === record.phenotype_id),
         variant,
         ancestry,
         sex,
@@ -682,11 +691,10 @@ export function lookupVariants({ phenotypes, variant, sex, ancestry }) {
       const emptyResults = phenotypes
         .filter(p => !data.find(r => r.phenotype_id === p.id))
         .map(p => ({
-          phenotype: p.title || p.label,
+          phenotype: p,
           sex,
           ancestry,
           variant,
-          variant_id: `not-found-${p.title || p.label}`,
           chromosome: null,
           position: null,
           allele_effect: null,
