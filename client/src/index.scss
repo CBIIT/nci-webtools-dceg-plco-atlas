@@ -276,6 +276,10 @@ input[type='checkbox'][disabled] {
   pointer-events: none;
 }
 
+.outline-none {
+  outline: none !important;
+}
+
 .overflow-ellipsis {
   overflow: hidden !important;
   text-overflow: ellipsis !important;
