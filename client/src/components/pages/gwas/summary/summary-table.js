@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Overlay, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import {
@@ -9,7 +9,6 @@ import {
   fetchSummarySnpTable
 } from '../../../../services/actions';
 import { Icon } from '../../../controls/icon/icon';
-import { getInitialState } from '../../../../services/store';
 import {
   Table,
   paginationText,
@@ -20,9 +19,11 @@ import {
 import paginationFactory from 'react-bootstrap-table2-paginator';
 import { asTitleCase } from './utils';
 import { asQueryString, query } from '../../../../services/query';
+import { RootContext } from '../../../..';
 
 export function SummaryResultsTable() {
   const dispatch = useDispatch();
+  const { getInitialState } = useContext(RootContext);
   const summaryTables = useSelector(state => state.summaryTables);
   const summarySnpTables = useSelector(state => state.summarySnpTables);
   const {
@@ -39,13 +40,6 @@ export function SummaryResultsTable() {
   const selectedTable = useSelector(state => state.summaryTables.selectedTable);
   const setSelectedTable = selectedTable =>
     dispatch(updateSummaryTable('selectedTable', selectedTable));
-
-  const defaultSorted = [
-    {
-      dataField: 'p_value',
-      order: 'asc'
-    }
-  ];
 
   const columns = [
     {
@@ -261,8 +255,8 @@ export function SummaryResultsTable() {
     dispatch(updateSummaryTable('stackedSex', sex));
   };
 
-  const handleSnpReset = () => {
-    const { summarySnpTables } = getInitialState();
+  const handleSnpReset = async () => {
+    const { summarySnpTables } = getInitialState(); // skip querying
     dispatch(updateKey('summarySnpTables', summarySnpTables));
   };
 

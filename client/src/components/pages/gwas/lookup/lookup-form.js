@@ -45,7 +45,7 @@ export function VariantLookupForm({ onChange, onSubmit, onReset }) {
         <label className="required">Phenotypes</label>
         <TreeSelect
           id="lookup-form-tree-select"
-          data={phenotypes}
+          data={phenotypes.tree}
           value={selectedPhenotypes}
           onChange={handleChangeCustom}
           ref={treeRef}

@@ -131,9 +131,9 @@ export class BubbleChart {
     //     .text(function (d) {
 
     //         if (getChildren(d, data)) {
-    //             return "Category: " + d.data.title + "\n" + "Participants: " + d.data.participant_count.toLocaleString();
+    //             return "Category: " + d.data.display_name + "\n" + "Participants: " + d.data.participant_count.toLocaleString();
     //         } else {
-    //             return "Phenotype: " + d.data.title + "\n" + "Participants: " + d.data.participant_count.toLocaleString();
+    //             return "Phenotype: " + d.data.display_name + "\n" + "Participants: " + d.data.participant_count.toLocaleString();
     //         }
     //     });
 
@@ -190,7 +190,7 @@ export class BubbleChart {
         if (d.r < 35) {
           return '' + '<br>' + '';
         } else {
-          return d.data.title + '<br>' + d.data.participant_count;
+          return d.data.display_name + '<br>' + d.data.participant_count;
         }
       })
       .attr('font-family', 'sans-serif')
@@ -242,7 +242,7 @@ export class BubbleChart {
         .html(
           (getChildren(d, data) ? 'Category: ' : 'Phenotype: ') +
             '<b>' +
-            d.data.title +
+            d.data.display_name +
             '</b><br>' +
             'Participants: <b>' +
             Number(d.data.participant_count).toLocaleString() +

@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useContext } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Alert, Spinner } from 'react-bootstrap';
 import { PhenotypesForm } from './phenotypes-form';
@@ -13,11 +13,11 @@ import {
   updateBrowsePhenotypes,
   updateBrowsePhenotypesPlots
 } from '../../../services/actions';
-import { getInitialState } from '../../../services/store';
 import { query } from '../../../services/query';
 import { BubbleChart as Plot } from '../../plots/custom/bubble-chart/bubble-chart';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 import { Icon } from '../../controls/icon/icon';
+import { RootContext } from '../../..';
 
 export function Phenotypes() {
   const dispatch = useDispatch();
@@ -32,6 +32,7 @@ export function Phenotypes() {
     sharedState
   } = useSelector(state => state.browsePhenotypes);
   const { loading } = useSelector(state => state.browsePhenotypesPlots);
+  const getInitialState = useContext(RootContext);
 
   const plotContainer = useRef(null);
 

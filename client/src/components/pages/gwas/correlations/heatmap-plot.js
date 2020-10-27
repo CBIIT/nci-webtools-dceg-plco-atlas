@@ -11,7 +11,7 @@ import { PlotlyWrapper as Plot } from '../../../plots/plotly/plotly-wrapper';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
 import { Tooltip } from '../../../controls/tooltip/tooltip';
 import {
-  submitSummaryResultsQuery,
+  // submitSummaryResultsQuery,
   updateBrowsePhenotypes,
   updateBrowsePhenotypesPlots,
   updateSummaryResults
@@ -66,13 +66,13 @@ export const Heatmap = forwardRef(({}, ref) => {
       ];
       const stratification = { sex: selectedSex, ancestry: selectedAncestry };
       const stratifications = [stratification, stratification];
-      dispatch(
-        submitSummaryResultsQuery({
-          phenotypes: phenotypePair,
-          stratifications,
-          isPairwise: true
-        })
-      );
+      // dispatch(
+      //   submitSummaryResultsQuery({
+      //     phenotypes: phenotypePair,
+      //     stratifications,
+      //     isPairwise: true
+      //   })
+      // );
     } else {
       dispatch(
         updateSummaryResults({

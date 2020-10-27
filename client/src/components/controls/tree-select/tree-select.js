@@ -38,12 +38,11 @@ export const TreeSelect = forwardRef(
       }
     }));
 
-    const root = useRef({ children: data ? data.tree : [] });
+    const root = useRef({ children: data || [] });
     const [selectedNodes, setSelectedNodes] = useState([]);
     const [expandedNodes, setExpandedNodes] = useState([]);
     const [searchFilter, setSearchFilter] = useState('');
-    useEffect(
-      _ => {
+    useEffect(_ => {
         if (!value) value = [];
         if (!Array.isArray(value)) value = [value];
         
@@ -56,15 +55,11 @@ export const TreeSelect = forwardRef(
           .filter(Boolean);
 
         setSelectedNodes(nodes);
-      },
-      [value]
-    );
-    useEffect(
-      _ => {
-        root.current.children = data ? data.tree : [];
-      },
-      [data]
-    );
+    }, [value]);
+
+    useEffect(_ => {
+        root.current.children = data || [];
+    }, [data]);
 
     const arrayWithElements = (elements, shouldInclude, array) =>
       shouldInclude
@@ -204,7 +199,7 @@ export const TreeSelect = forwardRef(
       </div>
     );
 
-    return !data || !data.tree.length ? null : (
+    return !data || !data.length ? null : (
       <div className="border">
         <div className="d-flex">
           <div className="border d-flex align-items-center p-1">
@@ -271,7 +266,7 @@ export const TreeSelect = forwardRef(
                 .map((node, i) => (
                   <Node key={`flat-tree-node-${i}`} keyPrefix={i} node={node} />
                 ))
-            : data.tree
+            : data
                 .sort(compareTitles)
                 .map((node, i) => (
                   <Node key={`tree-node-${i}`} keyPrefix={i} node={node} />
@@ -345,7 +340,7 @@ export const TreeSelect2 = forwardRef(({
 
   // find all parents of a node
   const getParents = (node, parents = []) => {
-    data && data.categories.map((item) => {
+    data.map((item) => {
       item.children.map((child) => {
         if (child.title === node.title && child.id === node.id) {
           parents.push(item)

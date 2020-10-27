@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef, useContext } from 'react';
 import {
   SidebarContainer,
   SidebarPanel,
@@ -8,11 +8,12 @@ import { Button, Tooltip, OverlayTrigger } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
 import { TreeSelect } from '../../controls/tree-select/tree-select';
 import { updateDownloads } from '../../../services/actions';
-import { getInitialState } from '../../../services/store';
+import { RootContext } from '../../../index';
 
 export function Downloads() {
   const dispatch = useDispatch();
   const phenotypes = useSelector(state => state.phenotypes);
+  const { getInitialState } = useContext(RootContext);
 
   const { selectedPhenotypes, downloadRoot, submitted } = useSelector(
     state => state.downloads
@@ -37,8 +38,7 @@ export function Downloads() {
   }
 
   function handleReset() {
-    const initialState = getInitialState();
-    dispatch(updateDownloads(initialState.downloads));
+    dispatch(updateDownloads(getInitialState().downloads));
   }
 
   function handleChange(items) {
@@ -74,7 +74,7 @@ export function Downloads() {
             <b>Phenotypes</b>
             <span style={{ color: 'red' }}>*</span>
             <TreeSelect
-              data={phenotypes}
+              data={phenotypes.tree}
               value={selectedPhenotypes}
               onChange={handleChange}
               ref={treeRef}

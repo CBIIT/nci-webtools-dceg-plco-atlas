@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { store } from '../../../../services/store';
 import { Alert, Tab, Tabs } from 'react-bootstrap';
+import * as clonedeep from 'lodash.clonedeep'
 import { SummaryResultsForm } from './summary-form';
 import { ManhattanPlot } from './manhattan-plot';
 import { QQPlot } from './qq-plot';
@@ -27,9 +27,9 @@ import {
   updateSummaryTableByIndex,
   updateSummarySnpTableByIndex
 } from '../../../../services/actions';
-import { getInitialState } from '../../../../services/store';
 import { query } from '../../../../services/query';
 import './summary.scss';
+import { RootContext } from '../../../..';
 
 export function SummaryResults() {
   const dispatch = useDispatch();
@@ -50,6 +50,7 @@ export function SummaryResults() {
   const selectedTable = useSelector(state => state.summaryTables.selectedTable);
   const qqplotData = useSelector(state => state.qqPlot.qqplotData);
   const [openSidebar, setOpenSidebar] = useState(true);
+  const { getInitialState } = useContext(RootContext);
 
   // selected tab
   const setSelectedPlot = selectedPlot => {
@@ -83,7 +84,7 @@ export function SummaryResults() {
   //   clearMessages();
   // };
 
-  const handleSubmit = ({ phenotypes, stratifications, isPairwise }) => {
+  const handleSubmit = async ({ phenotypes, stratifications, isPairwise }) => {
     clearMessages();
     if (!phenotypes.length || !stratifications.length || (isPairwise && stratifications.length != 2)) {
       return setMessages([{ type: 'danger', content: 'Please select phenotype(s) and corresponding stratification(s)' }]);
@@ -269,10 +270,7 @@ export function SummaryResults() {
       'qqPlot',
       'summaryTables',
       'summarySnpTables'
-    ])
-      dispatch(updateKey(key, initialState[key]));
-    const ranges = await query('ranges');
-    dispatch(updateSummaryResults({ ranges }));
+    ]) dispatch(updateKey(key, initialState[key]));
   };
 
   // resubmit summary results
@@ -357,65 +355,73 @@ export function SummaryResults() {
     );
   };
 
-  const loadState = state => {
-    if (!state || !Object.keys(state).length) return;
-    dispatch(updateSummaryResults({ ...state, submitted: new Date() }));
+  useEffect(() => {
+    console.log('loadState', sharedState);
+    
+    if (!(
+      sharedState &&
+      sharedState.parameters &&
+      sharedState.parameters.params &&
+      Object.keys(sharedState.parameters.params).length
+    )) return;
+
     const {
       selectedPhenotypes,
       selectedStratifications,
       selectedChromosome,
       selectedPlot,
+      isPairwise,
       manhattanPlotView,
-      bpMax,
-      bpMin,
+      nlogpMin,
       nlogpMax,
-      nlogpMin
-    } = state;
+      bpMin,
+      bpMax,
+    } = sharedState.parameters.params;
 
-    if (manhattanPlotView === 'summary') {
-      handleSubmit({
+    dispatch(updateSummaryResults({
+      selectedPhenotypes,
+      selectedStratifications,
+      selectedChromosome,
+      selectedPlot,
+      isPairwise,
+      manhattanPlotView,
+      nlogpMin,
+      nlogpMax,
+      bpMin,
+      bpMax,
+      submitted: true,
+    }));
+
+    handleSubmit({
+      phenotypes: selectedPhenotypes,
+      stratifications: selectedStratifications,
+      isPairwise,
+    });
+
+    dispatch(
+      drawQQPlot({
         phenotypes: selectedPhenotypes,
-        stratifications: selectedStratifications
-      });
-    } else {
-      if (selectedPlot === 'qq-plot') {
-        dispatch(
-          drawQQPlot({
-            phenotypes: selectedPhenotypes,
-            stratifications: selectedStratifications,
-            isPairwise
-          })
-        );
-      }
+        stratifications: selectedStratifications,
+        isPairwise
+      })
+    );
 
-      setTimeout(() => {
-        const isZoomed = bpMax && bpMax && nlogpMin && nlogpMax;
-        updateVariants({
-          phenotype: selectedPhenotypes,
-          stratifications: selectedStratifications,
-          chromosome: selectedChromosome,
-          bounds: {
-            bpMax,
-            bpMin,
-            nlogpMax,
-            nlogpMin
-          },
-          updatePlot: true,
-          metadataCount: !isZoomed,
-          count: isZoomed
-        });
-      }, 100);
-    }
-  };
+    // const isZoomed = bpMax && bpMax && nlogpMin && nlogpMax;
+    // updateVariants({
+    //   phenotype: selectedPhenotypes,
+    //   stratifications: selectedStratifications,
+    //   chromosome: selectedChromosome,
+    //   bounds: {
+    //     bpMax,
+    //     bpMin,
+    //     nlogpMax,
+    //     nlogpMin
+    //   },
+    //   updatePlot: true,
+    //   metadataCount: !isZoomed,
+    //   count: isZoomed
+    // });
 
-  useEffect(() => {
-    if (
-      sharedState &&
-      sharedState.parameters &&
-      sharedState.parameters.params
-    ) {
-      loadState(sharedState.parameters.params);
-    }
   }, [sharedState]);
 
   const placeholder = (

@@ -179,7 +179,7 @@ export function SummaryResultsForm({
         </div>
 
         <TreeSelect
-          data={phenotypes}
+          data={phenotypes.tree}
           value={_selectedPhenotypes}
           onChange={setSelectedPhenotypesAndOptions}
           ref={treeRef}

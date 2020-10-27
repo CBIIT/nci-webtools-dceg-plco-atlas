@@ -37,7 +37,7 @@ export function PhenotypesForm({ onSubmit, onChange, onReset }) {
       <div className="mb-2">
         <label className="required">Phenotypes</label>
         <TreeSelect
-          data={phenotypes}
+          data={phenotypes.tree}
           value={selectedPhenotype}
           // onChange={val => _setPhenotype((val && val.length) ? val[0] : null)}
           onChange={val => {

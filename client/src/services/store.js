@@ -95,6 +95,10 @@ export const getInitialState = async (skipQuery) => {
       shareID: null,
       sharedState: null
     },
+    variantLookupTable: {
+      results: [],
+      resultsCount: 0,
+    },
     phenotypeCorrelations: {
       selectedPhenotypes: [],
       selectedSex: 'all',
@@ -142,9 +146,9 @@ export const getInitialState = async (skipQuery) => {
   try {
     initialState.phenotypes.tree = await query('phenotypes');
     initialState.phenotypes.metadata = await query('metadata', {chromosome: 'all'});
-    initialState.summaryResults.exportRowLimit = await query('config', { key: 'exportRowLimit' }).exportRowLimit;
+    initialState.summaryResults.exportRowLimit = (await query('config', { key: 'exportRowLimit' })).exportRowLimit;
     initialState.summaryResults.ranges = await query('ranges');
-    initialState.downloads.downloadRoot = await query('config', {key: 'downloadRoot'}).downloadRoot;
+    initialState.downloads.downloadRoot = (await query('config', {key: 'downloadRoot'})).downloadRoot;
   } catch (e) {
     initialState.visible = true;
   }

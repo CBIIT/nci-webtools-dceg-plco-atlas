@@ -32,7 +32,7 @@ export function PhenotypeCorrelationsForm({ onChange, onSubmit, onReset }) {
       <div className="mb-2">
         <label className="required">Phenotypes</label>
         <TreeSelect
-          data={phenotypes}
+          data={phenotypes.tree}
           value={selectedPhenotypes}
           onChange={handleChangeCustom}
           ref={treeRef}

@@ -20,8 +20,8 @@ import { getInitialState } from './store';
 import { rootReducer } from './reducers';
 
 describe('Reducers Module', function() {
-  test('rootReducer() returns correct state for action: UPDATE_KEY', () => {
-    let state = getInitialState();
+  test('rootReducer() returns correct state for action: UPDATE_KEY', async () => {
+    let state = await getInitialState(true);
     let type = UPDATE_KEY;
     let key = 'test';
     let data = { test: 1 };
@@ -32,8 +32,8 @@ describe('Reducers Module', function() {
     });
   });
 
-  test('rootReducer() returns correct state for action: UPDATE_SUMMARY_RESULTS', () => {
-    let state = getInitialState();
+  test('rootReducer() returns correct state for action: UPDATE_SUMMARY_RESULTS', async () => {
+    let state = await getInitialState(true);
     let type = UPDATE_SUMMARY_RESULTS;
     let data = { test: 1 };
     let action = { type, data };
@@ -46,8 +46,8 @@ describe('Reducers Module', function() {
     });
   });
 
-  test('rootReducer() returns correct state for action: UPDATE_MANHATTAN_PLOT', () => {
-    let state = getInitialState();
+  test('rootReducer() returns correct state for action: UPDATE_MANHATTAN_PLOT', async () => {
+    let state = await getInitialState(true);
     let type = UPDATE_MANHATTAN_PLOT;
     let data = { test: 1 };
     let action = { type, data };
@@ -60,8 +60,8 @@ describe('Reducers Module', function() {
     });
   });
 
-  test('rootReducer() returns correct state for action: UPDATE_QQ_PLOT', () => {
-    let state = getInitialState();
+  test('rootReducer() returns correct state for action: UPDATE_QQ_PLOT', async () => {
+    let state = await getInitialState(true);
     let type = UPDATE_QQ_PLOT;
     let data = { test: 1 };
     let action = { type, data };
@@ -74,8 +74,8 @@ describe('Reducers Module', function() {
     });
   });
 
-  test('rootReducer() returns correct state for action: UPDATE_SUMMARY_TABLE', () => {
-    let state = getInitialState();
+  test('rootReducer() returns correct state for action: UPDATE_SUMMARY_TABLE', async () => {
+    let state = await getInitialState(true);
     let type = UPDATE_SUMMARY_TABLE;
     let key = 'test';
     let data = { test: 1 };
@@ -89,8 +89,8 @@ describe('Reducers Module', function() {
     });
   });
 
-  test('rootReducer() returns correct state for action: UPDATE_SUMMARY_SNP', () => {
-    let state = getInitialState();
+  test('rootReducer() returns correct state for action: UPDATE_SUMMARY_SNP', async () => {
+    let state = await getInitialState(true);
     let type = UPDATE_SUMMARY_SNP;
     let key = 'test';
     let data = { test: 1 };
@@ -104,8 +104,8 @@ describe('Reducers Module', function() {
     });
   });
 
-  test('rootReducer() returns correct state for action: UPDATE_SUMMARY_SNP_TABLE', () => {
-    let state = getInitialState();
+  test('rootReducer() returns correct state for action: UPDATE_SUMMARY_SNP_TABLE', async () => {
+    let state = await getInitialState(true);
     let type = UPDATE_SUMMARY_SNP_TABLE;
     let key = 'test';
     let data = { test: 1 };
@@ -119,8 +119,8 @@ describe('Reducers Module', function() {
     });
   });
 
-  test('rootReducer() returns correct state for action: UPDATE_VARIANT_LOOKUP', () => {
-    let state = getInitialState();
+  test('rootReducer() returns correct state for action: UPDATE_VARIANT_LOOKUP', async () => {
+    let state = await getInitialState(true);
     let type = UPDATE_VARIANT_LOOKUP;
     let data = { test: 1 };
     let action = { type, data };
@@ -133,8 +133,8 @@ describe('Reducers Module', function() {
     });
   });
 
-  test('rootReducer() returns correct state for action: UPDATE_VARIANT_LOOKUP_TABLE', () => {
-    let state = getInitialState();
+  test('rootReducer() returns correct state for action: UPDATE_VARIANT_LOOKUP_TABLE', async () => {
+    let state = await getInitialState(true);
     let type = UPDATE_VARIANT_LOOKUP_TABLE;
     let key = '';
     let data = { test: 1 };
@@ -148,8 +148,8 @@ describe('Reducers Module', function() {
     });
   });
 
-  test('rootReducer() returns correct state for action: UPDATE_PHENOTYPE_CORRELATIONS', () => {
-    let state = getInitialState();
+  test('rootReducer() returns correct state for action: UPDATE_PHENOTYPE_CORRELATIONS', async () => {
+    let state = await getInitialState(true);
     let type = UPDATE_PHENOTYPE_CORRELATIONS;
     let data = { test: 1 };
     let action = { type, data };
@@ -162,8 +162,8 @@ describe('Reducers Module', function() {
     });
   });
 
-  test('rootReducer() returns correct state for action: UPDATE_PHENOTYPES', () => {
-    let state = getInitialState();
+  test('rootReducer() returns correct state for action: UPDATE_PHENOTYPES', async () => {
+    let state = await getInitialState(true);
     let type = UPDATE_PHENOTYPES;
     let data = { test: 1 };
     let action = { type, data };
@@ -173,8 +173,8 @@ describe('Reducers Module', function() {
     });
   });
 
-  test('rootReducer() returns correct state for action: UPDATE_BROWSE_PHENOTYPES', () => {
-    let state = getInitialState();
+  test('rootReducer() returns correct state for action: UPDATE_BROWSE_PHENOTYPES', async () => {
+    let state = await getInitialState(true);
     let type = UPDATE_BROWSE_PHENOTYPES;
     let data = { test: 1 };
     let action = { type, data };
@@ -187,8 +187,8 @@ describe('Reducers Module', function() {
     });
   });
 
-  test('rootReducer() returns correct state for action: UPDATE_BROWSE_PHENOTYPES_PLOTS', () => {
-    let state = getInitialState();
+  test('rootReducer() returns correct state for action: UPDATE_BROWSE_PHENOTYPES_PLOTS', async () => {
+    let state = await getInitialState(true);
     let type = UPDATE_BROWSE_PHENOTYPES_PLOTS;
     let data = { test: 1 };
     let action = { type, data };
@@ -201,8 +201,8 @@ describe('Reducers Module', function() {
     });
   });
 
-  test('rootReducer() returns correct state for action: UPDATE_HEATMAP', () => {
-    let state = getInitialState();
+  test('rootReducer() returns correct state for action: UPDATE_HEATMAP', async () => {
+    let state = await getInitialState(true);
     let type = UPDATE_HEATMAP;
     let data = { test: 1 };
     let action = { type, data };
@@ -215,8 +215,8 @@ describe('Reducers Module', function() {
     });
   });
 
-  test('rootReducer() returns correct state for action: UPDATE_DOWNLOADS', () => {
-    let state = getInitialState();
+  test('rootReducer() returns correct state for action: UPDATE_DOWNLOADS', async () => {
+    let state = await getInitialState(true);
     let type = UPDATE_DOWNLOADS;
     let data = { test: 1 };
     let action = { type, data };
@@ -229,8 +229,8 @@ describe('Reducers Module', function() {
     });
   });
 
-  test('rootReducer() returns correct state for action: UPDATE_ERROR', () => {
-    let state = getInitialState();
+  test('rootReducer() returns correct state for action: UPDATE_ERROR', async () => {
+    let state = await getInitialState(true);
     let type = UPDATE_ERROR;
     let data = { test: 1 };
     let action = { type, data };

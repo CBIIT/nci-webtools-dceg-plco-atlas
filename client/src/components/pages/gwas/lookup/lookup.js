@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { VariantLookupForm } from './lookup-form';
 import {
@@ -6,7 +6,6 @@ import {
   lookupVariants,
   updateVariantLookupTable
 } from '../../../../services/actions';
-import { getInitialState } from '../../../../services/store';
 import {
   SidebarContainer,
   SidebarPanel,
@@ -23,9 +22,11 @@ import filterFactory, { textFilter } from 'react-bootstrap-table2-filter';
 import ToolkitProvider, { CSVExport } from 'react-bootstrap-table2-toolkit';
 import { Alert, Spinner } from 'react-bootstrap';
 import { VariantLookupSearchCriteria } from './lookup-search-criteria';
+import { RootContext } from '../../../..';
 
 export function VariantLookup() {
   const dispatch = useDispatch();
+  const { getInitialState } = useContext(RootContext);
   const { messages, submitted, sharedState, selectedPhenotypes } = useSelector(
     state => state.variantLookup
   );
@@ -349,9 +350,9 @@ export function VariantLookup() {
   }, [selectedPhenotypes]);
 
   const handleReset = () => {
-    const initialState = getInitialState();
-    dispatch(updateVariantLookup(initialState.variantLookup));
-    dispatch(updateVariantLookupTable(initialState.variantLookupTable));
+    const { variantLookup, variantLookupTable } = getInitialState();
+    dispatch(updateVariantLookup(variantLookup));
+    dispatch(updateVariantLookupTable(variantLookupTable));
   };
 
   return (

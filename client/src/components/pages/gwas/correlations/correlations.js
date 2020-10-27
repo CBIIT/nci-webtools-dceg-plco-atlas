@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useContext } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { PhenotypeCorrelationsForm } from './correlations-form';
 import { Heatmap } from './heatmap-plot';
@@ -14,10 +14,11 @@ import {
   updateHeatmap,
   drawHeatmap
 } from '../../../../services/actions';
-import { getInitialState } from '../../../../services/store';
+import { RootContext } from '../../../..';
 
 export function PhenotypeCorrelations() {
   const dispatch = useDispatch();
+  const { getInitialState } = useContext(RootContext);
 
   const phenotypeCorrelations = useSelector(
     state => state.phenotypeCorrelations
@@ -136,7 +137,7 @@ export function PhenotypeCorrelations() {
     }
   }, [selectedPhenotypes]);
 
-  const handleReset = () => {
+  const handleReset = async () => {
     const initialState = getInitialState();
     dispatch(updatePhenotypeCorrelations(initialState.phenotypeCorrelations));
     dispatch(updateHeatmap(initialState.heatmap));
