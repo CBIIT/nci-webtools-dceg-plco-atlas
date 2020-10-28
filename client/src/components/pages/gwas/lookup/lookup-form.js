@@ -77,7 +77,7 @@ export function VariantLookupForm({
       </div>
       
       <div className="form-group">
-        <label className="required" htmlFor="looup-form-variant">Variant</label>
+        <label className="required" htmlFor="lookup-form-variant">Variants</label>
         <textarea
           id="lookup-form-variant" 
           className="form-control"

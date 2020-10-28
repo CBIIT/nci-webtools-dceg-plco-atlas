@@ -259,10 +259,8 @@ export function VariantLookup() {
                 : 'p-2 bg-white tab-pane-bordered rounded-0 d-flex justify-content-center align-items-center'
             }
             style={{ minHeight: '472px' }}>
-            {results && (
-              <div
-                className="mw-100 my-2 px-4"
-                style={{ display: submitted && results ? 'block' : 'none' }}>
+            {results && submitted && (
+              <div className="mw-100 my-2 px-4">
                 <ToolkitProvider
                   keyField="variant_id"
                   data={results}
@@ -273,13 +271,7 @@ export function VariantLookup() {
                   {props => (
                     <div>
                       <ExportCSVButton
-                        className="float-right"
-                        style={{
-                          all: 'unset',
-                          textDecoration: 'underline',
-                          cursor: 'pointer',
-                          color: 'rgb(0, 126, 167)'
-                        }}
+                        className="float-right btn-link"
                         {...props.csvProps}>
                         Export CSV
                       </ExportCSVButton>
