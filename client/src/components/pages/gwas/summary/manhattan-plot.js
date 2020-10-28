@@ -880,7 +880,10 @@ export function ManhattanPlot({
           {zoomStack.length ? (
             <>
               <Icon name="arrow-left" className="mx-2 opacity-50" width="10" />
-              <a href="javascript:void(0)" onClick={e => onChromosomeSelected && onChromosomeSelected(selectedChromosome)}>
+              <a href="javascript:void(0)" onClick={e => {
+                resetZoom();
+                onChromosomeSelected && onChromosomeSelected(selectedChromosome)
+              }}>
                 Chromosome {selectedChromosome}
               </a>
             </>
