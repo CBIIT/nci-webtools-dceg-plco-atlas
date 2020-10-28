@@ -358,7 +358,7 @@ export function SummaryResults() {
   };
 
   useEffect(() => {
-    console.log('loadState', sharedState);
+    // console.log('loadState', sharedState);
     
     if (!(
       sharedState &&

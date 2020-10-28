@@ -283,17 +283,17 @@ export const GroupedAreaChart = ({
     return {x, y}
   });
   */
-  console.log('drawing grouped chart', {
-    data,
-    categories,
-    xTitle,
-    yTitle,
-    fill,
-    yMax,
-    formatPercent,
-    categoryPrefix,
-    type
-  });
+  // console.log('drawing grouped chart', {
+  //   data,
+  //   categories,
+  //   xTitle,
+  //   yTitle,
+  //   fill,
+  //   yMax,
+  //   formatPercent,
+  //   categoryPrefix,
+  //   type
+  // });
 
   if (!yMax) {
     for (let key in data) {

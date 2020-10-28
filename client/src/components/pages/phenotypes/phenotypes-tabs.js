@@ -132,7 +132,7 @@ export function PhenotypesTabs(props) {
     distributionKey,
     distributionCategory
   }) => {
-    console.log(phenotypeData, distributionKey, distributionCategory);
+    // console.log(phenotypeData, distributionKey, distributionCategory);
     const { counts, percentage } = phenotypeData[distributionKey];
     let columns = [];
     let data = [];

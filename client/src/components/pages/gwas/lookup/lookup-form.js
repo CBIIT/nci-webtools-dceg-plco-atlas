@@ -35,7 +35,7 @@ export function VariantLookupForm({
   }, [selectedPhenotypes, selectedVariant, selectedAncestry, selectedSex]);
 
   function handleReset(ev) {
-    console.log(ev);
+    // console.log(ev);
     ev.preventDefault();
     treeRef.current.resetSearchFilter();
     _setSelectedPhenotypes([]);
@@ -84,7 +84,6 @@ export function VariantLookupForm({
           placeholder="Enter RS Numbers"
           value={_selectedVariant}
           onChange={ev => _setSelectedVariant(ev.target.value)}
-          required
         />
       </div>
 

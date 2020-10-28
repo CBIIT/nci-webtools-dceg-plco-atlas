@@ -32,7 +32,7 @@ export function PhenotypeCorrelationsForm({
   }, [selectedPhenotypes, selectedAncestry, selectedSex]);
 
   function handleReset(ev) {
-    console.log(ev);
+    // console.log(ev);
     ev.preventDefault();
     treeRef.current.resetSearchFilter();
     _setSelectedPhenotypes([]);

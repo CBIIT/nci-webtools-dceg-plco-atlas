@@ -200,7 +200,6 @@ export function ManhattanPlot({
 
       plot.current = new Plot(plotContainer.current, config);
       if (genes && genes.length) {
-        console.log('yes genes', genes);
         plot.current.drawGenes(genes);
       }
       else plot.current.clearGenes();
@@ -506,7 +505,7 @@ export function ManhattanPlot({
           style: 'width: 300px;',
           content: async (data, index) => {
             let point = withKeys(data);
-            console.log(point);
+            // console.log(point);
             const response = await query('variants', {
               phenotype_id: (
                 selectedPhenotypes[point.index] || selectedPhenotypes[0]

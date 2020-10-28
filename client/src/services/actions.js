@@ -535,7 +535,7 @@ export function drawQQPlot({ phenotypes, stratifications, isPairwise }) {
 export function drawHeatmap({ phenotypes, ancestry, sex }) {
   return async function(dispatch) {
     try {
-      console.log({phenotypes, ancestry, sex})
+      // console.log({phenotypes, ancestry, sex})
 
       const truncate = (str, limit = 20) =>
         str.substring(0, limit) + (str.length > limit ? '...' : '');
