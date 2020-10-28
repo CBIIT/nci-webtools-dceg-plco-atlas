@@ -50,6 +50,10 @@ export function About() {
         phenotypes, and links to other pertinent genomic resources are
         available.
       </p>
+
+      <p>
+        This application's source code can be viewed on <a href="https://github.com/CBIIT/nci-webtools-dceg-plco-atlas" target="_blank" alt="Link to open GitHub">GitHub</a>.
+      </p>
     </div>
   );
 }

@@ -167,8 +167,7 @@ export function Home({ links }) {
           <br />
           Citation: TBD
           <br />
-          GWAS Explorer is available under the MIT license, an Open Source
-          Initiative approved license.
+          GWAS Explorer's <a href="https://github.com/CBIIT/nci-webtools-dceg-plco-atlas" target="_blank" alt="Link to open GitHub">source code</a> is available under the <a href="./assets/license.txt" target="_blank" alt="Link to MIT license">MIT license</a>, an <a href="https://opensource.org" target="_blank" alt="Link to open source initiative">Open Source Initiative</a> approved license.
         </div>
       </div>
     </>
