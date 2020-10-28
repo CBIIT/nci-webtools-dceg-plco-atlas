@@ -107,12 +107,10 @@ export const TreeSelect = forwardRef(
       const selection = singleSelect
         ? [node]
         : arrayWithElements(
-            getLeaves(node)
-              .filter(enabled)
-              .filter((_, i) => limit === 0 || i < limit),
+            getLeaves(node).filter(enabled),
             isSelected,
             selectedNodes
-          );
+          ).filter((_, i) => limit === 0 || i < limit);
       setSelectedNodes(selection);
       onChange(selection);
     };
