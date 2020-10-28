@@ -235,14 +235,25 @@ export function drawManhattanPlot(plotType, params) {
   // console.log('drawing plot', plotType, params);
   return async function(dispatch) {
     try {
-      const { phenotypes, stratifications, isPairwise } = params;
+      const { phenotypes, stratifications, chromosome, isPairwise, restore, position_min, position_max } = params;
 
       dispatch(updateManhattanPlot({ loadingManhattanPlot: true }));
 
+      let genes = [];
       const appendIndex = (index, record) => {
         record.columns.push('index');
         record.data.forEach(e => e.push(index));
       };
+
+      if (restore) {
+        if ((position_max - position_min) <= 2e6) {
+          genes = await query('genes', {
+            chromosome: chromosome,
+            transcription_start: position_min,
+            transcription_end: position_max
+          });
+        }
+      }
 
       if (isPairwise) {
         const manhattanPlotData = await rawQuery(plotType, {
@@ -264,7 +275,9 @@ export function drawManhattanPlot(plotType, params) {
         dispatch(
           updateManhattanPlot({
             manhattanPlotData,
-            manhattanPlotMirroredData
+            manhattanPlotMirroredData,
+            genes,
+            restore
           })
         );
       } else {
@@ -279,7 +292,9 @@ export function drawManhattanPlot(plotType, params) {
         dispatch(
           updateManhattanPlot({
             manhattanPlotData,
-            manhattanPlotMirroredData: {}
+            manhattanPlotMirroredData: {},
+            genes,
+            restore,
           })
         );
       }

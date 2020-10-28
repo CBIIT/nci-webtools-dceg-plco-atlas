@@ -148,7 +148,11 @@ export function drawZoomOverlay(config, ctx, overlayCtx) {
 
   function endZoom(ev) {
     if (!mouseDown) return;
-    if (Math.abs(zoomArea.x2 - zoomArea.x1) < 5 && Math.abs(zoomArea.y2 - zoomArea.y1) < 5) return;
+    if (Math.abs(zoomArea.x2 - zoomArea.x1) < 5 && Math.abs(zoomArea.y2 - zoomArea.y1) < 5) {
+      mouseDown = false;
+      config.zoomOverlayActive = false;
+      return;
+    }
     let { x, y } = viewportToLocalCoordinates(ev.clientX, ev.clientY, canvas);
 
     let yMidpoint = margins.top + height / 2;

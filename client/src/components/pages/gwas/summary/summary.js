@@ -167,7 +167,8 @@ export function SummaryResults() {
     isPairwise,
     count,
     metadataCount,
-    updatePlot
+    updatePlot,
+    restore,
   }) => {
     let queryBounds = {
       p_value_nlog_min: 2,
@@ -217,6 +218,7 @@ export function SummaryResults() {
           stratifications,
           chromosome,
           isPairwise,
+          restore,
           ...queryBounds
         })
       );
@@ -376,6 +378,7 @@ export function SummaryResults() {
       nlogpMax,
       bpMin,
       bpMax,
+      submitted,
     } = sharedState.parameters.params;
 
     dispatch(updateSummaryResults({
@@ -389,14 +392,8 @@ export function SummaryResults() {
       nlogpMax,
       bpMin,
       bpMax,
-      submitted: true,
+      submitted,
     }));
-
-    handleSubmit({
-      phenotypes: selectedPhenotypes,
-      stratifications: selectedStratifications,
-      isPairwise,
-    });
 
     dispatch(
       drawQQPlot({
@@ -406,21 +403,46 @@ export function SummaryResults() {
       })
     );
 
-    // const isZoomed = bpMax && bpMax && nlogpMin && nlogpMax;
-    // updateVariants({
-    //   phenotype: selectedPhenotypes,
-    //   stratifications: selectedStratifications,
-    //   chromosome: selectedChromosome,
-    //   bounds: {
-    //     bpMax,
-    //     bpMin,
-    //     nlogpMax,
-    //     nlogpMin
-    //   },
-    //   updatePlot: true,
-    //   metadataCount: !isZoomed,
-    //   count: isZoomed
-    // });
+    if (manhattanPlotView === 'summary') {
+      handleSubmit({
+        phenotypes: selectedPhenotypes,
+        stratifications: selectedStratifications,
+        isPairwise,
+      });
+    } else {
+      const isZoomed = bpMax && bpMax && nlogpMin && nlogpMax;
+
+      if (isZoomed) {
+        dispatch(updateManhattanPlot({
+          zoomStack: [{
+            bounds: {
+              xMin: bpMin,
+              xMax: bpMax,
+              yMin: nlogpMin,
+              yMax: nlogpMax,
+            }
+          }]
+        }))
+      }
+
+      updateVariants({
+        phenotypes: selectedPhenotypes,
+        stratifications: selectedStratifications,
+        chromosome: selectedChromosome,
+        isPairwise,
+        bounds: {
+          bpMax,
+          bpMin,
+          nlogpMax,
+          nlogpMin
+        },
+        updatePlot: true,
+        metadataCount: !isZoomed,
+        count: isZoomed,
+        restore: true,
+      });
+
+    }
 
   }, [sharedState]);
 
@@ -465,7 +487,7 @@ export function SummaryResults() {
               title="Manhattan Plot"
               className="p-2 bg-white tab-pane-bordered rounded-0"
               style={{ minHeight: '365px' }}>
-              <div style={{ display: submitted ? 'block' : 'none' }}>
+              {submitted && selectedPhenotypes && selectedStratifications && <div>
                 <div style={{ minHeight: '635px' }}>
                   <ManhattanPlot
                     onChromosomeSelected={onChromosomeSelected}
@@ -479,7 +501,7 @@ export function SummaryResults() {
                 <div className="mw-100 my-4 px-5">
                   <SummaryResultsTable />
                 </div>
-              </div>
+              </div>}
               {placeholder}
             </Tab>
             <Tab

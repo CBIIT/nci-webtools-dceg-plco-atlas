@@ -434,6 +434,7 @@ export class ManhattanPlot {
     }
 
     if (!genes || !this.config.zoomWindow) return;
+    console.log('continuing drawing genes', genes, this.config.zoomWindow);
 
     let getName = gene =>
       gene.strand === '+' ? `${gene.name} →` : `← ${gene.name}`;

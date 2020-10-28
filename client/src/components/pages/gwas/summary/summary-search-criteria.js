@@ -24,7 +24,7 @@ export const SummaryResultsSearchCriteria = () => {
 
   useEffect(() => {
     Promise.all(
-      submitted
+      submitted && selectedPhenotypes && selectedStratifications
         ? (isPairwise ? [0, 1] : [0]).map(async index => ({
             ...(selectedPhenotypes[index] || selectedPhenotypes[0]),
             stratification: [
@@ -48,7 +48,7 @@ export const SummaryResultsSearchCriteria = () => {
 
   return (
     <div className="p-3 mb-2 bg-white border rounded-0 d-flex justify-content-between">
-      {!submitted ? (
+      {!(submitted && selectedPhenotypes && selectedStratifications) ? (
         <strong className="d-flex align-items-center text-muted">
           No phenotype(s) selected.
         </strong>
@@ -79,6 +79,7 @@ export const SummaryResultsSearchCriteria = () => {
           nlogpMax,
           bpMin,
           bpMax,
+          submitted,
         }}
       />
     </div>

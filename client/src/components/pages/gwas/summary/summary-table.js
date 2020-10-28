@@ -102,23 +102,23 @@ export function SummaryResultsTable() {
       text: 'Beta [95% CI]',
       headerTitle: _ => 'Beta [95% Confidence Interval]',
       title: true,
-      formatter: (cell, row) => (!cell || isNaN(cell)) ? '-' : 
+      formatter: (cell, row) => (!cell || isNaN(cell)) ? '-' :
         `${(+cell).toFixed(3)} [${row.beta_ci_95_low.toFixed(3)} - ${+row.beta_ci_95_high.toFixed(3)}]`,
-      title: (cell, row) => (!cell || isNaN(cell)) ? '-' : 
+      title: (cell, row) => (!cell || isNaN(cell)) ? '-' :
         `${(+cell).toFixed(3)} [${row.beta_ci_95_low.toFixed(3)} - ${+row.beta_ci_95_high.toFixed(3)}]`,
-        headerStyle: { minWidth: '200px',  width: '200px' },
-        headerClasses: 'overflow-ellipsis',
+      headerStyle: { minWidth: '200px', width: '200px' },
+      headerClasses: 'overflow-ellipsis',
       classes: 'overflow-ellipsis',
     },
     {
       dataField: 'odds_ratio',
       text: 'OR [95% CI]',
       headerTitle: _ => 'Odds Ratio [95% Confidence Interval]',
-      formatter: (cell, row) => (!cell || isNaN(cell)) ? '-' : 
+      formatter: (cell, row) => (!cell || isNaN(cell)) ? '-' :
         `${(+cell).toFixed(3)} [${row.odds_ratio_ci_95_low.toFixed(3)} - ${+row.odds_ratio_ci_95_high.toFixed(3)}]`,
-      title: (cell, row) => (!cell || isNaN(cell)) ? '-' : 
+      title: (cell, row) => (!cell || isNaN(cell)) ? '-' :
         `${(+cell).toFixed(3)} [${row.odds_ratio_ci_95_low.toFixed(3)} - ${+row.odds_ratio_ci_95_high.toFixed(3)}]`,
-      headerStyle: { minWidth: '200px',  width: '200px' },
+      headerStyle: { minWidth: '200px', width: '200px' },
       classes: 'overflow-ellipsis',
       headerClasses: 'overflow-ellipsis'
     },
@@ -133,7 +133,7 @@ export function SummaryResultsTable() {
       formatter: cell => (cell < 1e-2 ? (+cell).toExponential() : cell),
       title: true,
       sort: true,
-      headerStyle: {width: '110px', minWidth: '110px'},
+      headerStyle: { width: '110px', minWidth: '110px' },
       headerClasses: 'overflow-ellipsis',
       classes: 'overflow-ellipsis'
     },
@@ -241,14 +241,15 @@ export function SummaryResultsTable() {
     // updating stacked sex
     dispatch(updateSummaryTable('stackedSex', sex));
   };
-
   const handleSnpReset = async () => {
+
     const { summarySnpTables } = getInitialState();
     dispatch(updateKey('summarySnpTables', summarySnpTables));
   };
 
   const getExportLink = () => {
-    if (!selectedStratifications.length || !selectedPhenotypes.length)
+    if (!selectedStratifications || !selectedPhenotypes ||      
+      !selectedStratifications.length || !selectedPhenotypes.length)
       return null;
 
     const phenotype =
@@ -262,23 +263,23 @@ export function SummaryResultsTable() {
 
     let exportParams = summarySnpTables.visible
       ? {
-          phenotype_id: phenotype.id,
-          sex,
-          ancestry,
-          snp: summarySnpTables.snp
-        }
+        phenotype_id: phenotype.id,
+        sex,
+        ancestry,
+        snp: summarySnpTables.snp
+      }
       : {
-          phenotype_id: phenotype.id,
-          sex,
-          ancestry,
-          chromosome: selectedChromosome,
-          orderBy: summaryTables.tables[selectedTable].orderBy || 'p_value',
-          order: summaryTables.tables[selectedTable].order || 'asc',
-          p_value_nlog_min: nlogpMin,
-          p_value_nlog_max: nlogpMax,
-          position_min: bpMin,
-          position_max: bpMax
-        };
+        phenotype_id: phenotype.id,
+        sex,
+        ancestry,
+        chromosome: selectedChromosome,
+        orderBy: summaryTables.tables[selectedTable].orderBy || 'p_value',
+        order: summaryTables.tables[selectedTable].order || 'asc',
+        p_value_nlog_min: nlogpMin,
+        p_value_nlog_max: nlogpMax,
+        position_min: bpMin,
+        position_max: bpMax
+      };
 
     return `${process.env.REACT_APP_API_ROOT}/export-variants${asQueryString(
       exportParams
@@ -363,9 +364,9 @@ export function SummaryResultsTable() {
             onClick={handleSnpLookup}>
             Search
           </button>
-              
+
           <OverlayTrigger overlay={
-            <Tooltip id="export-info-tooltip" className={summaryTables.tables[selectedTable].resultsCount > exportRowLimit ? 'visible': 'invisible'}>
+            <Tooltip id="export-info-tooltip" className={summaryTables.tables[selectedTable].resultsCount > exportRowLimit ? 'visible' : 'invisible'}>
               Only the top {exportRowLimit.toLocaleString()} variants based on the current sort order will be downloaded.
             </Tooltip>}>
             <a
@@ -380,20 +381,20 @@ export function SummaryResultsTable() {
 
       {/* Do not filter beforehand, as that resets indexes  */}
 
-        {selectedStratifications.map((s, i) =>
-          selectedTable === i && (!summarySnpTables.visible
-            ? <Table 
-                wrapperClasses="table-responsive" 
-                key={`variant-table-${i}`} 
-                {...getVariantTableProps(i)} />
-            : <Table
-                wrapperClasses="table-responsive"
-                key={`snp-table-${i}`}
-                keyField="variant_id"
-                data={summarySnpTables.tables[i].results}
-                columns={columns.filter(c => columnFilter(c, i))} />
-          )
-        )}
+      {selectedStratifications.map((s, i) =>
+        selectedTable === i && (!summarySnpTables.visible
+          ? <Table
+            wrapperClasses="table-responsive"
+            key={`variant-table-${i}`}
+            {...getVariantTableProps(i)} />
+          : <Table
+            wrapperClasses="table-responsive"
+            key={`snp-table-${i}`}
+            keyField="variant_id"
+            data={summarySnpTables.tables[i].results}
+            columns={columns.filter(c => columnFilter(c, i))} />
+        )
+      )}
     </div>
   );
 }

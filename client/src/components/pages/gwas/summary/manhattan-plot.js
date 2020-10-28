@@ -18,7 +18,6 @@ import {
   updateSummaryResults,
   updateManhattanPlot
 } from '../../../../services/actions';
-import { CHECKBOX_STATUS_CHECKED } from 'react-bootstrap-table-next';
 
 export function ManhattanPlot({
   onAllChromosomeSelected,
@@ -41,7 +40,11 @@ export function ManhattanPlot({
     selectedPlot,
     manhattanPlotView,
     isPairwise,
-    ranges
+    ranges,
+    bpMin,
+    bpMax,
+    nlogpMin,
+    nlogpMax,
   } = useSelector(state => state.summaryResults);
 
   const {
@@ -50,7 +53,8 @@ export function ManhattanPlot({
     manhattanPlotConfig,
     restoredZoomLevel,
     zoomStack,
-    genes
+    genes,
+    restore
   } = useSelector(state => state.manhattanPlot);
 
   const hasData = () =>
@@ -128,54 +132,81 @@ export function ManhattanPlot({
 
   useEffect(() => {
     if (selectedPlot != 'manhattan-plot' || !hasData()) return;
-    // removeChildren(plotContainer.current);
-    plotContainer.current.innerHTML = '';
+    (async () => {
 
-    let params;
-    if (isPairwise) {
-      params =
-        manhattanPlotView === 'summary'
-          ? getMirroredSummaryPlot(manhattanPlotData, manhattanPlotMirroredData)
-          : getMirroredChromosomePlot(
-              manhattanPlotData,
-              manhattanPlotMirroredData
-            );
-    } else {
-      params =
-        manhattanPlotView === 'summary'
-          ? getSummaryPlot(manhattanPlotData)
-          : getChromosomePlot(manhattanPlotData);
-    }
-    let config = { ...params };
-    config.genes = genes;
-    config.zoomStack = zoomStack;
+      // removeChildren(plotContainer.current);
+      plotContainer.current.innerHTML = '';
 
-    if (manhattanPlotConfig) {
-      if (manhattanPlotConfig.title) config.title = manhattanPlotConfig.title;
+      let params;
+      if (isPairwise) {
+        params =
+          manhattanPlotView === 'summary'
+            ? getMirroredSummaryPlot(manhattanPlotData, manhattanPlotMirroredData)
+            : getMirroredChromosomePlot(
+                manhattanPlotData,
+                manhattanPlotMirroredData
+              );
+      } else {
+        params =
+          manhattanPlotView === 'summary'
+            ? getSummaryPlot(manhattanPlotData)
+            : getChromosomePlot(manhattanPlotData);
+      }
+      let config = { ...params };
+      config.genes = genes;
+      config.zoomStack = zoomStack;
 
-      if (manhattanPlotConfig.zoomWindow)
-        config.zoomWindow = manhattanPlotConfig.zoomWindow;
+      if (manhattanPlotConfig) {
+        if (manhattanPlotConfig.title) config.title = manhattanPlotConfig.title;
 
-      if (manhattanPlotConfig.xAxis) {
-        config.xAxis.extent = manhattanPlotConfig.xAxis.extent;
-        config.xAxis.defaultExtent = manhattanPlotConfig.xAxis.defaultExtent;
+        if (manhattanPlotConfig.zoomWindow)
+          config.zoomWindow = manhattanPlotConfig.zoomWindow;
+
+        if (manhattanPlotConfig.xAxis) {
+          config.xAxis.extent = manhattanPlotConfig.xAxis.extent;
+          config.xAxis.defaultExtent = manhattanPlotConfig.xAxis.defaultExtent;
+        }
+
+        if (manhattanPlotConfig.yAxis) {
+          config.yAxis.extent = manhattanPlotConfig.yAxis.extent;
+          config.yAxis.defaultExtent = manhattanPlotConfig.yAxis.defaultExtent;
+        }
+
+        if (manhattanPlotConfig.yAxis2) {
+          config.yAxis2.extent = manhattanPlotConfig.yAxis2.extent;
+          config.yAxis2.defaultExtent = manhattanPlotConfig.yAxis2.defaultExtent;
+        }
       }
 
-      if (manhattanPlotConfig.yAxis) {
-        config.yAxis.extent = manhattanPlotConfig.yAxis.extent;
-        config.yAxis.defaultExtent = manhattanPlotConfig.yAxis.defaultExtent;
+      if (restore) {
+        dispatch(updateManhattanPlot({restore: false}));
+        if (bpMin && bpMax &&  nlogpMin && nlogpMax) {
+          config.xAxis.extent = [bpMin, bpMax];
+          config.yAxis.extent = [nlogpMin, nlogpMax];
+          config.title = [
+            {
+              text: getTitle({xMin: bpMin, xMax: bpMax, yMin: nlogpMin, yMax: nlogpMax}),
+              font: `600 16px ${systemFont}`
+            }
+          ];
+          config.zoomWindow = {bounds: {
+            xMin: bpMin,
+            xMax: bpMax,
+            yMin: nlogpMin,
+            yMax: nlogpMax
+          }}
+        }
       }
 
-      if (manhattanPlotConfig.yAxis2) {
-        config.yAxis2.extent = manhattanPlotConfig.yAxis2.extent;
-        config.yAxis2.defaultExtent = manhattanPlotConfig.yAxis2.defaultExtent;
+      plot.current = new Plot(plotContainer.current, config);
+      if (genes && genes.length) {
+        console.log('yes genes', genes);
+        plot.current.drawGenes(genes);
       }
-    }
+      else plot.current.clearGenes();
+      // setZoomStack([]);
+    })();
 
-    plot.current = new Plot(plotContainer.current, config);
-    if (genes && genes.length) plot.current.drawGenes(genes);
-    else plot.current.clearGenes();
-    // setZoomStack([]);
     return () => {
       // plot.current.destroy();
     };
@@ -183,7 +214,7 @@ export function ManhattanPlot({
     manhattanPlotData,
     manhattanPlotMirroredData,
     selectedPlot,
-    selectedChromosome
+    selectedChromosome,
   ]);
 
   useEffect(() => {
@@ -850,7 +881,7 @@ export function ManhattanPlot({
           {zoomStack.length ? (
             <>
               <Icon name="arrow-left" className="mx-2 opacity-50" width="10" />
-              <a href="javascript:void(0)" onClick={resetZoom}>
+              <a href="javascript:void(0)" onClick={e => onChromosomeSelected && onChromosomeSelected(selectedChromosome)}>
                 Chromosome {selectedChromosome}
               </a>
             </>

@@ -10,8 +10,9 @@ export function SummaryResultsForm({
   selectedPhenotypes = [],
   selectedStratifications = [],
   isPairwise = false,
-  onSubmit = any => {},
-  onReset = any => {}
+  onSubmit = any => { },
+  onReset = any => { },
+  className = '',
 }) {
   // in order to prevent updating the redux store until after the form has
   // been submitted, we should store the state in the component, and then emit
@@ -117,7 +118,7 @@ export function SummaryResultsForm({
 
   function setSelectedPhenotypesAndOptions(selectedPhenotypes, pairwise) {
     if (pairwise === undefined) pairwise = _isPairwise;
-    selectedPhenotypes = selectedPhenotypes.slice(0, pairwise ? 2 : 1);
+    // selectedPhenotypes = selectedPhenotypes.slice(0, pairwise ? 2 : 1);
     setStratificationOptions(
       getStratificationOptions(selectedPhenotypes, pairwise)
     );
@@ -154,9 +155,8 @@ export function SummaryResultsForm({
   }
 
   return (
-    <>
-      {/* <pre>{JSON.stringify({ _selectedPhenotypes, _selectedStratifications }, null, 2)}</pre> */}
-      <div className="mb-2">
+    <form className={className} onSubmit={handleSubmit} onReset={handleReset}>
+      <div className="form-group">
         <div className="d-flex justify-content-between">
           <label className="required">Phenotypes</label>
           <div className="custom-control custom-checkbox">
@@ -184,14 +184,14 @@ export function SummaryResultsForm({
           onChange={setSelectedPhenotypesAndOptions}
           ref={treeRef}
           enabled={item => item.import_date}
-          limit={isPairwise ? 2 : 1}
+          limit={_isPairwise ? 2 : 1}
         />
       </div>
 
       {(_isPairwise ? [0, 1] : [0])
         .map(i => stratificationOptions[i])
         .map((optionGroup, i) => (
-          <div className="mb-3" key={`stratification-option-group-${i}`}>
+          <div className="form-group" key={`stratification-option-group-${i}`}>
             <label
               htmlFor={`summary-results-stratification-${i}`}
               className="required">
@@ -232,35 +232,21 @@ export function SummaryResultsForm({
           </div>
         ))}
 
-      {/* Todo: replace selects with react-select if needed
-        <Select 
-          id="summary-results-stratification" 
-          options={existingStratifications} 
-          components={{ Option }}
-          value={_stratification}
-          onChange={item => {
-            _setStratification(item);
-            dispatch(updateSummaryResults({ disableSubmit: false }));
-          }}
-          placeholder={"Select a Stratification"}
-          isDisabled={existingStratifications.length === 0}
-        /> */}
+      {messages.map(({ type, content }) => (
+        <div className={`small my-3 text-${type}`}>
+          {content}
+        </div>
+      ))}
 
-      {messages &&
-        messages.map(({ type, content }) => (
-          <div className={`small my-3 text-${type}`}>
-            {content}
-          </div>
-        ))}
       <div>
-        <Button type="submit" variant="silver" onClick={handleSubmit}>
+        <Button type="submit" variant="silver">
           Submit
         </Button>
 
-        <Button className="ml-2" variant="silver" onClick={handleReset}>
+        <Button type="reset" className="ml-2" variant="silver">
           Reset
         </Button>
       </div>
-    </>
+    </form>
   );
 }
