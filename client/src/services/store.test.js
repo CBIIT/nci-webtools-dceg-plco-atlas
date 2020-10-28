@@ -135,7 +135,7 @@ describe('Store Module', function() {
       },
       error: {
         visible: false,
-        message: `An error occured when requesting data. If this problem persists, please contact the administrator at <a href="mailto:PLCOWebAdmin@cancer.gov">PLCOWebAdmin@cancer.gov</a>.`
+        message: `An error occured when requesting data. If this problem persists, please contact the administrator at <a href="mailto:NCIExploreGWASWebAdmin@cancer.gov">NCIExploreGWASWebAdmin@cancer.gov</a>.`
       }
     });
   });
