@@ -183,7 +183,7 @@ export const TreeSelect = forwardRef(
             ref={current =>
               current && (current.indeterminate = isIndeterminate(node))
             }
-            disabled={isDisabled(node)}
+            disabled={isDisabled(node) || (singleSelect && node.children && node.children.length)}
             onChange={e => setSelected(node, e.target.checked)}
           />
           <HighlightText text={node[titleKey]} highlighted={searchFilter} />
