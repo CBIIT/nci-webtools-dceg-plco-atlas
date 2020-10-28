@@ -102,7 +102,7 @@ export function Downloads() {
 
           <div>
             <Button type="submit" variant="silver">Submit</Button>
-            <Button type="reset" variant="silver" className="ml-1">Reset</Button>
+            <Button type="reset" variant="silver" className="ml-2">Reset</Button>
           </div>
         </form>
       </SidebarPanel>
