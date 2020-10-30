@@ -48,10 +48,11 @@ if (!fs.existsSync(inputFilePath)) {
 }
 
 importParticipantData().then(numRows => {
-    console.log(`[${duration()} s] Imported data for ${numRows} participants, please run the following scripts:
+    console.log(`[${duration()} s] Imported data for participants, please run the following scripts:
         import-participant-data-category.sql
         import-phenotype-correlation.sql
         update-participant-count.js
+        update-variant-count.js
     `);
     process.exit(0);
 });

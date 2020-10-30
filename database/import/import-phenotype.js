@@ -50,6 +50,7 @@ importPhenotypes().then(numRows => {
         import-participant-data-category.sql
         import-phenotype-correlation.sql
         update-participant-count.js
+        update-variant-count.js
     `);
     process.exit(0);
 });
