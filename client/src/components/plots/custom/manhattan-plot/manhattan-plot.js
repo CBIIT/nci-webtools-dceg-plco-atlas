@@ -843,6 +843,20 @@ export class ManhattanPlot {
       config.setZoomWindow = ev => {
         config.zoomWindow = ev;
         let { xMin, xMax, yMin, yMax } = ev.bounds;
+        let xRange = xMax - xMin;
+
+        if (config.windowLimits) {
+          if (xMin < config.windowLimits.xMin) {
+            xMin = config.windowLimits.xMin;
+            xMax = xMin + xRange;
+          }
+
+          if (xMax > config.windowLimits.xMax) {
+            xMax = config.windowLimits.xMax;
+            xMin = xMax - xRange;
+          }
+        }
+
         config.xAxis.extent = [xMin, xMax];
         config.yAxis.extent = [yMin, yMax];
         if (config.mirrored) {

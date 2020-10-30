@@ -152,6 +152,15 @@ export function ManhattanPlot({
       config.genes = genes;
       config.zoomStack = zoomStack;
 
+      // add pan limits based on currently selected chromosome
+      if (selectedChromosome) {
+        let xRange = ranges.find(r => +r.chromosome === +selectedChromosome);
+        config.windowLimits = {
+          xMin: xRange.position_min,
+          xMax: xRange.position_max,
+        };
+      }
+
       if (manhattanPlotConfig) {
         if (manhattanPlotConfig.title) config.title = manhattanPlotConfig.title;
 
