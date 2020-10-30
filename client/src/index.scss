@@ -256,6 +256,12 @@ input[type='checkbox'][disabled] {
   cursor: pointer;
 }
 
+.center-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .opacity-50 {
   opacity: 0.5;
 }

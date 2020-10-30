@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Alert, Tab, Tabs } from 'react-bootstrap';
+import { Nav, Tab, Tabs } from 'react-bootstrap';
 import * as clonedeep from 'lodash.clonedeep'
 import { SummaryResultsForm } from './summary-form';
 import { ManhattanPlot } from './manhattan-plot';
@@ -476,51 +476,52 @@ export function SummaryResults() {
 
         <MainPanel className="col-lg-9">
           <SummaryResultsSearchCriteria />
-          <Tabs
+          <Tab.Container
             transition={false}
             className="mt-2"
             defaultActiveKey={selectedPlot}
             activeKey={selectedPlot}
             onSelect={setSelectedPlot}>
-            <Tab
-              eventKey="manhattan-plot"
-              title="Manhattan Plot"
-              className="p-2 bg-white tab-pane-bordered rounded-0"
-              style={{ minHeight: '365px' }}>
-              {submitted && selectedPhenotypes && selectedStratifications && <div>
-                <div style={{ minHeight: '635px' }}>
-                  <ManhattanPlot
-                    onChromosomeSelected={onChromosomeSelected}
-                    onAllChromosomeSelected={onAllChromosomeSelected}
-                    onVariantLookup={handleVariantLookup}
-                    onZoom={handleZoom}
-                    loading={loadingManhattanPlot}
-                    panelCollapsed={openSidebar}
-                  />
-                </div>
-                <div className="mw-100 my-4 px-5">
-                  <SummaryResultsTable />
-                </div>
-              </div>}
-              {placeholder}
-            </Tab>
-            <Tab
-              eventKey="qq-plot"
-              title="Q-Q Plot"
-              className={
-                selectedPlot === 'qq-plot'
-                  ? 'p-2 bg-white tab-pane-bordered rounded-0 d-flex justify-content-center align-items-center'
-                  : 'p-2 bg-white tab-pane-bordered rounded-0'
-              }
-              style={{ minHeight: '365px' }}>
-              <div
-                className="mw-100 my-4"
-                style={{ display: submitted ? 'block' : 'none' }}>
-                <QQPlot onVariantLookup={handleVariantLookup} />
-              </div>
-              {placeholder}
-            </Tab>
-          </Tabs>
+            <Nav variant="tabs">
+              <Nav.Item>
+                <Nav.Link eventKey="manhattan-plot" as="button" className="outline-none">
+                  <strong>Manhattan Plot</strong>
+                </Nav.Link>
+              </Nav.Item>
+              <Nav.Item>
+                <Nav.Link eventKey="qq-plot" as="button" className="outline-none">
+                  <strong>Q-Q Plot</strong>
+                </Nav.Link>
+              </Nav.Item>
+            </Nav>
+            <Tab.Content 
+              className={`p-2 bg-white tab-pane-bordered rounded-0 ${submitted ? 'd-block' : 'center-content'}`} 
+              style={{ minHeight: '635px' }}>
+              <Tab.Pane eventKey="manhattan-plot" className="border-0 py-2">
+                {submitted && selectedPhenotypes && selectedStratifications 
+                  ? <>
+                      <ManhattanPlot
+                        onChromosomeSelected={onChromosomeSelected}
+                        onAllChromosomeSelected={onAllChromosomeSelected}
+                        onVariantLookup={handleVariantLookup}
+                        onZoom={handleZoom}
+                        loading={loadingManhattanPlot}
+                        panelCollapsed={openSidebar}
+                      />
+                      <div className="mw-100 my-4 px-5">
+                        <SummaryResultsTable />
+                      </div>
+                    </> 
+                  : placeholder}
+              </Tab.Pane>
+              <Tab.Pane eventKey="qq-plot" className="border-0 py-2">
+                {submitted
+                  ? <QQPlot onVariantLookup={handleVariantLookup} />
+                  : placeholder}
+              </Tab.Pane>
+            </Tab.Content>
+          </Tab.Container>
+
         </MainPanel>
       </SidebarContainer>
     </div>
