@@ -46,7 +46,7 @@ if (!fs.existsSync(inputFilePath)) {
 
 importPhenotypes().then(numRows => {
     console.log(`[${duration()} s] Imported ${numRows} phenotypes, please run the following scripts:
-        import-participant-data.sql
+        import-participant-data.js
         import-participant-data-category.sql
         import-phenotype-correlation.sql
         update-participant-count.js
