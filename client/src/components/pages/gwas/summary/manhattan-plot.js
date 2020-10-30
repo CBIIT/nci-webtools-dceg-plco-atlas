@@ -553,7 +553,27 @@ export function ManhattanPlot({
         color: selectedChromosome % 2 ? colors.bottom.light : colors.bottom.dark
       },
       lines: [{ y: -Math.log10(5e-8), style: 'dashed' }],
-      zoomStack: (plot.current && plot.current.zoomStack) || []
+      zoomStack: (plot.current && plot.current.zoomStack) || [],
+      geneTooltipContent: gene => {
+        return h('div', { className: '' }, [
+          h('div', null, [h('b', null, 'gene: '), `${gene.originalName}`]),
+          h('div', null, [
+            h('b', null, 'position: '),
+            `chr${selectedChromosome}:${gene.transcription_start}-${gene.transcription_end}`
+          ]),
+          h('div', null, [
+            h(
+              'a',
+              {
+                className: 'font-weight-bold',
+                href: `https://www.ncbi.nlm.nih.gov/gene/?term=(${gene.originalName}%5BGene+Name%5D)+AND+homo+sapiens%5BOrganism%5D`,
+                target: '_blank'
+              },
+              'Go to NCBI Gene'
+            )
+          ])
+        ]);
+      },      
     };
   }
 
