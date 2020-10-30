@@ -74,6 +74,17 @@ async function updateCounts() {
             ON DUPLICATE KEY UPDATE
             count = VALUES(count)`
         );
+
+        await connection.execute(
+            `update phenotype set 
+            import_count = (
+                select sum(count) from phenotype_metadata 
+                where phenotype_id = :id and chromosome = 'all'
+            ),
+            import_date = NOW()
+            where id = :id`,
+            {id: phenotype.id}
+        );
     }
 
     await connection.query(`COMMIT`);
