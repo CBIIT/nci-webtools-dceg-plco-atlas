@@ -158,6 +158,7 @@ export function ManhattanPlot({
         config.windowLimits = {
           xMin: xRange.position_min,
           xMax: xRange.position_max,
+          yMin: 2,
         };
       }
 

@@ -844,6 +844,7 @@ export class ManhattanPlot {
         config.zoomWindow = ev;
         let { xMin, xMax, yMin, yMax } = ev.bounds;
         let xRange = xMax - xMin;
+        let yRange = yMax - yMin;
 
         if (config.windowLimits) {
           if (xMin < config.windowLimits.xMin) {
@@ -854,6 +855,11 @@ export class ManhattanPlot {
           if (xMax > config.windowLimits.xMax) {
             xMax = config.windowLimits.xMax;
             xMin = xMax - xRange;
+          }
+
+          if (yMin < config.windowLimits.yMin) {
+            yMin = config.windowLimits.yMin;
+            yMin = yMin + yRange;
           }
         }
 
