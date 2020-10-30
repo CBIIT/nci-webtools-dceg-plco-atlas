@@ -52,7 +52,7 @@ export function About() {
       </p>
 
       <p>
-        This application's source code can be viewed on <a href="https://github.com/CBIIT/nci-webtools-dceg-plco-atlas" target="_blank" alt="Link to open GitHub">GitHub</a>.
+        This application's source code can be viewed on <a href="https://github.com/CBIIT/nci-webtools-dceg-plco-atlas" target="_blank" rel="noopener noreferrer" alt="Link to open GitHub">GitHub</a>.
       </p>
     </div>
   );

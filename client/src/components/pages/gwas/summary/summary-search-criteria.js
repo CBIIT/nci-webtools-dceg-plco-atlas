@@ -55,7 +55,7 @@ export const SummaryResultsSearchCriteria = () => {
       ) : (
         <div>
           {phenotypes.map((p, i) => (
-            <div className={isPairwise && i == 0 ? 'mb-2' : 'mb-0'}>
+            <div className={isPairwise && +i === 0 ? 'mb-2' : 'mb-0'}>
               <strong>
                 {p.display_name} ({p.stratification}) -{' '}
                 <small>{p.resultsCount.toLocaleString()} variants</small>

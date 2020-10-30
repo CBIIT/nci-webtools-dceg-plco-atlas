@@ -1,16 +1,12 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Spinner } from 'react-bootstrap';
 import LoadingOverlay from 'react-loading-overlay';
-import * as merge from 'lodash.merge';
-import * as isEqual from 'lodash.isequal';
 import { plotOverlayConfig } from '../../../controls/table/table';
-import { rawQuery, query } from '../../../../services/query';
+import { query } from '../../../../services/query';
 import { ManhattanPlot as Plot } from '../../../plots/custom/manhattan-plot/manhattan-plot';
 import { Icon } from '../../../controls/icon/icon';
 import {
   createElement as h,
-  removeChildren,
   extent
 } from '../../../plots/custom/utils';
 import { systemFont } from '../../../plots/custom/text';
@@ -131,7 +127,7 @@ export function ManhattanPlot({
   };
 
   useEffect(() => {
-    if (selectedPlot != 'manhattan-plot' || !hasData()) return;
+    if (selectedPlot !== 'manhattan-plot' || !hasData()) return;
     (async () => {
 
       // removeChildren(plotContainer.current);

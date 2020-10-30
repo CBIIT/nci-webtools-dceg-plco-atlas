@@ -1,7 +1,5 @@
 import {
   viewportToLocalCoordinates,
-  min,
-  max,
   addEventListener,
   withSavedContext,
   extent
@@ -19,7 +17,7 @@ export function drawSelectionOverlay(config, ctx, overlayCtx) {
   let margins = config.margins;
   let ticks = config.xAxis.ticks;
   let selectedBounds = null;
-  if (ticks[0] != 0) ticks.unshift(0);
+  if (+ticks[0] !== 0) ticks.unshift(0);
 
   canvas.removeEventListener('mousemove', drawOverlay);
   canvas.removeEventListener('click', selectOverlay);

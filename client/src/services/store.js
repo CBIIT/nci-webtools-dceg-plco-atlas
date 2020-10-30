@@ -29,7 +29,6 @@ export const getInitialState = async (skipQuery) => {
     },
     qqPlot: {
       loadingQQPlot: false,
-      lambdaGC: null,
       sampleSize: null,
       qqplotData: [],
       qqplotLayout: {},

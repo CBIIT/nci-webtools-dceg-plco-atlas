@@ -1,11 +1,8 @@
 import React from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { updateBrowsePhenotypes } from '../../../services/actions';
-import { Icon } from '../../controls/icon/icon';
+import { useSelector } from 'react-redux';
 import { ShareLink } from '../../controls/share-link/share-link';
 
 export const PhenotypesSearchCriteria = () => {
-  const dispatch = useDispatch();
   const browsePhenotypes = useSelector(state => state.browsePhenotypes);
   const { submitted, shareID, disableSubmit } = browsePhenotypes;
   const { phenotypeData } = useSelector(state => state.browsePhenotypesPlots);
@@ -19,14 +16,6 @@ export const PhenotypesSearchCriteria = () => {
       </p>
     </div>
   );
-
-  const setSubmitted = () => {
-    dispatch(
-      updateBrowsePhenotypes({
-        submitted: null
-      })
-    );
-  };
 
   return (
     <div className="mb-2">

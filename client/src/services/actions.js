@@ -549,8 +549,8 @@ export function drawHeatmap({ phenotypes, ancestry, sex }) {
         ids.map(b =>
           response.find(
             p =>
-              (p.phenotype_a == a && p.phenotype_b === b) ||
-              (p.phenotype_a == b && p.phenotype_b === a)
+              (+p.phenotype_a === +a && +p.phenotype_b === +b) ||
+              (+p.phenotype_a === +b && +p.phenotype_b === +a)
           )
         )
       );

@@ -73,7 +73,7 @@ export function showTooltip(tooltip, ev, html, options) {
   let left = Math.max(leftOffset, 0);
 
   if (options.constraints) {
-    let { xMin, xMax, yMin, yMax } = options.constraints;
+    let { xMin } = options.constraints;
     if (xMin) left = Math.max(left, xMin);
   }
 

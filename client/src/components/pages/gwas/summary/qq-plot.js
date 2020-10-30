@@ -6,10 +6,6 @@ import { Tooltip } from '../../../controls/tooltip/tooltip';
 import { query } from '../../../../services/query';
 
 export function QQPlot({ onVariantLookup }) {
-  const { selectedPhenotypes, selectedStratifications } = useSelector(
-    state => state.summaryResults
-  );
-
   const { loadingQQPlot, qqplotData, qqplotLayout } = useSelector(
     state => state.qqPlot
   );
@@ -28,7 +24,7 @@ export function QQPlot({ onVariantLookup }) {
       ...state
     });
 
-  useEffect(() => updateTooltip({ visible: false }), [qqplotData]);
+  useEffect(() => updateTooltip({ visible: false }), []);
 
   const config = {
     responsive: true,

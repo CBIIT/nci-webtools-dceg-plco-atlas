@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect, useContext } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Alert, Spinner } from 'react-bootstrap';
+import { Alert } from 'react-bootstrap';
 import { PhenotypesForm } from './phenotypes-form';
 import { PhenotypesTabs } from './phenotypes-tabs';
 import { PhenotypesSearchCriteria } from './phenotypes-search-criteria';
@@ -73,8 +73,8 @@ export function Phenotypes() {
 
   const getParents = (node, parents = []) => {
     phenotypes &&
-      phenotypes.tree.map(item => {
-        item.children.map(child => {
+      phenotypes.tree.forEach(item => {
+        item.children.forEach(child => {
           if (child.id === node.id) {
             parents.push(item);
             getParents(item, parents);
@@ -92,7 +92,7 @@ export function Phenotypes() {
     } else {
       const parents = getParents(node);
       if (parents && parents.length > 0) {
-        parents.map(item => {
+        parents.forEach(item => {
           if (item.color) {
             color = item.color;
           }

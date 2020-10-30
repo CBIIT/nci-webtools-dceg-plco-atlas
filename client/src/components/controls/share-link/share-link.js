@@ -53,7 +53,7 @@ export const ShareLink = props => {
             <div
               className="input-group my-1"
               style={{
-                width: '100%',
+                // width: '100%',
                 width: '250px'
               }}>
               <input

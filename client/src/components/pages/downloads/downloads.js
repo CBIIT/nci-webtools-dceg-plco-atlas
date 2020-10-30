@@ -4,7 +4,7 @@ import {
   SidebarPanel,
   MainPanel
 } from '../../controls/sidebar-container/sidebar-container';
-import { Button, Tooltip, OverlayTrigger } from 'react-bootstrap';
+import { Button } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
 import { TreeSelect } from '../../controls/tree-select/tree-select';
 import { updateDownloads } from '../../../services/actions';

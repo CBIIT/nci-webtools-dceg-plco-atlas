@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Tab, Tabs, Form } from 'react-bootstrap';
+import { Tab, Tabs } from 'react-bootstrap';
 import paginationFactory from 'react-bootstrap-table2-paginator';
 
 import {
@@ -26,10 +26,10 @@ import { ButtonGroup } from '../../controls/button-group/button-group';
 
 export function PhenotypesTabs(props) {
   const dispatch = useDispatch();
-  const { selectedPhenotype, selectedPlot, sharedState } = useSelector(
+  const { selectedPlot, sharedState } = useSelector(
     state => state.browsePhenotypes
   );
-  const { phenotypeType, phenotypeData, loading } = useSelector(
+  const { phenotypeData, loading } = useSelector(
     state => state.browsePhenotypesPlots
   );
   const phenotypes = useSelector(state => state.phenotypes);
@@ -80,12 +80,6 @@ export function PhenotypesTabs(props) {
     if (!selectedPlot || (selectedPlot && selectedPlot === 'frequency')) return;
     setSelectedPlot(selectedPlot);
   }, [sharedState]);
-
-  const titleCase = str =>
-    str
-      .split(/[_\s]+/g)
-      .map(word => word[0].toUpperCase() + word.substr(1).toLowerCase())
-      .join(' ');
 
   const FrequencyTable = ({ phenotypeData }) => {
     const data = phenotypeData.categories.map((category, i) => ({
@@ -435,7 +429,7 @@ export function PhenotypesTabs(props) {
                 onClick={e => {
                   if (props.onSubmit) {
                     let id = e.points[0].customdata.phenotype_id;
-                    let phenotype = phenotypes.flat.find(p => p.id == id);
+                    let phenotype = phenotypes.flat.find(p => +p.id === +id);
                     props.onSubmit(phenotype);
                   }
                 }}

@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Nav, Tab, Tabs } from 'react-bootstrap';
-import * as clonedeep from 'lodash.clonedeep'
+import { Nav, Tab } from 'react-bootstrap';
 import { SummaryResultsForm } from './summary-form';
 import { ManhattanPlot } from './manhattan-plot';
 import { QQPlot } from './qq-plot';
@@ -16,14 +15,11 @@ import {
   updateSummaryResults,
   updateVariantLookup,
   updateManhattanPlot,
-  updateQQPlot,
   lookupVariants,
   drawQQPlot,
   drawManhattanPlot,
   fetchSummaryTable,
-  updateSummaryTable,
   updateKey,
-  updateSummarySnpTable,
   updateSummaryTableByIndex,
   updateSummarySnpTableByIndex
 } from '../../../../services/actions';

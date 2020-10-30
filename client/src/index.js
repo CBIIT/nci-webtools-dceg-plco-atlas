@@ -2,7 +2,7 @@ import React, { createContext } from 'react';
 import ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
 import * as clonedeep from 'lodash.clonedeep';
-import { getInitialState, getStore } from './services/store';
+import { getStore } from './services/store';
 import App from './components/app';
 import './index.scss';
 import 'font-awesome/css/font-awesome.min.css';

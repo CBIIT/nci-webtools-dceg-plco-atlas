@@ -1,10 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Button, Alert } from 'react-bootstrap';
+import { Button } from 'react-bootstrap';
 import { TreeSelect } from '../../../controls/tree-select/tree-select';
 import { asTitleCase } from './utils';
 import { updateSummaryResults } from '../../../../services/actions';
-// import Select, { components } from 'react-select';
 
 export function SummaryResultsForm({
   selectedPhenotypes = [],
@@ -23,9 +22,8 @@ export function SummaryResultsForm({
   // select store members
   const dispatch = useDispatch();
   const phenotypes = useSelector(state => state.phenotypes);
-  const { submitted, messages } = useSelector(state => state.summaryResults);
+  const { messages } = useSelector(state => state.summaryResults);
   const setMessages = messages => dispatch(updateSummaryResults({ messages }));
-  const clearMessages = _ => setMessages([]);
 
   // private members prefixed with _
   const [_selectedPhenotypes, _setSelectedPhenotypes] = useState(
@@ -53,13 +51,6 @@ export function SummaryResultsForm({
     );
   }, [selectedPhenotypes, selectedStratifications, isPairwise]);
 
-  const isValid =
-    _selectedPhenotypes[0] &&
-    _selectedStratifications[0] &&
-    (!_isPairwise || (_isPairwise && _selectedStratifications[1]));
-
-  const showPhenotypesLabels = _isPairwise && _selectedPhenotypes[1];
-
   /**
    * Retrieves stratification option groups for each phenotype supplied
    * If isPairwise is passed in, and the second phenotype is not defined the first
@@ -78,7 +69,7 @@ export function SummaryResultsForm({
             item.phenotype_id === phenotype.id &&
             item.chromosome === 'all' &&
             item.count > 0 &&
-            item.sex != 'stacked'
+            item.sex !== 'stacked'
         )
         .forEach(({ sex, ancestry }) => {
           let stratification = stratifications.find(

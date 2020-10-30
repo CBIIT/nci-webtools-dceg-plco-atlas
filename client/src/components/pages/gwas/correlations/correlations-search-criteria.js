@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { ShareLink } from '../../../controls/share-link/share-link';
 
 export const PhenotypeCorrelationsSearchCriteria = () => {
-  const dispatch = useDispatch();
   const {
     selectedPhenotypes,
     selectedSex,

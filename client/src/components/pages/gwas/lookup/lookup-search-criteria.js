@@ -30,7 +30,7 @@ export const VariantLookupSearchCriteria = () => {
     : str;
 
   const VariantLink = ({variant}) => !/^rs\d+/.test(variant) ? variant : 
-    <a href={`https://www.ncbi.nlm.nih.gov/snp/${variant}`} target="_blank">
+    <a href={`https://www.ncbi.nlm.nih.gov/snp/${variant}`} target="_blank" rel="noopener noreferrer">
       {variant}
     </a>;
 

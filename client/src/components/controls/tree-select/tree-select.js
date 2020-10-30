@@ -3,7 +3,8 @@ import React, {
   useState,
   useEffect,
   useImperativeHandle,
-  useRef
+  useRef,
+  useCallback
 } from 'react';
 import { LoadingOverlay } from '../../controls/loading-overlay/loading-overlay';
 import { Spinner } from 'react-bootstrap';
@@ -42,24 +43,6 @@ export const TreeSelect = forwardRef(
     const [selectedNodes, setSelectedNodes] = useState([]);
     const [expandedNodes, setExpandedNodes] = useState([]);
     const [searchFilter, setSearchFilter] = useState('');
-    useEffect(_ => {
-        if (!value) value = [];
-        if (!Array.isArray(value)) value = [value];
-        
-        // ensure that any items passed in are references to internal nodes
-        const leaves = getLeaves(root.current);
-        const nodes = value
-          .map(item => leaves.includes(item)
-            ? item
-            : leaves.find(node => node.id == item.id))
-          .filter(Boolean);
-
-        setSelectedNodes(nodes);
-    }, [value]);
-
-    useEffect(_ => {
-        root.current.children = data || [];
-    }, [data]);
 
     const arrayWithElements = (elements, shouldInclude, array) =>
       shouldInclude
@@ -138,6 +121,26 @@ export const TreeSelect = forwardRef(
 
     const toggleExpanded = (node, recursive = false) =>
       setExpanded(node, !isExpanded(node), recursive);
+
+    useEffect(_ => {
+      let selection = value || [];
+      if (!Array.isArray(selection)) 
+        selection = [selection];
+      
+      // ensure that any items passed in are references to internal nodes
+      const leaves = getLeaves(root.current);
+      const nodes = selection
+        .map(item => leaves.includes(item)
+          ? item
+          : leaves.find(node => node.id === item.id))
+        .filter(Boolean);
+
+      setSelectedNodes(nodes);
+    }, [value]);
+
+    useEffect(_ => {
+      root.current.children = data || [];
+    }, [data]);      
 
     const HighlightText = ({ text, highlighted }) => {
       const index = text.toLowerCase().indexOf(highlighted.toLowerCase());
