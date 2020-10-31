@@ -58,21 +58,30 @@ async function updateCounts() {
         let [, name, sex, ancestry] = tableName.split('__');
         let phenotype = phenotypes.find(p => p.name == name)
         console.log(`Updating counts for ${name}, ${sex}, ${ancestry}`)
-        
-        await connection.query(
-            `insert into phenotype_metadata (phenotype_id, sex, ancestry, chromosome, count)
-            select ${phenotype.id}, '${sex}', '${ancestry}', chromosome, count(*) as count
-            from ${tableName} group by chromosome
-            ON DUPLICATE KEY UPDATE
-            count = VALUES(count)`
-        );
 
-        await connection.query(
+        for (let i = 1; i <= 22; i ++) {
+            console.log(`Updating counts for ${name}, ${sex}, ${ancestry} - Chromosome ${i}`)
+            await connection.query(
+                `insert into phenotype_metadata (phenotype_id, sex, ancestry, chromosome, count)
+                select 
+                    ${phenotype.id}, 
+                    '${sex}', 
+                    '${ancestry}', 
+                    ${i} as chromosome,
+                    (select count(*) from ${tableName} partition(\`${i}\`)) as count 
+                ON DUPLICATE KEY UPDATE
+                count = VALUES(count)`
+            );
+        }
+        
+        await connection.execute(
             `insert into phenotype_metadata (phenotype_id, sex, ancestry, chromosome, count)
-            select ${phenotype.id}, '${sex}', '${ancestry}', 'all', count(*) as count
-            from ${tableName}
+            select ${phenotype.id}, '${sex}', '${ancestry}', 'all', sum(count) as count
+            from phenotype_metadata
+            where phenotype_id = :id and sex = :sex and ancestry = :ancestry
             ON DUPLICATE KEY UPDATE
-            count = VALUES(count)`
+            count = VALUES(count)`,
+            {id: phenotype.id, sex, ancestry}
         );
 
         await connection.execute(
