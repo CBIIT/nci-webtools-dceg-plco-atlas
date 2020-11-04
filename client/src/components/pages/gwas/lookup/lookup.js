@@ -107,7 +107,7 @@ export function VariantLookup() {
     },
     {
       dataField: 'allele_effect',
-      text: 'Eff. Allele',
+      text: 'Eff. Allele [Freq.]',
       headerTitle: _ => 'Effect Allele [Frequency]',
       formatter: (cell, row) => cell === null ? '-' : `${cell} [${row.allele_effect_frequency.toPrecision(4)}]`,
       title: (cell, row) => cell === null ? '-' : `${cell} [${row.allele_effect_frequency.toPrecision(4)}]`,
@@ -117,7 +117,7 @@ export function VariantLookup() {
     },
     {
       dataField: 'allele_non_effect',
-      text: 'Non-Eff. Allele',
+      text: 'Non-Eff. Allele [Freq.]',
       headerTitle: _ => 'Non-Effect Allele [Frequency]',
       formatter: (cell, row) => cell === null ? '-' : `${cell} [${(1 - row.allele_effect_frequency).toPrecision(4)}]`,
       title: (cell, row) => cell === null ? '-' : `${cell} [${(1 - row.allele_effect_frequency).toPrecision(4)}]`,
@@ -130,10 +130,10 @@ export function VariantLookup() {
       text: 'Beta [95% CI]',
       headerTitle: _ => 'Beta [95% Confidence Interval]',
       title: true,
-      formatter: (cell, row) => (!cell || isNaN(cell) || row.type !== 'continuous') ? '-' : 
-        `${(+cell).toFixed(3)} [${row.beta_ci_95_low.toFixed(3)} - ${+row.beta_ci_95_high.toFixed(3)}]`,
+      formatter: (cell, row) => (cell === null || isNaN(cell) || row.phenotype.type !== 'continuous') ? '-' : 
+        `${(+cell).toFixed(3)} [${row.beta_ci_95_low.toFixed(3)}, ${+row.beta_ci_95_high.toFixed(3)}]`,
       title: (cell, row) => (!cell || isNaN(cell)) ? '-' : 
-        `${(+cell).toFixed(3)} [${row.beta_ci_95_low.toFixed(3)} - ${+row.beta_ci_95_high.toFixed(3)}]`,
+        `${(+cell).toFixed(3)} [${row.beta_ci_95_low.toFixed(3)}, ${+row.beta_ci_95_high.toFixed(3)}]`,
         headerStyle: { minWidth: '200px',  width: '200px' },
         headerClasses: 'overflow-ellipsis',
       classes: 'overflow-ellipsis',
@@ -142,10 +142,10 @@ export function VariantLookup() {
       dataField: 'odds_ratio',
       text: 'OR [95% CI]',
       headerTitle: _ => 'Odds Ratio [95% Confidence Interval]',
-      formatter: (cell, row) => (!cell || isNaN(cell) || row.type !== 'binary') ? '-' : 
-        `${(+cell).toFixed(3)} [${row.odds_ratio_ci_95_low.toFixed(3)} - ${+row.odds_ratio_ci_95_high.toFixed(3)}]`,
+      formatter: (cell, row) => (cell === null || isNaN(cell) || row.phenotype.type !== 'binary') ? '-' : 
+        `${(+cell).toFixed(3)} [${row.odds_ratio_ci_95_low.toFixed(3)}, ${+row.odds_ratio_ci_95_high.toFixed(3)}]`,
       title: (cell, row) => (!cell || isNaN(cell)) ? '-' : 
-        `${(+cell).toFixed(3)} [${row.odds_ratio_ci_95_low.toFixed(3)} - ${+row.odds_ratio_ci_95_high.toFixed(3)}]`,
+        `${(+cell).toFixed(3)} [${row.odds_ratio_ci_95_low.toFixed(3)}, ${+row.odds_ratio_ci_95_high.toFixed(3)}]`,
       headerStyle: { minWidth: '200px',  width: '200px' },
       classes: 'overflow-ellipsis',
       headerClasses: 'overflow-ellipsis'
