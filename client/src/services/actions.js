@@ -169,7 +169,7 @@ export function submitSummaryResultsQuery({
   isPairwise
 }) {
   return async function(dispatch) {
-    const initialState = getInitialState();
+    const initialState = await getInitialState();
     for (let key of [
       'manhattanPlot',
       'qqPlot',
