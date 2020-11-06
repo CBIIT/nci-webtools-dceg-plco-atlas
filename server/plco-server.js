@@ -48,7 +48,6 @@ logger.info(`[${process.pid}] Started worker process`);
 // create fastify app and register middleware
 const app = server({ ignoreTrailingSlash: true });
 const connection = getConnection();
-const isApi = args.api;
 app.register(compress);
 app.register(cors);
 app.register(serverTimeout, {serverTimeout: 1000 * 60 * 20}); // 20 min timeout
@@ -69,7 +68,8 @@ app.addHook('onError', async (req, reply, error) => {
 // execute before handling request
 app.addHook("onRequest", (req, res, done) => {
   const browser = new UAParser(req.headers['user-agent']).getBrowser();
-  if (!isApi && !browser.name) {
+  console.log(req.raw.url);
+  if (!browser.name && !/^\/api\//.test(req.raw.url)) {
     res.send('Please use the PLCO Atlas Public API to perform queries outside the browser.');
     done();
   }
@@ -101,7 +101,9 @@ app.addHook("onSend", (req, res, payload, done) => {
     '/config',
     '/phenotype',
     '/ranges',
-    '/share-link'
+    '/share-link',
+    '/api/phenotypes',
+    '/api/variants',
   ];
   if (timestamp && loggedRoutes.includes(pathname)) {
     let duration = new Date().getTime() - timestamp;
@@ -188,17 +190,15 @@ app.get("/config", async ({ query }, res) => {
   return getConfig(query.key);
 });
 
-if (isApi) {
-  // retrieves phenotypes
-  app.get("/api/phenotypes", async ({ query }, res) => {
-    return getPhenotypes(connection, query);
-  });
+// retrieves phenotypes
+app.get("/api/phenotypes", async ({ query }, res) => {
+  return getPhenotypes(connection, query);
+});
 
-  // retrieves all variants within the specified range
-  app.get("/api/variants", async ({ query }, res) => {
-    return getVariants(connection, query);
-  });
-}
+// retrieves all variants within the specified range
+app.get("/api/variants", async ({ query }, res) => {
+  return getVariants(connection, query);
+});
 
 app
   .listen(port, "0.0.0.0")
