@@ -20,7 +20,7 @@ import {
 import paginationFactory from 'react-bootstrap-table2-paginator';
 import filterFactory from 'react-bootstrap-table2-filter';
 import ToolkitProvider, { CSVExport } from 'react-bootstrap-table2-toolkit';
-import { Spinner } from 'react-bootstrap';
+import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
 import { VariantLookupSearchCriteria } from './lookup-search-criteria';
 import { RootContext } from '../../../../index';
 
@@ -261,6 +261,7 @@ export function VariantLookup() {
             style={{ minHeight: '472px' }}>
             {results && submitted && (
               <div className="mw-100 my-2 px-4">
+                <LoadingOverlay active={submitted && results.length === 0} />
                 <ToolkitProvider
                   keyField="variant_id"
                   data={results}
@@ -300,11 +301,6 @@ export function VariantLookup() {
                   )}
                 </ToolkitProvider>
               </div>
-            )}
-            {submitted && !results && (
-              <Spinner animation="border" variant="primary" role="status">
-                <span className="sr-only">Loading...</span>
-              </Spinner>
             )}
             {placeholder}
           </div>
