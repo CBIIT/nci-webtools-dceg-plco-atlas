@@ -32,7 +32,7 @@ export function Phenotypes() {
     sharedState
   } = useSelector(state => state.browsePhenotypes);
   const { loading } = useSelector(state => state.browsePhenotypesPlots);
-  const getInitialState = useContext(RootContext);
+  const { getInitialState } = useContext(RootContext);
 
   const plotContainer = useRef(null);
 
@@ -231,9 +231,8 @@ export function Phenotypes() {
   }, [selectedPhenotype]);
 
   const handleReset = () => {
-    const initialState = getInitialState();
-    dispatch(updateBrowsePhenotypes(initialState.browsePhenotypes));
-    dispatch(updateBrowsePhenotypesPlots(initialState.browsePhenotypesPlots));
+    dispatch(updateBrowsePhenotypes(getInitialState().browsePhenotypes));
+    dispatch(updateBrowsePhenotypesPlots(getInitialState().browsePhenotypesPlots));
   };
 
   useEffect(() => {
