@@ -6,7 +6,7 @@ export function ApiAccess() {
   const swaggerSpec = {
       swagger: '2.0',
       host: window.location.host,
-      basePath: window.location.host.includes("localhost") ? '' : '/plco-atlas',
+      basePath: window.location.host.includes("localhost") ? '' : '/plco-atlas/api',
       tags: [
           {
               name: 'phenotypes',
@@ -18,7 +18,7 @@ export function ApiAccess() {
           }
       ],
       paths: {
-          '/phenotypes': {
+          '/api/phenotypes': {
               get: {
                   tags: ['phenotypes'],
                   summary: 'Find phenotypes',
@@ -49,7 +49,7 @@ export function ApiAccess() {
                   },
               },
           },
-          '/variants': {
+          '/api/variants': {
               get: {
                   tags: ['variants'],
                   summary: 'Find variants for queried phenotype(s)',
