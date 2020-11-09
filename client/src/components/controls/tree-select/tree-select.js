@@ -155,10 +155,10 @@ export const TreeSelect = forwardRef(
       );
     };
 
-    const Node = ({ keyPrefix, node }) => (
+    const Node = ({ keyPrefix, node, sublevel, isFlat }) => (
       <div
         style={{
-          marginLeft: '10px',
+          marginLeft: !isFlat ? `${sublevel ? 24 : 5}px` : '19px',
           overflow: 'hidden',
           whiteSpace: 'nowrap'
         }}>
@@ -180,7 +180,10 @@ export const TreeSelect = forwardRef(
           style={{ whiteSpace: 'nowrap', overflow: 'hidden' }}
           title={node[titleKey]}>
           <input
-            className={`mr-1`}
+            className={`mr-2`}
+            style={{
+              marginLeft: '6px',
+            }}
             type="checkbox"
             checked={isSelected(node)}
             ref={current =>
@@ -195,7 +198,7 @@ export const TreeSelect = forwardRef(
           (node.children || [])
             .sort(compareTitles)
             .map((node, i) => (
-              <Node key={`tree-node-${keyPrefix}-${i}`} node={node} />
+              <Node key={`tree-node-${keyPrefix}-${i}`} node={node} sublevel={true}/>
             ))}
       </div>
     );
@@ -265,7 +268,7 @@ export const TreeSelect = forwardRef(
                 )
                 .sort(compareTitles)
                 .map((node, i) => (
-                  <Node key={`flat-tree-node-${i}`} keyPrefix={i} node={node} />
+                  <Node key={`flat-tree-node-${i}`} keyPrefix={i} node={node} isFlat={true} />
                 ))
             : data
                 .sort(compareTitles)
