@@ -120,7 +120,7 @@ export function Phenotypes() {
           breadCrumb: [
             {
               data: {
-                title: parent.title
+                title: parent.display_name
               },
               parent: {
                 data: {
@@ -308,19 +308,19 @@ export function Phenotypes() {
       if (breadCrumb.length === 1) {
         setCategoryColor(null);
       }
-      const crumbParents = getParents(breadCrumb[breadCrumb.length - 1].data);
+      const lastItem = breadCrumb.length - 2 >= 0 ? breadCrumb[breadCrumb.length - 2] : null;
       dispatch(
         updateBrowsePhenotypes({
           breadCrumb: [...breadCrumb.splice(0, breadCrumb.length - 1)],
-          currentBubbleData:
-            crumbParents.length > 0 ? crumbParents[0].children : phenotypes.tree
+          currentBubbleData: 
+            lastItem ? lastItem.data.children : phenotypes.tree,
         })
       );
     }
   };
 
   const crumbClick = (item, idx) => {
-    const crumbParents = getParents(item.data);
+    const lastItem = idx - 1 >= 0 ? breadCrumb[idx - 1] : null;
     if (idx === 0) {
       setCategoryColor(null);
     }
@@ -328,8 +328,8 @@ export function Phenotypes() {
     dispatch(
       updateBrowsePhenotypes({
         breadCrumb: newBreadCrumb,
-        currentBubbleData:
-          crumbParents.length > 0 ? crumbParents[0].children : phenotypes.tree,
+        currentBubbleData: 
+          lastItem ? lastItem.data.children : phenotypes.tree,
         selectedPhenotype: null
       })
     );
@@ -384,11 +384,11 @@ export function Phenotypes() {
               id="browse-phenotypes-container">
               {breadCrumb.length > 0 &&
                 breadCrumb.map((item, idx) => (
-                  <span className="" key={'crumb-' + item.data.title}>
+                  <span className="" key={'crumb-' + item.data.id}>
                     <a
                       href="javascript:void(0)"
                       onClick={_ => crumbClick(item, idx)}>
-                      {idx === 0 ? 'All Phenotypes' : item.data.title}
+                      {idx === 0 ? 'All Phenotypes' : item.data.display_name}
                     </a>
                     <Icon
                       name="arrow-left"
