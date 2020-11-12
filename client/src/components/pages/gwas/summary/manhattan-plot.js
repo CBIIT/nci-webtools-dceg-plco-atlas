@@ -855,7 +855,7 @@ export function ManhattanPlot({
         .split(' ')
         .map(titlecase)
         .join('-');
-    let title = formatTitle(selectedPhenotypes.map(p => p.title).join(', '));
+    let title = formatTitle(selectedPhenotypes.map(p => p.display_name).join(', '));
     // let plotType = formatTitle(selectedSex);
     let chr = selectedChromosome ? formatTitle(`Chr${selectedChromosome}`) : '';
     let range = getXRangeTitle();
