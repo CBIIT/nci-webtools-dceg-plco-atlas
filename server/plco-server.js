@@ -6,8 +6,9 @@ const compress = require("fastify-compress");
 const static = require("fastify-static");
 const serverTimeout = require('fastify-server-timeout');
 const { UAParser } = require('ua-parser-js');
+const redis = require('redis');
 const logger = require("./logger");
-const { port } = require("./config.json");
+const config = require("./config.json");
 const args = require('minimist')(process.argv.slice(2));
 const numCPUs = require('os').cpus().length;
 
@@ -27,8 +28,6 @@ const {
   getShareLink,
   setShareLink
 } = require("./query");
-
-
 
 if (cluster.isMaster) {
   logger.info(`Master ${process.pid} is running`);
@@ -55,6 +54,10 @@ app.register(static, {
   root: path.resolve("www")
 });
 
+const redisClient = config.redis
+  ? redis.createClient(config.redis)
+  : null;
+
 app.addHook('onError', async (req, reply, error) => {
   const statusCode = error.statusCode;
   const isClientError = statusCode >= 400 && statusCode < 500;
@@ -68,22 +71,44 @@ app.addHook('onError', async (req, reply, error) => {
 // execute before handling request
 app.addHook("onRequest", (req, res, done) => {
   const browser = new UAParser(req.headers['user-agent']).getBrowser();
-  console.log(req.raw.url);
-  if (!browser.name && !/^\/api\//.test(req.raw.url)) {
+  let url = req.raw.url;
+  if (!browser.name && !/^\/api\//.test(url)) {
     res.send('Please use the PLCO Atlas Public API to perform queries outside the browser.');
     done();
   }
-  let pathname = req.raw.url.replace(/\?.*$/, "");
-  res.header("Timestamp", new Date().getTime());
+
+  let pathname = url.replace(/\?.*$/, "");
+  let timestamp = new Date().getTime();
+  res.header("Timestamp", timestamp);
   logger.info(`[${process.pid}] ${pathname}: Started Request`, req.query);
   logger.debug(`[${process.pid}] ${pathname} ${JSON.stringify(req.query, null, 2)}`);
-  done();
+
+  if (redisClient && /variants/.test(url)) {
+    redisClient.get(url, function(error, result) {
+      if (!error && result !== null) {
+        res.send(result);
+      } else {
+        done();
+      }
+    });
+  } else {
+    done();
+  }
+});
+
+app.addHook('preSerialization', (req, res, payload, done) => {
+  let url = req.raw.url;
+  if (redisClient && /variants/.test(url) && payload.data.length > 1e4) {
+    redisClient.set(url, JSON.stringify(payload)); // asynchronously set data
+  }
+  done(null, payload)
 });
 
 // execute before sending response
 app.addHook("onSend", (req, res, payload, done) => {
 
-  let pathname = req.raw.url.replace(/\?.*$/, "");
+  let url = req.raw.url;
+  let pathname = url.replace(/\?.*$/, "");
   let timestamp = res.getHeader("Timestamp");
 
   // log response time and parameters for the specified routes
@@ -201,7 +226,7 @@ app.get("/api/variants", async ({ query }, res) => {
 });
 
 app
-  .listen(port, "0.0.0.0")
+  .listen(config.port, "0.0.0.0")
   .then(addr =>
     logger.info(`[${process.pid}] Application is running on: ${addr}`)
   )

@@ -316,7 +316,7 @@ async function getVariants(connection, params) {
 
     // sets limits and offsets (by default, limit to 1,000,000 records to prevent memory overflow)
     const defaultLimit = config.rowLimit || 1e6;
-    const limit = params.limit ? Math.min(params.limit, defaultLimit) : defaultLimit; // set hard limit to prevent overflow
+    const limit = Math.min(params.limit || 1e4, defaultLimit); // set hard limit to prevent overflow
     const offset = +params.offset || 0;
 
     // generate sql to query variants table(s)
