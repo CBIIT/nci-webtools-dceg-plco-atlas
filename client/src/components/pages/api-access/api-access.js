@@ -318,6 +318,18 @@ export function ApiAccess() {
     <div className="mt-3 container bg-white tab-pane-bordered rounded-0 p-4">
       <h1 className="font-weight-light">API Access</h1>
       <hr />
+
+      <p>
+        The GWAS Atlas summary statistic data are also accessible by command line 
+        from a terminal using the GWAS Atlas API server. This programmatic access 
+        facilitates researchers who are interested in performing more advanced queries, 
+        batch queries, or downloading results for specific genomic regions. The syntax 
+        needed to perform these API calls are explained in detail below with the ability 
+        to interactively test queries using the web interface before accessing the API 
+        programattically. Generally, text output is returned in JSON format for easy 
+        manipulation and data storage.
+      </p>
+
       <SwaggerUI spec={swaggerSpec} />
     </div>
   );
