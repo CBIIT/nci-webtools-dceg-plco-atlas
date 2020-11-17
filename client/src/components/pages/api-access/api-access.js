@@ -326,7 +326,7 @@ export function ApiAccess() {
         batch queries, or downloading results for specific genomic regions. The syntax 
         needed to perform these API calls are explained in detail below with the ability 
         to interactively test queries using the web interface before accessing the API 
-        programattically. Generally, text output is returned in JSON format for easy 
+        programmatically. Generally, text output is returned in JSON format for easy 
         manipulation and data storage.
       </p>
 
