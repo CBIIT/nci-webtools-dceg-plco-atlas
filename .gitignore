@@ -3,6 +3,7 @@
 /database/import/raw/*
 /database/import/hpc/slurm*
 /database/import/hpc/swarm*
+/database/import/hpc/sbatch*
 /database/import/nohup*
 /database/import/hpc/nohup*
 /database/import/hpc/my.cnf
