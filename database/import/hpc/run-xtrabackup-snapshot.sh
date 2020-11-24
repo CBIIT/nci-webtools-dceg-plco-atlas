@@ -66,4 +66,4 @@ if [ -z "$6" ]
 fi
 BUCKET_FOLDER=$6
 
-sbatch --gres=lscratch:200 --mem=120g --cpus-per-task=32 --partition=norm --time=08:00:00 --wrap="sh xtrabackup-snapshot.sh $DB_USER $DB_PASS $BASE_DIR $TARGET_DIR $BUCKET_NAME $BUCKET_FOLDER"
+sbatch --gres=lscratch:200 --mem=120g --cpus-per-task=28 --partition=norm --time=08:00:00 --wrap="sh xtrabackup-snapshot.sh $DB_USER $DB_PASS $BASE_DIR $TARGET_DIR $BUCKET_NAME $BUCKET_FOLDER"
