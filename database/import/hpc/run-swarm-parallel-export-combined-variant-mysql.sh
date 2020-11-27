@@ -58,7 +58,7 @@ if [ -z "$5" ]
 fi
 PHENOTYPE_FILE=$5
 
-CURRENT_DATE=$(date +%F)
+CURRENT_DATE=$(date +%F_%H:%M:%S)
 
 mkdir ./swarm_export_out_$CURRENT_DATE
 

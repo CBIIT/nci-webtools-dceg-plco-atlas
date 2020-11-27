@@ -44,7 +44,7 @@ if [ -z "$4" ]
 fi
 PASSWORD=$4
 
-CURRENT_DATE=$(date +%F)
+CURRENT_DATE=$(date +%F_%H:%M:%S)
 
 mkdir ./sbatch_import_out_$CURRENT_DATE
 
