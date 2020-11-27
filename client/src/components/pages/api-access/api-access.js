@@ -6,7 +6,7 @@ export function ApiAccess() {
   const swaggerSpec = {
       swagger: '2.0',
       host: window.location.host,
-      basePath: window.location.host.includes("localhost") ? '' : '/plco-atlas/api',
+      basePath: window.location.host.includes("localhost") ? '' : '/plco-atlas',
       tags: [
           {
               name: 'phenotypes',
