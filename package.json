@@ -22,7 +22,7 @@
   },
   "homepage": "https://github.com/CBIIT/nci-webtools-dceg-plco-atlas#readme",
   "dependencies": {
-    "fastify": "^2.6.0",
+    "fastify": "^2.15.1",
     "fastify-compress": "^0.11.0",
     "fastify-cors": "^2.1.3",
     "fastify-server-timeout": "^0.1.1",
