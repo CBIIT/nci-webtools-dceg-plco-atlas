@@ -171,6 +171,7 @@ export const TreeSelect = forwardRef(
           fa 
           fa-${isExpanded(node) ? 'minus' : 'plus'}-square 
           ${node.children && node.children.length ? 'visible' : 'invisible'}`}
+            aria-label={`${isExpanded(node) ? 'Close' : 'Open'}`}
           />
         )}
         <label
@@ -214,6 +215,7 @@ export const TreeSelect = forwardRef(
               text-secondary  
               fa 
               fa-${isExpanded(root.current) ? 'minus' : 'plus'}-square`}
+              aria-label={`${isExpanded(root.current) ? 'Close' : 'Open'}`}
             />
           </div>
           <div className="border d-flex align-items-center p-1">
@@ -224,6 +226,7 @@ export const TreeSelect = forwardRef(
                 current && (current.indeterminate = isIndeterminate(root))
               }
               onChange={e => setSelected(root.current, e.target.checked)}
+              aria-label="Select/Deselect all"
             />
           </div>
           <div className="input-group">
@@ -232,6 +235,7 @@ export const TreeSelect = forwardRef(
               value={searchFilter}
               onChange={e => setSearchFilter(e.target.value)}
               placeholder={placeholder}
+              aria-label="Filter"
             />
             <div className="input-group-append">
               <button
@@ -241,6 +245,7 @@ export const TreeSelect = forwardRef(
                   className={`fa fa-${
                     searchFilter.length ? 'times' : 'search'
                   }`}
+                  aria-label={`${searchFilter.length ? 'Clear' : 'Search'}`}
                 />
               </button>
             </div>
@@ -677,7 +682,7 @@ export const TreeSelect2 = forwardRef(({
                 style={{ all: 'unset' }}
                 className="collapse-button text-secondary"
                 onClick={e => toggleHideChildren(item.id)}>
-                <i className={"fa fa-plus-square collapse-button-text-" + item.id}></i>
+                <i className={"fa fa-plus-square collapse-button-text-" + item.id} aria-label="Open"></i>
               </button>
 
               <div
@@ -936,10 +941,10 @@ export const TreeSelect2 = forwardRef(({
                 onClick={e => toggleExpandAllParents()}
                 disabled={!data}>
                 {expandAll && (
-                  <i className="fa fa-minus-square" style={{cursor: !data ? 'not-allowed' : 'pointer'}}></i>
+                  <i className="fa fa-minus-square" style={{cursor: !data ? 'not-allowed' : 'pointer'}} aria-label="Close"></i>
                 )}
                 {!expandAll && (
-                  <i className="fa fa-plus-square" style={{cursor: !data ? 'not-allowed' : 'pointer'}}></i>
+                  <i className="fa fa-plus-square" style={{cursor: !data ? 'not-allowed' : 'pointer'}} aria-label="Open"></i>
                 )}
               </button>
 
@@ -1002,14 +1007,14 @@ export const TreeSelect2 = forwardRef(({
                   onClick={e => {
                     clearSearchFilter();
                   }}>
-                  <i className="fa fa-times" style={{fontSize: '14px'}}></i>
+                  <i className="fa fa-times" style={{fontSize: '14px'}} aria-label="Clear"></i>
                 </button>
               ) : (
                 <button 
                   className="input-group-text bg-white" 
                   title="Filter tree input icon"
                   disabled>
-                  <i className="fa fa-search" style={{fontSize: '14px'}}></i>
+                  <i className="fa fa-search" style={{fontSize: '14px'}} aria-label="Search"></i>
                 </button>
               )}
             </div>

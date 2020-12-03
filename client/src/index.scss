@@ -18,7 +18,7 @@ $enable-shadows: true;
 
 a {
   //color: rgb(0, 140, 186);
-  color: rgb(0, 126, 167);
+  color: rgb(0, 113, 150);
   text-decoration: none;
 }
 
@@ -153,9 +153,14 @@ input[type='checkbox'][disabled] {
   outline: none;
 }
 
+.btn-link {
+  // color: rgb(0, 140, 186);
+  color: rgb(0, 113, 150);
+}
+
 .btn.btn-link {
   // color: rgb(0, 140, 186);
-  color: rgb(0, 126, 167);
+  color: rgb(0, 113, 150);
 }
 
 .btn.btn-link:active,
@@ -311,7 +316,7 @@ input[type='checkbox'][disabled] {
 .small-link {
   font-size: 0.8rem;
   font-weight: 600;
-  color: #007bff !important;
+  color: rgb(0, 113, 150) !important;
   text-decoration: none;
   cursor: pointer;
 }
