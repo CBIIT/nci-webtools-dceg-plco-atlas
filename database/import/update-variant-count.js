@@ -3,6 +3,7 @@ const args = require('minimist')(process.argv.slice(2));
 // const { database } = require('../../server/config.json');
 const { timestamp } = require('./utils/logging');
 const { getRecords, pluck } = require('./utils/query');
+const { getLambdaGC } = require('./utils/math');
 
 // display help if needed
 if (!(args.user) || !(args.password)) {
@@ -39,11 +40,6 @@ updateCounts().then(e => {
 });
 
 async function updateCounts() {
-    await connection.query(`
-        START TRANSACTION;
-        SET autocommit = 0;
-    `);
-
     let [phenotypes] = await connection.query(`
         select id, name from phenotype
         where name is not null;
@@ -55,6 +51,11 @@ async function updateCounts() {
     `);
 
     for (let {tableName} of tableNameRows) {
+        await connection.query(`
+            START TRANSACTION;
+            SET autocommit = 0;
+        `);
+
         let [, name, sex, ancestry] = tableName.split('__');
         let phenotype = phenotypes.find(p => p.name == name)
         console.log(`Updating counts for ${name}, ${sex}, ${ancestry}`)
@@ -84,19 +85,38 @@ async function updateCounts() {
             {id: phenotype.id, sex, ancestry}
         );
 
-        await connection.execute(
-            `update phenotype set 
-            import_count = (
-                select sum(count) from phenotype_metadata 
-                where phenotype_id = :id and chromosome = 'all'
-            ),
-            import_date = NOW()
-            where id = :id`,
-            {id: phenotype.id}
+        const [countRows] = await connection.execute(
+            `SELECT count 
+            FROM phenotype_metadata
+            where 
+                phenotype_id = :id and 
+                sex = :sex and 
+                ancestry = :ancestry and 
+                chromosome = 'all'`,
+            {id: phenotype.id, sex, ancestry}
         );
+        const count = pluck(countRows);
+
+        const [medianRows] = await connection.execute(
+            `select avg(p_value) from (
+                select p_value from ${tableName} 
+                order by p_value 
+                limit ${Math.floor(count / 2)}, ${count % 2 ? 1 : 2}
+            ) p`
+        );
+        const median = pluck(medianRows);
+        const lambdaGC = getLambdaGC(median);
+        console.log(`LambdaGC: ${lambdaGC} FROM ${median}`);
+
+        connection.execute(
+            `update phenotype_metadata set lambda_gc = :lambdaGC
+            where phenotype_id = :id and sex = :sex and ancestry = :ancestry and chromosome = 'all'`,
+            {id: phenotype.id, sex, ancestry, lambdaGC}
+        );
+
+        await connection.query(`COMMIT`);
     }
 
-    await connection.query(`COMMIT`);
     await connection.end();
     return 0;
 }
