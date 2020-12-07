@@ -68,7 +68,7 @@ export const BarChart = ({
 }) => (
   <Plot
     className="w-100 disable-x-axis-tooltip override-cursor"
-    style={{ minHeight: '600px', width: '600px' }}
+    style={{ minHeight: '600px', width: '600px', minWidth: '500px' }}
     data={categories.map((name, i) => {
       let x = [];
       let y = [];
@@ -166,7 +166,7 @@ export const BarChart = ({
 export const HorizontalBarChart = ({ data, categories }) => (
   <Plot
     className="w-100  disable-x-axis-tooltip"
-    style={{ minHeight: '600px' }}
+    style={{ minHeight: '600px', minWidth: '500px' }}
     data={categories.map((name, i) => {
       let x = [],
         y = [];
@@ -213,7 +213,7 @@ export const AreaChart = ({
   return (
     <Plot
       className="w-100 disable-x-axis-tooltip override-cursor"
-      style={{ minHeight: '600px' }}
+      style={{ minHeight: '600px', minWidth: '500px' }}
       data={[
         {
           x: categories, //data.map((e, i) => i + 1),
@@ -307,7 +307,7 @@ export const GroupedAreaChart = ({
   return (
     <Plot
       className="w-100 disable-x-axis-tooltip override-cursor"
-      style={{ minHeight: '600px', width: '600px' }}
+      style={{ minHeight: '600px', width: '600px', minWidth: '500px' }}
       data={categories.map((name, i) => {
         let x = [];
         let y = [];
@@ -510,7 +510,7 @@ export function PhenotypesRelated({ title, relatedData, onClick }) {
   return (
     <Plot
       onClick={onClick}
-      style={{ width: '100%', height: '600px' }}
+      style={{ width: '100%', height: '600px', minWidth: '500px' }}
       data={data}
       layout={layout}
       config={config}

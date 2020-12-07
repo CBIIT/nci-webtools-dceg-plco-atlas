@@ -76,7 +76,7 @@ export function Downloads() {
   return (
     <SidebarContainer className="m-3">
       <SidebarPanel className="col-lg-3">
-        <form className="px-2 pt-2 pb-3 bg-white tab-pane-bordered rounded-0" onSubmit={handleSubmit} onReset={handleReset}>
+        <form className="px-2 pt-2 pb-3 mb-2 bg-white tab-pane-bordered rounded-0" onSubmit={handleSubmit} onReset={handleReset}>
           <div className="mb-2">
             <b>Phenotypes</b>
             <span style={{ color: 'red' }}>*</span>

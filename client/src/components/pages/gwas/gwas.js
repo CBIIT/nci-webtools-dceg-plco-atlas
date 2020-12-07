@@ -26,10 +26,35 @@ export function Gwas() {
     <div className="px-0">
       <div className="mx-3">
         <div className="mx-3 bg-white border border-top-0">
-          <div className="">
+          {/* for desktops and tablets */}
+          <div className="d-none d-md-block">
             <Nav defaultActiveKey="summary">
               {gwasLinks.map(({ name, pathId }) => (
                 <div key={pathId} className="d-inline-block">
+                  <NavLink
+                    // key={pathId}
+                    className="secondary-navlinks px-3 py-1 d-inline-block"
+                    activeClassName="active-secondary-navlinks"
+                    style={{
+                      textDecoration: 'none',
+                      fontSize: '11pt',
+                      color: 'black',
+                      fontWeight: '500'
+                    }}
+                    exact={true}
+                    to={`/gwas/${pathId}`}>
+                    {name}
+                  </NavLink>
+                  <div className="d-md-none w-100"></div>
+                </div>
+              ))}
+            </Nav>
+          </div>
+          {/* for mobile devices */}
+          <div className="row d-md-none">
+            <Nav defaultActiveKey="summary">
+              {gwasLinks.map(({ name, pathId }) => (
+                <div key={pathId} className="col-12 text-center">
                   <NavLink
                     // key={pathId}
                     className="secondary-navlinks px-3 py-1 d-inline-block"

@@ -256,7 +256,7 @@ export function PhenotypesTabs(props) {
           eventKey="frequency"
           title="Frequency (All)"
           className="p-4 bg-white tab-pane-bordered rounded-0"
-          style={{ minHeight: '600px' }}>
+          style={{ minHeight: '600px', overflowX: 'auto' }}>
           {phenotypeData &&
           phenotypeData.frequency &&
           phenotypeData.categories &&
@@ -326,7 +326,7 @@ export function PhenotypesTabs(props) {
               eventKey={t.key}
               title={t.title}
               className="p-4 bg-white tab-pane-bordered rounded-0"
-              style={{ minHeight: '600px' }}>
+              style={{ minHeight: '600px', overflowX: 'auto' }}>
               {/* <pre>{JSON.stringify(phenotypeData, null, 2)}</pre> */}
 
               {!loading &&
@@ -418,7 +418,7 @@ export function PhenotypesTabs(props) {
           eventKey="related-phenotypes"
           title="Related Phenotypes"
           className="p-4 bg-white tab-pane-bordered rounded-0"
-          style={{ minHeight: '50vh' }}>
+          style={{ minHeight: '50vh', overflowX: 'auto' }}>
           {!loading &&
             selectedPlot === 'related-phenotypes' &&
             phenotypeData &&

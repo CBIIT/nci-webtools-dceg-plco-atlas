@@ -373,7 +373,8 @@ export function Phenotypes() {
             }
             style={{
               position: 'static',
-              minHeight: '324px'
+              minHeight: '324px',
+              overflowX: 'auto'
             }}>
             <LoadingOverlay active={!phenotypes || loading} />
             <div
