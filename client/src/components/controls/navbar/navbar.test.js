@@ -15,6 +15,8 @@ describe('Navbar Module', function() {
         <Navbar links={links} />
       </HashRouter>
     );
-    expect(screen.queryByText(title)).toHaveAttribute('href', expectedRoute);
+    screen.getAllByText(title).map(item => {
+      expect(item).toHaveAttribute('href', expectedRoute);
+    })
   });
 });
