@@ -322,7 +322,8 @@ export function SummaryResultsTable() {
   const showPhenotypeNames = isPairwise && selectedPhenotypes.length == 2;
 
   return (
-    <div className="mt-3">
+    <div className="mt-3" 
+      style={{ minWidth: '800px' }}>
       <div
         key="controls"
         className="d-flex align-items-center justify-content-between">

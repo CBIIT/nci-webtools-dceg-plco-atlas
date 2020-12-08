@@ -492,7 +492,7 @@ export function SummaryResults() {
             </Nav>
             <Tab.Content 
               className={`p-2 bg-white tab-pane-bordered rounded-0 ${submitted ? 'd-block' : 'center-content'}`} 
-              style={{ minHeight: '635px' }}>
+              style={{ minHeight: '635px', overflowX: 'auto' }}>
               <Tab.Pane eventKey="manhattan-plot" className="border-0 py-2">
                 {submitted && selectedPhenotypes && selectedStratifications 
                   ? <>

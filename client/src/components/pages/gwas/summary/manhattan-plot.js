@@ -890,7 +890,7 @@ export function ManhattanPlot({
 
   return (
     <div
-      style={{ display: hasData() ? 'block' : 'none', position: 'relative' }}>
+      style={{ display: hasData() ? 'block' : 'none', position: 'relative', minWidth: '800px' }}>
       {loading && <LoadingOverlay active={loading} {...plotOverlayConfig} />}
 
       <div className="d-flex align-items-center justify-content-between mx-4 mt-3">

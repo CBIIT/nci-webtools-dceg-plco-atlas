@@ -35,7 +35,8 @@ export const VariantLookupSearchCriteria = () => {
     </a>;
 
   return (
-    <div className={`mb-2 px-3 py-2 bg-white tab-pane-bordered rounded-0 d-flex align-items-${collapsed ? 'center' : 'start'} justify-content-between`}>
+    <div className={`mb-2 px-3 py-2 bg-white tab-pane-bordered rounded-0 d-flex align-items-${collapsed ? 'center' : 'start'} justify-content-between`}
+      style={{ overflowX: 'auto' }}>
       <div className="d-flex align-items-start">
         <button 
             className="btn btn-link btn-sm p-0 outline-none"

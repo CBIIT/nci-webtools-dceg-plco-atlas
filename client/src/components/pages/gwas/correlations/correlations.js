@@ -100,7 +100,7 @@ export function PhenotypeCorrelations() {
             className={
               'bg-white tab-pane-bordered rounded-0 p-3 d-flex justify-content-center align-items-center'
             }
-            style={{ minHeight: '426px' }}>
+            style={{ minHeight: '426px', overflowX: 'auto' }}>
             {!submitted ? placeholder : 
               <div
                 className="mw-100 my-4"
