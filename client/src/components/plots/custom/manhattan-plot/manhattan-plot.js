@@ -842,11 +842,13 @@ export class ManhattanPlot {
       drawZoomOverlay(config, this.ctx, this.overlayCtx);
       config.setZoomWindow = ev => {
         config.zoomWindow = ev;
+        console.log(ev);
         let { xMin, xMax, yMin, yMax } = ev.bounds;
         let xRange = xMax - xMin;
-        let yRange = yMax - yMin;
+        // let yRange = yMax - yMin;
 
         if (config.windowLimits) {
+          // preserve x ranges, but not y-ranges
           if (xMin < config.windowLimits.xMin) {
             xMin = config.windowLimits.xMin;
             xMax = xMin + xRange;
@@ -859,7 +861,7 @@ export class ManhattanPlot {
 
           if (yMin < config.windowLimits.yMin) {
             yMin = config.windowLimits.yMin;
-            yMin = yMin + yRange;
+            // yMax = yMin + yRange;
           }
         }
 

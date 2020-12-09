@@ -451,6 +451,7 @@ export function ManhattanPlot({
         let bounds =
           zoomStack.length > 0 ? zoomStack[zoomStack.length - 1].bounds : null;
 
+        // console.log(bounds, getTitle(bounds));
         plot.current.setTitle([
           {
             text: getTitle(bounds),
@@ -812,18 +813,23 @@ export function ManhattanPlot({
 
   function resetZoom() {
     if (plot.current && plot.current.config.resetZoom) {
-      plot.current.config.resetZoom();
+      let config = plot.current.config;
+      config.resetZoom();
+      config.zoomStack = [];
+      setManhattanPlotConfig({ ...config });
+      setZoomStack([]);
     }
   }
 
   function zoomOut() {
     if (plot.current) {
-      console.log('ZOOMSTACK', plot.current.config, zoomStack);
+      // console.log('ZOOMSTACK', plot.current.config, zoomStack);
       if (zoomStack.length < 2) {
         this.resetZoom();
       } else {
         zoomStack.pop();
         let window = zoomStack[zoomStack.length - 1];
+        plot.current.config.zoomStack = [...zoomStack];
         plot.current.config.setZoomWindow({ ...window });
         setZoomStack([...zoomStack]);
         // plot.current.config.zoomOut();
