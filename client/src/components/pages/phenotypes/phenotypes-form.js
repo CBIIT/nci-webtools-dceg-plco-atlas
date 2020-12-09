@@ -45,7 +45,7 @@ export function PhenotypesForm({ onSubmit, onChange, onReset }) {
             dispatch(updateBrowsePhenotypes({ disableSubmit: false }));
           }}
           singleSelect
-          enabled={item => true}
+          enabled={item => !item.children || item.participant_count > 0}
           ref={treeRef}
         />
       </div>
