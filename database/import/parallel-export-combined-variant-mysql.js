@@ -315,7 +315,7 @@ async function exportVariants({
                             ${useOddsRatio ? `EXP(p.${sex}_${ancestry}_beta)` : `NULL`} as odds_ratio,
                             p.${sex}_${ancestry}_n
                         FROM prestage p
-                        INNER JOIN chromosome_range cr ON cr.chromosome = p.chromosome
+                        INNER JOIN chromosome_range cr ON cr.chromosome COLLATE utf8mb4_unicode_ci = p.chromosome
                         WHERE p.${sex}_${ancestry}_p_value > 1e-10000
                         AND p.position BETWEEN cr.position_min AND cr.position_max
                         ORDER BY ${sex}_${ancestry}_p_value;
@@ -424,7 +424,7 @@ async function exportVariants({
                             ${positionFactor} * FLOOR((s.position + cr.position_abs_min) / ${positionFactor})  as position_abs,
                             ${pValueNlogFactor} * FLOOR(-LOG10(s.p_value) / ${pValueNlogFactor}) as p_value_nlog
                         FROM ${stageTable} s
-                        JOIN chromosome_range cr ON s.chromosome = cr.chromosome
+                        JOIN chromosome_range cr ON s.chromosome COLLATE utf8mb4_unicode_ci = cr.chromosome
                         ORDER BY p_value_nlog DESC
                     `);
 
