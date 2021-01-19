@@ -7,4 +7,4 @@ CREATE TABLE IF NOT EXISTS ${table_name}
     p_value_nlog double null,
     p_value_nlog_expected double null,
     primary key (id, phenotype_id, sex, ancestry)
-) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+);

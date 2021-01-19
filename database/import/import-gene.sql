@@ -48,7 +48,7 @@ CREATE TABLE IF NOT EXISTS `gene` (
     `transcription_end` INTEGER NOT NULL,
     `exon_starts` MEDIUMTEXT,
     `exon_ends` MEDIUMTEXT
-) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+);
 
 -- create staging table
 DROP TEMPORARY TABLE IF EXISTS gene_stage;
@@ -66,7 +66,7 @@ CREATE TEMPORARY TABLE gene_stage (
     `exonEnds`      TEXT,
     `score`         TEXT,
     `name2`         TEXT
-) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+);
 
 -- load data into staging table
 LOAD DATA LOCAL INFILE "../raw/genes.tsv" INTO TABLE gene_stage
