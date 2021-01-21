@@ -13,7 +13,7 @@ export TMPDIR=/lscratch/$SLURM_JOB_ID
 
 module load mysql/8.0
 module use ~/mymodules
-module load xtrabackup_2.4.20
+module load xtrabackup_8.0.22
 
 [ -d $TARGET_DIR ] && echo "$TARGET_DIR directory already exists" || mkdir $TARGET_DIR
 
