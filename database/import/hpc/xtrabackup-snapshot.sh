@@ -22,7 +22,7 @@ local_mysql --basedir $BASE_DIR start --force
 echo 
 
 echo "BACKING UP VIA XTRABACKUP (MySQL-8.0.20, host=$SLURM_NODELIST, user=$DB_USER,basedir=$BASE_DIR, targetdir=$TARGET_DIR)..."
-time xtrabackup --backup --host=$SLURM_NODELIST --port=55555  --user=$DB_USER --password=$DB_PASS --datadir=$BASE_DIR/data/ --stream=xbstream --parallel=16 --target-dir=$TARGET_DIR | split -d --bytes=4000MB - $TARGET_DIR/backup.xbstream
+time xtrabackup --backup --host=$SLURM_NODELIST --port=55555  --user=$DB_USER --password=$DB_PASS --datadir=$BASE_DIR/data/ --stream=xbstream --parallel=16 --target-dir=$TARGET_DIR | split -d --bytes=2048MB - $TARGET_DIR/backup.xbstream
 echo
 
 echo "STOPPING MYSQL SERVER..."
