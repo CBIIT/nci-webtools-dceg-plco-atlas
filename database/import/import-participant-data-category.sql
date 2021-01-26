@@ -17,7 +17,7 @@ CREATE TABLE participant_data_category_stage (
     `label`                 TEXT,
     `show_distribution`     TEXT,
     `order`                 TEXT
-);
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
 
 
 CREATE TABLE IF NOT EXISTS `participant_data_category` (
@@ -28,7 +28,7 @@ CREATE TABLE IF NOT EXISTS `participant_data_category` (
     `show_distribution` BOOLEAN,
     `order` INTEGER,
     FOREIGN KEY (phenotype_id) REFERENCES phenotype(id)
-);
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
 
 -- D:/Development/Work/nci-webtools-dceg-plco-atlas/database/import/raw/participant_data_category.csv
 LOAD DATA LOCAL INFILE "../raw/participant_data_category.csv" INTO TABLE participant_data_category_stage

@@ -33,4 +33,4 @@ CREATE TABLE IF NOT EXISTS ${table_name} (
     `position_abs` BIGINT NOT NULL,
     `p_value_nlog` DOUBLE NOT NULL,
     PRIMARY KEY (id, phenotype_id)
-);
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;

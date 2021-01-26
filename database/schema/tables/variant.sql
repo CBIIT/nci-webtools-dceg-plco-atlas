@@ -19,7 +19,7 @@ CREATE TABLE IF NOT EXISTS ${table_name} (
     odds_ratio_ci_95_high double AS (IF(odds_ratio IS NULL, NULL, EXP(beta_ci_95_high))) STORED NULL,
     n int NULL,
     PRIMARY KEY (id, chromosome)
-)
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci
 PARTITION BY list(chromosome) (
     PARTITION `1` VALUES IN (1),
     PARTITION `2` VALUES IN (2),

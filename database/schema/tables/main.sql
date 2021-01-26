@@ -3,12 +3,12 @@ SET default_storage_engine = INNODB;
 CREATE TABLE IF NOT EXISTS `lookup_sex` (
     `id` INTEGER PRIMARY KEY NOT NULL AUTO_INCREMENT,
     `value` VARCHAR(20) UNIQUE
-);
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
 
 CREATE TABLE IF NOT EXISTS `lookup_ancestry` (
     `id` INTEGER PRIMARY KEY NOT NULL AUTO_INCREMENT,
     `value` VARCHAR(40) UNIQUE
-);
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
 
 CREATE TABLE IF NOT EXISTS `chromosome_range` (
     `id` INTEGER PRIMARY KEY NOT NULL AUTO_INCREMENT,
@@ -42,7 +42,7 @@ CREATE TABLE IF NOT EXISTS `chromosome_range` (
     `position_max` BIGINT NOT NULL,
     `position_abs_min` BIGINT NOT NULL,
     `position_abs_max` BIGINT NOT NULL
-);
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
 
 CREATE TABLE IF NOT EXISTS `gene` (
     `id` INTEGER PRIMARY KEY NOT NULL AUTO_INCREMENT,
@@ -78,7 +78,7 @@ CREATE TABLE IF NOT EXISTS `gene` (
     `transcription_end` INTEGER NOT NULL,
     `exon_starts` MEDIUMTEXT,
     `exon_ends` MEDIUMTEXT
-);
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
 
 CREATE TABLE IF NOT EXISTS `phenotype` (
     `id` INTEGER PRIMARY KEY NOT NULL AUTO_INCREMENT,
@@ -93,7 +93,7 @@ CREATE TABLE IF NOT EXISTS `phenotype` (
     `import_count` BIGINT,
     `import_date` DATETIME,
     FOREIGN KEY (parent_id) REFERENCES phenotype(id)
-);
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
 
 CREATE TABLE IF NOT EXISTS `phenotype_metadata` (
     `id` INTEGER PRIMARY KEY NOT NULL AUTO_INCREMENT,
@@ -135,7 +135,7 @@ CREATE TABLE IF NOT EXISTS `phenotype_metadata` (
     FOREIGN KEY (`sex`) REFERENCES lookup_sex(`value`),
     FOREIGN KEY (`ancestry`) REFERENCES lookup_ancestry(`value`),
     UNIQUE KEY (`phenotype_id`, `sex`, `ancestry`, `chromosome`)
-);
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
 
 CREATE TABLE IF NOT EXISTS `phenotype_correlation` (
     `id` INTEGER PRIMARY KEY NOT NULL AUTO_INCREMENT,
@@ -144,7 +144,7 @@ CREATE TABLE IF NOT EXISTS `phenotype_correlation` (
     `value` DOUBLE NOT NULL,
     FOREIGN KEY (phenotype_a) REFERENCES phenotype(id),
     FOREIGN KEY (phenotype_b) REFERENCES phenotype(id)
-);
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
 
 CREATE TABLE IF NOT EXISTS `phenotype_aggregate` (
     `id` BIGINT AUTO_INCREMENT NOT NULL,
@@ -180,7 +180,7 @@ CREATE TABLE IF NOT EXISTS `phenotype_aggregate` (
     `position_abs` BIGINT NOT NULL,
     `p_value_nlog` DOUBLE NOT NULL,
     PRIMARY KEY (id, phenotype_id)
-)
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci
 PARTITION BY list(phenotype_id) (PARTITION `0` VALUES IN (0));
 
 CREATE TABLE IF NOT EXISTS phenotype_point
@@ -192,7 +192,7 @@ CREATE TABLE IF NOT EXISTS phenotype_point
     p_value_nlog double null,
     p_value_nlog_expected double null,
     primary key (id, phenotype_id, sex, ancestry)
-)
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci
 PARTITION BY list(phenotype_id) (PARTITION `0` VALUES IN (0));
 
 
@@ -208,7 +208,7 @@ CREATE TABLE IF NOT EXISTS `participant` (
         'pacific_islander',
         'american_indian'
     )
-);
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
 
 CREATE TABLE IF NOT EXISTS `participant_data` (
     `id` BIGINT PRIMARY KEY NOT NULL AUTO_INCREMENT,
@@ -218,7 +218,7 @@ CREATE TABLE IF NOT EXISTS `participant_data` (
     `age` INTEGER,
     FOREIGN KEY (phenotype_id) REFERENCES phenotype(id),
     FOREIGN KEY (participant_id) REFERENCES participant(id)
-);
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
 
 CREATE TABLE IF NOT EXISTS `participant_data_category` (
     `id` INTEGER PRIMARY KEY NOT NULL AUTO_INCREMENT,
@@ -228,7 +228,7 @@ CREATE TABLE IF NOT EXISTS `participant_data_category` (
     `show_distribution` BOOLEAN,
     `order` INTEGER,
     FOREIGN KEY (phenotype_id) REFERENCES phenotype(id)
-);
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
 
 CREATE TABLE IF NOT EXISTS share_link (
   `id` INTEGER PRIMARY KEY AUTO_INCREMENT,
@@ -236,5 +236,5 @@ CREATE TABLE IF NOT EXISTS share_link (
   `route` VARCHAR(100),
   `parameters` JSON,
   `created_date` DATETIME
-);
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
 
