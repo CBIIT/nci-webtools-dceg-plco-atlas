@@ -209,4 +209,20 @@ async function importVariants({connection, database, folderPath, phenotype}) {
         logger.warn(`WARNING: Imported variants count (${variantCount}) does not match expected value (${metadataCount})`);
     }
 
+    // optimize variant table
+    logger.info(`Optimizing variant table`);
+    await connection.query(`OPTIMIZE TABLE ${variantTable}`);
+
+    // optimize aggregate table
+    logger.info(`Optimizing aggregate table`);
+    await connection.query(`OPTIMIZE TABLE ${aggregateTable}`);
+
+    // optimize point table
+    logger.info(`Optimizing point table`);
+    await connection.query(`OPTIMIZE TABLE ${pointTable}`);
+
+    // optimize metadata table
+    logger.info(`Optimizing metadata table`);
+    await connection.query(`OPTIMIZE TABLE ${metadataTable}`);
+
 }
