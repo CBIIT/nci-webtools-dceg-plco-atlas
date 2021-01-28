@@ -106,6 +106,13 @@ function getValidColumns(tableName, columns) {
         : validColumns;
 }
 
+async function ping(connection) {
+    let sql = `SELECT "true" as status`;
+    logger.debug(`ping sql: ${sql}`);
+    const [result] = await connection.query(sql);
+    return result[0].status === 'true';
+}
+
 /**
  * Returns records given a table name and optionally, conditions and condition joiner (AND/OR)
  * @param {*} connection A mysql connection 
@@ -1061,4 +1068,5 @@ module.exports = {
     getShareLink,
     setShareLink,
     exportVariants,
+    ping,
 };

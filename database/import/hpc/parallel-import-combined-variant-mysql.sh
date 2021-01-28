@@ -7,8 +7,12 @@ export PASSWORD=$4
 export LOG_PATH=$5
 export TMPDIR=/lscratch/$SLURM_JOB_ID
 
-echo "LOADING MODULES (MySQL-8.0.20, NodeJS)..."
-module load mysql/8.0 nodejs
+# echo "LOADING MODULES (MySQL-8.0.20, NodeJS)..."
+# module load mysql/8.0 nodejs
+# echo
+
+echo "LOADING MODULES (MySQL-5.7.22, NodeJS)..."
+module load mysql/5.7.22 nodejs
 echo
 
 echo "STARTING MYSQL DATABASE FROM BASE DIR $BASE_DIR..."

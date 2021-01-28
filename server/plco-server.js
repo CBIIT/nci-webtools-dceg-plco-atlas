@@ -26,7 +26,8 @@ const {
   getRanges,
   getConfig,
   getShareLink,
-  setShareLink
+  setShareLink,
+  ping
 } = require("./query");
 
 if (cluster.isMaster) {
@@ -57,6 +58,11 @@ app.register(static, {
 const redisClient = config.redis
   ? redis.createClient(config.redis)
   : null;
+
+const asAttachment = ({ filename, contents, response }) => {
+  response.header("Content-Disposition", `attachment; filename="${filename}"`);
+  return contents;
+}
 
 app.addHook('onError', async (req, reply, error) => {
   const statusCode = error.statusCode;
@@ -143,87 +149,50 @@ app.addHook("onSend", (req, res, payload, done) => {
   done();
 });
 
-app.get("/ping", async (req, res) => {
-  let sql = `SELECT "true" as status`;
-  logger.debug(`ping sql: ${sql}`);
-  const [result] = await connection.query(sql);
-  return result[0].status;
-});
+// returns "true" if service is up
+app.get("/ping", async (req, res) => ping(connection)); 
+app.get("/api/ping", async (req, res) => ping(connection));
 
 // retrieves all variant groups for all chroms. at the lowest granularity (in MBases)
-app.get("/summary", async ({ query }, res) => {
-  return getSummary(connection, query);
-});
+app.get("/summary", async ({ query }) => getSummary(connection, query)); 
+app.get("/api/summary", async ({ query }) => getSummary(connection, query));
 
-// retrieves all variants within the specified range
-app.get("/variants", async ({ query }, res) => {
-  return getVariants(connection, query);
-});
+// retrieves all variants filtered by the specified params
+app.get("/variants", async ({ query }) => getVariants(connection, query)); 
+app.get("/api/variants", async ({ query }) => getVariants(connection, query));
 
-// retrieves all variants within the specified range
-app.get("/export-variants", async ({ query }, res) => {
-  const { filename, contents } = await exportVariants(connection, query);
-  res.header("Content-Disposition", `attachment; filename="${filename}"`);
-  return contents;
-});
+// exports /variants as a csv
+app.get("/export-variants", async ({ query }, response) => asAttachment({response, ...await exportVariants(connection, query)}));
+app.get("/api/export-variants", async ({ query }, response) => asAttachment({response, ...await exportVariants(connection, query)}));
 
-// note: this is faster than /variants since only a subset of variants are stored as points
-app.get("/points", async ({ query }, res) => {
-  return getPoints(connection, query);
-});
+//retrieves a subset of variants
+app.get("/points", async ({ query }) => getPoints(connection, query)); 
+app.get("/api/points", async ({ query }) => getPoints(connection, query));
 
 // retrieves metadata
-app.get("/metadata", async ({ query }, res) => {
-  return getMetadata(connection, query);
-});
+app.get("/metadata", async ({ query }) => getMetadata(connection, query)); 
+app.get("/api/metadata", async ({ query }) => getMetadata(connection, query));
 
 // retrieves genes
-app.get("/genes", async ({ query }, res) => {
-  return getGenes(connection, query);
-});
+app.get("/genes", async ({ query }, res) => getGenes(connection, query)); 
 
 // retrieves phenotypes
-app.get("/phenotypes", async ({ query }, res) => {
-  return getPhenotypes(connection, query);
-});
+app.get("/phenotypes", async ({ query }) => getPhenotypes(connection, query));
+app.get("/api/phenotypes", async ({ query }) => getPhenotypes(connection, query));
 
-// retrieves phenotypes
-app.get("/phenotype", async ({ query }, res) => {
-  return getPhenotype(connection, query);
-});
+// retrieves a single phenotype's participant data
+app.get("/phenotype", async ({ query }) => getPhenotype(connection, query)); 
+app.get("/api/phenotype", async ({ query }) => getPhenotype(connection, query));
 
 // retrieves correlations
-app.get("/correlations", async ({ query }, res) => {
-  return getCorrelations(connection, query);
-});
+app.get("/correlations", async ({ query }) => getCorrelations(connection, query));
+app.get("/api/correlations", async ({ query }) => getCorrelations(connection, query));
 
-// retrieves chromosome ranges
-app.get("/ranges", async ({ query }, res) => {
-  return getRanges(connection);
-});
+app.get("/ranges", async _ => getRanges(connection)); // retrieves chromosome ranges
+app.get("/share-link", async ({ query }) => getShareLink(connection, query));
+app.post("/share-link", async ({ body }) => setShareLink(connection, body));
+app.get("/config", async ({ query }) => getConfig(query.key)); // retrieves configuration
 
-app.get("/share-link", async ({ query }, res) => {
-  return getShareLink(connection, query);
-});
-
-app.post("/share-link", async ({ body }, res) => {
-  return setShareLink(connection, body);
-});
-
-// retrieves configuration
-app.get("/config", async ({ query }, res) => {
-  return getConfig(query.key);
-});
-
-// retrieves phenotypes
-app.get("/api/phenotypes", async ({ query }, res) => {
-  return getPhenotypes(connection, query);
-});
-
-// retrieves all variants within the specified range
-app.get("/api/variants", async ({ query }, res) => {
-  return getVariants(connection, query);
-});
 
 app
   .listen(config.port, "0.0.0.0")
