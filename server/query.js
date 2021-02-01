@@ -462,6 +462,7 @@ async function getMetadata(connection, params) {
             m.ancestry as ancestry,
             m.chromosome as chromosome,
             m.lambda_gc as lambda_gc,
+            m.lambda_gc_ld_score as lambda_gc_ld_score,
             m.count as count
         FROM
             phenotype_metadata m
