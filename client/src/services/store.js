@@ -35,6 +35,11 @@ export const getInitialState = async (skipQuery) => {
       lambdaGC: '',
       areaItems: []
     },
+    pcaPlot: {
+      loadingPCAPlot: false,
+      pcaplotData: [],
+      pcaplotLayout: {}
+    },
     manhattanPlot: {
       loadingManhattanPlot: false,
       manhattanPlotData: {},

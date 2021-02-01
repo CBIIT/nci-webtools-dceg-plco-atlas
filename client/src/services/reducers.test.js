@@ -3,6 +3,7 @@ import {
   UPDATE_SUMMARY_RESULTS,
   UPDATE_MANHATTAN_PLOT,
   UPDATE_QQ_PLOT,
+  UPDATE_PCA_PLOT,
   UPDATE_SUMMARY_TABLE,
   UPDATE_SUMMARY_SNP,
   UPDATE_SUMMARY_SNP_TABLE,
@@ -69,6 +70,20 @@ describe('Reducers Module', function() {
       ...state,
       qqPlot: {
         ...state.qqPlot,
+        ...action.data
+      }
+    });
+  });
+
+  test('rootReducer() returns correct state for action: UPDATE_PCA_PLOT', async () => {
+    let state = await getInitialState(true);
+    let type = UPDATE_PCA_PLOT;
+    let data = { test: 1 };
+    let action = { type, data };
+    expect(rootReducer(state, action)).toEqual({
+      ...state,
+      pcaPlot: {
+        ...state.pcaPlot,
         ...action.data
       }
     });

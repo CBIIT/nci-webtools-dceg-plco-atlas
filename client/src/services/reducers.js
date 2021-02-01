@@ -3,6 +3,7 @@ import {
   UPDATE_SUMMARY_RESULTS,
   UPDATE_MANHATTAN_PLOT,
   UPDATE_QQ_PLOT,
+  UPDATE_PCA_PLOT,
   UPDATE_SUMMARY_TABLE,
   UPDATE_SUMMARY_TABLE_INDEX,
   UPDATE_SUMMARY_SNP,
@@ -47,6 +48,14 @@ export const rootReducer = (state, action) => {
         ...state,
         qqPlot: {
           ...state.qqPlot,
+          ...action.data
+        }
+      };
+    case UPDATE_PCA_PLOT:
+      return {
+        ...state,
+        pcaPlot: {
+          ...state.pcaPlot,
           ...action.data
         }
       };

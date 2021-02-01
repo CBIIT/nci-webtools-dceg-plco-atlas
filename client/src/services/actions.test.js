@@ -2,6 +2,7 @@ import {
   UPDATE_KEY,
   UPDATE_SUMMARY_RESULTS,
   UPDATE_QQ_PLOT,
+  UPDATE_PCA_PLOT,
   UPDATE_MANHATTAN_PLOT,
   UPDATE_SUMMARY_TABLE,
   UPDATE_SUMMARY_SNP_TABLE,
@@ -20,6 +21,7 @@ import {
   updateSummaryResults,
   updateManhattanPlot,
   updateQQPlot,
+  updatePCAPlot,
   updateSummaryTable,
   setSummaryTableLoading,
   updateSummarySnp,
@@ -66,6 +68,11 @@ describe('Actions Module', function() {
   test('updateQQPlot() generates expected action', () => {
     const data = { test: 1 };
     expect(updateQQPlot(data)).toEqual({ type: UPDATE_QQ_PLOT, data });
+  });
+
+  test('updatePCAPlot() generates expected action', () => {
+    const data = { test: 1 };
+    expect(updatePCAPlot(data)).toEqual({ type: UPDATE_PCA_PLOT, data });
   });
 
   test('updateSummaryTable() generates expected action', () => {

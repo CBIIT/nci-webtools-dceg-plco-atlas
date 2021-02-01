@@ -5,6 +5,7 @@ import { getInitialState } from './store';
 export const UPDATE_KEY = 'UPDATE_KEY';
 export const UPDATE_SUMMARY_RESULTS = 'UPDATE_SUMMARY_RESULTS';
 export const UPDATE_QQ_PLOT = 'UPDATE_QQ_PLOT';
+export const UPDATE_PCA_PLOT = 'UPDATE_PCA_PLOT';
 export const UPDATE_MANHATTAN_PLOT = 'UPDATE_MANHATTAN_PLOT';
 export const UPDATE_SUMMARY_TABLE = 'UPDATE_SUMMARY_TABLE';
 export const UPDATE_SUMMARY_TABLE_INDEX = 'UPDATE_SUMMARY_TABLE_INDEX';
@@ -40,6 +41,10 @@ export function updateManhattanPlot(data) {
 
 export function updateQQPlot(data) {
   return { type: UPDATE_QQ_PLOT, data };
+}
+
+export function updatePCAPlot(data) {
+  return { type: UPDATE_PCA_PLOT, data };
 }
 
 export function updateSummaryTable(key, data) {
@@ -173,12 +178,14 @@ export function submitSummaryResultsQuery({
     for (let key of [
       'manhattanPlot',
       'qqPlot',
+      'pcaPlot',
       'summaryTables',
       'summarySnpTables'
     ])
       dispatch(updateKey(key, initialState[key]));
 
     dispatch(drawQQPlot({ phenotypes, stratifications, isPairwise }));
+    dispatch(drawPCAPlot({ }));
     dispatch(
       drawManhattanPlot('summary', {
         phenotypes,
@@ -527,6 +534,192 @@ export function drawQQPlot({ phenotypes, stratifications, isPairwise }) {
           qqplotData: [],
           qqplotLayout: {},
           sampleSize: null
+        })
+      );
+    }
+  };
+}
+
+export function drawPCAPlot({ phenotypes, stratifications }) {
+  return async function(dispatch) {
+    try {
+      dispatch(
+        updatePCAPlot({
+          loadingPCAPlot: true,
+          pcaplotData: [],
+          pcaplotLayout: {}
+        })
+      );
+
+      // retrieve metadata for all sexes provided
+      const metadata = await query('metadata', {
+        phenotype_id: phenotypes.map(p => p.id),
+        chromosome: 'all'
+      });
+
+      stratifications = stratifications.map((s, i) => ({
+        ...s,
+        metadata: metadata.find(
+          m =>
+            m.phenotype_id === (phenotypes[i] || phenotypes[0]).id &&
+            m.sex === s.sex &&
+            m.ancestry === s.ancestry
+        )
+      }));
+
+      const layout = {
+        hoverlabel: {
+          bgcolor: '#fff',
+          bordercolor: '#bbb',
+          font: {
+            size: 14,
+            color: '#212529',
+            family: systemFont
+          }
+        },
+        dragmode: 'pan',
+        clickmode: 'event',
+        hovermode: 'closest',
+        width: 800,
+        height: 800,
+        autosize: true,
+        // title: {
+        //   text: title,
+        //   font: {
+        //     family: systemFont,
+        //     size: 14,
+        //     color: 'black'
+        //   }
+        // },
+        xaxis: {
+          automargin: true,
+          rangemode: 'tozero', // only show positive
+          showgrid: false, // disable grid lines
+          fixedrange: true, // disable zoom
+          title: {
+            text: '<b>PCA 1</b>',
+            font: {
+              family: systemFont,
+              size: 14,
+              color: 'black'
+            }
+          },
+          tick0: 0,
+          ticklen: 10,
+          tickfont: {
+            family: systemFont,
+            size: 10,
+            color: 'black'
+          }
+        },
+        yaxis: {
+          automargin: true,
+          rangemode: 'tozero', // only show positive
+          showgrid: false, // disable grid lines
+          fixedrange: true, // disable zoom
+          title: {
+            text: '<b>PCA 2</b>',
+            font: {
+              family: systemFont,
+              size: 14,
+              color: 'black'
+            }
+          },
+          tick0: 0,
+          ticklen: 10,
+          tickfont: {
+            family: systemFont,
+            size: 10,
+            color: 'black'
+          }
+        },
+        showlegend: true,
+        legend: {
+          itemclick: false,
+          itemdoubleclick: false,
+          orientation: 'v',
+          x: 0.0,
+          y: 1.1
+        }
+      };
+
+      dispatch(
+        updatePCAPlot({
+          pcaplotLayout: layout        
+        })
+      );
+
+      // EXAMPLE PCA DATA
+      let pcaData = {
+        controls: {
+          x: [1], // PCA 1
+          y: [1] // PCA 2
+        },
+        cases: {
+          x: [2], // PCA 1
+          y: [2] // PCA 2
+        }
+      }
+
+      let pcaplotData = [];
+
+      await Promise.all(
+        ['controls', 'cases'].map(async (item, i) => {
+          
+          const titleCase = str =>
+            str.replace(
+              /\w+/g,
+              str =>
+                str[0].toUpperCase() +
+                str.substring(1, str.length).toLowerCase()
+            );
+          const markerColor = item === 'controls'
+            ? 'blue'
+            : 'red';
+
+          pcaplotData = pcaplotData.concat([
+            {
+              x: pcaData[item]['x'], // PCA 1
+              y: pcaData[item]['y'], // PCA 2
+              // customdata: data.map((d, i) => ({
+              //   phenotypeId: (phenotypes[i] || phenotypes[0]).id,
+              //   sex,
+              //   ancestry,
+              //   variantId: ids[i],
+              //   p: Math.pow(10, -observedValues[i]),
+              //   showData: i <= 10000,
+              //   color: markerColor
+              // })),
+              name: 
+                titleCase(item),
+              mode: 'markers',
+              type: 'scattergl',
+              hoverinfo: 'none',
+              text: null,
+              marker: {
+                color: markerColor,
+                size: 8,
+                // opacity: 0.65
+              }
+            }
+          ]);
+
+          dispatch(updatePCAPlot({ pcaplotData }));
+        })
+      );
+
+      dispatch(
+        updatePCAPlot({
+          loadingPCAPlot: false
+        })
+      );
+    } catch (e) {
+      dispatch(updateError({ visible: true }));
+      dispatch(
+        updatePCAPlot({
+          loadingPCAPlot: true,
+          pcaplotData: [],
+          pcaplotLayout: {}
         })
       );
     }

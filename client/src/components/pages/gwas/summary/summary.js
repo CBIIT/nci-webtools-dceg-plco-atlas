@@ -4,6 +4,7 @@ import { Nav, Tab } from 'react-bootstrap';
 import { SummaryResultsForm } from './summary-form';
 import { ManhattanPlot } from './manhattan-plot';
 import { QQPlot } from './qq-plot';
+import { PCAPlot } from './pca-plot';
 import { SummaryResultsTable } from './summary-table';
 import { SummaryResultsSearchCriteria } from './summary-search-criteria';
 import {
@@ -17,6 +18,7 @@ import {
   updateManhattanPlot,
   lookupVariants,
   drawQQPlot,
+  drawPCAPlot,
   drawManhattanPlot,
   fetchSummaryTable,
   updateKey,
@@ -45,6 +47,7 @@ export function SummaryResults() {
   );
   const selectedTable = useSelector(state => state.summaryTables.selectedTable);
   const qqplotData = useSelector(state => state.qqPlot.qqplotData);
+  const pcaplotData = useSelector(state => state.pcaPlot.pcaplotData);
   const [openSidebar, setOpenSidebar] = useState(true);
   const { getInitialState } = useContext(RootContext);
 
@@ -57,6 +60,15 @@ export function SummaryResults() {
           phenotypes: selectedPhenotypes,
           stratifications: selectedStratifications,
           isPairwise
+        })
+      );
+    }
+
+    if (submitted && selectedPlot === 'pca-plot' && pcaplotData.length === 0) {
+      dispatch(
+        drawPCAPlot({
+          phenotypes: selectedPhenotypes,
+          stratifications: selectedStratifications
         })
       );
     }
@@ -90,6 +102,7 @@ export function SummaryResults() {
     for (let key of [
       'manhattanPlot',
       'qqPlot',
+      'pcaPlot',
       'summaryTables',
       'summarySnpTables'
     ])
@@ -97,6 +110,10 @@ export function SummaryResults() {
 
     if (selectedPlot === 'qq-plot') {
       dispatch(drawQQPlot({ phenotypes, stratifications, isPairwise }));
+    }
+
+    if (selectedPlot === 'pca-plot') {
+      dispatch(drawPCAPlot({ phenotypes, stratifications }));
     }
 
     drawSummaryManhattanPlot({ phenotypes, stratifications, isPairwise });
@@ -266,6 +283,7 @@ export function SummaryResults() {
       'summaryResults',
       'manhattanPlot',
       'qqPlot',
+      'pcaPlot',
       'summaryTables',
       'summarySnpTables'
     ]) dispatch(updateKey(key, initialState[key]));
@@ -399,6 +417,13 @@ export function SummaryResults() {
       })
     );
 
+    dispatch(
+      drawPCAPlot({
+        phenotypes: selectedPhenotypes,
+        stratifications: selectedStratifications
+      })
+    );
+
     if (manhattanPlotView === 'summary') {
       handleSubmit({
         phenotypes: selectedPhenotypes,
@@ -489,6 +514,11 @@ export function SummaryResults() {
                   <strong>Q-Q Plot</strong>
                 </Nav.Link>
               </Nav.Item>
+              <Nav.Item>
+                <Nav.Link eventKey="pca-plot" as="button" className="outline-none">
+                  <strong>PCA Plot</strong>
+                </Nav.Link>
+              </Nav.Item>
             </Nav>
             <Tab.Content 
               className={`p-2 bg-white tab-pane-bordered rounded-0 ${submitted ? 'd-block' : 'center-content'}`} 
@@ -513,6 +543,11 @@ export function SummaryResults() {
               <Tab.Pane eventKey="qq-plot" className="border-0 py-2">
                 {submitted
                   ? <QQPlot onVariantLookup={handleVariantLookup} />
+                  : placeholder}
+              </Tab.Pane>
+              <Tab.Pane eventKey="pca-plot" className="border-0 py-2">
+                {submitted
+                  ? <PCAPlot />
                   : placeholder}
               </Tab.Pane>
             </Tab.Content>
