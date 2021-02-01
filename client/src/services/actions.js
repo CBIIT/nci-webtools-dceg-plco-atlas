@@ -342,8 +342,8 @@ export function drawQQPlot({ phenotypes, stratifications, isPairwise }) {
       const title = isPairwise
         ? undefined
         : [
-            `<b>\u03BB</b> = ${stratifications[0].metadata.lambda_gc}`,
-            `<b>\u03BB (LD Score)</b> = ${stratifications[0].metadata.lambda_gc_ld_score || 'N/A'}`,
+            `<b>\u03BB (median)</b> = ${stratifications[0].metadata.lambda_gc}`,
+            `<b>\u03BB (LD score)</b> = ${stratifications[0].metadata.lambda_gc_ld_score || 'N/A'}`,
             `<b>Number of Variants</b> = ${stratifications[0].metadata.count.toLocaleString()}`
           ].join(' '.repeat(5));
 
@@ -418,7 +418,7 @@ export function drawQQPlot({ phenotypes, stratifications, isPairwise }) {
           itemclick: false,
           itemdoubleclick: false,
           orientation: 'v',
-          x: 0.2,
+          x: 0.0,
           y: 1.1
         }
       };
@@ -497,7 +497,7 @@ export function drawQQPlot({ phenotypes, stratifications, isPairwise }) {
               name: `${titlePrefix +
                 titleCase(
                   `${ancestry} - ${sex}`
-                )}     <b>\u03BB</b> = ${lambda_gc}   <b>\u03BB (LD Score)</b> = ${lambda_gc_ld_score || 'N/A'}  <b>Number of Variants</b> = ${count.toLocaleString()}`,
+                )}   <b>\u03BB (median)</b> = ${lambda_gc}   <b>\u03BB (LD score)</b> = ${lambda_gc_ld_score || 'N/A'}   <b>Number of Variants</b> = ${count.toLocaleString()}`,
               mode: 'markers',
               type: 'scattergl',
               hoverinfo: 'none',
