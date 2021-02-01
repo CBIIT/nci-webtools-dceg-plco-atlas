@@ -128,6 +128,7 @@ CREATE TABLE IF NOT EXISTS `phenotype_metadata` (
         'Y'
     ) NOT NULL,
     `lambda_gc` DOUBLE,
+    `lambda_gc_ld_score` DOUBLE,
     `average_value` DOUBLE,
     `standard_deviation` DOUBLE,
     `count` BIGINT,
