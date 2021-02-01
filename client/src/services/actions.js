@@ -343,6 +343,7 @@ export function drawQQPlot({ phenotypes, stratifications, isPairwise }) {
         ? undefined
         : [
             `<b>\u03BB</b> = ${stratifications[0].metadata.lambda_gc}`,
+            `<b>\u03BB (LD Score)</b> = ${stratifications[0].metadata.lambda_gc_ld_score || 'N/A'}`,
             `<b>Number of Variants</b> = ${stratifications[0].metadata.count.toLocaleString()}`
           ].join(' '.repeat(5));
 
@@ -433,7 +434,7 @@ export function drawQQPlot({ phenotypes, stratifications, isPairwise }) {
 
       await Promise.all(
         stratifications.map(async ({ sex, ancestry, metadata }, i) => {
-          const { lambda_gc, count } = metadata;
+          const { lambda_gc, lambda_gc_ld_score, count } = metadata;
 
           const { data, columns } = await query('points', {
             phenotype_id: (phenotypes[i] || phenotypes[0]).id,
@@ -496,7 +497,7 @@ export function drawQQPlot({ phenotypes, stratifications, isPairwise }) {
               name: `${titlePrefix +
                 titleCase(
                   `${ancestry} - ${sex}`
-                )}     <b>\u03BB</b> = ${lambda_gc}     <b>Number of Variants</b> = ${count.toLocaleString()}`,
+                )}     <b>\u03BB</b> = ${lambda_gc}   <b>\u03BB (LD Score)</b> = ${lambda_gc_ld_score || 'N/A'}  <b>Number of Variants</b> = ${count.toLocaleString()}`,
               mode: 'markers',
               type: 'scattergl',
               hoverinfo: 'none',
