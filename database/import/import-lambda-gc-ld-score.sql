@@ -38,7 +38,7 @@ JOIN lambdagc_stage ls ON
     pm.phenotype_id = ls.phenotype_id AND 
     pm.ancestry = ls.ancestry AND 
     pm.sex = ls.sex AND 
-    ls.platform = 'meta'
+    ls.platform in ('meta', 'meta-all-categories')
 SET pm.lambda_gc_ld_score = ls.intercept
 WHERE pm.chromosome = 'all';
 
