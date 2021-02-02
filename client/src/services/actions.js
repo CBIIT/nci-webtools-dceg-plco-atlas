@@ -594,7 +594,8 @@ export function drawPCAPlot({ phenotypes, stratifications }) {
         xaxis: {
           automargin: true,
           rangemode: 'tozero', // only show positive
-          showgrid: false, // disable grid lines
+          showgrid: true, // disable grid lines
+          zeroline: false,
           fixedrange: true, // disable zoom
           title: {
             text: '<b>PC 1</b>',
@@ -615,7 +616,8 @@ export function drawPCAPlot({ phenotypes, stratifications }) {
         yaxis: {
           automargin: true,
           rangemode: 'tozero', // only show positive
-          showgrid: false, // disable grid lines
+          showgrid: true, // disable grid lines
+          zeroline: false,
           fixedrange: true, // disable zoom
           title: {
             text: '<b>PC 2</b>',
@@ -648,23 +650,34 @@ export function drawPCAPlot({ phenotypes, stratifications }) {
           pcaplotLayout: layout        
         })
       );
+      
+      // RANDOM PC GENERATOR
+      const generateRandomPCArray = (length, min, max) => {
+        return [...new Array(length)].map(() => 
+          (Math.random() * (max - min)) + min
+        )
+      };
 
       // EXAMPLE PCA DATA
       let pcaData = {
+        others: {
+          x: generateRandomPCArray(10000, -20, 20),
+          y: generateRandomPCArray(10000, -20, 20)
+        },
         controls: {
-          x: [1], // PCA 1
-          y: [1] // PCA 2
+          x: generateRandomPCArray(1000, -10, 5),
+          y: generateRandomPCArray(1000, -10, 5)
         },
         cases: {
-          x: [2], // PCA 1
-          y: [2] // PCA 2
+          x: generateRandomPCArray(250, -5, 10),
+          y: generateRandomPCArray(250, -5, 10)
         }
       }
 
       let pcaplotData = [];
 
       await Promise.all(
-        ['controls', 'cases'].map(async (item, i) => {
+        ['others', 'controls', 'cases'].map(async (item, i) => {
           
           const titleCase = str =>
             str.replace(
@@ -673,9 +686,16 @@ export function drawPCAPlot({ phenotypes, stratifications }) {
                 str[0].toUpperCase() +
                 str.substring(1, str.length).toLowerCase()
             );
-          const markerColor = item === 'controls'
-            ? 'blue'
-            : 'red';
+
+          // const markerColor = item === 'controls'
+          //   ? 'blue'
+          //   : 'red';
+
+          const markerColor = {
+            others: 'grey',
+            controls: 'blue',
+            cases: 'red'
+          }[item];
 
           pcaplotData = pcaplotData.concat([
             {
