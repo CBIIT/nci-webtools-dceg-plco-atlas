@@ -99,6 +99,24 @@ export function ApiAccess() {
                     responses: {
                         '200': {
                             description: 'successful operation',
+                            schema: {
+                                type: 'object',
+                                required: ['data', 'columns'],
+                                properties: {
+                                    data: {
+                                        type: 'array',
+                                        items: {
+                                            $ref: '#/definitions/Summary'
+                                        }
+                                    },
+                                    columns: {
+                                        type: 'array',
+                                        items: {
+                                            type: 'string'
+                                        }
+                                    }
+                                },
+                            }
                         },
                         '500': {
                             description: 'service unavailable'
@@ -529,6 +547,12 @@ export function ApiAccess() {
                     responses: {
                         '200': {
                             description: 'successful operation',
+                            schema: {
+                                type: 'array',
+                                items: {
+                                    $ref: '#/definitions/Metadata'
+                                }
+                            }
                         },
                         '500': {
                             description: 'service unavailable'
@@ -557,7 +581,7 @@ export function ApiAccess() {
                             schema: {
                                 type: 'array',
                                 items: {
-                                    $ref: '#/definitions/Phenotype'
+                                    $ref: '#/definitions/Phenotypes'
                                 }
                             }
                         },
@@ -634,7 +658,43 @@ export function ApiAccess() {
             // },
         },
         definitions: {
-            Phenotype: {
+            Metadata: {
+                type: 'object',
+                required: ['id', 'phenotype_id', 'phenotype_name', 'phenotype_display_name', 'sex', 'ancestry'],
+                properties: {
+                    id: {
+                        type: 'integer',
+                    },
+                    phenotype_id: {
+                        type: 'integer',
+                    },
+                    phenotype_name: {
+                        type: 'string'
+                    },
+                    phenotype_display_name: {
+                        type: 'string'
+                    },
+                    sex: {
+                        type: 'string'
+                    },
+                    ancestry: {
+                        type: 'string'
+                    },
+                    chromosome: {
+                        type: 'string'
+                    },
+                    lambda_gc: {
+                        type: 'number'
+                    },
+                    lambda_gc_ld_score: {
+                        type: 'number'
+                    },
+                    count: {
+                        type: 'integer'
+                    }
+                }
+            },
+            Phenotypes: {
                 type: 'object',
                 required: ['id', 'name', 'display_name', 'description'],
                 properties: {
@@ -649,6 +709,33 @@ export function ApiAccess() {
                     },
                     description: {
                         type: 'string'
+                    }
+                }
+            },
+            Summary: {
+                type: 'object',
+                required: ['id', 'phenotype_id', 'sex', 'ancestry', 'chromosome', 'position_abs', 'p_value_nlog'],
+                properties: {
+                    id: {
+                        type: 'integer',
+                    },
+                    phenotype_id: {
+                        type: 'integer'
+                    },
+                    sex: {
+                        type: 'string'
+                    },
+                    ancestry: {
+                        type: 'string'
+                    },
+                    chromosome: {
+                        type: 'integer'
+                    },
+                    position_abs: {
+                        type: 'integer'
+                    },
+                    p_value_nlog: {
+                        type: 'number'
                     }
                 }
             },
