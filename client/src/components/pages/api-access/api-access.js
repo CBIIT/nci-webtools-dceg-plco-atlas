@@ -595,9 +595,7 @@ export function ApiAccess() {
                                 "frequencyBySex", 
                                 "frequencyByAncestry",
                                 "related"
-                            ],
-                            value: 'frequency'
-                        },
+                            ]                        },
                     ],
                     responses: {
                         '200': {
