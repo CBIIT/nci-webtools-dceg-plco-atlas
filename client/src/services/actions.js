@@ -597,7 +597,7 @@ export function drawPCAPlot({ phenotypes, stratifications }) {
           showgrid: false, // disable grid lines
           fixedrange: true, // disable zoom
           title: {
-            text: '<b>PCA 1</b>',
+            text: '<b>PC 1</b>',
             font: {
               family: systemFont,
               size: 14,
@@ -618,7 +618,7 @@ export function drawPCAPlot({ phenotypes, stratifications }) {
           showgrid: false, // disable grid lines
           fixedrange: true, // disable zoom
           title: {
-            text: '<b>PCA 2</b>',
+            text: '<b>PC 2</b>',
             font: {
               family: systemFont,
               size: 14,

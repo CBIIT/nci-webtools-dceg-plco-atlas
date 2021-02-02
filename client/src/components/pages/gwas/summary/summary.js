@@ -516,7 +516,7 @@ export function SummaryResults() {
               </Nav.Item>
               <Nav.Item>
                 <Nav.Link eventKey="pca-plot" as="button" className="outline-none">
-                  <strong>PCA Plot</strong>
+                  <strong>PC Plot</strong>
                 </Nav.Link>
               </Nav.Item>
             </Nav>
