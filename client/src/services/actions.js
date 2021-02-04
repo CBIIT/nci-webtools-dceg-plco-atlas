@@ -686,11 +686,7 @@ export function drawPCAPlot({ phenotypes, stratifications }) {
                 str[0].toUpperCase() +
                 str.substring(1, str.length).toLowerCase()
             );
-
-          // const markerColor = item === 'controls'
-          //   ? 'blue'
-          //   : 'red';
-
+            
           const markerColor = {
             others: 'grey',
             controls: 'blue',
@@ -710,8 +706,7 @@ export function drawPCAPlot({ phenotypes, stratifications }) {
               //   showData: i <= 10000,
               //   color: markerColor
               // })),
-              name: 
-                titleCase(item),
+              name: titleCase(item),
               mode: 'markers',
               type: 'scattergl',
               hoverinfo: 'none',

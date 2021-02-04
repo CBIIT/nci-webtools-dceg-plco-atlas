@@ -89,6 +89,7 @@ CREATE TABLE IF NOT EXISTS `phenotype` (
     `description` MEDIUMTEXT,
     `color` VARCHAR(40),
     `type` ENUM('binary', 'categorical', 'continuous') NULL,
+    `sex_specific` ENUM('female', 'male') NULL,
     `participant_count` BIGINT,
     `import_count` BIGINT,
     `import_date` DATETIME,
