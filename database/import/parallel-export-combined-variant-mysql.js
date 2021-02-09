@@ -195,21 +195,6 @@ async function exportVariants({
         // set up database for import
         logger.info('Setting up database');
         await connection.query([
-            `DROP TABLE IF EXISTS 
-                participant_data_category,
-                participant_data,
-                participant,
-                phenotype_correlation,
-                phenotype_metadata,
-                phenotype,
-                variant_aggregate, 
-                variant_metadata, 
-                chromosome_range, 
-                lookup_sex, 
-                lookup_ancestry;`,
-            readFile(path.resolve(__dirname, '../schema/tables/main.sql')),
-            readFile(path.resolve(__dirname, 'import-chromosome-range.sql')),
-            readFile(path.resolve(__dirname, 'import-lookup-tables.sql')),
             `DROP TABLE IF EXISTS prestage;
             CREATE TABLE prestage (
                 chromosome                  VARCHAR(2),
