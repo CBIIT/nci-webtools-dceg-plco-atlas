@@ -209,7 +209,9 @@ async function exportVariants({
 
         // set up database for import
         logger.info('Setting up database');
+
         await connection.query([
+            readFile(path.resolve(__dirname, 'initialize.sql')),
             `DROP TABLE IF EXISTS prestage;
             CREATE TABLE prestage (
                 chromosome                  VARCHAR(2),
