@@ -164,15 +164,27 @@ async function exportVariants({
     phenotype,
 }) {
     try {
+        console.log(phenotype);
+
         // determine ancestry/sex for stratified columns
         const firstLine = await readFirstLineAsync(inputFilePath);
-        const stratifiedColumns = firstLine.split(/\s+/g)
+        let stratifiedColumns = firstLine.split(/\s+/g)
             .filter(originalColumName => !['chr', 'pos', 'snp', 'tested_allele', 'other_allele'].includes(originalColumName.toLowerCase()))
             .map(originalColumName => {
                 // original column names may or may not contain ancestry and/or sex, parsing rules are brittle and may require changes
                 // example columns: CHR	POS	SNP	Tested_Allele	Other_Allele	
                 // FREQ_East_Asian	BETA_East_Asian_all	SE_East_Asian_all	P_East_Asian_all	N_East_Asian_all	PHet_East_Asian_all	
                 // FREQ_European	BETA_European_all	SE_European_all	P_European_all	N_European_all	PHet_European_all
+
+                // All columns:
+                // CHR	POS	SNP	Tested_Allele	Other_Allele
+                // FREQ_East_Asian	BETA_East_Asian_all	SE_East_Asian_all	P_East_Asian_all	N_East_Asian_all	PHet_East_Asian_all	
+                // BETA_East_Asian_female	SE_East_Asian_female	P_East_Asian_female	N_East_Asian_female	PHet_East_Asian_female	
+                // BETA_East_Asian_male	SE_East_Asian_male	P_East_Asian_male	N_East_Asian_male	PHet_East_Asian_male	
+                // FREQ_European	BETA_European_all	SE_European_all	P_European_all	N_European_all	PHet_European_all	
+                // BETA_European_female	SE_European_female	P_European_female	N_European_female	PHet_European_female	
+                // BETA_European_male	SE_European_male	P_European_male	N_European_male	PHet_European_male
+
 
                 let [columnName, ...ancestrySex] = originalColumName.split('_');
                 let sex = ancestrySex[ancestrySex.length - 1];
@@ -189,9 +201,6 @@ async function exportVariants({
                 if (ancestry) 
                     ancestry = ancestry.toLowerCase();
 
-                if (sex === 'all' && phenotype.sex_specific)
-                    sex = phenotype.sex_specific.toLowerCase()
-
                 const mappedColumnName = [
                     sex, 
                     ancestry, 
@@ -206,6 +215,22 @@ async function exportVariants({
                 ].filter(Boolean).join('_')
                 return {originalColumName, columnName, mappedColumnName, ancestry, sex}
             });
+
+        if (phenotype.sex_specific) {
+            // remove other columns if sex-specific stratification exists
+            if (stratifiedColumns.find(c => c.sex === phenotype.sex_specific)) {
+                stratifiedColumns = stratifiedColumns.filter(c => [null, phenotype.sex_specific].includes(c.sex));
+            }
+
+            // otherwise, replace 'all' with the specified sex, updating the mapped column name as well
+            else if (stratifiedColumns.find(c => c.sex === 'all')) {
+                stratifiedColumns = stratifiedColumns.map(c => c.sex === null ? c : {
+                    ...c, 
+                    sex: phenotype.sex_specific,
+                    mappedColumnName:  c.mappedColumnName.replace(/^all_/, `${phenotype.sex_specific}_`),
+                });
+            }
+        }
 
         // set up database for import
         logger.info('Setting up database');
