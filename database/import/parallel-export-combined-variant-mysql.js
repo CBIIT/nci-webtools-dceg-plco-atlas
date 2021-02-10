@@ -130,10 +130,12 @@ function getPhenotype(phenotypeFilePath, phenotype) {
     const phenotypeKey = /^\d+$/.test(phenotype) ? 'id' : 'name';
 
     // read the phenotypes file and attempt to find the specified phenotype
+    // header: Phenotype ID,Phenotype Parent ID,Display Name,Association Name,Description (Definition),Phenotype Data Type,Age,Sex Specific
     const phenotypes = parseCsv(    
         fs.readFileSync(phenotypeFilePath),
-        {columns: ['id', 'parent_id', 'display_name', 'name', 'description', 'type', 'age']}
+        {columns: ['id', 'parent_id', 'display_name', 'name', 'description', 'type', 'age', 'sex_specific']}
     ).filter(p => p[phenotypeKey] == phenotype.toLowerCase());
+
     
     if (phenotypes.length === 0) {
         throw(`Phenotype does not exist`);
@@ -168,15 +170,28 @@ async function exportVariants({
             .filter(originalColumName => !['chr', 'pos', 'snp', 'tested_allele', 'other_allele'].includes(originalColumName.toLowerCase()))
             .map(originalColumName => {
                 // original column names may or may not contain ancestry and/or sex, parsing rules are brittle and may require changes
+                // example columns: CHR	POS	SNP	Tested_Allele	Other_Allele	
+                // FREQ_East_Asian	BETA_East_Asian_all	SE_East_Asian_all	P_East_Asian_all	N_East_Asian_all	PHet_East_Asian_all	
+                // FREQ_European	BETA_European_all	SE_European_all	P_European_all	N_European_all	PHet_European_all
+
                 let [columnName, ...ancestrySex] = originalColumName.split('_');
                 let sex = ancestrySex[ancestrySex.length - 1];
                 let ancestry = ancestrySex.slice(0, ancestrySex.length - 1).join('_');
+                
                 if (!/^(all|female|male)$/.test(sex)) {
                     sex = null
                     ancestry = ancestrySex.join('_');
                 }
-                if (sex) sex = sex.toLowerCase()
-                if (ancestry) ancestry = ancestry.toLowerCase();
+
+                if (sex) 
+                    sex = sex.toLowerCase()
+
+                if (ancestry) 
+                    ancestry = ancestry.toLowerCase();
+
+                if (sex === 'all' && phenotype.sex_specific)
+                    sex = phenotype.sex_specific.toLowerCase()
+
                 const mappedColumnName = [
                     sex, 
                     ancestry, 
