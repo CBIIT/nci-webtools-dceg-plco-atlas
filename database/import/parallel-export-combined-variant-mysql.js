@@ -216,7 +216,7 @@ async function exportVariants({
                 return {originalColumName, columnName, mappedColumnName, ancestry, sex}
             });
 
-        if (phenotype.sex_specific) {
+        if (phenotype.sex_specific && phenotype.sex_specific !== 'NULL') {
             // remove other columns if sex-specific stratification exists
             if (stratifiedColumns.find(c => c.sex === phenotype.sex_specific)) {
                 stratifiedColumns = stratifiedColumns.filter(c => [null, phenotype.sex_specific].includes(c.sex));
