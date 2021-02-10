@@ -13,8 +13,4 @@ DROP TABLE IF EXISTS
     lookup_sex, 
     lookup_ancestry;
 
-source ../schema/tables/main.sql;
-source import-chromosome-range.sql;
-source import-lookup-tables.sql;
-
 COMMIT;

@@ -212,6 +212,9 @@ async function exportVariants({
 
         await connection.query([
             readFile(path.resolve(__dirname, 'initialize.sql')),
+            readFile(path.resolve(__dirname, '../schema/tables/main.sql')),
+            readFile(path.resolve(__dirname, 'import-chromosome-range.sql')),
+            readFile(path.resolve(__dirname, 'import-lookup-tables.sql')),
             `DROP TABLE IF EXISTS prestage;
             CREATE TABLE prestage (
                 chromosome                  VARCHAR(2),
