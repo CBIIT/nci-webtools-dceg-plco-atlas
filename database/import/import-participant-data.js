@@ -93,6 +93,7 @@ async function importParticipantData() {
 
         CREATE TABLE IF NOT EXISTS participant (
             id            INTEGER PRIMARY KEY NOT NULL AUTO_INCREMENT,
+            plco_id       VARCHAR(100),
             sex           ENUM('female', 'male'),
             ancestry      ENUM('white', 'black', 'hispanic', 'asian', 'pacific_islander', 'american_indian')
         );
@@ -130,9 +131,10 @@ async function importParticipantData() {
     console.info('Loading participants');
     await connection.query(`
         -- import phenotype_sample values
-        INSERT INTO participant (id, ancestry, sex)
+        INSERT INTO participant (id, plco_id, ancestry, sex)
         SELECT
             id,
+            plco_id,
             CASE bq_race7_ca
                 WHEN 1 THEN 'white'
                 WHEN 2 THEN 'black'
