@@ -1061,6 +1061,9 @@ async function getPrincipalComponentAnalysis(connection, {phenotype_id, x, y, ra
 
     if (!x || !y || isNaN(x) || isNaN(y))
         throw new Error('Valid x and y values must be provided as principal components');
+
+    if (x == y)
+        throw new Error('Principal components must be different');
     
     // query parameters as passed in as strings
     raw = raw === 'true';
