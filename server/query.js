@@ -1087,7 +1087,9 @@ async function getPrincipalComponentAnalysis(connection, {phenotype_id, x, y, ra
         from pca
         left join participant p on pca.participant_id = p.id
         left join participant_data pd on pca.participant_id = pd.participant_id
-        where pd.phenotype_id = :phenotype_id;`
+        where pd.phenotype_id = :phenotype_id
+        and pca.x_axis = :x
+        and pca.y_axis = :y`
 
     logger.debug(`getPrincipalComponentAnalysis sql: ${sql}`);
 
