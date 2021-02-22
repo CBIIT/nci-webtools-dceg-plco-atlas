@@ -238,7 +238,6 @@ CREATE TABLE IF NOT EXISTS `principal_component_analysis` (
     `participant_id` INTEGER NOT NULL,
     `principal_component` INTEGER NOT NULL,
     `value` DOUBLE NOT NULL,
-    FOREIGN KEY (phenotype_id) REFERENCES phenotype(id),
     FOREIGN KEY (participant_id) REFERENCES participant(id)
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
 

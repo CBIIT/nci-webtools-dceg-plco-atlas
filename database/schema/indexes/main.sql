@@ -33,5 +33,4 @@ ALTER TABLE phenotype_point
     ADD INDEX idx_phenotype_point_query (sex, ancestry, p_value_nlog);
 
 ALTER TABLE principal_component_analysis
-    ADD INDEX idx_principal_component_analysis__participant_id (participant_id);
-    ADD INDEX idx_principal_component_analysis__principal_component (principal_component);
+    ADD INDEX idx_principal_component_analysis__query (participant_id, principal_component, value);
