@@ -61,6 +61,7 @@ async function importPhenotypes() {
 
         // remove phenotype table and all other associated tables
         await connection.query(`
+            DROP TABLE IF EXISTS principal_component_analysis;
             DROP TABLE IF EXISTS participant_data_category;
             DROP TABLE IF EXISTS participant_data;
             DROP TABLE IF EXISTS participant;
