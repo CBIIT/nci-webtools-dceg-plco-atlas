@@ -9,6 +9,10 @@ ALTER TABLE participant_data
     ADD INDEX idx_participant_data__participant_id (participant_id),
     ADD INDEX idx_participant_data__value (value);
 
+-- participants
+ALTER TABLE participant
+    ADD INDEX idx_participant__plco_id (plco_id);
+
 -- phenotype correlations
 ALTER TABLE phenotype_correlation
     ADD INDEX idx_phenotype_correlation__phenotype_a (phenotype_a),
@@ -28,3 +32,5 @@ ALTER TABLE phenotype_aggregate
 ALTER TABLE phenotype_point
     ADD INDEX idx_phenotype_point_query (sex, ancestry, p_value_nlog);
 
+ALTER TABLE principal_component_analysis
+    ADD INDEX idx_principal_component_analysis__query (participant_id, principal_component, value);

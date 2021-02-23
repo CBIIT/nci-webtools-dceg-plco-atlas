@@ -27,6 +27,7 @@ const {
   getConfig,
   getShareLink,
   setShareLink,
+  getPrincipalComponentAnalysis,
   ping
 } = require("./query");
 
@@ -187,6 +188,10 @@ app.get("/api/phenotype", async ({ query }) => getPhenotype(connection, query));
 // retrieves correlations
 app.get("/correlations", async ({ query }) => getCorrelations(connection, query));
 app.get("/api/correlations", async ({ query }) => getCorrelations(connection, query));
+
+// retrieves pca (using x and y)
+app.get("/pca",  async ({ query }) => getPrincipalComponentAnalysis(connection, query));
+app.get("/api/pca",  async ({ query }) => getPrincipalComponentAnalysis(connection, query));
 
 app.get("/ranges", async _ => getRanges(connection)); // retrieves chromosome ranges
 app.get("/share-link", async ({ query }) => getShareLink(connection, query));

@@ -162,8 +162,20 @@ async function hasRecord(connection, tableName, conditions, conditionJoiner) {
  */
 async function getSummary(connection, {phenotype_id, table, sex, ancestry, p_value_nlog_min, raw}) {
     // validate parameters
-    if (!await hasRecord(connection, 'phenotype', {id: phenotype_id}))
-        return null;
+    if (!phenotype_id || !await hasRecord(connection, 'phenotype', {id: phenotype_id}))
+        throw new Error('A valid phenotype id must be provided');
+
+    // validate sex
+    if (!sex || !await hasRecord(connection, 'lookup_sex', {value: sex}))
+        throw new Error('A valid sex must be provided');
+
+    // validate ancestry
+    if (!ancestry || !await hasRecord(connection, 'lookup_ancestry', {value: ancestry}))
+        throw new Error('A valid ancestry must be provided');
+
+    // validate p_value_nlog_min
+    if (!p_value_nlog_min || isNaN(p_value_nlog_min))
+        throw new Error('A valid -log10(p), p_value_nlog_min must be provided');
 
     // determine number of variants
     const sql = `
@@ -216,7 +228,7 @@ async function getSummary(connection, {phenotype_id, table, sex, ancestry, p_val
 async function getVariants(connection, params) {
     const { sex, ancestry, chromosome } = params;
     // const connection = await connectionPool.getConnection();
-    const phenotypeIds = params.phenotype_id.split(',');
+    const phenotypeIds = (params.phenotype_id || '').split(',');
     const phenotypeIdPlaceholders = getPlaceholders(phenotypeIds.length);
 
     console.log(params, phenotypeIds,phenotypeIdPlaceholders );
@@ -228,19 +240,19 @@ async function getVariants(connection, params) {
     );
 
     if (!phenotypes.length)
-        throw('Valid phenotype ids must be provided');
+        throw new Error('Valid phenotype ids must be provided');
 
     // validate sex
     if (!sex || !await hasRecord(connection, 'lookup_sex', {value: sex}))
-        throw('A valid sex must be provided');
+        throw new Error('A valid sex must be provided');
 
     // validate ancestry
     if (!ancestry || !await hasRecord(connection, 'lookup_ancestry', {value: ancestry}))
-        throw('A valid ancestry must be provided');
+        throw new Error('A valid ancestry must be provided');
 
     // validate chromosome
     if (chromosome && !await hasRecord(connection, 'chromosome_range', {chromosome}))
-        throw('A valid chromosome must be provided');
+        throw new Error('A valid chromosome must be provided');
 
     // validate/sanitize snps
     if (params.snp) {
@@ -269,7 +281,7 @@ async function getVariants(connection, params) {
 
     // use only phenotypes with data
     if (!metadata.length || metadata.some(m => !m.count))
-        throw('The specified phenotype(s) do not have any variants.');
+        throw new Error('The specified phenotype(s) do not have any variants.');
 
     // determine tables for selected phenotypes
     const [tables] = await connection.query(
@@ -292,7 +304,7 @@ async function getVariants(connection, params) {
         columns.unshift(`"${sex}" as sex`);
 
     if (!tables.length) {
-        // throw('No data exists for the selected phenotype(s) stratification(s)');
+        // throw new Error('No data exists for the selected phenotype(s) stratification(s)');
         console.log("No data exists for the selected phenotype(s)");
         return { columns: columns, data: [] };
     }
@@ -387,7 +399,7 @@ async function exportVariants(connection, params) {
     );
 
     if (!phenotypes.length)
-        throw('Valid phenotype ids must be provided');
+        throw new Error('Valid phenotype ids must be provided');
 
     const { data, columns } = await getVariants(connection, {
         ...params, 
@@ -415,15 +427,15 @@ async function exportVariants(connection, params) {
 async function getPoints(connection, { phenotype_id, sex, ancestry, raw }) {
     // validate phenotype id
     if (!phenotype_id || !await hasRecord(connection, 'phenotype', {id: phenotype_id}))
-        throw('A valid phenotype id must be provided');
+        throw new Error('A valid phenotype id must be provided');
 
     // validate sex
     if (!sex || !await hasRecord(connection, 'lookup_sex', {value: sex}))
-        throw('A valid sex must be provided');
+        throw new Error('A valid sex must be provided');
 
     // validate ancestry
     if (!ancestry || !await hasRecord(connection, 'lookup_ancestry', {value: ancestry}))
-        throw('A valid ancestry must be provided');
+        throw new Error('A valid ancestry must be provided');
 
     // query database
     const [data, columns] = await connection.execute({
@@ -452,6 +464,14 @@ async function getMetadata(connection, params) {
     const sex = params.sex ? params.sex.split(',') : [];
     const ancestry = params.ancestry ? params.ancestry.split(',') : [];
     const chromosome = params.chromosome ? params.chromosome.split(',') : [];
+    const conditions = [
+        coalesce(params.phenotype_id, `m.phenotype_id IN (${getPlaceholders(phenotype_id.length)})`),
+        coalesce(params.sex, `sex IN (${getPlaceholders(sex.length)})`),
+        coalesce(params.ancestry, `ancestry IN (${getPlaceholders(ancestry.length)})`),
+        coalesce(params.chromosome, `chromosome IN (${getPlaceholders(chromosome.length)})`),
+        coalesce(params.countNotNull, `count IS NOT NULL`)
+    ].filter(Boolean).join(' AND ');
+
     const sql = `
         SELECT
             m.id as id,
@@ -462,18 +482,13 @@ async function getMetadata(connection, params) {
             m.ancestry as ancestry,
             m.chromosome as chromosome,
             m.lambda_gc as lambda_gc,
+            m.lambda_gc_ld_score as lambda_gc_ld_score,
             m.count as count
         FROM
             phenotype_metadata m
         JOIN
             phenotype p on m.phenotype_id = p.id
-        WHERE ${[
-            coalesce(params.phenotype_id, `m.phenotype_id IN (${getPlaceholders(phenotype_id.length)})`),
-            coalesce(params.sex, `sex IN (${getPlaceholders(sex.length)})`),
-            coalesce(params.ancestry, `ancestry IN (${getPlaceholders(ancestry.length)})`),
-            coalesce(params.chromosome, `chromosome IN (${getPlaceholders(chromosome.length)})`),
-            coalesce(params.countNotNull, `count IS NOT NULL`)
-        ].filter(Boolean).join(' AND ')}
+        ${conditions ? `WHERE ${conditions}` : ``}
     `;
 
     logger.debug(`getMetadata sql: ${sql}`);
@@ -498,6 +513,10 @@ async function getMetadata(connection, params) {
  * @returns {any[]} Genes matching the search criteria
  */
 async function getGenes(connection, params) {
+    if (!params.transcription_start || !params.transcription_end || !params.chromosome) {
+        throw new Error('Chromosome, transcription_start, and transcription_end are required');
+    }
+
     let sql = `
         SELECT *
         FROM gene
@@ -523,6 +542,10 @@ async function getGenes(connection, params) {
  * @returns {any} The specified key and its value
  */
 async function getCorrelations(connection, {a, b}) {
+    if (!a || !b) {
+        throw new Error('Phenotype ids a and b must be provided');
+    }
+
     let sql = `
         SELECT
             phenotype_a, pa.display_name as phenotype_a_display_name,
@@ -596,7 +619,10 @@ async function getPhenotype(connectionPool, params) {
     const {id, type} = params;
 
     if (!type)
-        throw('Please specify a valid type:  "frequency"|"frequencyByAge"|"frequencyBySex"|"frequencyByAncestry"|"related"');
+        throw new Error('Please specify a valid type:  "frequency"|"frequencyByAge"|"frequencyBySex"|"frequencyByAncestry"|"related"');
+
+    if (!id)
+        throw new Error('A phenotype id must be provided');
 
     let connection = await connectionPool.getConnection();
 
@@ -612,7 +638,7 @@ async function getPhenotype(connectionPool, params) {
     );
 
     if (!phenotypeRows.length)
-        throw('No phenotypes with the specified id was found');
+        throw new Error('No phenotypes with the specified id was found');
 
     const phenotype = phenotypeRows[0];
 
@@ -997,6 +1023,9 @@ async function getRanges(connection) {
  * @returns {any} The specified key and its value
  */
 function getConfig(key) {
+    if (!key)
+        throw new Error('A valid configuration key must be provided')
+
     const allowedKeys = ['downloadRoot', 'exportRowLimit'];
     return allowedKeys.includes(key)
         ? {[key]: config[key]}
@@ -1004,7 +1033,8 @@ function getConfig(key) {
 }
 
 async function getShareLink(connection, {share_id}) {
-    if (!share_id) return null;
+    if (!share_id) 
+        throw new Error('A valid share_id must be provided');
 
     let sql = `
         SELECT route, parameters
@@ -1023,7 +1053,8 @@ async function getShareLink(connection, {share_id}) {
 }
 
 async function setShareLink(connection, {route, parameters}) {
-    if (!route || !parameters) return null;
+    if (!route || !parameters)
+        throw new Error('A valid route and parameters object must be provided')
 
     let sql1 = `
         INSERT INTO share_link (share_id, route, parameters, created_date)
@@ -1053,6 +1084,55 @@ async function setShareLink(connection, {route, parameters}) {
     return pluck(shareLinkRows);
 }
 
+async function getPrincipalComponentAnalysis(connection, {phenotype_id, x, y, raw}) {
+    // validate phenotype id
+    if (!phenotype_id || !await hasRecord(connection, 'phenotype', {id: phenotype_id}))
+        throw new Error('A valid phenotype id must be provided');
+
+    if (!x || !y || isNaN(x) || isNaN(y))
+        throw new Error('Valid x and y values must be provided as principal components');
+
+    if (x == y)
+        throw new Error('Principal components must be different');
+    
+    // query parameters as passed in as strings
+    raw = raw === 'true';
+
+    const sql = `
+        with pca as (
+            select pca.participant_id,
+                substring_index(group_concat(pca.principal_component), ',', 1)  as x_axis,
+                substring_index(group_concat(pca.principal_component), ',', -1) as y_axis,
+                substring_index(group_concat(pca.value), ',', 1) as x,
+                substring_index(group_concat(pca.value), ',', -1) as y
+            from principal_component_analysis pca
+            where pca.principal_component in (:x, :y)
+            group by pca.participant_id
+        ) select
+                pca.participant_id,
+                pca.x_axis,
+                pca.y_axis,
+                pca.x,
+                pca.y,
+                p.sex,
+                p.ancestry,
+                pd.value
+        from pca
+        left join participant p on pca.participant_id = p.id
+        left join participant_data pd on pca.participant_id = pd.participant_id
+        where pd.phenotype_id = :phenotype_id`
+
+    logger.debug(`getPrincipalComponentAnalysis sql: ${sql}`);
+
+    const [data, columns] = await connection.query({
+        rowsAsArray: raw,
+        values: {phenotype_id, x, y},
+        sql,
+    });
+
+    return {data, columns: columns.map(c => c.name)};
+}
+
 module.exports = {
     getConnection,
     getSummary,
@@ -1068,5 +1148,6 @@ module.exports = {
     getShareLink,
     setShareLink,
     exportVariants,
+    getPrincipalComponentAnalysis,
     ping,
 };

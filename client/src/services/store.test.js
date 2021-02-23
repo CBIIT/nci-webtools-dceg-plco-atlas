@@ -34,6 +34,11 @@ describe('Store Module', function() {
         lambdaGC: '',
         areaItems: []
       },
+      pcaPlot: {
+        loadingPCAPlot: false,
+        pcaplotData: [],
+        pcaplotLayout: {}
+      },
       manhattanPlot: {
         loadingManhattanPlot: false,
         manhattanPlotData: {},

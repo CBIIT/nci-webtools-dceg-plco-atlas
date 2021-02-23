@@ -89,6 +89,7 @@ CREATE TABLE IF NOT EXISTS `phenotype` (
     `description` MEDIUMTEXT,
     `color` VARCHAR(40),
     `type` ENUM('binary', 'categorical', 'continuous') NULL,
+    `sex_specific` ENUM('female', 'male') NULL,
     `participant_count` BIGINT,
     `import_count` BIGINT,
     `import_date` DATETIME,
@@ -128,6 +129,7 @@ CREATE TABLE IF NOT EXISTS `phenotype_metadata` (
         'Y'
     ) NOT NULL,
     `lambda_gc` DOUBLE,
+    `lambda_gc_ld_score` DOUBLE,
     `average_value` DOUBLE,
     `standard_deviation` DOUBLE,
     `count` BIGINT,
@@ -199,6 +201,7 @@ PARTITION BY list(phenotype_id) (PARTITION `0` VALUES IN (0));
 -- reported ancestry is different from genetic ancestry
 CREATE TABLE IF NOT EXISTS `participant` (
     `id` INTEGER PRIMARY KEY NOT NULL AUTO_INCREMENT,
+    `plco_id` VARCHAR(200) NOT NULL UNIQUE,
     `sex` ENUM('female', 'male'),
     `ancestry` ENUM(
         'white',
@@ -228,6 +231,14 @@ CREATE TABLE IF NOT EXISTS `participant_data_category` (
     `show_distribution` BOOLEAN,
     `order` INTEGER,
     FOREIGN KEY (phenotype_id) REFERENCES phenotype(id)
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+
+CREATE TABLE IF NOT EXISTS `principal_component_analysis` (
+    `id` INTEGER PRIMARY KEY NOT NULL AUTO_INCREMENT,
+    `participant_id` INTEGER NOT NULL,
+    `principal_component` INTEGER NOT NULL,
+    `value` DOUBLE NOT NULL,
+    FOREIGN KEY (participant_id) REFERENCES participant(id)
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
 
 CREATE TABLE IF NOT EXISTS share_link (

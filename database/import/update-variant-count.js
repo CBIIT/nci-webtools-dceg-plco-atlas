@@ -117,6 +117,22 @@ async function updateCounts() {
         await connection.query(`COMMIT`);
     }
 
+    connection.execute(
+        `update phenotype p
+        join phenotype_metadata pm on 
+            p.id = pm.phenotype_id 
+            and pm.chromosome = 'all' 
+            and pm.count is not null
+        set p.import_count = (select sum(pm.count))`
+    );
+
+    connection.execute(
+        `update phenotype p
+        set p.import_date = NOW()
+        where p.import_count is not null
+        and p.import_date is null`
+    );
+
     await connection.end();
     return 0;
 }

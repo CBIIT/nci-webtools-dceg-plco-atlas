@@ -61,6 +61,7 @@ async function importPhenotypes() {
 
         // remove phenotype table and all other associated tables
         await connection.query(`
+            DROP TABLE IF EXISTS principal_component_analysis;
             DROP TABLE IF EXISTS participant_data_category;
             DROP TABLE IF EXISTS participant_data;
             DROP TABLE IF EXISTS participant;
@@ -83,7 +84,7 @@ async function importPhenotypes() {
     let records = parse(readFile(inputFilePath), {
         bom: true,
         from_line: 2,
-        columns: ['id', 'parent_id', 'display_name', 'name', 'description', 'type', 'age_name'],
+        columns: ['id', 'parent_id', 'display_name', 'name', 'description', 'type', 'age_name', 'sex_specific'],
         on_record: (record, context) => {
             // ensure that:
             // id and parent_id are numeric values or null
@@ -144,53 +145,6 @@ async function importPhenotypes() {
             console.log('ERROR: Could not find parent for', record);
     }
 
-
-
-    // // add test data (todo: remove once we have data for actual phenotypes)
-    // let maxId = orderedRecords.reduce((acc, curr) => Math.max(acc, curr.id), 0);
-    // let parentId = Math.max(10000, maxId + 1);
-    // orderedRecords.push(
-    //     {
-    //         id: parentId,
-    //         parent_id: null,
-    //         display_name: 'Test',
-    //         name: null,
-    //         description: null,
-    //         type: null,
-    //         age_name: null
-    //     },
-    //     {
-    //         id: parentId + 1,
-    //         parent_id: parentId,
-    //         name: `test_ewings_sarcoma`,
-    //         display_name: `Ewing's Sarcoma`,
-    //         description: `Test Description`,
-    //         type: `binary`,
-    //         age_name: null,
-    //         import_date: '2000-01-01 01:01:01'
-    //     },
-    //     {
-    //         id: parentId + 2,
-    //         parent_id: parentId,
-    //         name: `test_melanoma`,
-    //         display_name: `Melanoma`,
-    //         description: `Test Description`,
-    //         type: `binary`,
-    //         age_name: null,
-    //         import_date: '2000-01-01 01:01:01'
-    //     },
-    //     {
-    //         id: parentId + 3,
-    //         parent_id: parentId,
-    //         name: `test_renal_cell_carcinoma`,
-    //         display_name: `Renal Cell Carcinoma`,
-    //         description: `Test Description`,
-    //         type: `binary`,
-    //         age_name: null,
-    //         import_date: '2000-01-01 01:01:01'
-    //     },
-    // );
-
     console.log(`[${duration()} s] Inserting records...`);
 
     // insert records (preserve color)
@@ -202,8 +156,8 @@ async function importPhenotypes() {
 
         if (!createPartitionsOnly)
             await connection.execute(
-                `INSERT INTO phenotype (id, parent_id, name, age_name, display_name, description, type)
-                    VALUES (:id, :parent_id, :name, :age_name, :display_name, :description, :type)`,
+                `INSERT INTO phenotype (id, parent_id, name, age_name, display_name, description, type, sex_specific)
+                    VALUES (:id, :parent_id, :name, :age_name, :display_name, :description, :type, :sex_specific)`,
                 record
             );
 

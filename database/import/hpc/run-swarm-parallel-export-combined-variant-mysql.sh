@@ -69,7 +69,7 @@ LOG_PATH="./swarm_export_out_$CURRENT_DATE/"
 TMP_DIR="/lscratch/\$SLURM_JOB_ID/mysql/"
 
 # Initialize MySQL port (incremented per job)
-PORT=55550
+PORT=10000
 
 # Export script path
 EXPORT_SCRIPT="../parallel-export-combined-variant-mysql.js"

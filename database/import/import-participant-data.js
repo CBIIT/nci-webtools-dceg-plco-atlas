@@ -87,12 +87,14 @@ async function importParticipantData() {
 
 
     await connection.query(`
+        DROP TABLE IF EXISTS principal_component_analysis;
         DROP TABLE IF EXISTS participant_data_stage;
         DROP TABLE IF EXISTS participant_data;
         DROP TABLE IF EXISTS participant;
 
         CREATE TABLE IF NOT EXISTS participant (
             id            INTEGER PRIMARY KEY NOT NULL AUTO_INCREMENT,
+            plco_id       VARCHAR(100),
             sex           ENUM('female', 'male'),
             ancestry      ENUM('white', 'black', 'hispanic', 'asian', 'pacific_islander', 'american_indian')
         );
@@ -104,6 +106,14 @@ async function importParticipantData() {
             value DOUBLE,
             age INTEGER,
             FOREIGN KEY (phenotype_id) REFERENCES phenotype(id),
+            FOREIGN KEY (participant_id) REFERENCES participant(id)
+        );
+
+        CREATE TABLE IF NOT EXISTS principal_component_analysis (
+            id INTEGER PRIMARY KEY NOT NULL AUTO_INCREMENT,
+            participant_id INTEGER NOT NULL,
+            principal_component INTEGER NOT NULL,
+            value DOUBLE NOT NULL,
             FOREIGN KEY (participant_id) REFERENCES participant(id)
         );
 
@@ -130,9 +140,10 @@ async function importParticipantData() {
     console.info('Loading participants');
     await connection.query(`
         -- import phenotype_sample values
-        INSERT INTO participant (id, ancestry, sex)
+        INSERT INTO participant (id, plco_id, ancestry, sex)
         SELECT
             id,
+            plco_id,
             CASE bq_race7_ca
                 WHEN 1 THEN 'white'
                 WHEN 2 THEN 'black'
@@ -162,13 +173,14 @@ async function importParticipantData() {
     `);
 
     console.info('Loading participant data');
+    let row = 0;
     for (let {id, name, age_name} of phenotypes) {
         if (!headers.includes(name) || (age_name && !headers.includes(age_name))) {
             console.warn(`WARNING: Phenotype ${name} was not found in the input file`);
         } else if (age_name && !headers.includes(age_name)) {
             console.warn(`WARNING: Age variable ${age_name} was not found in the input file`);
         } else {
-            console.info(`Inserting data for: ${name}`);
+            console.info(`Inserting data for: ${name} (${++row}/${phenotypes.length})`);
             await connection.execute(`
                 INSERT INTO participant_data (phenotype_id, participant_id, value, age)
                 SELECT 
@@ -184,8 +196,19 @@ async function importParticipantData() {
     console.info('Creating indexes and updating metadata');
     await connection.query(`
         -- create indexes on tables
+
+        -- participant data
         ALTER TABLE participant_data
-            ADD INDEX idx_participant_data__phenotype_id  (phenotype_id);
+            ADD INDEX idx_participant_data__participant_id (participant_id),
+            ADD INDEX idx_participant_data__value (value);
+        
+        -- participants
+        ALTER TABLE participant
+            ADD INDEX idx_participant__plco_id (plco_id);
+
+        -- pca
+        ALTER TABLE principal_component_analysis
+            ADD INDEX idx_principal_component_analysis__query (participant_id, principal_component, value);
 
         -- insert average and standard deviation metadata
         INSERT INTO phenotype_metadata (phenotype_id, sex, ancestry, chromosome, average_value, standard_deviation)
