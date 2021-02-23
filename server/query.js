@@ -1100,27 +1100,24 @@ async function getPrincipalComponentAnalysis(connection, {phenotype_id, x, y, ra
 
     const sql = `
         with pca as (
-            select pca.participant_id,
-                substring_index(group_concat(pca.principal_component), ',', 1)  as x_axis,
-                substring_index(group_concat(pca.principal_component), ',', -1) as y_axis,
-                substring_index(group_concat(pca.value), ',', 1) as x,
-                substring_index(group_concat(pca.value), ',', -1) as y
-            from principal_component_analysis pca
-            where pca.principal_component in (:x, :y)
-            group by pca.participant_id
-        ) select
-                pca.participant_id,
-                pca.x_axis,
-                pca.y_axis,
-                pca.x,
-                pca.y,
-                p.sex,
-                p.ancestry,
-                pd.value
+            select 
+                participant_id as participant_id,
+                max(case when principal_component = :x then value end) as x,
+                max(case when principal_component = :y then value end) as y
+            from principal_component_analysis
+            group by participant_id
+        ) select 
+            pca.participant_id as participant_id,
+            pca.x as x,
+            pca.y as y,
+            p.ancestry as ancestry,
+            p.sex as sex,
+            pd.value as value
         from pca
-        left join participant p on pca.participant_id = p.id
-        left join participant_data pd on pca.participant_id = pd.participant_id
-        where pd.phenotype_id = :phenotype_id`
+            join participant p on pca.participant_id = p.id
+            join participant_data pd on pca.participant_id = pd.participant_id 
+        where
+            pd.phenotype_id = :phenotype_id`
 
     logger.debug(`getPrincipalComponentAnalysis sql: ${sql}`);
 
