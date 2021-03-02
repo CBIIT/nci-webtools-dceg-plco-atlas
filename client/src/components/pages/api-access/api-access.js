@@ -740,6 +740,12 @@ export function ApiAccess() {
                     responses: {
                         '200': {
                             description: 'successful operation',
+                            schema: {
+                                type: 'array',
+                                items: {
+                                    $ref: '#/definitions/PCA'
+                                }
+                            }
                         },
                         '500': {
                             description: 'service unavailable'
@@ -807,6 +813,30 @@ export function ApiAccess() {
                     },
                     count: {
                         type: 'integer'
+                    }
+                }
+            },
+            PCA: {
+                type: 'object',
+                required: ['participant_id', 'x', 'y', 'ancestry', 'sex'],
+                properties: {
+                    participant_id: {
+                        type: 'integer',
+                    },
+                    x: {
+                        type: 'number'
+                    },
+                    y: {
+                        type: 'number'
+                    },
+                    ancestry: {
+                        type: 'string'
+                    },
+                    sex: {
+                        type: 'string'
+                    },
+                    value: {
+                        type: 'number'
                     }
                 }
             },
