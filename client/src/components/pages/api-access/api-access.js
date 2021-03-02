@@ -10,22 +10,25 @@ export function ApiAccess() {
         basePath: window.location.host.includes("localhost") ? '' : '/plco-atlas',
         tags: [
             {
+                name: 'metadata',
+            },
+            {
+                name: 'pca'
+            },
+            {
+                name: 'phenotypes',
+            },
+            {
                 name: 'ping',
+            },
+            {
+                name: 'points',
             },
             {
                 name: 'summary',
             },
             {
                 name: 'variants',
-            },
-            {
-                name: 'points',
-            },
-            {
-                name: 'metadata',
-            },
-            {
-                name: 'phenotypes',
             }
         ],
         paths: {
@@ -73,7 +76,8 @@ export function ApiAccess() {
                             description: 'Either "all", "female", or "male". Specifies the sex for the summarized variants to retrieve.',
                             required: true,
                             type: 'string',
-                            enum: ['all', 'female', 'male']
+                            enum: ['all', 'female', 'male'],
+                            value: 'female'
                         },
                         {
                             name: 'ancestry',
@@ -146,7 +150,8 @@ export function ApiAccess() {
                             description: 'Either "all", "female", or "male". Specifies the sex for the variants to retrieve.',
                             required: true,
                             type: 'string',
-                            enum: ['all', 'female', 'male']
+                            enum: ['all', 'female', 'male'],
+                            value: 'female'
                         },
                         {
                             name: 'ancestry',
@@ -318,7 +323,8 @@ export function ApiAccess() {
                             description: 'Either "all", "female", or "male". Specifies the sex for the variants to retrieve.',
                             required: true,
                             type: 'string',
-                            enum: ['all', 'female', 'male']
+                            enum: ['all', 'female', 'male'],
+                            value: 'female'
                         },
                         {
                             name: 'ancestry',
@@ -464,7 +470,7 @@ export function ApiAccess() {
                         {
                             name: 'phenotype_id',
                             in: 'query',
-                            description: 'A numeric value or a list of comma-separated numbers. Specifies the phenotype id(s) for the variants to retrieve.',
+                            description: 'A numeric value. Specifies the phenotype id for the summarized Q-Q points to retrieve.',
                             required: true,
                             type: 'integer',
                             value: '3080'
@@ -475,7 +481,8 @@ export function ApiAccess() {
                             description: 'Either "all", "female", or "male". Specifies the sex for the variants to retrieve.',
                             required: true,
                             type: 'string',
-                            enum: ['all', 'female', 'male']
+                            enum: ['all', 'female', 'male'],
+                            value: 'female'
                         },
                         {
                             name: 'ancestry',
@@ -519,7 +526,7 @@ export function ApiAccess() {
                         {
                             name: 'phenotype_id',
                             in: 'query',
-                            description: 'A numeric value or a list of comma-separated numbers. Specifies the phenotype id(s) for the variants to retrieve.',
+                            description: 'A numeric value. Specifies the phenotype id for the metadata to retrieve.',
                             required: true,
                             type: 'integer',
                             value: '3080'
@@ -530,7 +537,8 @@ export function ApiAccess() {
                             description: 'Either "all", "female", or "male". Specifies the sex for the variants to retrieve.',
                             required: true,
                             type: 'string',
-                            enum: ['all', 'female', 'male']
+                            enum: ['all', 'female', 'male'],
+                            value: 'female'
                         },
                         {
                             name: 'ancestry',
@@ -620,6 +628,66 @@ export function ApiAccess() {
                                 "frequencyByAncestry",
                                 "related"
                             ]                        },
+                    ],
+                    responses: {
+                        '200': {
+                            description: 'successful operation',
+                        },
+                        '500': {
+                            description: 'service unavailable'
+                        }
+                    },
+                },
+            },
+            '/api/pca': {
+                get: {
+                    tags: ['pca'],
+                    summary: 'Retrieves TBD',
+                    description: 'Retrieves TBD.',
+                    operationId: 'getPCA',
+                    produces: ['application/json'],
+                    parameters: [
+                        {
+                            name: 'phenotype_id',
+                            in: 'query',
+                            description: 'A numeric value. Specifies the phenotype id for the PCs to retrieve.',
+                            required: true,
+                            type: 'integer',
+                            value: '3080'
+                        },
+                        {
+                            name: 'x',
+                            in: 'query',
+                            description: 'A numeric value. TBD.',
+                            required: true,
+                            type: 'integer',
+                            value: '1'
+                        },
+                        {
+                            name: 'y',
+                            in: 'query',
+                            description: 'A numeric value. TBD.',
+                            required: true,
+                            type: 'integer',
+                            value: '2'
+                        },
+                        {
+                            name: 'raw',
+                            in: 'query',
+                            description: 'TBD',
+                            required: false,
+                            type: 'string',
+                            enum: ['true'],
+                            value: 'true'
+                        },
+                        {
+                            name: 'limit',
+                            in: 'query',
+                            description: 'TBD',
+                            required: false,
+                            type: 'string',
+                            value: '10'
+                        }
                     ],
                     responses: {
                         '200': {
