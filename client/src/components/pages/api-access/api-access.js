@@ -99,6 +99,14 @@ export function ApiAccess() {
                             minimum: 0,
                             value: 4
                         },
+                        {
+                            name: 'raw',
+                            in: 'query',
+                            description: 'If true, returns data in an array of arrays instead of an array of JSONs.',
+                            required: false,
+                            type: 'string',
+                            enum: ['true']
+                        }
                     ],
                     responses: {
                         '200': {
@@ -271,6 +279,14 @@ export function ApiAccess() {
                             value: 10,
                             minimum: 0,
                             maximum: 1000000
+                        },
+                        {
+                            name: 'raw',
+                            in: 'query',
+                            description: 'If true, returns data in an array of arrays instead of an array of JSONs.',
+                            required: false,
+                            type: 'string',
+                            enum: ['true']
                         }
                     ],
                     responses: {
@@ -495,6 +511,14 @@ export function ApiAccess() {
                                 'european'
                             ]
                         },
+                        {
+                            name: 'raw',
+                            in: 'query',
+                            description: 'If true, returns data in an array of arrays instead of an array of JSONs.',
+                            required: false,
+                            type: 'string',
+                            enum: ['true']
+                        }
                     ],
                     responses: {
                         '200': {
@@ -551,6 +575,14 @@ export function ApiAccess() {
                                 'european'
                             ]
                         },
+                        {
+                            name: 'raw',
+                            in: 'query',
+                            description: 'If true, returns data in an array of arrays instead of an array of JSONs.',
+                            required: false,
+                            type: 'string',
+                            enum: ['true']
+                        }
                     ],
                     responses: {
                         '200': {
@@ -581,6 +613,14 @@ export function ApiAccess() {
                             in: 'query',
                             description: 'If specified, filters phenotypes by name, display name, or description and returns a flat list.',
                             type: 'string'
+                        },
+                        {
+                            name: 'raw',
+                            in: 'query',
+                            description: 'If true, returns data in an array of arrays instead of an array of JSONs.',
+                            required: false,
+                            type: 'string',
+                            enum: ['true']
                         }
                     ],
                     responses: {
@@ -627,7 +667,16 @@ export function ApiAccess() {
                                 "frequencyBySex", 
                                 "frequencyByAncestry",
                                 "related"
-                            ]                        },
+                            ]                        
+                        },
+                        {
+                            name: 'raw',
+                            in: 'query',
+                            description: 'If true, returns data in an array of arrays instead of an array of JSONs.',
+                            required: false,
+                            type: 'string',
+                            enum: ['true']
+                        }
                     ],
                     responses: {
                         '200': {
@@ -642,8 +691,8 @@ export function ApiAccess() {
             '/api/pca': {
                 get: {
                     tags: ['pca'],
-                    summary: 'Retrieves TBD',
-                    description: 'Retrieves TBD.',
+                    summary: `Retrieves single phenotype's principal component data`,
+                    description: `Retrieves single phenotype's principal component data.`,
                     operationId: 'getPCA',
                     produces: ['application/json'],
                     parameters: [
@@ -658,7 +707,7 @@ export function ApiAccess() {
                         {
                             name: 'x',
                             in: 'query',
-                            description: 'A numeric value. TBD.',
+                            description: 'A numeric value. Specifies the first PC to retrieve.',
                             required: true,
                             type: 'integer',
                             value: '1'
@@ -666,27 +715,26 @@ export function ApiAccess() {
                         {
                             name: 'y',
                             in: 'query',
-                            description: 'A numeric value. TBD.',
+                            description: 'A numeric value. Specifies the second PC to retrieve.',
                             required: true,
                             type: 'integer',
                             value: '2'
                         },
                         {
-                            name: 'raw',
-                            in: 'query',
-                            description: 'TBD',
-                            required: false,
-                            type: 'string',
-                            enum: ['true'],
-                            value: 'true'
-                        },
-                        {
                             name: 'limit',
                             in: 'query',
-                            description: 'TBD',
+                            description: 'A numeric value to limit the number of PCs returned.',
+                            type: 'integer',
+                            value: 10,
+                            minimum: 0
+                        },
+                        {
+                            name: 'raw',
+                            in: 'query',
+                            description: 'If true, returns data in an array of arrays instead of an array of JSONs.',
                             required: false,
                             type: 'string',
-                            value: '10'
+                            enum: ['true']
                         }
                     ],
                     responses: {
