@@ -185,7 +185,7 @@ export function submitSummaryResultsQuery({
       dispatch(updateKey(key, initialState[key]));
 
     dispatch(drawQQPlot({ phenotypes, stratifications, isPairwise }));
-    dispatch(drawPCAPlot({ }));
+    dispatch(drawPCAPlot({ phenotypes, stratifications }));
     dispatch(
       drawManhattanPlot('summary', {
         phenotypes,
@@ -650,74 +650,77 @@ export function drawPCAPlot({ phenotypes, stratifications }) {
           pcaplotLayout: layout        
         })
       );
-      
-      // RANDOM PC GENERATOR
-      const generateRandomPCArray = (length, min, max) => {
-        return [...new Array(length)].map(() => 
-          (Math.random() * (max - min)) + min
-        )
-      };
-
-      // EXAMPLE PCA DATA
-      let pcaData = {
-        others: {
-          x: generateRandomPCArray(10000, -20, 20),
-          y: generateRandomPCArray(10000, -20, 20)
-        },
-        controls: {
-          x: generateRandomPCArray(1000, -10, 5),
-          y: generateRandomPCArray(1000, -10, 5)
-        },
-        cases: {
-          x: generateRandomPCArray(250, -5, 10),
-          y: generateRandomPCArray(250, -5, 10)
-        }
-      }
 
       let pcaplotData = [];
 
       await Promise.all(
-        ['others', 'controls', 'cases'].map(async (item, i) => {
-          
-          const titleCase = str =>
-            str.replace(
-              /\w+/g,
-              str =>
-                str[0].toUpperCase() +
-                str.substring(1, str.length).toLowerCase()
-            );
-            
-          const markerColor = {
-            others: 'grey',
-            controls: 'blue',
-            cases: 'red'
-          }[item];
+        stratifications.map(async ({ sex, ancestry }, i) => {
 
-          pcaplotData = pcaplotData.concat([
-            {
-              x: pcaData[item]['x'], // PCA 1
-              y: pcaData[item]['y'], // PCA 2
-              // customdata: data.map((d, i) => ({
-              //   phenotypeId: (phenotypes[i] || phenotypes[0]).id,
-              //   sex,
-              //   ancestry,
-              //   variantId: ids[i],
-              //   p: Math.pow(10, -observedValues[i]),
-              //   showData: i <= 10000,
-              //   color: markerColor
-              // })),
-              name: titleCase(item),
-              mode: 'markers',
-              type: 'scattergl',
-              hoverinfo: 'none',
-              text: null,
-              marker: {
-                color: markerColor,
-                size: 8,
-                // opacity: 0.65
-              }
+          const { data, columns } = await query('pca', {
+            phenotype_id: (phenotypes[i] || phenotypes[0]).id,
+            x: 1,
+            y: 2,
+            raw: true
+          });
+          
+          // filter data
+          let others = [];
+          // let controls = [];
+          let cases = [];
+          data.forEach(item => {
+            if (item[4] !== sex || item[5] == null) {
+              others.push(item);
             }
-          ]);
+            // if (item[4] === sex && (item[5] == null || item[5] === 0)) {
+            //   controls.push(item);
+            // }
+            if (item[4] === sex && item[5] != null) {
+              cases.push(item);
+            }
+          });
+
+          ['others', 'cases'].map(item => {
+            
+            const titleCase = str =>
+              str.replace(
+                /\w+/g,
+                str =>
+                  str[0].toUpperCase() +
+                  str.substring(1, str.length).toLowerCase()
+              );
+              
+            const markerColor = {
+              others: 'grey',
+              // controls: 'blue',
+              cases: 'red'
+            }[item];
+
+            pcaplotData = pcaplotData.concat([
+              {
+                x: item === 'others' ? others.map(item => item[1]) : cases.map(item => item[1]), // PCA 1
+                y: item === 'others' ? others.map(item => item[2]) : cases.map(item => item[2]), // PCA 2
+                // customdata: data.map((d, i) => ({
+                //   phenotypeId: (phenotypes[i] || phenotypes[0]).id,
+                //   sex,
+                //   ancestry,
+                //   variantId: ids[i],
+                //   p: Math.pow(10, -observedValues[i]),
+                //   showData: i <= 10000,
+                //   color: markerColor
+                // })),
+                name: titleCase(item),
+                mode: 'markers',
+                type: 'scattergl',
+                hoverinfo: 'none',
+                text: null,
+                marker: {
+                  color: markerColor,
+                  size: 8,
+                  // opacity: 0.65
+                }
+              }
+            ]);
+          });
 
           dispatch(updatePCAPlot({ pcaplotData }));
         })
