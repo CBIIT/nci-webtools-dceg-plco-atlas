@@ -460,13 +460,18 @@ export function drawQQPlot({ phenotypes, stratifications, isPairwise }) {
           const maxExpectedValue = expectedValues.reduce((a, b) =>
             b > a ? b : a
           );
-          const titleCase = str =>
-            str.replace(
+          const titleCase = str => {
+            let titleString = str.replace(
+              /_+/g, ' '
+            );
+            titleString = titleString.replace(
               /\w+/g,
               str =>
                 str[0].toUpperCase() +
                 str.substring(1, str.length).toLowerCase()
             );
+            return titleString;
+          };
           const markerColor = isPairwise
             ? ['#f41c52', '#006bb8'][i]
             : '#f2990d';
@@ -699,13 +704,18 @@ export function drawPCAPlot({ phenotypes, stratifications, isPairwise }) {
 
       traces.map((item) => {
         
-        const titleCase = str =>
-          str.replace(
+        const titleCase = str => {
+          let titleString = str.replace(
+            /_+/g, ' '
+          );
+          titleString = titleString.replace(
             /\w+/g,
             str =>
               str[0].toUpperCase() +
               str.substring(1, str.length).toLowerCase()
           );
+          return titleString;
+        };
           
         const markerColor = {
           others: 'grey',
