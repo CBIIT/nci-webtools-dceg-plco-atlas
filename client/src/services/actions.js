@@ -185,7 +185,7 @@ export function submitSummaryResultsQuery({
       dispatch(updateKey(key, initialState[key]));
 
     dispatch(drawQQPlot({ phenotypes, stratifications, isPairwise }));
-    dispatch(drawPCAPlot({ phenotypes, stratifications }));
+    dispatch(drawPCAPlot({ phenotypes, stratifications, isPairwise }));
     dispatch(
       drawManhattanPlot('summary', {
         phenotypes,
@@ -540,7 +540,7 @@ export function drawQQPlot({ phenotypes, stratifications, isPairwise }) {
   };
 }
 
-export function drawPCAPlot({ phenotypes, stratifications }) {
+export function drawPCAPlot({ phenotypes, stratifications, isPairwise }) {
   return async function(dispatch) {
     try {
       dispatch(
@@ -637,7 +637,7 @@ export function drawPCAPlot({ phenotypes, stratifications }) {
         },
         showlegend: true,
         legend: {
-          itemclick: false,
+          // itemclick: false,
           itemdoubleclick: false,
           orientation: 'v',
           x: 0.0,
@@ -652,79 +652,101 @@ export function drawPCAPlot({ phenotypes, stratifications }) {
       );
 
       let pcaplotData = [];
+      let pcaData = [];
 
       await Promise.all(
-        stratifications.map(async ({ sex, ancestry }, i) => {
-
+        stratifications.map(async ({ sex, ancestry, metadata }, i) => {
           const { data, columns } = await query('pca', {
             phenotype_id: (phenotypes[i] || phenotypes[0]).id,
             x: 1,
             y: 2,
             raw: true
           });
-          
-          // filter data
-          let others = [];
-          // let controls = [];
-          let cases = [];
-          data.forEach(item => {
-            if (item[4] !== sex || item[5] == null) {
-              others.push(item);
-            }
-            // if (item[4] === sex && (item[5] == null || item[5] === 0)) {
-            //   controls.push(item);
-            // }
-            if (item[4] === sex && item[5] != null) {
-              cases.push(item);
-            }
-          });
-
-          ['others', 'cases'].map(item => {
-            
-            const titleCase = str =>
-              str.replace(
-                /\w+/g,
-                str =>
-                  str[0].toUpperCase() +
-                  str.substring(1, str.length).toLowerCase()
-              );
-              
-            const markerColor = {
-              others: 'grey',
-              // controls: 'blue',
-              cases: 'red'
-            }[item];
-
-            pcaplotData = pcaplotData.concat([
-              {
-                x: item === 'others' ? others.map(item => item[1]) : cases.map(item => item[1]), // PCA 1
-                y: item === 'others' ? others.map(item => item[2]) : cases.map(item => item[2]), // PCA 2
-                // customdata: data.map((d, i) => ({
-                //   phenotypeId: (phenotypes[i] || phenotypes[0]).id,
-                //   sex,
-                //   ancestry,
-                //   variantId: ids[i],
-                //   p: Math.pow(10, -observedValues[i]),
-                //   showData: i <= 10000,
-                //   color: markerColor
-                // })),
-                name: titleCase(item),
-                mode: 'markers',
-                type: 'scattergl',
-                hoverinfo: 'none',
-                text: null,
-                marker: {
-                  color: markerColor,
-                  size: 8,
-                  // opacity: 0.65
-                }
-              }
-            ]);
-          });
-
-          dispatch(updatePCAPlot({ pcaplotData }));
+          pcaData.push(data);
         })
       );
+
+      let others = [];
+      let cases1 = [];
+      let cases2 = [];
+
+      stratifications.map(({ sex, ancestry }, i) => {
+
+        // filter data
+        pcaData[i].forEach(item => {
+          if (item[4] !== sex || item[5] == null) {
+            others.push(item);
+          }
+          // if (item[4] === sex && (item[5] == null || item[5] === 0)) {
+          //   controls.push(item);
+          // }
+          if (item[4] === sex && item[5] != null) {
+            if (i === 0) {
+              cases1.push(item);
+            } else {
+              cases2.push(item);
+            }
+          }
+        });
+      });
+
+      let traces = [];
+      if (isPairwise || stratifications.length === 2) {
+        traces = ['others', 'cases1', 'cases2'];
+      } else {
+        traces = ['others', 'cases1']
+      }
+
+      traces.map((item) => {
+        
+        const titleCase = str =>
+          str.replace(
+            /\w+/g,
+            str =>
+              str[0].toUpperCase() +
+              str.substring(1, str.length).toLowerCase()
+          );
+          
+        const markerColor = {
+          others: 'grey',
+          // controls: 'blue',
+          cases1: 'red',
+          cases2: 'orange'
+        }[item];
+
+        pcaplotData = pcaplotData.concat([
+          {
+            x: item === 'others' ? others.map(item => item[1]) : item === 'cases1' ? cases1.map(item => item[1]) : cases2.map(item => item[1]), // PCA 1
+            y: item === 'others' ? others.map(item => item[2]) : item === 'cases1' ? cases1.map(item => item[2]) : cases2.map(item => item[2]), // PCA 2
+            // customdata: data.map((d, i) => ({
+            //   phenotypeId: (phenotypes[i] || phenotypes[0]).id,
+            //   sex,
+            //   ancestry,
+            //   variantId: ids[i],
+            //   p: Math.pow(10, -observedValues[i]),
+            //   showData: i <= 10000,
+            //   color: markerColor
+            // })),
+            name: isPairwise || stratifications.length === 2 ? (
+              item === 'cases1' || item === 'cases2' ? 
+                (item === 'cases1') ? 'Cases - ' + (phenotypes[0] || phenotypes[0]).display_name + ' - ' + titleCase(stratifications[0].ancestry) + ' - ' + titleCase(stratifications[0].sex)
+                : 'Cases - ' + (phenotypes[1] || phenotypes[0]).display_name + ' - ' + titleCase(stratifications[1].ancestry) + ' - ' + titleCase(stratifications[1].sex)
+              : 'Others'
+             ) : item === 'cases1' ? 'Cases' : 'Others',
+            mode: 'markers',
+            type: 'scattergl',
+            hoverinfo: 'none',
+            text: null,
+            marker: {
+              color: markerColor,
+              size: 8,
+              // opacity: 0.65
+            }
+          }
+        ]);
+      });
+
+      dispatch(updatePCAPlot({ pcaplotData }));
 
       dispatch(
         updatePCAPlot({
