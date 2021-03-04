@@ -740,7 +740,7 @@ export function drawPCAPlot({ phenotypes, stratifications, isPairwise }) {
             marker: {
               color: markerColor,
               size: 8,
-              // opacity: 0.65
+              opacity: 0.65
             }
           }
         ]);
