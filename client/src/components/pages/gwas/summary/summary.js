@@ -68,7 +68,8 @@ export function SummaryResults() {
       dispatch(
         drawPCAPlot({
           phenotypes: selectedPhenotypes,
-          stratifications: selectedStratifications
+          stratifications: selectedStratifications,
+          isPairwise
         })
       );
     }
@@ -420,7 +421,8 @@ export function SummaryResults() {
     dispatch(
       drawPCAPlot({
         phenotypes: selectedPhenotypes,
-        stratifications: selectedStratifications
+        stratifications: selectedStratifications,
+        isPairwise
       })
     );
 

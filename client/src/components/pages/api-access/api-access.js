@@ -10,22 +10,25 @@ export function ApiAccess() {
         basePath: window.location.host.includes("localhost") ? '' : '/plco-atlas',
         tags: [
             {
+                name: 'metadata',
+            },
+            {
+                name: 'pca'
+            },
+            {
+                name: 'phenotypes',
+            },
+            {
                 name: 'ping',
+            },
+            {
+                name: 'points',
             },
             {
                 name: 'summary',
             },
             {
                 name: 'variants',
-            },
-            {
-                name: 'points',
-            },
-            {
-                name: 'metadata',
-            },
-            {
-                name: 'phenotypes',
             }
         ],
         paths: {
@@ -73,7 +76,8 @@ export function ApiAccess() {
                             description: 'Either "all", "female", or "male". Specifies the sex for the summarized variants to retrieve.',
                             required: true,
                             type: 'string',
-                            enum: ['all', 'female', 'male']
+                            enum: ['all', 'female', 'male'],
+                            value: 'female'
                         },
                         {
                             name: 'ancestry',
@@ -95,6 +99,14 @@ export function ApiAccess() {
                             minimum: 0,
                             value: 4
                         },
+                        {
+                            name: 'raw',
+                            in: 'query',
+                            description: 'If true, returns data in an array of arrays instead of an array of JSONs.',
+                            required: false,
+                            type: 'string',
+                            enum: ['true']
+                        }
                     ],
                     responses: {
                         '200': {
@@ -146,7 +158,8 @@ export function ApiAccess() {
                             description: 'Either "all", "female", or "male". Specifies the sex for the variants to retrieve.',
                             required: true,
                             type: 'string',
-                            enum: ['all', 'female', 'male']
+                            enum: ['all', 'female', 'male'],
+                            value: 'female'
                         },
                         {
                             name: 'ancestry',
@@ -266,6 +279,14 @@ export function ApiAccess() {
                             value: 10,
                             minimum: 0,
                             maximum: 1000000
+                        },
+                        {
+                            name: 'raw',
+                            in: 'query',
+                            description: 'If true, returns data in an array of arrays instead of an array of JSONs.',
+                            required: false,
+                            type: 'string',
+                            enum: ['true']
                         }
                     ],
                     responses: {
@@ -318,7 +339,8 @@ export function ApiAccess() {
                             description: 'Either "all", "female", or "male". Specifies the sex for the variants to retrieve.',
                             required: true,
                             type: 'string',
-                            enum: ['all', 'female', 'male']
+                            enum: ['all', 'female', 'male'],
+                            value: 'female'
                         },
                         {
                             name: 'ancestry',
@@ -464,7 +486,7 @@ export function ApiAccess() {
                         {
                             name: 'phenotype_id',
                             in: 'query',
-                            description: 'A numeric value or a list of comma-separated numbers. Specifies the phenotype id(s) for the variants to retrieve.',
+                            description: 'A numeric value. Specifies the phenotype id for the summarized Q-Q points to retrieve.',
                             required: true,
                             type: 'integer',
                             value: '3080'
@@ -475,7 +497,8 @@ export function ApiAccess() {
                             description: 'Either "all", "female", or "male". Specifies the sex for the variants to retrieve.',
                             required: true,
                             type: 'string',
-                            enum: ['all', 'female', 'male']
+                            enum: ['all', 'female', 'male'],
+                            value: 'female'
                         },
                         {
                             name: 'ancestry',
@@ -488,6 +511,14 @@ export function ApiAccess() {
                                 'european'
                             ]
                         },
+                        {
+                            name: 'raw',
+                            in: 'query',
+                            description: 'If true, returns data in an array of arrays instead of an array of JSONs.',
+                            required: false,
+                            type: 'string',
+                            enum: ['true']
+                        }
                     ],
                     responses: {
                         '200': {
@@ -519,7 +550,7 @@ export function ApiAccess() {
                         {
                             name: 'phenotype_id',
                             in: 'query',
-                            description: 'A numeric value or a list of comma-separated numbers. Specifies the phenotype id(s) for the variants to retrieve.',
+                            description: 'A numeric value. Specifies the phenotype id for the metadata to retrieve.',
                             required: true,
                             type: 'integer',
                             value: '3080'
@@ -530,7 +561,8 @@ export function ApiAccess() {
                             description: 'Either "all", "female", or "male". Specifies the sex for the variants to retrieve.',
                             required: true,
                             type: 'string',
-                            enum: ['all', 'female', 'male']
+                            enum: ['all', 'female', 'male'],
+                            value: 'female'
                         },
                         {
                             name: 'ancestry',
@@ -543,6 +575,14 @@ export function ApiAccess() {
                                 'european'
                             ]
                         },
+                        {
+                            name: 'raw',
+                            in: 'query',
+                            description: 'If true, returns data in an array of arrays instead of an array of JSONs.',
+                            required: false,
+                            type: 'string',
+                            enum: ['true']
+                        }
                     ],
                     responses: {
                         '200': {
@@ -573,6 +613,14 @@ export function ApiAccess() {
                             in: 'query',
                             description: 'If specified, filters phenotypes by name, display name, or description and returns a flat list.',
                             type: 'string'
+                        },
+                        {
+                            name: 'raw',
+                            in: 'query',
+                            description: 'If true, returns data in an array of arrays instead of an array of JSONs.',
+                            required: false,
+                            type: 'string',
+                            enum: ['true']
                         }
                     ],
                     responses: {
@@ -619,11 +667,85 @@ export function ApiAccess() {
                                 "frequencyBySex", 
                                 "frequencyByAncestry",
                                 "related"
-                            ]                        },
+                            ]                        
+                        },
+                        {
+                            name: 'raw',
+                            in: 'query',
+                            description: 'If true, returns data in an array of arrays instead of an array of JSONs.',
+                            required: false,
+                            type: 'string',
+                            enum: ['true']
+                        }
                     ],
                     responses: {
                         '200': {
                             description: 'successful operation',
+                        },
+                        '500': {
+                            description: 'service unavailable'
+                        }
+                    },
+                },
+            },
+            '/api/pca': {
+                get: {
+                    tags: ['pca'],
+                    summary: `Retrieves single phenotype's principal component data`,
+                    description: `Retrieves single phenotype's principal component data.`,
+                    operationId: 'getPCA',
+                    produces: ['application/json'],
+                    parameters: [
+                        {
+                            name: 'phenotype_id',
+                            in: 'query',
+                            description: 'A numeric value. Specifies the phenotype id for the PCs to retrieve.',
+                            required: true,
+                            type: 'integer',
+                            value: '3080'
+                        },
+                        {
+                            name: 'x',
+                            in: 'query',
+                            description: 'A numeric value. Specifies the first PC to retrieve.',
+                            required: true,
+                            type: 'integer',
+                            value: '1'
+                        },
+                        {
+                            name: 'y',
+                            in: 'query',
+                            description: 'A numeric value. Specifies the second PC to retrieve.',
+                            required: true,
+                            type: 'integer',
+                            value: '2'
+                        },
+                        {
+                            name: 'limit',
+                            in: 'query',
+                            description: 'A numeric value to limit the number of PCs returned.',
+                            type: 'integer',
+                            value: 10,
+                            minimum: 0
+                        },
+                        {
+                            name: 'raw',
+                            in: 'query',
+                            description: 'If true, returns data in an array of arrays instead of an array of JSONs.',
+                            required: false,
+                            type: 'string',
+                            enum: ['true']
+                        }
+                    ],
+                    responses: {
+                        '200': {
+                            description: 'successful operation',
+                            schema: {
+                                type: 'array',
+                                items: {
+                                    $ref: '#/definitions/PCA'
+                                }
+                            }
                         },
                         '500': {
                             description: 'service unavailable'
@@ -691,6 +813,30 @@ export function ApiAccess() {
                     },
                     count: {
                         type: 'integer'
+                    }
+                }
+            },
+            PCA: {
+                type: 'object',
+                required: ['participant_id', 'x', 'y', 'ancestry', 'sex'],
+                properties: {
+                    participant_id: {
+                        type: 'integer',
+                    },
+                    x: {
+                        type: 'number'
+                    },
+                    y: {
+                        type: 'number'
+                    },
+                    ancestry: {
+                        type: 'string'
+                    },
+                    sex: {
+                        type: 'string'
+                    },
+                    value: {
+                        type: 'number'
                     }
                 }
             },

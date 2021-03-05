@@ -1084,7 +1084,7 @@ async function setShareLink(connection, {route, parameters}) {
     return pluck(shareLinkRows);
 }
 
-async function getPrincipalComponentAnalysis(connection, {phenotype_id, x, y, raw}) {
+async function getPrincipalComponentAnalysis(connection, {phenotype_id, x, y, raw, limit}) {
     // validate phenotype id
     if (!phenotype_id || !await hasRecord(connection, 'phenotype', {id: phenotype_id}))
         throw new Error('A valid phenotype id must be provided');
@@ -1097,6 +1097,8 @@ async function getPrincipalComponentAnalysis(connection, {phenotype_id, x, y, ra
     
     // query parameters as passed in as strings
     raw = raw === 'true';
+
+    const rowLimit = limit ? `LIMIT ${limit}` : ``;
 
     const sql = `
         with pca as (
@@ -1117,7 +1119,8 @@ async function getPrincipalComponentAnalysis(connection, {phenotype_id, x, y, ra
             join participant p on pca.participant_id = p.id
             join participant_data pd on pca.participant_id = pd.participant_id 
         where
-            pd.phenotype_id = :phenotype_id`
+            pd.phenotype_id = :phenotype_id
+        ${rowLimit}`
 
     logger.debug(`getPrincipalComponentAnalysis sql: ${sql}`);
 
