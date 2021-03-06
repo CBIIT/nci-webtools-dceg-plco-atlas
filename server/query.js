@@ -1084,13 +1084,20 @@ async function setShareLink(connection, {route, parameters}) {
     return pluck(shareLinkRows);
 }
 
-async function getPrincipalComponentAnalysis(connection, {phenotype_id, x, y, raw, limit}) {
+async function getPrincipalComponentAnalysis(connection, {phenotype_id, platform, x, y, raw, limit}) {
+
+
     // validate phenotype id
     if (!phenotype_id || !await hasRecord(connection, 'phenotype', {id: phenotype_id}))
         throw new Error('A valid phenotype id must be provided');
 
+    // validate platforms
+    const platforms = ['PLCO_GSA', 'PLCO_Omni25', 'PLCO_Oncoarray', 'PLCO_OmniX'];
+    if (!platforms.includes(platform))
+        throw new Error(`A valid platform must be provided. Supported platforms include: ${platforms.join(', ')}`)
+
     if (!x || !y || isNaN(x) || isNaN(y))
-        throw new Error('Valid x and y values must be provided as principal components');
+        throw new Error('Valid  principal components must be provided as x and y values');
 
     if (x == y)
         throw new Error('Principal components must be different');
@@ -1107,12 +1114,13 @@ async function getPrincipalComponentAnalysis(connection, {phenotype_id, x, y, ra
                 max(case when principal_component = :x then value end) as x,
                 max(case when principal_component = :y then value end) as y
             from principal_component_analysis
+            where platform = :platform
             group by participant_id
         ) select 
             pca.participant_id as participant_id,
             pca.x as x,
             pca.y as y,
-            p.ancestry as ancestry,
+            p.genetic_ancestry as ancestry,
             p.sex as sex,
             pd.value as value
         from pca
@@ -1126,11 +1134,11 @@ async function getPrincipalComponentAnalysis(connection, {phenotype_id, x, y, ra
 
     const [data, columns] = await connection.query({
         rowsAsArray: raw,
-        values: {phenotype_id, x, y},
+        values: {phenotype_id, platform, x, y},
         sql,
     });
 
-    return {data, columns: columns.map(c => c.name)};
+    return {columns: columns.map(c => c.name), data};
 }
 
 module.exports = {
