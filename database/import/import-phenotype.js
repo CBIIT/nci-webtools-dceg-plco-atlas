@@ -11,7 +11,7 @@ const { getIntervals, getLambdaGC } = require('./utils/math');
 
 // display help if needed
 if (!(args.file) || !(args.host) || !(args.port) || !(args.db_name) || !(args.user) || !(args.password)) {
-    console.log(`USAGE: node import-phenotypes.js 
+    console.log(`USAGE: node import-phenotype.js 
         --file "filename"
         --create_partitions_only
         --host "MySQL hostname" 
@@ -57,26 +57,21 @@ importPhenotypes().then(numRows => {
 
 async function importPhenotypes() {
     if (!createPartitionsOnly) {
-        console.log(`[${duration()} s] Recreating schema...`);
+        console.log(`[${duration()} s] Truncating tables...`);
 
-        // remove phenotype table and all other associated tables
+        // truncate phenotype table and all other associated tables
         await connection.query(`
-            DROP TABLE IF EXISTS principal_component_analysis;
-            DROP TABLE IF EXISTS participant_data_category;
-            DROP TABLE IF EXISTS participant_data;
-            DROP TABLE IF EXISTS participant;
-            DROP TABLE IF EXISTS phenotype_correlation;
-            DROP TABLE IF EXISTS phenotype_metadata;
-            DROP TABLE IF EXISTS phenotype;
+            SET FOREIGN_KEY_CHECKS=0;
+            TRUNCATE TABLE principal_component_analysis;
+            TRUNCATE TABLE participant_data_category;
+            TRUNCATE TABLE participant_data;
+            TRUNCATE TABLE participant;
+            TRUNCATE TABLE phenotype_correlation;
+            TRUNCATE TABLE phenotype_metadata;
+            TRUNCATE TABLE phenotype;
+            SET FOREIGN_KEY_CHECKS=1;
         `);
-
-        // recreate tables
-        await connection.query(
-            readFile('../../schema/tables/main.sql')
-        );
-            
     }
-
 
     console.log(`[${duration()} s] Parsing records...`);
 
@@ -147,7 +142,7 @@ async function importPhenotypes() {
 
     console.log(`[${duration()} s] Inserting records...`);
 
-    // insert records (preserve color)
+    // insert records
     for (let record of orderedRecords) {
         const aggregateTable = `phenotype_aggregate`;
         const pointTable = `phenotype_point`;

@@ -1,5 +1,4 @@
 TRUNCATE chromosome_range;
-ALTER TABLE chromosome_range AUTO_INCREMENT = 1;
 INSERT INTO chromosome_range (`chromosome`, `position_min`, `position_max`, `position_abs_min`, `position_abs_max`) VALUES
 ('1', 0, 249698942, 0, 249698942),
 ('2', 0, 242508799, 249698942, 492207741),
