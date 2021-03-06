@@ -705,6 +705,15 @@ export function ApiAccess() {
                             value: '3080'
                         },
                         {
+                            name: 'platform',
+                            in: 'query',
+                            description: 'A string. Specifies the platform used.',
+                            required: true,
+                            type: 'string',
+                            value: 'PLCO_GSA',
+                            enum: ['PLCO_GSA', 'PLCO_Omni25', 'PLCO_Oncoarray', 'PLCO_OmniX'],
+                        },
+                        {
                             name: 'x',
                             in: 'query',
                             description: 'A numeric value. Specifies the first PC to retrieve.',
