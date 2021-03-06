@@ -663,8 +663,9 @@ export function drawPCAPlot({ phenotypes, stratifications, isPairwise }) {
         stratifications.map(async ({ sex, ancestry, metadata }, i) => {
           const { data, columns } = await query('pca', {
             phenotype_id: (phenotypes[i] || phenotypes[0]).id,
-            x: 1,
-            y: 2,
+            platform: 'PLCO_GSA', // ['PLCO_GSA', 'PLCO_Omni25', 'PLCO_Oncoarray', 'PLCO_OmniX']
+            x: 1, // 1-20
+            y: 2, // 1-20, different from x
             raw: true
           });
           pcaData.push(data);
