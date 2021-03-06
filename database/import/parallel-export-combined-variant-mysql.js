@@ -236,7 +236,6 @@ async function exportVariants({
         logger.info('Setting up database');
 
         await connection.query([
-            readFile(path.resolve(__dirname, 'initialize.sql')),
             readFile(path.resolve(__dirname, '../schema/tables/main.sql')),
             readFile(path.resolve(__dirname, 'import-chromosome-range.sql')),
             readFile(path.resolve(__dirname, 'import-lookup-tables.sql')),
