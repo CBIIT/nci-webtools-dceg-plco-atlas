@@ -33,9 +33,15 @@ LOAD DATA LOCAL INFILE "../raw/ldscore_summary.tsv" INTO TABLE lambdagc_stage
         intercept = @intercept,
         error = @error;
 
-insert into phenotype_metadata(phenotype_id, sex, ancestry, chromosome, lambda_gc_ld_score)
-select phenotype_id, sex, ancestry, 'all' as chromosome, intercept as lambda_gc_ld_score from lambdagc_stage
-where platform in ('meta', 'meta-all-categories')
-on duplicate key update lambda_gc_ld_score = values(lambda_gc_ld_score);
+INSERT INTO phenotype_metadata(phenotype_id, sex, ancestry, chromosome, lambda_gc_ld_score)
+SELECT 
+    phenotype_id, 
+    sex, 
+    ancestry, 
+    'all' AS chromosome, 
+    intercept AS lambda_gc_ld_score 
+FROM lambdagc_stage
+WHERE platform IN ('meta', 'meta-all-categories')
+ON DUPLICATE KEY UPDATE lambda_gc_ld_score = VALUES(lambda_gc_ld_score);
 
 COMMIT;

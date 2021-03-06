@@ -10,9 +10,10 @@ const { getRecords, pluck } = require('./utils/query');
 const { getIntervals, getLambdaGC } = require('./utils/math');
 
 // display help if needed
-if (!(args.file) || !(args.user) || !(args.password)) {
-    console.log(`USAGE: node import-phenotypes.js 
+if (!(args.file) || !(args.ancestry_file) || !(args.user) || !(args.password)) {
+    console.log(`USAGE: node import-participant-data.js 
         --file "filename"
+        --ancestry_file "filename"
         --host "MySQL hostname" 
         --port "MySQL port" 
         --db_name "MySQL database name" 
@@ -22,12 +23,13 @@ if (!(args.file) || !(args.user) || !(args.password)) {
 }
 
 // parse arguments and set defaults
-let { file, host, port, db_name, user, password } = args;
+let { file, ancestry_file, host, port, db_name, user, password } = args;
 host = host || 'localhost';
 port = port || '3306';
 db_name = db_name || 'plcogwas';
 
 const inputFilePath = path.resolve(file);
+const ancestryFilePath = path.resolve(ancestry_file);
 const errorLog = {write: e => console.log(e)};
 const duration = timestamp();
 const connection = mysql.createConnection({
@@ -44,6 +46,12 @@ const connection = mysql.createConnection({
 // input file should exist
 if (!fs.existsSync(inputFilePath)) {
     console.error(`ERROR: ${inputFilePath} does not exist.`);
+    process.exit(1);
+}
+
+// ancestry file file should exist
+if (!fs.existsSync(ancestryFilePath)) {
+    console.error(`ERROR: ${ancestryFilePath} does not exist.`);
     process.exit(1);
 }
 
@@ -87,46 +95,31 @@ async function importParticipantData() {
 
 
     await connection.query(`
-        DROP TABLE IF EXISTS principal_component_analysis;
-        DROP TABLE IF EXISTS participant_data_stage;
-        DROP TABLE IF EXISTS participant_data;
-        DROP TABLE IF EXISTS participant;
+        SET FOREIGN_KEY_CHECKS=0;
+        TRUNCATE TABLE principal_component_analysis;
+        TRUNCATE TABLE participant_data;
+        TRUNCATE TABLE participant;
+        SET FOREIGN_KEY_CHECKS=1;
 
-        CREATE TABLE IF NOT EXISTS participant (
-            id            INTEGER PRIMARY KEY NOT NULL AUTO_INCREMENT,
-            plco_id       VARCHAR(100),
-            sex           ENUM('female', 'male'),
-            ancestry      ENUM('white', 'black', 'hispanic', 'asian', 'pacific_islander', 'american_indian')
-        );
-
-        CREATE TABLE IF NOT EXISTS participant_data (
-            id BIGINT PRIMARY KEY NOT NULL AUTO_INCREMENT,
-            phenotype_id INTEGER NOT NULL,
-            participant_id INTEGER,
-            value DOUBLE,
-            age INTEGER,
-            FOREIGN KEY (phenotype_id) REFERENCES phenotype(id),
-            FOREIGN KEY (participant_id) REFERENCES participant(id)
-        );
-
-        CREATE TABLE IF NOT EXISTS principal_component_analysis (
-            id INTEGER PRIMARY KEY NOT NULL AUTO_INCREMENT,
-            participant_id INTEGER NOT NULL,
-            principal_component INTEGER NOT NULL,
-            value DOUBLE NOT NULL,
-            FOREIGN KEY (participant_id) REFERENCES participant(id)
-        );
-
-        CREATE TABLE participant_data_stage (
+        CREATE TEMPORARY TABLE participant_data_stage (
             id integer primary key auto_increment,
             ${headers.map(header => `\`${header}\` ${
                 header === 'plco_id' ? 'text' : 'double'
             }`).join(',\n')}
         ) ENGINE=MYISAM;
+
+        CREATE TEMPORARY TABLE participant_ancestry_stage (
+            plco_id varchar(100) primary key,
+            sample_id varchar(200),
+            tgs_id varchar(100),
+            platforms varchar(100),
+            sources varchar(100),
+            ancestry varchar(100),
+            unique_genotype_platform varchar(100)
+        );
     `);
 
-
-    console.info('Loading data into prestage table');
+    console.info('Loading data into staging tables');
     await connection.query({
         infileStreamFactory: path => fs.createReadStream(inputFilePath),
         sql: `LOAD DATA LOCAL INFILE "${inputFilePath}"
@@ -136,15 +129,27 @@ async function importParticipantData() {
             SET ${headers.map(header => `${header} = if(@${header} in('NA', ''), null, @${header})`).join(',\n')}`
     });
 
+    await connection.query({
+        infileStreamFactory: path => fs.createReadStream(ancestryFilePath),
+        sql: `LOAD DATA LOCAL INFILE "${ancestryFilePath}"
+            INTO TABLE participant_ancestry_stage
+            FIELDS TERMINATED BY '\t'
+            IGNORE 1 LINES`
+    });
 
     console.info('Loading participants');
     await connection.query(`
         -- import phenotype_sample values
-        INSERT INTO participant (id, plco_id, ancestry, sex)
+        INSERT INTO participant (id, plco_id, sex, ancestry, genetic_ancestry)
         SELECT
-            id,
-            plco_id,
-            CASE bq_race7_ca
+            pds.id,
+            pds.plco_id,
+            CASE pds.sex
+                WHEN 1 THEN 'male'
+                WHEN 2 THEN 'female'
+                ELSE NULL
+                END AS sex,
+            CASE pds.bq_race7_ca
                 WHEN 1 THEN 'white'
                 WHEN 2 THEN 'black'
                 WHEN 3 THEN 'hispanic'
@@ -153,12 +158,9 @@ async function importParticipantData() {
                 WHEN 6 THEN 'american_indian'
                 ELSE NULL
             END AS ancestry,
-            CASE sex
-            WHEN 1 THEN 'male'
-            WHEN 2 THEN 'female'
-            ELSE NULL
-            END AS sex
-        FROM participant_data_stage;
+            LOWER(REPLACE(pas.ancestry, ' ', '_')) as genetic_ancestry 
+        FROM participant_data_stage pds
+        LEFT JOIN participant_ancestry_stage pas on pds.plco_id = pas.plco_id;
         
         -- remove invalid age_name values 
         -- (non-numeric values which are not columns in the participant data stage table)
@@ -184,32 +186,17 @@ async function importParticipantData() {
             await connection.execute(`
                 INSERT INTO participant_data (phenotype_id, participant_id, value, age)
                 SELECT 
-                    ${id}, 
-                    pd.id as phenotype_sample_id, 
+                    ${id} as phenotype_id, 
+                    pds.id as participant_id, 
                     ${name} as value, 
                     ${age_name || 'NULL'} as age
-                FROM participant_data_stage pd
+                FROM participant_data_stage pds
             `);
         }
     }
 
-    console.info('Creating indexes and updating metadata');
+    console.info('Updating metadata');
     await connection.query(`
-        -- create indexes on tables
-
-        -- participant data
-        ALTER TABLE participant_data
-            ADD INDEX idx_participant_data__participant_id (participant_id),
-            ADD INDEX idx_participant_data__value (value);
-        
-        -- participants
-        ALTER TABLE participant
-            ADD INDEX idx_participant__plco_id (plco_id);
-
-        -- pca
-        ALTER TABLE principal_component_analysis
-            ADD INDEX idx_principal_component_analysis__query (participant_id, principal_component, value);
-
         -- insert average and standard deviation metadata
         INSERT INTO phenotype_metadata (phenotype_id, sex, ancestry, chromosome, average_value, standard_deviation)
         SELECT
