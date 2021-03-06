@@ -15,6 +15,7 @@ const args = require('minimist')(process.argv.slice(2));
 let {host, port, db_name: databaseName, user, password, file, phenotype_file: phenotypeFile, phenotype, validate, output, logdir, tmp } = args;
 
 if (!file || !output || !logdir) {
+    console.log('NOTE: depending on the permissions of the mysql data directory, you may need to use sudo');
     console.log(`USAGE: node parallel-export-combined-variant-mysql.js 
         --host "MySQL hostname [OPTIONAL, localhost by default]" 
         --port "MySQL port [OPTIONAL, 3306 by default]" 
@@ -68,7 +69,7 @@ if (!fs.existsSync(inputFilePath)) {
 
 // phenotype file should exist
 if (!fs.existsSync(phenotypeFilePath)) {
-    console.error(`ERROR: ${inputFilePath} does not exist.`);
+    console.error(`ERROR: ${phenotypeFilePath} does not exist.`);
     process.exit(1);
 }
 
@@ -177,11 +178,13 @@ async function exportVariants({
                 // FREQ_European	BETA_European_all	SE_European_all	P_European_all	N_European_all	PHet_European_all
 
                 // All columns:
-                // CHR	POS	SNP	Tested_Allele	Other_Allele
-                // FREQ_East_Asian	BETA_East_Asian_all	SE_East_Asian_all	P_East_Asian_all	N_East_Asian_all	PHet_East_Asian_all	
+                // CHR	POS	SNP	Tested_Allele	Other_Allele	
+                // FREQ_East_Asian	
+                // BETA_East_Asian_all	SE_East_Asian_all	P_East_Asian_all	N_East_Asian_all	PHet_East_Asian_all	
                 // BETA_East_Asian_female	SE_East_Asian_female	P_East_Asian_female	N_East_Asian_female	PHet_East_Asian_female	
                 // BETA_East_Asian_male	SE_East_Asian_male	P_East_Asian_male	N_East_Asian_male	PHet_East_Asian_male	
-                // FREQ_European	BETA_European_all	SE_European_all	P_European_all	N_European_all	PHet_European_all	
+                // FREQ_European	
+                // BETA_European_all	SE_European_all	P_European_all	N_European_all	PHet_European_all	
                 // BETA_European_female	SE_European_female	P_European_female	N_European_female	PHet_European_female	
                 // BETA_European_male	SE_European_male	P_European_male	N_European_male	PHet_European_male
 
@@ -216,29 +219,29 @@ async function exportVariants({
                 return {originalColumName, columnName, mappedColumnName, ancestry, sex}
             });
 
-        if (phenotype.sex_specific && phenotype.sex_specific !== 'NULL') {
-            // remove other columns if sex-specific stratification exists
-            if (stratifiedColumns.find(c => c.sex === phenotype.sex_specific)) {
-                stratifiedColumns = stratifiedColumns.filter(c => [null, phenotype.sex_specific].includes(c.sex));
-            }
-
-            // otherwise, replace 'all' with the specified sex, updating the mapped column name as well
-            else if (stratifiedColumns.find(c => c.sex === 'all')) {
-                stratifiedColumns = stratifiedColumns.map(c => c.sex === null ? c : {
-                    ...c, 
-                    sex: phenotype.sex_specific,
-                    mappedColumnName:  c.mappedColumnName.replace(/^all_/, `${phenotype.sex_specific}_`),
-                });
-            }
+        // replace 'all' with the specified sex if sex-specific stratification does not exist, updating the mapped column name as well
+        if (phenotype.sex_specific 
+            && phenotype.sex_specific !== 'NULL' 
+            && stratifiedColumns.find(c => c.sex === 'all') 
+            && !stratifiedColumns.find(c => c.sex === phenotype.sex_specific)) {
+            stratifiedColumns = stratifiedColumns.map(c => c.sex === null ? c : {
+                ...c, 
+                sex: phenotype.sex_specific,
+                mappedColumnName:  c.mappedColumnName.replace(/^all_/, `${phenotype.sex_specific}_`),
+            });
         }
+
+        console.log(stratifiedColumns);
 
         // set up database for import
         logger.info('Setting up database');
 
         await connection.query([
+            `SET FOREIGN_KEY_CHECKS=0;`,
             readFile(path.resolve(__dirname, '../schema/tables/main.sql')),
             readFile(path.resolve(__dirname, 'import-chromosome-range.sql')),
             readFile(path.resolve(__dirname, 'import-lookup-tables.sql')),
+            `SET FOREIGN_KEY_CHECKS=1;`,
             `DROP TABLE IF EXISTS prestage;
             CREATE TABLE prestage (
                 chromosome                  VARCHAR(2),
@@ -247,7 +250,7 @@ async function exportVariants({
                 allele_effect               VARCHAR(200),
                 allele_non_effect           VARCHAR(200),
                 ${stratifiedColumns.map(c => `${c.mappedColumnName} DOUBLE`).join(',')}
-            );`
+            );`,
         ].join('\n'));
 
         logger.info('Loading data into prestage table');
@@ -267,6 +270,11 @@ async function exportVariants({
 
         // iterate through each ancestry/sex
         for (let sex of sexes) {
+            // skip sex if sex_specific
+            if (phenotype.sex_specific 
+                && phenotype.sex_specific != 'NULL' 
+                & sex !== phenotype.sex_specific) 
+                continue;
             for (let ancestry of ancestries) {
                 // get columns specific to each ancestry/sex combo
                 const additionalColumns = stratifiedColumns.filter(c => c.ancestry === ancestry && (c.sex === sex || c.sex === null));
