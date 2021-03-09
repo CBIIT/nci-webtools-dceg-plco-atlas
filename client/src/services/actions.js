@@ -545,7 +545,14 @@ export function drawQQPlot({ phenotypes, stratifications, isPairwise }) {
   };
 }
 
-export function drawPCAPlot({ phenotypes, stratifications, isPairwise }) {
+export function drawPCAPlot({ 
+  phenotypes, 
+  stratifications, 
+  isPairwise, 
+  pc_platform, 
+  pc_x, 
+  pc_y 
+}) {
   return async function(dispatch) {
     try {
       dispatch(
@@ -603,7 +610,7 @@ export function drawPCAPlot({ phenotypes, stratifications, isPairwise }) {
           zeroline: false,
           fixedrange: true, // disable zoom
           title: {
-            text: '<b>PC 1</b>',
+            text: `<b>PC ${(pc_x || '1')}</b>`,
             font: {
               family: systemFont,
               size: 14,
@@ -625,7 +632,7 @@ export function drawPCAPlot({ phenotypes, stratifications, isPairwise }) {
           zeroline: false,
           fixedrange: true, // disable zoom
           title: {
-            text: '<b>PC 2</b>',
+            text: `<b>PC ${(pc_y || '2')}</b>`,
             font: {
               family: systemFont,
               size: 14,
@@ -657,18 +664,22 @@ export function drawPCAPlot({ phenotypes, stratifications, isPairwise }) {
       );
 
       let pcaplotData = [];
-      let pcaData = [];
+      let pcaData = {};
 
+      console.log("pc_platform", pc_platform);
+      console.log("pc_x", pc_x);
+      console.log("pc_y", pc_y);
+      
       await Promise.all(
         stratifications.map(async ({ sex, ancestry, metadata }, i) => {
           const { data, columns } = await query('pca', {
             phenotype_id: (phenotypes[i] || phenotypes[0]).id,
-            platform: 'PLCO_GSA', // ['PLCO_GSA', 'PLCO_Omni25', 'PLCO_Oncoarray', 'PLCO_OmniX']
-            x: 1, // 1-20
-            y: 2, // 1-20, different from x
+            platform: (pc_platform || 'PLCO_GSA'), // ['PLCO_GSA', 'PLCO_Omni25', 'PLCO_Oncoarray', 'PLCO_OmniX']
+            x: (pc_x || 1), // 1-20
+            y: (pc_y || 2), // 1-20, different from x
             raw: true
           });
-          pcaData.push(data);
+          pcaData[i] = data;
         })
       );
 
@@ -679,14 +690,14 @@ export function drawPCAPlot({ phenotypes, stratifications, isPairwise }) {
       stratifications.map(({ sex, ancestry }, i) => {
 
         // filter data
-        pcaData[i].forEach(item => {
-          if (item[4] !== sex || item[5] == null) {
+        (pcaData[i] || pcaData[0]).forEach(item => {
+          if (item[3] !== ancestry || item[4] !== sex || item[5] == null) {
             others.push(item);
           }
           // if (item[4] === sex && (item[5] == null || item[5] === 0)) {
           //   controls.push(item);
           // }
-          if (item[4] === sex && item[5] != null) {
+          if (item[3] === ancestry && item[4] === sex && item[5] != null) {
             if (i === 0) {
               cases1.push(item);
             } else {
@@ -721,8 +732,8 @@ export function drawPCAPlot({ phenotypes, stratifications, isPairwise }) {
         const markerColor = {
           others: 'grey',
           // controls: 'blue',
-          cases1: 'red',
-          cases2: 'orange'
+          cases1: stratifications.length === 2 ? '#f41c52' : '#f2990d',
+          cases2: '#006bb8'
         }[item];
 
         pcaplotData = pcaplotData.concat([

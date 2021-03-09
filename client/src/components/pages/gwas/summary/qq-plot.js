@@ -55,72 +55,74 @@ export function QQPlot({ onVariantLookup }) {
       ref={plotContainer}>
       <LoadingOverlay active={loadingQQPlot} />
 
-      <Plot
-        className="override-cursor-default position-relative"
-        data={qqplotData}
-        layout={qqplotLayout}
-        config={config}
-        onHover={data => {
-          const [point] = data.points;
-          if (point.customdata) {
-            const { xaxis, yaxis } = point;
-            const xOffset = xaxis.l2p(point.x) + xaxis._offset + 5;
-            const yOffset = yaxis.l2p(point.y) + yaxis._offset + 5;
+      {qqplotData && (
+        <Plot
+          className="override-cursor-default position-relative"
+          data={qqplotData}
+          layout={qqplotLayout}
+          config={config}
+          onHover={data => {
+            const [point] = data.points;
+            if (point.customdata) {
+              const { xaxis, yaxis } = point;
+              const xOffset = xaxis.l2p(point.x) + xaxis._offset + 5;
+              const yOffset = yaxis.l2p(point.y) + yaxis._offset + 5;
 
-            /* Use event.clientX/Y if we want to position the tooltip at the cursor (instead of point)
-            const {clientX, clientY} = data.event;
-            const {x, y} = viewportToLocalCoordinates(
-              clientX, 
-              clientY, 
-              plotContainer.current
-            ); */
+              /* Use event.clientX/Y if we want to position the tooltip at the cursor (instead of point)
+              const {clientX, clientY} = data.event;
+              const {x, y} = viewportToLocalCoordinates(
+                clientX, 
+                clientY, 
+                plotContainer.current
+              ); */
 
-            updateTooltip({
-              visible: true,
-              data: point.customdata,
-              x: xOffset,
-              y: yOffset
-            });
-          }
-        }}
-        onClick={async data => {
-          const [point] = data.points;
-          if (point.customdata) {
-            const response = await query('variants', {
-              columns: ['chromosome', 'position', 'snp'],
-              phenotype_id: point.customdata.phenotypeId,
-              id: point.customdata.variantId,
-              ancestry: point.customdata.ancestry,
-              sex: point.customdata.sex
-            });
-            const record = response.data[0];
-            const { xaxis, yaxis } = point;
-            const xOffset = xaxis.l2p(point.x) + xaxis._offset + 5;
-            const yOffset = yaxis.l2p(point.y) + yaxis._offset + 5;
+              updateTooltip({
+                visible: true,
+                data: point.customdata,
+                x: xOffset,
+                y: yOffset
+              });
+            }
+          }}
+          onClick={async data => {
+            const [point] = data.points;
+            if (point.customdata) {
+              const response = await query('variants', {
+                columns: ['chromosome', 'position', 'snp'],
+                phenotype_id: point.customdata.phenotypeId,
+                id: point.customdata.variantId,
+                ancestry: point.customdata.ancestry,
+                sex: point.customdata.sex
+              });
+              const record = response.data[0];
+              const { xaxis, yaxis } = point;
+              const xOffset = xaxis.l2p(point.x) + xaxis._offset + 5;
+              const yOffset = yaxis.l2p(point.y) + yaxis._offset + 5;
 
-            /* Use event.clientX/Y if we want to position the tooltip at the cursor (instead of point)
-            const {clientX, clientY} = data.event;
-            const {x, y} = viewportToLocalCoordinates(
-              clientX, 
-              clientY, 
-              plotContainer.current
-            ); */
+              /* Use event.clientX/Y if we want to position the tooltip at the cursor (instead of point)
+              const {clientX, clientY} = data.event;
+              const {x, y} = viewportToLocalCoordinates(
+                clientX, 
+                clientY, 
+                plotContainer.current
+              ); */
 
-            updateTooltip({
-              visible: true,
-              data: {
-                ...point.customdata,
-                ...record
-              },
-              x: xOffset,
-              y: yOffset
-            });
-          }
-        }}
-        onRelayout={relayout => {
-          updateTooltip({ visible: false });
-        }}
-      />
+              updateTooltip({
+                visible: true,
+                data: {
+                  ...point.customdata,
+                  ...record
+                },
+                x: xOffset,
+                y: yOffset
+              });
+            }
+          }}
+          onRelayout={relayout => {
+            updateTooltip({ visible: false });
+          }}
+        />
+      )}
 
       <Tooltip
         closeButton

@@ -716,7 +716,7 @@ export function ApiAccess() {
                         {
                             name: 'x',
                             in: 'query',
-                            description: 'A numeric value. Specifies the first PC to retrieve.',
+                            description: 'A numeric value 1-20. Specifies the first PC to retrieve.',
                             required: true,
                             type: 'integer',
                             value: '1'
@@ -724,7 +724,7 @@ export function ApiAccess() {
                         {
                             name: 'y',
                             in: 'query',
-                            description: 'A numeric value. Specifies the second PC to retrieve.',
+                            description: 'A numeric value 1-20. Specifies the second PC to retrieve.',
                             required: true,
                             type: 'integer',
                             value: '2'

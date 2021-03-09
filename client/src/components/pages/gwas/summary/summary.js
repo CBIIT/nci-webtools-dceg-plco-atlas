@@ -42,6 +42,11 @@ export function SummaryResults() {
     messages,
     sharedState
   } = useSelector(state => state.summaryResults);
+  const { 
+    selectedPlatform,
+    selectedPCX,
+    selectedPCY
+  } = useSelector(state => state.pcaPlot);
   const loadingManhattanPlot = useSelector(
     state => state.manhattanPlot.loadingManhattanPlot
   );
@@ -114,7 +119,11 @@ export function SummaryResults() {
     }
 
     if (selectedPlot === 'pca-plot') {
-      dispatch(drawPCAPlot({ phenotypes, stratifications }));
+      dispatch(drawPCAPlot({ 
+        phenotypes, 
+        stratifications,
+        isPairwise
+      }));
     }
 
     drawSummaryManhattanPlot({ phenotypes, stratifications, isPairwise });

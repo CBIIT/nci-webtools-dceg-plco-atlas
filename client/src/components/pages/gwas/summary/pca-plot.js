@@ -1,14 +1,28 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
+import { updatePCAPlot, drawPCAPlot } from '../../../../services/actions';
 import { PlotlyWrapper as Plot } from '../../../plots/plotly/plotly-wrapper';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
 import { Tooltip } from '../../../controls/tooltip/tooltip';
 import { query } from '../../../../services/query';
 
 export function PCAPlot() {
-  const { loadingPCAPlot, pcaplotData, pcaplotLayout } = useSelector(
-    state => state.pcaPlot
-  );
+  const { 
+    loadingPCAPlot, 
+    pcaplotData, 
+    pcaplotLayout,
+    selectedPlatform,
+    selectedPCX,
+    selectedPCY
+  } = useSelector(state => state.pcaPlot);
+
+  const {
+    selectedPhenotypes,
+    selectedStratifications,
+    isPairwise
+  } = useSelector(state => state.summaryResults);
+
+  const dispatch = useDispatch();
 
   const plotContainer = useRef(null);
 
@@ -49,164 +63,244 @@ export function PCAPlot() {
   };
 
   return (
-    <div
-      className="text-center my-3 position-relative mw-100"
-      style={{ width: '800px', margin: '1rem auto' }}
-      ref={plotContainer}>
-      <LoadingOverlay active={loadingPCAPlot} />
+    <>
+      <form className="row px-3">
+        <div className="form-group col-md-4">
+          <label htmlFor="pca-form-platform">Platform</label>
+          <select 
+            id="pca-form-platform" 
+            className="form-control" 
+            value={selectedPlatform}
+            onChange={ev => {
+              dispatch(updatePCAPlot({selectedPlatform: ev.target.value}));
+              dispatch(
+                drawPCAPlot({
+                  phenotypes: selectedPhenotypes,
+                  stratifications: selectedStratifications,
+                  isPairwise,
+                  pc_platform: ev.target.value,
+                  pc_x: selectedPCX,
+                  pc_y: selectedPCY
+                })
+              );
+            }}
+            disabled={loadingPCAPlot}>
+            <option value="PLCO_GSA">PLCO_GSA</option>
+            <option value="PLCO_Omni25">PLCO_Omni25</option>
+            <option value="PLCO_Oncoarray">PLCO_Oncoarray</option>
+            <option value="PLCO_OmniX">PLCO_OmniX</option>
+          </select>
+        </div>
+        <div className="form-group col-md-4">
+          <label htmlFor="pca-form-pcx">PC (X-axis)</label>
+          <input
+            type="number" 
+            id="pca-form-pcx" 
+            className="form-control" 
+            value={selectedPCX}
+            onChange={ev => {
+              dispatch(updatePCAPlot({selectedPCX: ev.target.value}));
+              dispatch(
+                drawPCAPlot({
+                  phenotypes: selectedPhenotypes,
+                  stratifications: selectedStratifications,
+                  isPairwise,
+                  pc_platform: selectedPlatform,
+                  pc_x: ev.target.value,
+                  pc_y: selectedPCY
+                })
+              );
+            }}
+            disabled={loadingPCAPlot}
+            min="1"
+            max="20" />
+        </div>
+        <div className="form-group col-md-4">
+          <label htmlFor="pca-form-pcy">PC (Y-axis)</label>
+          <input
+            type="number" 
+            id="pca-form-pcy" 
+            className="form-control" 
+            value={selectedPCY}
+            onChange={ev => {
+              dispatch(updatePCAPlot({selectedPCY: ev.target.value}));
+              dispatch(
+                drawPCAPlot({
+                  phenotypes: selectedPhenotypes,
+                  stratifications: selectedStratifications,
+                  isPairwise,
+                  pc_platform: selectedPlatform,
+                  pc_x: selectedPCX,
+                  pc_y: ev.target.value
+                })
+              );
+            }}
+            disabled={loadingPCAPlot} 
+            min="1"
+            max="20" />
+        </div>
+      </form>
+      <div
+        className="text-center my-3 position-relative mw-100"
+        style={{ width: '800px', margin: '1rem auto' }}
+        ref={plotContainer}>
+        <LoadingOverlay active={loadingPCAPlot} />
+        
+        {pcaplotData && (
+          <Plot
+            className="override-cursor-default position-relative"
+            data={pcaplotData}
+            layout={pcaplotLayout}
+            config={config}
+            onHover={data => {
+              const [point] = data.points;
+              if (point.customdata) {
+                const { xaxis, yaxis } = point;
+                const xOffset = xaxis.l2p(point.x) + xaxis._offset + 5;
+                const yOffset = yaxis.l2p(point.y) + yaxis._offset + 5;
 
-      <Plot
-        className="override-cursor-default position-relative"
-        data={pcaplotData}
-        layout={pcaplotLayout}
-        config={config}
-        onHover={data => {
-          const [point] = data.points;
-          if (point.customdata) {
-            const { xaxis, yaxis } = point;
-            const xOffset = xaxis.l2p(point.x) + xaxis._offset + 5;
-            const yOffset = yaxis.l2p(point.y) + yaxis._offset + 5;
+                /* Use event.clientX/Y if we want to position the tooltip at the cursor (instead of point)
+                const {clientX, clientY} = data.event;
+                const {x, y} = viewportToLocalCoordinates(
+                  clientX, 
+                  clientY, 
+                  plotContainer.current
+                ); */
 
-            /* Use event.clientX/Y if we want to position the tooltip at the cursor (instead of point)
-            const {clientX, clientY} = data.event;
-            const {x, y} = viewportToLocalCoordinates(
-              clientX, 
-              clientY, 
-              plotContainer.current
-            ); */
+                updateTooltip({
+                  visible: true,
+                  data: point.customdata,
+                  x: xOffset,
+                  y: yOffset
+                });
+              }
+            }}
+            onClick={async data => {
+              const [point] = data.points;
+              if (point.customdata) {
+                const response = await query('variants', {
+                  columns: ['chromosome', 'position', 'snp'],
+                  phenotype_id: point.customdata.phenotypeId,
+                  id: point.customdata.variantId,
+                  ancestry: point.customdata.ancestry,
+                  sex: point.customdata.sex
+                });
+                const record = response.data[0];
+                const { xaxis, yaxis } = point;
+                const xOffset = xaxis.l2p(point.x) + xaxis._offset + 5;
+                const yOffset = yaxis.l2p(point.y) + yaxis._offset + 5;
 
-            updateTooltip({
-              visible: true,
-              data: point.customdata,
-              x: xOffset,
-              y: yOffset
-            });
-          }
-        }}
-        onClick={async data => {
-          const [point] = data.points;
-          if (point.customdata) {
-            const response = await query('variants', {
-              columns: ['chromosome', 'position', 'snp'],
-              phenotype_id: point.customdata.phenotypeId,
-              id: point.customdata.variantId,
-              ancestry: point.customdata.ancestry,
-              sex: point.customdata.sex
-            });
-            const record = response.data[0];
-            const { xaxis, yaxis } = point;
-            const xOffset = xaxis.l2p(point.x) + xaxis._offset + 5;
-            const yOffset = yaxis.l2p(point.y) + yaxis._offset + 5;
+                /* Use event.clientX/Y if we want to position the tooltip at the cursor (instead of point)
+                const {clientX, clientY} = data.event;
+                const {x, y} = viewportToLocalCoordinates(
+                  clientX, 
+                  clientY, 
+                  plotContainer.current
+                ); */
 
-            /* Use event.clientX/Y if we want to position the tooltip at the cursor (instead of point)
-            const {clientX, clientY} = data.event;
-            const {x, y} = viewportToLocalCoordinates(
-              clientX, 
-              clientY, 
-              plotContainer.current
-            ); */
-
-            updateTooltip({
-              visible: true,
-              data: {
-                ...point.customdata,
-                ...record
-              },
-              x: xOffset,
-              y: yOffset
-            });
-          }
-        }}
-        onRelayout={relayout => {
-          updateTooltip({ visible: false });
-        }}
-      />
-
-      <Tooltip
-        closeButton
-        visible={tooltip.visible}
-        x={tooltip.x}
-        y={tooltip.y}
-        onClose={e => updateTooltip({ visible: false })}
-        style={{
-          width: '240px',
-          border: `1px solid ${tooltip.data.color}`
-        }}
-        className="text-left pca-plot-tooltip">
-        {!tooltip.data || !tooltip.data.showData ? (
-          <div>Only the top 10,000 variants are selectable.</div>
-        ) : (
-          <div>
-            {tooltip.data.chromosome && tooltip.data.position && (
-              <div>
-                <b>position:</b> {tooltip.data.chromosome}:
-                {tooltip.data.position}
-              </div>
-            )}
-            {/* {tooltip.data.expected_p && <div><b>expected p-value:</b> {(+tooltip.data.expected_p || 0).toPrecision(5)}</div>} */}
-            {tooltip.data.p && (
-              <div>
-                <b>p-value:</b> {(+tooltip.data.p || 0).toPrecision(5)}
-              </div>
-            )}
-            {tooltip.data.snp && (
-              <div>
-                <b>snp:</b> {tooltip.data.snp || 'N/A'}
-              </div>
-            )}
-            {/* {!tooltip.data.snp && (
-              <div className="text-secondary">
-                <small>
-                  Click on Point or
-                  <a
-                    href="javascript:void(0)"
-                    className="mx-1"
-                    onClick={async _ => {
-                      const response = await query('variants', {
-                        columns: ['chromosome', 'position', 'snp'],
-                        phenotype_id: tooltip.data.phenotypeId,
-                        id: tooltip.data.variantId,
-                        ancestry: tooltip.data.ancestry,
-                        sex: tooltip.data.sex
-                      });
-
-                      const record = response.data[0];
-                      updateTooltip({
-                        data: {
-                          ...tooltip.data,
-                          ...record
-                        }
-                      });
-                    }}>
-                    here
-                  </a>
-                  for details
-                </small>
-              </div>
-            )} */}
-            {(tooltip.data.snp ||
-              (tooltip.data.chromosome && tooltip.data.position)) && (
-              <div>
-                {/* <a
-                  href="#/gwas/lookup"
-                  className="font-weight-bold"
-                  onClick={e =>
-                    onVariantLookup({
-                      phenotype: { id: tooltip.data.phenotypeId },
-                      sex: tooltip.data.sex,
-                      ancestry: tooltip.data.ancestry,
-                      snp:
-                        tooltip.data.snp ||
-                        `chr${tooltip.data.chromosome}:${tooltip.data.position}`
-                    })
-                  }>
-                  Go to Variant Lookup
-                </a> */}
-              </div>
-            )}
-          </div>
+                updateTooltip({
+                  visible: true,
+                  data: {
+                    ...point.customdata,
+                    ...record
+                  },
+                  x: xOffset,
+                  y: yOffset
+                });
+              }
+            }}
+            onRelayout={relayout => {
+              updateTooltip({ visible: false });
+            }}
+          />
         )}
-      </Tooltip>
-    </div>
+
+        <Tooltip
+          closeButton
+          visible={tooltip.visible}
+          x={tooltip.x}
+          y={tooltip.y}
+          onClose={e => updateTooltip({ visible: false })}
+          style={{
+            width: '240px',
+            border: `1px solid ${tooltip.data.color}`
+          }}
+          className="text-left pca-plot-tooltip">
+          {!tooltip.data || !tooltip.data.showData ? (
+            <div>Only the top 10,000 variants are selectable.</div>
+          ) : (
+            <div>
+              {tooltip.data.chromosome && tooltip.data.position && (
+                <div>
+                  <b>position:</b> {tooltip.data.chromosome}:
+                  {tooltip.data.position}
+                </div>
+              )}
+              {/* {tooltip.data.expected_p && <div><b>expected p-value:</b> {(+tooltip.data.expected_p || 0).toPrecision(5)}</div>} */}
+              {tooltip.data.p && (
+                <div>
+                  <b>p-value:</b> {(+tooltip.data.p || 0).toPrecision(5)}
+                </div>
+              )}
+              {tooltip.data.snp && (
+                <div>
+                  <b>snp:</b> {tooltip.data.snp || 'N/A'}
+                </div>
+              )}
+              {/* {!tooltip.data.snp && (
+                <div className="text-secondary">
+                  <small>
+                    Click on Point or
+                    <a
+                      href="javascript:void(0)"
+                      className="mx-1"
+                      onClick={async _ => {
+                        const response = await query('variants', {
+                          columns: ['chromosome', 'position', 'snp'],
+                          phenotype_id: tooltip.data.phenotypeId,
+                          id: tooltip.data.variantId,
+                          ancestry: tooltip.data.ancestry,
+                          sex: tooltip.data.sex
+                        });
+
+                        const record = response.data[0];
+                        updateTooltip({
+                          data: {
+                            ...tooltip.data,
+                            ...record
+                          }
+                        });
+                      }}>
+                      here
+                    </a>
+                    for details
+                  </small>
+                </div>
+              )} */}
+              {(tooltip.data.snp ||
+                (tooltip.data.chromosome && tooltip.data.position)) && (
+                <div>
+                  {/* <a
+                    href="#/gwas/lookup"
+                    className="font-weight-bold"
+                    onClick={e =>
+                      onVariantLookup({
+                        phenotype: { id: tooltip.data.phenotypeId },
+                        sex: tooltip.data.sex,
+                        ancestry: tooltip.data.ancestry,
+                        snp:
+                          tooltip.data.snp ||
+                          `chr${tooltip.data.chromosome}:${tooltip.data.position}`
+                      })
+                    }>
+                    Go to Variant Lookup
+                  </a> */}
+                </div>
+              )}
+            </div>
+          )}
+        </Tooltip>
+      </div>
+    </>
   );
 }

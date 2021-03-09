@@ -38,7 +38,10 @@ export const getInitialState = async (skipQuery) => {
     pcaPlot: {
       loadingPCAPlot: false,
       pcaplotData: [],
-      pcaplotLayout: {}
+      pcaplotLayout: {},
+      selectedPlatform: 'PLCO_GSA',
+      selectedPCX: '1',
+      selectedPCY: '2'
     },
     manhattanPlot: {
       loadingManhattanPlot: false,
