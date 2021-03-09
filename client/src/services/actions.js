@@ -666,9 +666,9 @@ export function drawPCAPlot({
       let pcaplotData = [];
       let pcaData = {};
 
-      console.log("pc_platform", pc_platform);
-      console.log("pc_x", pc_x);
-      console.log("pc_y", pc_y);
+      // console.log("pc_platform", pc_platform);
+      // console.log("pc_x", pc_x);
+      // console.log("pc_y", pc_y);
       
       await Promise.all(
         stratifications.map(async ({ sex, ancestry, metadata }, i) => {

@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { updatePCAPlot, drawPCAPlot } from '../../../../services/actions';
+import { updatePCAPlot, drawPCAPlot, updateError } from '../../../../services/actions';
 import { PlotlyWrapper as Plot } from '../../../plots/plotly/plotly-wrapper';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
 import { Tooltip } from '../../../controls/tooltip/tooltip';
@@ -64,7 +64,7 @@ export function PCAPlot() {
 
   return (
     <>
-      <form className="row px-3">
+      <form className="row px-2 mx-1">
         <div className="form-group col-md-4">
           <label htmlFor="pca-form-platform">Platform</label>
           <select 
@@ -93,51 +93,69 @@ export function PCAPlot() {
         </div>
         <div className="form-group col-md-4">
           <label htmlFor="pca-form-pcx">PC (X-axis)</label>
-          <input
-            type="number" 
+          <select
             id="pca-form-pcx" 
             className="form-control" 
             value={selectedPCX}
             onChange={ev => {
-              dispatch(updatePCAPlot({selectedPCX: ev.target.value}));
-              dispatch(
-                drawPCAPlot({
-                  phenotypes: selectedPhenotypes,
-                  stratifications: selectedStratifications,
-                  isPairwise,
-                  pc_platform: selectedPlatform,
-                  pc_x: ev.target.value,
-                  pc_y: selectedPCY
-                })
-              );
+              if (ev.target.value !== selectedPCY) {
+                dispatch(updatePCAPlot({selectedPCX: ev.target.value}));
+                dispatch(
+                  drawPCAPlot({
+                    phenotypes: selectedPhenotypes,
+                    stratifications: selectedStratifications,
+                    isPairwise,
+                    pc_platform: selectedPlatform,
+                    pc_x: ev.target.value,
+                    pc_y: selectedPCY
+                  })
+                );
+              } else {
+                dispatch(updateError({ 
+                  visible: true,
+                  message: 'Principal components must be different.'
+                 }));
+              }
             }}
-            disabled={loadingPCAPlot}
-            min="1"
-            max="20" />
+            disabled={loadingPCAPlot}>
+            {
+              [...Array(20)].map((_, idx) => 
+                <option key={`opt_x_${idx + 1}`} value={`${idx + 1}`}>{idx + 1}</option>)
+            }
+          </select>
         </div>
         <div className="form-group col-md-4">
           <label htmlFor="pca-form-pcy">PC (Y-axis)</label>
-          <input
-            type="number" 
+          <select
             id="pca-form-pcy" 
             className="form-control" 
             value={selectedPCY}
             onChange={ev => {
-              dispatch(updatePCAPlot({selectedPCY: ev.target.value}));
-              dispatch(
-                drawPCAPlot({
-                  phenotypes: selectedPhenotypes,
-                  stratifications: selectedStratifications,
-                  isPairwise,
-                  pc_platform: selectedPlatform,
-                  pc_x: selectedPCX,
-                  pc_y: ev.target.value
-                })
-              );
+              if (ev.target.value !== selectedPCX) {
+                dispatch(updatePCAPlot({selectedPCY: ev.target.value}));
+                dispatch(
+                  drawPCAPlot({
+                    phenotypes: selectedPhenotypes,
+                    stratifications: selectedStratifications,
+                    isPairwise,
+                    pc_platform: selectedPlatform,
+                    pc_x: selectedPCX,
+                    pc_y: ev.target.value
+                  })
+                );
+              } else {
+                dispatch(updateError({ 
+                  visible: true,
+                  message: 'Principal components must be different.'
+                 }));
+              }
             }}
-            disabled={loadingPCAPlot} 
-            min="1"
-            max="20" />
+            disabled={loadingPCAPlot}>
+            {
+              [...Array(20)].map((_, idx) => 
+                <option key={`opt_y_${idx + 1}`} value={`${idx + 1}`}>{idx + 1}</option>)
+            }
+          </select>
         </div>
       </form>
       <div
