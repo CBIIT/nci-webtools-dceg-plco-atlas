@@ -675,8 +675,8 @@ export function drawPCAPlot({
           const { data, columns } = await query('pca', {
             phenotype_id: (phenotypes[i] || phenotypes[0]).id,
             platform: (pc_platform || 'PLCO_GSA'), // ['PLCO_GSA', 'PLCO_Omni25', 'PLCO_Oncoarray', 'PLCO_OmniX']
-            x: (pc_x || 1), // 1-20
-            y: (pc_y || 2), // 1-20, different from x
+            pc_x: (pc_x || 1), // 1-20
+            pc_y: (pc_y || 2), // 1-20, different from x
             raw: true
           });
           pcaData[i] = data;

@@ -199,7 +199,7 @@ app.get("/api/phenotype", async ({ query }) => getPhenotype(connection, query));
 app.get("/correlations", async ({ query }) => getCorrelations(connection, query));
 app.get("/api/correlations", async ({ query }) => getCorrelations(connection, query));
 
-// retrieves pca (using x and y)
+// retrieves pca (using pc_x and pc_y)
 app.get("/pca",  async ({ query }) => getPrincipalComponentAnalysis(connection, query));
 app.get("/api/pca",  async ({ query }) => getPrincipalComponentAnalysis(connection, query));
 

@@ -714,7 +714,7 @@ export function ApiAccess() {
                             enum: ['PLCO_GSA', 'PLCO_Omni25', 'PLCO_Oncoarray', 'PLCO_OmniX'],
                         },
                         {
-                            name: 'x',
+                            name: 'pc_x',
                             in: 'query',
                             description: 'A numeric value 1-20. Specifies the first PC to retrieve.',
                             required: true,
@@ -722,7 +722,7 @@ export function ApiAccess() {
                             value: '1'
                         },
                         {
-                            name: 'y',
+                            name: 'pc_y',
                             in: 'query',
                             description: 'A numeric value 1-20. Specifies the second PC to retrieve.',
                             required: true,
@@ -827,15 +827,15 @@ export function ApiAccess() {
             },
             PCA: {
                 type: 'object',
-                required: ['participant_id', 'x', 'y', 'ancestry', 'sex'],
+                required: ['participant_id', 'pc_x', 'pc_y', 'ancestry', 'sex'],
                 properties: {
                     participant_id: {
                         type: 'integer',
                     },
-                    x: {
+                    pc_x: {
                         type: 'number'
                     },
-                    y: {
+                    pc_y: {
                         type: 'number'
                     },
                     ancestry: {

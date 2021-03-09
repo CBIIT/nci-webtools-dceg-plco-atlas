@@ -1084,7 +1084,7 @@ async function setShareLink(connection, {route, parameters}) {
     return pluck(shareLinkRows);
 }
 
-async function getPrincipalComponentAnalysis(connection, {phenotype_id, platform, x, y, raw, limit}) {
+async function getPrincipalComponentAnalysis(connection, {phenotype_id, platform, pc_x, pc_y, raw, limit}) {
 
 
     // validate phenotype id
@@ -1096,10 +1096,10 @@ async function getPrincipalComponentAnalysis(connection, {phenotype_id, platform
     if (!platforms.includes(platform))
         throw new Error(`A valid platform must be provided. Supported platforms include: ${platforms.join(', ')}`)
 
-    if (!x || !y || isNaN(x) || isNaN(y))
-        throw new Error('Valid  principal components must be provided as x and y values');
+    if (!pc_x || !pc_y || isNaN(pc_x) || isNaN(pc_y))
+        throw new Error('Valid  principal components must be provided as pc_x and pc_y values');
 
-    if (x == y)
+    if (pc_x == pc_y)
         throw new Error('Principal components must be different');
     
     // query parameters as passed in as strings
@@ -1111,15 +1111,15 @@ async function getPrincipalComponentAnalysis(connection, {phenotype_id, platform
         with pca as (
             select 
                 participant_id as participant_id,
-                max(case when principal_component = :x then value end) as x,
-                max(case when principal_component = :y then value end) as y
+                max(case when principal_component = :pc_x then value end) as pc_x,
+                max(case when principal_component = :pc_y then value end) as pc_y
             from principal_component_analysis
             where platform = :platform
             group by participant_id
         ) select 
             pca.participant_id as participant_id,
-            pca.x as x,
-            pca.y as y,
+            pca.pc_x as pc_x,
+            pca.pc_y as pc_y,
             p.genetic_ancestry as ancestry,
             p.sex as sex,
             pd.value as value
@@ -1134,7 +1134,7 @@ async function getPrincipalComponentAnalysis(connection, {phenotype_id, platform
 
     const [data, columns] = await connection.query({
         rowsAsArray: raw,
-        values: {phenotype_id, platform, x, y},
+        values: {phenotype_id, platform, pc_x, pc_y},
         sql,
     });
 
