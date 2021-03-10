@@ -422,7 +422,7 @@ export function drawQQPlot({ phenotypes, stratifications, isPairwise }) {
         },
         showlegend: isPairwise,
         legend: {
-          itemclick: false,
+          // itemclick: false,
           itemdoubleclick: false,
           orientation: 'v',
           x: 0.0,
@@ -606,8 +606,8 @@ export function drawPCAPlot({
         xaxis: {
           automargin: true,
           rangemode: 'tozero', // only show positive
-          showgrid: true, // disable grid lines
-          zeroline: false,
+          showgrid: false, // disable grid lines
+          // zeroline: false,
           fixedrange: true, // disable zoom
           title: {
             text: `<b>PC ${(pc_x || '1')}</b>`,
@@ -628,8 +628,8 @@ export function drawPCAPlot({
         yaxis: {
           automargin: true,
           rangemode: 'tozero', // only show positive
-          showgrid: true, // disable grid lines
-          zeroline: false,
+          showgrid: false, // disable grid lines
+          // zeroline: false,
           fixedrange: true, // disable zoom
           title: {
             text: `<b>PC ${(pc_y || '2')}</b>`,
