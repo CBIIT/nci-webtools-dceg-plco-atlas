@@ -1092,7 +1092,7 @@ async function getPrincipalComponentAnalysis(connection, {phenotype_id, platform
         throw new Error('A valid phenotype id must be provided');
 
     // validate platforms
-    const platforms = ['PLCO_GSA', 'PLCO_Omni25', 'PLCO_Oncoarray', 'PLCO_OmniX'];
+    const platforms = ['PLCO_GSA', 'PLCO_Omni5', 'PLCO_Omni25', 'PLCO_Oncoarray', 'PLCO_OmniX'];
     if (!platforms.includes(platform))
         throw new Error(`A valid platform must be provided. Supported platforms include: ${platforms.join(', ')}`)
 
