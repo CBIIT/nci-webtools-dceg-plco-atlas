@@ -24,7 +24,6 @@ CREATE TEMPORARY TABLE `pca_stage`  (
     `pc18` double,
     `pc19` double,
     `pc20` double,
-    `rel_unrel` varchar(20),
     `platform` varchar(20)
 );
 

@@ -86,6 +86,7 @@ export function PCAPlot() {
             }}
             disabled={loadingPCAPlot}>
             <option value="PLCO_GSA">PLCO_GSA</option>
+            <option value="PLCO_Omni5">PLCO_Omni5</option>                        
             <option value="PLCO_Omni25">PLCO_Omni25</option>
             <option value="PLCO_Oncoarray">PLCO_Oncoarray</option>
             <option value="PLCO_OmniX">PLCO_OmniX</option>

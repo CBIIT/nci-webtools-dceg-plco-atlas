@@ -711,7 +711,7 @@ export function ApiAccess() {
                             required: true,
                             type: 'string',
                             value: 'PLCO_GSA',
-                            enum: ['PLCO_GSA', 'PLCO_Omni25', 'PLCO_Oncoarray', 'PLCO_OmniX'],
+                            enum: ['PLCO_GSA', 'PLCO_Omni5', 'PLCO_Omni25', 'PLCO_Oncoarray', 'PLCO_OmniX'],
                         },
                         {
                             name: 'pc_x',
