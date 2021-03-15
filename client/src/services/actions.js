@@ -516,7 +516,7 @@ export function drawQQPlot({ phenotypes, stratifications, isPairwise }) {
               text: null,
               marker: {
                 color: markerColor,
-                size: 8,
+                size: 5,
                 opacity: 0.65
               }
             }
@@ -761,7 +761,7 @@ export function drawPCAPlot({
             text: null,
             marker: {
               color: markerColor,
-              size: 8,
+              size: 5,
               opacity: 0.65
             }
           }
