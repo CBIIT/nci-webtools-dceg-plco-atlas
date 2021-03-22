@@ -608,7 +608,7 @@ export function drawPCAPlot({
           rangemode: 'tozero', // only show positive
           showgrid: false, // disable grid lines
           // zeroline: false,
-          fixedrange: true, // disable zoom
+          // fixedrange: true, // disable zoom
           title: {
             text: `<b>PC ${(pc_x || '1')}</b>`,
             font: {
@@ -630,7 +630,7 @@ export function drawPCAPlot({
           rangemode: 'tozero', // only show positive
           showgrid: false, // disable grid lines
           // zeroline: false,
-          fixedrange: true, // disable zoom
+          // fixedrange: true, // disable zoom
           title: {
             text: `<b>PC ${(pc_y || '2')}</b>`,
             font: {
@@ -686,18 +686,25 @@ export function drawPCAPlot({
       let others = [];
       let cases1 = [];
       let cases2 = [];
+      let controls1 = [];
+      let controls2 = [];
 
       stratifications.map(({ sex, ancestry }, i) => {
+        const phenotypeType = (phenotypes[i] || phenotypes[0]).type;
 
         // filter data
         (pcaData[i] || pcaData[0]).forEach(item => {
           if (item[3] !== ancestry || item[4] !== sex || item[5] == null) {
             others.push(item);
           }
-          // if (item[4] === sex && (item[5] == null || item[5] === 0)) {
-          //   controls.push(item);
-          // }
-          if (item[3] === ancestry && item[4] === sex && item[5] != null) {
+          if (item[3] === ancestry && item[4] === sex && (phenotypeType === 'binary' ? item[5] == null || item[5] === 0 : item[5] == null)) {
+            if (i === 0) {
+              controls1.push(item);
+            } else {
+              controls2.push(item);
+            }
+          }
+          if (item[3] === ancestry && item[4] === sex && item[5] != null && item[5] !== 0) {
             if (i === 0) {
               cases1.push(item);
             } else {
@@ -709,9 +716,9 @@ export function drawPCAPlot({
 
       let traces = [];
       if (isPairwise || stratifications.length === 2) {
-        traces = ['others', 'cases1', 'cases2'];
+        traces = ['others', 'controls1', 'cases1', 'controls2', 'cases2'];
       } else {
-        traces = ['others', 'cases1']
+        traces = ['others', 'controls1', 'cases1']
       }
 
       traces.map((item) => {
@@ -731,15 +738,30 @@ export function drawPCAPlot({
           
         const markerColor = {
           others: 'grey',
-          // controls: 'blue',
-          cases1: stratifications.length === 2 ? '#f41c52' : '#f2990d',
-          cases2: '#006bb8'
+          controls1: stratifications.length === 2 ? '#F41C52' : '#006BB8',
+          controls2: '#006BB8',
+          cases1: stratifications.length === 2 ? '#A2173A' : '#F41C52',
+          cases2: '#002A47'
         }[item];
 
         pcaplotData = pcaplotData.concat([
           {
-            x: item === 'others' ? others.map(item => item[1]) : item === 'cases1' ? cases1.map(item => item[1]) : cases2.map(item => item[1]), // PCA 1
-            y: item === 'others' ? others.map(item => item[2]) : item === 'cases1' ? cases1.map(item => item[2]) : cases2.map(item => item[2]), // PCA 2
+            // x: item === 'others' ? others.map(item => item[1]) : item === 'cases1' ? cases1.map(item => item[1]) : cases2.map(item => item[1]), // PCA 1
+            x: {
+              'others': others.map(item => item[1]),
+              'controls1': controls1.map(item => item[1]),
+              'controls2': controls2.map(item => item[1]),
+              'cases1': cases1.map(item => item[1]),
+              'cases2': cases2.map(item => item[1])
+            }[item],
+            // y: item === 'others' ? others.map(item => item[2]) : item === 'cases1' ? cases1.map(item => item[2]) : cases2.map(item => item[2]), // PCA 2
+            y: {
+              'others': others.map(item => item[2]),
+              'controls1': controls1.map(item => item[2]),
+              'controls2': controls2.map(item => item[2]),
+              'cases1': cases1.map(item => item[2]),
+              'cases2': cases2.map(item => item[2])
+            }[item],
             // customdata: data.map((d, i) => ({
             //   phenotypeId: (phenotypes[i] || phenotypes[0]).id,
             //   sex,
@@ -749,12 +771,19 @@ export function drawPCAPlot({
             //   showData: i <= 10000,
             //   color: markerColor
             // })),
-            name: isPairwise || stratifications.length === 2 ? (
-              item === 'cases1' || item === 'cases2' ? 
-                (item === 'cases1') ? 'Cases - ' + (phenotypes[0] || phenotypes[0]).display_name + ' - ' + titleCase(stratifications[0].ancestry) + ' - ' + titleCase(stratifications[0].sex)
-                : 'Cases - ' + (phenotypes[1] || phenotypes[0]).display_name + ' - ' + titleCase(stratifications[1].ancestry) + ' - ' + titleCase(stratifications[1].sex)
-              : 'Others'
-             ) : item === 'cases1' ? 'Cases' : 'Others',
+            // name: isPairwise || stratifications.length === 2 ? (
+            //   item === 'cases1' || item === 'cases2' ? 
+            //     (item === 'cases1') ? 'Cases - ' + (phenotypes[0] || phenotypes[0]).display_name + ' - ' + titleCase(stratifications[0].ancestry) + ' - ' + titleCase(stratifications[0].sex)
+            //     : 'Cases - ' + (phenotypes[1] || phenotypes[0]).display_name + ' - ' + titleCase(stratifications[1].ancestry) + ' - ' + titleCase(stratifications[1].sex)
+            //   : 'Others'
+            //  ) : item === 'cases1' ? 'Cases' : 'Others',
+            name: {
+              'others': 'Others',
+              'controls1': isPairwise || stratifications.length === 2 ? 'Controls - ' + (phenotypes[0] || phenotypes[0]).display_name + ' - ' + titleCase(stratifications[0].ancestry) + ' - ' + titleCase(stratifications[0].sex) : 'Controls',
+              'controls2': isPairwise || stratifications.length === 2 ? 'Controls - ' + (phenotypes[1] || phenotypes[0]).display_name + ' - ' + titleCase(stratifications[1].ancestry) + ' - ' + titleCase(stratifications[1].sex) : 'Controls',
+              'cases1': isPairwise || stratifications.length === 2 ? 'Cases - ' + (phenotypes[0] || phenotypes[0]).display_name + ' - ' + titleCase(stratifications[0].ancestry) + ' - ' + titleCase(stratifications[0].sex) : 'Cases',
+              'cases2': isPairwise || stratifications.length === 2 ? 'Cases - ' + (phenotypes[1] || phenotypes[0]).display_name + ' - ' + titleCase(stratifications[1].ancestry) + ' - ' + titleCase(stratifications[1].sex) : 'Cases',
+            }[item],
             mode: 'markers',
             type: 'scattergl',
             hoverinfo: 'none',

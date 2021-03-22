@@ -51,9 +51,9 @@ export function PCAPlot() {
     },
     displaylogo: false,
     modeBarButtonsToRemove: [
-      'zoom2d',
-      'zoomIn2d',
-      'zoomOut2d',
+      // 'zoom2d',
+      // 'zoomIn2d',
+      // 'zoomOut2d',
       'select2d',
       'autoScale2d',
       'hoverClosestCartesian',
