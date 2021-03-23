@@ -690,21 +690,22 @@ export function drawPCAPlot({
       let controls2 = [];
 
       stratifications.map(({ sex, ancestry }, i) => {
+        // console.log("sex", sex);
         const phenotypeType = (phenotypes[i] || phenotypes[0]).type;
 
         // filter data
         (pcaData[i] || pcaData[0]).forEach(item => {
-          if (item[3] !== ancestry || item[4] !== sex || item[5] == null) {
+          if (item[3] !== ancestry || (sex !== 'all' && item[4] !== sex) || item[5] == null) {
             others.push(item);
           }
-          if (item[3] === ancestry && item[4] === sex && (phenotypeType === 'binary' ? item[5] == null || item[5] === 0 : item[5] == null)) {
+          if (item[3] === ancestry && (sex === 'all' ? item[4] === 'female' || item[4] === 'male' : item[4] === sex) && (phenotypeType === 'binary' ? item[5] == null || item[5] === 0 : item[5] == null)) {
             if (i === 0) {
               controls1.push(item);
             } else {
               controls2.push(item);
             }
           }
-          if (item[3] === ancestry && item[4] === sex && item[5] != null && item[5] !== 0) {
+          if (item[3] === ancestry && (sex === 'all' ? item[4] === 'female' || item[4] === 'male' : item[4] === sex) && item[5] != null && item[5] !== 0) {
             if (i === 0) {
               cases1.push(item);
             } else {
