@@ -194,7 +194,7 @@ export function SummaryResultsTable() {
   };
 
   const handleTableChange = (key, type, pagination) => {
-    if (!selectedPhenotypes || !selectedPhenotypes.length) return;
+    if (!selectedPhenotypes || !selectedPhenotypes.length || !summaryTables.tables[key].results.length) return;
     const { page, sizePerPage, sortField, sortOrder } = pagination;
     const cachedTable = summaryTables.tables[key];
     const paginationParams = {
