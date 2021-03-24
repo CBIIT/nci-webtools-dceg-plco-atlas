@@ -739,10 +739,10 @@ export function drawPCAPlot({
           
         const markerColor = {
           others: 'grey',
-          controls1: stratifications.length === 2 ? '#F41C52' : '#006BB8',
-          controls2: '#006BB8',
-          cases1: stratifications.length === 2 ? '#A2173A' : '#F41C52',
-          cases2: '#002A47'
+          controls1: stratifications.length === 2 ? '#a2173a' : '#A76909',
+          controls2: '#002a47',
+          cases1: stratifications.length === 2 ? '#f41c52' : '#F2990D',
+          cases2: '#006bb8'
         }[item];
 
         pcaplotData = pcaplotData.concat([
