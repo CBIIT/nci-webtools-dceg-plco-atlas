@@ -77,6 +77,10 @@ echo "IMPORTING PARTICIPANT COUNTS..."
 time node ../update-participant-count.js --host $SLURM_NODELIST --port 55555 --db_name plcogwas --user $DB_USER --password $DB_PASS
 echo
 
+echo "IMPORTING PC DATA..."
+time mysql -u $DB_USER -p$DB_PASS --host=$SLURM_NODELIST --port=55555 --local-infile=1 plcogwas < ../import-pca.sql
+echo
+
 echo "STOPPING MYSQL SERVER..."
 local_mysql --basedir $BASE_DIR stop
 echo
