@@ -78,7 +78,7 @@ time node ../update-participant-count.js --host $SLURM_NODELIST --port 55555 --d
 echo
 
 echo "IMPORTING LAMBDA GC LD SCORES..."
-time mysql -u $DB_USER -p$DB_PASS --host=$SLURM_NODELIST --port=55555 --local-infile=1 plcogwas < < ../import-lambda-gc-ld-score.sql
+time mysql -u $DB_USER -p$DB_PASS --host=$SLURM_NODELIST --port=55555 --local-infile=1 plcogwas < ../import-lambda-gc-ld-score.sql
 echo
 
 echo "IMPORTING PC DATA..."
