@@ -62,7 +62,7 @@ time node ../import-phenotype.js --file ../raw/phenotype.csv --host $SLURM_NODEL
 echo
 
 echo "IMPORTING PARTICIPANT DATA..."
-time node ../import-participant-data.js --file ../raw/participant_data.tsv --host $SLURM_NODELIST --port 55555 --db_name plcogwas --user $DB_USER --password $DB_PASS
+time node ../import-participant-data.js --file ../raw/participant_data.tsv --ancestry_file ../raw/participant_ancestry.tsv --host $SLURM_NODELIST --port 55555 --db_name plcogwas --user $DB_USER --password $DB_PASS
 echo
 
 echo "IMPORTING PARTICIPANT DATA CATEGORIES..."
@@ -77,9 +77,9 @@ echo "IMPORTING PARTICIPANT COUNTS..."
 time node ../update-participant-count.js --host $SLURM_NODELIST --port 55555 --db_name plcogwas --user $DB_USER --password $DB_PASS
 echo
 
-echo "IMPORTING LAMBDA GC LD SCORES..."
-time mysql -u $DB_USER -p$DB_PASS --host=$SLURM_NODELIST --port=55555 --local-infile=1 plcogwas < ../import-lambda-gc-ld-score.sql
-echo
+# echo "IMPORTING LAMBDA GC LD SCORES..."
+# time mysql -u $DB_USER -p$DB_PASS --host=$SLURM_NODELIST --port=55555 --local-infile=1 plcogwas < ../import-lambda-gc-ld-score.sql
+# echo
 
 echo "IMPORTING PC DATA..."
 time mysql -u $DB_USER -p$DB_PASS --host=$SLURM_NODELIST --port=55555 --local-infile=1 plcogwas < ../import-pca.sql
