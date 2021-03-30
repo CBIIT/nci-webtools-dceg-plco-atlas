@@ -10,6 +10,7 @@ export BUCKET_FOLDER=$6
 # export AWS_SECRET_ACCESS_KEY=$6
 export TMPDIR=/lscratch/$SLURM_JOB_ID
 # export SERVER_HOST=$SLURM_NODELIST
+export INCREMENTAL_FOLDER=$7
 
 module load mysql/5.7.22
 # module load mysql/8.0
@@ -24,7 +25,14 @@ local_mysql --basedir $BASE_DIR start --force
 echo 
 
 echo "BACKING UP VIA XTRABACKUP (MySQL-5.7.22, host=$SLURM_NODELIST, user=$DB_USER,basedir=$BASE_DIR, targetdir=$TARGET_DIR)..."
-time xtrabackup --backup --host=$SLURM_NODELIST --port=55555  --user=$DB_USER --password=$DB_PASS --datadir=$BASE_DIR/data/ --stream=xbstream --parallel=16 --target-dir=$TARGET_DIR | split -d --bytes=2048MB - $TARGET_DIR/backup.xbstream
+if [ $INCREMENTAL_FOLDER = false]
+    then
+        # Full backup...
+        time xtrabackup --backup --host=$SLURM_NODELIST --port=55555  --user=$DB_USER --password=$DB_PASS --datadir=$BASE_DIR/data/ --stream=xbstream --parallel=16 --target-dir=$TARGET_DIR | split -d --bytes=2048MB - $TARGET_DIR/backup.xbstream
+    else
+        # Incremental backup...  
+        time xtrabackup --backup --host=$SLURM_NODELIST --incremental-basedir=$INCREMENTAL_FOLDER --port=55555  --user=$DB_USER --password=$DB_PASS --datadir=$BASE_DIR/data/ --stream=xbstream --parallel=16 --target-dir=$TARGET_DIR | split -d --bytes=2048MB - $TARGET_DIR/backup.xbstream
+fi
 echo
 
 echo "STOPPING MYSQL SERVER..."

@@ -66,4 +66,15 @@ if [ -z "$6" ]
 fi
 BUCKET_FOLDER=$6
 
-sbatch --gres=lscratch:200 --mem=120g --cpus-per-task=28 --partition=norm --time=08:00:00 --wrap="sh xtrabackup-snapshot.sh $DB_USER $DB_PASS $BASE_DIR $TARGET_DIR $BUCKET_NAME $BUCKET_FOLDER"
+# ARGUMENT 7: Input xtrabackup incremental snapshot target directory path
+# INCREMENTAL_FOLDER = "/data/jiangk3/plco/mysql/rds-backup/incremental1"
+if [ -z "$7" ]
+    then
+        echo "Full backup..."
+        INCREMENTAL_FOLDER=false 
+    else
+        echo "Incremental backup..."
+        INCREMENTAL_FOLDER=$7
+fi
+
+sbatch --gres=lscratch:200 --mem=120g --cpus-per-task=28 --partition=norm --time=08:00:00 --wrap="sh xtrabackup-snapshot.sh $DB_USER $DB_PASS $BASE_DIR $TARGET_DIR $BUCKET_NAME $BUCKET_FOLDER $INCREMENTAL_FOLDER"

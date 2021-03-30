@@ -604,8 +604,9 @@ export function drawPCAPlot({
         //   }
         // },
         xaxis: {
+          // tickmode: 'auto',
           automargin: true,
-          rangemode: 'tozero', // only show positive
+          // rangemode: 'tozero', // only show positive
           showgrid: false, // disable grid lines
           // zeroline: false,
           // fixedrange: true, // disable zoom
@@ -626,8 +627,9 @@ export function drawPCAPlot({
           }
         },
         yaxis: {
+          // tickmode: 'auto',
           automargin: true,
-          rangemode: 'tozero', // only show positive
+          // rangemode: 'tozero', // only show positive
           showgrid: false, // disable grid lines
           // zeroline: false,
           // fixedrange: true, // disable zoom
