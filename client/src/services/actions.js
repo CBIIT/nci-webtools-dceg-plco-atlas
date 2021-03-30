@@ -651,11 +651,18 @@ export function drawPCAPlot({
         },
         showlegend: true,
         legend: {
+          title: {
+            text: 'Click legend to show/hide points',
+            font: {
+              size: 12,
+              color: 'grey'
+            }
+          },
           // itemclick: false,
           itemdoubleclick: false,
           orientation: 'v',
           x: 0.0,
-          y: 1.1
+          y: 1.2
         }
       };
 
