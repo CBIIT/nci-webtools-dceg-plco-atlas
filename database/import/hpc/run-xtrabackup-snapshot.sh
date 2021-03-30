@@ -5,7 +5,7 @@
 if [ -z "$1" ]
     then
         echo "ERROR: No MySQL db username supplied..."
-        echo "USAGE: sh run-xtrabackup-snapshot.sh <DB_USER> <DB_PASS> <BASE_DIR> <TARGET_DIR> <BUCKET_NAME> <BUCKET_FOLDER>"
+        echo "USAGE: sh run-xtrabackup-snapshot.sh <DB_USER> <DB_PASS> <BASE_DIR> <TARGET_DIR> <BUCKET_NAME> <BUCKET_FOLDER> <OPTIONAL: INCREMENTAL_BACKUP_PATH>"
         echo "EXAMPLE: sh run-xtrabackup-snapshot.sh sample_username sample_password /data/jiangk3/plco/mysql/saved-instance-path /data/jiangk3/plco/mysql/rds-backup bucket_name bucket_folder"
         exit 1
 fi
@@ -16,7 +16,7 @@ DB_USER=$1
 if [ -z "$2" ]
     then
         echo "ERROR: No MySQL db password supplied..."
-        echo "USAGE: sh run-xtrabackup-snapshot.sh <DB_USER> <DB_PASS> <BASE_DIR> <TARGET_DIR> <BUCKET_NAME> <BUCKET_FOLDER>"
+        echo "USAGE: sh run-xtrabackup-snapshot.sh <DB_USER> <DB_PASS> <BASE_DIR> <TARGET_DIR> <BUCKET_NAME> <BUCKET_FOLDER> <OPTIONAL: INCREMENTAL_BACKUP_PATH>"
         echo "EXAMPLE: sh run-xtrabackup-snapshot.sh sample_username sample_password /data/jiangk3/plco/mysql/saved-instance-path /data/jiangk3/plco/mysql/rds-backup bucket_name bucket_folder"
         exit 1
 fi
@@ -27,7 +27,7 @@ DB_PASS=$2
 if [ -z "$3" ]
     then
         echo "ERROR: No MySQL base directory path supplied..."
-        echo "USAGE: sh run-xtrabackup-snapshot.sh <DB_USER> <DB_PASS> <BASE_DIR> <TARGET_DIR> <BUCKET_NAME> <BUCKET_FOLDER>"
+        echo "USAGE: sh run-xtrabackup-snapshot.sh <DB_USER> <DB_PASS> <BASE_DIR> <TARGET_DIR> <BUCKET_NAME> <BUCKET_FOLDER> <OPTIONAL: INCREMENTAL_BACKUP_PATH>"
         echo "EXAMPLE: sh run-xtrabackup-snapshot.sh sample_username sample_password /data/jiangk3/plco/mysql/saved-instance-path /data/jiangk3/plco/mysql/rds-backup bucket_name bucket_folder"
         exit 1
 fi
@@ -38,7 +38,7 @@ BASE_DIR=$3
 if [ -z "$4" ]
     then
         echo "ERROR: No xtrabackup target directory path supplied..."
-        echo "USAGE: sh run-xtrabackup-snapshot.sh <DB_USER> <DB_PASS> <BASE_DIR> <TARGET_DIR> <BUCKET_NAME> <BUCKET_FOLDER>"
+        echo "USAGE: sh run-xtrabackup-snapshot.sh <DB_USER> <DB_PASS> <BASE_DIR> <TARGET_DIR> <BUCKET_NAME> <BUCKET_FOLDER> <OPTIONAL: INCREMENTAL_BACKUP_PATH>"
         echo "EXAMPLE: sh run-xtrabackup-snapshot.sh sample_username sample_password /data/jiangk3/plco/mysql/saved-instance-path /data/jiangk3/plco/mysql/rds-backup bucket_name bucket_folder"
         exit 1
 fi
@@ -49,7 +49,7 @@ TARGET_DIR=$4
 if [ -z "$5" ]
     then
         echo "ERROR: No AWS access key supplied..."
-        echo "USAGE: sh run-xtrabackup-snapshot.sh <DB_USER> <DB_PASS> <BASE_DIR> <TARGET_DIR> <BUCKET_NAME> <BUCKET_FOLDER>"
+        echo "USAGE: sh run-xtrabackup-snapshot.sh <DB_USER> <DB_PASS> <BASE_DIR> <TARGET_DIR> <BUCKET_NAME> <BUCKET_FOLDER> <OPTIONAL: INCREMENTAL_BACKUP_PATH>"
         echo "EXAMPLE: sh run-xtrabackup-snapshot.sh sample_username sample_password /data/jiangk3/plco/mysql/saved-instance-path /data/jiangk3/plco/mysql/rds-backup bucket_name bucket_folder"
         exit 1
 fi
@@ -60,7 +60,7 @@ BUCKET_NAME=$5
 if [ -z "$6" ]
     then
         echo "ERROR: No AWS secret access key supplied..."
-        echo "USAGE: sh run-xtrabackup-snapshot.sh <DB_USER> <DB_PASS> <BASE_DIR> <TARGET_DIR> <BUCKET_NAME> <BUCKET_FOLDER>"
+        echo "USAGE: sh run-xtrabackup-snapshot.sh <DB_USER> <DB_PASS> <BASE_DIR> <TARGET_DIR> <BUCKET_NAME> <BUCKET_FOLDER> <OPTIONAL: INCREMENTAL_BACKUP_PATH>"
         echo "EXAMPLE: sh run-xtrabackup-snapshot.sh sample_username sample_password /data/jiangk3/plco/mysql/saved-instance-path /data/jiangk3/plco/mysql/rds-backup bucket_name bucket_folder"
         exit 1
 fi
