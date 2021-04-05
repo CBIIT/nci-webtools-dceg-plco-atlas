@@ -388,6 +388,7 @@ export function SummaryResultsTable() {
             </Tooltip>}>
             <a
               className="btn btn-sm btn-link text-nowrap"
+              target="_blank"
               href={getExportLink()}>
               Export Variants
             </a>
