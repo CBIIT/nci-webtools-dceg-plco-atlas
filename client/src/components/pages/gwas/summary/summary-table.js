@@ -37,6 +37,9 @@ export function SummaryResultsTable() {
     bpMax,
     exportRowLimit
   } = useSelector(state => state.summaryResults);
+  const { downloadRoot } = useSelector(
+    state => state.downloads
+  );
   const selectedTable = useSelector(state => state.summaryTables.selectedTable);
   const setSelectedTable = selectedTable =>
     dispatch(updateSummaryTable('selectedTable', selectedTable));
@@ -247,6 +250,19 @@ export function SummaryResultsTable() {
     dispatch(updateKey('summarySnpTables', summarySnpTables));
   };
 
+  const getDownloadLink = () => {
+    if (!selectedStratifications || !selectedPhenotypes ||      
+      !selectedStratifications.length || !selectedPhenotypes.length)
+      return null;
+
+    const phenotype =
+      isPairwise && selectedPhenotypes[1]
+        ? selectedPhenotypes[selectedTable]
+        : selectedPhenotypes[0];
+    
+    return `${downloadRoot}${phenotype.name}.tsv.gz`;
+  }
+
   const getExportLink = () => {
     if (!selectedStratifications || !selectedPhenotypes ||      
       !selectedStratifications.length || !selectedPhenotypes.length)
@@ -345,7 +361,7 @@ export function SummaryResultsTable() {
 
         </div>
 
-        <div key="snpSearch" className="d-flex mb-2">
+        <div key="snpSearch" className="d-flex align-items-center">
           <input
             style={{ minWidth: '280px' }}
             className="form-control form-control-sm"
@@ -368,12 +384,24 @@ export function SummaryResultsTable() {
 
           <OverlayTrigger overlay={
             <Tooltip id="export-info-tooltip" className={summaryTables.tables[selectedTable].resultsCount > exportRowLimit ? 'visible' : 'invisible'}>
-              Only the top {exportRowLimit.toLocaleString()} variants based on the current sort order will be downloaded.
+              Download top {exportRowLimit.toLocaleString()} variants based on the current sort order.
             </Tooltip>}>
             <a
               className="btn btn-sm btn-link text-nowrap"
               href={getExportLink()}>
               Export Variants
+            </a>
+          </OverlayTrigger>
+
+
+          <OverlayTrigger overlay={
+            <Tooltip id="download-dataset-tooltip">
+              Download the entire dataset for this phenotype.
+            </Tooltip>}>
+            <a
+              className="btn btn-sm btn-link text-nowrap"
+              href={getDownloadLink()}>
+              Download Dataset
             </a>
           </OverlayTrigger>
 
