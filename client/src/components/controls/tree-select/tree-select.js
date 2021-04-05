@@ -24,6 +24,7 @@ export const TreeSelect = forwardRef(
       limit = 0,
       singleSelect,
       enabled = node => true,
+      visible = node => true,
       placeholder = 'Search',
       titleKey = 'display_name',
     },
@@ -90,7 +91,7 @@ export const TreeSelect = forwardRef(
       const selection = singleSelect
         ? [node]
         : arrayWithElements(
-            getLeaves(node).filter(enabled),
+            getLeaves(node).filter(node => enabled(node, api)),
             isSelected,
             selectedNodes
           ).filter((_, i) => limit === 0 || i < limit);
@@ -98,7 +99,7 @@ export const TreeSelect = forwardRef(
       onChange(selection);
     };
 
-    const isDisabled = node => !getLeaves(node).some(enabled);
+    const isDisabled = node => !getLeaves(node).some(node => enabled(node, api));
 
     const isIndeterminate = node => {
       const selectedLeaves = getSelectedLeaves(node);
@@ -121,6 +122,18 @@ export const TreeSelect = forwardRef(
 
     const toggleExpanded = (node, recursive = false) =>
       setExpanded(node, !isExpanded(node), recursive);
+
+    const api = {
+      getIntermediateNodes,
+      getLeaves,
+      getSelectedLeaves,
+      setSelected,
+      isDisabled,
+      isIndeterminate,
+      isExpanded,
+      setExpanded,
+      toggleExpanded
+    };
 
     useEffect(_ => {
       let selection = value || [];
@@ -156,7 +169,7 @@ export const TreeSelect = forwardRef(
     };
 
     const Node = ({ keyPrefix, node, sublevel, isFlat }) => (
-      <div
+      !visible(node, api) ? null : <div
         style={{
           marginLeft: !isFlat ? `${sublevel ? 24 : 5}px` : '19px',
           overflow: 'hidden',
