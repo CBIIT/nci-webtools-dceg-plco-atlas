@@ -73,6 +73,7 @@ export function VariantLookupForm({
           onChange={ev => _setSelectedPhenotypes(ev)}
           ref={treeRef}
           enabled={item => item.import_date}
+          visible={(item, {getLeaves}) => item.import_date || getLeaves(item).filter(e => e.import_date).length}
         />
       </div>
       

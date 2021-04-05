@@ -175,6 +175,7 @@ export function SummaryResultsForm({
           onChange={setSelectedPhenotypesAndOptions}
           ref={treeRef}
           enabled={item => item.import_date}
+          visible={(item, {getLeaves}) => item.import_date || getLeaves(item).filter(e => e.import_date).length}
           limit={_isPairwise ? 2 : 1}
         />
       </div>

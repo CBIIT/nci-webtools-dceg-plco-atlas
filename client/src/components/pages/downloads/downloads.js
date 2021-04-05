@@ -86,6 +86,7 @@ export function Downloads() {
               onChange={handleChange}
               ref={treeRef}
               enabled={node => node.import_date}
+              visible={(item, {getLeaves}) => item.import_date || getLeaves(item).filter(e => e.import_date).length}
             />
             <small className="text-muted">
               <i>Up to 5 phenotypes may be selected for download. You have currently selected {selectedPhenotypes.length} phenotype(s).</i>

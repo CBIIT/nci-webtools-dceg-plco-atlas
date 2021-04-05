@@ -69,6 +69,7 @@ export function PhenotypeCorrelationsForm({
           onChange={ev => _setSelectedPhenotypes(ev)}
           ref={treeRef}
           enabled={item => item.import_date}
+          visible={(item, {getLeaves}) => item.import_date || getLeaves(item).filter(e => e.import_date).length}
           limit={120}
         />
         <small className="text-muted">Up to 120 phenotypes may be selected.</small>
