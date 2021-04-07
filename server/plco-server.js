@@ -13,8 +13,6 @@ const args = require('minimist')(process.argv.slice(2));
 const numCPUs = require('os').cpus().length;
 const isApi = args.api;
 
-console.log(isApi);
-
 const {
   getConnection,
   getSummary,
