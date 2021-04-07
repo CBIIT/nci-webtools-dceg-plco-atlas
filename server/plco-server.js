@@ -164,6 +164,49 @@ app.addHook("onSend", (req, res, payload, done) => {
   done();
 });
 
+// returns "true" if service is up
+app.get("/ping", async (req, res) => ping(connection)); 
+
+// retrieves all variant groups for all chroms. at the lowest granularity (in MBases)
+app.get("/summary", async ({ query }) => getSummary(connection, query)); 
+
+// retrieves all variants filtered by the specified params
+app.get("/variants", async ({ query }) => getVariants(connection, query)); 
+
+// exports /variants as a csv
+app.get("/export-variants", async ({ query }, response) => asAttachment({response, ...await exportVariants(connection, query)}));
+
+//retrieves a subset of variants
+app.get("/points", async ({ query }) => getPoints(connection, query)); 
+
+// retrieves metadata
+app.get("/metadata", async ({ query }) => getMetadata(connection, query)); 
+
+// retrieves genes
+app.get("/genes", async ({ query }, res) => getGenes(connection, query)); 
+
+// retrieves phenotypes
+app.get("/phenotypes", async ({ query }) => getPhenotypes(connection, query));
+
+// retrieves a single phenotype's participant data
+app.get("/phenotype", async ({ query }) => getPhenotype(connection, query)); 
+
+// retrieves correlations
+app.get("/correlations", async ({ query }) => getCorrelations(connection, query));
+
+// retrieves pca (using pc_x and pc_y)
+app.get("/pca",  async ({ query }) => getPrincipalComponentAnalysis(connection, query));
+
+// retrieves chromosome ranges
+app.get("/ranges", async _ => getRanges(connection));
+
+// sets and retrieves share link parameters
+app.get("/share-link", async ({ query }) => getShareLink(connection, query));
+app.post("/share-link", async ({ body }) => setShareLink(connection, body));
+
+// retrieves public configuration
+app.get("/config", async ({ query }) => getConfig(query.key));
+
 if (isApi) {
   // returns "true" if service is up
   app.get("/api/ping", async (req, res) => ping(connection));
@@ -194,50 +237,6 @@ if (isApi) {
   
   // retrieves pca (using pc_x and pc_y)
   app.get("/api/pca",  async ({ query }) => getPrincipalComponentAnalysis(connection, query));
-  
-} else {
-  // returns "true" if service is up
-  app.get("/ping", async (req, res) => ping(connection)); 
-
-  // retrieves all variant groups for all chroms. at the lowest granularity (in MBases)
-  app.get("/summary", async ({ query }) => getSummary(connection, query)); 
-
-  // retrieves all variants filtered by the specified params
-  app.get("/variants", async ({ query }) => getVariants(connection, query)); 
-
-  // exports /variants as a csv
-  app.get("/export-variants", async ({ query }, response) => asAttachment({response, ...await exportVariants(connection, query)}));
-
-  //retrieves a subset of variants
-  app.get("/points", async ({ query }) => getPoints(connection, query)); 
-
-  // retrieves metadata
-  app.get("/metadata", async ({ query }) => getMetadata(connection, query)); 
-
-  // retrieves genes
-  app.get("/genes", async ({ query }, res) => getGenes(connection, query)); 
-
-  // retrieves phenotypes
-  app.get("/phenotypes", async ({ query }) => getPhenotypes(connection, query));
-
-  // retrieves a single phenotype's participant data
-  app.get("/phenotype", async ({ query }) => getPhenotype(connection, query)); 
-
-  // retrieves correlations
-  app.get("/correlations", async ({ query }) => getCorrelations(connection, query));
-
-  // retrieves pca (using pc_x and pc_y)
-  app.get("/pca",  async ({ query }) => getPrincipalComponentAnalysis(connection, query));
-
-  // retrieves chromosome ranges
-  app.get("/ranges", async _ => getRanges(connection));
-
-  // sets and retrieves share link parameters
-  app.get("/share-link", async ({ query }) => getShareLink(connection, query));
-  app.post("/share-link", async ({ body }) => setShareLink(connection, body));
-
-  // retrieves public configuration
-  app.get("/config", async ({ query }) => getConfig(query.key));
 }
 
 app
