@@ -11,6 +11,9 @@ const logger = require("./logger");
 const config = require("./config.json");
 const args = require('minimist')(process.argv.slice(2));
 const numCPUs = require('os').cpus().length;
+const isApi = args.api;
+
+console.log(isApi);
 
 const {
   getConnection,
@@ -52,9 +55,12 @@ const connection = getConnection();
 app.register(compress);
 app.register(cors);
 app.register(serverTimeout, {serverTimeout: 1000 * 60 * 20}); // 20 min timeout
-app.register(static, {
-  root: path.resolve("www")
-});
+
+if (!isApi) {
+  app.register(static, {
+    root: path.resolve("www")
+  });
+}
 
 const redisClient = config.redis
   ? redis.createClient(config.redis)
@@ -160,54 +166,81 @@ app.addHook("onSend", (req, res, payload, done) => {
   done();
 });
 
-// returns "true" if service is up
-app.get("/ping", async (req, res) => ping(connection)); 
-app.get("/api/ping", async (req, res) => ping(connection));
+if (isApi) {
+  // returns "true" if service is up
+  app.get("/api/ping", async (req, res) => ping(connection));
+  
+  // retrieves all variant groups for all chroms. at the lowest granularity (in MBases)
+  app.get("/api/summary", async ({ query }) => getSummary(connection, query));
+  
+  // retrieves all variants filtered by the specified params
+  app.get("/api/variants", async ({ query }) => getVariants(connection, query));
+  
+  // exports /variants as a csv
+  app.get("/api/export-variants", async ({ query }, response) => asAttachment({response, ...await exportVariants(connection, query)}));
+  
+  //retrieves a subset of variants
+  app.get("/api/points", async ({ query }) => getPoints(connection, query));
+  
+  // retrieves metadata
+  app.get("/api/metadata", async ({ query }) => getMetadata(connection, query));
+  
+  // retrieves phenotypes
+  app.get("/api/phenotypes", async ({ query }) => getPhenotypes(connection, query));
+  
+  // retrieves a single phenotype's participant data
+  app.get("/api/phenotype", async ({ query }) => getPhenotype(connection, query));
+  
+  // retrieves correlations
+  app.get("/api/correlations", async ({ query }) => getCorrelations(connection, query));
+  
+  // retrieves pca (using pc_x and pc_y)
+  app.get("/api/pca",  async ({ query }) => getPrincipalComponentAnalysis(connection, query));
+  
+} else {
+  // returns "true" if service is up
+  app.get("/ping", async (req, res) => ping(connection)); 
 
-// retrieves all variant groups for all chroms. at the lowest granularity (in MBases)
-app.get("/summary", async ({ query }) => getSummary(connection, query)); 
-app.get("/api/summary", async ({ query }) => getSummary(connection, query));
+  // retrieves all variant groups for all chroms. at the lowest granularity (in MBases)
+  app.get("/summary", async ({ query }) => getSummary(connection, query)); 
 
-// retrieves all variants filtered by the specified params
-app.get("/variants", async ({ query }) => getVariants(connection, query)); 
-app.get("/api/variants", async ({ query }) => getVariants(connection, query));
+  // retrieves all variants filtered by the specified params
+  app.get("/variants", async ({ query }) => getVariants(connection, query)); 
 
-// exports /variants as a csv
-app.get("/export-variants", async ({ query }, response) => asAttachment({response, ...await exportVariants(connection, query)}));
-app.get("/api/export-variants", async ({ query }, response) => asAttachment({response, ...await exportVariants(connection, query)}));
+  // exports /variants as a csv
+  app.get("/export-variants", async ({ query }, response) => asAttachment({response, ...await exportVariants(connection, query)}));
 
-//retrieves a subset of variants
-app.get("/points", async ({ query }) => getPoints(connection, query)); 
-app.get("/api/points", async ({ query }) => getPoints(connection, query));
+  //retrieves a subset of variants
+  app.get("/points", async ({ query }) => getPoints(connection, query)); 
 
-// retrieves metadata
-app.get("/metadata", async ({ query }) => getMetadata(connection, query)); 
-app.get("/api/metadata", async ({ query }) => getMetadata(connection, query));
+  // retrieves metadata
+  app.get("/metadata", async ({ query }) => getMetadata(connection, query)); 
 
-// retrieves genes
-app.get("/genes", async ({ query }, res) => getGenes(connection, query)); 
+  // retrieves genes
+  app.get("/genes", async ({ query }, res) => getGenes(connection, query)); 
 
-// retrieves phenotypes
-app.get("/phenotypes", async ({ query }) => getPhenotypes(connection, query));
-app.get("/api/phenotypes", async ({ query }) => getPhenotypes(connection, query));
+  // retrieves phenotypes
+  app.get("/phenotypes", async ({ query }) => getPhenotypes(connection, query));
 
-// retrieves a single phenotype's participant data
-app.get("/phenotype", async ({ query }) => getPhenotype(connection, query)); 
-app.get("/api/phenotype", async ({ query }) => getPhenotype(connection, query));
+  // retrieves a single phenotype's participant data
+  app.get("/phenotype", async ({ query }) => getPhenotype(connection, query)); 
 
-// retrieves correlations
-app.get("/correlations", async ({ query }) => getCorrelations(connection, query));
-app.get("/api/correlations", async ({ query }) => getCorrelations(connection, query));
+  // retrieves correlations
+  app.get("/correlations", async ({ query }) => getCorrelations(connection, query));
 
-// retrieves pca (using pc_x and pc_y)
-app.get("/pca",  async ({ query }) => getPrincipalComponentAnalysis(connection, query));
-app.get("/api/pca",  async ({ query }) => getPrincipalComponentAnalysis(connection, query));
+  // retrieves pca (using pc_x and pc_y)
+  app.get("/pca",  async ({ query }) => getPrincipalComponentAnalysis(connection, query));
 
-app.get("/ranges", async _ => getRanges(connection)); // retrieves chromosome ranges
-app.get("/share-link", async ({ query }) => getShareLink(connection, query));
-app.post("/share-link", async ({ body }) => setShareLink(connection, body));
-app.get("/config", async ({ query }) => getConfig(query.key)); // retrieves configuration
+  // retrieves chromosome ranges
+  app.get("/ranges", async _ => getRanges(connection));
 
+  // sets and retrieves share link parameters
+  app.get("/share-link", async ({ query }) => getShareLink(connection, query));
+  app.post("/share-link", async ({ body }) => setShareLink(connection, body));
+
+  // retrieves public configuration
+  app.get("/config", async ({ query }) => getConfig(query.key));
+}
 
 app
   .listen(config.port, "0.0.0.0")
