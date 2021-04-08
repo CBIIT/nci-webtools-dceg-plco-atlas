@@ -414,7 +414,7 @@ export function PhenotypesTabs(props) {
             </Tab>
           ))}
 
-        <Tab
+        {false && <Tab
           eventKey="related-phenotypes"
           title="Related Phenotypes"
           className="p-4 bg-white tab-pane-bordered rounded-0"
@@ -435,7 +435,7 @@ export function PhenotypesTabs(props) {
                 }}
               />
             )}
-        </Tab>
+        </Tab>}
       </Tabs>
     </div>
   );

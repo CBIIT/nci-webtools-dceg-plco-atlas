@@ -16,10 +16,10 @@ export function Gwas() {
       pathId: 'lookup',
       name: 'Variant Lookup'
     },
-    {
-      pathId: 'correlations',
-      name: 'Phenotype Correlations'
-    }
+    // {
+    //   pathId: 'correlations',
+    //   name: 'Phenotype Correlations'
+    // }
   ];
 
   return (
