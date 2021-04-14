@@ -488,7 +488,7 @@ export function drawQQPlot({ phenotypes, stratifications, isPairwise }) {
               mode: 'lines',
               type: 'scattergl',
               line: {
-                color: 'gray',
+                color: '#A6A6A6',
                 width: 1
               },
               opacity: 0.5,
@@ -747,7 +747,7 @@ export function drawPCAPlot({
         };
           
         const markerColor = {
-          others: 'grey',
+          others: '#A6A6A6',
           controls1: stratifications.length === 2 ? '#a2173a' : '#A76909',
           controls2: '#002a47',
           cases1: stratifications.length === 2 ? '#f41c52' : '#F2990D',
