@@ -46,6 +46,7 @@ export function PhenotypesForm({ onSubmit, onChange, onReset }) {
           }}
           singleSelect
           enabled={item => item.participant_count}
+          visible={(item, {getLeaves}) => item.import_date || getLeaves(item).filter(e => e.import_date).length}
           ref={treeRef}
         />
       </div>
