@@ -165,8 +165,8 @@ export function Home({ links }) {
         <div className="container my-3 text-dark">
           Credits: TBD
           <br />
-          Citation: TBD
-          <br />
+          {/* Citation: TBD
+          <br /> */}
           GWAS Explorer's <a href="https://github.com/CBIIT/nci-webtools-dceg-plco-atlas" target="_blank" alt="Link to open GitHub">source code</a> is available under the <a href="./assets/license.txt" target="_blank" alt="Link to MIT license">MIT license</a>, an <a href="https://opensource.org" target="_blank" alt="Link to open source initiative">Open Source Initiative</a> approved license.
         </div>
       </div>
