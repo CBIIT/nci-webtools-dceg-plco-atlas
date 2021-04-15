@@ -188,7 +188,7 @@ async function getSummary(connection, {phenotype_id, table, sex, ancestry, p_val
     logger.debug(`getSummary sql: ${sql}`);
 
     const [data, columns] = await connection.query({
-        rowsAsArray: raw,
+        rowsAsArray: raw === 'true',
         values: {p_value_nlog_min, sex, ancestry},
         sql,
     });
@@ -357,7 +357,7 @@ async function getVariants(connection, params) {
 
     // query database
     const [data, metaColumns] = await connection.execute({
-        sql, rowsAsArray: params.raw,
+        sql, rowsAsArray: params.raw === 'true',
     }, params);
 
     const results = {data, columns: metaColumns.map(c => c.name)};
@@ -445,7 +445,7 @@ async function getPoints(connection, { phenotype_id, sex, ancestry, raw }) {
                 AND sex = :sex 
                 AND ancestry = :ancestry
             ORDER BY p_value_nlog DESC`, 
-        rowsAsArray: raw,
+        rowsAsArray: raw === 'true',
     }, { phenotype_id, sex, ancestry, raw });
     
     return {data, columns: columns.map(c => c.name)};
@@ -1101,10 +1101,7 @@ async function getPrincipalComponentAnalysis(connection, {phenotype_id, platform
 
     if (pc_x == pc_y)
         throw new Error('Principal components must be different');
-    
-    // query parameters as passed in as strings
-    raw = raw === 'true';
-
+        
     const rowLimit = limit ? `LIMIT ${limit}` : ``;
 
     const sql = `
@@ -1133,7 +1130,7 @@ async function getPrincipalComponentAnalysis(connection, {phenotype_id, platform
     logger.debug(`getPrincipalComponentAnalysis sql: ${sql}`);
 
     const [data, columns] = await connection.query({
-        rowsAsArray: raw,
+        rowsAsArray: raw === 'true',
         values: {phenotype_id, platform, pc_x, pc_y},
         sql,
     });
