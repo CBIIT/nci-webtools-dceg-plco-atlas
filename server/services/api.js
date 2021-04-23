@@ -1,6 +1,8 @@
 const config = require("../config.json");
 const { asAttachment } = require("./response");
 const { logResponse, useBrowserOnly } = require("./hooks");
+const cors = require("fastify-cors");
+const caching = require("fastify-caching");
 const {
   getSummary,
   getVariants,
@@ -19,117 +21,153 @@ const {
   ping,
 } = require("./query");
 
-async function webApiRoutes(app, options) {
+async function webApiRoutes(fastify, options) {
   const context = {
-    connection: app.mysql[config.database.name],
-    logger: app.log,
+    connection: fastify.mysql[config.database.name],
+    logger: fastify.log,
   };
 
+  // set cache headers
+  fastify.register(
+    caching,
+    {
+      privacy: caching.privacy.PUBLIC,
+      expiresIn: 60 * 60,
+    },
+    err => {
+      if (err) throw err;
+    }
+  );
+
   // log response status code, time, path, and query params
-  app.addHook("onResponse", logResponse);
+  fastify.addHook("onResponse", logResponse);
 
   // suggest public api for non-browser users
-  app.addHook("onRequest", useBrowserOnly({
-    message: 'Please use the PLCO Atlas Public API to perform queries outside the browser.'
-  }));
+  fastify.addHook(
+    "onRequest",
+    useBrowserOnly({
+      message:
+        "Please use the PLCO Atlas Public API to perform queries outside the browser.",
+    })
+  );
 
   // returns "true" if service is up
-  app.get("/ping", async () => ping(context));
+  fastify.get("/ping", async () => ping(context));
 
   // retrieves all variant groups for all chroms. at the lowest granularity (in MBases)
-  app.get("/summary", async ({ query }) => getSummary(context, query));
+  fastify.get("/summary", async ({ query }) => getSummary(context, query));
 
   // retrieves all variants filtered by the specified params
-  app.get("/variants", async ({ query }) => getVariants(context, query));
+  fastify.get("/variants", async ({ query }) => getVariants(context, query));
 
   // exports /variants as a csv
-  app.get("/export-variants", async ({ query }, response) =>
+  fastify.get("/export-variants", async ({ query }, response) =>
     asAttachment({ response, ...(await exportVariants(context, query)) })
   );
 
   //retrieves a subset of variants
-  app.get("/points", async ({ query }) => getPoints(context, query));
+  fastify.get("/points", async ({ query }) => getPoints(context, query));
 
   // retrieves metadata
-  app.get("/metadata", async ({ query }) => getMetadata(context, query));
+  fastify.get("/metadata", async ({ query }) => getMetadata(context, query));
 
   // retrieves genes
-  app.get("/genes", async ({ query }, res) => getGenes(context, query));
+  fastify.get("/genes", async ({ query }, res) => getGenes(context, query));
 
   // retrieves phenotypes
-  app.get("/phenotypes", async ({ query }) => getPhenotypes(context, query));
-
-  // retrieves a single phenotype's participant data
-  app.get("/phenotype", async ({ query }) => getPhenotype(context, query));
-
-  // retrieves correlations
-  app.get("/correlations", async ({ query }) =>
-    getCorrelations(context, query)
-  );
-
-  // retrieves pca (using pc_x and pc_y)
-  app.get("/pca", async ({ query }) =>
-    getPrincipalComponentAnalysis(context, query)
-  );
-
-  // retrieves chromosome ranges
-  app.get("/ranges", async _ => getRanges(context));
-
-  // sets and retrieves share link parameters
-  app.get("/share-link", async ({ query }) => getShareLink(context, query));
-  app.post("/share-link", async ({ body }) => setShareLink(context, body));
-
-  // retrieves public configuration
-  app.get("/config", async ({ query }) => getConfig(query.key));
-}
-
-async function publicApiRoutes(app, options) {
-  const context = {
-    connection: app.mysql[config.database.name],
-    logger: app.log,
-  };
-
-  // add cors headers to public api routes
-  app.use(require('fastify-cors'));
-
-  // log response status code, time, path, and query params
-  app.addHook("onResponse", logResponse);
-
-  // returns "true" if service is up
-  app.get("/api/ping", async (req, res) => ping(context));
-
-  // retrieves all variant groups for all chroms. at the lowest granularity (in MBases)
-  app.get("/api/summary", async ({ query }) => getSummary(context, query));
-
-  // retrieves all variants filtered by the specified params
-  app.get("/api/variants", async ({ query }) => getVariants(context, query));
-
-  // exports /variants as a csv
-  app.get("/api/export-variants", async ({ query }, response) =>
-    asAttachment({ response, ...(await exportVariants(context, query)) })
-  );
-
-  //retrieves a subset of variants
-  app.get("/api/points", async ({ query }) => getPoints(context, query));
-
-  // retrieves metadata
-  app.get("/api/metadata", async ({ query }) => getMetadata(context, query));
-
-  // retrieves phenotypes
-  app.get("/api/phenotypes", async ({ query }) =>
+  fastify.get("/phenotypes", async ({ query }) =>
     getPhenotypes(context, query)
   );
 
   // retrieves a single phenotype's participant data
-  app.get("/api/phenotype", async ({ query }) => getPhenotype(context, query));
+  fastify.get("/phenotype", async ({ query }) => getPhenotype(context, query));
 
   // retrieves correlations
-  app.get("/api/correlations", async ({ query }) =>
+  fastify.get("/correlations", async ({ query }) =>
     getCorrelations(context, query)
   );
 
   // retrieves pca (using pc_x and pc_y)
-  app.get("/api/pca", async ({ query }) =>
+  fastify.get("/pca", async ({ query }) =>
+    getPrincipalComponentAnalysis(context, query)
+  );
+
+  // retrieves chromosome ranges
+  fastify.get("/ranges", async _ => getRanges(context));
+
+  // sets and retrieves share link parameters
+  fastify.get("/share-link", async ({ query }) => getShareLink(context, query));
+  fastify.post("/share-link", async ({ body }) => setShareLink(context, body));
+
+  // retrieves public configuration
+  fastify.get("/config", async ({ query }) => getConfig(query.key));
+}
+
+async function publicApiRoutes(fastify, options) {
+  const context = {
+    connection: fastify.mysql[config.database.name],
+    logger: fastify.log,
+  };
+
+  // add cors headers to public api routes
+  fastify.register(cors);
+
+  // set cache headers
+  fastify.register(
+    caching,
+    {
+      privacy: caching.privacy.PUBLIC,
+      expiresIn: 60 * 60,
+    },
+    err => {
+      if (err) throw err;
+    }
+  );
+
+  // log response status code, time, path, and query params
+  fastify.addHook("onResponse", logResponse);
+
+  // returns "true" if service is up
+  fastify.get("/api/ping", async (req, res) => ping(context));
+
+  // retrieves all variant groups for all chroms. at the lowest granularity (in MBases)
+  fastify.get("/api/summary", async ({ query }) => getSummary(context, query));
+
+  // retrieves all variants filtered by the specified params
+  fastify.get("/api/variants", async ({ query }) =>
+    getVariants(context, query)
+  );
+
+  // exports /variants as a csv
+  fastify.get("/api/export-variants", async ({ query }, response) =>
+    asAttachment({ response, ...(await exportVariants(context, query)) })
+  );
+
+  //retrieves a subset of variants
+  fastify.get("/api/points", async ({ query }) => getPoints(context, query));
+
+  // retrieves metadata
+  fastify.get("/api/metadata", async ({ query }) =>
+    getMetadata(context, query)
+  );
+
+  // retrieves phenotypes
+  fastify.get("/api/phenotypes", async ({ query }) =>
+    getPhenotypes(context, query)
+  );
+
+  // retrieves a single phenotype's participant data
+  fastify.get("/api/phenotype", async ({ query }) =>
+    getPhenotype(context, query)
+  );
+
+  // retrieves correlations
+  fastify.get("/api/correlations", async ({ query }) =>
+    getCorrelations(context, query)
+  );
+
+  // retrieves pca (using pc_x and pc_y)
+  fastify.get("/api/pca", async ({ query }) =>
     getPrincipalComponentAnalysis(context, query)
   );
 }
