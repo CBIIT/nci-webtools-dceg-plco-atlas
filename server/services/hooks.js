@@ -1,5 +1,5 @@
 // log response status code, time, path, and query params
-function logResponse(req, reply, done) {
+function useResponseLogger(req, reply, done) {
   req.log.info(
     [
       `[${reply.statusCode}]`,
@@ -21,7 +21,21 @@ function useBrowserOnly(options) {
     }
 }
 
+function useSetRedisKey(options) {
+    return function(req, reply, done) {
+
+    }
+}
+
+function useGetRedisKey(options) {
+    return function(req, reply, done) {
+
+    }
+}
+
 module.exports = {
+    useResponseLogger,
     useBrowserOnly,
-    logResponse,
+    useSetRedisKey,
+    useGetRedisKey,
 };

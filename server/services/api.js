@@ -1,8 +1,13 @@
-const config = require("../config.json");
-const { asAttachment } = require("./response");
-const { logResponse, useBrowserOnly } = require("./hooks");
 const cors = require("fastify-cors");
 const caching = require("fastify-caching");
+const config = require("../config.json");
+const { asAttachment } = require("./response");
+const {
+  useResponseLogger,
+  useBrowserOnly,
+  useGetRedisKey,
+  useSetRedisKey,
+} = require("./hooks");
 const {
   getSummary,
   getVariants,
@@ -28,19 +33,13 @@ async function webApiRoutes(fastify, options) {
   };
 
   // set cache headers
-  fastify.register(
-    caching,
-    {
-      privacy: caching.privacy.PUBLIC,
-      expiresIn: 60 * 60,
-    },
-    err => {
-      if (err) throw err;
-    }
-  );
+  fastify.register(caching, {
+    privacy: caching.privacy.PUBLIC,
+    expiresIn: 60 * 60,
+  });
 
   // log response status code, time, path, and query params
-  fastify.addHook("onResponse", logResponse);
+  fastify.addHook("onResponse", useResponseLogger);
 
   // suggest public api for non-browser users
   fastify.addHook(
@@ -48,6 +47,23 @@ async function webApiRoutes(fastify, options) {
     useBrowserOnly({
       message:
         "Please use the PLCO Atlas Public API to perform queries outside the browser.",
+    })
+  );
+
+  // retrieve variants from redis if they exist
+  fastify.addHook(
+    "onRequest",
+    useGetRedisKey({
+      match: req => /variants|summary/.test(req.raw.url),
+    })
+  );
+
+  // save variants to redis if the response size is large
+  fastify.addHook(
+    "preSerialization",
+    useSetRedisKey({
+      match: (req, res, payload) =>
+        /variants|summary/.test(req.raw.url) && payload.data.length > 1e4,
     })
   );
 
@@ -113,19 +129,30 @@ async function publicApiRoutes(fastify, options) {
   fastify.register(cors);
 
   // set cache headers
-  fastify.register(
-    caching,
-    {
-      privacy: caching.privacy.PUBLIC,
-      expiresIn: 60 * 60,
-    },
-    err => {
-      if (err) throw err;
-    }
-  );
+  fastify.register(caching, {
+    privacy: caching.privacy.PUBLIC,
+    expiresIn: 60 * 60,
+  });
 
   // log response status code, time, path, and query params
-  fastify.addHook("onResponse", logResponse);
+  fastify.addHook("onResponse", useResponseLogger);
+
+  // retrieve variants from redis if they exist
+  fastify.addHook(
+    "onRequest",
+    useGetRedisKey({
+      match: req => /variants|summary/.test(req.raw.url),
+    })
+  );
+
+  // save variants to redis if the response size is large
+  fastify.addHook(
+    "preSerialization",
+    useSetRedisKey({
+      match: (req, res, payload) =>
+        /variants|summary/.test(req.raw.url) && payload.data.length > 1e4,
+    })
+  );
 
   // returns "true" if service is up
   fastify.get("/api/ping", async (req, res) => ping(context));
