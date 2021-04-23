@@ -7,7 +7,7 @@ const config = require("./config.json");
 const isProduction = process.env.NODE_ENV === "production";
 
 // fork and return if in master process
-// if (isProduction && forkCluster()) return;
+if (isProduction && forkCluster()) return;
 
 // create fastify app
 const app = fastify({
