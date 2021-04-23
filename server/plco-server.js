@@ -43,6 +43,11 @@ app.register(require("fastify-mysql"), {
   multipleStatements: true,
 });
 
+// register redis cache if available
+if (config.redis) {
+  app.register(require("fastify-redis"), config.redis);
+}
+
 // serve website api
 app.register(api.webApiRoutes);
 
