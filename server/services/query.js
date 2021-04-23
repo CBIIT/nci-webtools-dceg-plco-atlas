@@ -1,21 +1,5 @@
-const mysql = require('mysql2');
-const config = require('./config.json');
-const logger = require('./logger');
-const {database, exportRowLimit} = config;
-
-function getConnection() {
-    return mysql.createPool({
-        host: database.host,
-        database: database.name,
-        user: database.user,
-        password: database.password,
-        port: database.port,
-        waitForConnections: true,
-        connectionLimit: 10,
-        namedPlaceholders: true,
-        multipleStatements: true,
-    }).promise();
-}
+const config = require('../config.json');
+const { exportRowLimit } = config;
 
 /**
  * Returns a function which can be used to get the elapseed
@@ -106,7 +90,7 @@ function getValidColumns(tableName, columns) {
         : validColumns;
 }
 
-async function ping(connection) {
+async function ping({connection, logger}) {
     let sql = `SELECT "true" as status`;
     logger.debug(`ping sql: ${sql}`);
     const [result] = await connection.query(sql);
@@ -160,7 +144,7 @@ async function hasRecord(connection, tableName, conditions, conditionJoiner) {
    }} params - Database query criteria
  * @returns Records in the aggregate summary table which match query criteria
  */
-async function getSummary(connection, {phenotype_id, table, sex, ancestry, p_value_nlog_min, raw}) {
+async function getSummary({connection, logger}, {phenotype_id, table, sex, ancestry, p_value_nlog_min, raw}) {
     // validate parameters
     if (!phenotype_id || !await hasRecord(connection, 'phenotype', {id: phenotype_id}))
         throw new Error('A valid phenotype id must be provided');
@@ -225,7 +209,7 @@ async function getSummary(connection, {phenotype_id, table, sex, ancestry, p_val
  */
 
 
-async function getVariants(connection, params) {
+async function getVariants({connection, logger}, params) {
     const { sex, ancestry, chromosome } = params;
     // const connection = await connectionPool.getConnection();
     const phenotypeIds = (params.phenotype_id || '').split(',');
@@ -383,7 +367,7 @@ async function getVariants(connection, params) {
     return results;
 }
 
-async function exportVariants(connection, params) {
+async function exportVariants({connection, logger}, params) {
     let rowLimit = exportRowLimit || 1e5;
     params.limit = params.limit || rowLimit;
 
@@ -401,7 +385,7 @@ async function exportVariants(connection, params) {
     if (!phenotypes.length)
         throw new Error('Valid phenotype ids must be provided');
 
-    const { data, columns } = await getVariants(connection, {
+    const { data, columns } = await getVariants({connection, logger}, {
         ...params, 
         columns: ['phenotype_id', 'ancestry', 'sex', 'chromosome', 'position', 'snp', 'allele_effect', 'allele_non_effect', 'allele_effect_frequency', 'p_value', 'p_value_heterogenous', 'beta', 'odds_ratio', 'beta_ci_95_high', 'beta_ci_95_low', 'odds_ratio_ci_95_high', 'odds_ratio_ci_95_low', 'n'],
         raw: true,
@@ -424,7 +408,7 @@ async function exportVariants(connection, params) {
     }
 }
 
-async function getPoints(connection, { phenotype_id, sex, ancestry, raw }) {
+async function getPoints({connection, logger}, { phenotype_id, sex, ancestry, raw }) {
     // validate phenotype id
     if (!phenotype_id || !await hasRecord(connection, 'phenotype', {id: phenotype_id}))
         throw new Error('A valid phenotype id must be provided');
@@ -458,7 +442,7 @@ async function getPoints(connection, { phenotype_id, sex, ancestry, raw }) {
  * @returns {any} A specified key and value, or the entire list of
  * metadata properties if the key is not specified
  */
-async function getMetadata(connection, params) {
+async function getMetadata({connection, logger}, params) {
     // parse parameters as arrays
     const phenotype_id = params.phenotype_id ? params.phenotype_id.split(',') : [];
     const sex = params.sex ? params.sex.split(',') : [];
@@ -512,7 +496,7 @@ async function getMetadata(connection, params) {
    }} params - Criteria to filter genes
  * @returns {any[]} Genes matching the search criteria
  */
-async function getGenes(connection, params) {
+async function getGenes({connection, logger}, params) {
     if (!params.transcription_start || !params.transcription_end || !params.chromosome) {
         throw new Error('Chromosome, transcription_start, and transcription_end are required');
     }
@@ -541,7 +525,7 @@ async function getGenes(connection, params) {
  * @param {string} key - The key to retrieve
  * @returns {any} The specified key and its value
  */
-async function getCorrelations(connection, {a, b}) {
+async function getCorrelations({connection, logger}, {a, b}) {
     if (!a || !b) {
         throw new Error('Phenotype ids a and b must be provided');
     }
@@ -573,7 +557,7 @@ async function getCorrelations(connection, {a, b}) {
     return results;
 }
 
-async function getPhenotypes(connection, params = {}) {
+async function getPhenotypes({connection, logger}, params = {}) {
     let columns = getValidColumns('phenotype', params.columns).map(quote).join(',')
     if (params.q) {
         columns = ['id', 'name', 'display_name', 'description'];
@@ -1007,7 +991,7 @@ async function getPhenotype(connectionPool, params) {
 }
 
 
-async function getRanges(connection) {
+async function getRanges({connection, logger}) {
     let sql = `SELECT * FROM chromosome_range`;
 
     logger.debug(`getRanges sql: ${sql}`);
@@ -1032,7 +1016,7 @@ function getConfig(key) {
         : null;
 }
 
-async function getShareLink(connection, {share_id}) {
+async function getShareLink({connection, logger}, {share_id}) {
     if (!share_id) 
         throw new Error('A valid share_id must be provided');
 
@@ -1052,7 +1036,7 @@ async function getShareLink(connection, {share_id}) {
     return shareLinkRows.length ? shareLinkRows[0] : null;;
 }
 
-async function setShareLink(connection, {route, parameters}) {
+async function setShareLink({connection, logger}, {route, parameters}) {
     if (!route || !parameters)
         throw new Error('A valid route and parameters object must be provided')
 
@@ -1084,7 +1068,7 @@ async function setShareLink(connection, {route, parameters}) {
     return pluck(shareLinkRows);
 }
 
-async function getPrincipalComponentAnalysis(connection, {phenotype_id, platform, pc_x, pc_y, raw, limit}) {
+async function getPrincipalComponentAnalysis({connection, logger}, {phenotype_id, platform, pc_x, pc_y, raw, limit}) {
 
 
     // validate phenotype id
@@ -1139,7 +1123,6 @@ async function getPrincipalComponentAnalysis(connection, {phenotype_id, platform
 }
 
 module.exports = {
-    getConnection,
     getSummary,
     getVariants,
     getPoints,
