@@ -25,14 +25,15 @@
   "dependencies": {
     "csv-parse": "^4.15.4",
     "fastify": "^3.14.2",
+    "fastify-caching": "^6.1.0",
     "fastify-compress": "^3.4.2",
     "fastify-cors": "^5.2.0",
     "fastify-mysql": "^2.1.0",
+    "fastify-redis": "^4.3.0",
     "fastify-server-timeout": "^0.1.1",
     "fastify-static": "^4.0.1",
     "lib-r-math.js": "^1.0.89",
     "minimist": "^1.2.5",
-    "redis": "^3.1.1",
     "ua-parser-js": "^0.7.28",
     "winston": "^3.3.3",
     "winston-daily-rotate-file": "^4.5.2"
