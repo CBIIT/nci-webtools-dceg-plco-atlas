@@ -24,24 +24,39 @@ function useBrowserOnly(options) {
 }
 
 // intended to be called from preSerialization
-function useSetRedisKey({match}) {
+function useSetRedisKey({match, redis}) {
     return function(request, reply, payload, done) {
-        if (match(request, reply, payload, done)) {
-            request.log.info(`setRedisKey match`, request.url, payload);
+        console.log(payload);
 
+        if (match(request, reply, payload)) {
+            request.log.info(`setRedisKey match: ${request.url}`);
+            redis.set(request.url, JSON.stringify(payload), error => {
+                // asynchronously set value
+                if (error) {
+                    request.log.error(`Could not cache: ${request.url}`);
+                    request.log.error(error);
+                }
+            }); 
         }
         done();
     }
 }
 
 // intended to be called from onResponse
-function useGetRedisKey({match}) {
+function useGetRedisKey({match, redis}) {
     return function(request, reply, done) {
-        if (match(request, reply, done)) {
-            request.log.info(`getRedisKey match`, request.url);
 
+        if (match(request, reply)) {
+            request.log.debug(`Got value from cache: ${request.url}`);
+            redis.get(request.url, (error, value) => {
+                if (!error && value)
+                    reply.send(value);
+                done();
+            });
+
+        } else {
+            done();
         }
-        done();
     }
 }
 
