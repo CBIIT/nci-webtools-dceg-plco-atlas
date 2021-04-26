@@ -1,4 +1,5 @@
 const path = require("path");
+const util = require("util");
 const { createLogger, format, transports, info } = require("winston");
 const { logpath, loglevel } = require("../config.json");
 require("winston-daily-rotate-file");
@@ -20,7 +21,7 @@ function getLogger(name) {
       format.printf(
         ({ label, timestamp, level, message }) => {
           return `[${label} - ${process.pid}] [${timestamp}] [${level}] ${
-            message.err ? message.err.stack : message
+            util.format(message.err || message)
           }`
         }
       )
