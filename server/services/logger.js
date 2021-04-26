@@ -21,7 +21,7 @@ function getLogger(name) {
       format.printf(
         ({ label, timestamp, level, message }) => {
           return `[${label} - ${process.pid}] [${timestamp}] [${level}] ${
-            util.format(message.err || message)
+            util.format(message && message.err || message)
           }`
         }
       )
