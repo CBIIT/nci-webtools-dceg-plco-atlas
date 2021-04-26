@@ -30,6 +30,7 @@ async function webApiRoutes(fastify, options) {
   const context = {
     connection: fastify.mysql[config.database.name],
     logger: fastify.log,
+    redis: fastify.redis,
   };
 
   // set cache headers
@@ -54,7 +55,8 @@ async function webApiRoutes(fastify, options) {
   fastify.addHook(
     "onRequest",
     useGetRedisKey({
-      match: req => /variants|summary/.test(req.raw.url),
+      redis: context.redis,
+      match: req => /variants|summary/.test(req.url),
     })
   );
 
@@ -62,8 +64,9 @@ async function webApiRoutes(fastify, options) {
   fastify.addHook(
     "preSerialization",
     useSetRedisKey({
+      redis: context.redis,
       match: (req, res, payload) =>
-        /variants|summary/.test(req.raw.url) && payload.data.length > 1e4,
+        /variants|summary/.test(req.url) && payload && payload.data.length > 1e3,
     })
   );
 
@@ -137,11 +140,13 @@ async function publicApiRoutes(fastify, options) {
   // log response status code, time, path, and query params
   fastify.addHook("onResponse", useResponseLogger);
 
+
   // retrieve variants from redis if they exist
   fastify.addHook(
     "onRequest",
     useGetRedisKey({
-      match: req => /variants|summary/.test(req.raw.url),
+      redis: context.redis,
+      match: req => /variants|summary/.test(req.url),
     })
   );
 
@@ -149,11 +154,12 @@ async function publicApiRoutes(fastify, options) {
   fastify.addHook(
     "preSerialization",
     useSetRedisKey({
+      redis: context.redis,
       match: (req, res, payload) =>
-        /variants|summary/.test(req.raw.url) && payload.data.length > 1e4,
+        /variants|summary/.test(req.url) && payload && payload.data.length > 1e3,
     })
   );
-
+  
   // returns "true" if service is up
   fastify.get("/api/ping", async (req, res) => ping(context));
 
