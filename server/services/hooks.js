@@ -1,3 +1,5 @@
+const { UAParser } = require('ua-parser-js');
+
 // log response status code, time, path, and query params
 function useResponseLogger(req, reply, done) {
   req.log.info(
@@ -16,20 +18,25 @@ function useBrowserOnly(options) {
         const browser = new UAParser(req.headers['user-agent']).getBrowser();
         if (!browser.name) {
             res.send(options.message);
-            done();
         }
+        done();
     }
 }
 
-function useSetRedisKey(options) {
-    return function(req, reply, done) {
+// intended to be called from preSerialization
+function useSetRedisKey({match}) {
+    return function(req, reply, payload, done) {
+        if (match(req, reply, payload, done)) {
 
+        }
+        done();
     }
 }
 
-function useGetRedisKey(options) {
+// intended to be called from onResponse
+function useGetRedisKey({match}) {
     return function(req, reply, done) {
-
+        done();
     }
 }
 
