@@ -10,4 +10,5 @@ TRUNCATE lookup_ancestry;
 insert into lookup_ancestry (`value`) values 
     ('all'),
     ('east_asian'),
-    ('european');
+    ('european'),
+    ('african_american');
