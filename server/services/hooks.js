@@ -1,23 +1,23 @@
 const { UAParser } = require('ua-parser-js');
 
 // log response status code, time, path, and query params
-function useResponseLogger(req, reply, done) {
-  req.log.info(
+function useResponseLogger(request, reply, done) {
+  request.log.info(
     [
       `[${reply.statusCode}]`,
       `[${Math.round(reply.getResponseTime())} ms]`,
-      req.routerPath,
-      JSON.stringify(req.query),
+      request.routerPath,
+      JSON.stringify(request.query),
     ].join(" ")
   );
   done();
 }
 
 function useBrowserOnly(options) {
-    return function(req, reply, done) {
-        const browser = new UAParser(req.headers['user-agent']).getBrowser();
+    return function(request, reply, done) {
+        const browser = new UAParser(request.headers['user-agent']).getBrowser();
         if (!browser.name) {
-            res.send(options.message);
+            reply.send(options.message);
         }
         done();
     }
@@ -25,8 +25,9 @@ function useBrowserOnly(options) {
 
 // intended to be called from preSerialization
 function useSetRedisKey({match}) {
-    return function(req, reply, payload, done) {
-        if (match(req, reply, payload, done)) {
+    return function(request, reply, payload, done) {
+        if (match(request, reply, payload, done)) {
+            request.log.info(`setRedisKey match`, request.url, payload);
 
         }
         done();
@@ -35,7 +36,11 @@ function useSetRedisKey({match}) {
 
 // intended to be called from onResponse
 function useGetRedisKey({match}) {
-    return function(req, reply, done) {
+    return function(request, reply, done) {
+        if (match(request, reply, done)) {
+            request.log.info(`getRedisKey match`, request.url);
+
+        }
         done();
     }
 }
