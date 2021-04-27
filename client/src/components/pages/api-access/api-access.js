@@ -82,12 +82,13 @@ export function ApiAccess() {
                         {
                             name: 'ancestry',
                             in: 'query',
-                            description: 'Either "east_asian" or "european" (other ancestries TBD). Specifies the ancestries for the summarized variants to retrieve.',
+                            description: 'Either "african_american", "east_asian" or "european" (other ancestries TBD). Specifies the ancestries for the summarized variants to retrieve.',
                             required: true,
                             type: 'string',
                             enum: [
+                                'african_american',
                                 'east_asian',
-                                'european'
+                                'european',
                             ]
                         },
                         {
@@ -164,12 +165,13 @@ export function ApiAccess() {
                         {
                             name: 'ancestry',
                             in: 'query',
-                            description: 'Either "east_asian" or "european" (other ancestries TBD). Specifies the ancestries for the variants to retrieve.',
+                            description: 'Either "african_american", "east_asian" or "european" (other ancestries TBD). Specifies the ancestries for the variants to retrieve.',
                             required: true,
                             type: 'string',
                             enum: [
+                                'african_american',
                                 'east_asian',
-                                'european'
+                                'european',
                             ]
                         },
                         {
@@ -345,12 +347,13 @@ export function ApiAccess() {
                         {
                             name: 'ancestry',
                             in: 'query',
-                            description: 'Either "east_asian" or "european" (other ancestries TBD). Specifies the ancestries for the variants to retrieve.',
+                            description: 'Either "african_american", "east_asian" or "european" (other ancestries TBD). Specifies the ancestries for the variants to retrieve.',
                             required: true,
                             type: 'string',
                             enum: [
+                                'african_american',
                                 'east_asian',
-                                'european'
+                                'european',
                             ]
                         },
                         {
@@ -503,12 +506,13 @@ export function ApiAccess() {
                         {
                             name: 'ancestry',
                             in: 'query',
-                            description: 'Either "east_asian" or "european" (other ancestries TBD). Specifies the ancestries for the variants to retrieve.',
+                            description: 'Either "african_american", "east_asian" or "european" (other ancestries TBD). Specifies the ancestries for the variants to retrieve.',
                             required: true,
                             type: 'string',
                             enum: [
+                                'african_american',
                                 'east_asian',
-                                'european'
+                                'european',
                             ]
                         },
                         {
@@ -539,7 +543,7 @@ export function ApiAccess() {
                         <li>name - Internal name of the phenotype</li>
                         <li>display_name - Displayed name</li>
                         <li>sex - all, female, or male - sex for metadata entry</li>
-                        <li>ancestry - east_asian, european, (TBD) - ancestry for metadata entry</li>
+                        <li>ancestry - african_american, east_asian, european, TBD - ancestry for metadata entry</li>
                         <li>chromosome - all, or numeric value - chromosome for metadata entry</li>
                         <li>lambda_gc - Numeric value of lambda gc</li>
                         <li>count - Number of variants in chromosome (or 'all' chromosomes)</li>
@@ -567,12 +571,13 @@ export function ApiAccess() {
                         {
                             name: 'ancestry',
                             in: 'query',
-                            description: 'Either "east_asian" or "european" (other ancestries TBD). Specifies the ancestries for the variants to retrieve.',
+                            description: 'Either "african_american", "east_asian" or "european" (other ancestries TBD). Specifies the ancestries for the variants to retrieve.',
                             required: true,
                             type: 'string',
                             enum: [
+                                'african_american',
                                 'east_asian',
-                                'european'
+                                'european',
                             ]
                         },
                         {

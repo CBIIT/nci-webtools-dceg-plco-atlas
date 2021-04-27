@@ -96,6 +96,7 @@ export function VariantLookupForm({
           value={_selectedAncestry}
           onChange={ev => _setSelectedAncestry(ev.target.value)}>
           <option value="" hidden>Select Ancestry</option>
+          <option value="african_american">African American</option>
           <option value="east_asian">East Asian</option>
           <option value="european">European</option>
         </select>
