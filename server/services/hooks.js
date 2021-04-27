@@ -26,7 +26,6 @@ function useBrowserOnly(options) {
 // intended to be called from preSerialization
 function useSetRedisKey({match, redis}) {
     return function(request, reply, payload, done) {
-        console.log(payload);
 
         if (match(request, reply, payload)) {
             request.log.info(`setRedisKey match: ${request.url}`);
