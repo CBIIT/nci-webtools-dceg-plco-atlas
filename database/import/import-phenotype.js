@@ -160,9 +160,10 @@ async function importPhenotypes() {
             // create partitions for each phenotype (if they do not exist)
             const [partitionRows] = await connection.execute(
                 `SELECT * FROM INFORMATION_SCHEMA.PARTITIONS
-                WHERE TABLE_NAME = :table
+                WHERE TABLE_SCHEMA = :db_name
+                AND TABLE_NAME = :table
                 AND PARTITION_NAME = :phenotypeId`,
-                {table, phenotypeId}
+                {table, db_name, phenotypeId}
             );
 
             // create partitions
