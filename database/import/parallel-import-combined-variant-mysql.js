@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const mysql = require('mysql2');
 const args = require('minimist')(process.argv.slice(2));
-const { getRecords, importInnoDBTable, pluck } = require('./utils/query');
+const { getRecords, importInnoDBTable,deleteInnoDBTableFiles, pluck } = require('./utils/query');
 const { readFile } = require('./utils/file');
 // const { database } = require('../../server/config.json');
 const { timestamp, getLogger } = require('./utils/logging');
@@ -112,16 +112,21 @@ async function importVariants({connection, database, folderPath, phenotype}) {
     const pointTable = `phenotype_point__${tableSuffix}`;
     const metadataTable = `phenotype_metadata__${tableSuffix}`;
 
+    // remove old tablespace files if they exist
+    for (let table of [variantTable, aggregateTable, pointTable, metadataTable]) {
+        await deleteInnoDBTableFiles(connection, database, table);
+    }
+
     // create variant table
     await connection.query([
-        `DROP TABLE IF EXISTS ${variantTable}, ${aggregateTable}, ${metadataTable};`,
+        `DROP TABLE IF EXISTS ${variantTable}, ${aggregateTable},  ${pointTable}, ${metadataTable};`,
         getSql('../schema/tables/variant.sql', {table_name: variantTable}),
         getSql('../schema/indexes/variant.sql', {table_name: variantTable}),
         getSql('../schema/tables/aggregate.sql', {table_name: aggregateTable}),
         getSql('../schema/tables/point.sql', {table_name: pointTable}),
-        `CREATE TABLE ${metadataTable} LIKE phenotype_metadata;`,
+        getSql('../schema/tables/metadata.sql', {table_name: metadataTable}),
     ].join('\n'));
-   
+
     logger.info('Importing variant table');
     await importInnoDBTable(connection, database, variantTable, folderPath);
 

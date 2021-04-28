@@ -319,7 +319,7 @@ async function exportVariants({
                         getSql('../schema/tables/variant.sql', {table_name: variantTable}),
                         getSql('../schema/tables/aggregate.sql', {table_name: aggregateTable}),
                         getSql('../schema/tables/point.sql', {table_name: pointTable}),
-                        `CREATE TABLE ${metadataTable} LIKE phenotype_metadata;`,
+                        getSql('../schema/tables/metadata.sql', {table_name: metadataTable}),
                     ].join('\n'));
 
                     logger.info('Filtering and ordering data into stage table');
