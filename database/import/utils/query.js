@@ -9,6 +9,7 @@ module.exports = {
     tableExists,
     exportInnoDBTable,
     importInnoDBTable,
+    deleteInnoDBTableFiles,
 }
 
 function pluck(rows) {
@@ -74,29 +75,51 @@ async function getDataDirectory(connection) {
     return pluck(rows);
 }
 
+async function deleteInnoDBTableFiles(connection, database, tableName) {
+    const dataDirectory = path.resolve(await getDataDirectory(connection), database);
+    const filenames = (await fs.promises.readdir(dataDirectory))
+        .filter(name => new RegExp(`${tableName}(#p#.*)?(\.ibd|\.cfg)$`, "i").test(name));
+
+    for (let filename of filenames) {
+        await fs.promises.unlink(
+            path.resolve(dataDirectory, filename),
+        );
+    }
+}
+
 async function copyInnoDBTable(tableName, sourceDirectory, targetDirectory) {
     // select table files (including partitioned tables) which can be copied
     const filenames = (await fs.promises.readdir(sourceDirectory))
         .filter(name => new RegExp(`${tableName}(#p#.*)?(\.ibd|\.cfg)$`, "i").test(name));
 
     for (let filename of filenames) {
-        await fs.promises.copyFile(
-            path.resolve(sourceDirectory, filename),
-            path.resolve(targetDirectory, filename)
-        )
+        const sourcePath = path.resolve(sourceDirectory, filename);
+        const targetPath = path.resolve(targetDirectory, filename);
+        await fs.promises.copyFile(sourcePath, targetPath);
+
+        // preserve original uid/gid
+        const { uid, gid } = await fs.promises.stat(sourcePath);
+        await fs.promises.chown(targetPath, uid, gid);
     }
 }
 
-async function exportInnoDBTable(connection, database, tableName, targetDirectory) {
-    const dataDirectory = path.resolve(await getDataDirectory(connection), database);
+async function exportInnoDBTable(connection, database, tableName, targetDirectory, dataDirectory) {
+    dataDirectory = dataDirectory || path.resolve(await getDataDirectory(connection), database);
     await connection.query(`FLUSH TABLES ${tableName} FOR EXPORT`);
+    await sleep(200); // workaround to ensure tables have been flushed
     await copyInnoDBTable(tableName, dataDirectory, targetDirectory);
     await connection.query(`UNLOCK TABLES`);
 }
 
-async function importInnoDBTable(connection, database, tableName, sourceDirectory) {
-    const dataDirectory = path.resolve(await getDataDirectory(connection), database);
+async function importInnoDBTable(connection, database, tableName, sourceDirectory, dataDirectory) {
+    dataDirectory = dataDirectory || path.resolve(await getDataDirectory(connection), database);
     await connection.query(`ALTER TABLE ${tableName} DISCARD TABLESPACE`);
     await copyInnoDBTable(tableName, sourceDirectory, dataDirectory);
     await connection.query(`ALTER TABLE ${tableName} IMPORT TABLESPACE`);
+}
+
+function sleep(ms) {
+    return new Promise((resolve, reject) => 
+        setTimeout(resolve, ms)
+    );
 }
