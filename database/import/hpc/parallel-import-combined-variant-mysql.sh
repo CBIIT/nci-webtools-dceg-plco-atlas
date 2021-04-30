@@ -20,8 +20,8 @@ time local_mysql --basedir $BASE_DIR start --force
 echo
 
 echo "LOGGING INTO MYSQL WITH DB_USER=$USER, DB_PASS=$PASSWORD, HOST=$SLURM_NODELIST, PORT=55555..."
-echo "DROPPING EXISTING STAGE TABLES..."
-time mysql -u $USER -p$PASSWORD --host=$SLURM_NODELIST --port=55555 plcogwas --execute="SET GLOBAL innodb_file_per_table=ON; SELECT @@innodb_file_per_table; SELECT @@key_buffer_size; DROP TABLE participant_data_stage; DROP TABLE participant_data_category_stage;"
+echo "SETTING INNODB_FILE_PER_TABLE ON AND PRINTING CONFIGS..."
+time mysql -u $USER -p$PASSWORD --host=$SLURM_NODELIST --port=55555 plcogwas --execute="SET GLOBAL innodb_file_per_table=ON; SELECT @@innodb_file_per_table; SELECT @@key_buffer_size;"
 echo
 
 echo "STARTING SCRIPT ..."
