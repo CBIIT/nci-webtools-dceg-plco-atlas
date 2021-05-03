@@ -10,7 +10,8 @@ export BUCKET_FOLDER=$6
 # export AWS_SECRET_ACCESS_KEY=$6
 export TMPDIR=/lscratch/$SLURM_JOB_ID
 # export SERVER_HOST=$SLURM_NODELIST
-export INCREMENTAL_FOLDER=$7
+export STREAM=$7
+export INCREMENTAL_FOLDER=$8
 
 module load mysql/5.7.22
 # module load mysql/8.0
@@ -28,14 +29,20 @@ echo "BACKING UP VIA XTRABACKUP (MySQL-5.7.22, host=$SLURM_NODELIST, user=$DB_US
 if [ $INCREMENTAL_FOLDER = false ]
 then
     # Full backup...
-    time xtrabackup --backup --host=$SLURM_NODELIST --port=55555  --user=$DB_USER --password=$DB_PASS --datadir=$BASE_DIR/data/ --stream=xbstream --parallel=16 --target-dir=$TARGET_DIR | split -d --bytes=2048MB - $TARGET_DIR/backup.xbstream
-    # -C $TARGET_DIR
-    # | split -d --bytes=2048MB - $TARGET_DIR/backup.xbstream
+    if [ $STREAM = "xbstream" ]
+    then
+        time xtrabackup --backup --host=$SLURM_NODELIST --port=55555  --user=$DB_USER --password=$DB_PASS --datadir=$BASE_DIR/data/ --stream=xbstream --parallel=16 --target-dir=$TARGET_DIR | split -d --bytes=2048MB - $TARGET_DIR/backup.xbstream
+    else
+        time xtrabackup --backup --host=$SLURM_NODELIST --port=55555  --user=$DB_USER --password=$DB_PASS --datadir=$BASE_DIR/data/ --parallel=16 --target-dir=$TARGET_DIR
+    fi
 else
     # Incremental backup...  
-    time xtrabackup --backup --host=$SLURM_NODELIST --incremental-basedir=$INCREMENTAL_FOLDER --port=55555  --user=$DB_USER --password=$DB_PASS --datadir=$BASE_DIR/data/ --stream=xbstream --parallel=16 --target-dir=$TARGET_DIR | split -d --bytes=2048MB - $TARGET_DIR/backup.xbstream
-    # -C $TARGET_DIR
-    # | split -d --bytes=2048MB - $TARGET_DIR/backup.xbstream
+    if [ $STREAM = "xbstream" ]
+    then
+        time xtrabackup --backup --host=$SLURM_NODELIST --incremental-basedir=$INCREMENTAL_FOLDER --port=55555  --user=$DB_USER --password=$DB_PASS --datadir=$BASE_DIR/data/ --stream=xbstream --parallel=16 --target-dir=$TARGET_DIR | split -d --bytes=2048MB - $TARGET_DIR/backup.xbstream
+    else
+        time xtrabackup --backup --host=$SLURM_NODELIST --incremental-basedir=$INCREMENTAL_FOLDER --port=55555  --user=$DB_USER --password=$DB_PASS --datadir=$BASE_DIR/data/ --parallel=16 --target-dir=$TARGET_DIR
+    fi
 fi
 echo
 

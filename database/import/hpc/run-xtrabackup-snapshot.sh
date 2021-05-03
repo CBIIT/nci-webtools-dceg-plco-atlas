@@ -5,8 +5,8 @@
 if [ -z "$1" ]
     then
         echo "ERROR: No MySQL db username supplied..."
-        echo "USAGE: sh run-xtrabackup-snapshot.sh <DB_USER> <DB_PASS> <BASE_DIR> <TARGET_DIR> <BUCKET_NAME> <BUCKET_FOLDER> <OPTIONAL: INCREMENTAL_BACKUP_PATH>"
-        echo "EXAMPLE: sh run-xtrabackup-snapshot.sh sample_username sample_password /data/jiangk3/plco/mysql/saved-instance-path /data/jiangk3/plco/mysql/rds-backup bucket_name bucket_folder"
+        echo "USAGE: sh run-xtrabackup-snapshot.sh <DB_USER> <DB_PASS> <BASE_DIR> <TARGET_DIR> <BUCKET_NAME> <BUCKET_FOLDER> <STREAM> <OPTIONAL: INCREMENTAL_BACKUP_PATH>"
+        echo "EXAMPLE: sh run-xtrabackup-snapshot.sh sample_username sample_password /data/jiangk3/plco/mysql/saved-instance-path /data/jiangk3/plco/mysql/rds-backup bucket_name bucket_folder xbstream <optional incremental path>"
         exit 1
 fi
 DB_USER=$1
@@ -16,8 +16,8 @@ DB_USER=$1
 if [ -z "$2" ]
     then
         echo "ERROR: No MySQL db password supplied..."
-        echo "USAGE: sh run-xtrabackup-snapshot.sh <DB_USER> <DB_PASS> <BASE_DIR> <TARGET_DIR> <BUCKET_NAME> <BUCKET_FOLDER> <OPTIONAL: INCREMENTAL_BACKUP_PATH>"
-        echo "EXAMPLE: sh run-xtrabackup-snapshot.sh sample_username sample_password /data/jiangk3/plco/mysql/saved-instance-path /data/jiangk3/plco/mysql/rds-backup bucket_name bucket_folder"
+        echo "USAGE: sh run-xtrabackup-snapshot.sh <DB_USER> <DB_PASS> <BASE_DIR> <TARGET_DIR> <BUCKET_NAME> <BUCKET_FOLDER> <STREAM> <OPTIONAL: INCREMENTAL_BACKUP_PATH>"
+        echo "EXAMPLE: sh run-xtrabackup-snapshot.sh sample_username sample_password /data/jiangk3/plco/mysql/saved-instance-path /data/jiangk3/plco/mysql/rds-backup bucket_name bucket_folder xbstream <optional incremental path>"
         exit 1
 fi
 DB_PASS=$2
@@ -27,8 +27,8 @@ DB_PASS=$2
 if [ -z "$3" ]
     then
         echo "ERROR: No MySQL base directory path supplied..."
-        echo "USAGE: sh run-xtrabackup-snapshot.sh <DB_USER> <DB_PASS> <BASE_DIR> <TARGET_DIR> <BUCKET_NAME> <BUCKET_FOLDER> <OPTIONAL: INCREMENTAL_BACKUP_PATH>"
-        echo "EXAMPLE: sh run-xtrabackup-snapshot.sh sample_username sample_password /data/jiangk3/plco/mysql/saved-instance-path /data/jiangk3/plco/mysql/rds-backup bucket_name bucket_folder"
+        echo "USAGE: sh run-xtrabackup-snapshot.sh <DB_USER> <DB_PASS> <BASE_DIR> <TARGET_DIR> <BUCKET_NAME> <BUCKET_FOLDER> <STREAM> <OPTIONAL: INCREMENTAL_BACKUP_PATH>"
+        echo "EXAMPLE: sh run-xtrabackup-snapshot.sh sample_username sample_password /data/jiangk3/plco/mysql/saved-instance-path /data/jiangk3/plco/mysql/rds-backup bucket_name bucket_folder xbstream <optional incremental path>"
         exit 1
 fi
 BASE_DIR=$3
@@ -38,8 +38,8 @@ BASE_DIR=$3
 if [ -z "$4" ]
     then
         echo "ERROR: No xtrabackup target directory path supplied..."
-        echo "USAGE: sh run-xtrabackup-snapshot.sh <DB_USER> <DB_PASS> <BASE_DIR> <TARGET_DIR> <BUCKET_NAME> <BUCKET_FOLDER> <OPTIONAL: INCREMENTAL_BACKUP_PATH>"
-        echo "EXAMPLE: sh run-xtrabackup-snapshot.sh sample_username sample_password /data/jiangk3/plco/mysql/saved-instance-path /data/jiangk3/plco/mysql/rds-backup bucket_name bucket_folder"
+        echo "USAGE: sh run-xtrabackup-snapshot.sh <DB_USER> <DB_PASS> <BASE_DIR> <TARGET_DIR> <BUCKET_NAME> <BUCKET_FOLDER> <STREAM> <OPTIONAL: INCREMENTAL_BACKUP_PATH>"
+        echo "EXAMPLE: sh run-xtrabackup-snapshot.sh sample_username sample_password /data/jiangk3/plco/mysql/saved-instance-path /data/jiangk3/plco/mysql/rds-backup bucket_name bucket_folder xbstream <optional incremental path>"
         exit 1
 fi
 TARGET_DIR=$4
@@ -49,8 +49,8 @@ TARGET_DIR=$4
 if [ -z "$5" ]
     then
         echo "ERROR: No AWS access key supplied..."
-        echo "USAGE: sh run-xtrabackup-snapshot.sh <DB_USER> <DB_PASS> <BASE_DIR> <TARGET_DIR> <BUCKET_NAME> <BUCKET_FOLDER> <OPTIONAL: INCREMENTAL_BACKUP_PATH>"
-        echo "EXAMPLE: sh run-xtrabackup-snapshot.sh sample_username sample_password /data/jiangk3/plco/mysql/saved-instance-path /data/jiangk3/plco/mysql/rds-backup bucket_name bucket_folder"
+        echo "USAGE: sh run-xtrabackup-snapshot.sh <DB_USER> <DB_PASS> <BASE_DIR> <TARGET_DIR> <BUCKET_NAME> <BUCKET_FOLDER> <STREAM> <OPTIONAL: INCREMENTAL_BACKUP_PATH>"
+        echo "EXAMPLE: sh run-xtrabackup-snapshot.sh sample_username sample_password /data/jiangk3/plco/mysql/saved-instance-path /data/jiangk3/plco/mysql/rds-backup bucket_name bucket_folder xbstream <optional incremental path>"
         exit 1
 fi
 BUCKET_NAME=$5
@@ -60,21 +60,32 @@ BUCKET_NAME=$5
 if [ -z "$6" ]
     then
         echo "ERROR: No AWS secret access key supplied..."
-        echo "USAGE: sh run-xtrabackup-snapshot.sh <DB_USER> <DB_PASS> <BASE_DIR> <TARGET_DIR> <BUCKET_NAME> <BUCKET_FOLDER> <OPTIONAL: INCREMENTAL_BACKUP_PATH>"
-        echo "EXAMPLE: sh run-xtrabackup-snapshot.sh sample_username sample_password /data/jiangk3/plco/mysql/saved-instance-path /data/jiangk3/plco/mysql/rds-backup bucket_name bucket_folder"
+        echo "USAGE: sh run-xtrabackup-snapshot.sh <DB_USER> <DB_PASS> <BASE_DIR> <TARGET_DIR> <BUCKET_NAME> <BUCKET_FOLDER> <STREAM> <OPTIONAL: INCREMENTAL_BACKUP_PATH>"
+        echo "EXAMPLE: sh run-xtrabackup-snapshot.sh sample_username sample_password /data/jiangk3/plco/mysql/saved-instance-path /data/jiangk3/plco/mysql/rds-backup bucket_name bucket_folder xbstream <optional incremental path>"
         exit 1
 fi
 BUCKET_FOLDER=$6
 
-# ARGUMENT 7: Input xtrabackup incremental snapshot target directory path
-# INCREMENTAL_FOLDER = "/data/jiangk3/plco/mysql/rds-backup/incremental1"
+# ARGUMENT 7: Input stream type
+# STREAM = "xbstream" or "full"
 if [ -z "$7" ]
+    then
+        echo "ERROR: No stream type supplied (either 'full' or 'xbstream')..."
+        echo "USAGE: sh run-xtrabackup-snapshot.sh <DB_USER> <DB_PASS> <BASE_DIR> <TARGET_DIR> <BUCKET_NAME> <BUCKET_FOLDER> <STREAM> <OPTIONAL: INCREMENTAL_BACKUP_PATH>"
+        echo "EXAMPLE: sh run-xtrabackup-snapshot.sh sample_username sample_password /data/jiangk3/plco/mysql/saved-instance-path /data/jiangk3/plco/mysql/rds-backup bucket_name bucket_folder xbstream <optional incremental path>"
+        exit 1
+fi
+STREAM=$7
+
+# ARGUMENT 8: Input xtrabackup incremental snapshot target directory path
+# INCREMENTAL_FOLDER = "/data/jiangk3/plco/mysql/rds-backup/incremental1"
+if [ -z "$8" ]
     then
         echo "Full backup..."
         INCREMENTAL_FOLDER=false 
     else
         echo "Incremental backup..."
-        INCREMENTAL_FOLDER=$7
+        INCREMENTAL_FOLDER=$8
 fi
 
-sbatch --gres=lscratch:200 --mem=120g --cpus-per-task=28 --partition=norm --time=08:00:00 --wrap="sh xtrabackup-snapshot.sh $DB_USER $DB_PASS $BASE_DIR $TARGET_DIR $BUCKET_NAME $BUCKET_FOLDER $INCREMENTAL_FOLDER"
+sbatch --gres=lscratch:200 --mem=120g --cpus-per-task=28 --partition=norm --time=08:00:00 --wrap="sh xtrabackup-snapshot.sh $DB_USER $DB_PASS $BASE_DIR $TARGET_DIR $BUCKET_NAME $BUCKET_FOLDER $STREAM $INCREMENTAL_FOLDER"
