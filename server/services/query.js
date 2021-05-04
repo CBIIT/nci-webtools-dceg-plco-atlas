@@ -599,7 +599,7 @@ async function getPhenotypes({connection, logger}, params = {}) {
  * @param {*} connection - The connection to the mysql database
  * @param {{phenotype_id: number, type: "frequency"|"frequencyByAge"|"frequencyBySex"|"frequencyByAncestry"|"related"}} params - Type may be a string with the following values:
  */
-async function getPhenotype(connectionPool, params) {
+async function getPhenotype({connection, logger}, params) {
     const {id, type} = params;
 
     if (!type)
@@ -608,7 +608,7 @@ async function getPhenotype(connectionPool, params) {
     if (!id)
         throw new Error('A phenotype id must be provided');
 
-    let connection = await connectionPool.getConnection();
+    // let connection = await connectionPool.getConnection();
 
     // use less-strict group_by mode
     await connection.query(`SET sql_mode = 'STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION'`);
@@ -986,7 +986,7 @@ async function getPhenotype(connectionPool, params) {
     }
 
 
-    await connection.release();
+    // await connection.release();
     return phenotype;
 }
 
