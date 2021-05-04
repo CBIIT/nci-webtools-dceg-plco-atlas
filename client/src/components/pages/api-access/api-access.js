@@ -89,7 +89,8 @@ export function ApiAccess() {
                                 'african_american',
                                 'east_asian',
                                 'european',
-                            ]
+                            ],
+                            value: 'european'
                         },
                         {
                             name: 'p_value_nlog_min',
@@ -172,7 +173,8 @@ export function ApiAccess() {
                                 'african_american',
                                 'east_asian',
                                 'european',
-                            ]
+                            ],
+                            value: 'european'
                         },
                         {
                             name: 'chromosome',
@@ -354,7 +356,8 @@ export function ApiAccess() {
                                 'african_american',
                                 'east_asian',
                                 'european',
-                            ]
+                            ],
+                            value: 'european'
                         },
                         {
                             name: 'chromosome',
@@ -513,7 +516,8 @@ export function ApiAccess() {
                                 'african_american',
                                 'east_asian',
                                 'european',
-                            ]
+                            ],
+                            value: 'european'
                         },
                         {
                             name: 'raw',
@@ -578,7 +582,8 @@ export function ApiAccess() {
                                 'african_american',
                                 'east_asian',
                                 'european',
-                            ]
+                            ],
+                            value: 'european'
                         },
                         {
                             name: 'raw',
