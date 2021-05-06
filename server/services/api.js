@@ -22,6 +22,7 @@ const {
   getConfig,
   getShareLink,
   setShareLink,
+  getParticipants,
   getPrincipalComponentAnalysis,
   ping,
 } = require("./query");
@@ -51,24 +52,26 @@ async function webApiRoutes(fastify, options) {
     })
   );
 
-  // retrieve variants from redis if they exist
-  fastify.addHook(
-    "onRequest",
-    useGetRedisKey({
-      redis: context.redis,
-      match: req => /variants|summary/.test(req.url),
-    })
-  );
+  if (context.redis) {
+    // retrieve variants from redis if they exist
+    fastify.addHook(
+      "onRequest",
+      useGetRedisKey({
+        redis: context.redis,
+        match: req => /variants|summary/.test(req.url),
+      })
+    );
 
-  // save variants to redis if the response size is large
-  fastify.addHook(
-    "preSerialization",
-    useSetRedisKey({
-      redis: context.redis,
-      match: (req, res, payload) =>
-        /variants|summary/.test(req.url) && payload && payload.data.length > 1e3,
-    })
-  );
+    // save variants to redis if the response size is large
+    fastify.addHook(
+      "preSerialization",
+      useSetRedisKey({
+        redis: context.redis,
+        match: (req, res, payload) =>
+          /variants|summary/.test(req.url) && payload && payload.data.length > 1e3,
+      })
+    );
+  }
 
   // returns "true" if service is up
   fastify.get("/ping", async () => ping(context));
@@ -126,6 +129,7 @@ async function publicApiRoutes(fastify, options) {
   const context = {
     connection: fastify.mysql[config.database.name],
     logger: fastify.log,
+    redis: fastify.redis,
   };
 
   // add cors headers to public api routes
@@ -140,26 +144,27 @@ async function publicApiRoutes(fastify, options) {
   // log response status code, time, path, and query params
   fastify.addHook("onResponse", useResponseLogger);
 
+  if (context.redis) {
+    // retrieve variants from redis if they exist
+    fastify.addHook(
+      "onRequest",
+      useGetRedisKey({
+        redis: context.redis,
+        match: req => /variants|summary|participants/.test(req.url),
+      })
+    );
 
-  // retrieve variants from redis if they exist
-  fastify.addHook(
-    "onRequest",
-    useGetRedisKey({
-      redis: context.redis,
-      match: req => /variants|summary/.test(req.url),
-    })
-  );
+    // save variants to redis if the response size is large
+    fastify.addHook(
+      "preSerialization",
+      useSetRedisKey({
+        redis: context.redis,
+        match: (req, res, payload) =>
+          /variants|summary|participants/.test(req.url) && payload && payload.data.length > 1e3,
+      })
+    );
+  }
 
-  // save variants to redis if the response size is large
-  fastify.addHook(
-    "preSerialization",
-    useSetRedisKey({
-      redis: context.redis,
-      match: (req, res, payload) =>
-        /variants|summary/.test(req.url) && payload && payload.data.length > 1e3,
-    })
-  );
-  
   // returns "true" if service is up
   fastify.get("/api/ping", async (req, res) => ping(context));
 
@@ -203,6 +208,12 @@ async function publicApiRoutes(fastify, options) {
   fastify.get("/api/pca", async ({ query }) =>
     getPrincipalComponentAnalysis(context, query)
   );
+
+  // retrieves participant data
+  fastify.get("/api/participants", async ({ query }) =>
+    getParticipants(context, query)
+  );
+  
 }
 
 module.exports = {
