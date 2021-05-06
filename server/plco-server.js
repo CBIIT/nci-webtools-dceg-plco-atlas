@@ -1,5 +1,6 @@
 const path = require("path");
 const fastify = require("fastify");
+const zlib = require("zlib");
 const forkCluster = require("./services/cluster");
 const getLogger = require("./services/logger");
 const api = require("./services/api");
@@ -19,8 +20,18 @@ const app = fastify({
   disableRequestLogging: true,
 });
 
-// compress all responses
-app.register(require("fastify-compress"));
+// compress all responses (note: keep quality low to decrease ttfb)
+app.register(require("fastify-compress"), {
+  brotliOptions: {
+    params: {
+      [zlib.constants.BROTLI_PARAM_MODE]: zlib.constants.BROTLI_MODE_TEXT,
+      [zlib.constants.BROTLI_PARAM_QUALITY]: 1,
+    },
+  },
+  zlibOptions: {
+    level: 1,
+  }
+});
 
 // set 20 minute response timeout
 app.register(require("fastify-server-timeout"), {
