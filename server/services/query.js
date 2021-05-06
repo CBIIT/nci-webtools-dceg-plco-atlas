@@ -594,6 +594,38 @@ async function getPhenotypes({connection, logger}, params = {}) {
         : phenotypes.filter(phenotype => phenotype.parent_id === null);
 }
 
+async function getParticipants({connection, logger}, params) {
+    const { phenotype_id } = params;
+
+    // validate phenotype id
+    if (!phenotype_id || !await hasRecord(connection, 'phenotype', {id: phenotype_id}))
+        throw new Error('A valid phenotype id must be provided');
+
+    let sql = `
+        select p.plco_id as plco_id,
+            pd.phenotype_id as phenotype_id,
+            pd.value as value,
+            pdc.label as label,
+            pd.age as age,
+            p.sex a sex,
+            p.ancestry as self_reported_ancestry,
+            p.genetic_ancestry as genetic_ancestry
+        from participant_data pd
+        join participant p on pd.participant_id = p.id
+        left join participant_data_category pdc on pd.phenotype_id = pdc.phenotype_id and pd.value = pdc.value
+        where pd.phenotype_id = :phenotype_id`;
+
+    logger.debug(`getParticipants sql: ${sql}`);
+
+    const [data, columns] = await connection.execute({
+        sql, 
+        values: {phenotype_id}, 
+        rowsAsArray: params.raw === 'true'
+    });
+
+    return {data, columns: columns.map(c => c.name)};
+}
+
 /**
  * Gets statistical data for a specified phenotype
  * @param {*} connection - The connection to the mysql database
@@ -1128,6 +1160,7 @@ module.exports = {
     getPoints,
     getMetadata,
     getCorrelations,
+    getParticipants,
     getPhenotype,
     getPhenotypes,
     getRanges,
