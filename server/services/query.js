@@ -602,12 +602,12 @@ async function getParticipants({connection, logger}, params) {
         throw new Error('A valid phenotype id must be provided');
 
     let sql = `
-        select p.plco_id as plco_id,
+        select p.participant_id as participant_id,
             pd.phenotype_id as phenotype_id,
             pd.value as value,
             pdc.label as label,
             pd.age as age,
-            p.sex a sex,
+            p.sex as sex,
             p.ancestry as self_reported_ancestry,
             p.genetic_ancestry as genetic_ancestry
         from participant_data pd
