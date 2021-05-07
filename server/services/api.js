@@ -114,6 +114,11 @@ async function webApiRoutes(fastify, options) {
     getPrincipalComponentAnalysis(context, query)
   );
 
+  // retrieves participant data
+  fastify.get("/participants", async ({ query }) =>
+    getParticipants(context, query)
+  );
+
   // retrieves chromosome ranges
   fastify.get("/ranges", async _ => getRanges(context));
 
