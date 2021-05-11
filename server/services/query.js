@@ -12,6 +12,15 @@ function getTimestamp() {
 }
 
 /**
+ * Resolves after the specified duration
+ * @param {number} ms - The number of milliseconds to sleep
+ * @returns upon resolution
+ */
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+/**
  * Ensures that identifiers with sql keywords in them do not throw errors
  * @param {string} str - A string which needs to be quoted
  * @returns {string} The quoted string
@@ -91,8 +100,32 @@ function getValidColumns(tableName, columns) {
         : validColumns;
 }
 
-async function waitUntilConnected(config) {
+/**
+ * Resolves once a connection has been created
+ * @param {object} config 
+ * @param {object} logger 
+ * @returns 
+ */
+function deferUntilConnected(config, logger) {
+    let interval = 1;
+
+    async function tryConnection() {
+        try {
+            return await mysql
+                .createConnection(config)
+                .promise()
+                .query('select 1');
+        } catch(e) {
+            logger.error(e.message);
+            interval *= 1.5;
+            await sleep(1000 * 10 * interval);
+            return await tryConnection();
+        }
+    }
+
+    return tryConnection();
 }
+
 
 async function ping({connection, logger}) {
     let sql = `SELECT "true" as status`;
@@ -1194,5 +1227,6 @@ module.exports = {
     setShareLink,
     exportVariants,
     getPrincipalComponentAnalysis,
+    deferUntilConnected,
     ping,
 };
