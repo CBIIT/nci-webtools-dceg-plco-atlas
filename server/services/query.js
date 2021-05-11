@@ -1,3 +1,4 @@
+const mysql = require('mysql2');
 const config = require('../config.json');
 const { exportRowLimit } = config;
 
@@ -88,6 +89,9 @@ function getValidColumns(tableName, columns) {
     return columns.length
         ? intersection(columns, validColumns)
         : validColumns;
+}
+
+async function waitUntilConnected(config) {
 }
 
 async function ping({connection, logger}) {
@@ -595,35 +599,55 @@ async function getPhenotypes({connection, logger}, params = {}) {
 }
 
 async function getParticipants({connection, logger}, params) {
-    const { phenotype_id } = params;
+    let { phenotype_id, columns, raw } = params;
+    const validColumns = [
+        'phenotype_id',
+        'value',
+        'label',
+        'age',
+        'sex',
+        'ancestry',
+        'genetic_ancestry'
+    ];
+
+    // sanitize parameters
+    raw = raw === 'true'
+    columns = (columns || '').split(',').filter(c => validColumns.includes(c));
+    if (!columns.length) columns = ['value'];
 
     // validate phenotype id
     if (!phenotype_id || !await hasRecord(connection, 'phenotype', {id: phenotype_id}))
         throw new Error('A valid phenotype id must be provided');
 
     let sql = `
-        select p.participant_id as participant_id,
-            pd.phenotype_id as phenotype_id,
-            pd.value as value,
-            pdc.label as label,
-            pd.age as age,
-            p.sex as sex,
-            p.ancestry as self_reported_ancestry,
-            p.genetic_ancestry as genetic_ancestry
+        select
+            ${[
+                columns.includes('phenotype_id') ? `pd.phenotype_id as phenotype_id` : ``,
+                columns.includes('value') ? `pd.value as value` : ``,
+                columns.includes('label') ? `pdc.label as label` : ``,
+                columns.includes('age') ? `pd.age as age` : ``,
+                columns.includes('sex') ? `p.sex as sex` : ``,
+                columns.includes('ancestry') ? `p.ancestry as ancestry` : ``,
+                columns.includes('genetic_ancestry') ? `p.genetic_ancestry as genetic_ancestry` : ``,
+                `if(count(*) < 10, "< 10", count(*)) as counts`,
+            ].filter(Boolean).join(',')}
         from participant_data pd
         join participant p on pd.participant_id = p.id
         left join participant_data_category pdc on pd.phenotype_id = pdc.phenotype_id and pd.value = pdc.value
-        where pd.phenotype_id = :phenotype_id`;
+        where pd.phenotype_id = :phenotype_id
+        group by ${columns.join(',')}
+        order by ${columns.join(',')}
+    `;
 
     logger.debug(`getParticipants sql: ${sql}`);
 
-    const [data, columns] = await connection.execute({
+    const [data, columnMetadata] = await connection.execute({
         sql, 
         values: {phenotype_id}, 
-        rowsAsArray: params.raw === 'true'
+        rowsAsArray: raw
     });
 
-    return {data, columns: columns.map(c => c.name)};
+    return {data, columns: columnMetadata.map(c => c.name)};
 }
 
 /**
