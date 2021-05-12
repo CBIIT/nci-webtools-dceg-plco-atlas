@@ -170,7 +170,7 @@ export function Phenotypes() {
 
     let plot = preserveTab ? selectedPlot : 'frequency';
 
-    const data = await query('phenotype', {
+    const data = await query('participants', {
       id: phenotype.id,
       type:
         {

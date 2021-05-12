@@ -16,7 +16,7 @@ const {
   getMetadata,
   getGenes,
   getCorrelations,
-  getPhenotype,
+  getPhenotypeParticipants,
   getPhenotypes,
   getRanges,
   getConfig,
@@ -74,13 +74,19 @@ async function webApiRoutes(fastify, options) {
   }
 
   // returns "true" if service is up
-  fastify.get("/ping", async () => ping(context));
+  fastify.get("/ping", async () => 
+    ping(context)
+  );
 
   // retrieves all variant groups for all chroms. at the lowest granularity (in MBases)
-  fastify.get("/summary", async ({ query }) => getSummary(context, query));
+  fastify.get("/summary", async ({ query }) => 
+    getSummary(context, query)
+  );
 
   // retrieves all variants filtered by the specified params
-  fastify.get("/variants", async ({ query }) => getVariants(context, query));
+  fastify.get("/variants", async ({ query }) => 
+    getVariants(context, query)
+  );
 
   // exports /variants as a csv
   fastify.get("/export-variants", async ({ query }, response) =>
@@ -88,13 +94,19 @@ async function webApiRoutes(fastify, options) {
   );
 
   //retrieves a subset of variants
-  fastify.get("/points", async ({ query }) => getPoints(context, query));
+  fastify.get("/points", async ({ query }) => 
+    getPoints(context, query)
+  );
 
   // retrieves metadata
-  fastify.get("/metadata", async ({ query }) => getMetadata(context, query));
+  fastify.get("/metadata", async ({ query }) => 
+    getMetadata(context, query)
+  );
 
   // retrieves genes
-  fastify.get("/genes", async ({ query }, res) => getGenes(context, query));
+  fastify.get("/genes", async ({ query }, res) => 
+    getGenes(context, query)
+  );
 
   // retrieves phenotypes
   fastify.get("/phenotypes", async ({ query }) =>
@@ -102,7 +114,9 @@ async function webApiRoutes(fastify, options) {
   );
 
   // retrieves a single phenotype's participant data
-  fastify.get("/phenotype", async ({ query }) => getPhenotype(context, query));
+  fastify.get("/participants", async ({ query }) => 
+    getPhenotypeParticipants(context, query)
+  );
 
   // retrieves correlations
   fastify.get("/correlations", async ({ query }) =>
@@ -114,20 +128,24 @@ async function webApiRoutes(fastify, options) {
     getPrincipalComponentAnalysis(context, query)
   );
 
-  // retrieves participant data
-  fastify.get("/participants", async ({ query }) =>
-    getParticipants(context, query)
+  // retrieves chromosome ranges
+  fastify.get("/ranges", async _ => 
+    getRanges(context)
   );
 
-  // retrieves chromosome ranges
-  fastify.get("/ranges", async _ => getRanges(context));
-
   // sets and retrieves share link parameters
-  fastify.get("/share-link", async ({ query }) => getShareLink(context, query));
-  fastify.post("/share-link", async ({ body }) => setShareLink(context, body));
+  fastify.get("/share-link", async ({ query }) => 
+    getShareLink(context, query)
+  );
+
+  fastify.post("/share-link", async ({ body }) => 
+    setShareLink(context, body)
+  );
 
   // retrieves public configuration
-  fastify.get("/config", async ({ query }) => getConfig(query.key));
+  fastify.get("/config", async ({ query }) => 
+    getConfig(query.key)
+  );
 }
 
 async function publicApiRoutes(fastify, options) {
@@ -171,10 +189,14 @@ async function publicApiRoutes(fastify, options) {
   }
 
   // returns "true" if service is up
-  fastify.get("/api/ping", async (req, res) => ping(context));
+  fastify.get("/api/ping", async (req, res) => 
+    ping(context)
+  );
 
   // retrieves all variant groups for all chroms. at the lowest granularity (in MBases)
-  fastify.get("/api/summary", async ({ query }) => getSummary(context, query));
+  fastify.get("/api/summary", async ({ query }) => 
+    getSummary(context, query)
+  );
 
   // retrieves all variants filtered by the specified params
   fastify.get("/api/variants", async ({ query }) =>
@@ -187,7 +209,9 @@ async function publicApiRoutes(fastify, options) {
   );
 
   //retrieves a subset of variants
-  fastify.get("/api/points", async ({ query }) => getPoints(context, query));
+  fastify.get("/api/points", async ({ query }) => 
+    getPoints(context, query)
+  );
 
   // retrieves metadata
   fastify.get("/api/metadata", async ({ query }) =>
@@ -200,8 +224,8 @@ async function publicApiRoutes(fastify, options) {
   );
 
   // retrieves a single phenotype's participant data
-  fastify.get("/api/phenotype", async ({ query }) =>
-    getPhenotype(context, query)
+  fastify.get("/api/participants", async ({ query }) =>
+    getParticipants(context, query)
   );
 
   // retrieves correlations
@@ -213,12 +237,6 @@ async function publicApiRoutes(fastify, options) {
   fastify.get("/api/pca", async ({ query }) =>
     getPrincipalComponentAnalysis(context, query)
   );
-
-  // retrieves participant data
-  fastify.get("/api/participants", async ({ query }) =>
-    getParticipants(context, query)
-  );
-  
 }
 
 module.exports = {

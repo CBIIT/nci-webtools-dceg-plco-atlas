@@ -688,7 +688,7 @@ async function getParticipants({connection, logger}, params) {
  * @param {*} connection - The connection to the mysql database
  * @param {{phenotype_id: number, type: "frequency"|"frequencyByAge"|"frequencyBySex"|"frequencyByAncestry"|"related"}} params - Type may be a string with the following values:
  */
-async function getPhenotype({connection, logger}, params) {
+async function getPhenotypeParticipants({connection, logger}, params) {
     const {id, type} = params;
 
     if (!type)
@@ -1218,7 +1218,7 @@ module.exports = {
     getMetadata,
     getCorrelations,
     getParticipants,
-    getPhenotype,
+    getPhenotypeParticipants,
     getPhenotypes,
     getRanges,
     getGenes,

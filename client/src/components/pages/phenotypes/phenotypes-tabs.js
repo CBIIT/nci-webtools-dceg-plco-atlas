@@ -66,7 +66,7 @@ export function PhenotypesTabs(props) {
           loading: false,
           phenotypeData: {
             ...phenotypeData,
-            ...(await query('phenotype', {
+            ...(await query('participants', {
               id: phenotypeData.id,
               type: selectedPlot || 'all'
             }))

@@ -103,7 +103,7 @@ export const Heatmap = forwardRef(({}, ref) => {
       })
     );
 
-    const data = await query('phenotype', {
+    const data = await query('participants', {
       id: phenotype.id,
       type: 'frequency'
     });
