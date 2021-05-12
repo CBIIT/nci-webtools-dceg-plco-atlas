@@ -20,6 +20,7 @@ const {
   getPhenotypes,
   getRanges,
   getConfig,
+  getDownloadLink,
   getShareLink,
   setShareLink,
   getParticipants,
@@ -133,6 +134,11 @@ async function webApiRoutes(fastify, options) {
     getRanges(context)
   );
 
+  // redirects to the specified download phenotype's download link
+  fastify.get("/download", ({ query }, reply) => 
+    getDownloadLink(context, query).then(link => reply.redirect(link))
+  );
+
   // sets and retrieves share link parameters
   fastify.get("/share-link", async ({ query }) => 
     getShareLink(context, query)
@@ -201,7 +207,7 @@ async function publicApiRoutes(fastify, options) {
   // retrieves all variants filtered by the specified params
   fastify.get("/api/variants", async ({ query }) =>
     getVariants(context, query)
-  );
+  );  
 
   // exports /variants as a csv
   fastify.get("/api/export-variants", async ({ query }, response) =>
@@ -236,6 +242,11 @@ async function publicApiRoutes(fastify, options) {
   // retrieves pca (using pc_x and pc_y)
   fastify.get("/api/pca", async ({ query }) =>
     getPrincipalComponentAnalysis(context, query)
+  );
+
+  // redirects to the specified download phenotype's download link
+  fastify.get("/api/download", ({ query }, reply) => 
+    getDownloadLink(context, query).then(link => reply.redirect(link))
   );
 }
 

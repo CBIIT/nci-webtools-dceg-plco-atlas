@@ -1105,6 +1105,33 @@ function getConfig(key) {
         : null;
 }
 
+async function getDownloadLink({connection, logger}, {phenotype_id}) {
+
+    if (!phenotype_id) {
+        throw new Error('Please provide a phenotype_id.');
+    }
+
+    let sql = `
+        SELECT name
+        FROM phenotype
+        WHERE id = :phenotype_id
+        AND import_date IS NOT NULL
+    `;
+
+    logger.debug(`getDownloadLink sql: ${sql}`);
+
+    let [downloadLinkRows] = await connection.execute(
+        sql,
+        {phenotype_id}
+    );
+
+    if (!downloadLinkRows.length) {
+        throw new Error('The provided phenotype_id must have an import date.');
+    }
+    
+    return `${config.downloadRoot}${downloadLinkRows[0].name}.tsv.gz`;
+}
+
 async function getShareLink({connection, logger}, {share_id}) {
     if (!share_id) 
         throw new Error('A valid share_id must be provided');
@@ -1223,6 +1250,7 @@ module.exports = {
     getRanges,
     getGenes,
     getConfig,
+    getDownloadLink,
     getShareLink,
     setShareLink,
     exportVariants,
