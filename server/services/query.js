@@ -632,7 +632,21 @@ async function getPhenotypes({connection, logger}, params = {}) {
 }
 
 async function getParticipants({connection, logger}, params) {
-    let { phenotype_id, columns, raw } = params;
+    let { phenotype_id, columns, raw, precision } = params;
+
+    // validate phenotype_id
+    const [phenotypeRows] = await connection.execute(
+        `SELECT id, name, type
+        FROM phenotype
+        WHERE id = :phenotype_id`,
+        {phenotype_id}
+    );
+
+    if (!phenotypeRows.length) {
+        throw new Error('Please provide a valid phenotype_id')
+    }
+
+    const { type } = phenotypeRows[0];
     const validColumns = [
         'phenotype_id',
         'value',
@@ -645,30 +659,27 @@ async function getParticipants({connection, logger}, params) {
 
     // sanitize parameters
     raw = raw === 'true'
+    precision = (type === 'continuous' && Number(precision)) || 0;
     columns = (columns || '').split(',').filter(c => validColumns.includes(c));
     if (!columns.length) columns = ['value'];
-
-    // validate phenotype id
-    if (!phenotype_id || !await hasRecord(connection, 'phenotype', {id: phenotype_id}))
-        throw new Error('A valid phenotype id must be provided');
 
     let sql = `
         select
             ${[
                 columns.includes('phenotype_id') ? `pd.phenotype_id as phenotype_id` : ``,
-                columns.includes('value') ? `pd.value as value` : ``,
+                columns.includes('value') ? `round(pd.value, :precision) as value` : ``,
                 columns.includes('label') ? `pdc.label as label` : ``,
                 columns.includes('age') ? `pd.age as age` : ``,
                 columns.includes('sex') ? `p.sex as sex` : ``,
                 columns.includes('ancestry') ? `p.ancestry as ancestry` : ``,
                 columns.includes('genetic_ancestry') ? `p.genetic_ancestry as genetic_ancestry` : ``,
-                `if(count(*) < 10, "< 10", count(*)) as counts`,
+                `if(count(*) < 10, "< 10", count(*)) as counts`,    // do not stratify down to individuals
             ].filter(Boolean).join(',')}
         from participant_data pd
         join participant p on pd.participant_id = p.id
         left join participant_data_category pdc on pd.phenotype_id = pdc.phenotype_id and pd.value = pdc.value
         where pd.phenotype_id = :phenotype_id
-        group by ${columns.join(',')}
+        group by ${columns.map(c => c === 'value' ? `round(pd.value, :precision)` : c).join(',')}
         order by ${columns.join(',')}
     `;
 
@@ -676,7 +687,7 @@ async function getParticipants({connection, logger}, params) {
 
     const [data, columnMetadata] = await connection.execute({
         sql, 
-        values: {phenotype_id}, 
+        values: {phenotype_id, precision}, 
         rowsAsArray: raw
     });
 
