@@ -7,10 +7,16 @@ export function ApiAccess() {
     const swaggerSpec = {
         swagger: '2.0',
         host: window.location.host,
-        basePath: window.location.host.includes("localhost") ? '' : '/plco-atlas',
+        basePath: window.location.pathname,
         tags: [
             {
+                name: 'download',
+            },
+            {
                 name: 'metadata',
+            },
+            {
+                name: 'participants',
             },
             {
                 name: 'pca'
@@ -53,6 +59,36 @@ export function ApiAccess() {
                         }
                     },
                 }
+            },
+            '/api/download': {
+                get: {
+                    tags: ['download'],
+                    summary: 'Download the original dataset for a phenotype',
+                    description: 'Allows users to download the original dataset for the specified phenotype.',
+                    operationId: 'downloadVariants',
+                    produces: ['application/x-gzip'],
+                    parameters: [
+                        {
+                            name: 'phenotype_id',
+                            in: 'query',
+                            description: 'A phenotype to download the original dataset for',
+                            required: true,
+                            type: 'integer',
+                            value: '3080'
+                        },
+                    ],
+                    responses: {
+                        '200': {
+                            description: 'a tsv.gz file',
+                            schema: {
+                                type: 'file'
+                            }
+                        },
+                        '500': {
+                            description: 'service unavailable'
+                        }
+                    },
+                },
             },
             '/api/summary': {
                 get: {
@@ -649,35 +685,37 @@ export function ApiAccess() {
                     },
                 },
             },
-            '/api/phenotype': {
+            '/api/participants': {
                 get: {
-                    tags: ['phenotypes'],
-                    summary: `Retrieves single phenotype's participant data and/or related phenotypes`,
-                    description: `Retrieves single phenotype's participant data and/or related phenotypes.`,
-                    operationId: 'getPhenotype',
+                    tags: ['participants'],
+                    summary: `Retrieves single phenotype's participant data`,
+                    description: `Retrieves single phenotype's participant data.`,
+                    operationId: 'getParticipants',
                     produces: ['application/json'],
                     parameters: [
                         {
-                            name: 'id',
+                            name: 'phenotype_id',
                             in: 'query',
-                            description: 'A numeric value. Specifies the phenotype id to retrieve data about.',
+                            description: 'A numeric value. Specifies the phenotype id to retrieve participant data from.',
                             required: true,
                             type: 'integer',
-                            value: '3080'
+                            value: '2250'
                         },
                         {
-                            name: 'type',
+                            name: 'columns',
                             in: 'query',
-                            description: 'Either "frequency", "frequencyByAge", "frequencyBySex", "frequencyByAncestry", or "related". Specifies type of data to retrieve.',
-                            required: true,
+                            description: `A comma-separated list of properties to group participant counts by. Can be entered as any combination of "value", "label", "sex", "age", "ancestry", and "genetic_ancestry". "Value" refers to the recorded value for the phenotype and "label" refers to the categorical label for that value (if applicable). "Sex" refers to participant sex, "age" refers to age at diagnosis, "ancestry" refers to self-reported race, and "genetic_ancestry" refers to genetically imputed ancestry.`,
+                            required: false,
                             type: 'string',
-                            enum: [
-                                "frequency",
-                                "frequencyByAge", 
-                                "frequencyBySex", 
-                                "frequencyByAncestry",
-                                "related"
-                            ]                        
+                            value: 'value,age'
+                        },
+                        {
+                            name: 'precision',
+                            in: 'query',
+                            description: 'The numeric precision used for stratifying by value. Rounds to the nearest multiple of 10^-precision. For example, a precision of -1 rounds the value to the nearest multiple of 10^1, a precision of 2 rounds to the nearest multiple of 10^-2. Used only for continuous phenotypes. ',
+                            required: false,
+                            type: 'integer',
+                            value: '0'
                         },
                         {
                             name: 'raw',
