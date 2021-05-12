@@ -63,10 +63,10 @@ export function ApiAccess() {
             '/api/download': {
                 get: {
                     tags: ['download'],
-                    summary: 'Download the original dataset for a phenotype',
-                    description: 'Allows users to download the original dataset for the specified phenotype.',
-                    operationId: 'downloadVariants',
-                    produces: ['application/x-gzip'],
+                    summary: 'Download the original dataset for a phenotype. ',
+                    description: 'Allows users to download the original dataset for the specified phenotype. If noRedirect is specified, retrieves the download link instead.',
+                    operationId: 'download',
+                    produces: ['application/x-gzip', 'text/plain'],
                     parameters: [
                         {
                             name: 'phenotype_id',
@@ -76,13 +76,23 @@ export function ApiAccess() {
                             type: 'integer',
                             value: '3080'
                         },
+                        {
+                            name: 'no_redirect',
+                            in: 'query',
+                            description: 'If set, return the download link instead of redirecting automatically to the file.',
+                            required: false,
+                            value: true,
+                            type: 'boolean',
+                        },
                     ],
                     responses: {
                         '200': {
-                            description: 'a tsv.gz file',
+                            description: 'a download link or a tsv.gz file',
+                            content: `text/plain`,
                             schema: {
-                                type: 'file'
-                            }
+                                type: 'string',
+                                example: 'true'
+                            },
                         },
                         '500': {
                             description: 'service unavailable'
