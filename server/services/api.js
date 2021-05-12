@@ -29,7 +29,7 @@ const {
 
 async function webApiRoutes(fastify, options) {
   const context = {
-    connection: fastify.mysql[config.database.name],
+    connection: fastify.mysql,
     logger: fastify.log,
     redis: fastify.redis,
   };
@@ -132,7 +132,7 @@ async function webApiRoutes(fastify, options) {
 
 async function publicApiRoutes(fastify, options) {
   const context = {
-    connection: fastify.mysql[config.database.name],
+    connection: fastify.mysql,
     logger: fastify.log,
     redis: fastify.redis,
   };
