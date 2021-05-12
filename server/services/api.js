@@ -136,7 +136,9 @@ async function webApiRoutes(fastify, options) {
 
   // redirects to the specified download phenotype's download link
   fastify.get("/download", ({ query }, reply) => 
-    getDownloadLink(context, query).then(link => reply.redirect(link))
+    getDownloadLink(context, query).then(link => {
+      query.no_redirect === 'true' ? reply.send(link) : reply.redirect(link)
+    })
   );
 
   // sets and retrieves share link parameters
@@ -246,7 +248,9 @@ async function publicApiRoutes(fastify, options) {
 
   // redirects to the specified download phenotype's download link
   fastify.get("/api/download", ({ query }, reply) => 
-    getDownloadLink(context, query).then(link => reply.redirect(link))
+    getDownloadLink(context, query).then(link => {
+      query.no_redirect === 'true' ? reply.send(link) : reply.redirect(link)
+    })
   );
 }
 
