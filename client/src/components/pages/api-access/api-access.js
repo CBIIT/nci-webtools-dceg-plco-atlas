@@ -885,11 +885,8 @@ export function ApiAccess() {
             },
             PCA: {
                 type: 'object',
-                required: ['participant_id', 'pc_x', 'pc_y', 'ancestry', 'sex'],
+                required: ['pc_x', 'pc_y', 'ancestry', 'sex'],
                 properties: {
-                    participant_id: {
-                        type: 'integer',
-                    },
                     pc_x: {
                         type: 'number'
                     },

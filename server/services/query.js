@@ -1225,7 +1225,6 @@ async function getPrincipalComponentAnalysis({connection, logger}, {phenotype_id
             where platform = :platform
             group by participant_id
         ) select 
-            pca.participant_id as participant_id,
             pca.pc_x as pc_x,
             pca.pc_y as pc_y,
             p.genetic_ancestry as ancestry,
