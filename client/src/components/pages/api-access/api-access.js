@@ -63,26 +63,26 @@ export function ApiAccess() {
             '/api/download': {
                 get: {
                     tags: ['download'],
-                    summary: 'Download the original dataset for a phenotype. ',
-                    description: 'Allows users to download the original dataset for the specified phenotype. If noRedirect is specified, retrieves the download link instead.',
+                    summary: 'Download the original association results for a phenotype. ',
+                    description: 'Allows users to download the original association results for the specified phenotype. Because results may be hosted on a different host, ensure that your client is configured to follow redirects.',
                     operationId: 'download',
                     produces: ['application/x-gzip', 'text/plain'],
                     parameters: [
                         {
                             name: 'phenotype_id',
                             in: 'query',
-                            description: 'A phenotype to download the original dataset for',
+                            description: 'Specifies the phenotype for which to download the original association results.',
                             required: true,
                             type: 'integer',
                             value: '3080'
                         },
                         {
-                            name: 'no_redirect',
+                            name: 'get_link_only',
                             in: 'query',
-                            description: 'If set, return the download link instead of redirecting automatically to the file.',
+                            description: 'If set, returns the download link instead of redirecting automatically to the file.',
                             required: false,
-                            value: true,
-                            type: 'boolean',
+                            type: 'string',
+                            enum: ['true']
                         },
                     ],
                     responses: {
@@ -150,7 +150,7 @@ export function ApiAccess() {
                         {
                             name: 'raw',
                             in: 'query',
-                            description: 'If true, returns data in an array of arrays instead of an array of JSONs.',
+                            description: 'If true, returns data in an array of arrays instead of an array of objects.',
                             required: false,
                             type: 'string',
                             enum: ['true']
@@ -333,7 +333,7 @@ export function ApiAccess() {
                         {
                             name: 'raw',
                             in: 'query',
-                            description: 'If true, returns data in an array of arrays instead of an array of JSONs.',
+                            description: 'If true, returns data in an array of arrays instead of an array of objects.',
                             required: false,
                             type: 'string',
                             enum: ['true']
@@ -568,7 +568,7 @@ export function ApiAccess() {
                         {
                             name: 'raw',
                             in: 'query',
-                            description: 'If true, returns data in an array of arrays instead of an array of JSONs.',
+                            description: 'If true, returns data in an array of arrays instead of an array of objects.',
                             required: false,
                             type: 'string',
                             enum: ['true']
@@ -634,7 +634,7 @@ export function ApiAccess() {
                         {
                             name: 'raw',
                             in: 'query',
-                            description: 'If true, returns data in an array of arrays instead of an array of JSONs.',
+                            description: 'If true, returns data in an array of arrays instead of an array of objects.',
                             required: false,
                             type: 'string',
                             enum: ['true']
@@ -673,7 +673,7 @@ export function ApiAccess() {
                         {
                             name: 'raw',
                             in: 'query',
-                            description: 'If true, returns data in an array of arrays instead of an array of JSONs.',
+                            description: 'If true, returns data in an array of arrays instead of an array of objects.',
                             required: false,
                             type: 'string',
                             enum: ['true']
@@ -722,7 +722,7 @@ export function ApiAccess() {
                         {
                             name: 'precision',
                             in: 'query',
-                            description: 'The numeric precision used for stratifying by value. Rounds to the nearest multiple of 10^-precision. For example, a precision of -1 rounds the value to the nearest multiple of 10^1, a precision of 2 rounds to the nearest multiple of 10^-2. Used only for continuous phenotypes. ',
+                            description: 'This parameter is only used only for phenotypes with continuous values. The numeric precision used for stratifying by value. Rounds to the nearest multiple of 10^-precision. For example, a precision of -1 rounds the value to the nearest multiple of 10^1, a precision of 2 rounds to the nearest multiple of 10^-2. ',
                             required: false,
                             type: 'integer',
                             value: '0'
@@ -730,7 +730,7 @@ export function ApiAccess() {
                         {
                             name: 'raw',
                             in: 'query',
-                            description: 'If true, returns data in an array of arrays instead of an array of JSONs.',
+                            description: 'If true, returns data in an array of arrays instead of an array of objects.',
                             required: false,
                             type: 'string',
                             enum: ['true']
@@ -798,7 +798,7 @@ export function ApiAccess() {
                         {
                             name: 'raw',
                             in: 'query',
-                            description: 'If true, returns data in an array of arrays instead of an array of JSONs.',
+                            description: 'If true, returns data in an array of arrays instead of an array of objects.',
                             required: false,
                             type: 'string',
                             enum: ['true']
@@ -1036,15 +1036,28 @@ export function ApiAccess() {
             <hr />
 
             <p>
-                The GWAS Atlas summary statistic data are also accessible by command line
-                from a terminal using the GWAS Atlas API server. This programmatic access
-                facilitates researchers who are interested in performing more advanced queries,
-                batch queries, or downloading results for specific genomic regions. The syntax
-                needed to perform these API calls are explained in detail below with the ability
-                to interactively test queries using the web interface before accessing the API
-                programmatically. Generally, text output is returned in JSON format for easy
-                manipulation and data storage.
-      </p>
+                The GWAS Atlas summary data are also accessible via a REST api. The api
+                enables users to retrieve GWAS results in their preferred environment and
+                offers more flexibility for querying data than does the web interface. The syntax
+                needed to perform api calls is described below. Users can test queries interactively 
+                using the web interface before accessing the api programmatically. Output is returned 
+                in JSON format except when specifically indicated.
+            </p>
+
+            <p>
+                Many api endpoints require a phenotype_id, which can be obtained by querying
+                the /api/phenotypes route. For example, to find all cancer-associated phenotypes,
+                users can send a GET request to the /api/phenotypes route with the following query
+                parameters: <a href="api/phenotypes?q=cancer" target="blank">/api/phenotypes?q=cancer</a>. 
+                This will retrieve an array of phenotype objects containing the phenotype_id, name, and 
+                other properties. Phenotypes that have an import_count of 0 have not yet been imported 
+                into the database, and will not have association results.
+            </p>
+
+            <p>
+                If a query parameter is not provided then a hierarchical tree of all phenotypes
+                will be returned, along with their associated metadata.
+            </p>
 
             <SwaggerUI spec={swaggerSpec} />
         </div>
