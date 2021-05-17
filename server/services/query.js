@@ -597,7 +597,7 @@ async function getCorrelations({connection, logger}, {a, b}) {
 async function getPhenotypes({connection, logger}, params = {}) {
     let columns = getValidColumns('phenotype', params.columns).map(quote).join(',')
     if (params.q) {
-        columns = ['id', 'name', 'display_name', 'description'];
+        columns = ['id', 'name', 'display_name', 'description', 'import_count'];
         params.q = `%${params.q}%`.toLowerCase();
     }
 
