@@ -698,8 +698,8 @@ export function ApiAccess() {
             '/api/participants': {
                 get: {
                     tags: ['participants'],
-                    summary: `Retrieves single phenotype's participant data`,
-                    description: `Retrieves single phenotype's participant data.`,
+                    summary: `Retrieves single phenotype's aggregated participant data`,
+                    description: `Retrieves single phenotype's aggregated participant data. `,
                     operationId: 'getParticipants',
                     produces: ['application/json'],
                     parameters: [
@@ -722,7 +722,7 @@ export function ApiAccess() {
                         {
                             name: 'precision',
                             in: 'query',
-                            description: 'This parameter is only used only for phenotypes with continuous values. The numeric precision used for stratifying by value. Rounds to the nearest multiple of 10^-precision. For example, a precision of -1 rounds the value to the nearest multiple of 10^1, a precision of 2 rounds to the nearest multiple of 10^-2. ',
+                            description: 'This parameter is relevant only for continuous phenotypes (such as BMI or Height). Values are rounded to the specified precision, which can help reduce the number of distinct counts returned. For example, a precision of -1 rounds values to the nearest multiple of 10^1, and a precision of 2 rounds to the nearest multiple of 10^-2. ',
                             required: false,
                             type: 'integer',
                             value: '0'
