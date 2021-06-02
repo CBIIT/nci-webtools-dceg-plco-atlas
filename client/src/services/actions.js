@@ -578,7 +578,7 @@ export function drawPCAPlot({
             m.ancestry === s.ancestry
         )
       }));
-
+      
       const layout = {
         hoverlabel: {
           bgcolor: '#fff',
@@ -704,17 +704,17 @@ export function drawPCAPlot({
 
         // filter data
         (pcaData[i] || pcaData[0]).forEach(item => {
-          if (item[3] !== ancestry || (sex !== 'all' && item[4] !== sex) || item[5] == null) {
+          if (item[2] !== ancestry || (sex !== 'all' && item[3] !== sex) || item[4] == null) {
             others.push(item);
           }
-          if (item[3] === ancestry && (sex === 'all' ? item[4] === 'female' || item[4] === 'male' : item[4] === sex) && (phenotypeType === 'binary' ? item[5] == null || item[5] === 0 : item[5] == null)) {
+          if (item[2] === ancestry && (sex === 'all' ? item[3] === 'female' || item[4] === 'male' : item[3] === sex) && (phenotypeType === 'binary' ? item[4] == null || item[4] === 0 : item[4] == null)) {
             if (i === 0) {
               controls1.push(item);
             } else {
               controls2.push(item);
             }
           }
-          if (item[3] === ancestry && (sex === 'all' ? item[4] === 'female' || item[4] === 'male' : item[4] === sex) && item[5] != null && item[5] !== 0) {
+          if (item[2] === ancestry && (sex === 'all' ? item[4] === 'female' || item[3] === 'male' : item[3] === sex) && item[4] != null && item[4] !== 0) {
             if (i === 0) {
               cases1.push(item);
             } else {
@@ -756,21 +756,21 @@ export function drawPCAPlot({
 
         pcaplotData = pcaplotData.concat([
           {
-            // x: item === 'others' ? others.map(item => item[1]) : item === 'cases1' ? cases1.map(item => item[1]) : cases2.map(item => item[1]), // PCA 1
+            // PCA 1
             x: {
+              'others': others.map(item => item[0]),
+              'controls1': controls1.map(item => item[0]),
+              'controls2': controls2.map(item => item[0]),
+              'cases1': cases1.map(item => item[0]),
+              'cases2': cases2.map(item => item[0])
+            }[item],
+            // PCA 2
+            y: {
               'others': others.map(item => item[1]),
               'controls1': controls1.map(item => item[1]),
               'controls2': controls2.map(item => item[1]),
               'cases1': cases1.map(item => item[1]),
               'cases2': cases2.map(item => item[1])
-            }[item],
-            // y: item === 'others' ? others.map(item => item[2]) : item === 'cases1' ? cases1.map(item => item[2]) : cases2.map(item => item[2]), // PCA 2
-            y: {
-              'others': others.map(item => item[2]),
-              'controls1': controls1.map(item => item[2]),
-              'controls2': controls2.map(item => item[2]),
-              'cases1': cases1.map(item => item[2]),
-              'cases2': cases2.map(item => item[2])
             }[item],
             // customdata: data.map((d, i) => ({
             //   phenotypeId: (phenotypes[i] || phenotypes[0]).id,
