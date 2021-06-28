@@ -425,7 +425,7 @@ async function exportVariants({connection, logger}, params) {
     const { data, columns } = await getVariants({connection, logger}, {
         ...params, 
         columns: ['phenotype_id', 'ancestry', 'sex', 'chromosome', 'position', 'snp', 'allele_effect', 'allele_non_effect', 'allele_effect_frequency', 'p_value', 'p_value_heterogenous', 'beta', 'odds_ratio', 'beta_ci_95_high', 'beta_ci_95_low', 'odds_ratio_ci_95_high', 'odds_ratio_ci_95_low', 'n'],
-        raw: true,
+        raw: 'true',
         limit: Math.min(params.limit, rowLimit),
         offset: 0,
     });
