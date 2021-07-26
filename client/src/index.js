@@ -21,7 +21,7 @@ getStore().then(store => {
     }}>
       <Provider store={store}>
         <App />
-      </Provider>,
+      </Provider>
   </RootContext.Provider>,
     document.getElementById('root')
   );
