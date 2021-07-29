@@ -181,7 +181,7 @@ async function hasRecord(connection, tableName, conditions, conditionJoiner) {
    }} params - Database query criteria
  * @returns Records in the aggregate summary table which match query criteria
  */
-async function getSummary({connection, logger}, {phenotype_id, table, sex, ancestry, p_value_nlog_min, raw}) {
+async function getSummary({connection, logger}, {phenotype_id, table, sex, ancestry, p_value_nlog_min, limit, offset raw}) {
     // validate parameters
     if (!phenotype_id || !await hasRecord(connection, 'phenotype', {id: phenotype_id}))
         throw new Error('A valid phenotype id must be provided');
@@ -198,12 +198,18 @@ async function getSummary({connection, logger}, {phenotype_id, table, sex, ances
     if (!p_value_nlog_min || isNaN(p_value_nlog_min))
         throw new Error('A valid -log10(p), p_value_nlog_min must be provided');
 
+    // sets limits and offsets (by default, limit to 1,000,000 records to prevent memory overflow)
+    const defaultLimit = config.rowLimit || 1e6;
+    limit = Math.min(+limit, defaultLimit) || defaultLimit; // set hard limit to prevent overflow
+    offset = +offset || 0;
+
     // determine number of variants
     const sql = `
         SELECT * FROM phenotype_aggregate partition(${quote(phenotype_id)})
         WHERE p_value_nlog > :p_value_nlog_min
         AND sex = :sex
         AND ancestry = :ancestry
+        LIMIT ${offset}, ${limit}
     `;
 
     logger.debug(`getSummary sql: ${sql}`);
@@ -356,7 +362,7 @@ async function getVariants({connection, logger}, params) {
 
     // sets limits and offsets (by default, limit to 1,000,000 records to prevent memory overflow)
     const defaultLimit = config.rowLimit || 1e6;
-    const limit = params.limit ? Math.min(params.limit, defaultLimit) : defaultLimit; // set hard limit to prevent overflow
+    const limit = Math.min(+params.limit, defaultLimit) || defaultLimit; // set hard limit to prevent overflow
     const offset = +params.offset || 0;
 
     // generate sql to query variants table(s)
@@ -445,7 +451,7 @@ async function exportVariants({connection, logger}, params) {
     }
 }
 
-async function getPoints({connection, logger}, { phenotype_id, sex, ancestry, raw }) {
+async function getPoints({connection, logger}, { phenotype_id, sex, ancestry, raw, limit, offset }) {
     // validate phenotype id
     if (!phenotype_id || !await hasRecord(connection, 'phenotype', {id: phenotype_id}))
         throw new Error('A valid phenotype id must be provided');
@@ -458,6 +464,11 @@ async function getPoints({connection, logger}, { phenotype_id, sex, ancestry, ra
     if (!ancestry || !await hasRecord(connection, 'lookup_ancestry', {value: ancestry}))
         throw new Error('A valid ancestry must be provided');
 
+    // sets limits and offsets (by default, limit to 1,000,000 records to prevent memory overflow)
+    const defaultLimit = config.rowLimit || 1e6;
+    limit = Math.min(+limit, defaultLimit) || defaultLimit; // set hard limit to prevent overflow
+    offset = +offset || 0;
+
     // query database
     const [data, columns] = await connection.execute({
         sql: `SELECT id, p_value_nlog_expected, p_value_nlog
@@ -465,7 +476,9 @@ async function getPoints({connection, logger}, { phenotype_id, sex, ancestry, ra
             WHERE phenotype_id = :phenotype_id
                 AND sex = :sex 
                 AND ancestry = :ancestry
-            ORDER BY p_value_nlog DESC`, 
+            ORDER BY p_value_nlog DESC
+            LIMIT ${offset}, ${limit}
+            `, 
         rowsAsArray: raw === 'true',
     }, { phenotype_id, sex, ancestry, raw });
     
