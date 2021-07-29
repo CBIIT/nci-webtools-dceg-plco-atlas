@@ -170,7 +170,7 @@ export function SummaryResults() {
         window.ga && window.ga(
           'send', 
           'event', 
-          'submit', 
+          'query', 
           'phenotype-summary', 
           [sex, ancestry, phenotype.display_name].join(' - ')
         );
