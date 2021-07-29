@@ -167,13 +167,10 @@ export function SummaryResults() {
         const { sex, ancestry } = stratification;
         const phenotype = phenotypes[i] || phenotypes[0];
 
-        window.ga && window.ga(
-          'send', 
-          'event', 
-          'query', 
-          'phenotype-summary', 
-          [sex, ancestry, phenotype.display_name].join(' - ')
-        );
+        window.gtag && window.gtag('event', 'phenotype-summary', {
+          event_category: 'query',
+          event_label: [sex, ancestry, phenotype.display_name].join(' - ')
+        });
 
         dispatch(
           fetchSummaryTable(i, {
