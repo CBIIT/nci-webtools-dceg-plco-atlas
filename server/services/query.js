@@ -181,7 +181,7 @@ async function hasRecord(connection, tableName, conditions, conditionJoiner) {
    }} params - Database query criteria
  * @returns Records in the aggregate summary table which match query criteria
  */
-async function getSummary({connection, logger}, {phenotype_id, table, sex, ancestry, p_value_nlog_min, limit, offset raw}) {
+async function getSummary({connection, logger}, {phenotype_id, table, sex, ancestry, p_value_nlog_min, limit, offset, raw}) {
     // validate parameters
     if (!phenotype_id || !await hasRecord(connection, 'phenotype', {id: phenotype_id}))
         throw new Error('A valid phenotype id must be provided');
