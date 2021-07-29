@@ -245,7 +245,7 @@ async function exportVariants({
             `DROP TABLE IF EXISTS prestage;
             CREATE TABLE prestage (
                 chromosome                  VARCHAR(2),
-                position                    BIGINT,
+                position                    INT,
                 snp                         VARCHAR(200),
                 allele_effect               VARCHAR(200),
                 allele_non_effect           VARCHAR(200),
@@ -302,7 +302,7 @@ async function exportVariants({
                         `DROP TABLE IF EXISTS ${stageTable}, ${variantTable}, ${aggregateTable}, ${pointTable}, ${metadataTable};`,
                         `CREATE TABLE ${stageTable} (
                             id                          BIGINT PRIMARY KEY NOT NULL AUTO_INCREMENT,
-                            chromosome                  VARCHAR(2),
+                            chromosome                  INT,
                             position                    BIGINT,
                             snp                         VARCHAR(200),
                             allele_effect               VARCHAR(200),
