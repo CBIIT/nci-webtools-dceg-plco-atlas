@@ -39,6 +39,7 @@ export function Downloads() {
 
     selectedPhenotypes.forEach((e, i) => {
       setTimeout(() => {
+        window.ga && window.ga('send', 'event', 'download', 'phenotype', e.display_name);
         download(generateLink(e.name, true));
       }, i * 250);
     });

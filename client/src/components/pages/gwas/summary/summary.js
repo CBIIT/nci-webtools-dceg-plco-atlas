@@ -166,6 +166,15 @@ export function SummaryResults() {
       .forEach((stratification, i) => {
         const { sex, ancestry } = stratification;
         const phenotype = phenotypes[i] || phenotypes[0];
+
+        window.ga && window.ga(
+          'send', 
+          'event', 
+          'submit', 
+          'phenotype-summary', 
+          [sex, ancestry, phenotype.display_name].join(' - ')
+        );
+
         dispatch(
           fetchSummaryTable(i, {
             phenotype_id: phenotype.id,
