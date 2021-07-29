@@ -148,6 +148,14 @@ export function ApiAccess() {
                             value: 4
                         },
                         {
+                            name: 'limit',
+                            in: 'query',
+                            description: 'A numeric value to limit the number of records returned.',
+                            type: 'integer',
+                            value: 10,
+                            minimum: 0
+                        },
+                        {
                             name: 'raw',
                             in: 'query',
                             description: 'If true, returns data in an array of arrays instead of an array of objects.',
@@ -565,6 +573,14 @@ export function ApiAccess() {
                             ],
                             value: 'european'
                         },
+                        {
+                            name: 'limit',
+                            in: 'query',
+                            description: 'A numeric value to limit the number of records returned.',
+                            type: 'integer',
+                            value: 10,
+                            minimum: 0
+                        },                        
                         {
                             name: 'raw',
                             in: 'query',
