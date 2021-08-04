@@ -518,12 +518,12 @@ async function exportVariants({
                             ${phenotype.id} as phenotype_id, 
                             '${sex}' as sex, 
                             '${ancestry}' as ancestry, 
-                            s.chromosome + 1 as chromosome, 
+                            s.chromosome as chromosome, 
                             null as lambda_gc, 
                             count(*) as count 
                         FROM ${stageTable} s 
-                        GROUP BY chromosome
-                        ORDER BY chromosome
+                        GROUP BY s.chromosome
+                        ORDER BY s.chromosome
                     `);
 
                     // export tables to output folder

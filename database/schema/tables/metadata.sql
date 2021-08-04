@@ -5,7 +5,6 @@ CREATE TABLE IF NOT EXISTS `${table_name}` (
     `sex` VARCHAR(20),
     `ancestry` VARCHAR(40),
     `chromosome` ENUM(
-        'all',
         '1',
         '2',
         '3',
@@ -29,7 +28,8 @@ CREATE TABLE IF NOT EXISTS `${table_name}` (
         '21',
         '22',
         'X',
-        'Y'
+        'Y',
+        'all'
     ) NOT NULL,
     `lambda_gc` DOUBLE,
     `lambda_gc_ld_score` DOUBLE,
