@@ -244,7 +244,7 @@ async function exportVariants({
             `SET FOREIGN_KEY_CHECKS=1;`,
             `DROP TABLE IF EXISTS prestage;
             CREATE TABLE prestage (
-                chromosome                  VARCHAR(2),
+                chromosome                  INT,
                 position                    INT,
                 snp                         VARCHAR(200),
                 allele_effect               VARCHAR(200),
