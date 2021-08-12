@@ -78,7 +78,7 @@ export function VariantLookup() {
       headerTitle: _ => 'Chromosome',
       title: true,
       sort: true,
-      formatter: defaultFormatter,
+      formatter: cell => cell == 23 ? 'X' : defaultFormatter(cell),
       headerStyle: { width: '65px', minWidth: '65px' },
       headerClasses: 'overflow-ellipsis',
       classes: 'overflow-ellipsis'

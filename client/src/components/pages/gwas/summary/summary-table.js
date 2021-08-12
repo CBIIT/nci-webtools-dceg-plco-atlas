@@ -53,7 +53,8 @@ export function SummaryResultsTable() {
       sort: true,
       headerStyle: { width: '65px', minWidth: '65px' },
       headerClasses: 'overflow-ellipsis',
-      classes: 'overflow-ellipsis'
+      classes: 'overflow-ellipsis',
+      formatter: cell => cell == 23 ? 'X' : cell,
     },
     {
       dataField: 'position',
