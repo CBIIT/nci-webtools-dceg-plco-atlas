@@ -205,7 +205,15 @@ async function getSummary({connection, logger}, {phenotype_id, table, sex, ances
 
     // determine number of variants
     const sql = `
-        SELECT * FROM phenotype_aggregate partition(${quote(phenotype_id)})
+        SELECT 
+            id, 
+            phenotype_id, 
+            sex, 
+            ancestry, 
+            CAST(chromosome AS UNSIGNED) as chromosome, 
+            position_abs, 
+            p_value_nlog
+        FROM phenotype_aggregate partition(${quote(phenotype_id)})
         WHERE p_value_nlog > :p_value_nlog_min
         AND sex = :sex
         AND ancestry = :ancestry
@@ -253,7 +261,7 @@ async function getSummary({connection, logger}, {phenotype_id, table, sex, ances
 
 
 async function getVariants({connection, logger}, params) {
-    const { sex, ancestry, chromosome } = params;
+    let { sex, ancestry, chromosome } = params;
     // const connection = await connectionPool.getConnection();
     const phenotypeIds = (params.phenotype_id || '').split(',');
     const phenotypeIdPlaceholders = getPlaceholders(phenotypeIds.length);
@@ -278,6 +286,7 @@ async function getVariants({connection, logger}, params) {
         throw new Error('A valid ancestry must be provided');
 
     // validate chromosome
+    if (chromosome === 'X') chromosome = 23;
     if (chromosome && !await hasRecord(connection, 'chromosome_range', {chromosome}))
         throw new Error('A valid chromosome must be provided');
 
