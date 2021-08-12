@@ -154,7 +154,7 @@ export function ManhattanPlot({
 
       // add pan limits based on currently selected chromosome
       if (selectedChromosome) {
-        let xRange = ranges.find(r => +r.chromosome === +selectedChromosome);
+        let xRange = ranges.find(r => r.id === +selectedChromosome);
         config.windowLimits = {
           xMin: xRange.position_min,
           xMax: xRange.position_max,
@@ -413,7 +413,7 @@ export function ManhattanPlot({
     });
 
     let title = getTitle();
-    let range = ranges.find(r => r.chromosome == selectedChromosome);
+    let range = ranges.find(r => r.id == selectedChromosome);
 
     let yExtent = extent(
       [...plotData.data, ...mirroredPlotData.data].map(
@@ -608,7 +608,7 @@ export function ManhattanPlot({
         key: columnIndexes.bp,
         tickFormat: tick => (tick / 1e6).toPrecision(3) + ' MB',
         ticks: ranges
-          .filter(r => !isNaN(r.chromosome))
+          .filter(r => r.id <= 23)
           .map(r => r.position_abs_max),
         tickFormat: (tick, i) => +ranges[i].chromosome,
         labelsBetweenTicks: true,
@@ -659,7 +659,7 @@ export function ManhattanPlot({
     });
 
     let title = getTitle();
-    let range = ranges.find(r => r.chromosome == selectedChromosome);
+    let range = ranges.find(r => r.id == selectedChromosome);
     let yExtent = extent([...plotData.data].map(d => d[columnIndexes.nLogP]));
     yExtent[1] *= 1.1;
 
