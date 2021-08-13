@@ -310,7 +310,7 @@ async function getVariants({connection, logger}, params) {
         [
             ancestry,
             sex,
-            chromosome || 'all',
+            +chromosome || 'all',
             phenotypeIds,
         ]        
     );
