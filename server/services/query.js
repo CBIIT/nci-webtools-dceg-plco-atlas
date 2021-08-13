@@ -287,7 +287,7 @@ async function getVariants({connection, logger}, params) {
 
     // validate chromosome
     if (chromosome === 'X') chromosome = 23;
-    if (chromosome && !await hasRecord(connection, 'chromosome_range', {chromosome}))
+    if (chromosome && !await hasRecord(connection, 'chromosome_range', {id: +chromosome}))
         throw new Error('A valid chromosome must be provided');
 
     // validate/sanitize snps
