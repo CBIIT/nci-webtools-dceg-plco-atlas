@@ -352,7 +352,7 @@ export function ManhattanPlot({
         ticks: ranges
           .filter(r => r.id <= 23)
           .map(r => +r.position_abs_max),
-        tickFormat: (tick, i) => +ranges[i].chromosome,
+        tickFormat: (tick, i) => ranges[i].chromosome,
         labelsBetweenTicks: true,
         allowSelection: true,
         onSelected: (range, i) => {
@@ -606,15 +606,14 @@ export function ManhattanPlot({
       xAxis: {
         title: null,
         key: columnIndexes.bp,
-        tickFormat: tick => (tick / 1e6).toPrecision(3) + ' MB',
         ticks: ranges
           .filter(r => r.id <= 23)
           .map(r => r.position_abs_max),
-        tickFormat: (tick, i) => +ranges[i].chromosome,
+        tickFormat: (tick, i) => ranges[i].chromosome,
         labelsBetweenTicks: true,
         allowSelection: true,
         onSelected: (range, i) => {
-          onChromosomeSelected(ranges[i].chromosome);
+          onChromosomeSelected(ranges[i].id);
         }
       },
       yAxis: {
