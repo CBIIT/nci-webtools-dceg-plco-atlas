@@ -246,7 +246,7 @@ export function Phenotypes() {
   const drawBubbleChart = data => {
     new Plot(
       plotContainer.current,
-      data,
+      filterImportDate(data),
       handleSingleClick,
       handleDoubleClick,
       handleBackgroundDoubleClick,
@@ -254,6 +254,19 @@ export function Phenotypes() {
       categoryColor
     );
   };
+
+  const filterImportDate = (array) => {
+    return array.some(o => o.import_date)
+        ? array.filter((child) => child.import_date || (child.children && child.children.some(o => o.import_date)))
+        : array.reduce((r, o) => {
+            if (o.import_date) return [...r, o];
+            if (o.children) {
+                const children = filterImportDate(o.children);
+                if (children.length) r.push({ ...o, children });
+            }
+            return r;
+        }, []);
+  }
 
   const handleSingleClick = e => {
     if (e) {
