@@ -1,6 +1,5 @@
 const path = require("path");
 const fastify = require("fastify");
-const redis = require("ioredis");
 const zlib = require("zlib");
 const forkCluster = require("./services/cluster");
 const getLogger = require("./services/logger");
@@ -70,7 +69,6 @@ if (isProduction && forkCluster()) return;
 
   // register redis cache if available
   if (config.redis) {
-    new redis(config.redis).flushall();
     app.register(require("fastify-redis"), config.redis);
   }
 
