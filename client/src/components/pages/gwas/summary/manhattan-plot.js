@@ -333,13 +333,12 @@ export function ManhattanPlot({
       )
     );
 
-    console.log({xExtent})
-
     let yExtent = extent(
       [...plotData.data, ...mirroredPlotData.data].map(
         d => +d[columnIndexes.nLogP]
       )
     );
+    
     yExtent[1] *= 1.1;
 
     return {
@@ -358,7 +357,7 @@ export function ManhattanPlot({
         key: columnIndexes.bp,
         tickFormat: tick => (tick / 1e6).toPrecision(3) + ' MB',
         ticks: ranges
-          .filter(r => r.id <= 23)
+          .filter(r => r.id <= xExtent[1])
           .map(r => +r.position_abs_max),
         tickFormat: (tick, i) => ranges[i].chromosome,
         labelsBetweenTicks: true,
@@ -616,7 +615,7 @@ export function ManhattanPlot({
         title: null,
         key: columnIndexes.bp,
         ticks: ranges
-          .filter(r => r.id <= 23)
+          .filter(r => r.id <= xExtent[1])
           .map(r => r.position_abs_max),
         tickFormat: (tick, i) => ranges[i].chromosome,
         labelsBetweenTicks: true,
