@@ -10,7 +10,8 @@
     "start": "node server/plco-server.js",
     "start:api": "node server/plco-server.js --api",
     "build": "cd client && npm run build",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "flush-cache": "node scripts/flush-cache.js"
   },
   "repository": {
     "type": "git",
@@ -32,6 +33,7 @@
     "fastify-redis": "^4.3.0",
     "fastify-server-timeout": "^0.1.1",
     "fastify-static": "^4.0.1",
+    "ioredis": "^4.27.7",
     "lib-r-math.js": "^1.0.89",
     "minimist": "^1.2.5",
     "mysql2": "^2.2.5",
