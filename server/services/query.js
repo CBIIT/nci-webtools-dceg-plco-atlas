@@ -560,8 +560,20 @@ async function getGenes({connection, logger}, params) {
         throw new Error('Chromosome, transcription_start, and transcription_end are required');
     }
 
+    // todo: only use numeric values for genes
+    if (+params.chromosome === 23)
+      params.chromosome = 'X';
+
     let sql = `
-        SELECT *
+        SELECT 
+            id, 
+            name, 
+            cast(chromosome as signed) as chromosome, 
+            strand, 
+            transcription_start, 
+            transcription_end, 
+            exon_starts, 
+            exon_ends
         FROM gene
         WHERE chromosome = :chromosome AND (
             (transcription_start BETWEEN :transcription_start AND :transcription_end) OR
