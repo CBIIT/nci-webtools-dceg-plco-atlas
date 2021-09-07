@@ -7,7 +7,7 @@ const config = require('../server/config');
   // flush redis cache
   if (config.redis) {
     const redisClient = new redis(config.redis);
-    redisClient.flushall();
+    await redisClient.flushall();
   }
 
   // populate cache with new defaults
@@ -20,13 +20,10 @@ const config = require('../server/config');
       password: config.database.password
     });
 
-    const phenotypes = await connection.query(`SELECT distinct phenotype_id FROM phenotype_metadata WHERE COUNT > 0`);
-    const metadataRecords = await connection.query(`SELECT phenotype_id, sex, ancestry FROM phenotype_metadata WHERE chromosome = 'all' AND COUNT > 0`);
+    const [metadataRecords] = await connection.query(`SELECT phenotype_id, sex, ancestry FROM phenotype_metadata WHERE chromosome = 'all' AND COUNT > 0`);
 
     for (const record of metadataRecords) {
       const summaryQueryParams = asQueryString({
-        phenotypes: [record],
-        stratifications: [record] ,
         p_value_nlog_min: 2,
         phenotype_id: record.phenotype_id,
         sex: record.sex,
@@ -41,7 +38,7 @@ const config = require('../server/config');
       });
 
       // populate /summary cache
-      const summaryQueryUrl = `http://localhost:${config.port}/summary?${summaryQueryParams}`;\
+      const summaryQueryUrl = `http://localhost:${config.port}/summary?${summaryQueryParams}`;
       console.log(summaryQueryUrl);
       await request(summaryQueryUrl);
 
