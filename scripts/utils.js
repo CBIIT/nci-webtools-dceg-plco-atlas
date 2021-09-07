@@ -1,4 +1,24 @@
-module.exports = { request };
+module.exports = { request, asQueryString };
+
+/**
+ * Serializes an object as a query string
+ * @param {object} obj
+ */
+ function asQueryString(obj) {
+  const query = [];
+  for (let key in obj) {
+    let value = obj[key];
+
+    // treat arrays as comma-delineated lists
+    if (Array.isArray(value)) value = value.join(',');
+
+    // exclude undefined, null, or false values
+    if (![undefined, null, false].includes(value))
+      query.push([key, value].map(encodeURIComponent).join('='));
+  }
+  return '?' + query.join('&');
+}
+
 
 function request(url, opts) {
   return new Promise((resolve, reject) => {
