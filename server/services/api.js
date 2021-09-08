@@ -59,7 +59,7 @@ async function webApiRoutes(fastify, options) {
       "onRequest",
       useGetRedisKey({
         redis: context.redis,
-        match: req => /variants|summary/.test(req.url),
+        match: req => /variants|summary|points/.test(req.url),
       })
     );
 
@@ -69,7 +69,7 @@ async function webApiRoutes(fastify, options) {
       useSetRedisKey({
         redis: context.redis,
         match: (req, res, payload) =>
-          /variants|summary/.test(req.url) && payload && payload.data.length > 1e3,
+          /variants|summary|points/.test(req.url) && payload && payload.data.length > 1e3,
       })
     );
   }
@@ -181,7 +181,7 @@ async function publicApiRoutes(fastify, options) {
       "onRequest",
       useGetRedisKey({
         redis: context.redis,
-        match: req => /variants|summary|participants/.test(req.url),
+        match: req => /variants|summary|participants|points/.test(req.url),
       })
     );
 
@@ -191,7 +191,7 @@ async function publicApiRoutes(fastify, options) {
       useSetRedisKey({
         redis: context.redis,
         match: (req, res, payload) =>
-          /variants|summary|participants/.test(req.url) && payload && payload.data.length > 1e3,
+          /variants|summary|participants|points/.test(req.url) && payload && payload.data.length > 1e3,
       })
     );
   }
