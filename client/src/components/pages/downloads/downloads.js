@@ -39,8 +39,8 @@ export function Downloads() {
 
     selectedPhenotypes.forEach((e, i) => {
       setTimeout(() => {
-        window.gtag && window.gtag('event', 'phenotype', {
-          event_category: 'download',
+        window.gtag && window.gtag('event', 'download', {
+          event_category: 'original-variants',
           event_label: e.display_name
         });
         download(generateLink(e.name, true));

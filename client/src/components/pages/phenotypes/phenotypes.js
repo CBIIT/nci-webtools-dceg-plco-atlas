@@ -155,8 +155,8 @@ export function Phenotypes() {
       ]);
     }
     
-    window.gtag && window.gtag('event', 'phenotype', {
-      event_category: 'browse',
+    window.gtag && window.gtag('event', 'query', {
+      event_category: 'participants',
       event_label: phenotype.display_name
     });
 
