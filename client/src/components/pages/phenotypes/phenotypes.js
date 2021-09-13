@@ -154,6 +154,11 @@ export function Phenotypes() {
         }
       ]);
     }
+    
+    window.gtag && window.gtag('event', 'phenotype', {
+      event_category: 'browse',
+      event_label: phenotype.display_name
+    });
 
     dispatch(
       updateBrowsePhenotypes({
