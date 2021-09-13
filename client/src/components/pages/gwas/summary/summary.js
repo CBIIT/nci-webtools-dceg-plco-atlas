@@ -167,8 +167,8 @@ export function SummaryResults() {
         const { sex, ancestry } = stratification;
         const phenotype = phenotypes[i] || phenotypes[0];
 
-        window.gtag && window.gtag('event', 'phenotype-summary', {
-          event_category: 'query',
+        window.gtag && window.gtag('event', 'query', {
+          event_category: 'variants',
           event_label: [sex, ancestry, phenotype.display_name].join(' - ')
         });
 
