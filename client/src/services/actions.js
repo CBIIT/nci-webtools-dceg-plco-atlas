@@ -697,6 +697,10 @@ export function drawPCAPlot({
       let cases2 = [];
       let controls1 = [];
       let controls2 = [];
+      let cases1_display_name = 'Cases';
+      let cases2_display_name = 'Cases';
+      let controls1_display_name = 'Controls';
+      let controls2_display_name = 'Controls';
 
       stratifications.map(({ sex, ancestry }, i) => {
         // console.log("sex", sex);
@@ -722,6 +726,17 @@ export function drawPCAPlot({
             }
           }
         });
+
+        // check if type = continuous, if so, rename legend items to "Included" and "Missing"
+        if (phenotypeType === 'continuous') {
+          if (i === 0) {
+            cases1_display_name = 'Included';
+            controls1_display_name = 'Missing';
+          } else {
+            cases2_display_name = 'Included';
+            controls2_display_name = 'Missing';
+          }
+        }
       });
 
       let traces = [];
@@ -772,27 +787,12 @@ export function drawPCAPlot({
               'cases1': cases1.map(item => item[1]),
               'cases2': cases2.map(item => item[1])
             }[item],
-            // customdata: data.map((d, i) => ({
-            //   phenotypeId: (phenotypes[i] || phenotypes[0]).id,
-            //   sex,
-            //   ancestry,
-            //   variantId: ids[i],
-            //   p: Math.pow(10, -observedValues[i]),
-            //   showData: i <= 10000,
-            //   color: markerColor
-            // })),
-            // name: isPairwise || stratifications.length === 2 ? (
-            //   item === 'cases1' || item === 'cases2' ? 
-            //     (item === 'cases1') ? 'Cases - ' + (phenotypes[0] || phenotypes[0]).display_name + ' - ' + titleCase(stratifications[0].ancestry) + ' - ' + titleCase(stratifications[0].sex)
-            //     : 'Cases - ' + (phenotypes[1] || phenotypes[0]).display_name + ' - ' + titleCase(stratifications[1].ancestry) + ' - ' + titleCase(stratifications[1].sex)
-            //   : 'Others'
-            //  ) : item === 'cases1' ? 'Cases' : 'Others',
             name: {
               'others': 'Others',
-              'controls1': isPairwise || stratifications.length === 2 ? 'Controls - ' + (phenotypes[0] || phenotypes[0]).display_name + ' - ' + titleCase(stratifications[0].ancestry) + ' - ' + titleCase(stratifications[0].sex) : 'Controls',
-              'controls2': isPairwise || stratifications.length === 2 ? 'Controls - ' + (phenotypes[1] || phenotypes[0]).display_name + ' - ' + titleCase(stratifications[1].ancestry) + ' - ' + titleCase(stratifications[1].sex) : 'Controls',
-              'cases1': isPairwise || stratifications.length === 2 ? 'Cases - ' + (phenotypes[0] || phenotypes[0]).display_name + ' - ' + titleCase(stratifications[0].ancestry) + ' - ' + titleCase(stratifications[0].sex) : 'Cases',
-              'cases2': isPairwise || stratifications.length === 2 ? 'Cases - ' + (phenotypes[1] || phenotypes[0]).display_name + ' - ' + titleCase(stratifications[1].ancestry) + ' - ' + titleCase(stratifications[1].sex) : 'Cases',
+              'controls1': isPairwise || stratifications.length === 2 ? `${controls1_display_name} - ` + (phenotypes[0] || phenotypes[0]).display_name + ' - ' + titleCase(stratifications[0].ancestry) + ' - ' + titleCase(stratifications[0].sex) : `${controls1_display_name}`,
+              'controls2': isPairwise || stratifications.length === 2 ? `${controls2_display_name} - ` + (phenotypes[1] || phenotypes[0]).display_name + ' - ' + titleCase(stratifications[1].ancestry) + ' - ' + titleCase(stratifications[1].sex) : `${controls2_display_name}`,
+              'cases1': isPairwise || stratifications.length === 2 ? `${cases1_display_name} - ` + (phenotypes[0] || phenotypes[0]).display_name + ' - ' + titleCase(stratifications[0].ancestry) + ' - ' + titleCase(stratifications[0].sex) : `${cases1_display_name}`,
+              'cases2': isPairwise || stratifications.length === 2 ? `${cases2_display_name} - ` + (phenotypes[1] || phenotypes[0]).display_name + ' - ' + titleCase(stratifications[1].ancestry) + ' - ' + titleCase(stratifications[1].sex) : `${cases2_display_name}`,
             }[item],
             mode: 'markers',
             type: 'scattergl',
