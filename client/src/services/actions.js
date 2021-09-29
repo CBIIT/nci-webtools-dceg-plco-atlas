@@ -966,30 +966,29 @@ export function lookupVariants({ phenotypes, variant, sex, ancestry }) {
         submitted: true
       }));
 
-      let chromosome = null;
-      let position = null;
-      let snp = variant;
+      let lookup_snps_filtered = null;
 
-      // // determine if we should query by snp or chromosome/position
-      // const coordinates = variant.match(/^chr(x|y|\d+):\d+$/i);
-      // if (coordinates) {
-      //   [, chromosome, position] = coordinates;
-      // } else {
-      //   snp = variant;
-      // }
+      let sanitized_variants = variant.match(/[\w:]+/g);
 
-      // null properties are not included in query
-      const { data } = await query('variants', {
-        phenotype_id: phenotypes.map(p => p.id),
-        sex,
-        ancestry,
-        chromosome,
-        position,
-        snp
+      lookup_snps_filtered = sanitized_variants.filter((x) => {
+        return (/^rs\d+$/i.test(x) || /^(chr)?\d?[\d|X|Y]:\d+$/i.test(x))
+      }).map((x) => {
+        return x.replace(/chr/ig, '')
       });
 
+      let results = [];
+      if (lookup_snps_filtered.length > 0) {
+        const { data } = await query('variants', {
+            phenotype_id: phenotypes.map(p => p.id),
+            sex,
+            ancestry,
+            lookup_snps: lookup_snps_filtered.join(',')
+          });
+          results = data
+      }
+
       // populate results
-      const results = data.map(record => ({
+      const totalResults = results.map(record => ({
         phenotype: phenotypes.find(p => p.id === record.phenotype_id),
         variant,
         ancestry,
@@ -999,7 +998,7 @@ export function lookupVariants({ phenotypes, variant, sex, ancestry }) {
   
       // populate empty results
       const emptyResults = phenotypes
-        .filter(p => !data.find(r => r.phenotype_id === p.id))
+        .filter(p => !results.find(r => r.phenotype_id === p.id))
         .map(p => ({
           phenotype: p,
           sex,
@@ -1018,8 +1017,8 @@ export function lookupVariants({ phenotypes, variant, sex, ancestry }) {
 
       dispatch(
         updateVariantLookupTable({
-          results: results.concat(emptyResults),
-          numResults: results.length
+          results: totalResults.concat(emptyResults),
+          resultsCount: results.length
         })
       );
     } catch (e) {

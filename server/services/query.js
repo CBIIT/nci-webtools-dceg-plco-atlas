@@ -265,8 +265,7 @@ async function getVariants({connection, logger}, params) {
     // const connection = await connectionPool.getConnection();
     const phenotypeIds = (params.phenotype_id || '').split(',');
     const phenotypeIdPlaceholders = getPlaceholders(phenotypeIds.length);
-
-    console.log(params, phenotypeIds,phenotypeIdPlaceholders );
+    // console.log(params, phenotypeIds,phenotypeIdPlaceholders );
 
     const [phenotypes] = await connection.query(
         `SELECT id, name FROM phenotype 
@@ -293,6 +292,11 @@ async function getVariants({connection, logger}, params) {
     // validate/sanitize snps
     if (params.snp) {
         params.snp = params.snp.match(/[\w:]+/g)
+    }
+
+    // validate/lookup snps
+    if (params.lookup_snps) {
+        params.lookup_snps = params.lookup_snps.match(/[\w:]+/g)
     }
 
     if (params.order_by) {
@@ -357,6 +361,7 @@ async function getVariants({connection, logger}, params) {
         coalesce(params.p_value_min, `p_value >= :p_value_min`),
         coalesce(params.p_value_max, `p_value <= :p_value_max`),
         coalesce(params.mod, `(id % :mod) = 0`),
+        coalesce(params.lookup_snps, `${(params.lookup_snps || []).map(s => s.includes('rs') ? `(snp = "${s}")` : `(chromosome = "${s.split(':')[0]}" AND position = ${s.split(':')[1]})`).join(' OR ')}`)
     ].filter(Boolean).join(' AND ');
 
     // determine valid order and orderBy columns

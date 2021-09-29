@@ -82,7 +82,7 @@ export function VariantLookupForm({
         <textarea
           id="lookup-form-variant" 
           className="form-control"
-          placeholder="Enter RS Numbers"
+          placeholder="Enter RS Number(s) or CHR:POS"
           value={_selectedVariant}
           onChange={ev => _setSelectedVariant(ev.target.value)}
         />
