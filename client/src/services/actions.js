@@ -982,7 +982,7 @@ export function lookupVariants({ phenotypes, variant, sex, ancestry }) {
             phenotype_id: phenotypes.map(p => p.id),
             sex,
             ancestry,
-            lookup_snps: lookup_snps_filtered.join(',')
+            snp: lookup_snps_filtered.join(',')
           });
           results = data
       }

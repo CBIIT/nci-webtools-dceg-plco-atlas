@@ -291,12 +291,7 @@ async function getVariants({connection, logger}, params) {
 
     // validate/sanitize snps
     if (params.snp) {
-        params.snp = params.snp.match(/[\w:]+/g)
-    }
-
-    // validate/lookup snps
-    if (params.lookup_snps) {
-        params.lookup_snps = params.lookup_snps.match(/[\w:]+/g)
+        params.snp = params.snp.match(/[\w:]+/g).filter((x) => /^[a-z0-9\:]+$/gi.test(x));
     }
 
     if (params.order_by) {
@@ -351,7 +346,7 @@ async function getVariants({connection, logger}, params) {
 
     const conditions = [
         coalesce(params.id, `id = :id`),
-        coalesce(params.snp, `snp IN (${(params.snp || []).map(s => `"${s}"`).join(',')})`),
+        coalesce(params.snp, `${(params.snp || []).map(s => /^rs\d+$/i.test(s) ? `(snp = "${s.toLowerCase()}")` : `(chromosome = "${s.split(':')[0].replace(/chr/ig, '').replace(/X/ig, '23').toUpperCase()}" AND position = ${s.split(':')[1]})`).join(' OR ')}`),
         coalesce(params.chromosome, `chromosome = :chromosome`),
         coalesce(params.position, `position = :position`),
         coalesce(params.position_min, `position >= :position_min`),
@@ -360,8 +355,7 @@ async function getVariants({connection, logger}, params) {
         coalesce(params.p_value_nlog_max, `p_value_nlog <= :p_value_nlog_max`),
         coalesce(params.p_value_min, `p_value >= :p_value_min`),
         coalesce(params.p_value_max, `p_value <= :p_value_max`),
-        coalesce(params.mod, `(id % :mod) = 0`),
-        coalesce(params.lookup_snps, `${(params.lookup_snps || []).map(s => s.includes('rs') ? `(snp = "${s}")` : `(chromosome = "${s.split(':')[0]}" AND position = ${s.split(':')[1]})`).join(' OR ')}`)
+        coalesce(params.mod, `(id % :mod) = 0`)
     ].filter(Boolean).join(' AND ');
 
     // determine valid order and orderBy columns
