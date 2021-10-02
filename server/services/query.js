@@ -525,7 +525,10 @@ async function getMetadata({connection, logger}, params) {
             m.chromosome as chromosome,
             m.lambda_gc as lambda_gc,
             m.lambda_gc_ld_score as lambda_gc_ld_score,
-            m.count as count
+            m.count as count,
+            m.participant_count,
+            m.participant_count_case,
+            m.participant_count_control
         FROM
             phenotype_metadata m
         JOIN
