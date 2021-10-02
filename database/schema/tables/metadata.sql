@@ -36,5 +36,8 @@ CREATE TABLE IF NOT EXISTS `${table_name}` (
     `average_value` DOUBLE,
     `standard_deviation` DOUBLE,
     `count` BIGINT,
+    `participant_count` INTEGER,
+    `participant_count_case` INTEGER,
+    `participant_count_control` INTEGER,
     UNIQUE KEY (`phenotype_id`, `sex`, `ancestry`, `chromosome`)
 );

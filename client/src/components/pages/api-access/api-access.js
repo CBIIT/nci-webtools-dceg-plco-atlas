@@ -233,11 +233,10 @@ export function ApiAccess() {
                         {
                             name: 'chromosome',
                             in: 'query',
-                            description: 'A chromosome number ("X" and "Y" chromosomes may be added in the future). Specifies the chromosome for the variants to retrieve.',
-                            required: true,
-                            type: 'integer',
-                            minimum: 1,
-                            maximum: 22,
+                            description: 'Specifies the chromosome for the variants to retrieve.',
+                            // required: true,
+                            type: 'string',
+                            enum: Array.from({length: 22}, (_, i) => (i + 1).toString()).concat('X'),
                             value: 8
                         },
                         {
@@ -416,11 +415,10 @@ export function ApiAccess() {
                         {
                             name: 'chromosome',
                             in: 'query',
-                            description: 'A chromosome number ("X" and "Y" chromosomes may be added in the future). Specifies the chromosome for the variants to retrieve.',
-                            required: true,
-                            type: 'integer',
-                            minimum: 1,
-                            maximum: 22,
+                            description: 'Specifies the chromosome for the variants to retrieve.',
+                            // required: true,
+                            type: 'string',
+                            enum: Array.from({length: 22}, (_, i) => (i + 1).toString()).concat('X'),
                             value: 8
                         },
                         {

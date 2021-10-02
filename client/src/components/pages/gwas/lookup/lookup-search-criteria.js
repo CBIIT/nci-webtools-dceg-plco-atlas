@@ -13,10 +13,17 @@ export const VariantLookupSearchCriteria = () => {
   } = useSelector(
     state => state.variantLookup
   );
+
+  const {
+    resultsCount
+  } = useSelector(
+    state => state.variantLookupTable
+  );
+
   const [collapsed, setCollapsed] = useState(true);
   const canCollapse = submitted && selectedPhenotypes.length > 1;
   const toggleCollapsed = _ =>  canCollapse && setCollapsed(!collapsed);
-  const selectedVariants = (selectedVariant || '').split(/\s+/g).filter(e => e.trim().length);
+  const selectedVariants = (selectedVariant || '').split(/\s+|,/g).filter(e => e.trim().length);
 
   const asTitleCase = str => str.replace(/_+/g, ' ').replace(/\w+/g, word =>
     word[0].toUpperCase() + word.substr(1).toLowerCase());
@@ -104,7 +111,7 @@ export const VariantLookupSearchCriteria = () => {
       <div className="d-flex align-items-center">
         <span className="mr-2">
           <b>Total Results: </b>
-          {selectedPhenotypes.length ? selectedPhenotypes.length.toLocaleString() : 'None'}
+          {selectedPhenotypes.length && resultsCount ? resultsCount.toLocaleString() : 'None'}
         </span>
         <ShareLink
           disabled={!submitted}

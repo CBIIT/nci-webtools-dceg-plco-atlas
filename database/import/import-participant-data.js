@@ -212,4 +212,160 @@ async function importParticipantData() {
             average_value = VALUES(average_value),
             standard_deviation = VALUES(standard_deviation);
     `);
+    
+
+    // insert participant count metadata
+    await connection.query(`
+        -- workaround for group_by temp table issue: https://bugs.mysql.com/bug.php?id=99100
+        SET SESSION internal_tmp_mem_storage_engine=Memory;
+
+        -- insert participant counts for "all" ancestries, grouped by sex
+        INSERT INTO phenotype_metadata (phenotype_id, sex, ancestry, chromosome, participant_count)
+        SELECT 
+            pd.phenotype_id AS phenotype_id,
+            p.sex AS sex,
+            "all" AS ancestry,
+            "all" as chromosome,
+            COUNT(pd.value) AS participant_count
+        FROM participant_data pd
+        INNER JOIN participant p ON pd.participant_id = p.id
+        WHERE pd.value IS NOT NULL
+        GROUP BY pd.phenotype_id, p.sex
+        ON DUPLICATE KEY UPDATE
+            participant_count = VALUES(participant_count);
+
+        -- insert participant counts grouped by ancestry and sex
+        INSERT INTO phenotype_metadata (phenotype_id, sex, ancestry, chromosome, participant_count)
+        SELECT 
+            pd.phenotype_id AS phenotype_id,
+            p.sex AS sex,
+            p.genetic_ancestry AS ancestry,
+            "all" as chromosome,
+            COUNT(pd.value) AS participant_count
+        FROM participant_data pd
+        INNER JOIN participant p ON pd.participant_id = p.id
+        INNER JOIN lookup_ancestry la ON p.genetic_ancestry = la.value
+        WHERE pd.value IS NOT NULL
+        GROUP BY pd.phenotype_id, p.sex, p.genetic_ancestry
+        ON DUPLICATE KEY UPDATE
+            participant_count = VALUES(participant_count);
+
+        -- insert participant counts for "all" sexes, grouped by ancestry
+        INSERT INTO phenotype_metadata (phenotype_id, sex, ancestry, chromosome, participant_count)
+        SELECT 
+            phenotype_id, 
+            "all" AS sex, 
+            ancestry, 
+            "all" AS chromosome, 
+            SUM(participant_count) AS participant_count
+        FROM phenotype_metadata
+        WHERE participant_count IS NOT NULL
+        AND sex IN ("female", "male")
+        GROUP BY phenotype_id, ancestry
+        ON DUPLICATE KEY UPDATE
+            participant_count = VALUES(participant_count);
+
+        -- insert participant case counts for "all" ancestries, grouped by sex
+        INSERT INTO phenotype_metadata (phenotype_id, sex, ancestry, chromosome, participant_count_case)
+        SELECT 
+            pd.phenotype_id AS phenotype_id, 
+            p.sex AS sex, 
+            "all" AS ancestry,
+            "all" AS chromosome,
+            COUNT(pd.value) AS participant_count_case 
+        FROM participant_data pd
+        JOIN participant p ON pd.participant_id = p.id
+        WHERE phenotype_id IN (SELECT id FROM phenotype WHERE TYPE = 'binary') 
+        AND pd.value = 1 
+        GROUP BY phenotype_id, p.sex
+        ON DUPLICATE KEY UPDATE
+            participant_count_case = VALUES(participant_count_case);
+
+
+        -- insert participant case counts grouped by ancestry and sex
+        INSERT INTO phenotype_metadata (phenotype_id, sex, ancestry, chromosome, participant_count_case)
+        SELECT 
+            pd.phenotype_id AS phenotype_id,
+            p.sex AS sex,
+            p.genetic_ancestry AS ancestry,
+            "all" AS chromosome,
+            COUNT(pd.value) AS participant_count_case
+        FROM participant_data pd
+        INNER JOIN participant p ON pd.participant_id = p.id
+        INNER JOIN lookup_ancestry la ON p.genetic_ancestry = la.value
+        WHERE phenotype_id IN (SELECT id FROM phenotype WHERE TYPE = 'binary') 
+        AND pd.value = 1         
+        GROUP BY pd.phenotype_id, p.sex, p.genetic_ancestry
+        ON DUPLICATE KEY UPDATE
+            participant_count_case = VALUES(participant_count_case);
+
+        -- insert participant case counts for "all" sexes, grouped by ancestry
+        INSERT INTO phenotype_metadata (phenotype_id, sex, ancestry, chromosome, participant_count_case)
+        SELECT 
+            phenotype_id, 
+            "all" AS sex, 
+            ancestry, 
+            "all" AS chromosome, 
+            SUM(participant_count_case) AS participant_count_case
+        FROM phenotype_metadata
+        WHERE participant_count_case IS NOT NULL
+        AND sex IN ("female", "male")
+        GROUP BY phenotype_id, ancestry
+        ON DUPLICATE KEY UPDATE
+            participant_count_case = VALUES(participant_count_case);
+
+
+            
+        -- insert participant control counts for "all" ancestries, grouped by sex
+        INSERT INTO phenotype_metadata (phenotype_id, sex, ancestry, chromosome, participant_count_control)
+        SELECT 
+            pd.phenotype_id AS phenotype_id, 
+            p.sex AS sex, 
+            "all" AS ancestry,
+            "all" AS chromosome,
+            COUNT(pd.value) AS participant_count_control 
+        FROM participant_data pd
+        JOIN participant p ON pd.participant_id = p.id
+        WHERE phenotype_id IN (SELECT id FROM phenotype WHERE TYPE = 'binary') 
+        AND pd.value = 0
+        GROUP BY phenotype_id, p.sex
+        ON DUPLICATE KEY UPDATE
+            participant_count_control = VALUES(participant_count_control);
+
+
+        -- insert participant control counts grouped by ancestry and sex
+        INSERT INTO phenotype_metadata (phenotype_id, sex, ancestry, chromosome, participant_count_control)
+        SELECT 
+            pd.phenotype_id AS phenotype_id,
+            p.sex AS sex,
+            p.genetic_ancestry AS ancestry,
+            "all" AS chromosome,
+            COUNT(pd.value) AS participant_count_control
+        FROM participant_data pd
+        INNER JOIN participant p ON pd.participant_id = p.id
+        INNER JOIN lookup_ancestry la ON p.genetic_ancestry = la.value
+        WHERE phenotype_id IN (SELECT id FROM phenotype WHERE TYPE = 'binary') 
+        AND pd.value = 0         
+        GROUP BY pd.phenotype_id, p.sex, p.genetic_ancestry
+        ON DUPLICATE KEY UPDATE
+            participant_count_control = VALUES(participant_count_control);
+
+        -- insert participant control counts for "all" sexes, grouped by ancestry
+        INSERT INTO phenotype_metadata (phenotype_id, sex, ancestry, chromosome, participant_count_control)
+        SELECT 
+            phenotype_id, 
+            "all" AS sex, 
+            ancestry, 
+            "all" AS chromosome, 
+            SUM(participant_count_control) AS participant_count_control
+        FROM phenotype_metadata
+        WHERE participant_count_control IS NOT NULL
+        AND sex IN ("female", "male")
+        GROUP BY phenotype_id, ancestry
+        ON DUPLICATE KEY UPDATE
+            participant_count_control = VALUES(participant_count_control);
+
+    `);
+
+
 }
