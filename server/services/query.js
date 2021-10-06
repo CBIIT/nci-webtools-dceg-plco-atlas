@@ -314,8 +314,8 @@ async function getVariants({connection, logger}, params) {
         ]        
     );
 
-    // use only phenotypes with data
-    if (!metadata.length || metadata.some(m => !m.count))
+    // use only phenotypes with data, skip check if searching by SNP
+    if (!params.snp && (!metadata.length || metadata.some(m => !m.count)))
         throw new Error('The specified phenotype(s) do not have any variants.');
 
     // determine tables for selected phenotypes
