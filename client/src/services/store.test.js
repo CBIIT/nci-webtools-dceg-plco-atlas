@@ -36,7 +36,7 @@ describe('Store Module', function() {
       },
       pcaPlot: {
         loadingPCAPlot: false,
-        pcaplotData: [],
+        pcaplotData: { trait1: [], trait2: []},
         pcaplotLayout: {},
         selectedPlatform: 'PLCO_GSA',
         selectedPCX: '1',

@@ -558,7 +558,7 @@ export function drawPCAPlot({
       dispatch(
         updatePCAPlot({
           loadingPCAPlot: true,
-          pcaplotData: [],
+          pcaplotData: { trait1: [], trait2: []},
           pcaplotLayout: {}
         })
       );
@@ -672,7 +672,7 @@ export function drawPCAPlot({
         })
       );
 
-      let pcaplotData = [];
+      let pcaplotData = { trait1: [], trait2: []};
       let pcaData = {};
 
       // console.log("pc_platform", pc_platform);
@@ -692,7 +692,8 @@ export function drawPCAPlot({
         })
       );
 
-      let others = [];
+      let others1 = [];
+      let others2 = [];
       let cases1 = [];
       let cases2 = [];
       let controls1 = [];
@@ -702,6 +703,18 @@ export function drawPCAPlot({
       let controls1_display_name = 'Controls';
       let controls2_display_name = 'Controls';
 
+      let traces = [];
+      if (isPairwise || stratifications.length === 2) {
+        traces = [
+          ['others1', 'controls1', 'cases1'],
+          ['others2', 'controls2', 'cases2']
+        ];
+      } else {
+        traces = [
+          ['others1', 'controls1', 'cases1']
+        ]
+      }
+
       stratifications.map(({ sex, ancestry }, i) => {
         // console.log("sex", sex);
         const phenotypeType = (phenotypes[i] || phenotypes[0]).type;
@@ -709,7 +722,11 @@ export function drawPCAPlot({
         // filter data
         (pcaData[i] || pcaData[0]).forEach(item => {
           if (item[2] !== ancestry || (sex !== 'all' && item[3] !== sex) || item[4] == null) {
-            others.push(item);
+            if (i === 0) {
+              others1.push(item);
+            } else {
+              others2.push(item);
+            }
           }
           if (item[2] === ancestry && (sex === 'all' ? item[3] === 'female' || item[4] === 'male' : item[3] === sex) && (phenotypeType === 'binary' ? item[4] == null || item[4] === 0 : item[4] == null)) {
             if (i === 0) {
@@ -737,74 +754,71 @@ export function drawPCAPlot({
             controls2_display_name = 'Missing';
           }
         }
-      });
 
-      let traces = [];
-      if (isPairwise || stratifications.length === 2) {
-        traces = ['others', 'controls1', 'cases1', 'controls2', 'cases2'];
-      } else {
-        traces = ['others', 'controls1', 'cases1']
-      }
-
-      traces.map((item) => {
-        
-        const titleCase = str => {
-          let titleString = str.replace(
-            /_+/g, ' '
-          );
-          titleString = titleString.replace(
-            /\w+/g,
-            str =>
-              str[0].toUpperCase() +
-              str.substring(1, str.length).toLowerCase()
-          );
-          return titleString;
-        };
+        traces[i].map((item) => {
           
-        const markerColor = {
-          others: '#A6A6A6',
-          controls1: stratifications.length === 2 ? '#a2173a' : '#A76909',
-          controls2: '#002a47',
-          cases1: stratifications.length === 2 ? '#f41c52' : '#F2990D',
-          cases2: '#006bb8'
-        }[item];
-
-        pcaplotData = pcaplotData.concat([
-          {
-            // PCA 1
-            x: {
-              'others': others.map(item => item[0]),
-              'controls1': controls1.map(item => item[0]),
-              'controls2': controls2.map(item => item[0]),
-              'cases1': cases1.map(item => item[0]),
-              'cases2': cases2.map(item => item[0])
-            }[item],
-            // PCA 2
-            y: {
-              'others': others.map(item => item[1]),
-              'controls1': controls1.map(item => item[1]),
-              'controls2': controls2.map(item => item[1]),
-              'cases1': cases1.map(item => item[1]),
-              'cases2': cases2.map(item => item[1])
-            }[item],
-            name: {
-              'others': 'Others',
-              'controls1': isPairwise || stratifications.length === 2 ? `${controls1_display_name} - ` + (phenotypes[0] || phenotypes[0]).display_name + ' - ' + titleCase(stratifications[0].ancestry) + ' - ' + titleCase(stratifications[0].sex) : `${controls1_display_name}`,
-              'controls2': isPairwise || stratifications.length === 2 ? `${controls2_display_name} - ` + (phenotypes[1] || phenotypes[0]).display_name + ' - ' + titleCase(stratifications[1].ancestry) + ' - ' + titleCase(stratifications[1].sex) : `${controls2_display_name}`,
-              'cases1': isPairwise || stratifications.length === 2 ? `${cases1_display_name} - ` + (phenotypes[0] || phenotypes[0]).display_name + ' - ' + titleCase(stratifications[0].ancestry) + ' - ' + titleCase(stratifications[0].sex) : `${cases1_display_name}`,
-              'cases2': isPairwise || stratifications.length === 2 ? `${cases2_display_name} - ` + (phenotypes[1] || phenotypes[0]).display_name + ' - ' + titleCase(stratifications[1].ancestry) + ' - ' + titleCase(stratifications[1].sex) : `${cases2_display_name}`,
-            }[item],
-            mode: 'markers',
-            type: 'scattergl',
-            hoverinfo: 'none',
-            text: null,
-            marker: {
-              color: markerColor,
-              size: 5,
-              opacity: 0.65
+          const titleCase = str => {
+            let titleString = str.replace(
+              /_+/g, ' '
+            );
+            titleString = titleString.replace(
+              /\w+/g,
+              str =>
+                str[0].toUpperCase() +
+                str.substring(1, str.length).toLowerCase()
+            );
+            return titleString;
+          };
+            
+          const markerColor = {
+            others1: '#A6A6A6',
+            others2: '#A6A6A6',
+            controls1: stratifications.length === 2 ? '#a2173a' : '#A76909',
+            controls2: '#002a47',
+            cases1: stratifications.length === 2 ? '#f41c52' : '#F2990D',
+            cases2: '#006bb8'
+          }[item];
+          
+          pcaplotData[ i === 0 ? 'trait1' : 'trait2'].push(
+            {
+              // PCA 1
+              x: {
+                'others1': others1.map(item => item[0]),
+                'others2': others2.map(item => item[0]),
+                'controls1': controls1.map(item => item[0]),
+                'controls2': controls2.map(item => item[0]),
+                'cases1': cases1.map(item => item[0]),
+                'cases2': cases2.map(item => item[0])
+              }[item],
+              // PCA 2
+              y: {
+                'others1': others1.map(item => item[1]),
+                'others2': others2.map(item => item[1]),
+                'controls1': controls1.map(item => item[1]),
+                'controls2': controls2.map(item => item[1]),
+                'cases1': cases1.map(item => item[1]),
+                'cases2': cases2.map(item => item[1])
+              }[item],
+              name: {
+                'others1': 'Others',
+                'others2': 'Others',
+                'controls1': isPairwise || stratifications.length === 2 ? `${controls1_display_name} - ` + (phenotypes[0] || phenotypes[0]).display_name + ' - ' + titleCase(stratifications[0].ancestry) + ' - ' + titleCase(stratifications[0].sex) : `${controls1_display_name}`,
+                'controls2': isPairwise || stratifications.length === 2 ? `${controls2_display_name} - ` + (phenotypes[1] || phenotypes[0]).display_name + ' - ' + titleCase(stratifications[1].ancestry) + ' - ' + titleCase(stratifications[1].sex) : `${controls2_display_name}`,
+                'cases1': isPairwise || stratifications.length === 2 ? `${cases1_display_name} - ` + (phenotypes[0] || phenotypes[0]).display_name + ' - ' + titleCase(stratifications[0].ancestry) + ' - ' + titleCase(stratifications[0].sex) : `${cases1_display_name}`,
+                'cases2': isPairwise || stratifications.length === 2 ? `${cases2_display_name} - ` + (phenotypes[1] || phenotypes[0]).display_name + ' - ' + titleCase(stratifications[1].ancestry) + ' - ' + titleCase(stratifications[1].sex) : `${cases2_display_name}`,
+              }[item],
+              mode: 'markers',
+              type: 'scattergl',
+              hoverinfo: 'none',
+              text: null,
+              marker: {
+                color: markerColor,
+                size: 5,
+                opacity: 0.65
+              }
             }
-          }
-        ]);
+          );
+        });
       });
 
       dispatch(updatePCAPlot({ pcaplotData }));
@@ -819,7 +833,7 @@ export function drawPCAPlot({
       dispatch(
         updatePCAPlot({
           loadingPCAPlot: true,
-          pcaplotData: [],
+          pcaplotData: { trait1: [], trait2: []},
           pcaplotLayout: {}
         })
       );

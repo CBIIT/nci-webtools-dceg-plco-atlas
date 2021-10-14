@@ -69,7 +69,7 @@ export function SummaryResults() {
       );
     }
 
-    if (submitted && selectedPlot === 'pca-plot' && pcaplotData.length === 0) {
+    if (submitted && selectedPlot === 'pca-plot' && pcaplotData['trait1'].length === 0) {
       dispatch(
         drawPCAPlot({
           phenotypes: selectedPhenotypes,
