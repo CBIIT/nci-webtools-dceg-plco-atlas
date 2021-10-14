@@ -731,8 +731,14 @@ export function drawPCAPlot({
           if (item[2] === ancestry && (sex === 'all' ? item[3] === 'female' || item[4] === 'male' : item[3] === sex) && (phenotypeType === 'binary' ? item[4] == null || item[4] === 0 : item[4] == null)) {
             if (i === 0) {
               controls1.push(item);
+              if (phenotypeType === 'continuous') {
+                others1 = others1.concat(controls1)
+              }
             } else {
               controls2.push(item);
+              if (phenotypeType === 'continuous') {
+                others2 = others2.concat(controls2)
+              }
             }
           }
           if (item[2] === ancestry && (sex === 'all' ? item[4] === 'female' || item[3] === 'male' : item[3] === sex) && item[4] != null && item[4] !== 0) {
@@ -755,8 +761,11 @@ export function drawPCAPlot({
           }
         }
 
-        traces[i].map((item) => {
-          
+        traces[i]
+        .filter((item) => {
+          return (phenotypeType != 'continuous') || (phenotypeType === 'continuous' && !(item === 'controls1' || item === 'controls2'))
+        })
+        .map((item) => {
           const titleCase = str => {
             let titleString = str.replace(
               /_+/g, ' '
@@ -800,8 +809,8 @@ export function drawPCAPlot({
                 'cases2': cases2.map(item => item[1])
               }[item],
               name: {
-                'others1': 'Others',
-                'others2': 'Others',
+                'others1': 'Not included',
+                'others2': 'Not included',
                 'controls1': isPairwise || stratifications.length === 2 ? `${controls1_display_name} - ` + (phenotypes[0] || phenotypes[0]).display_name + ' - ' + titleCase(stratifications[0].ancestry) + ' - ' + titleCase(stratifications[0].sex) : `${controls1_display_name}`,
                 'controls2': isPairwise || stratifications.length === 2 ? `${controls2_display_name} - ` + (phenotypes[1] || phenotypes[0]).display_name + ' - ' + titleCase(stratifications[1].ancestry) + ' - ' + titleCase(stratifications[1].sex) : `${controls2_display_name}`,
                 'cases1': isPairwise || stratifications.length === 2 ? `${cases1_display_name} - ` + (phenotypes[0] || phenotypes[0]).display_name + ' - ' + titleCase(stratifications[0].ancestry) + ' - ' + titleCase(stratifications[0].sex) : `${cases1_display_name}`,
