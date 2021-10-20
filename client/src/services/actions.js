@@ -350,7 +350,7 @@ export function drawQQPlot({ phenotypes, stratifications, isPairwise }) {
         ? undefined
         : [
             `<b>\u03BB (median)</b> = ${stratifications[0].metadata.lambda_gc}`,
-            `<b>\u03BB (LD score)</b> = ${stratifications[0].metadata.lambda_gc_ld_score || 'N/A'}`,
+            stratifications[0].metadata.lambda_gc_ld_score ? `<b>\u03BB (LD score)</b> = ${stratifications[0].metadata.lambda_gc_ld_score}` : ``,
             `<b>Number of Variants</b> = ${stratifications[0].metadata.count.toLocaleString()}`
           ].join(' '.repeat(5));
 
