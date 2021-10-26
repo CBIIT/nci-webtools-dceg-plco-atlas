@@ -60,6 +60,7 @@ export function ApiAccess() {
                     },
                 }
             },
+            /*
             '/api/download': {
                 get: {
                     tags: ['download'],
@@ -100,6 +101,7 @@ export function ApiAccess() {
                     },
                 },
             },
+            */
             '/api/summary': {
                 get: {
                     tags: ['summary'],
