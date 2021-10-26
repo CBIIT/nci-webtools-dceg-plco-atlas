@@ -46,16 +46,16 @@ function App() {
       image: 'assets/images/phenotypes.svg',
       navIndex: 1
     },
-    {
-      route: '/downloads',
-      action: 'Download',
-      title: 'Data',
-      cardTitle: 'Access Data',
-      cardText:
-        'Download files of genome-wide association study estimates and summary statistics',
-      image: 'assets/images/downloads.svg',
-      navIndex: 2
-    },
+    // {
+    //   route: '/downloads',
+    //   action: 'Download',
+    //   title: 'Data',
+    //   cardTitle: 'Access Data',
+    //   cardText:
+    //     'Download files of genome-wide association study estimates and summary statistics',
+    //   image: 'assets/images/downloads.svg',
+    //   navIndex: 2
+    // },
     {
       route: '/link'
     }
@@ -70,7 +70,7 @@ function App() {
       <Route path="/api-access" component={ApiAccess} />
       <Route path="/gwas" component={Gwas} />
       <Route path="/phenotypes" component={Phenotypes} />
-      <Route path="/downloads" component={Downloads} />
+      {/* <Route path="/downloads" component={Downloads} /> */}
       <Route path="/link/:shareID?" component={LinkWrapper} />
     </Router>
   );

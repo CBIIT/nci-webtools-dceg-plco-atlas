@@ -396,7 +396,7 @@ export function SummaryResultsTable() {
           </OverlayTrigger>
 
 
-          <OverlayTrigger overlay={
+          {/* <OverlayTrigger overlay={
             <Tooltip id="download-dataset-tooltip">
               Download the original dataset for this phenotype.
             </Tooltip>}>
@@ -406,7 +406,7 @@ export function SummaryResultsTable() {
               href={getDownloadLink()}>
               Download Dataset
             </a>
-          </OverlayTrigger>
+          </OverlayTrigger> */}
 
         </div>
       </div>
