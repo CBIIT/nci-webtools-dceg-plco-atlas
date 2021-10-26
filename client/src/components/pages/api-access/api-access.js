@@ -9,9 +9,9 @@ export function ApiAccess() {
         host: window.location.host,
         basePath: window.location.pathname,
         tags: [
-            {
-                name: 'download',
-            },
+            // {
+            //     name: 'download',
+            // },
             {
                 name: 'metadata',
             },
