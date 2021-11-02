@@ -22,6 +22,5 @@ const config = require('../server/config');
 
     const [metadataRecords] = await connection.query(`SELECT phenotype_id, sex, ancestry FROM phenotype_metadata WHERE chromosome = 'all' AND COUNT > 0`);
     console.log(metadataRecords);
-    }
   }
 })();
