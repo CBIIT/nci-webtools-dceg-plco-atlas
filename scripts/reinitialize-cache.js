@@ -1,6 +1,6 @@
 const mysql = require('mysql2/promise');
 const redis = require('ioredis');
-const { request, asQueryString } = require('./utils');
+const { request, asQueryString, deferUntilResolved } = require('./utils');
 const config = require('../server/config');
 
 async function main() {
@@ -22,6 +22,15 @@ async function main() {
     });
 
     const [metadataRecords] = await connection.query(`SELECT phenotype_id, sex, ancestry FROM phenotype_metadata WHERE chromosome = 'all' AND COUNT > 0`);
+
+    const status = await deferUntilResolved(async () => {
+      const pingUrl = `http://localhost:${config.port}/api/ping`;
+      await request(pingUrl);
+    });
+
+    if (!status) {
+      throw new Error("API is not running")
+    }
 
     for (const record of metadataRecords) {
       const summaryQueryParams = asQueryString({

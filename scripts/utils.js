@@ -1,4 +1,4 @@
-module.exports = { request, asQueryString };
+module.exports = { request, asQueryString, sleep, deferUntilResolved };
 
 /**
  * Serializes an object as a query string
@@ -61,4 +61,22 @@ function request(url, opts) {
 
       req.end();
   });
+}
+
+function sleep(ms) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+}
+  
+async function deferUntilResolved(callback) {
+    let success = false;
+
+    while (!success) {
+        try {
+        const result = await callback();
+        success = true;
+        return result;
+        } catch(e) {
+        await sleep(1000);
+        }
+    }
 }
