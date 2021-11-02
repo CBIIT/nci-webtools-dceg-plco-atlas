@@ -2,7 +2,8 @@ const mysql = require('mysql2/promise');
 const redis = require('ioredis');
 const { request, asQueryString } = require('./utils');
 const config = require('../server/config');
-(async function main() {
+
+async function main() {
 
   // flush redis cache
   if (config.redis) {
@@ -21,6 +22,41 @@ const config = require('../server/config');
     });
 
     const [metadataRecords] = await connection.query(`SELECT phenotype_id, sex, ancestry FROM phenotype_metadata WHERE chromosome = 'all' AND COUNT > 0`);
-    console.log(metadataRecords);
+
+    for (const record of metadataRecords) {
+      const summaryQueryParams = asQueryString({
+        p_value_nlog_min: 2,
+        phenotype_id: record.phenotype_id,
+        sex: record.sex,
+        ancestry: record.ancestry,
+        raw: true,
+      });
+      const pointsQueryParams = asQueryString({
+        phenotype_id: record.phenotype_id,
+        sex: record.sex,
+        ancestry: record.ancestry,
+        raw: true,
+      });
+
+      // populate /summary cache
+      const summaryQueryUrl = `http://localhost:${config.port}/api/summary?${summaryQueryParams}`;
+      console.log(summaryQueryUrl);
+      await request(summaryQueryUrl);
+
+      // populate /points cache
+      const pointsQueryUrl = `http://localhost:${config.port}/api/points?${pointsQueryParams}`;
+      console.log(pointsQueryUrl);
+      await request(pointsQueryUrl);
+    }
   }
-})();
+
+  return true;
+}
+
+main().then(success => {
+  console.log('reinitialized cache')
+  process.exit(0);
+}).catch(error => {
+  console.log(error);
+  process.exit(1);
+});
