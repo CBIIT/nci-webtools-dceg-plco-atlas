@@ -48,12 +48,12 @@ async function main() {
       });
 
       // populate /summary cache
-      const summaryQueryUrl = `http://localhost:${config.port}/api/summary?${summaryQueryParams}`;
+      const summaryQueryUrl = `http://localhost:${config.port}/api/summary${summaryQueryParams}`;
       console.log(summaryQueryUrl);
       await request(summaryQueryUrl);
 
       // populate /points cache
-      const pointsQueryUrl = `http://localhost:${config.port}/api/points?${pointsQueryParams}`;
+      const pointsQueryUrl = `http://localhost:${config.port}/api/points${pointsQueryParams}`;
       console.log(pointsQueryUrl);
       await request(pointsQueryUrl);
     }
