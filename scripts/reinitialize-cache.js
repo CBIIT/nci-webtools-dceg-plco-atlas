@@ -25,7 +25,7 @@ async function main() {
 
     const status = await deferUntilResolved(async () => {
       const pingUrl = `http://localhost:${config.port}/api/ping`;
-      await request(pingUrl);
+      return await request(pingUrl);
     });
 
     if (!status) {
