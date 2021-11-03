@@ -506,10 +506,12 @@ export function drawQQPlot({ phenotypes, stratifications, isPairwise }) {
                 showData: i <= 10000,
                 color: markerColor
               })),
-              name: `${titlePrefix +
-                titleCase(
-                  `${ancestry} - ${sex}`
-                )}   <b>\u03BB (median)</b> = ${lambda_gc}   <b>\u03BB (LD score)</b> = ${lambda_gc_ld_score || 'N/A'}   <b>Number of Variants</b> = ${count.toLocaleString()}`,
+              name: [
+                `${titlePrefix + titleCase(`${ancestry} - ${sex}`)}`,
+                `<b>\u03BB (median)</b> = ${lambda_gc}`,
+                lambda_gc_ld_score ? `<b>\u03BB (LD score)</b> = ${lambda_gc_ld_score}` : ``,
+                `<b>Number of Variants</b> = ${count.toLocaleString()}`
+              ].join(' '.repeat(5)),
               mode: 'markers',
               type: 'scattergl',
               hoverinfo: 'none',
