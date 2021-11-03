@@ -285,7 +285,7 @@ async function getVariants({connection, logger}, params) {
         throw new Error('A valid ancestry must be provided');
 
     // validate chromosome
-    if (chromosome === 'X') chromosome = 23;
+    if (chromosome === 'X' || chromosome === 'x') chromosome = "23";
     if (chromosome && !await hasRecord(connection, 'chromosome_range', {id: +chromosome}))
         throw new Error('A valid chromosome must be provided');
 
@@ -347,7 +347,7 @@ async function getVariants({connection, logger}, params) {
     const conditions = [
         coalesce(params.id, `id = :id`),
         coalesce(params.snp, `${(params.snp || []).map(s => /^rs\d+$/i.test(s) ? `(snp = "${s.toLowerCase()}")` : `(chromosome = "${s.split(':')[0].replace(/chr/ig, '').replace(/X/ig, '23').toUpperCase()}" AND position = ${s.split(':')[1]})`).join(' OR ')}`),
-        coalesce(params.chromosome, `chromosome = :chromosome`),
+        coalesce(chromosome, `chromosome = :chromosome`),
         coalesce(params.position, `position = :position`),
         coalesce(params.position_min, `position >= :position_min`),
         coalesce(params.position_max, `position <= :position_max`),

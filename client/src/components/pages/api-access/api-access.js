@@ -237,7 +237,7 @@ export function ApiAccess() {
                             // required: true,
                             type: 'string',
                             enum: Array.from({length: 22}, (_, i) => (i + 1).toString()).concat('X'),
-                            value: 8
+                            value: "8"
                         },
                         {
                             name: 'columns',
@@ -419,7 +419,7 @@ export function ApiAccess() {
                             // required: true,
                             type: 'string',
                             enum: Array.from({length: 22}, (_, i) => (i + 1).toString()).concat('X'),
-                            value: 8
+                            value: "8"
                         },
                         {
                             name: 'columns',
