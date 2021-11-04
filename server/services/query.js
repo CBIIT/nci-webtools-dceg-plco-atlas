@@ -261,7 +261,7 @@ async function getSummary({connection, logger}, {phenotype_id, table, sex, ances
 
 
 async function getVariants({connection, logger}, params) {
-    let { sex, ancestry, chromosome } = params;
+    let { sex, ancestry } = params;
     // const connection = await connectionPool.getConnection();
     const phenotypeIds = (params.phenotype_id || '').split(',');
     const phenotypeIdPlaceholders = getPlaceholders(phenotypeIds.length);
@@ -285,8 +285,8 @@ async function getVariants({connection, logger}, params) {
         throw new Error('A valid ancestry must be provided');
 
     // validate chromosome
-    if (chromosome === 'X' || chromosome === 'x') chromosome = "23";
-    if (chromosome && !await hasRecord(connection, 'chromosome_range', {id: +chromosome}))
+    if (params.chromosome === 'X' || params.chromosome === 'x') params.chromosome = "23";
+    if (params.chromosome && !await hasRecord(connection, 'chromosome_range', {id: +params.chromosome}))
         throw new Error('A valid chromosome must be provided');
 
     // validate/sanitize snps
@@ -309,7 +309,7 @@ async function getVariants({connection, logger}, params) {
         [
             ancestry,
             sex,
-            +chromosome || 'all',
+            +params.chromosome || 'all',
             phenotypeIds,
         ]        
     );
@@ -347,7 +347,7 @@ async function getVariants({connection, logger}, params) {
     const conditions = [
         coalesce(params.id, `id = :id`),
         coalesce(params.snp, `${(params.snp || []).map(s => /^rs\d+$/i.test(s) ? `(snp = "${s.toLowerCase()}")` : `(chromosome = "${s.split(':')[0].replace(/chr/ig, '').replace(/X/ig, '23').toUpperCase()}" AND position = ${s.split(':')[1]})`).join(' OR ')}`),
-        coalesce(chromosome, `chromosome = :chromosome`),
+        coalesce(params.chromosome, `chromosome = :chromosome`),
         coalesce(params.position, `position = :position`),
         coalesce(params.position_min, `position >= :position_min`),
         coalesce(params.position_max, `position <= :position_max`),
