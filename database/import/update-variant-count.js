@@ -47,7 +47,7 @@ async function updateCounts() {
 
     let [tableNameRows] = await connection.query(`
         select TABLE_NAME as tableName from information_schema.tables
-        where TABLE_NAME like 'phenotype_variant__%' and TABLE_ROWS > 0;
+        where TABLE_NAME like 'variant__%' and TABLE_ROWS > 0;
     `);
 
     for (let {tableName} of tableNameRows) {

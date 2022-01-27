@@ -65,9 +65,9 @@ CREATE PROCEDURE warmup_cache()
   DECLARE done INT;
   DECLARE table_name VARCHAR(200);
 
-  DECLARE phenotype_variant_table_cursor CURSOR FOR
+  DECLARE variant_table_cursor CURSOR FOR
     select t.TABLE_NAME from INFORMATION_SCHEMA.TABLES t
-    WHERE t.TABLE_NAME LIKE 'phenotype_variant_%';
+    WHERE t.TABLE_NAME LIKE 'variant_%';
 
   DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = 1;
 
@@ -78,10 +78,10 @@ CREATE PROCEDURE warmup_cache()
     WHERE p_value_nlog > 3
     GROUP BY phenotype_id, sex, ancestry; 
 
-  OPEN phenotype_variant_table_cursor;
+  OPEN variant_table_cursor;
   SET done = 0;
   REPEAT
-    FETCH phenotype_variant_table_cursor INTO table_name;
+    FETCH variant_table_cursor INTO table_name;
 
     -- warm up phenotype indexes (do not use or to join conditions, as this will perform a full-table scan)
     call execute_sql(CONCAT('SELECT COUNT(*) FROM ', table_name, ' GROUP BY chromosome'));
@@ -91,7 +91,7 @@ CREATE PROCEDURE warmup_cache()
     call execute_sql(CONCAT('SELECT COUNT(*) FROM ', table_name, ' WHERE snp = "1"'));
 
   UNTIL done END REPEAT;
-  CLOSE phenotype_variant_table_cursor;
+  CLOSE variant_table_cursor;
 END $$
 
 DROP PROCEDURE IF EXISTS calculate_ci $$
@@ -101,18 +101,18 @@ CREATE PROCEDURE calculate_ci()
   DECLARE table_name VARCHAR(200);
   DECLARE phenotype_type VARCHAR(200);
 
-  DECLARE phenotype_variant_table_cursor CURSOR FOR
-    select distinct concat('phenotype_variant', '__', p.name, '__', pm.sex, '__', pm.ancestry), p.type
+  DECLARE variant_table_cursor CURSOR FOR
+    select distinct concat('variant', '__', p.name, '__', pm.sex, '__', pm.ancestry), p.type
         from phenotype_metadata pm
         join phenotype p on pm.phenotype_id = p.id
     where chromosome = 'all' and count > 0;
 
   DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = 1;
 
-  OPEN phenotype_variant_table_cursor;
+  OPEN variant_table_cursor;
   SET done = 0;
   REPEAT
-    FETCH phenotype_variant_table_cursor INTO table_name, phenotype_type;
+    FETCH variant_table_cursor INTO table_name, phenotype_type;
 
     IF(phenotype_type = 'binary') THEN
       call execute_sql(CONCAT('
@@ -131,7 +131,7 @@ CREATE PROCEDURE calculate_ci()
     END IF;
 
   UNTIL done END REPEAT;
-  CLOSE phenotype_variant_table_cursor;
+  CLOSE variant_table_cursor;
 END $$
 
 DROP PROCEDURE IF EXISTS migrate_ci $$
@@ -140,16 +140,16 @@ CREATE PROCEDURE migrate_ci()
   DECLARE done INT;
   DECLARE table_name VARCHAR(200);
 
-  DECLARE phenotype_variant_table_cursor CURSOR FOR
+  DECLARE variant_table_cursor CURSOR FOR
     select t.TABLE_NAME from INFORMATION_SCHEMA.TABLES t
-    WHERE t.TABLE_NAME LIKE 'phenotype_variant__%';
+    WHERE t.TABLE_NAME LIKE 'variant__%';
 
   DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = 1;
 
-  OPEN phenotype_variant_table_cursor;
+  OPEN variant_table_cursor;
   SET done = 0;
   REPEAT
-    FETCH phenotype_variant_table_cursor INTO table_name;
+    FETCH variant_table_cursor INTO table_name;
 
     call execute_sql(concat('alter table ', table_name, ' add column beta_ci_95_low double AS (beta - 1.96 * standard_error) NULL'));
     call execute_sql(concat('alter table ', table_name, ' add column beta_ci_95_high double AS (beta + 1.96 * standard_error) NULL'));
@@ -160,7 +160,7 @@ CREATE PROCEDURE migrate_ci()
     call execute_sql(concat('ALTER TABLE ', table_name, ' add column allele_effect_frequency double as (allele_frequency) NULL'));
 
   UNTIL done END REPEAT;
-  CLOSE phenotype_variant_table_cursor;
+  CLOSE variant_table_cursor;
 END $$
 
 DELIMITER ;
