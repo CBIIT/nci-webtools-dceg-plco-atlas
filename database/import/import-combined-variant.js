@@ -281,7 +281,7 @@ async function exportVariants({
                     // specify table names
                     const tableSuffix = `${phenotype.name}__${sex}__${ancestry}`;
                     const stageTable = `stage__${tableSuffix}`;
-                    const variantTable = `variant__${tableSuffix}`;
+                    const variantTable = `var__${tableSuffix}`;
                     const useOddsRatio = phenotype.type === 'binary';
 
                     // create stage, variant, aggregate, and metadata tables
