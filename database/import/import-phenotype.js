@@ -152,7 +152,7 @@ async function importPhenotypes() {
         if (!createPartitionsOnly)
             await connection.execute(
                 `INSERT INTO phenotype (id, parent_id, name, age_name, display_name, description, type, sex_specific)
-                    VALUES (:id, :parent_id, :name, :age_name, :display_name, :description, :type, :sex_specific)`,
+                    VALUES (:id, :parent_id, LOWER(:name), :age_name, :display_name, :description, :type, :sex_specific)`,
                 record
             );
 
