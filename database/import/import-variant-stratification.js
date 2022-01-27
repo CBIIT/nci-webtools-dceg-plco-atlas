@@ -55,7 +55,7 @@ const tempFolder = tmp ? path.resolve(tmp) : outputFolder;
 const phenotypeFilePath = path.resolve(phenotypeFile || '../raw/phenotype.csv');
 
 // set phenotype from filename
-if (!phenotype) phenotype = inputFileName.split('.')[0];
+if (!phenotype) phenotype = inputFileName.split('.')[0].toLowerCase();
 
 // create global logger for initial log messages
 const logFilePath = path.resolve(logFolder, `${phenotype}.log`);
