@@ -279,8 +279,8 @@ async function exportVariants({
 
                 try {
                     // specify table names
-                    const tableSuffix = `${phenotype.name}__${sex}__${ancestry}`;
-                    const stageTable = `stage__${tableSuffix}`;
+                    const tableSuffix = `${phenotype.name.toLowerCase()}__${sex}__${ancestry}`;
+                    const stageTable = `stg__${tableSuffix}`;
                     const variantTable = `var__${tableSuffix}`;
                     const useOddsRatio = phenotype.type === 'binary';
 

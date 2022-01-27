@@ -108,9 +108,9 @@ function getSql(filepath, args) {
 async function importVariants({connection, database, folderPath, phenotype}) {
     const { tableSuffix, id, sex, ancestry } = phenotype;
     const variantTable = `var__${tableSuffix}`;
-    const aggregateTable = `aggr__${tableSuffix}`;
+    const aggregateTable = `agg__${tableSuffix}`;
     const pointTable = `pnt__${tableSuffix}`;
-    const metadataTable = `meta__${tableSuffix}`;
+    const metadataTable = `mta__${tableSuffix}`;
 
     // remove old tablespace files if they exist
     for (let table of [variantTable, aggregateTable, pointTable, metadataTable]) {

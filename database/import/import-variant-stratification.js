@@ -133,7 +133,7 @@ function getPhenotype(phenotypeFilePath, phenotype) {
     const phenotypes = parseCsv(    
         fs.readFileSync(phenotypeFilePath),
         {columns: ['id', 'parent_id', 'display_name', 'name', 'description', 'type', 'age', 'sex_specific']}
-    ).filter(p => p[phenotypeKey]toLowerCase() == phenotype.toLowerCase());
+    ).filter(p => p[phenotypeKey].toLowerCase() == phenotype.toLowerCase());
 
     
     if (phenotypes.length === 0) {
@@ -279,8 +279,8 @@ async function exportVariants({
 
                 try {
                     // specify table names
-                    const tableSuffix = `${phenotype.name}__${sex}__${ancestry}`;
-                    const stageTable = `stage__${tableSuffix}`;
+                    const tableSuffix = `${phenotype.name.toLowerCase()}__${sex}__${ancestry}`;
+                    const stageTable = `stg__${tableSuffix}`;
                     const variantTable = `var__${tableSuffix}`;
                     const useOddsRatio = phenotype.type === 'binary';
 
