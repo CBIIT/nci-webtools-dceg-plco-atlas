@@ -133,7 +133,7 @@ function getPhenotype(phenotypeFilePath, phenotype) {
     const phenotypes = parseCsv(    
         fs.readFileSync(phenotypeFilePath),
         {columns: ['id', 'parent_id', 'display_name', 'name', 'description', 'type', 'age', 'sex_specific']}
-    ).filter(p => p[phenotypeKey] == phenotype.toLowerCase());
+    ).filter(p => p[phenotypeKey].toLowerCase() == phenotype.toLowerCase());
 
     
     if (phenotypes.length === 0) {

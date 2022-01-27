@@ -129,14 +129,12 @@ function getPhenotype(phenotypeFilePath, phenotype) {
     // if a numeric phenotype was provided, assume we're looking up by id
     // otherwise, look up phenotype by association name
     const phenotypeKey = /^\d+$/.test(phenotype) ? 'id' : 'name';
-
     // read the phenotypes file and attempt to find the specified phenotype
     // header: Phenotype ID,Phenotype Parent ID,Display Name,Association Name,Description (Definition),Phenotype Data Type,Age,Sex Specific
     const phenotypes = parseCsv(    
         fs.readFileSync(phenotypeFilePath),
         {columns: ['id', 'parent_id', 'display_name', 'name', 'description', 'type', 'age', 'sex_specific']}
-    ).filter(p => p[phenotypeKey] == phenotype.toLowerCase());
-
+    ).filter(p => p[phenotypeKey].toLowerCase() == phenotype.toLowerCase());
     
     if (phenotypes.length === 0) {
         throw(`Phenotype does not exist`);
