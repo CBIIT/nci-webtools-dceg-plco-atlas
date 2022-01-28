@@ -36,7 +36,7 @@
    ```sql
         source import/import-participant-data.sql; # requires raw/participant_data.tsv (renamed GSA NA dataset)
         source import/import-participant-data-category.sql; # requires raw/participant_data_category.csv
-        source import-phenotype-correlation.sql; # requires raw/phenotype_correlation.csv
+        source import-phenotype-correlation.sql; # requires ./phenotype_correlation.csv
    ```
    In OS shell:
    ```bash
@@ -53,7 +53,7 @@
       node parallel-export-combined-variant.js
         --sqlite "./sqlite3" [OPTIONAL, use PATH by default]
         --file "phenotype.sex.csv" [REQUIRED]
-        --phenotype_file "raw/phenotype.csv" [OPTIONAL, use raw/phenotype.csv by default]
+        --phenotype_file "./phenotype.csv" [OPTIONAL, use ./phenotype.csv by default]
         --phenotype "test_melanoma" or 10002 [OPTIONAL, use filename by default]
         --validate [REQUIRED only if phenotype name is used as identifier, implicitly set to true if only filename is given]
         --output "../raw/output" [REQUIRED]

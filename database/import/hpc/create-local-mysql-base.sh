@@ -85,7 +85,7 @@ echo
 # echo
 
 echo "IMPORTING PHENOTYPE MAPPINGS..."
-time node ../import-phenotype.js --file ../raw/phenotype.csv --host $SLURM_NODELIST --port 55555 --db_name plcogwas --user $DB_USER --password $DB_PASS
+time node ../import-phenotype.js --file ../phenotype.csv --host $SLURM_NODELIST --port 55555 --db_name plcogwas --user $DB_USER --password $DB_PASS
 echo
 
 echo "IMPORTING PARTICIPANT DATA..."

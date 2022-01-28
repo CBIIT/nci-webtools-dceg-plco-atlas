@@ -22,7 +22,7 @@ time mysql $PLCO_MYSQL_ARGS --execute="
 echo "Importing phenotypes"
 time node import-phenotype.js \
     $PLCO_NODE_ARGS \
-    --file ../raw/phenotype.csv
+    --file ../phenotype.csv
 
 echo "Importing phenotype correlations"
 time mysql $PLCO_MYSQL_ARGS $PLCO_MYSQL_DATABASE < import-phenotype-correlation.sql

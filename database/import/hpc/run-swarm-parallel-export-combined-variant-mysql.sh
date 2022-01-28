@@ -9,7 +9,7 @@ if [ -z "$1" ]
     then
         echo "ERROR: No MySQL db username supplied..."
         echo "USAGE: sh run-swarm-parallel-export-variant-mysql.sh <USER> <PASSWORD> <INPUT_PATH> <OUTPUT_PATH> <PHENOTYPE_FILE>"
-        echo "EXAMPLE: sh run-swarm-parallel-export-variant-mysql.sh sample_username sample_password ../raw/input ../raw/output ../raw/phenotype.csv"
+        echo "EXAMPLE: sh run-swarm-parallel-export-variant-mysql.sh sample_username sample_password ../raw/input ../raw/output ../phenotype.csv"
         exit 1
 fi
 USER=$1
@@ -20,7 +20,7 @@ if [ -z "$2" ]
     then
         echo "ERROR: No MySQL db password supplied..."
         echo "USAGE: sh run-swarm-parallel-export-variant-mysql.sh <USER> <PASSWORD> <INPUT_PATH> <OUTPUT_PATH> <PHENOTYPE_FILE>"
-        echo "EXAMPLE: sh run-swarm-parallel-export-variant-mysql.sh sample_username sample_password ../raw/input ../raw/output ../raw/phenotype.csv"
+        echo "EXAMPLE: sh run-swarm-parallel-export-variant-mysql.sh sample_username sample_password ../raw/input ../raw/output ../phenotype.csv"
         exit 1
 fi
 PASSWORD=$2
@@ -31,7 +31,7 @@ if [ -z "$3" ]
     then
         echo "ERROR: No input data path supplied..."
         echo "USAGE: sh run-swarm-parallel-export-variant-mysql.sh <USER> <PASSWORD> <INPUT_PATH> <OUTPUT_PATH> <PHENOTYPE_FILE>"
-        echo "EXAMPLE: sh run-swarm-parallel-export-variant-mysql.sh sample_username sample_password ../raw/input ../raw/output ../raw/phenotype.csv"
+        echo "EXAMPLE: sh run-swarm-parallel-export-variant-mysql.sh sample_username sample_password ../raw/input ../raw/output ../phenotype.csv"
         exit 1
 fi
 INPUT_DIR=$3
@@ -42,7 +42,7 @@ if [ -z "$4" ]
     then
         echo "ERROR: No output path supplied..."
         echo "USAGE: sh run-swarm-parallel-export-variant-mysql.sh <USER> <PASSWORD> <INPUT_PATH> <OUTPUT_PATH> <PHENOTYPE_FILE>"
-        echo "EXAMPLE: sh run-swarm-parallel-export-variant-mysql.sh sample_username sample_password ../raw/input ../raw/output ../raw/phenotype.csv"
+        echo "EXAMPLE: sh run-swarm-parallel-export-variant-mysql.sh sample_username sample_password ../raw/input ../raw/output ../phenotype.csv"
         exit 1
 fi
 OUTPUT_DIR=$4
@@ -53,7 +53,7 @@ if [ -z "$5" ]
     then
         echo "ERROR: No phenotype.csv path supplied..."
         echo "USAGE: sh run-swarm-parallel-export-variant-mysql.sh <USER> <PASSWORD> <INPUT_PATH> <OUTPUT_PATH> <PHENOTYPE_FILE>"
-        echo "EXAMPLE: sh run-swarm-parallel-export-variant-mysql.sh sample_username sample_password ../raw/input ../raw/output ../raw/phenotype.csv"
+        echo "EXAMPLE: sh run-swarm-parallel-export-variant-mysql.sh sample_username sample_password ../raw/input ../raw/output ../phenotype.csv"
         exit 1
 fi
 PHENOTYPE_FILE=$5

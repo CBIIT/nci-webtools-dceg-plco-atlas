@@ -23,7 +23,7 @@ if (!file || !output || !logdir) {
         --user "MySQL username" 
         --password "MySQL password"
         --file "phenotype_name.variants.csv" [REQUIRED]
-        --phenotype_file "raw/phenotype.csv" [OPTIONAL, use raw/phenotype.csv by default]
+        --phenotype_file "./phenotype.csv" [OPTIONAL, use ./phenotype.csv by default]
         --phenotype "test_melanoma" or 10002 [OPTIONAL, use filename by default]
         --output "../raw/output" [REQUIRED]
         --logdir "./" [REQUIRED]
@@ -52,7 +52,7 @@ let inputFileName = path.basename(inputFilePath);
 const outputFolder = path.resolve(output);
 const logFolder = path.resolve(logdir);
 const tempFolder = tmp ? path.resolve(tmp) : outputFolder;
-const phenotypeFilePath = path.resolve(phenotypeFile || '../raw/phenotype.csv');
+const phenotypeFilePath = path.resolve(phenotypeFile || '../phenotype.csv');
 
 // set phenotype from filename
 if (!phenotype) phenotype = inputFileName.split('.')[0].toLowerCase();
