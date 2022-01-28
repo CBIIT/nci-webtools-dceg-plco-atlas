@@ -122,9 +122,9 @@ async function importVariants({connection, database, folderPath, phenotype}) {
         `DROP TABLE IF EXISTS ${variantTable}, ${aggregateTable},  ${pointTable}, ${metadataTable};`,
         getSql('../schema/tables/variant.sql', {table_name: variantTable}),
         getSql('../schema/indexes/variant.sql', {table_name: variantTable}),
-        getSql('../schema/tables/aggregate.sql', {table_name: aggregateTable}),
-        getSql('../schema/tables/point.sql', {table_name: pointTable}),
-        getSql('../schema/tables/metadata.sql', {table_name: metadataTable}),
+        getSql('../schema/tables/aggregate.sql', {table_name: "phenotype_aggregate"}),
+        getSql('../schema/tables/point.sql', {table_name: "phenotype_point"}),
+        getSql('../schema/tables/metadata.sql', {table_name: "phenotype_metadata"}),
     ].join('\n'));
 
     logger.info('Importing variant table');
