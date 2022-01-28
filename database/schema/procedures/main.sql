@@ -125,8 +125,8 @@ CREATE PROCEDURE calculate_ci()
     IF(phenotype_type = 'continuous') THEN
       call execute_sql(CONCAT('
         update ', table_name, ' set
-            ci_95_low = beta - 1.96 * standard_error,
-            ci_95_high = beta + 1.96 * standard_error;
+            ci_95_low = beta - (1.96 * standard_error),
+            ci_95_high = beta + (1.96 * standard_error);
       '));
     END IF;
 
@@ -151,10 +151,10 @@ CREATE PROCEDURE migrate_ci()
   REPEAT
     FETCH variant_table_cursor INTO table_name;
 
-    call execute_sql(concat('alter table ', table_name, ' add column beta_ci_95_low double AS (beta - 1.96 * standard_error) NULL'));
-    call execute_sql(concat('alter table ', table_name, ' add column beta_ci_95_high double AS (beta + 1.96 * standard_error) NULL'));
-    call execute_sql(concat('alter table ', table_name, ' add column odds_ratio_ci_95_low double AS (EXP(beta - 1.96 * standard_error)) NULL'));
-    call execute_sql(concat('alter table ', table_name, ' add column odds_ratio_ci_95_high double AS (EXP(beta + 1.96 * standard_error)) NULL'));
+    call execute_sql(concat('alter table ', table_name, ' add column beta_ci_95_low decimal(64,16) AS (beta - (1.96 * standard_error)) NULL'));
+    call execute_sql(concat('alter table ', table_name, ' add column beta_ci_95_high decimal(64,16) AS (beta + (1.96 * standard_error)) NULL'));
+    call execute_sql(concat('alter table ', table_name, ' add column odds_ratio_ci_95_low decimal(64,16) AS (EXP(beta - (1.96 * standard_error))) NULL'));
+    call execute_sql(concat('alter table ', table_name, ' add column odds_ratio_ci_95_high decimal(64,16) AS (EXP(beta + (1.96 * standard_error))) NULL'));
     call execute_sql(concat('ALTER TABLE ', table_name, ' add column allele_effect varchar(200) as (allele_reference) NULL'));
     call execute_sql(concat('ALTER TABLE ', table_name, ' add column allele_non_effect varchar(200) as (allele_alternate) NULL'));
     call execute_sql(concat('ALTER TABLE ', table_name, ' add column allele_effect_frequency double as (allele_frequency) NULL'));

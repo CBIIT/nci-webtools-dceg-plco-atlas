@@ -195,7 +195,7 @@ async function importParticipantData() {
         }
     }
 
-    console.info('Updating metadata');
+    console.info('Insert average and standard deviation metadata');
     await connection.query(`
         -- insert average and standard deviation metadata
         INSERT INTO phenotype_metadata (phenotype_id, sex, ancestry, chromosome, average_value, standard_deviation)
@@ -213,12 +213,15 @@ async function importParticipantData() {
             standard_deviation = VALUES(standard_deviation);
     `);
     
-
+    // console.info('SET SESSION internal_tmp_mem_storage_engine=MEMORY');
     // insert participant count metadata
-    await connection.query(`
-        -- workaround for group_by temp table issue: https://bugs.mysql.com/bug.php?id=99100
-        SET SESSION internal_tmp_mem_storage_engine=Memory;
+    // await connection.query(`
+    //     -- workaround for group_by temp table issue: https://bugs.mysql.com/bug.php?id=99100
+    //     SET SESSION internal_tmp_mem_storage_engine=MEMORY;
+    // `);
 
+    console.info('Insert participant counts for "all" ancestries, grouped by sex');
+    await connection.query(`
         -- insert participant counts for "all" ancestries, grouped by sex
         INSERT INTO phenotype_metadata (phenotype_id, sex, ancestry, chromosome, participant_count)
         SELECT 
@@ -233,7 +236,10 @@ async function importParticipantData() {
         GROUP BY pd.phenotype_id, p.sex
         ON DUPLICATE KEY UPDATE
             participant_count = VALUES(participant_count);
+    `);
 
+    console.info('Insert participant counts grouped by ancestry and sex');
+    await connection.query(`
         -- insert participant counts grouped by ancestry and sex
         INSERT INTO phenotype_metadata (phenotype_id, sex, ancestry, chromosome, participant_count)
         SELECT 
@@ -249,7 +255,10 @@ async function importParticipantData() {
         GROUP BY pd.phenotype_id, p.sex, p.genetic_ancestry
         ON DUPLICATE KEY UPDATE
             participant_count = VALUES(participant_count);
+    `);
 
+    console.info('Insert participant counts for "all" sexes, grouped by ancestry');
+    await connection.query(`
         -- insert participant counts for "all" sexes, grouped by ancestry
         INSERT INTO phenotype_metadata (phenotype_id, sex, ancestry, chromosome, participant_count)
         SELECT 
@@ -264,7 +273,10 @@ async function importParticipantData() {
         GROUP BY phenotype_id, ancestry
         ON DUPLICATE KEY UPDATE
             participant_count = VALUES(participant_count);
+    `);
 
+    console.info('Insert participant case counts for "all" ancestries, grouped by sex');
+    await connection.query(`
         -- insert participant case counts for "all" ancestries, grouped by sex
         INSERT INTO phenotype_metadata (phenotype_id, sex, ancestry, chromosome, participant_count_case)
         SELECT 
@@ -280,8 +292,10 @@ async function importParticipantData() {
         GROUP BY phenotype_id, p.sex
         ON DUPLICATE KEY UPDATE
             participant_count_case = VALUES(participant_count_case);
+    `);
 
-
+    console.info('Insert participant case counts grouped by ancestry and sex');
+    await connection.query(`
         -- insert participant case counts grouped by ancestry and sex
         INSERT INTO phenotype_metadata (phenotype_id, sex, ancestry, chromosome, participant_count_case)
         SELECT 
@@ -298,7 +312,10 @@ async function importParticipantData() {
         GROUP BY pd.phenotype_id, p.sex, p.genetic_ancestry
         ON DUPLICATE KEY UPDATE
             participant_count_case = VALUES(participant_count_case);
+    `);
 
+    console.info('Insert participant case counts for "all" sexes, grouped by ancestry');
+    await connection.query(`
         -- insert participant case counts for "all" sexes, grouped by ancestry
         INSERT INTO phenotype_metadata (phenotype_id, sex, ancestry, chromosome, participant_count_case)
         SELECT 
@@ -313,9 +330,11 @@ async function importParticipantData() {
         GROUP BY phenotype_id, ancestry
         ON DUPLICATE KEY UPDATE
             participant_count_case = VALUES(participant_count_case);
+    `);
 
-
-            
+         
+    console.info('Insert participant control counts for "all" ancestries, grouped by sex');
+    await connection.query(`
         -- insert participant control counts for "all" ancestries, grouped by sex
         INSERT INTO phenotype_metadata (phenotype_id, sex, ancestry, chromosome, participant_count_control)
         SELECT 
@@ -331,8 +350,10 @@ async function importParticipantData() {
         GROUP BY phenotype_id, p.sex
         ON DUPLICATE KEY UPDATE
             participant_count_control = VALUES(participant_count_control);
+    `);
 
-
+    console.info('Insert participant control counts grouped by ancestry and sex');
+    await connection.query(`
         -- insert participant control counts grouped by ancestry and sex
         INSERT INTO phenotype_metadata (phenotype_id, sex, ancestry, chromosome, participant_count_control)
         SELECT 
@@ -349,7 +370,10 @@ async function importParticipantData() {
         GROUP BY pd.phenotype_id, p.sex, p.genetic_ancestry
         ON DUPLICATE KEY UPDATE
             participant_count_control = VALUES(participant_count_control);
+    `);
 
+    console.info('Insert participant control counts for "all" sexes, grouped by ancestry');
+    await connection.query(`
         -- insert participant control counts for "all" sexes, grouped by ancestry
         INSERT INTO phenotype_metadata (phenotype_id, sex, ancestry, chromosome, participant_count_control)
         SELECT 
