@@ -91,8 +91,8 @@ async function getPhenotypes({connection, folderPath}) {
         .reduce((acc, curr) => !acc.includes(curr) ? acc.concat([curr]) : acc, [])
         .reduce((phenotypes, tableSuffix) => {
             const [name, sex, ancestry] = tableSuffix.split('__');
-            const {id} = phenotypeRows.find(p => p.name.toLowerCase() === name.toLowerCase());
-            phenotypes.push({id, name: name.toLowerCase(), tableSuffix, sex, ancestry});
+            const {id} = phenotypeRows.find(p => p.name === name);
+            phenotypes.push({id, name, tableSuffix, sex, ancestry});
             return phenotypes;
         }, []);
 }
