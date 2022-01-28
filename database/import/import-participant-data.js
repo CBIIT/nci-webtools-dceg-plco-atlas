@@ -215,10 +215,10 @@ async function importParticipantData() {
     
     // console.info('SET SESSION internal_tmp_mem_storage_engine=MEMORY');
     // insert participant count metadata
-    // await connection.query(`
-    //     -- workaround for group_by temp table issue: https://bugs.mysql.com/bug.php?id=99100
-    //     SET SESSION internal_tmp_mem_storage_engine=MEMORY;
-    // `);
+    await connection.query(`
+        -- workaround for group_by temp table issue: https://bugs.mysql.com/bug.php?id=99100
+        SET SESSION internal_tmp_mem_storage_engine=MEMORY;
+    `);
 
     console.info('Insert participant counts for "all" ancestries, grouped by sex');
     await connection.query(`
