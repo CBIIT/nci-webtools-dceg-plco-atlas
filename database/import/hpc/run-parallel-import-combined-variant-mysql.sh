@@ -51,4 +51,4 @@ mkdir ./sbatch_import_out_$CURRENT_DATE
 # Log path
 LOG_PATH="./sbatch_import_out_$CURRENT_DATE/"
 
-sbatch --gres=lscratch:200 --mem=64g --cpus-per-task=8 --time=48:00:00 --output=$LOG_PATH/sbatch.out --wrap="sh parallel-import-combined-variant-mysql.sh $INPUT_DIR $BASE_DIR $USER $PASSWORD $LOG_PATH"
+sbatch --gres=lscratch:200 --mem=96g --cpus-per-task=8 --time=48:00:00 --output=$LOG_PATH/sbatch.out --wrap="sh parallel-import-combined-variant-mysql.sh $INPUT_DIR $BASE_DIR $USER $PASSWORD $LOG_PATH"
