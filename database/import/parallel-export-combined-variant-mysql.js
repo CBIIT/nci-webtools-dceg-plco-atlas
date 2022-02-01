@@ -432,9 +432,9 @@ async function exportVariants({
                             allele_effect_frequency,
                             p_value,
                             p_value_heterogenous,
-                            beta,
-                            standard_error,
-                            odds_ratio,
+                            CAST(beta as DECIMAL(64,16)),
+                            CAST(standard_error as DECIMAL(64,16)),
+                            CAST(odds_ratio as DECIMAL(64,16)),
                             n
                         FROM ${stageTable}
                         ORDER BY chromosome, p_value
