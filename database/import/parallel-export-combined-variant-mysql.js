@@ -310,7 +310,7 @@ async function exportVariants({
                             p_value_heterogenous        BIGINT,
                             beta                        DOUBLE,
                             standard_error              DOUBLE,
-                            odds_ratio                  DOUBLE,
+                            odds_ratio                  DECIMAL(64,16),
                             n                           BIGINT
                         );`,
                         // create variant, aggregate, and metadata tables

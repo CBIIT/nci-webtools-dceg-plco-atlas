@@ -11,12 +11,12 @@ CREATE TABLE IF NOT EXISTS ${table_name} (
     p_value_nlog double AS (-LOG10(p_value)) STORED NULL,
     p_value_heterogenous double NULL,
     beta double NULL,
-    odds_ratio double NULL,
+    odds_ratio decimal(64,16) NULL,
     standard_error double NULL,
-    beta_ci_95_low double AS (beta - (1.96 * standard_error)) STORED NULL,
-    beta_ci_95_high double AS (beta + (1.96 * standard_error)) STORED NULL,
-    odds_ratio_ci_95_low double AS (IF(odds_ratio IS NULL, NULL, EXP(beta_ci_95_low))) STORED NULL,
-    odds_ratio_ci_95_high double AS (IF(odds_ratio IS NULL, NULL, EXP(beta_ci_95_high))) STORED NULL,
+    beta_ci_95_low decimal(64,16) AS (beta - (1.96 * standard_error)) STORED NULL,
+    beta_ci_95_high decimal(64,16) AS (beta + (1.96 * standard_error)) STORED NULL,
+    odds_ratio_ci_95_low decimal(64,16) AS (IF(odds_ratio IS NULL, NULL, EXP(beta_ci_95_low))) STORED NULL,
+    odds_ratio_ci_95_high decimal(64,16) AS (IF(odds_ratio IS NULL, NULL, EXP(beta_ci_95_high))) STORED NULL,
     n int NULL,
     PRIMARY KEY (id, chromosome)
 )
