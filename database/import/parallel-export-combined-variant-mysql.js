@@ -322,6 +322,7 @@ async function exportVariants({
 
                     logger.info('Filtering and ordering data into stage table');
                     await connection.query(`
+                        SET sql_mode = '';
                         INSERT INTO ${stageTable} (
                             chromosome,
                             position,
@@ -403,6 +404,7 @@ async function exportVariants({
                     // populate variants table
                     logger.info(`Generating variants table ${variantTable}`);
                     await connection.query(`
+                        SET sql_mode = '';
                         INSERT INTO ${variantTable} (
                             id,
                             chromosome,
