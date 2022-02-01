@@ -300,7 +300,7 @@ async function exportVariants({
                             p_value_heterogenous        BIGINT,
                             beta                        DOUBLE,
                             standard_error              DOUBLE,
-                            odds_ratio                  DECIMAL(64,16),
+                            odds_ratio                  DOUBLE,
                             n                           BIGINT
                         );`,
                         getSql('../schema/tables/variant.sql', {table_name: variantTable}),

@@ -232,12 +232,8 @@ async function exportVariants({
         console.log(stratifiedColumns);
 
         // set up database for import
-        logger.info('Disable sql strict mode');
-        await connection.query(`
-            SET sql_mode = '';
-        `);
-
         logger.info('Setting up database');
+
         await connection.query([
             `SET FOREIGN_KEY_CHECKS=0;`,
             readFile(path.resolve(__dirname, '../schema/tables/main.sql')),
@@ -312,9 +308,9 @@ async function exportVariants({
                             allele_effect_frequency     DOUBLE,
                             p_value                     DOUBLE,
                             p_value_heterogenous        BIGINT,
-                            beta                        DECIMAL(64,16),
-                            standard_error              DECIMAL(64,16),
-                            odds_ratio                  DECIMAL(64,16),
+                            beta                        DOUBLE,
+                            standard_error              DOUBLE,
+                            odds_ratio                  DOUBLE,
                             n                           BIGINT
                         );`,
                         // create variant, aggregate, and metadata tables
@@ -349,9 +345,9 @@ async function exportVariants({
                             p.${ancestry}_allele_effect_frequency,
                             p.${sex}_${ancestry}_p_value,
                             p.${sex}_${ancestry}_p_value_heterogenous,
-                            CAST(p.${sex}_${ancestry}_beta as DECIMAL(64,16)),
-                            CAST(p.${sex}_${ancestry}_standard_error as DECIMAL(64,16)),
-                            ${useOddsRatio ? `CAST(EXP(p.${sex}_${ancestry}_beta) as DECIMAL(64,16))` : `NULL`} as odds_ratio,
+                            p.${sex}_${ancestry}_beta,
+                            p.${sex}_${ancestry}_standard_error,
+                            ${useOddsRatio ? `EXP(p.${sex}_${ancestry}_beta)` : `NULL`} as odds_ratio,
                             p.${sex}_${ancestry}_n
                         FROM prestage p
                         INNER JOIN chromosome_range cr ON cr.chromosome = p.chromosome
@@ -407,8 +403,7 @@ async function exportVariants({
                     // populate variants table
                     logger.info(`Generating variants table ${variantTable}`);
                     await connection.query(`
-                        SET sql_mode = 'NO_UNSIGNED_SUBTRACTION';
-                        INSERT IGNORE INTO ${variantTable} (
+                        INSERT INTO ${variantTable} (
                             id,
                             chromosome,
                             position,
@@ -433,20 +428,13 @@ async function exportVariants({
                             allele_effect_frequency,
                             p_value,
                             p_value_heterogenous,
-                            CAST(beta as DECIMAL(64,16)),
-                            CAST(standard_error as DECIMAL(64,16)),
-                            CAST(odds_ratio as DECIMAL(64,16)),
+                            beta,
+                            standard_error,
+                            odds_ratio,
                             n
                         FROM ${stageTable}
                         ORDER BY chromosome, p_value
                     `);
-
-                    logger.info(`Show warnings`);
-                    const [warnings] = await connection.execute(
-                        `SHOW WARNINGS;`
-                    );
-                    console.log("WARNINGS", warnings);
-        
                     logger.info(`Indexing variants table ${variantTable}`);
                     await connection.query(
                         readFile(path.resolve(__dirname, '../schema/indexes/variant.sql'))
