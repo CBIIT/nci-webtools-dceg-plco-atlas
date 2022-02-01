@@ -348,7 +348,7 @@ async function exportVariants({
                             p.${sex}_${ancestry}_p_value_heterogenous,
                             p.${sex}_${ancestry}_beta,
                             p.${sex}_${ancestry}_standard_error,
-                            ${useOddsRatio ? `EXP(p.${sex}_${ancestry}_beta)` : `NULL`} as odds_ratio,
+                            ${useOddsRatio ? `CAST(EXP(p.${sex}_${ancestry}_beta) as DECIMAL(64,16))` : `NULL`} as odds_ratio,
                             p.${sex}_${ancestry}_n
                         FROM prestage p
                         INNER JOIN chromosome_range cr ON cr.chromosome = p.chromosome
