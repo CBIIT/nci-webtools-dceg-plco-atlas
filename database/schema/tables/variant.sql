@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS ${table_name} (
     beta_ci_95_low decimal(64,16) AS (CAST((beta - (1.96 * standard_error)) as decimal(64,16))) STORED NULL,
     beta_ci_95_high decimal(64,16) AS (CAST((beta + (1.96 * standard_error)) as decimal(64,16))) STORED NULL,
     odds_ratio_ci_95_low decimal(64,16) AS (IF(CAST(odds_ratio as decimal(64,16)) IS NULL, NULL, CAST(EXP(beta_ci_95_low) as decimal(64,16)))) STORED NULL,
-    odds_ratio_ci_95_high decimal(64,16) AS (IF(CAST(odds_ratio decimal(64,16)) IS NULL, NULL, CAST(EXP(beta_ci_95_high) as decimal(64,16)))) STORED NULL,
+    odds_ratio_ci_95_high decimal(64,16) AS (IF(CAST(odds_ratio as decimal(64,16)) IS NULL, NULL, CAST(EXP(beta_ci_95_high) as decimal(64,16)))) STORED NULL,
     n int NULL,
     PRIMARY KEY (id, chromosome)
 )
