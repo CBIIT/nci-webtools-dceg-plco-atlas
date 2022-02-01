@@ -440,6 +440,13 @@ async function exportVariants({
                         FROM ${stageTable}
                         ORDER BY chromosome, p_value
                     `);
+
+                    logger.info(`Show warnings`);
+                    const [warnings] = await connection.execute(
+                        `SHOW WARNINGS;`
+                    );
+                    console.log("WARNINGS", warnings);
+        
                     logger.info(`Indexing variants table ${variantTable}`);
                     await connection.query(
                         readFile(path.resolve(__dirname, '../schema/indexes/variant.sql'))
