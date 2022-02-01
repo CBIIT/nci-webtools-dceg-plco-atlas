@@ -408,7 +408,7 @@ async function exportVariants({
                     logger.info(`Generating variants table ${variantTable}`);
                     await connection.query(`
                         SET sql_mode = 'NO_UNSIGNED_SUBTRACTION';
-                        INSERT INTO ${variantTable} (
+                        INSERT IGNORE INTO ${variantTable} (
                             id,
                             chromosome,
                             position,
