@@ -188,7 +188,7 @@ CREATE TABLE IF NOT EXISTS `phenotype_aggregate` (
 )
 PARTITION BY list(phenotype_id) (PARTITION `0` VALUES IN (0));
 
-CREATE TABLE IF NOT EXISTS phenotype_point
+CREATE TABLE IF NOT EXISTS `phenotype_point`
 (
     id bigint auto_increment,
     phenotype_id int not null,
@@ -246,7 +246,7 @@ CREATE TABLE IF NOT EXISTS `principal_component_analysis` (
     FOREIGN KEY (participant_id) REFERENCES participant(id)
 );
 
-CREATE TABLE IF NOT EXISTS share_link (
+CREATE TABLE IF NOT EXISTS `share_link` (
   `id` INTEGER PRIMARY KEY AUTO_INCREMENT,
   `share_id` CHAR(36) UNIQUE,
   `route` VARCHAR(100),

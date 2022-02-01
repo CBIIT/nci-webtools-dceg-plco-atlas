@@ -232,8 +232,12 @@ async function exportVariants({
         console.log(stratifiedColumns);
 
         // set up database for import
-        logger.info('Setting up database');
+        logger.info('Disable sql strict mode');
+        await connection.query(`
+            SET sql_mode = '';
+        `);
 
+        logger.info('Setting up database');
         await connection.query([
             `SET FOREIGN_KEY_CHECKS=0;`,
             readFile(path.resolve(__dirname, '../schema/tables/main.sql')),
@@ -308,8 +312,8 @@ async function exportVariants({
                             allele_effect_frequency     DOUBLE,
                             p_value                     DOUBLE,
                             p_value_heterogenous        BIGINT,
-                            beta                        DOUBLE,
-                            standard_error              DOUBLE,
+                            beta                        DECIMAL(64,16),
+                            standard_error              DECIMAL(64,16),
                             odds_ratio                  DECIMAL(64,16),
                             n                           BIGINT
                         );`,
@@ -322,7 +326,6 @@ async function exportVariants({
 
                     logger.info('Filtering and ordering data into stage table');
                     await connection.query(`
-                        SET sql_mode = '';
                         INSERT INTO ${stageTable} (
                             chromosome,
                             position,
@@ -346,8 +349,8 @@ async function exportVariants({
                             p.${ancestry}_allele_effect_frequency,
                             p.${sex}_${ancestry}_p_value,
                             p.${sex}_${ancestry}_p_value_heterogenous,
-                            p.${sex}_${ancestry}_beta,
-                            p.${sex}_${ancestry}_standard_error,
+                            CAST(p.${sex}_${ancestry}_beta as DECIMAL(64,16)),
+                            CAST(p.${sex}_${ancestry}_standard_error as DECIMAL(64,16)),
                             ${useOddsRatio ? `CAST(EXP(p.${sex}_${ancestry}_beta) as DECIMAL(64,16))` : `NULL`} as odds_ratio,
                             p.${sex}_${ancestry}_n
                         FROM prestage p
@@ -404,7 +407,6 @@ async function exportVariants({
                     // populate variants table
                     logger.info(`Generating variants table ${variantTable}`);
                     await connection.query(`
-                        SET sql_mode = '';
                         INSERT INTO ${variantTable} (
                             id,
                             chromosome,
