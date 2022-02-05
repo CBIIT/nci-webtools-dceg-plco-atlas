@@ -79,12 +79,15 @@ async function deleteInnoDBTableFiles(connection, database, tableName) {
     const dataDirectory = path.resolve(await getDataDirectory(connection), database);
     const filenames = (await fs.promises.readdir(dataDirectory))
         .filter(name => new RegExp(`${tableName}(#p#.*)?(\.ibd|\.cfg)$`, "i").test(name));
-
+    console.log("FOUND MATCH TABLES", filenames);
     for (let filename of filenames) {
         await fs.promises.unlink(
             path.resolve(dataDirectory, filename),
         );
     }
+    const remaining_files = (await fs.promises.readdir(dataDirectory))
+        .filter(name => new RegExp(`${tableName}(#p#.*)?(\.ibd|\.cfg)$`, "i").test(name));
+    console.log("STILL THERE???", remaining_files);
 }
 
 async function copyInnoDBTable(tableName, sourceDirectory, targetDirectory) {
@@ -101,6 +104,10 @@ async function copyInnoDBTable(tableName, sourceDirectory, targetDirectory) {
         const { uid, gid } = await fs.promises.stat(sourcePath);
         await fs.promises.chown(targetPath, uid, gid);
     }
+    const dataDirectory = path.resolve(await getDataDirectory(connection), database);
+    const files_there = (await fs.promises.readdir(dataDirectory))
+        .filter(name => new RegExp(`${tableName}(#p#.*)?(\.ibd|\.cfg)$`, "i").test(name));
+    console.log("FILES THERE???", files_there);
 }
 
 async function exportInnoDBTable(connection, database, tableName, targetDirectory, dataDirectory) {
@@ -114,6 +121,7 @@ async function exportInnoDBTable(connection, database, tableName, targetDirector
 async function importInnoDBTable(connection, database, tableName, sourceDirectory, dataDirectory) {
     dataDirectory = dataDirectory || path.resolve(await getDataDirectory(connection), database);
     await connection.query(`ALTER TABLE ${tableName} DISCARD TABLESPACE`);
+    await sleep(1000); // workaround to ensure tablespaces have been discared
     await copyInnoDBTable(tableName, sourceDirectory, dataDirectory);
     await connection.query(`ALTER TABLE ${tableName} IMPORT TABLESPACE`);
 }

@@ -114,9 +114,11 @@ async function importVariants({connection, database, folderPath, phenotype}) {
 
     // remove old tablespace files if they exist
     for (let table of [variantTable, aggregateTable, pointTable, metadataTable]) {
+        logger.info(`Deleting tables ${variantTable} ${aggregateTable} ${pointTable} ${metadataTable}`);
         await deleteInnoDBTableFiles(connection, database, table);
     }
 
+    logger.info('Re-creating tables');
     // create variant table
     await connection.query([
         `DROP TABLE IF EXISTS ${variantTable}, ${aggregateTable},  ${pointTable}, ${metadataTable};`,
