@@ -105,7 +105,7 @@ async function copyInnoDBTable(tableName, sourceDirectory, targetDirectory) {
         await fs.promises.chown(targetPath, uid, gid);
     }
     const dataDirectory = path.resolve(await getDataDirectory(connection), database);
-    const files_there = (await fs.promises.readdir(dataDirectory))
+    const files_there = (await fs.promises.readdir(sourceDirectory))
         .filter(name => new RegExp(`${tableName}(#p#.*)?(\.ibd|\.cfg)$`, "i").test(name));
     console.log("FILES THERE???", files_there);
 }
