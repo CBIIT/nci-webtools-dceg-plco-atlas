@@ -10,6 +10,7 @@ module.exports = {
     exportInnoDBTable,
     importInnoDBTable,
     deleteInnoDBTableFiles,
+    sleep
 }
 
 function pluck(rows) {
