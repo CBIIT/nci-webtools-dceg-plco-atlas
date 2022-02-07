@@ -112,7 +112,7 @@ async function copyInnoDBTable(tableName, sourceDirectory, targetDirectory) {
 async function exportInnoDBTable(connection, database, tableName, targetDirectory, dataDirectory) {
     dataDirectory = dataDirectory || path.resolve(await getDataDirectory(connection), database);
     await connection.query(`FLUSH TABLES ${tableName} FOR EXPORT`);
-    await sleep(200); // workaround to ensure tables have been flushed
+    await sleep(1000); // workaround to ensure tables have been flushed
     await copyInnoDBTable(tableName, dataDirectory, targetDirectory);
     await connection.query(`UNLOCK TABLES`);
 }
@@ -122,6 +122,7 @@ async function importInnoDBTable(connection, database, tableName, sourceDirector
     await connection.query(`ALTER TABLE ${tableName} DISCARD TABLESPACE`);
     await sleep(1000); // workaround to ensure tablespaces have been discared
     await copyInnoDBTable(tableName, sourceDirectory, dataDirectory);
+    await sleep(1000); // workaround to ensure tablespaces have been discarded
     await connection.query(`ALTER TABLE ${tableName} IMPORT TABLESPACE`);
 }
 

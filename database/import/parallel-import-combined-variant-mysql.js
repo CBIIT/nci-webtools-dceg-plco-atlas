@@ -118,10 +118,16 @@ async function importVariants({connection, database, folderPath, phenotype}) {
         await deleteInnoDBTableFiles(connection, database, table);
     }
 
+    await sleep(1000); // workaround to ensure tablespaces have been deleted
+    
+    logger.info('Dropping tables');
+    await connection.query(`DROP TABLE IF EXISTS ${variantTable}, ${aggregateTable},  ${pointTable}, ${metadataTable}`);
+
+    await sleep(1000); // workaround to ensure tables have been dropped
+
     logger.info('Re-creating tables');
     // create variant table
     await connection.query([
-        `DROP TABLE IF EXISTS ${variantTable}, ${aggregateTable},  ${pointTable}, ${metadataTable};`,
         getSql('../schema/tables/variant.sql', {table_name: variantTable}),
         getSql('../schema/indexes/variant.sql', {table_name: variantTable}),
         getSql('../schema/tables/aggregate.sql', {table_name: aggregateTable}),
