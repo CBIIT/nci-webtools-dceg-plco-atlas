@@ -88,4 +88,4 @@ if [ -z "$8" ]
         INCREMENTAL_FOLDER=$8
 fi
 
-sbatch --gres=lscratch:200 --mem=120g --cpus-per-task=28 --partition=norm --time=08:00:00 --wrap="sh xtrabackup-snapshot.sh $DB_USER $DB_PASS $BASE_DIR $TARGET_DIR $BUCKET_NAME $BUCKET_FOLDER $STREAM $INCREMENTAL_FOLDER"
+sbatch --gres=lscratch:200 --mem=120g --cpus-per-task=28 --partition=norm --time=48:00:00 --wrap="sh xtrabackup-snapshot.sh $DB_USER $DB_PASS $BASE_DIR $TARGET_DIR $BUCKET_NAME $BUCKET_FOLDER $STREAM $INCREMENTAL_FOLDER"
