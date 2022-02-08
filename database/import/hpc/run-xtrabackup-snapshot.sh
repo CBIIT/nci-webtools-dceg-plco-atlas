@@ -48,7 +48,7 @@ TARGET_DIR=$4
 # BUCKET_NAME = "bucket_name"
 if [ -z "$5" ]
     then
-        echo "ERROR: No AWS access key supplied..."
+        echo "ERROR: No AWS S3 bucket name supplied..."
         echo "USAGE: sh run-xtrabackup-snapshot.sh <DB_USER> <DB_PASS> <BASE_DIR> <TARGET_DIR> <BUCKET_NAME> <BUCKET_FOLDER> <STREAM> <OPTIONAL: INCREMENTAL_BACKUP_PATH>"
         echo "EXAMPLE: sh run-xtrabackup-snapshot.sh sample_username sample_password /data/jiangk3/plco/mysql/saved-instance-path /data/jiangk3/plco/mysql/rds-backup bucket_name bucket_folder xbstream <optional incremental path>"
         exit 1
@@ -59,7 +59,7 @@ BUCKET_NAME=$5
 # BUCKET_FOLDER = "bucket_folder"
 if [ -z "$6" ]
     then
-        echo "ERROR: No AWS secret access key supplied..."
+        echo "ERROR: No AWS S3 bucket subfolder name supplied..."
         echo "USAGE: sh run-xtrabackup-snapshot.sh <DB_USER> <DB_PASS> <BASE_DIR> <TARGET_DIR> <BUCKET_NAME> <BUCKET_FOLDER> <STREAM> <OPTIONAL: INCREMENTAL_BACKUP_PATH>"
         echo "EXAMPLE: sh run-xtrabackup-snapshot.sh sample_username sample_password /data/jiangk3/plco/mysql/saved-instance-path /data/jiangk3/plco/mysql/rds-backup bucket_name bucket_folder xbstream <optional incremental path>"
         exit 1

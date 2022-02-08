@@ -31,17 +31,17 @@ then
     # Full backup...
     if [ $STREAM = "xbstream" ]
     then
-        time xtrabackup --backup --host=$SLURM_NODELIST --port=55555  --user=$DB_USER --password=$DB_PASS --datadir=$BASE_DIR/data/ --stream=xbstream --parallel=16 --target-dir=$TARGET_DIR | split -d --bytes=2048MB - $TARGET_DIR/backup.xbstream
+        time xtrabackup --backup --host=$SLURM_NODELIST --port=55555  --user=$DB_USER --password=$DB_PASS --datadir=$BASE_DIR/data/ --stream=xbstream --parallel=16 --close-files --target-dir=$TARGET_DIR | split -d --bytes=2048MB - $TARGET_DIR/backup.xbstream
     else
-        time xtrabackup --backup --host=$SLURM_NODELIST --port=55555  --user=$DB_USER --password=$DB_PASS --datadir=$BASE_DIR/data/ --parallel=16 --target-dir=$TARGET_DIR
+        time xtrabackup --backup --host=$SLURM_NODELIST --port=55555  --user=$DB_USER --password=$DB_PASS --datadir=$BASE_DIR/data/ --parallel=16 --close-files  --target-dir=$TARGET_DIR
     fi
 else
     # Incremental backup...  
     if [ $STREAM = "xbstream" ]
     then
-        time xtrabackup --backup --host=$SLURM_NODELIST --incremental-basedir=$INCREMENTAL_FOLDER --port=55555  --user=$DB_USER --password=$DB_PASS --datadir=$BASE_DIR/data/ --stream=xbstream --parallel=16 --target-dir=$TARGET_DIR | split -d --bytes=2048MB - $TARGET_DIR/backup.xbstream
+        time xtrabackup --backup --host=$SLURM_NODELIST --incremental-basedir=$INCREMENTAL_FOLDER --port=55555  --user=$DB_USER --password=$DB_PASS --datadir=$BASE_DIR/data/ --stream=xbstream --parallel=16 --close-files --target-dir=$TARGET_DIR | split -d --bytes=2048MB - $TARGET_DIR/backup.xbstream
     else
-        time xtrabackup --backup --host=$SLURM_NODELIST --incremental-basedir=$INCREMENTAL_FOLDER --port=55555  --user=$DB_USER --password=$DB_PASS --datadir=$BASE_DIR/data/ --parallel=16 --target-dir=$TARGET_DIR
+        time xtrabackup --backup --host=$SLURM_NODELIST --incremental-basedir=$INCREMENTAL_FOLDER --port=55555  --user=$DB_USER --password=$DB_PASS --datadir=$BASE_DIR/data/ --parallel=16 --close-files  --target-dir=$TARGET_DIR
     fi
 fi
 echo
