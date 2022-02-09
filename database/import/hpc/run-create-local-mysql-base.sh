@@ -33,4 +33,4 @@ if [ -z "$3" ]
 fi
 TARGET_DIR=$3
 
-sbatch --gres=lscratch:100 --mem=32g --cpus-per-task=4 --partition=quick --time=04:00:00 --wrap="sh create-local-mysql-base.sh $DB_USER $DB_PASS"
+sbatch --gres=lscratch:100 --mem=32g --cpus-per-task=4 --partition=quick --time=04:00:00 --wrap="sh create-local-mysql-base.sh $DB_USER $DB_PASS $TARGET_DIR"
