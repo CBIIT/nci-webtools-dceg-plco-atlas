@@ -6,18 +6,18 @@ if [ -z "$1" ]
     then
         echo "ERROR: No input path supplied..."
         echo "USAGE: sh run-parallel-import-combined-variant-mysql.sh <INPUT_DIR> <BASE_DIR> <USER> <PASSWORD>"
-        echo "EXAMPLE: sh run-parallel-import-combined-variant-mysql.sh ../raw/output_ibd /data/jiangk3/plco/mysql/mysql-instance-base sample_username sample_password"
+        echo "EXAMPLE: sh run-parallel-import-combined-variant-mysql.sh ../raw/output_ibd /data/<username>/plco/mysql/mysql-instance-base sample_username sample_password"
         exit 1
 fi
 INPUT_DIR=$1
 
 # ARGUMENT 2: Input MySQL base directory path
-# BASE_DIR="/data/jiangk3/plco/mysql/mysql-instance-base"
+# BASE_DIR="/data/<username>/plco/mysql/mysql-instance-base"
 if [ -z "$2" ]
     then
         echo "ERROR: No input path supplied..."
         echo "USAGE: sh run-parallel-import-combined-variant-mysql.sh <INPUT_DIR> <BASE_DIR> <USER> <PASSWORD>"
-        echo "EXAMPLE: sh run-parallel-import-combined-variant-mysql.sh ../raw/output_ibd /data/jiangk3/plco/mysql/mysql-instance-base sample_username sample_password"
+        echo "EXAMPLE: sh run-parallel-import-combined-variant-mysql.sh ../raw/output_ibd /data/<username>/plco/mysql/mysql-instance-base sample_username sample_password"
         exit 1
 fi
 BASE_DIR=$2
@@ -28,7 +28,7 @@ if [ -z "$3" ]
     then
         echo "ERROR: No MySQL db username supplied..."
         echo "USAGE: sh run-parallel-import-combined-variant-mysql.sh <INPUT_DIR> <BASE_DIR> <USER> <PASSWORD>"
-        echo "EXAMPLE: sh run-parallel-import-combined-variant-mysql.sh ../raw/output_ibd /data/jiangk3/plco/mysql/mysql-instance-base sample_username sample_password"
+        echo "EXAMPLE: sh run-parallel-import-combined-variant-mysql.sh ../raw/output_ibd /data/<username>/plco/mysql/mysql-instance-base sample_username sample_password"
         exit 1
 fi
 USER=$3
@@ -39,7 +39,7 @@ if [ -z "$4" ]
     then
         echo "ERROR: No MySQL db password supplied..."
         echo "USAGE: sh run-parallel-import-combined-variant-mysql.sh <INPUT_DIR> <BASE_DIR> <USER> <PASSWORD>"
-        echo "EXAMPLE: sh run-parallel-import-combined-variant-mysql.sh ../raw/output_ibd /data/jiangk3/plco/mysql/mysql-instance-base sample_username sample_password"
+        echo "EXAMPLE: sh run-parallel-import-combined-variant-mysql.sh ../raw/output_ibd /data/<username>/plco/mysql/mysql-instance-base sample_username sample_password"
         exit 1
 fi
 PASSWORD=$4
