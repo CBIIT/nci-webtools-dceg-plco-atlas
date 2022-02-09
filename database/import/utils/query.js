@@ -80,7 +80,7 @@ async function deleteInnoDBTableFiles(connection, database, tableName) {
     const dataDirectory = path.resolve(await getDataDirectory(connection), database);
     const filenames = (await fs.promises.readdir(dataDirectory))
         .filter(name => new RegExp(`${tableName}(#p#.*)?(\.ibd|\.cfg)$`, "i").test(name));
-    console.log("FOUND MATCH TABLES", filenames);
+    console.log("deleteInnoDBTableFiles found tables to delete", filenames);
     for (let filename of filenames) {
         await fs.promises.unlink(
             path.resolve(dataDirectory, filename),
@@ -88,7 +88,7 @@ async function deleteInnoDBTableFiles(connection, database, tableName) {
     }
     const remaining_files = (await fs.promises.readdir(dataDirectory))
         .filter(name => new RegExp(`${tableName}(#p#.*)?(\.ibd|\.cfg)$`, "i").test(name));
-    console.log("STILL THERE???", remaining_files);
+    console.log("deleteInnoDBTableFiles remaining tables after delete", remaining_files);
 }
 
 async function copyInnoDBTable(tableName, sourceDirectory, targetDirectory) {
@@ -107,7 +107,7 @@ async function copyInnoDBTable(tableName, sourceDirectory, targetDirectory) {
     }
     const files_there = (await fs.promises.readdir(sourceDirectory))
         .filter(name => new RegExp(`${tableName}(#p#.*)?(\.ibd|\.cfg)$`, "i").test(name));
-    console.log("FILES THERE???", files_there);
+    console.log("copyInnoDBTable files found after copy", files_there);
 }
 
 async function exportInnoDBTable(connection, database, tableName, targetDirectory, dataDirectory) {
