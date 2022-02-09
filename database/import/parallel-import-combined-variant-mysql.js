@@ -111,6 +111,11 @@ async function importVariants({connection, database, folderPath, phenotype}) {
     const aggregateTable = `agg__${tableSuffix}`;
     const pointTable = `pnt__${tableSuffix}`;
     const metadataTable = `mta__${tableSuffix}`;
+    
+    logger.info('Dropping tables');
+    await connection.query(`DROP TABLE IF EXISTS ${variantTable}, ${aggregateTable},  ${pointTable}, ${metadataTable}`);
+
+    await sleep(10000); // workaround to ensure tables have been dropped
 
     // remove old tablespace files if they exist
     for (let table of [variantTable, aggregateTable, pointTable, metadataTable]) {
@@ -118,12 +123,7 @@ async function importVariants({connection, database, folderPath, phenotype}) {
         await deleteInnoDBTableFiles(connection, database, table);
     }
 
-    await sleep(1000); // workaround to ensure tablespaces have been deleted
-    
-    logger.info('Dropping tables');
-    await connection.query(`DROP TABLE IF EXISTS ${variantTable}, ${aggregateTable},  ${pointTable}, ${metadataTable}`);
-
-    await sleep(1000); // workaround to ensure tables have been dropped
+    await sleep(10000); // workaround to ensure tablespaces have been deleted
 
     logger.info('Re-creating tables');
     // create variant table
