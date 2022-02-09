@@ -96,9 +96,9 @@ echo "IMPORTING PARTICIPANT DATA CATEGORIES..."
 time mysql -u $DB_USER -p$DB_PASS --host=$SLURM_NODELIST --port=55555 --local-infile=1 plcogwas < ../import-participant-data-category.sql
 echo
 
-echo "IMPORTING PHENOTYPE CORRELATIONS..."
-time mysql -u $DB_USER -p$DB_PASS --host=$SLURM_NODELIST --port=55555 --local-infile=1 plcogwas < ../import-phenotype-correlation.sql
-echo
+# echo "IMPORTING PHENOTYPE CORRELATIONS..."
+# time mysql -u $DB_USER -p$DB_PASS --host=$SLURM_NODELIST --port=55555 --local-infile=1 plcogwas < ../import-phenotype-correlation.sql
+# echo
 
 echo "IMPORTING PARTICIPANT COUNTS..."
 time node ../update-participant-count.js --host $SLURM_NODELIST --port 55555 --db_name plcogwas --user $DB_USER --password $DB_PASS
