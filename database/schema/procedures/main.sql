@@ -67,7 +67,7 @@ CREATE PROCEDURE warmup_cache()
 
   DECLARE variant_table_cursor CURSOR FOR
     select t.TABLE_NAME from INFORMATION_SCHEMA.TABLES t
-    WHERE t.TABLE_NAME LIKE 'variant_%';
+    WHERE t.TABLE_NAME LIKE 'var_%';
 
   DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = 1;
 
