@@ -34,7 +34,7 @@ time local_mysql --basedir $BASE_DIR start
 echo
 
 echo "LOGGING INTO MYSQL AS ROOT AND CREATING $DB_USER USER, CREATING PLCOGWAS DATABASE..."
-time mysql -u root -p$DB_PASS --socket=$BASE_DIR/mysql.sock --execute="
+time mysql -u root -pmysql123 --socket=$BASE_DIR/mysql.sock --execute="
     CREATE USER '$DB_USER'@'localhost' IDENTIFIED BY '$DB_PASS'; 
     GRANT ALL PRIVILEGES ON *.* TO '$DB_USER'@'localhost' WITH GRANT OPTION; 
     CREATE USER '$DB_USER'@'%' IDENTIFIED BY '$DB_PASS';
