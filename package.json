@@ -35,7 +35,7 @@
     "fastify-static": "^4.0.1",
     "ioredis": "^4.27.7",
     "lib-r-math.js": "^1.0.89",
-    "minimist": "^1.2.5",
+    "minimist": "^1.2.6",
     "mysql2": "^2.2.5",
     "ua-parser-js": "^0.7.28",
     "winston": "^3.3.3",
