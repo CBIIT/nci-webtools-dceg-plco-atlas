@@ -52,6 +52,20 @@ export function About() {
       </p>
 
       <p>
+        All PLCO genotype data is available in dbGaP under accession number{' '}
+        <a href="https://www.ncbi.nlm.nih.gov/projects/gap/cgi-bin/study.cgi?study_id=phs001286.v2.p2" target="_blank" rel="noopener noreferrer" alt="Link to open dbGAP study">phs001286.v2.p2</a>. 
+        This public repository allows researchers to apply for access to the individual 
+        genotype and imputation data that we used to create the PLCO Atlas. 
+        Companion phenotype data can be requested through the{' '}
+        <a href="https://cdas.cancer.gov/plco/" target="_blank" rel="noopener noreferrer" alt="Link to open NCI CDAS portal">NCI Cancer Data Access System (CDAS)</a>. 
+        We note that some of the cancer endpoint data used in the PLCO Atlas cannot be shared 
+        through CDAS due to restrictions on data use agreements with certain cancer registries. 
+        However, summary GWAS statistic data is directly available from this website, as well as 
+        accessed directly through{' '}
+        <a href="#/api-access" target="_blank" rel="noopener noreferrer" alt="Link to open ExploreGWAS API Access tab">API Access</a>.
+      </p>
+
+      <p>
         This application's source code can be viewed on <a href="https://github.com/CBIIT/nci-webtools-dceg-plco-atlas" target="_blank" rel="noopener noreferrer" alt="Link to open GitHub">GitHub</a>.
       </p>
     </div>
