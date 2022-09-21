@@ -183,6 +183,7 @@ async function hasRecord(connection, tableName, conditions, conditionJoiner) {
  */
 async function getSummary({connection, logger}, {phenotype_id, table, sex, ancestry, p_value_nlog_min, limit, offset, raw}) {
     // validate parameters
+    phenotype_id = parseInt(phenotype_id);
     if (!phenotype_id || !await hasRecord(connection, 'phenotype', {id: phenotype_id}))
         throw new Error('A valid phenotype id must be provided');
 
@@ -1248,7 +1249,9 @@ async function getPrincipalComponentAnalysis({connection, logger}, {phenotype_id
 
     if (pc_x == pc_y)
         throw new Error('Principal components must be different');
-        
+
+    const defaultLimit = 1e6;
+    limit = +limit || defaultLimit;
     const rowLimit = limit ? `LIMIT ${limit}` : ``;
 
     const sql = `

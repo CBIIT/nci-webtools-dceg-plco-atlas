@@ -7,19 +7,16 @@ START TRANSACTION;
 
 SET autocommit = 0;
 
-CREATE TEMPORARY TABLE `lambdagc_stage` (
+CREATE TEMPORARY TABLE `phenotype_metadata_lambda_gc_ld_score` (
     `phenotype_id` integer,
     `sex` varchar(200),
     `ancestry` varchar(200),
-    `platform` varchar(200),
-    `method` varchar(200),
-    `intercept` double,
-    `error` double
+    `score` double
 );
 
-LOAD DATA LOCAL INFILE "../raw/ldscore_summary.tsv" INTO TABLE lambdagc_stage
+LOAD DATA LOCAL INFILE "../raw/ldscore.tsv" INTO TABLE lambdagc_stage
     FIELDS TERMINATED BY '\t' OPTIONALLY ENCLOSED BY '"'
-    IGNORE 1 ROWS (@phenotype, @platform, @ancestry, @method, @intercept, @error)
+    IGNORE 1 ROWS (@phenotype, @ancestry, @score)
     SET 
         phenotype_id = (SELECT id from phenotype where name = REGEXP_REPLACE(@phenotype, '_(fe)?male$', '')),
         sex =  if(
@@ -28,20 +25,14 @@ LOAD DATA LOCAL INFILE "../raw/ldscore_summary.tsv" INTO TABLE lambdagc_stage
             'all'
         ),
         ancestry = lower(@ancestry),
-        platform = @platform,
-        method = @method,
-        intercept = @intercept,
-        error = @error;
+        score = @score;
 
-INSERT INTO phenotype_metadata(phenotype_id, sex, ancestry, chromosome, lambda_gc_ld_score)
-SELECT 
-    phenotype_id, 
-    sex, 
-    ancestry, 
-    'all' AS chromosome, 
-    intercept AS lambda_gc_ld_score 
-FROM lambdagc_stage
-WHERE platform IN ('meta', 'meta-all-categories')
-ON DUPLICATE KEY UPDATE lambda_gc_ld_score = VALUES(lambda_gc_ld_score);
+update phenotype_metadata pm
+inner join phenotype_metadata_lambda_gc_ld_score pmlgls on
+    pm.phenotype_id = pmlgls.phenotype_id and
+    pm.sex = pmlgls.sex and
+    pm.ancestry = pmlgls.ancestry and
+    pm.chromosome = 'all'
+set pm.lambda_gc_ld_score = pmlgls.score;
 
 COMMIT;
