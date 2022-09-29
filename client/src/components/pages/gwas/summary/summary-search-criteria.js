@@ -65,7 +65,7 @@ export const SummaryResultsSearchCriteria = () => {
                   <small className="ml-2">{(p.resultsCounts.participant_count_control || 0).toLocaleString()} controls</small>                  
                 </>
                 : <>
-                    <small className="ml-2">{(p.resultsCounts.participant_count || 0).toLocaleString()} participants</small>                  
+                    <small className="ml-2">{(p.resultsCounts.participant_count_case || 0).toLocaleString()} participants</small>                  
                 </>}
                 
               </strong>
