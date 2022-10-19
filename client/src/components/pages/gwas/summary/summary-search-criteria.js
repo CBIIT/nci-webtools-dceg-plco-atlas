@@ -59,13 +59,13 @@ export const SummaryResultsSearchCriteria = () => {
               <strong>
                 {p.display_name} ({p.stratification}) -{' '}
                 <small>{p.resultsCounts.count.toLocaleString()} variants</small>
-                {p.type === 'binary'
+                {(p.type === 'binary' || p.type === 'categorical')
                 ? <>
                   <small className="ml-2">{(p.resultsCounts.participant_count_case || 0).toLocaleString()} cases</small>                  
                   <small className="ml-2">{(p.resultsCounts.participant_count_control || 0).toLocaleString()} controls</small>                  
                 </>
                 : <>
-                    <small className="ml-2">{(p.resultsCounts.participant_count_case || 0).toLocaleString()} participants</small>                  
+                    <small className="ml-2">{(p.resultsCounts.participant_count || 0).toLocaleString()} participants</small>                  
                 </>}
                 
               </strong>
