@@ -327,7 +327,7 @@ async function getVariants({connection, logger}, params) {
                 "${p.id}" as phenotype_id,
                 "${p.name}" as phenotype_name
             from information_schema.tables 
-            where TABLE_NAME = 'phenotype_variant__${p.name}__${sex}__${ancestry}'
+            where TABLE_NAME = 'var__${p.name}__${sex}__${ancestry}'
         `).join(' UNION ')
     );
 
