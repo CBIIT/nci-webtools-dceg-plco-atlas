@@ -27,7 +27,6 @@ LOAD DATA LOCAL INFILE "../raw/participant_counts.tsv" INTO TABLE participant_co
         participant_count_case = @cases,
         participant_count_control = @controls;
 
-UPDATE phenotype_metadata set participant_count_case = null, participant_count_control = null;
 INSERT INTO phenotype_metadata (phenotype_id, sex, ancestry, chromosome, participant_count_case, participant_count_control)
 SELECT 
     phenotype_id, 
