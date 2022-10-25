@@ -110,6 +110,10 @@ echo "IMPORTING LAMBDA GC LD SCORES..."
 time mysql -u $DB_USER -p$DB_PASS --host=$SLURM_NODELIST --port=55555 --local-infile=1 plcogwas < ../import-lambda-gc-ld-score.sql
 echo
 
+echo "IMPORTING PARTICIPANT COUNTS..."
+time mysql -u $DB_USER -p$DB_PASS --host=$SLURM_NODELIST --port=55555 --local-infile=1 plcogwas < ../import-participant-counts.sql
+echo
+
 echo "IMPORTING PC DATA..."
 time mysql -u $DB_USER -p$DB_PASS --host=$SLURM_NODELIST --port=55555 --local-infile=1 plcogwas < ../import-pca.sql
 echo
