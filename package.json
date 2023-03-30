@@ -8,8 +8,8 @@
   },
   "scripts": {
     "contrast": "node -r @contrast/agent server/plco-server.js",
-    "start": "node server/plco-server.js",
-    "start:contrast": "npm run contrast",
+    "start:dev": "node server/plco-server.js",
+    "start": "npm run contrast",
     "start:api": "node server/plco-server.js --api",
     "build": "cd client && npm run build",
     "test": "echo \"Error: no test specified\" && exit 1",
