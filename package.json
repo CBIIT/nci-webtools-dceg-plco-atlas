@@ -26,6 +26,7 @@
   },
   "homepage": "https://github.com/CBIIT/nci-webtools-dceg-plco-atlas#readme",
   "dependencies": {
+    "@contrast/agent": "^4.32.0",
     "csv-parse": "^5.3.0",
     "fastify": "^4.6.0",
     "fastify-caching": "^6.3.0",
