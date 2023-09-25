@@ -173,7 +173,7 @@ export const TreeSelect = forwardRef(
       !visible(node, api) ? null : <div
         style={{
           marginLeft: !isFlat ? `${sublevel ? 24 : 5}px` : '19px',
-          overflow: 'hidden',
+          overflow: 'visible',
           whiteSpace: 'nowrap'
         }}>
         {!searchFilter && (
