@@ -60,7 +60,10 @@ export const SummaryResultsSearchCriteria = () => {
 					{phenotypes.map((p, i) => (
 						<div className={isPairwise && +i === 0 ? 'mb-2' : 'mb-0'}>
 							<strong>
-								<a href={p.link}>{p.display_name}</a> ({p.stratification}) -{' '}
+								<a href={p.link} target='_blank'>
+									{p.display_name}
+								</a>{' '}
+								({p.stratification}) -{' '}
 								<small>{p.resultsCounts.count.toLocaleString()} variants</small>
 								{p.display_name.includes('Machiela') ? (
 									p.type === 'binary' ? (
