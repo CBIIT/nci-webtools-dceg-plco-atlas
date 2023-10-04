@@ -49,7 +49,7 @@ async function webApiRoutes(fastify, options) {
 		'onRequest',
 		useBrowserOnly({
 			message:
-				'Please use the GWAS Atlas Public API to perform queries outside the browser.',
+				'Please use the GWAS Explorer Public API to perform queries outside the browser.',
 		})
 	);
 

@@ -16,7 +16,7 @@ export function Home({ links }) {
 				<div className='banner-overlay-text row justify-content-center text-center text-light w-75'>
 					<div className='col-12'>
 						<h1 className='text-light'>
-							<b>GWAS ATLAS</b>
+							<b>GWAS Explorer</b>
 						</h1>
 					</div>
 					<div
@@ -51,7 +51,7 @@ export function Home({ links }) {
 
 			<div className='text-center mt-2 d-md-none'>
 				<h1 className='text-dark'>
-					<b>GWAS ATLAS</b>
+					<b>GWAS Explorer</b>
 				</h1>
 				<hr className='w-75'></hr>
 				<div className='px-3 text-center'>
