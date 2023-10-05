@@ -500,6 +500,10 @@ async function exportVariants({ connection, logger }, params) {
 		}
 	);
 	const rows = [columns].concat(data);
+	//for odds_ratio_ci_95_high if it is more than 100000, then set as Na for export file
+	rows.forEach((r) => {
+		r[15] = r[15] > 100000 ? NaN : r[15];
+	});
 	return {
 		filename:
 			[
