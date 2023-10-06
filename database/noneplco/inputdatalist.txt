@@ -1,0 +1,11 @@
+2_breast_cancer.tsv,9786072,20
+3_breast_cancer.tsv,9786072,20
+4_breast_cancer.tsv,13777796,35
+5_colo_rectal.tsv,11250397,30
+6_colo_rectal.tsv, 8859571, 20,nobeta_odds
+7_endo_cancer.tsv,9525179,25
+8_endo_endometrioid.tsv,9518925,25
+8_endo_none_endometrioid.tsv,9027656,25
+9_lung_cancer.tsv,7877738,20
+9_lung_cancer_ever_smokers.tsv,7945966,20
+9_lung_cancer_never_smokers.tsv,8015034,20

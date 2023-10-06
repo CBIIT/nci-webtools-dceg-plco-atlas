@@ -1,0 +1,2 @@
+filename,study_id,ancestry,sex,path,hasFreq,n,has_odds_ratio
+3_breast_cancer,3,european,all,29059683-GCST004988-EFO_0000305.h.tsv,yes,106000,yes

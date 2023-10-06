@@ -1,0 +1,12 @@
+filename,study_id,ancestry,sex,path,hasFreq,n,has_odds_ratio
+2_breast_cancer,2,european,all,32887889-GCST90011804-EFO_0000305.h.tsv,yes,237537,yes
+3_breast_cancer,3,european,all,29059683-GCST004988-EFO_0000305.h.tsv,yes,106000,yes
+4_breast_cancer,4,european,all,25751625-GCST007236-EFO_0000305.h.tsv,yes,89677,yes
+5_colo_rectal,5,european,all,GCST90255675_buildGRCh37.tsv,none,185616,none
+6_colo_rectal,6,east_asian,all,31826910-GCST009869-EFO_0005842.h.tsv,yes,72272,yes
+7_endo_cancer,7,european,all,30093612-GCST006464-EFO_1001512.h.tsv,yes,121885,yes
+8_endo_endometrioid,8,european,all,30093612-GCST006465-EFO_1001512.h.tsv,yes,54884,yes
+8_endo_none_endometrioid,8,european,all,30093612-GCST006466-EFO_1001512.h.tsv,yes,36677,yes
+9_lung_cancer,9,european,all,28604730-GCST004748-EFO_0001071.h.tsv,yes,85716,yes
+9_lung_cancer_ever_smokers,9,european,all,28604730-GCST004749-EFO_0001071.h.tsv,yes,20833,yes
+9_lung_cancer_never_smokers,9,european,all,28604730-GCST004747-EFO_0001071.h.tsv,yes,9859,yes
