@@ -846,8 +846,8 @@ async function getPhenotypeParticipants({ connection, logger }, params) {
 	);
 	// retrieve the specified phenotype
 	const [phenotypeRows] = await connection.execute(
-		`SELECT id, name, display_name as displayName, age_name as ageName, description, type
-        FROM phenotype
+		`SELECT id, name, display_name as displayName, age_name as ageName, description, type, link
+        FROM v_phenotype
         WHERE id = :id`,
 		{ id }
 	);
@@ -889,6 +889,7 @@ async function getPhenotypeParticipants({ connection, logger }, params) {
 	phenotype.frequencyByAge = {};
 	phenotype.frequencyByAncestry = {};
 	phenotype.frequencyBySex = {};
+	console.log(phenotype);
 	// if binary, assume there are two categories (with/without)
 	if (phenotype.type === 'binary') {
 		phenotype.categories = [
