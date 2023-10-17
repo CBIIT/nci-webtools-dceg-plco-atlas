@@ -6,7 +6,7 @@ export const PhenotypesSearchCriteria = () => {
 	const browsePhenotypes = useSelector((state) => state.browsePhenotypes);
 	const { submitted, shareID, disableSubmit } = browsePhenotypes;
 	const { phenotypeData } = useSelector((state) => state.browsePhenotypesPlots);
-
+	console.log(phenotypeData);
 	const phenotypes = useSelector((state) => state.phenotypes);
 
 	const placeholder = (
@@ -44,7 +44,7 @@ export const PhenotypesSearchCriteria = () => {
 					<p className='h5 my-1'>
 						{(phenotypeData && (
 							<a href={phenotypeData.link} target='_blank'>
-								{phenotypeData.display_name}
+								{phenotypeData.displayName}
 							</a>
 						)) ||
 							''}
