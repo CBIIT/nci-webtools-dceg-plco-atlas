@@ -1323,6 +1323,7 @@ async function getPrincipalComponentAnalysis(
             join participant_data pd on pca.participant_id = pd.participant_id 
         where
             pd.phenotype_id = :phenotype_id
+						and pd.value is not null
         ${rowLimit}`;
 	logger.debug(`getPrincipalComponentAnalysis sql: ${sql}`);
 	const [data, columns] = await connection.query({
