@@ -7,7 +7,7 @@ export function About() {
 			<hr />
 
 			<p>
-				The GWAS Explorer is a publicly available webtool developed and hosted by the 
+				The GWAS Explorer is a publicly available webtool developed and hosted by the {' '}
 				<a
 					className='font-weight-bold'
 					target='_blank'
@@ -26,7 +26,7 @@ export function About() {
 				200 cancer and cancer-related phenotypes harmonized from large-scale GWAS efforts. 
 				Interactive tools are available to visualize and examine association results utilizing 
 				dynamic Manhattan and Miami plots, stratify by sex and ancestry, as well as review diagnostic 
-				plots (e.g., Q-q plots). Additional links permit users to integrate findings with 
+				plots (e.g., Q-q plots). Additional links permit users to integrate findings with {' '}
 				<a
 					href='https://ldlink.nih.gov/?tab=home'
 					target='_blank'
@@ -36,7 +36,7 @@ export function About() {
 					external resources
 				</a>
 				. GWAS summary statistic data are directly available from this website, 
-				as well as through 
+				as well as through {' '}
 				<a
 					href='#/api-access'
 					target='_blank'
@@ -54,7 +54,7 @@ export function About() {
 				the effects of screening on cancer-related mortality and secondary endpoints. 
 				A cohort of PLCO participants has been followed for two decades, resulting in a rich collection 
 				of anthropometric, lifestyle, and disease information, and data from several smaller-scale 
-				molecular studies. Existing data from the trial can be obtained from the 
+				molecular studies. Existing data from the trial can be obtained from the {' '}
 				<a
 					target='_blank'
 					rel='noopener noreferrer'
@@ -64,7 +64,7 @@ export function About() {
 					Cancer Data Access System (CDAS)
 				</a>. Some of the cancer endpoint data used in the GWAS Explorer 
 				cannot be shared through CDAS due to restrictions on data use agreements with certain cancer registries. 
-				All PLCO genotype data are available in dbGaP under accession number 
+				All PLCO genotype data are available in dbGaP under accession number {' '}
 				<a
 					href='https://www.ncbi.nlm.nih.gov/projects/gap/cgi-bin/study.cgi?study_id=phs001286.v2.p2'
 					target='_blank'
