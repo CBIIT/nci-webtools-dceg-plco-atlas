@@ -14,9 +14,9 @@ export function About() {
 					rel='noopener noreferrer'
 					href='https://dceg.cancer.gov'
 				>
-					Division of Cancer Epidemiology and Genetics 
+					Division of Cancer Epidemiology and Genetics (DCEG) 
 				</a>
-				(DCEG), National Cancer Institute, part of the National Institutes of Health. 
+				, National Cancer Institute, part of the National Institutes of Health. 
 			</p>
 
 			<p>
