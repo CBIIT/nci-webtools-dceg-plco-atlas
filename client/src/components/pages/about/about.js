@@ -28,7 +28,7 @@ export function About() {
 				dynamic Manhattan and Miami plots, stratify by sex and ancestry, as well as review diagnostic 
 				plots (e.g., Q-q plots). Additional links permit users to integrate findings with {' '}
 				<a
-					href='https://ldlink.nih.gov/?tab=home'
+					href='https://ldlink.nih.gov/?tab=ldtrait'
 					target='_blank'
 					rel='noopener noreferrer'
 					alt='Link to open Ldlink'
@@ -80,7 +80,7 @@ export function About() {
 			<p>
 				Since development of the GWAS Explorer to host PLCO GWAS summary statistics, 
 				the GWAS Explorer has been expanded to include cancer and cancer-related data from a variety of 
-				external public resources (e.g., 
+				external public resources (e.g.,{' '} 
 				<a
 					href='https://www.ebi.ac.uk/gwas/'
 					target='_blank'
