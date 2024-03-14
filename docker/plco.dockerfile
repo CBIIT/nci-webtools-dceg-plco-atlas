@@ -1,10 +1,15 @@
 # Sets up the plco environment for
 
-FROM centos
 
-RUN yum update -y \
- && curl -sL https://rpm.nodesource.com/setup_12.x | sh \
- && yum install -y gcc-c++ git make nodejs
+FROM public.ecr.aws/amazonlinux/amazonlinux:2022
+
+RUN dnf -y update \
+ && dnf -y install \
+    make \
+    gcc-c++ \
+    nodejs \
+    npm \
+ && dnf clean all
 
 COPY . /deploy
 
