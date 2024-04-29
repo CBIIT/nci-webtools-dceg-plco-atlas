@@ -276,14 +276,14 @@ export function Home({ links }) {
             Open Source Initiative
           </a>{" "}
           approved license.
-          <br></br>
           <p>
+            <br></br>
             Machiela, M.J., Huang, WY., Wong, W.{" "}
             <span style={{ fontStyle: "italic" }}>et al</span>. GWAS Explorer:
             an open-source tool to explore, visualize, and access GWAS summary
             statistics in the PLCO Atlas.{" "}
             <span style={{ fontStyle: "italic" }}>Sci Data </span>
-            <span style={{ fontWeight: "bold" }}>10 </span>, 25 (2023).{" "}
+            <span style={{ fontWeight: "bold" }}>10</span>, 25 (2023).{" "}
             <a
               href="https://doi.org/10.1038/s41597-022-01921-2"
               target="_black"
