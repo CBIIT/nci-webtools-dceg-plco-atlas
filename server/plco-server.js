@@ -1,18 +1,19 @@
+require("dotenv").config();
 const path = require("path");
 const fastify = require("fastify");
 const zlib = require("zlib");
 const forkCluster = require("./services/cluster");
 const getLogger = require("./services/logger");
 const api = require("./services/api");
-const { deferUntilConnected } = require('./services/query');
+const { deferUntilConnected } = require("./services/query");
 const isProduction = process.env.NODE_ENV === "production";
-const config = require("./config.json");
+const config = require("./config");
 const databaseConfig = {
   database: config.database.name,
   user: config.database.user,
   host: config.database.host,
   port: config.database.port,
-  password: config.database.password
+  password: config.database.password,
 };
 
 // fork and return if in master process
@@ -29,9 +30,9 @@ if (isProduction && forkCluster()) return;
     disableRequestLogging: true,
   });
 
-  app.log.info('Waiting for mysql connection...')
+  app.log.info("Waiting for mysql connection...");
   await deferUntilConnected(databaseConfig, app.log);
-  app.log.info('Connection established')
+  app.log.info("Connection established");
 
   // compress all responses (note: keep quality low to decrease ttfb)
   app.register(require("fastify-compress"), {
@@ -79,7 +80,7 @@ if (isProduction && forkCluster()) return;
   app.register(api.publicApiRoutes);
 
   // listen on specified port
-  app.listen(config.port, "0.0.0.0").catch(error => {
+  app.listen(config.port, "0.0.0.0").catch((error) => {
     app.log.error(error);
     process.exit(1);
   });

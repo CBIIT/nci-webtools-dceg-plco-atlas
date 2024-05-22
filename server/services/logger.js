@@ -1,9 +1,11 @@
+require("dotenv").config();
 const path = require("path");
 const util = require("util");
 const { createLogger, format, transports, info } = require("winston");
-const { logpath, loglevel } = require("../config.json");
+const config = require("../config");
+const { logpath, loglevel } = config;
 require("winston-daily-rotate-file");
-
+console.log(logpath, loglevel);
 function getLogger(name) {
   return new createLogger({
     level: loglevel || "info",
@@ -18,13 +20,13 @@ function getLogger(name) {
     format: format.combine(
       format.timestamp({ format: "YYYY-MM-DD HH:mm:ss" }),
       format.label({ label: name }),
-      format.printf(
-        ({ label, timestamp, level, message }) => {
-          return `[${label} - ${process.pid}] [${timestamp}] [${level}] ${
-            util.format(message && message.err || message)
-          }`
-        }
-      )
+      format.printf(({ label, timestamp, level, message }) => {
+        return `[${label} - ${
+          process.pid
+        }] [${timestamp}] [${level}] ${util.format(
+          (message && message.err) || message
+        )}`;
+      })
     ),
     transports: [
       new transports.Console(),

@@ -6,6 +6,7 @@ services:
       dockerfile: "./docker/backend.dockerfile"
     ports:
       - "9000:9000"
+    env_file: server/.env
 
   frontend:
     build:
