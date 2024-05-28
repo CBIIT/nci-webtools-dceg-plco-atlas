@@ -1,0 +1,10 @@
+id,pubmed_id,display_name,description,link
+1,00000000,plco,"plco study","https://www.nature.com/articles/s41597-022-01921-2"
+2,32887889,"Rashkin 2020","UKBB,GERA​"
+3,29059683,"Michailidou 2017","BCAC, DRIVE; comparison with iCOGS, 11 other breast cancer GWAS"
+4,25751625,"Michailidou 2015","BCAC - iCOGS + 11 other breast cancer GWAS"
+5,36539618,"Fernandez 2022","Everybody: CCFR, CORECT, CORSA_2, GECCO, NSCCG, COIN, UK Biobank, Finnish (THL Biobank), CCFR1, CCFR2, QUASAR2, SCOT, CORGI(UK1), Scotland Phase 1, Scotland Phase 2, SOCCS, DACHS4, Croatia, CORSA_1 [ GECCO @ fred hutch ] , Generation Scotland, Lothian Birth Cohort, Aichi1, Aichi2, BBJ , Guanzhou1, HCES, HCES2, Korea cohort, Shanghai cohort; V58, NSCCG; if only considering European ancestry, exclude Aichi1, Aichi2, BBJ, Guanzhou1, HCES, HCES2, Korea_KCPSII, Korea_NCC, Korea_NCC2, Korea_seoul, Shanghai1 through Shanghai 4"
+6,31826910,"Lu 2019","accc"
+7,30093612,"O'Mara 2018","ECAC, E2C2, UK Biobank; control samples provided by BCAC"
+8,30093612,"O'Mara 2018","Published GWAS (NSECG, UK1-CORGI, SEARCH, WTCCC, ANECS, QIMR, HCS, E2C2), iCOGS (BECS/HJECS/ BBCC, BSUCH, ESTHER, GC-HBOC, GENICA, MARIE, MoMaTEC, NBCS, SEARCH, NSECG, BBCS, SBCS, UKBGS), OncoArray , WHI, UK Biobank"
+9,28604730,"McKay 2017","Their study: OncoArray-genotyped + previous GWAS studies == TRICL-ILCCO & LC3: IARC, MDACC, SLRI, ICR, Harvard, ATBC, CPSII, German and deCODE studies"

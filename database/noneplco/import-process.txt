@@ -1,0 +1,10 @@
+created backup db on local(dev later)
+run the following script:
+
+in mysql console:
+use plcogwas;
+
+in terminal:
+#node import-phenotype.js $args
+
+3. run directly-import-combined-variant-mysql to import each new phenotype 

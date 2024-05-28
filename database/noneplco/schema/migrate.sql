@@ -1,0 +1,11 @@
+alter table study add column link varchar(200);
+create view v_phenotype as select p.*, s.link from phenotype p join study s on p.study_id = s.id;
+update study set link="https://pubmed.ncbi.nlm.nih.gov/32887889/" where id=2;
+update study set link="https://pubmed.ncbi.nlm.nih.gov/29059683/" where id=3;
+update study set link="https://pubmed.ncbi.nlm.nih.gov/25751625/" where id=4;
+update study set link="https://pubmed.ncbi.nlm.nih.gov/36539618/" where id=5;
+update study set link="https://pubmed.ncbi.nlm.nih.gov/31826910/" where id=6;
+update study set link="https://pubmed.ncbi.nlm.nih.gov/30093612/" where id=7;
+update study set link="https://pubmed.ncbi.nlm.nih.gov/30093612/" where id=8;
+update study set link="https://pubmed.ncbi.nlm.nih.gov/28604730/" where id=9;
+update study set link="https://www.nature.com/articles/s41597-022-01921-2" where study_id=1;

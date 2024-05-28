@@ -1,0 +1,12 @@
+﻿Phenotype ID,Phenotype Parent ID,Display Name,Association Name,Description (Definition),Phenotype Data Type,Age,Sex Specific,study
+3255,3070,All Female Breast Cancer - Rashkin 2020,2_breast_cancer,"17,881 cases. 219,656 controls. European ancestry, breast cancer",binary,NULL,female,2
+3256,3070,All Female Breast Cancer - Michailidou 2017,3_breast_cancer,"> 61,000 cases. >45,000 controls. European ancestry, breast cancer",NULL,NULL,female,3
+3257,3070,All Female Breast Cancer - Michailidou 2015,4_breast_cancer,"46,785 cases. 42,892 controls. European ancestry, breast cancer",binary,NULL,female,4
+3275,3010,Colorectal Cancer - Fernandez 2022,5_colo_rectal,"78,743 cases. 107,143 controls. European ancestry, colorectal cancer",NULL,NULL,NULL,5
+3276,3010,Colorectal Cancer - Lu 2019,6_colo_rectal,"23,572 cases. 48,700 controls. East Asian, colorectal cancer",,NULL,NULL,6
+3374,3010,All Endometrial Cancer - O'Mara 2018,7_endo_cancer,"12,906 cases. 108,979 controls. European ancestry, endometrial cancer",NULL,NULL,female,7
+3375,3310,"Endometrial Cancer (endometrioid histology) - O'Mara 2018",8_endo_endometrioid,"8,758 cases. 46,126 controls. European ancestry, endometrial cancer (endometrioid histology) ",NULL,NULL,female,8
+3376,3310,"Endometrial Cancer (Non-endometrioid histology) - O'Mara 2018",8_endo_none_endometrioid,"1,230 cases. 35,447 controls. European ancestry, endometrial cancer (Non-endometrioid histology)",NULL,NULL,female,8
+3541,3010,Lung Cancer - McKay 2017,9_lung_cancer,"29,266 cases. 56,450 controls. European ancestry, lung cancer",binary,NULL,NULL,9
+3586,3540,Lung cancer among ever smokers - McKay 2017,9_lung_cancer_ever_smokers,"13,356 cases. 7,477 controls. European ancestry, current smoker lung cancer",binary,NULL,NULL,9
+3587,3540,Lung cancer among never smokers - McKay 2017,9_lung_cancer_never_smokers,"2,355 cases. 7,504 controls. European ancestry, never smoker lung cancer",binary,NULL,NULL,9

@@ -173,7 +173,7 @@ export const TreeSelect = forwardRef(
       !visible(node, api) ? null : <div
         style={{
           marginLeft: !isFlat ? `${sublevel ? 24 : 5}px` : '19px',
-          overflow: 'hidden',
+          overflow: 'visible',
           whiteSpace: 'nowrap'
         }}>
         {!searchFilter && (
@@ -192,7 +192,7 @@ export const TreeSelect = forwardRef(
           className={`d-inline-flex align-items-center font-weight-normal ml-1 small ${
             isDisabled(node) ? 'text-muted c-not-allowed' : ''
           }`}
-          style={{ whiteSpace: 'nowrap', overflow: 'hidden' }}
+          style={{ whiteSpace: 'nowrap', overflow: 'visible' }}
           title={node[titleKey]}>
           <input
             id={"checkbox-" + node.id}
