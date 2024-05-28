@@ -7,8 +7,8 @@
     "doc": "docs"
   },
   "scripts": {
-    "start": "node server/plco-server.js",
-    "start:api": "node server/plco-server.js --api",
+    "start": "node server.js",
+    "start:api": "node server.js --api",
     "build": "cd client && npm run build",
     "test": "echo \"Error: no test specified\" && exit 1",
     "flush-cache": "node scripts/flush-cache.js"

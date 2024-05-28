@@ -30,15 +30,15 @@ function getLogger(name) {
     ),
     transports: [
       new transports.Console(),
-      new transports.DailyRotateFile({
-        filename: path.resolve(logpath, "application-%DATE%.log"),
-        datePattern: "YYYY-MM-DD-HH",
-        zippedArchive: false,
-        maxSize: "1024m",
-        timestamp: true,
-        maxFiles: "1d",
-        prepend: true,
-      }),
+      // new transports.DailyRotateFile({
+      //   filename: path.resolve(logpath, "application-%DATE%.log"),
+      //   datePattern: "YYYY-MM-DD-HH",
+      //   zippedArchive: false,
+      //   maxSize: "1024m",
+      //   timestamp: true,
+      //   maxFiles: "1d",
+      //   prepend: true,
+      // }),
     ],
     exitOnError: false,
   });
