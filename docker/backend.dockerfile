@@ -10,14 +10,12 @@ RUN dnf -y update \
 
 RUN mkdir -p /deploy/server /deploy/logs
 
-WORKDIR /deploy/
-
-COPY package*.json /deploy/
-
-RUN npm install 
-
 # copy the rest of the application
 #COPY server/config*.json /deploy/server/
 COPY server /deploy/server/
+
+WORKDIR /deploy/server/
+
+RUN npm install 
 
 CMD npm start

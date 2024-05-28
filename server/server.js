@@ -69,7 +69,7 @@ if (isProduction && forkCluster()) return;
   });
 
   // register redis cache if available
-  if (config.redis) {
+  if (config.redis?.host) {
     app.register(require("fastify-redis"), config.redis);
   }
 
