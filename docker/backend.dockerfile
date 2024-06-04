@@ -8,13 +8,13 @@ RUN dnf -y update \
     npm \
     && dnf clean all
 
-RUN mkdir -p /deploy/server /deploy/logs
+RUN mkdir -p /server /logs
 
 # copy the rest of the application
 #COPY server/config*.json /deploy/server/
-COPY server /deploy/server/
+COPY server /server/
 
-WORKDIR /deploy/server/
+WORKDIR /server/
 
 RUN npm install 
 
