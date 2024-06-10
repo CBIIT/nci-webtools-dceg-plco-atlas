@@ -31,7 +31,7 @@
   },
   "scripts": {
     "start": "react-scripts --max_old_space_size=4096 start",
-    "build": "npm run format && react-scripts --max_old_space_size=4096 --openssl-legacy-provider build && rm -rf ../www && mv build ../www",
+    "build": "npm run format && react-scripts --max_old_space_size=4096 --openssl-legacy-provider build",
     "test": "react-scripts test --ci --reporters=default --reporters=jest-junit --watchAll=false",
     "eject": "react-scripts eject",
     "format": "prettier --single-quote --jsx-bracket-same-line --write \"src/**/*.{js,json,css,scss}\""

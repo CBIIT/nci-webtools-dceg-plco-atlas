@@ -17,15 +17,13 @@ COPY client/package*.json /client/
 
 RUN npm install 
 
-COPY client /client/
+COPY client/ /client/
+COPY client/.env.development /client/.env.development
 
-ARG APPLICATION_PATH=/
-
-ENV APPLICATION_PATH=${APPLICATION_PATH}
 
 RUN npm run build \
-   && mkdir -p /var/www/html/${APPLICATION_PATH} \
-   && cp -r /client/build/* /var/www/html/${APPLICATION_PATH}
+   && mkdir -p /var/www/html/ \
+   && cp -r /client/build/* /var/www/html/
 
 WORKDIR /var/www/html
 

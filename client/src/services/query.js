@@ -1,5 +1,7 @@
 // set api root, removing trailing slashes
-export const root = window.location.pathname.replace(/\/+$/, '');
+//export const root = window.location.pathname.replace(/\/+$/, "");
+export const root = "http://localhost:9000";
+console.log("API:", root);
 
 /**
  * Serializes an object as a query string
@@ -11,13 +13,13 @@ export function asQueryString(obj) {
     let value = obj[key];
 
     // treat arrays as comma-delineated lists
-    if (Array.isArray(value)) value = value.join(',');
+    if (Array.isArray(value)) value = value.join(",");
 
     // exclude undefined, null, or false values
     if (![undefined, null, false].includes(value))
-      query.push([key, value].map(encodeURIComponent).join('='));
+      query.push([key, value].map(encodeURIComponent).join("="));
   }
-  return '?' + query.join('&');
+  return "?" + query.join("&");
 }
 
 /**
@@ -26,14 +28,14 @@ export function asQueryString(obj) {
  * @param {*} params
  */
 export const query = (resource, params) =>
-  fetch(`${root}/${resource}${asQueryString(params)}`).then(r => r.json());
+  fetch(`${root}/${resource}${asQueryString(params)}`).then((r) => r.json());
 
 export const rawQuery = (resource, params) =>
   query(resource, { ...params, raw: true });
 
 export const post = (resource, params) =>
   fetch(`${root}/${resource}`, {
-    method: 'post',
-    headers: { 'content-type': 'application/json' },
-    body: JSON.stringify(params)
-  }).then(r => r.json());
+    method: "post",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify(params),
+  }).then((r) => r.json());
