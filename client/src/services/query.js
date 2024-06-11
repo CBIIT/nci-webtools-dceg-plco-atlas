@@ -1,5 +1,5 @@
 // set api root, removing trailing slashes
-export const root = window.location.pathname.replace(/\/+$/, "") + "/api";
+export const root = window.location.pathname.replace(/\/+$/, "/web");
 //export const root = "http://localhost:9000";
 console.log("API:", root);
 
