@@ -1,6 +1,6 @@
 //enviroment variables loadded here are avaible through process.env in the build
 const config = {
-  port: process.env.PORT,
+  port: process.env.API_PORT,
   exportRowLimit: process.env.EXPORT_ROW_LIMIT,
   downloadRoot: process.env.DOWNLOADROOT,
   database: {
