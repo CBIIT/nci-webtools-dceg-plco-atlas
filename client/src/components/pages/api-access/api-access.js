@@ -82,7 +82,8 @@ export function ApiAccess() {
                             description: 'If set, returns the download link instead of redirecting automatically to the file.',
                             required: false,
                             type: 'string',
-                            enum: ['true']
+                            enum: ['true'],
+                            default: 'true'
                         },
                     ],
                     responses: {
