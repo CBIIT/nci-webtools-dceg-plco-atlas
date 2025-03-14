@@ -7,8 +7,8 @@
     "doc": "docs"
   },
   "scripts": {
-    "start": "node server/plco-server.js",
-    "start:api": "node server/plco-server.js --api",
+    "start": "node server.js",
+    "start:api": "node server.js --api",
     "build": "cd client && npm run build",
     "test": "echo \"Error: no test specified\" && exit 1",
     "flush-cache": "node scripts/flush-cache.js"
@@ -25,6 +25,7 @@
   "homepage": "https://github.com/CBIIT/nci-webtools-dceg-plco-atlas#readme",
   "dependencies": {
     "csv-parse": "^4.15.4",
+    "dotenv": "^16.4.5",
     "fastify": "^3.14.2",
     "fastify-caching": "^6.1.0",
     "fastify-compress": "^3.4.2",

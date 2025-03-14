@@ -1,0 +1,22 @@
+version: "3"
+services:
+  backend:
+    build:
+      context: "."
+      dockerfile: "./docker/backend.dockerfile"
+    ports:
+      - "9000:9000"
+    env_file: 
+      - server/.env
+
+  frontend:
+    build:
+      context: "."
+      dockerfile: "./docker/frontend.dockerfile"
+    environment:
+      API_BASE_URL: http://backend:9000
+    links:
+      - backend:backend
+    ports:
+      - "3000:80"
+ 
