@@ -529,6 +529,7 @@ export function ManhattanPlot({
               sex: selectedStratifications[point.index].sex
             });
             const record = response.data[0];
+            const ancestry = mapAncestry(record.ancestry)
             return h('div', { className: '' }, [
               h('div', null, [
                 h('b', null, 'position: '),
@@ -557,6 +558,39 @@ export function ManhattanPlot({
                     target: '_blank'
                   },
                   'Go to GWAS Catalog'
+                )
+              ]),
+                 h('div', null, [
+                h(
+                  'a',
+                  {
+                    className: 'font-weight-bold',
+                    href: `https://ldlink.nih.gov/?var=${record.snp}&pop=${ancestry}&genome_build=grch37&r2_d=r2&window=500000&collapseTranscript=true&annotate=forge&tab=ldproxy`,
+                    target: '_blank'
+                  },
+                  'Find variants in LD'
+                )
+              ]),
+                 h('div', null, [
+                h(
+                  'a',
+                  {
+                    className: 'font-weight-bold',
+                    href: `https://www.ebi.ac.uk/gwas/search?query=${record.snp}`,
+                    target: '_blank'
+                  },
+                  'Find tissue eQTLs'
+                )
+              ]),
+                 h('div', null, [
+                h(
+                  'a',
+                  {
+                    className: 'font-weight-bold',
+                    href: `https://www.ebi.ac.uk/gwas/search?query=${record.snp}`,
+                    target: '_blank'
+                  },
+                  'Find associated traits'
                 )
               ])
             ]);
@@ -759,6 +793,7 @@ export function ManhattanPlot({
               sex: selectedStratifications[point.index].sex
             });
             const record = response.data[0];
+            const ancestry = record.ancestry;
             return h('div', { className: '' }, [
               h('div', null, [
                 h('b', null, 'position: '),
@@ -842,6 +877,20 @@ export function ManhattanPlot({
         // plot.current.config.zoomOut();
       }
     }
+  }
+
+  function mapAncestry(ancestryGwas) {
+    let ancestry = ancestryGwas;
+    if (ancestryGwas=="european"){
+      ancestry="CEU%2BTSI%2BFIN%2BGBR%2BIBS"
+    }
+    else if (ancestryGwas=="east_asian"){
+      ancestry="CHB%2BJPT%2BCHS%2BCDX%2BKHV"
+    }
+    else if (ancestryGwas=="african_american"){
+      ancestry="YRI%2BLWK%2BGWD%2BMSL%2BESN%2BASW%2BACB"
+    }
+    return ancestry;
   }
 
   function getXRange() {
