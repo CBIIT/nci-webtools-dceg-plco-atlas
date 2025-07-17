@@ -840,7 +840,7 @@ export function ManhattanPlot({
                   'a',
                   {
                     className: 'font-weight-bold',
-                    href: `https://www.ebi.ac.uk/gwas/search?query=${record.snp}`,
+                    href: `https://ldlink.nih.gov/?tab=ldexpress`,
                     target: '_blank'
                   },
                   'Find tissue eQTLs'
@@ -851,7 +851,7 @@ export function ManhattanPlot({
                   'a',
                   {
                     className: 'font-weight-bold',
-                    href: `https://www.ebi.ac.uk/gwas/search?query=${record.snp}`,
+                    href: `https://ldlink.nih.gov/?tab=ldtrait`,
                     target: '_blank'
                   },
                   'Find associated traits'
