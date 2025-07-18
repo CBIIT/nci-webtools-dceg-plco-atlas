@@ -534,7 +534,7 @@ export function ManhattanPlot({
             let ldLinkUrl;
             const hostname = window.location.hostname;
             if (hostname === 'localhost') {
-              ldLinkUrl = 'http://localhost';
+              ldLinkUrl = 'http://localhost:9090/';
             } else if (hostname.includes('dev')) {
               ldLinkUrl = 'https://ldlink-dev.nih.gov/';
             } else if (hostname.includes('qa')) {
@@ -813,7 +813,7 @@ export function ManhattanPlot({
             let ldLinkUrl;
             const hostname = window.location.hostname;
             if (hostname === 'localhost') {
-              ldLinkUrl = 'http://localhost';
+              ldLinkUrl = 'http://localhost:9090/';
             } else if (hostname.includes('dev')) {
               ldLinkUrl = 'https://ldlink-dev.nih.gov/';
             } else if (hostname.includes('qa')) {
