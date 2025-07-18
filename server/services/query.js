@@ -291,7 +291,7 @@ async function getVariants({ connection, logger }, params) {
   // const connection = await connectionPool.getConnection();
   const phenotypeIds = (params.phenotype_id || "").split(",");
   const phenotypeIdPlaceholders = getPlaceholders(phenotypeIds.length);
-  // console.log(params, phenotypeIds,phenotypeIdPlaceholders );
+  logger.debug(params, phenotypeIds, phenotypeIdPlaceholders);
   const [phenotypes] = await connection.query(
     `SELECT id, name FROM phenotype 
         WHERE id IN (${phenotypeIdPlaceholders})`,
@@ -463,7 +463,7 @@ async function exportVariants({ connection, logger }, params) {
   params.limit = params.limit || rowLimit;
   const phenotypeIds = params.phenotype_id.split(",");
   const phenotypeIdPlaceholders = getPlaceholders(phenotypeIds.length);
-  console.log(params, phenotypeIds, phenotypeIdPlaceholders);
+  logger.debug(params, phenotypeIds, phenotypeIdPlaceholders);
   const [phenotypes] = await connection.query(
     `SELECT id, name FROM phenotype 
         WHERE id IN (${phenotypeIdPlaceholders})`,
