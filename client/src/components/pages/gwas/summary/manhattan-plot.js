@@ -591,7 +591,7 @@ export function ManhattanPlot({
                   'a',
                   {
                     className: 'font-weight-bold',
-                    href: `${ldLinkUrl}?snps=${record.snp}&pop=${ancestry}&tab=ldexpressgwas`,
+                    href: `${ldLinkUrl}?snps=${record.snp}&pop=${ancestry}&tab=ldexpressget`,
                     target: '_blank'
                   },
                   'Find tissue eQTLs'
@@ -602,7 +602,7 @@ export function ManhattanPlot({
                   'a',
                   {
                     className: 'font-weight-bold',
-                    href: `${ldLinkUrl}?snps=${record.snp}&pop=${ancestry}&tab=ldtraitgwas`,
+                    href: `${ldLinkUrl}?snps=${record.snp}&pop=${ancestry}&tab=ldtraitget`,
                     target: '_blank'
                   },
                   'Find associated traits'
@@ -870,7 +870,7 @@ export function ManhattanPlot({
                   'a',
                   {
                     className: 'font-weight-bold',
-                    href: `${ldLinkUrl}?snps=${record.snp}&pop=${ancestry}&tab=ldexpressgwas`,
+                    href: `${ldLinkUrl}?snps=${record.snp}&pop=${ancestry}&tab=ldexpressget`,
                     target: '_blank'
                   },
                   'Find tissue eQTLs'
@@ -881,7 +881,7 @@ export function ManhattanPlot({
                   'a',
                   {
                     className: 'font-weight-bold',
-                    href: `${ldLinkUrl}?snps=${record.snp}&pop=${ancestry}&tab=ldtraitgwas`,
+                    href: `${ldLinkUrl}?snps=${record.snp}&pop=${ancestry}&tab=ldtraitget`,
                     target: '_blank'
                   },
                   'Find associated traits'
