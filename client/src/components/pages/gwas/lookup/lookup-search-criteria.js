@@ -84,7 +84,7 @@ export const VariantLookupSearchCriteria = () => {
               <VariantLink variant={selectedVariants[0]} />
               {selectedVariants.length > 1 && <> 
                 {` and `}
-                <span className="" role="button" onClick={toggleCollapsed}>
+                <span className="" role="" onClick={toggleCollapsed}>
                   {selectedVariants.length - 1}
                   {pluralize(selectedVariants.length - 1, ' other')}
                 </span>
