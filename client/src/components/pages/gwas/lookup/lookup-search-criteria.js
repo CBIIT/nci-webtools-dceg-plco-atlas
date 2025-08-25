@@ -92,8 +92,7 @@ export const VariantLookupSearchCriteria = () => {
             </> 
             : selectedVariants.map((variant, i) => 
               <div key={`lookup-variant-${i}`} title={variant}>
-                {variant}
-                {/* <VariantLink variant={variant} /> */}
+                  <VariantLink variant={variant} />
               </div>
             )}
         </span>
