@@ -529,6 +529,22 @@ export function ManhattanPlot({
               sex: selectedStratifications[point.index].sex
             });
             const record = response.data[0];
+            const ancestry = mapAncestry(record.ancestry);
+            
+            let ldLinkUrl;
+            const hostname = window.location.hostname;
+            if (hostname === 'localhost') {
+              ldLinkUrl = 'http://localhost:9090/';
+            } else if (hostname.includes('dev')) {
+              ldLinkUrl = 'https://ldlink-dev.nih.gov/';
+            } else if (hostname.includes('qa')) {
+              ldLinkUrl = 'https://ldlink-qa.nih.gov/';
+            } else if (hostname.includes('stage')) {
+              ldLinkUrl = 'https://ldlink-stage.nih.gov/';
+            } else {
+              ldLinkUrl = 'https://ldlink.nih.gov/';
+            }
+
             return h('div', { className: '' }, [
               h('div', null, [
                 h('b', null, 'position: '),
@@ -557,6 +573,39 @@ export function ManhattanPlot({
                     target: '_blank'
                   },
                   'Go to GWAS Catalog'
+                )
+              ]),
+                 h('div', null, [
+                h(
+                  'a',
+                  {
+                    className: 'font-weight-bold',
+                    href: `${ldLinkUrl}?var=${record.snp}&pop=${ancestry}&genome_build=grch37&r2_d=r2&window=500000&collapseTranscript=true&annotate=forge&tab=ldproxy`,
+                    target: '_blank'
+                  },
+                  'Find variants in LD'
+                )
+              ]),
+                 h('div', null, [
+                h(
+                  'a',
+                  {
+                    className: 'font-weight-bold',
+                    href: `${ldLinkUrl}?snps=${record.snp}&pop=${ancestry}&tab=ldexpressget`,
+                    target: '_blank'
+                  },
+                  'Find tissue eQTLs'
+                )
+              ]),
+                 h('div', null, [
+                h(
+                  'a',
+                  {
+                    className: 'font-weight-bold',
+                    href: `${ldLinkUrl}?snps=${record.snp}&pop=${ancestry}&tab=ldtraitget`,
+                    target: '_blank'
+                  },
+                  'Find associated traits'
                 )
               ])
             ]);
@@ -759,6 +808,22 @@ export function ManhattanPlot({
               sex: selectedStratifications[point.index].sex
             });
             const record = response.data[0];
+            const ancestry = mapAncestry(record.ancestry);
+            
+            let ldLinkUrl;
+            const hostname = window.location.hostname;
+            if (hostname === 'localhost') {
+              ldLinkUrl = 'http://localhost:9090/';
+            } else if (hostname.includes('dev')) {
+              ldLinkUrl = 'https://ldlink-dev.nih.gov/';
+            } else if (hostname.includes('qa')) {
+              ldLinkUrl = 'https://ldlink-qa.nih.gov/';
+            } else if (hostname.includes('stage')) {
+              ldLinkUrl = 'https://ldlink-stage.nih.gov/';
+            } else {
+              ldLinkUrl = 'https://ldlink.nih.gov/';
+            }
+
             return h('div', { className: '' }, [
               h('div', null, [
                 h('b', null, 'position: '),
@@ -787,6 +852,39 @@ export function ManhattanPlot({
                     target: '_blank'
                   },
                   'Go to GWAS Catalog'
+                )
+              ]),
+                 h('div', null, [
+                h(
+                  'a',
+                  {
+                    className: 'font-weight-bold',
+                    href: `${ldLinkUrl}?var=${record.snp}&pop=${ancestry}&genome_build=grch37&r2_d=r2&window=500000&collapseTranscript=true&annotate=forge&tab=ldproxy`,
+                    target: '_blank'
+                  },
+                  'Find variants in LD'
+                )
+              ]),
+                 h('div', null, [
+                h(
+                  'a',
+                  {
+                    className: 'font-weight-bold',
+                    href: `${ldLinkUrl}?snps=${record.snp}&pop=${ancestry}&tab=ldexpressget`,
+                    target: '_blank'
+                  },
+                  'Find tissue eQTLs'
+                )
+              ]),
+                 h('div', null, [
+                h(
+                  'a',
+                  {
+                    className: 'font-weight-bold',
+                    href: `${ldLinkUrl}?snps=${record.snp}&pop=${ancestry}&tab=ldtraitget`,
+                    target: '_blank'
+                  },
+                  'Find associated traits'
                 )
               ])
             ]);
@@ -842,6 +940,20 @@ export function ManhattanPlot({
         // plot.current.config.zoomOut();
       }
     }
+  }
+
+  function mapAncestry(ancestryGwas) {
+    let ancestry = ancestryGwas;
+    if (ancestryGwas=="european"){
+      ancestry="CEU%2BTSI%2BFIN%2BGBR%2BIBS"
+    }
+    else if (ancestryGwas=="east_asian"){
+      ancestry="CHB%2BJPT%2BCHS%2BCDX%2BKHV"
+    }
+    else if (ancestryGwas=="african_american"){
+      ancestry="YRI%2BLWK%2BGWD%2BMSL%2BESN%2BASW%2BACB"
+    }
+    return ancestry;
   }
 
   function getXRange() {
