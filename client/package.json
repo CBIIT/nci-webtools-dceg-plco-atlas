@@ -30,7 +30,7 @@
     "swagger-ui": "^3.41.1"
   },
   "scripts": {
-    "start": "react-scripts --max_old_space_size=4096 start",
+    "start": "react-scripts --max_old_space_size=4096 --openssl-legacy-provider start",
     "build": "npm run format && react-scripts --max_old_space_size=4096 --openssl-legacy-provider build",
     "test": "react-scripts test --ci --reporters=default --reporters=jest-junit --watchAll=false",
     "eject": "react-scripts eject",
