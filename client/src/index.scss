@@ -374,3 +374,64 @@ select.form-control-sm {
 .react-bootstrap-table table {
   table-layout: auto;
 }
+
+/** Footer Styles **/
+
+footer {
+  text-rendering: optimizeLegibility !important;
+  -webkit-font-smoothing: antialiased !important;
+}
+
+.footer-header {
+  h1 {
+    font-weight: bold !important;
+    font-style: normal !important;
+    font-size: 25px !important;
+    line-height: 1.1em !important;
+
+    span {
+      display: block;
+      font-size: 16px;
+    }
+  }
+}
+
+.footer-header-mobile {
+  h1 {
+    font-weight: bold !important;
+    font-style: normal !important;
+    font-size: 20px !important;
+    line-height: 1.1em !important;
+
+    span {
+      display: block;
+      font-size: 14px;
+    }
+  }
+}
+
+.footer-nav {
+  line-height: 1.5;
+
+  h2 {
+    font-size: 1.2em !important;
+    line-height: 1.215em !important;
+    font-weight: 400 !important;
+  }
+}
+
+.footer-link {
+  font-weight: 700;
+}
+
+.footer-agencies {
+  font-size: 0.8em;
+}
+
+.footer-tagline {
+  h3 {
+    font-size: 16px !important;
+    font-weight: 400 !important;
+    line-height: 1.333em !important;
+  }
+}
