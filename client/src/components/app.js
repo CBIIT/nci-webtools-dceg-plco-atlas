@@ -9,6 +9,7 @@ import { Phenotypes } from './pages/phenotypes/phenotypes';
 import { Downloads } from './pages/downloads/downloads';
 import { LinkWrapper } from './pages/link/link-wrapper';
 import { ErrorModal } from './controls/error-modal/error-modal';
+import Footer from './footer';
 
 function App() {
   const links = [
@@ -62,6 +63,7 @@ function App() {
   ];
 
   return (
+    <>
     <Router>
       <ErrorModal />
       <Navbar links={links} />
@@ -73,6 +75,8 @@ function App() {
       <Route path="/downloads" component={Downloads} />
       <Route path="/link/:shareID?" component={LinkWrapper} />
     </Router>
+    <Footer />
+    </>
   );
 }
 

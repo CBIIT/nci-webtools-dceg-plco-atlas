@@ -28,7 +28,7 @@ export function About() {
 				dynamic Manhattan and Miami plots, stratify by sex and ancestry, as well as review diagnostic 
 				plots (e.g., Q-q plots). Additional links permit users to integrate findings with {' '}
 				<a
-					href='https://ldlink.nih.gov/?tab=ldtrait'
+					href='https://ldlink.nih.gov/ldtrait'
 					target='_blank'
 					rel='noopener noreferrer'
 					alt='Link to open Ldlink'

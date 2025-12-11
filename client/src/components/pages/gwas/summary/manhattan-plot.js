@@ -580,7 +580,7 @@ export function ManhattanPlot({
                   'a',
                   {
                     className: 'font-weight-bold',
-                    href: `${ldLinkUrl}?var=${record.snp}&pop=${ancestry}&genome_build=grch37&r2_d=r2&window=500000&collapseTranscript=true&annotate=forge&tab=ldproxy`,
+                    href: `${ldLinkUrl}ldproxy?var=${record.snp}&pop=${ancestry}&genome_build=grch37&r2_d=r2&window=500000&collapseTranscript=true&annotate=forge`,
                     target: '_blank'
                   },
                   'Find variants in LD'
@@ -591,7 +591,7 @@ export function ManhattanPlot({
                   'a',
                   {
                     className: 'font-weight-bold',
-                    href: `${ldLinkUrl}?snps=${record.snp}&pop=${ancestry}&tab=ldexpressget`,
+                    href:  `${ldLinkUrl}ldexpress?snps=${record.snp}&pop=${ancestry}&tissues=all&genome_build=grch37&r2_d=r2&r2_d_threshold=0.1&window=500000&p_threshold=0.1`,
                     target: '_blank'
                   },
                   'Find tissue eQTLs'
@@ -602,7 +602,7 @@ export function ManhattanPlot({
                   'a',
                   {
                     className: 'font-weight-bold',
-                    href: `${ldLinkUrl}?snps=${record.snp}&pop=${ancestry}&tab=ldtraitget`,
+                    href: `${ldLinkUrl}ldtrait?snps=${record.snp}&pop=${ancestry}&genome_build=grch37&r2_d=r2&r2_d_threshold=0.1&window=500000&ifContinue=Continue`,
                     target: '_blank'
                   },
                   'Find associated traits'
@@ -859,7 +859,7 @@ export function ManhattanPlot({
                   'a',
                   {
                     className: 'font-weight-bold',
-                    href: `${ldLinkUrl}?var=${record.snp}&pop=${ancestry}&genome_build=grch37&r2_d=r2&window=500000&collapseTranscript=true&annotate=forge&tab=ldproxy`,
+                    href: `${ldLinkUrl}ldproxy?var=${record.snp}&pop=${ancestry}&genome_build=grch37&r2_d=r2&window=500000&collapseTranscript=true&annotate=forge`,
                     target: '_blank'
                   },
                   'Find variants in LD'
@@ -870,7 +870,7 @@ export function ManhattanPlot({
                   'a',
                   {
                     className: 'font-weight-bold',
-                    href: `${ldLinkUrl}?snps=${record.snp}&pop=${ancestry}&tab=ldexpressget`,
+                    href: `${ldLinkUrl}ldexpress?snps=${record.snp}&pop=${ancestry}&tissues=all&genome_build=grch37&r2_d=r2&r2_d_threshold=0.1&window=500000&p_threshold=0.1`,
                     target: '_blank'
                   },
                   'Find tissue eQTLs'
@@ -881,7 +881,7 @@ export function ManhattanPlot({
                   'a',
                   {
                     className: 'font-weight-bold',
-                    href: `${ldLinkUrl}?snps=${record.snp}&pop=${ancestry}&tab=ldtraitget`,
+                    href: `${ldLinkUrl}ldtrait?snps=${record.snp}&pop=${ancestry}&genome_build=grch37&r2_d=r2&r2_d_threshold=0.1&window=500000&ifContinue=Continue`,
                     target: '_blank'
                   },
                   'Find associated traits'

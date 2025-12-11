@@ -20,6 +20,8 @@ RUN npm install
 COPY client/ /client/
 COPY client/.env.development /client/.env.development
 
+ARG REACT_APP_VERSION=docker
+ENV REACT_APP_VERSION=${REACT_APP_VERSION}
 
 RUN npm run build \
    && mkdir -p /var/www/html/ \
