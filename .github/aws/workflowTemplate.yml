@@ -1,0 +1,202 @@
+# =============================================================================
+# ECS Fargate Multi-Container Deployment Template
+# =============================================================================
+#
+# PURPOSE:
+#   Deploys frontend + backend containers to ECS Fargate
+#
+# PREREQUISITES:
+#   - AWS IAM role: github-actions-cicd (with ECR, ECS, SSM permissions)
+#   - GitHub Environment secrets: AWS_ACCOUNT_ID
+#   - ECR repository created
+#   - ECS cluster, services, and task definitions configured
+#   - SSM parameters stored at: /analysistools/{tier}/{app}/*
+#   - EFS filesystem and access point (if using shared storage)
+#
+# REQUIRED CUSTOMIZATION:
+#   - Line 28: Replace 'my-app' with your application name
+#   - Line 31: Update TASK_DEFINITION_TEMPLATE_PATH to match your repo structure
+#   - Line 77: Update SSM parameter path if not using '/analysistools/'
+#   - Line 119, 132: Verify docker file paths match your repository
+#   - Line 53-55: Update version/date extraction if not using branch naming convention
+#
+# OPTIONAL CUSTOMIZATION:
+#   - Line 80-88: Add/remove SSM parameters based on your infrastructure
+#   - Line 184-188: Uncomment to wait for service stability before completing
+#   - Line 218-224: Adjust task definition retention (currently keeps 3 versions)
+#
+# =============================================================================
+
+name: Deploy
+on:
+  workflow_dispatch:
+    inputs:
+      tier:
+        description: "Deploy environment"
+        required: true
+        default: "dev"
+        type: choice
+        options:
+          - dev
+          - qa
+          - stage
+          - prod
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  deploy-fargate-app:
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.tier }}
+    env:
+      APP: my-app
+      TZ: America/New_York
+      AWS_REGION: us-east-1
+      TASK_DEFINITION_TEMPLATE_PATH: task-definition-examples
+      FRONTEND_CONTAINER_PORT: 80
+      BACKEND_CONTAINER_PORT: 8000
+      TIER: ${{ inputs.tier }}
+      IMAGE_TIER: ${{ contains(fromJson('["dev","qa"]'), inputs.tier) && 'development' || 'release' }}
+      CICD_ROLE_ARN: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/github-actions-cicd
+
+    steps:
+      - uses: "actions/checkout@v6.0.1"
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v5.1.1
+        with:
+          role-to-assume: ${{ env.CICD_ROLE_ARN }}
+          role-session-name: ${{ env.TIER }}-${{ env.APP }}-deploy-${{ github.ref_name }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Set dynamic environment variables
+        run: |
+          BRANCH_NAME=${{ github.ref_name }}
+          VERSION=$(echo "$BRANCH_NAME" | awk -F'_' '{print $2}')
+          DATE=$(echo "$BRANCH_NAME" | awk -F'_' '{print $3}')
+          echo "VERSION=${VERSION:-unknown_version}" >> $GITHUB_ENV
+          echo "DATE=${DATE:-unknown_date}" >> $GITHUB_ENV
+
+          TIMESTAMP=$(date +"%Y%m%d%H%M%S")
+          REPO=${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.$AWS_REGION.amazonaws.com/$APP
+          echo "IMAGE_REPOSITORY=$REPO" >> $GITHUB_ENV
+          echo "FRONTEND_IMAGE=$REPO:$IMAGE_TIER-frontend-${{ github.ref_name }}-$TIMESTAMP" >> $GITHUB_ENV
+          echo "BACKEND_IMAGE=$REPO:$IMAGE_TIER-backend-${{ github.ref_name }}-$TIMESTAMP" >> $GITHUB_ENV
+          echo "FRONTEND_IMAGE_LATEST=$REPO:$IMAGE_TIER-frontend-${{ github.ref_name }}-latest" >> $GITHUB_ENV
+          echo "BACKEND_IMAGE_LATEST=$REPO:$IMAGE_TIER-backend-${{ github.ref_name }}-latest" >> $GITHUB_ENV
+          echo "PARAMETER_PATH=/analysistools/${TIER}/${APP}" >> $GITHUB_ENV
+          echo "ENVIRONMENT_TIER=${TIER^^}" >> $GITHUB_ENV
+
+          if [[ "$TIER" == "dev" ]]; then
+              echo "LOG_LEVEL=debug" >> $GITHUB_ENV
+          else
+              echo "LOG_LEVEL=info" >> $GITHUB_ENV
+          fi
+
+      - name: Retrieve SSM parameters
+        run: |
+          PARAMETER_PATH="/analysistools/${TIER}/${APP}"
+
+          # Define parameters to retrieve (SSM name = ENV_VAR_NAME)
+          declare -A PARAMS=(
+            ["ecs_cluster"]="ECS_CLUSTER"
+            ["ecs_web_task"]="ECS_WEB_TASK"
+            ["ecs_web_service"]="ECS_WEB_SERVICE"
+            ["ecs_cpu_units"]="ECS_CPU_UNITS"
+            ["ecs_memory_units"]="ECS_MEMORY_UNITS"
+            ["role_arn"]="ROLE_ARN"
+            ["efs_filesystem_id"]="EFS_FILESYSTEM_ID"
+            ["efs_access_point_id"]="EFS_ACCESS_POINT_ID"
+          )
+
+          # Retrieve each parameter and export to environment
+          for ssm_name in "${!PARAMS[@]}"; do
+            env_var="${PARAMS[$ssm_name]}"
+            value=$(aws ssm get-parameter \
+              --name "${PARAMETER_PATH}/${ssm_name}" \
+              --with-decryption \
+              --query "Parameter.Value" \
+              --output text)
+            echo "${env_var}=${value}" >> $GITHUB_ENV
+            echo "Retrieved ${ssm_name} -> ${env_var}"
+          done
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2.0.1
+        with:
+          mask-password: true
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3.12.0
+
+      - name: Create and use a new builder instance
+        run: |
+          docker buildx create --name mybuilder --use
+
+      - name: Build backend image ${{ env.BACKEND_IMAGE }}
+        uses: docker/build-push-action@v6.18.0
+        with:
+          context: .
+          file: docker/backend.dockerfile
+          pull: true
+          push: true
+          tags: |
+            ${{ env.BACKEND_IMAGE }}
+            ${{ env.BACKEND_IMAGE_LATEST }}
+          cache-from: type=registry,ref=${{ env.IMAGE_REPOSITORY }}:backend-cache
+          cache-to: type=registry,ref=${{ env.IMAGE_REPOSITORY }}:backend-cache,image-manifest=true,oci-mediatypes=true,mode=max
+
+      - name: Build frontend image ${{ env.FRONTEND_IMAGE }}
+        uses: docker/build-push-action@v6.18.0
+        with:
+          context: .
+          file: docker/frontend.dockerfile
+          pull: true
+          push: true
+          tags: |
+            ${{ env.FRONTEND_IMAGE }}
+            ${{ env.FRONTEND_IMAGE_LATEST }}
+          cache-from: type=registry,ref=${{ env.IMAGE_REPOSITORY }}:frontend-cache
+          cache-to: type=registry,ref=${{ env.IMAGE_REPOSITORY }}:frontend-cache,image-manifest=true,oci-mediatypes=true,mode=max
+
+      - name: Substitute web task definition variables
+        id: substitute-web-task-definition
+        run: |
+          echo "Substituting web task definition variables"
+          envsubst < $TASK_DEFINITION_TEMPLATE_PATH/web.yml > web.yml
+
+      - name: Print rendered web task definition
+        run: |
+          echo "Rendered web Task Definition:"
+          cat web.yml
+
+      - name: Register task definitions
+        run: |
+          aws ecs register-task-definition --cli-input-yaml file://web.yml
+
+      - name: Update web service
+        run: |
+          aws ecs update-service \
+              --cluster ${{ env.ECS_CLUSTER }} \
+              --service ${{ env.ECS_WEB_SERVICE }} \
+              --task-definition ${{ env.ECS_WEB_TASK }} \
+              --desired-count 1 \
+              --propagate-tags TASK_DEFINITION \
+              --force-new-deployment
+
+      # - name: Wait for service stability
+      #   run: |
+      #     aws ecs wait services-stable \
+      #         --cluster ${{ env.ECS_CLUSTER }} \
+      #         --services ${{ env.ECS_WEB_SERVICE }}
+
+      - name: Remove old task definitions
+        run: |
+          for family in "$ECS_WEB_TASK"; do
+              echo "Pruning old revisions for family: $family"
+              aws ecs list-task-definitions --family-prefix "$family" --sort DESC --query 'taskDefinitionArns[3:]' --output text \
+                  | xargs -n1 -r aws ecs deregister-task-definition --task-definition
+          done
