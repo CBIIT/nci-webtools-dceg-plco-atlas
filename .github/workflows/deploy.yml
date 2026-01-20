@@ -39,11 +39,11 @@ permissions:
   contents: read
 
 jobs:
-  deploy-plco-atlas:
+  deploy-exploregwas:
     runs-on: ubuntu-latest
     environment: ${{ inputs.tier }}
     env:
-      APP: plco-atlas
+      APP: exploregwas
       TZ: America/New_York
       AWS_REGION: us-east-1
       TASK_DEFINITION_TEMPLATE_PATH: .github/aws
