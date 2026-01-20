@@ -99,13 +99,17 @@ jobs:
           # Retrieve each parameter and export to environment
           for ssm_name in "${!PARAMS[@]}"; do
             env_var="${PARAMS[$ssm_name]}"
+            echo "Retrieving ${PARAMETER_PATH}/${ssm_name} -> ${env_var}"
             value=$(aws ssm get-parameter \
               --name "${PARAMETER_PATH}/${ssm_name}" \
               --with-decryption \
               --query "Parameter.Value" \
-              --output text)
+              --output text 2>&1) || {
+                echo "ERROR: Failed to retrieve parameter: ${PARAMETER_PATH}/${ssm_name}"
+                exit 1
+              }
             echo "${env_var}=${value}" >> $GITHUB_ENV
-            echo "Retrieved ${ssm_name} -> ${env_var}"
+            echo "✓ Retrieved ${ssm_name} -> ${env_var}"
           done
 
       - name: Login to Amazon ECR
