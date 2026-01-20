@@ -1,20 +1,20 @@
 # =============================================================================
-# PLCO Atlas ECS Fargate Deployment
+# ExploreGWAS ECS Fargate Deployment
 # =============================================================================
 #
 # PURPOSE:
-#   Deploys PLCO Atlas frontend + backend containers to ECS Fargate
+#   Deploys ExploreGWAS frontend + backend containers to ECS Fargate
 #
 # PREREQUISITES:
 #   - AWS IAM role: github-actions-cicd (with ECR, ECS, SSM permissions)
 #   - GitHub Environment secrets: AWS_ACCOUNT_ID
-#   - ECR repository: plco-atlas
+#   - ECR repository: exploregwas
 #   - ECS cluster, services, and task definitions configured
-#   - SSM parameters stored at: /analysistools/{tier}/plco-atlas/*
+#   - SSM parameters stored at: /analysistools/{tier}/exploregwas/*
 #
 # =============================================================================
 
-name: Deploy PLCO Atlas
+name: Deploy ExploreGWAS
 on:
   workflow_dispatch:
     inputs:
@@ -70,10 +70,10 @@ jobs:
           TIMESTAMP=$(date +"%Y%m%d%H%M%S")
           REPO=${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.$AWS_REGION.amazonaws.com/exploregwas
           echo "IMAGE_REPOSITORY=$REPO" >> $GITHUB_ENV
-          echo "FRONTEND_IMAGE=$REPO:$IMAGE_TIER-frontend-$TIMESTAMP" >> $GITHUB_ENV
-          echo "BACKEND_IMAGE=$REPO:$IMAGE_TIER-backend-$TIMESTAMP" >> $GITHUB_ENV
-          echo "FRONTEND_IMAGE_LATEST=$REPO:$IMAGE_TIER-frontend-latest" >> $GITHUB_ENV
-          echo "BACKEND_IMAGE_LATEST=$REPO:$IMAGE_TIER-backend-latest" >> $GITHUB_ENV
+          echo "FRONTEND_IMAGE=$REPO:$IMAGE_TIER-frontend-${{ github.ref_name }}-$TIMESTAMP" >> $GITHUB_ENV
+          echo "BACKEND_IMAGE=$REPO:$IMAGE_TIER-backend-${{ github.ref_name }}-$TIMESTAMP" >> $GITHUB_ENV
+          echo "FRONTEND_IMAGE_LATEST=$REPO:$IMAGE_TIER-frontend-${{ github.ref_name }}-latest" >> $GITHUB_ENV
+          echo "BACKEND_IMAGE_LATEST=$REPO:$IMAGE_TIER-backend-${{ github.ref_name }}-latest" >> $GITHUB_ENV
           echo "ENVIRONMENT_TIER=${TIER^^}" >> $GITHUB_ENV
 
           if [[ "$TIER" == "dev" ]]; then
