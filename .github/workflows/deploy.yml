@@ -92,7 +92,6 @@ jobs:
             ["ecs_web_task"]="ECS_WEB_TASK"
             ["ecs_web_service"]="ECS_WEB_SERVICE"
             ["ecs_cpu_units"]="ECS_CPU_UNITS"
-            ["ecs_memory_units"]="ECS_MEMORY_UNITS"
             ["role_arn"]="ROLE_ARN"
           )
 
