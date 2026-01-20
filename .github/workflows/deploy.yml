@@ -75,6 +75,10 @@ jobs:
           echo "FRONTEND_IMAGE_LATEST=$REPO:$IMAGE_TIER-frontend-${{ github.ref_name }}-latest" >> $GITHUB_ENV
           echo "BACKEND_IMAGE_LATEST=$REPO:$IMAGE_TIER-backend-${{ github.ref_name }}-latest" >> $GITHUB_ENV
           echo "ENVIRONMENT_TIER=${TIER^^}" >> $GITHUB_ENV
+          
+          # Set default ECS CPU and Memory units (2 vCPU, 4 GiB)
+          echo "ECS_CPU_UNITS=2048" >> $GITHUB_ENV
+          echo "ECS_MEMORY_UNITS=4096" >> $GITHUB_ENV
 
           if [[ "$TIER" == "dev" ]]; then
               echo "LOG_LEVEL=debug" >> $GITHUB_ENV
@@ -91,7 +95,6 @@ jobs:
             ["ecs_cluster"]="ECS_CLUSTER"
             ["ecs_web_task"]="ECS_WEB_TASK"
             ["ecs_web_service"]="ECS_WEB_SERVICE"
-            ["ecs_cpu_units"]="ECS_CPU_UNITS"
             ["role_arn"]="ROLE_ARN"
           )
 
