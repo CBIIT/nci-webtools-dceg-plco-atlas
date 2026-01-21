@@ -49,6 +49,8 @@ jobs:
       TASK_DEFINITION_TEMPLATE_PATH: .github/aws
       FRONTEND_CONTAINER_PORT: 80
       BACKEND_CONTAINER_PORT: 8000
+      ECS_CPU_UNITS: ${{ secrets.ECS_CPU_UNITS || '2048' }}
+      ECS_MEMORY_UNITS: ${{ secrets.ECS_MEMORY_UNITS || '4096' }}
       TIER: ${{ inputs.tier }}
       IMAGE_TIER: ${{ contains(fromJson('["dev","qa"]'), inputs.tier) && 'development' || 'release' }}
       CICD_ROLE_ARN: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/github-actions-cicd
@@ -75,10 +77,6 @@ jobs:
           echo "FRONTEND_IMAGE_LATEST=$REPO:$IMAGE_TIER-frontend-${{ github.ref_name }}-latest" >> $GITHUB_ENV
           echo "BACKEND_IMAGE_LATEST=$REPO:$IMAGE_TIER-backend-${{ github.ref_name }}-latest" >> $GITHUB_ENV
           echo "ENVIRONMENT_TIER=${TIER^^}" >> $GITHUB_ENV
-          
-          # Set default ECS CPU and Memory units (2 vCPU, 4 GiB)
-          echo "ECS_CPU_UNITS=2048" >> $GITHUB_ENV
-          echo "ECS_MEMORY_UNITS=4096" >> $GITHUB_ENV
 
           if [[ "$TIER" == "dev" ]]; then
               echo "LOG_LEVEL=debug" >> $GITHUB_ENV
