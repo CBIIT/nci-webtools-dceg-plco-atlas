@@ -1,0 +1,45 @@
+# =============================================================================
+# ExploreGWAS ECS Fargate Deployment
+# =============================================================================
+#
+# PURPOSE:
+#   Deploys ExploreGWAS frontend + backend containers to ECS Fargate
+#
+# PREREQUISITES:
+#   - AWS IAM role: github-actions-cicd (with ECR, ECS, SSM permissions)
+#   - GitHub Environment secrets: AWS_ACCOUNT_ID
+#   - ECR repository: exploregwas
+#   - ECS cluster, services, and task definitions configured
+#   - SSM parameters stored at: /analysistools/{tier}/exploregwas/*
+#
+# =============================================================================
+
+name: Deploy ExploreGWAS
+on:
+  workflow_dispatch:
+    inputs:
+      tier:
+        description: "Deploy environment"
+        required: true
+        default: "dev"
+        type: choice
+        options:
+          - dev
+          - qa
+          - stage
+          - prod
+      reinitialize_redis_cache:
+        description: "Reinitialize Redis cache after deployment"
+        required: false
+        default: false
+        type: boolean
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  deploy-exploregwas:
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.tier }}
+    
