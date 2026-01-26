@@ -1,0 +1,189 @@
+---
+- name: Deploy {{ app }} with Docker.
+  hosts: all
+  become: yes
+  become_method: sudo
+  environment:
+    PATH: "{{ ansible_env.PATH }}:/usr/local/bin"
+    DOCKER_BUILDKIT: 1
+  vars:
+    - app: exploregwas
+    - app_folder: "{{ app }}"
+    - datetime: "{{ ansible_date_time.year }}{{ ansible_date_time.month }}{{ ansible_date_time.day }}{{ ansible_date_time.hour }}{{ ansible_date_time.minute }}{{ ansible_date_time.second }}"
+    - image_tier: "{{ (tier in ['prod', 'stage']) | ternary('release', 'development') }}"
+    - image_repository: "{{ docker_registry }}/{{ app }}"
+    - frontend_image: "{{ image_repository }}:{{ image_tier }}-frontend-{{ app_git_tag }}-{{ datetime }}"
+    - backend_image: "{{ image_repository }}:{{ image_tier }}-backend-{{ app_git_tag }}-{{ datetime }}"
+    - frontend_image_latest: "{{ image_repository }}:{{ image_tier }}-frontend-latest"
+    - backend_image_latest: "{{ image_repository }}:{{ image_tier }}-backend-latest"
+    - frontend_container: "{{ tier }}-{{ app }}-frontend"
+    - backend_container: "{{ tier }}-{{ app }}-backend"
+    - frontend_container_port: 80
+    - backend_container_port: 9000
+    - ecs_cpu_units: "2 vCPU"
+    - ecs_memory_units: "4 GB"
+    - aws_region: us-east-1
+    - aws_account_tier: "{{ (tier in ['prod', 'stage']) | ternary('prod', 'nonprod') }}"
+    - parameter_path: "/analysistools/{{ tier }}/{{ app }}"
+    - task_definition_template_path: "{{ workspace_folder }}/deployment/build-deploy/ecs-task-definitions/{{ app }}"
+    - import_data: "false"
+    - no_cache: "false"
+
+  tasks:
+    - name: Deploy {{ app }}
+      when: inventory_hostname in groups['build']
+      block:
+        - name: Retrieve AWS account id
+          shell: aws sts get-caller-identity --query "Account" --output text
+          register: aws_account_result
+
+        - name: Retrieve parameters
+          shell: "aws ssm get-parameters-by-path --path {{ parameter_path }} --output json"
+          register: aws_parameters_result
+        
+        - name: Debug AWS SSM parameters output
+          debug:
+            var: aws_parameters_result.stdout
+
+        - name: Debug SSM parameter path
+          debug:
+            msg: "SSM parameter path: {{ parameter_path }}"
+
+        - name: Ensure parameters were retrieved
+          fail:
+            msg: "No parameters were found under path {{ parameter_path }}"
+          when: aws_parameters_result.stdout | from_json | json_query('Parameters') | length == 0
+
+
+        - set_fact:
+            docker_registry: "{{ aws_account_result.stdout }}.dkr.ecr.{{ aws_region }}.amazonaws.com"
+            ecs_cluster: "{{ aws_parameters_result.stdout | from_json | json_query(ecs_cluster_query) | first | default('') }}"
+            ecs_web_task: "{{ aws_parameters_result.stdout | from_json | json_query(ecs_web_task_query) | first | default('') }}"
+            ecs_web_service: "{{ aws_parameters_result.stdout | from_json | json_query(ecs_web_service_query) | first | default('') }}"
+            role_arn: "{{ aws_parameters_result.stdout | from_json | json_query(role_arn_query) | first | default('') }}"
+            application_path: "{{ aws_parameters_result.stdout | from_json | json_query(application_path_query) | first }}"
+          vars:
+            ecs_cluster_query: "Parameters[?Name==`{{ parameter_path }}/ecs_cluster`].Value"
+            ecs_web_task_query: "Parameters[?Name==`{{ parameter_path }}/ecs_web_task`].Value"
+            ecs_web_service_query: "Parameters[?Name==`{{ parameter_path }}/ecs_web_service`].Value"
+            role_arn_query: "Parameters[?Name==`{{ parameter_path }}/role_arn`].Value"
+            application_path_query: "Parameters[?Name==`{{ parameter_path }}/application_path`].Value"
+        
+        - name: Ensure required parameters are set
+          fail:
+            msg: "Required parameter '{{ item }}' is missing or empty"
+          with_items:
+            - ecs_cluster
+            - ecs_web_service
+            - application_path
+          when: "{{ item }} == ''"
+
+
+        - name: Login to Docker registry
+          shell: aws ecr get-login-password | docker login --username AWS --password-stdin {{ docker_registry }}
+
+        - name: Ensure folders exist on build host
+          file:
+            dest: "{{ item }}"
+            state: directory
+            owner: "{{ ncianalysis_user }}"
+            group: "{{ ncianalysis_group }}"
+          with_items:
+            - "{{ docker_app_root }}"
+            - "{{ docker_app_root }}/{{ docker_app_code_folder }}"
+            - "{{ docker_app_root }}/ecs"
+
+        - name: Copy app source to build host
+          synchronize:
+            src: "{{ workspace_folder }}/source/"
+            dest: "{{ docker_app_root }}/{{ docker_app_code_folder }}"
+            delete: yes
+
+        # note: docker_image does not support buildkit, so we must build images manually
+        - name: Build backend image {{ backend_image }}
+          shell: >
+            docker build \
+              --pull \
+              -t {{ backend_image }} \
+              -t {{ backend_image_latest }} \
+              --build-arg BUILDKIT_INLINE_CACHE=1 \
+              {{ '--no-cache' if no_cache == 'true' else '--cache-from ' + backend_image_latest }} \
+              -f {{ docker_app_root }}/{{ docker_app_code_folder }}/docker/backend.dockerfile \
+              {{ docker_app_root }}/{{ docker_app_code_folder }};
+
+            docker push {{ backend_image }};
+            docker push {{ backend_image_latest }};
+          environment:
+            DOCKER_BUILDKIT: "{{ (no_cache == 'true') | ternary('0', '1') }}"
+          async: 10800
+          poll: 5
+          when: rebuild_backend_image == "true"
+
+        
+        - name: Build frontend image {{ frontend_image }}
+          shell: >
+            docker build \
+              --pull \
+              -t {{ frontend_image }} \
+              -t {{ frontend_image_latest }} \
+              --build-arg BUILDKIT_INLINE_CACHE=1 \
+              --build-arg APPLICATION_PATH={{ application_path }} \
+              {{ '--no-cache' if no_cache == 'true' else '--cache-from ' + frontend_image_latest }} \
+              -f {{ docker_app_root }}/{{ docker_app_code_folder }}/docker/frontend.dockerfile \
+              {{ docker_app_root }}/{{ docker_app_code_folder }};
+
+            docker push {{ frontend_image }};
+            docker push {{ frontend_image_latest }};
+          environment:
+            DOCKER_BUILDKIT: "{{ (no_cache == 'true') | ternary('0', '1') }}"
+          async: 10800
+          poll: 5
+          when: rebuild_frontend_image == "true"
+
+        - name: Check frontend build artifacts
+          shell: "ls -l {{ docker_app_root }}/{{ docker_app_code_folder }}"
+          register: frontend_build_check
+          ignore_errors: yes
+
+        - debug:
+            var: frontend_build_check.stdout
+
+        - name: Debug application path
+          debug:
+            msg: "Application path: {{ application_path }}"
+
+        - name: Debug frontend container build directory
+          shell: "docker run --rm {{ frontend_image }} ls -l /var/www/html"
+          register: frontend_container_build_check
+
+        - debug:
+            var: frontend_container_build_check.stdout
+
+        - name: Debug AWS parameters
+          debug:
+            var: aws_parameters_result.stdout
+
+
+        - name: Update task definitions from templates
+          ansible.builtin.template:
+            src: "{{ task_definition_template_path }}/{{ item }}"
+            dest: "{{ docker_app_root }}/ecs/{{ item }}"
+          with_items:
+            - web.yml
+
+        - name: Register task definitions
+          shell: aws ecs register-task-definition --cli-input-yaml file://{{ docker_app_root }}/ecs/{{ item }}
+          with_items:
+            - web.yml
+
+
+        - name: Update web service
+          shell: >
+            aws ecs update-service \
+              --cluster {{ ecs_cluster }} \
+              --service {{ ecs_web_service }} \
+              --task-definition {{ ecs_web_task }} \
+              --desired-count 1 \
+              --force-new-deployment;
+
+       
