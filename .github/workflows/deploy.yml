@@ -12,11 +12,6 @@ on:
           - qa
           - stage
           - prod
-      reinitialize_redis_cache:
-        description: "Reinitialize Redis cache after deployment"
-        required: false
-        default: false
-        type: boolean
 
 permissions:
   id-token: write
