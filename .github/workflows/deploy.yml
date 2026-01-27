@@ -159,20 +159,11 @@ jobs:
               --propagate-tags TASK_DEFINITION \
               --force-new-deployment
 
-      - name: Wait for service stability
-        run: |
-          aws ecs wait services-stable \
-              --cluster ${{ env.ECS_CLUSTER }} \
-              --services ${{ env.ECS_WEB_SERVICE }}
-
-      - name: Reinitialize Redis cache
-        if: inputs.reinitialize_redis_cache
-        run: |
-          echo "Reinitializing Redis cache..."
-          # Note: This requires an ECS Exec session or alternative method
-          # For now, this is a placeholder for the cache reinitialization logic
-          # In production, you may need to run this via ECS Exec or Lambda
-          echo "Cache reinitialization would be triggered here"
+      # - name: Wait for service stability
+      #   run: |
+      #     aws ecs wait services-stable \
+      #         --cluster ${{ env.ECS_CLUSTER }} \
+      #         --services ${{ env.ECS_WEB_SERVICE }}
 
       - name: Cleanup old task definitions
         run: |
