@@ -1,0 +1,109 @@
+family: "${ECS_WEB_TASK}"
+networkMode: awsvpc
+cpu: "${ECS_CPU_UNITS}"
+memory: "${ECS_MEMORY_UNITS}"
+executionRoleArn: "${ROLE_ARN}"
+taskRoleArn: "${ROLE_ARN}"
+requiresCompatibilities:
+  - FARGATE
+containerDefinitions:
+  - name: logs
+    image: public.ecr.aws/aws-observability/aws-for-fluent-bit:stable
+    firelensConfiguration:
+      type: fluentbit
+    memoryReservation: 50
+    logConfiguration:
+      logDriver: awslogs
+      options:
+        awslogs-group: "/analysistools/${TIER}/${APP}/web"
+        awslogs-region: "${AWS_REGION}"
+        awslogs-stream-prefix: logs
+
+  - name: frontend
+    image: "${FRONTEND_IMAGE_LATEST}"
+    portMappings:
+      - protocol: tcp
+        containerPort: ${FRONTEND_CONTAINER_PORT}
+    environment:
+      - name: API_BASE_URL
+        value: http://localhost:${BACKEND_CONTAINER_PORT}
+    secrets:
+      - name: APPLICATION_PATH
+        valueFrom: "/analysistools/${TIER}/${APP}/application_path"
+    logConfiguration:
+      logDriver: awsfirelens
+      options:
+        Name: datadog
+        tls: "on"
+        tls.verify: "off"
+        dd_service: "${TIER}-${APP}-frontend"
+        dd_source: "httpd"
+        dd_tags: "project:${APP} tier:${TIER}"
+        provider: ecs
+      secretOptions:
+        - name: Host
+          valueFrom: /analysistools/${TIER}/datadog/log_endpoint_host
+        - name: apikey
+          valueFrom: /analysistools/${TIER}/datadog/api_key
+    memoryReservation: 100
+
+  - name: backend
+    image: "${BACKEND_IMAGE_LATEST}"
+    environment:
+      - name: API_PORT
+        value: "${BACKEND_CONTAINER_PORT}"
+      - name: DATABASE_PATH
+        value: "/app/database/database.db"
+    secrets:
+      - name: APPLICATION_NAME
+        valueFrom: "/analysistools/${TIER}/${APP}/application_name"
+      - name: BASE_URL
+        valueFrom: "/analysistools/${TIER}/${APP}/base_url"  
+      - name: EXPORT_ROW_LIMIT
+        valueFrom: "/analysistools/${TIER}/${APP}/export_row_limit"
+      - name: DOWNLOADROOT
+        valueFrom: "/analysistools/${TIER}/${APP}/downloadroot"
+      - name: DATABASE_NAME
+        valueFrom: "/analysistools/${TIER}/${APP}/database_name"
+      - name: DATABASE_HOST
+        valueFrom: "/analysistools/${TIER}/${APP}/database_host"
+      - name: DATABASE_PORT
+        valueFrom: "/analysistools/${TIER}/${APP}/database_port"
+      - name: DATABASE_USER
+        valueFrom: "/analysistools/${TIER}/${APP}/database_user"
+      - name: DATABASE_PASSWORD
+        valueFrom: "/analysistools/${TIER}/${APP}/database_password"
+      - name: REDIS_HOST
+        valueFrom: "/analysistools/${TIER}/${APP}/redis_host"
+      - name: REDIS_PORT
+        valueFrom: "/analysistools/${TIER}/${APP}/redis_port"   
+
+    logConfiguration:
+      logDriver: awsfirelens
+      options:
+        Name: datadog
+        tls: "on"
+        tls.verify: "off"
+        dd_service: "${TIER}-${APP}-backend"
+        dd_source: "nodejs"
+        dd_tags: "project:${APP} tier:${TIER}"
+        provider: ecs
+      secretOptions:
+        - name: Host
+          valueFrom: /analysistools/${TIER}/datadog/log_endpoint_host
+        - name: apikey
+          valueFrom: /analysistools/${TIER}/datadog/api_key
+
+tags:
+- key: Project
+  value: "${APP}"
+- key: ApplicationName
+  value: "${APP}"
+- key: ResourceName
+  value: "${TIER}-${APP}-web-ecs-task"
+- key: ResourceFunction
+  value: compute
+- key: EnvironmentTier
+  value: "${ENVIRONMENT_TIER}"
+- key: Creator
+  value: TF
