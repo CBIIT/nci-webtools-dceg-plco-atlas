@@ -124,7 +124,7 @@ jobs:
           push: true
           build-args: |
             APPLICATION_PATH=${{ env.APPLICATION_PATH }}
-            REACT_APP_VERSION="gwasExplorer2.2.2_20260306"
+            REACT_APP_VERSION="gwasExplorer2.2.2_20260310"
           
           tags: |
             ${{ env.FRONTEND_IMAGE }}
