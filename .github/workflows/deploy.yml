@@ -124,6 +124,8 @@ jobs:
           push: true
           build-args: |
             APPLICATION_PATH=${{ env.APPLICATION_PATH }}
+            REACT_APP_VERSION=${{  github.ref_name }}
+          
           tags: |
             ${{ env.FRONTEND_IMAGE }}
             ${{ env.FRONTEND_IMAGE_LATEST }}
