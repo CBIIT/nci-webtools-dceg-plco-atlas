@@ -114,7 +114,7 @@ jobs:
             ${{ env.BACKEND_IMAGE_LATEST }}
           cache-from: type=registry,ref=${{ env.BACKEND_IMAGE_LATEST }}
           cache-to: type=inline
-
+    
       - name: Build and push frontend image
         uses: docker/build-push-action@v6.18.0
         with:
@@ -124,7 +124,7 @@ jobs:
           push: true
           build-args: |
             APPLICATION_PATH=${{ env.APPLICATION_PATH }}
-            REACT_APP_VERSION=${{  github.ref_name }}
+            REACT_APP_VERSION="gwasExplorer2.2.2_20260306"
           
           tags: |
             ${{ env.FRONTEND_IMAGE }}
