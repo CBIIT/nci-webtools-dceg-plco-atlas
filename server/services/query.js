@@ -361,10 +361,20 @@ async function getVariants({ connection, logger }, params) {
   if (!params.columns || params.columns.includes("sex"))
     columns.unshift(`"${sex}" as sex`);
   if (!tables.length) {
-    // throw new Error('No data exists for the selected phenotype(s) stratification(s)');
-    console.log("No data exists for the selected phenotype(s)");
-    return { columns: columns, data: [] };
+    const phenotypeNames = phenotypes.map(p => p.name).join(', ');
+    const errorMsg = `No variant data tables found for phenotype(s): ${phenotypeNames} with sex=${sex} and ancestry=${ancestry}. The tables may not exist or the phenotype may not have data for this stratification.`;
+    logger.error(errorMsg);
+    throw new Error(errorMsg);
   }
+  
+  // Log which tables were found vs requested
+  const foundPhenotypes = tables.map(t => t.phenotype_id);
+  const missingPhenotypes = phenotypes.filter(p => !foundPhenotypes.includes(p.id.toString()));
+  if (missingPhenotypes.length > 0) {
+    logger.warn(`Warning: Tables not found for phenotypes: ${missingPhenotypes.map(p => `${p.id}(${p.name})`).join(', ')}`);
+  }
+  logger.debug(`Found ${tables.length} tables for query: ${tables.map(t => t.table_name).join(', ')}`);
+  
   const conditions = [
     coalesce(params.id, `id = :id`),
     coalesce(
@@ -414,9 +424,9 @@ async function getVariants({ connection, logger }, params) {
   const unionQuery = tables
     .map((t) => {
       // add phenotype_id column if needed
-      let queryColumns = columns;
+      let queryColumns = [...columns]; // Create a new array copy
       if (!params.columns || params.columns.includes("phenotype_id"))
-        queryColumns = [`${t.phenotype_id} as phenotype_id`, ...columns];
+        queryColumns = [`${t.phenotype_id} as phenotype_id`, ...queryColumns];
       // generate select statement for current table
       return `(SELECT ${queryColumns.join(",")} FROM ${t.table_name} 
           ${conditions.length ? `WHERE ${conditions}` : ""})`;
