@@ -411,22 +411,25 @@ async function getVariants({ connection, logger }, params) {
   const limit = Math.min(+params.limit, defaultLimit) || defaultLimit; // set hard limit to prevent overflow
   const offset = +params.offset || 0;
   // generate sql to query variants table(s)
-  const sql =
-    tables
-      .map((t) => {
-        // add phenotype_id column if needed
-        let queryColumns = columns;
-        if (!params.columns || params.columns.includes("phenotype_id"))
-          queryColumns = [`${t.phenotype_id} as phenotype_id`, ...columns];
-        // generate select statement for current table
-        return `SELECT ${queryColumns.join(",")} FROM ${t.table_name} 
-            ${conditions.length ? `WHERE ${conditions}` : ""}`;
-      })
-      .join(" UNION ") +
-    `
+  const unionQuery = tables
+    .map((t) => {
+      // add phenotype_id column if needed
+      let queryColumns = columns;
+      if (!params.columns || params.columns.includes("phenotype_id"))
+        queryColumns = [`${t.phenotype_id} as phenotype_id`, ...columns];
+      // generate select statement for current table
+      return `(SELECT ${queryColumns.join(",")} FROM ${t.table_name} 
+          ${conditions.length ? `WHERE ${conditions}` : ""})`;
+    })
+    .join(" UNION ");
+  
+  const sql = tables.length > 1 
+    ? `SELECT * FROM (${unionQuery}) AS combined
         ${params.orderBy ? `ORDER BY ${orderBy} ${order}` : ""}
-        LIMIT ${offset}, ${limit}
-    `;
+        LIMIT ${offset}, ${limit}`
+    : `${unionQuery}
+        ${params.orderBy ? `ORDER BY ${orderBy} ${order}` : ""}
+        LIMIT ${offset}, ${limit}`;
   logger.debug(`getVariants sql: ${sql}`);
   // query database
   const [data, metaColumns] = await connection.execute(
