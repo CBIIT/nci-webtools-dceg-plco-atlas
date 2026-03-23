@@ -428,8 +428,8 @@ async function getVariants({ connection, logger }, params) {
       if (!params.columns || params.columns.includes("phenotype_id"))
         queryColumns = [`${t.phenotype_id} as phenotype_id`, ...queryColumns];
       // generate select statement for current table
-      return `(SELECT ${queryColumns.join(",")} FROM ${t.table_name} 
-          ${conditions.length ? `WHERE ${conditions}` : ""})`;
+      return `SELECT ${queryColumns.join(",")} FROM ${t.table_name} 
+          ${conditions.length ? `WHERE ${conditions}` : ""}`;
     })
     .join(" UNION ");
   
