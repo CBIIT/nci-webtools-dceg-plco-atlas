@@ -335,7 +335,7 @@ async function getVariants({ connection, logger }, params) {
             AND sex = ? 
             AND chromosome = ? 
             AND phenotype_id IN (${phenotypeIdPlaceholders})`,
-    [ancestry, sex, +params.chromosome || "all", ...phenotypeIds]
+    [ancestry, sex, +params.chromosome || "all", phenotypeIds]
   );
   // use only phenotypes with data, skip check if searching by SNP
   if (!params.snp && (!metadata.length || metadata.some((m) => !m.count)))
