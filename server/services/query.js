@@ -335,7 +335,7 @@ async function getVariants({ connection, logger }, params) {
             AND sex = ? 
             AND chromosome = ? 
             AND phenotype_id IN (${phenotypeIdPlaceholders})`,
-    [ancestry, sex, +params.chromosome || "all", phenotypeIds]
+    [ancestry, sex, +params.chromosome || "all", ...phenotypeIds]
   );
   // use only phenotypes with data, skip check if searching by SNP
   if (!params.snp && (!metadata.length || metadata.some((m) => !m.count)))
@@ -360,12 +360,6 @@ async function getVariants({ connection, logger }, params) {
     columns.unshift(`"${ancestry}" as ancestry`);
   if (!params.columns || params.columns.includes("sex"))
     columns.unshift(`"${sex}" as sex`);
-  if (!tables.length) {
-    const phenotypeNames = phenotypes.map(p => p.name).join(', ');
-    const errorMsg = `No variant data tables found for phenotype(s): ${phenotypeNames} with sex=${sex} and ancestry=${ancestry}. The tables may not exist or the phenotype may not have data for this stratification.`;
-    logger.error(errorMsg);
-    throw new Error(errorMsg);
-  }
   
   // Log which tables were found vs requested
   const foundPhenotypes = tables.map(t => t.phenotype_id);
@@ -373,6 +367,16 @@ async function getVariants({ connection, logger }, params) {
   if (missingPhenotypes.length > 0) {
     logger.warn(`Warning: Tables not found for phenotypes: ${missingPhenotypes.map(p => `${p.id}(${p.name})`).join(', ')}`);
   }
+  
+  // If no tables found, return empty result with proper column structure
+  if (!tables.length) {
+    logger.warn(`No variant data tables found for any requested phenotypes with sex=${sex} and ancestry=${ancestry}`);
+    let resultColumns = [...columns];
+    if (!params.columns || params.columns.includes("phenotype_id"))
+      resultColumns = ["phenotype_id", ...resultColumns];
+    return { data: [], columns: resultColumns };
+  }
+  
   logger.debug(`Found ${tables.length} tables for query: ${tables.map(t => t.table_name).join(', ')}`);
   
   const conditions = [
