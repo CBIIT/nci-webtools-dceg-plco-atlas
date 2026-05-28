@@ -30,7 +30,24 @@
   color: #ff8080 !important;
 }
 
+/* Fix inline-styled comment/link gray values (#888888 on #333333 = 3.56:1, fails 4.5:1) */
+.swagger-ui .highlight-code pre span[style*="color: rgb(136, 136, 136)"],
+.swagger-ui .microlight span[style*="color: rgb(136, 136, 136)"] {
+  color: #b3b3b3 !important;
+}
+
 /* Fix response header lines (#1f2933 on #333333 = 1.16:1, fails 4.5:1) */
 .swagger-ui .headerline {
   color: #ffffff !important;
+}
+
+/* Fix cancel button contrast (#ff6060 on #fcfdff = 2.9:1, fails 4.5:1) */
+.swagger-ui .try-out__btn.cancel {
+  color: #b00020 !important;
+  border-color: #b00020 !important;
+}
+
+/* Fix download contents contrast (#ffffff on #7d8293 = 3.82:1, fails 4.5:1) */
+.swagger-ui .download-contents {
+  color: #000000 !important;
 }
