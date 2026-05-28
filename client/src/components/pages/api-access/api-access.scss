@@ -1,4 +1,10 @@
-.swagger-ui .opblock.opblock-get .opblock-summary-method {
+.swagger-ui .opblock.opblock-get .opblock-summary-method,
+.swagger-ui .opblock.opblock-post .opblock-summary-method,
+.swagger-ui .opblock.opblock-put .opblock-summary-method,
+.swagger-ui .opblock.opblock-delete .opblock-summary-method,
+.swagger-ui .opblock.opblock-patch .opblock-summary-method,
+.swagger-ui .opblock.opblock-head .opblock-summary-method,
+.swagger-ui .opblock.opblock-options .opblock-summary-method {
   color: #000000 !important;
 }
 
@@ -10,4 +16,21 @@
   background-color: #4990e2;
   color: #000000 !important;
   border-color: #4990e2;
+}
+
+.swagger-ui .microlight .hljs-attr,
+.swagger-ui .highlight-code pre .hljs-attr {
+  color: #f8c555 !important;
+}
+
+/* Fix inline-styled number values (#d36363 on #333333 = 3.45:1, fails 4.5:1) */
+.swagger-ui .highlight-code pre span[style*="color: rgb(211, 99, 99)"],
+.swagger-ui .microlight span[style*="color: rgb(211, 99, 99)"],
+.swagger-ui .body-param__example span[style*="color: rgb(211, 99, 99)"] {
+  color: #ff8080 !important;
+}
+
+/* Fix response header lines (#1f2933 on #333333 = 1.16:1, fails 4.5:1) */
+.swagger-ui .headerline {
+  color: #ffffff !important;
 }
