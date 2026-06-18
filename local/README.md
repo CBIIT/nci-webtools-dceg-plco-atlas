@@ -33,11 +33,15 @@ volume.
 > than containerized. Node 22 is recommended (Fastify 3 emits deprecation
 > warnings but runs).
 
-**Scope of the local seed:** only the phenotype *tree* is seeded, which fixes
-the `/web/phenotypes` 500 and loads the Phenotype Characteristics page cleanly.
-Selecting a phenotype triggers calls for GWAS variant data / participant
-characteristics, which require the large production dataset and are **not**
-seeded locally.
+**Scope of the local seed:**
+- `gen-seed.py` seeds the phenotype **tree** (visible + searchable).
+- `gen-participant-seed.py` seeds **synthetic participant data** (200
+  participants + `phenotype_metadata`) so the **Phenotype Characteristics**
+  charts render (Frequency All/Age/Sex/Race) for any leaf phenotype. Leaf
+  phenotypes are forced to `binary` for the chart path; the values are random
+  synthetic data, not real PLCO results.
+- The **GWAS Results** pages (Manhattan/QQ/summary/variant lookup) read the
+  large production variant dataset and are **not** seeded locally.
 
 ## Run the client
 

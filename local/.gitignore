@@ -1,3 +1,4 @@
 node_modules/
 package-lock.json
 db-init/02-seed-phenotype.sql
+db-init/03-participant-seed.sql

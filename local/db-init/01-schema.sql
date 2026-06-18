@@ -57,3 +57,32 @@ CREATE TABLE IF NOT EXISTS `phenotype_metadata` (
   `participant_count_case` BIGINT,
   `participant_count_control` BIGINT
 );
+
+-- Participant tables backing the Phenotype Characteristics charts
+-- (getPhenotypeParticipants). Seeded with synthetic data by
+-- local/gen-participant-seed.py.
+
+CREATE TABLE IF NOT EXISTS `participant` (
+  `id` INTEGER PRIMARY KEY NOT NULL,
+  `plco_id` VARCHAR(20),
+  `sex` ENUM('female', 'male'),
+  `ancestry` ENUM('white', 'black', 'hispanic', 'asian', 'pacific_islander', 'american_indian'),
+  `genetic_ancestry` VARCHAR(100)
+);
+
+CREATE TABLE IF NOT EXISTS `participant_data` (
+  `id` BIGINT PRIMARY KEY NOT NULL AUTO_INCREMENT,
+  `phenotype_id` INTEGER NOT NULL,
+  `participant_id` INTEGER,
+  `value` DOUBLE,
+  `age` INTEGER
+);
+
+CREATE TABLE IF NOT EXISTS `participant_data_category` (
+  `id` INTEGER PRIMARY KEY NOT NULL AUTO_INCREMENT,
+  `phenotype_id` INTEGER NOT NULL,
+  `value` DOUBLE,
+  `label` TEXT,
+  `show_distribution` BOOLEAN,
+  `order` INTEGER
+);

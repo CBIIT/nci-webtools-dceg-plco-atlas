@@ -27,8 +27,9 @@ if ! docker info >/dev/null 2>&1; then
   exit 1
 fi
 
-echo "==> generating phenotype seed from database/import/phenotype.csv"
+echo "==> generating phenotype + participant seeds from database/import/phenotype.csv"
 python3 gen-seed.py
+python3 gen-participant-seed.py
 
 echo "==> starting MySQL + Redis"
 $COMPOSE up -d
@@ -38,10 +39,12 @@ until [ "$(docker inspect -f '{{.State.Health.Status}}' plco-local-db-1 2>/dev/n
   sleep 2
 done
 
-echo "==> applying schema + seed"
+echo "==> applying schema + seeds"
 $DB < db-init/01-schema.sql
 $DB plcogwas < db-init/02-seed-phenotype.sql
-echo "    phenotype rows: $($DB -N -e 'SELECT COUNT(*) FROM plcogwas.phenotype;')"
+$DB plcogwas < db-init/03-participant-seed.sql
+echo "    phenotype rows:        $($DB -N -e 'SELECT COUNT(*) FROM plcogwas.phenotype;')"
+echo "    participant_data rows: $($DB -N -e 'SELECT COUNT(*) FROM plcogwas.participant_data;')"
 
 echo "==> installing server dependencies (first run only)"
 [ -d "$ROOT/server/node_modules" ] || ( cd "$ROOT/server" && npm install )
