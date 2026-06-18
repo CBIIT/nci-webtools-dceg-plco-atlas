@@ -5,6 +5,40 @@ client-side, so you only need the React client running to see the fixes. (The
 full backend additionally requires MySQL + Redis; it is not needed for these
 pages.)
 
+## Running the data-backed pages (Phenotypes, etc.)
+
+The Home and API Access pages are client-only. The other pages (Phenotypes,
+GWAS, Downloads) call a backend API on `:9000`. With no backend running, those
+calls fail and the browser shows a 500 (e.g. `/web/phenotypes`).
+
+**Data source facts:** the app reads all data from **MySQL** — there is no S3
+access at runtime (the only S3 usage in the repo is HPC backup scripts under
+`database/import/hpc/`). In production the MySQL host is **AWS RDS**; locally we
+point the API at a Docker MySQL. The API also gates `/web/*` routes to browser
+user-agents, so `curl` must send a browser `User-Agent` to test them.
+
+### Start the backend (MySQL + Redis + API)
+
+```bash
+./local/backend.sh        # Docker MySQL+Redis, seed phenotypes, run API (Node 22)
+```
+
+This brings up MySQL + Redis (Docker), seeds the `phenotype` tree from
+`database/import/phenotype.csv`, and runs the Fastify API with host Node.
+`./local/backend.sh down` stops the containers; `reset` also deletes the DB
+volume.
+
+> The repo's `docker/backend.dockerfile` (amazonlinux) can't build behind a
+> TLS-intercepting corporate proxy, so the API is run with host Node here rather
+> than containerized. Node 22 is recommended (Fastify 3 emits deprecation
+> warnings but runs).
+
+**Scope of the local seed:** only the phenotype *tree* is seeded, which fixes
+the `/web/phenotypes` 500 and loads the Phenotype Characteristics page cleanly.
+Selecting a phenotype triggers calls for GWAS variant data / participant
+characteristics, which require the large production dataset and are **not**
+seeded locally.
+
 ## Run the client
 
 ```bash

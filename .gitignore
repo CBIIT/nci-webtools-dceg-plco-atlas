@@ -22,3 +22,7 @@ config*.json
 *-audit.json
 .DS_Store
 *.env
+
+# local server deps (installed for local backend run)
+/server/node_modules/
+/server/package-lock.json
