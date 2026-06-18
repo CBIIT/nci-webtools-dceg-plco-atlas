@@ -1,7 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import Card from "react-bootstrap/Card";
-import { CardDeck, Button } from "react-bootstrap";
+import { CardDeck } from "react-bootstrap";
 import "./home.scss";
 
 export function Home({ links }) {
@@ -128,19 +128,19 @@ export function Home({ links }) {
                       className="bg-white border-top-0"
                       style={{ width: "100%" }}
                     >
-                      <Button
-                        as={Link}
-                        to={route}
-                        className="my-2 border border-0 font-weight-bold text-dark stretched-link"
+                      <Link
+                        className="my-2 border border-0 font-weight-bold btn btn-primary text-dark"
                         style={{
                           backgroundColor: "#2CC799",
-                          // borderRadius: '10px',
                           width: "90%",
                           textDecoration: "none",
                         }}
+                        exact={exact}
+                        key={index}
+                        to={route}
                       >
                         {action}
-                      </Button>
+                      </Link>
                     </Card.Footer>
                   </Card>
                   <div className="d-lg-none w-100"></div>
