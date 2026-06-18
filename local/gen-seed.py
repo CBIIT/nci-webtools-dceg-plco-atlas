@@ -63,12 +63,23 @@ def main():
         out.write("SET FOREIGN_KEY_CHECKS=0;\n")
         out.write("TRUNCATE TABLE phenotype;\n")
         for (pid, parent, name, age_name, display_name, description, ptype, sex) in rows:
+            # The phenotype tree (phenotypes-form.js) only shows nodes that have
+            # an import_date (or a descendant leaf that does), and only allows
+            # selecting nodes with a participant_count. Mark the associatable
+            # (leaf) phenotypes -- those with a real `name` -- as "imported" so
+            # the tree is visible and searchable locally. Parent categories
+            # become visible via their descendants.
+            imported = name is not None
+            import_date = "'2024-01-01 00:00:00'" if imported else "NULL"
+            participant_count = "10000" if imported else "NULL"
+            import_count = "1000000" if imported else "NULL"
             out.write(
                 "INSERT INTO phenotype "
-                "(id, parent_id, name, age_name, display_name, description, type, sex_specific) VALUES "
+                "(id, parent_id, name, age_name, display_name, description, type, sex_specific, "
+                "import_date, participant_count, import_count) VALUES "
                 f"({pid}, {parent if parent is not None else 'NULL'}, "
                 f"{sql(name)}, {sql(age_name)}, {sql(display_name)}, {sql(description)}, "
-                f"{sql(ptype)}, {sql(sex)});\n"
+                f"{sql(ptype)}, {sql(sex)}, {import_date}, {participant_count}, {import_count});\n"
             )
         out.write("SET FOREIGN_KEY_CHECKS=1;\n")
     print(f"Wrote {len(rows)} phenotype rows to {OUT_PATH}")
