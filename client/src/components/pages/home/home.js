@@ -129,22 +129,17 @@ export function Home({ links }) {
                       style={{ width: "100%" }}
                     >
                       <Button
-                        className="my-2 border border-0 font-weight-bold"
+                        as={Link}
+                        to={route}
+                        className="my-2 border border-0 font-weight-bold text-dark stretched-link"
                         style={{
                           backgroundColor: "#2CC799",
                           // borderRadius: '10px',
                           width: "90%",
+                          textDecoration: "none",
                         }}
                       >
-                        <Link
-                          className="stretched-link text-dark"
-                          style={{ textDecoration: "none" }}
-                          exact={exact}
-                          key={index}
-                          to={route}
-                        >
-                          {action}
-                        </Link>
+                        {action}
                       </Button>
                     </Card.Footer>
                   </Card>

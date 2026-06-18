@@ -11,3 +11,46 @@
   color: #000000 !important;
   border-color: #4990e2;
 }
+
+/* Section 508 color-contrast fixes for Swagger UI's default palette.
+   Swagger ships several text colors that fall below the WCAG AA 4.5:1
+   threshold against their (near-white) backgrounds. Darken them so the
+   API Access documentation meets contrast requirements. */
+
+/* "Cancel" button text/border (#ff6060 -> ~2.9:1) */
+.swagger-ui .btn.cancel {
+  color: #b32424 !important;
+  border-color: #b32424 !important;
+}
+
+/* Light-gray secondary text used throughout operations, parameters,
+   responses, models and tabs */
+.swagger-ui .parameter__type,
+.swagger-ui .parameter__deprecated,
+.swagger-ui .parameter__in,
+.swagger-ui .parameter__extension,
+.swagger-ui .prop-format,
+.swagger-ui .response-col_links,
+.swagger-ui .opblock-summary-path__deprecated,
+.swagger-ui .model .property.primitive,
+.swagger-ui .model-title__text,
+.swagger-ui .tab li,
+.swagger-ui .opblock .opblock-section-header label,
+.swagger-ui .opblock-description-wrapper,
+.swagger-ui .markdown p,
+.swagger-ui .renderedMarkdown p,
+.swagger-ui table.headers .header-example,
+.swagger-ui .info .base-url {
+  color: #454545 !important;
+}
+
+/* Placeholder text in "Try it out" inputs (#999 -> below AA) */
+.swagger-ui input::placeholder,
+.swagger-ui textarea::placeholder {
+  color: #595959 !important;
+}
+
+/* Property type accents in the model viewer (#55a / teal are low-contrast) */
+.swagger-ui .prop-type {
+  color: #3b4151 !important;
+}
