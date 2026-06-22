@@ -1,4 +1,10 @@
-.swagger-ui .opblock.opblock-get .opblock-summary-method {
+.swagger-ui .opblock.opblock-get .opblock-summary-method,
+.swagger-ui .opblock.opblock-post .opblock-summary-method,
+.swagger-ui .opblock.opblock-put .opblock-summary-method,
+.swagger-ui .opblock.opblock-delete .opblock-summary-method,
+.swagger-ui .opblock.opblock-patch .opblock-summary-method,
+.swagger-ui .opblock.opblock-head .opblock-summary-method,
+.swagger-ui .opblock.opblock-options .opblock-summary-method {
   color: #000000 !important;
 }
 
@@ -10,4 +16,74 @@
   background-color: #4990e2;
   color: #000000 !important;
   border-color: #4990e2;
+}
+
+/* Section 508 color-contrast fixes for Swagger UI's default palette.
+   Swagger ships several text colors that fall below the WCAG AA 4.5:1
+   threshold against their (near-white) backgrounds. Darken them so the
+   API Access documentation meets contrast requirements. */
+
+/* Light-gray secondary text used throughout operations, parameters,
+   responses, models and tabs */
+.swagger-ui .parameter__type,
+.swagger-ui .parameter__deprecated,
+.swagger-ui .prop-format,
+.swagger-ui .response-col_links,
+.swagger-ui .opblock-summary-path__deprecated,
+.swagger-ui .model .property.primitive,
+.swagger-ui .model-title__text,
+.swagger-ui .tab li,
+.swagger-ui .opblock .opblock-section-header label,
+.swagger-ui .opblock-description-wrapper,
+.swagger-ui .markdown p,
+.swagger-ui .renderedMarkdown p,
+.swagger-ui table.headers .header-example,
+.swagger-ui .info .base-url {
+  color: #454545 !important;
+}
+
+/* Placeholder text in "Try it out" inputs (#999 -> below AA) */
+.swagger-ui input::placeholder,
+.swagger-ui textarea::placeholder {
+  color: #595959 !important;
+}
+
+/* Property type accents in the model viewer (#55a / teal are low-contrast) */
+.swagger-ui .prop-type {
+  color: #3b4151 !important;
+}
+
+/* Syntax-highlight attribute names in code samples */
+.swagger-ui .microlight .hljs-attr,
+.swagger-ui .highlight-code pre .hljs-attr {
+  color: #f8c555 !important;
+}
+
+/* Fix inline-styled number values (#d36363 on #333333 = 3.45:1, fails 4.5:1) */
+.swagger-ui .highlight-code pre span[style*="color: rgb(211, 99, 99)"],
+.swagger-ui .microlight span[style*="color: rgb(211, 99, 99)"],
+.swagger-ui .body-param__example span[style*="color: rgb(211, 99, 99)"] {
+  color: #ff8080 !important;
+}
+
+/* Fix inline-styled comment/link gray values (#888888 on #333333 = 3.56:1, fails 4.5:1) */
+.swagger-ui .highlight-code pre span[style*="color: rgb(136, 136, 136)"],
+.swagger-ui .microlight span[style*="color: rgb(136, 136, 136)"] {
+  color: #b3b3b3 !important;
+}
+
+/* Fix response header lines (#1f2933 on #333333 = 1.16:1, fails 4.5:1) */
+.swagger-ui .headerline {
+  color: #ffffff !important;
+}
+
+/* Fix cancel button contrast (#ff6060 on #fcfdff = 2.9:1, fails 4.5:1) */
+.swagger-ui .try-out__btn.cancel {
+  color: #b00020 !important;
+  border-color: #b00020 !important;
+}
+
+/* Fix download contents contrast (#ffffff on #7d8293 = 3.82:1, fails 4.5:1) */
+.swagger-ui .download-contents {
+  color: #000000 !important;
 }
