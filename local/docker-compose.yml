@@ -1,0 +1,34 @@
+# Local datastores for GWAS Explorer: MySQL (seeded with the phenotype tree)
+# and Redis. The Fastify API is run with host Node by local/backend.sh -- the
+# repo's amazonlinux backend image cannot build behind TLS-intercepting
+# corporate proxies (the package mirror presents a self-signed cert), so we
+# don't containerize the API here.
+#
+# Data source note: the app reads from MySQL only (no S3 at runtime); in
+# production the MySQL host is AWS RDS, here it is this local `db` container.
+
+name: plco-local
+
+services:
+  db:
+    image: mysql:8
+    environment:
+      MYSQL_ROOT_PASSWORD: plcolocal
+      MYSQL_DATABASE: plcogwas
+    ports:
+      - "3306:3306"
+    volumes:
+      - plco-db:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-uroot", "-pplcolocal"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+
+volumes:
+  plco-db:

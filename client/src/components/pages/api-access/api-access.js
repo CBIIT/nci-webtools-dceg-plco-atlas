@@ -603,16 +603,16 @@ export function ApiAccess() {
                 get: {
                     tags: ['metadata'],
                     summary: 'Retrieves metadata about each phenotype specified',
-                    description: `Retrieves metadata about each phenotype specified. The following properties are returned:
-                    <ul>
-                        <li>name - Internal name of the phenotype</li>
-                        <li>display_name - Displayed name</li>
-                        <li>sex - all, female, or male - sex for metadata entry</li>
-                        <li>ancestry - african_american, east_asian, european, TBD - ancestry for metadata entry</li>
-                        <li>chromosome - all, or numeric value - chromosome for metadata entry</li>
-                        <li>lambda_gc - Numeric value of lambda gc</li>
-                        <li>count - Number of variants in chromosome (or 'all' chromosomes)</li>
-                    </ul>`,
+                    description: `Retrieves metadata about each phenotype specified. The following properties are returned:` +
+                        `<ul>` +
+                        `<li>name - Internal name of the phenotype</li>` +
+                        `<li>display_name - Displayed name</li>` +
+                        `<li>sex - all, female, or male - sex for metadata entry</li>` +
+                        `<li>ancestry - african_american, east_asian, european, TBD - ancestry for metadata entry</li>` +
+                        `<li>chromosome - all, or numeric value - chromosome for metadata entry</li>` +
+                        `<li>lambda_gc - Numeric value of lambda gc</li>` +
+                        `<li>count - Number of variants in chromosome (or 'all' chromosomes)</li>` +
+                        `</ul>`,
                     operationId: 'getMetadata',
                     produces: ['application/json'],
                     parameters: [
