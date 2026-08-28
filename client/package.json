@@ -27,7 +27,7 @@
     "react-select": "^3.1.0",
     "redux": "^4.0.4",
     "redux-thunk": "^2.3.0",
-    "swagger-ui": "^3.41.1"
+    "swagger-ui": "4.13.0"
   },
   "scripts": {
     "start": "react-scripts --max_old_space_size=4096 --openssl-legacy-provider start",
@@ -60,5 +60,14 @@
     "prettier": "^1.18.2",
     "react-test-renderer": "^16.13.1",
     "sass": "^1.32.8"
+  },
+  "overrides": {
+    "swagger-ui": {
+      "swagger-client": "3.18.5",
+      "dompurify": "3.4.14",
+      "react": "$react",
+      "react-dom": "$react-dom"
+    },
+    "cookie": "0.7.2"
   }
 }
