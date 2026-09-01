@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import SwaggerUi, { presets } from 'swagger-ui';
+import SwaggerUi from 'swagger-ui';
 import 'swagger-ui/dist/swagger-ui.css';
 
 // Swagger UI generates its own DOM, which ships with several Section 508 / WCAG
@@ -65,7 +65,7 @@ export const SwaggerUI = ({ spec }) => {
         SwaggerUi({
             dom_id: '#swaggerContainer',
             spec: spec,
-            presets: [presets.apis],
+            presets: [SwaggerUi.presets.apis],
             onComplete: () => patchAccessibility(container),
         });
 
