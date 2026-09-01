@@ -10,7 +10,7 @@
     "lodash.clonedeep": "^4.5.0",
     "lodash.isequal": "^4.5.0",
     "lodash.merge": "^4.6.2",
-    "plotly.js": "^1.54.7",
+    "plotly.js": "^2.35.3",
     "react": "^16.8.6",
     "react-bootstrap": "^1.0.0",
     "react-bootstrap-table-next": "^4.0.3",
@@ -66,8 +66,11 @@
       "swagger-client": "3.18.5",
       "dompurify": "3.4.14",
       "react": "$react",
-      "react-dom": "$react-dom"
+      "react-dom": "$react-dom",
+      "@braintree/sanitize-url": "^6.0.4",
+      "js-yaml": "^4.3.2"
     },
-    "cookie": "0.7.2"
+    "cookie": "0.7.2",
+    "underscore": "^1.13.8"
   }
 }
