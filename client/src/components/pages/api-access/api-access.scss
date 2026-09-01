@@ -87,3 +87,15 @@
 .swagger-ui .download-contents {
   color: #000000 !important;
 }
+
+/* Swagger UI 4.x adds a "copy path" control to every operation summary row that
+   reveals on hover. Unlike the copy buttons in the Curl and Response body blocks
+   (which render a real <button> and are labeled by patchAccessibility()), this one
+   renders a bare <svg> inside a <div> with no role and no tabindex, so it is not
+   keyboard operable -- failing WCAG 2.1.1 (Keyboard) and 4.1.2 (Name, Role, Value).
+   It did not exist in 3.x, so hiding it also restores parity with production.
+   Scoped to .opblock-summary so the accessible Curl / Response body copy buttons
+   are unaffected. */
+.swagger-ui .opblock-summary .view-line-link.copy-to-clipboard {
+  display: none;
+}
