@@ -1,0 +1,13 @@
+{
+  "name": "plco-atlas-local-a11y",
+  "private": true,
+  "type": "module",
+  "description": "Local Section 508 / WCAG audit tooling for GWAS Explorer (NCIATWP-9363)",
+  "scripts": {
+    "audit": "node a11y-audit.mjs"
+  },
+  "dependencies": {
+    "axe-core": "^4.10.0",
+    "puppeteer-core": "^23.0.0"
+  }
+}
