@@ -37,9 +37,14 @@
     "ioredis": "^4.27.7",
     "lib-r-math.js": "^1.0.89",
     "minimist": "^1.2.5",
-    "mysql2": "^2.2.5",
+    "mysql2": "^3.24.2",
     "ua-parser-js": "^0.7.28",
     "winston": "^3.3.3",
     "winston-daily-rotate-file": "^4.5.2"
+  },
+  "overrides": {
+    "fastify-mysql": {
+      "mysql2": "$mysql2"
+    }
   }
 }
