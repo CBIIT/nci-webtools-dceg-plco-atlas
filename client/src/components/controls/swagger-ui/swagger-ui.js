@@ -29,7 +29,7 @@ function patchAccessibility(root) {
         const row = select.closest('tr');
         const paramAttr = row && row.getAttribute('data-param-name');
         const nameEl = row && row.querySelector('.parameter__name');
-        const visibleName = nameEl ? nameEl.textContent.replace('*', '').trim() : '';
+        const visibleName = nameEl ? nameEl.textContent.replace(/\*/g, '').trim() : '';
         const labelSource = visibleName || paramAttr || 'parameter';
         const readableName = labelSource.replace(/^_+/, '').replace(/[_-]+/g, ' ').trim();
         const label = `Parameter ${readableName || 'value'}`;
