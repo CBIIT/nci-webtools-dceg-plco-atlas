@@ -80,7 +80,9 @@ describe('footer build configuration', () => {
       'utf8'
     );
 
-    expect(workflow).toContain('DEPLOYMENT_DATE=$(date +"%Y-%m-%d")');
+    expect(workflow).toContain(
+      'DEPLOYMENT_DATE=$(TZ=America/New_York date +"%Y-%m-%d")'
+    );
     expect(workflow).toContain('REACT_APP_VERSION=${{ github.ref_name }}');
     expect(workflow).toContain(
       'REACT_APP_DEPLOYMENT_DATE=${{ env.DEPLOYMENT_DATE }}'

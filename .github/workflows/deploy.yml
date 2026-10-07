@@ -47,7 +47,7 @@ jobs:
 
       - name: Set dynamic environment variables
         run: |
-          echo "DEPLOYMENT_DATE=$(date +"%Y-%m-%d")" >> $GITHUB_ENV
+          echo "DEPLOYMENT_DATE=$(TZ=America/New_York date +"%Y-%m-%d")" >> $GITHUB_ENV
 
           TIMESTAMP=$(date +"%Y%m%d%H%M%S")
           REPO=${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.$AWS_REGION.amazonaws.com/exploregwas
