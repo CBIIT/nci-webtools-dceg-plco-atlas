@@ -47,7 +47,7 @@ jobs:
 
       - name: Set dynamic environment variables
         run: |
-          echo "DATE=$(date +"%Y%m%d")" >> $GITHUB_ENV
+          echo "DEPLOYMENT_DATE=$(TZ=America/New_York date +"%Y-%m-%d")" >> $GITHUB_ENV
 
           TIMESTAMP=$(date +"%Y%m%d%H%M%S")
           REPO=${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.$AWS_REGION.amazonaws.com/exploregwas
@@ -125,6 +125,7 @@ jobs:
           build-args: |
             APPLICATION_PATH=${{ env.APPLICATION_PATH }}
             REACT_APP_VERSION=${{ github.ref_name }}
+            REACT_APP_DEPLOYMENT_DATE=${{ env.DEPLOYMENT_DATE }}
           
           tags: |
             ${{ env.FRONTEND_IMAGE }}
