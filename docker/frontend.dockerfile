@@ -29,7 +29,9 @@ COPY client/ /client/
 COPY client/.env.development /client/.env.development
 
 ARG REACT_APP_VERSION=docker
+ARG REACT_APP_DEPLOYMENT_DATE=Unknown
 ENV REACT_APP_VERSION=${REACT_APP_VERSION}
+ENV REACT_APP_DEPLOYMENT_DATE=${REACT_APP_DEPLOYMENT_DATE}
 
 RUN npm run build \
    && mkdir -p /var/www/html/ \
