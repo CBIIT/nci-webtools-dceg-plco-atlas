@@ -10,7 +10,7 @@
     "lodash.clonedeep": "^4.5.0",
     "lodash.isequal": "^4.5.0",
     "lodash.merge": "^4.6.2",
-    "plotly.js": "^1.54.7",
+    "plotly.js": "^2.35.3",
     "react": "^16.8.6",
     "react-bootstrap": "^1.0.0",
     "react-bootstrap-table-next": "^4.0.3",
@@ -27,7 +27,7 @@
     "react-select": "^3.1.0",
     "redux": "^4.0.4",
     "redux-thunk": "^2.3.0",
-    "swagger-ui": "^3.41.1"
+    "swagger-ui": "4.13.0"
   },
   "scripts": {
     "start": "react-scripts --max_old_space_size=4096 --openssl-legacy-provider start",
@@ -60,5 +60,17 @@
     "prettier": "^1.18.2",
     "react-test-renderer": "^16.13.1",
     "sass": "^1.32.8"
+  },
+  "overrides": {
+    "swagger-ui": {
+      "swagger-client": "3.18.5",
+      "dompurify": "3.4.14",
+      "react": "$react",
+      "react-dom": "$react-dom",
+      "@braintree/sanitize-url": "^6.0.4",
+      "js-yaml": "^4.3.2"
+    },
+    "cookie": "0.7.2",
+    "underscore": "^1.13.8"
   }
 }
