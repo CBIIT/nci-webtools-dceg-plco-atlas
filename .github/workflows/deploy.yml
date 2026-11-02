@@ -138,7 +138,7 @@ jobs:
           echo "Application path: ${{ env.APPLICATION_PATH }}"
           echo "Frontend image: ${{ env.FRONTEND_IMAGE }}"
           echo "Inspecting frontend container build directory:"
-          docker run --rm ${{ env.FRONTEND_IMAGE }} ls -l /var/www/html || echo "Failed to inspect container"
+          docker run --rm ${{ env.FRONTEND_IMAGE }} ls -l /usr/local/apache2/htdocs || echo "Failed to inspect container"
 
       - name: Render web task definition
         run: |
