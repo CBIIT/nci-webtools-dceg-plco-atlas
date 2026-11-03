@@ -1,6 +1,6 @@
 require("dotenv").config();
-const cors = require("fastify-cors");
-const caching = require("fastify-caching");
+const cors = require("@fastify/cors");
+const caching = require("@fastify/caching");
 const config = require("../config.js");
 const { asAttachment } = require("./response");
 const {

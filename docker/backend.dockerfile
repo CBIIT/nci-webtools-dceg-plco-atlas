@@ -1,30 +1,24 @@
-FROM public.ecr.aws/amazonlinux/amazonlinux:2023
+FROM public.ecr.aws/docker/library/node:24-alpine AS builder
 
-# Use bash with pipefail so a failed curl/download in a piped command fails
-# the RUN step instead of silently falling back to AL2023's default (Node 18).
-SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+WORKDIR /server
 
-# AL2023's dnf repo only ships Node.js 18.x; use NodeSource to install a
-# supported current LTS release (Node 24) instead.
-RUN dnf -y update \
-    && dnf -y install gcc-c++ make \
-    && curl -fsSL https://rpm.nodesource.com/setup_24.x | bash - \
-    && dnf -y install nodejs \
-    && dnf clean all
+COPY server/package.json /server/package.json
 
-# Run the version assertion as its own step so it only ever runs after the
-# install above has already succeeded (avoids ambiguous failures/output if an
-# earlier command in the install chain fails).
-RUN node -v | grep -q '^v24\.' || (echo "Expected Node 24, got: $(node -v)" && exit 1)
+RUN npm install --omit=dev --no-audit --no-fund
 
-RUN mkdir -p /server /logs
+FROM public.ecr.aws/docker/library/node:24-alpine
 
-# copy the rest of the application
-#COPY server/config*.json /deploy/server/
-COPY server /server/
+# The application only needs the node binary at runtime; remove the package
+# managers (and their bundled dependencies) so they are not shipped.
+RUN apk upgrade --no-cache \
+    && rm -rf /usr/local/lib/node_modules/npm /usr/local/lib/node_modules/corepack \
+       /usr/local/bin/npm /usr/local/bin/npx /usr/local/bin/corepack \
+       /opt/yarn-* /usr/local/bin/yarn /usr/local/bin/yarnpkg \
+    && mkdir -p /server /logs
 
 WORKDIR /server/
 
-RUN npm install 
+COPY server /server/
+COPY --from=builder /server/node_modules /server/node_modules
 
-CMD npm start
+CMD ["node", "server.js"]

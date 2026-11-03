@@ -25,7 +25,16 @@ RUN npm run build \
 
 FROM public.ecr.aws/docker/library/httpd:2.4-alpine
 
-RUN apk upgrade --no-cache
+# perl and libxml2 are only needed by apxs/dbmmanage and the (unused)
+# mod_proxy_html/mod_xml2enc modules, and have no patched Alpine release yet.
+# The base image pins libxml2 through the .httpd-so-deps virtual package, so
+# re-pin the remaining runtime libraries before removing it.
+RUN apk upgrade --no-cache \
+    && rm -f /usr/local/apache2/bin/apxs /usr/local/apache2/bin/dbmmanage \
+       /usr/local/apache2/modules/mod_proxy_html.so /usr/local/apache2/modules/mod_xml2enc.so \
+    && apk add --no-cache --virtual .httpd-keep \
+       $(apk info -R .httpd-so-deps | sed 1d | tr -d ' ' | grep -v libxml2) \
+    && apk del .httpd-so-deps perl
 
 COPY --from=builder /var/www/html/ /usr/local/apache2/htdocs/
 COPY docker/frontend.conf /usr/local/apache2/conf/extra/frontend.conf
