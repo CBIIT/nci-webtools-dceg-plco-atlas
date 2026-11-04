@@ -1,6 +1,23 @@
-FROM public.ecr.aws/docker/library/node:24 AS builder
+FROM public.ecr.aws/amazonlinux/amazonlinux:2023 AS builder
 
+# Use bash with pipefail so a failed curl/download in a piped command fails
+# the RUN step instead of silently falling back to AL2023's default (Node 18).
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+
+# AL2023's dnf repo only ships Node.js 18.x; use NodeSource to install a
+# supported current LTS release (Node 24) instead.
+RUN dnf -y update \
+   && dnf -y install gcc-c++ make \
+   && curl -fsSL https://rpm.nodesource.com/setup_24.x | bash - \
+   && dnf -y install nodejs \
+   && dnf clean all
+
+# Run the version assertion as its own step so it only ever runs after the
+# install above has already succeeded (avoids ambiguous failures/output if an
+# earlier command in the install chain fails).
 RUN node -v | grep -q '^v24\.' || (echo "Expected Node 24, got: $(node -v)" && exit 1)
+
+# The lockfile is generated with npm 10
 RUN npm install --global npm@10.8.2 --no-audit --no-fund
 
 RUN mkdir /client
@@ -23,28 +40,26 @@ RUN npm run build \
    && mkdir -p /var/www/html/ \
    && cp -r /client/build/* /var/www/html/
 
-FROM public.ecr.aws/docker/library/httpd:2.4-alpine
+# Runtime image: only httpd and the built static files (no Node/npm/build tools)
+FROM public.ecr.aws/amazonlinux/amazonlinux:2023
 
-# perl and libxml2 are only needed by apxs/dbmmanage and the (unused)
-# mod_proxy_html/mod_xml2enc modules, and have no patched Alpine release yet.
-# The base image pins libxml2 through the .httpd-so-deps virtual package, so
-# re-pin the remaining runtime libraries before removing it.
-RUN apk upgrade --no-cache \
-    && rm -f /usr/local/apache2/bin/apxs /usr/local/apache2/bin/dbmmanage \
-       /usr/local/apache2/modules/mod_proxy_html.so /usr/local/apache2/modules/mod_xml2enc.so \
-    && apk add --no-cache --virtual .httpd-keep \
-       $(apk info -R .httpd-so-deps | sed 1d | tr -d ' ' | grep -v libxml2) \
-    && apk del .httpd-so-deps perl
+# python3 is only present as a dependency of dnf and has no patched AL2023
+# release, so remove dnf and python3 once the packages are installed.
+RUN dnf -y update \
+   && dnf -y install httpd \
+   && dnf clean all \
+   && rpm -e --nodeps $(rpm -qa 'python3*') yum dnf dnf-data \
+   && rm -rf /var/cache/dnf /var/lib/dnf
 
-COPY --from=builder /var/www/html/ /usr/local/apache2/htdocs/
-COPY docker/frontend.conf /usr/local/apache2/conf/extra/frontend.conf
+COPY --from=builder /var/www/html/ /var/www/html/
 
-RUN sed -i \
-      -e 's/^#LoadModule rewrite_module/LoadModule rewrite_module/' \
-      -e 's/^#LoadModule remoteip_module/LoadModule remoteip_module/' \
-      -e 's/^#LoadModule proxy_module/LoadModule proxy_module/' \
-      -e 's/^#LoadModule proxy_http_module/LoadModule proxy_http_module/' \
-      /usr/local/apache2/conf/httpd.conf \
-    && printf '\nInclude conf/extra/frontend.conf\n' >> /usr/local/apache2/conf/httpd.conf
+WORKDIR /var/www/html
+
+# Add custom httpd configuration
+COPY docker/frontend.conf /etc/httpd/conf.d/frontend.conf
 
 EXPOSE 80
+EXPOSE 443
+
+CMD rm -rf /run/httpd/* /tmp/httpd* \
+   && exec /usr/sbin/httpd -DFOREGROUND
