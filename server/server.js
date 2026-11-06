@@ -1,6 +1,7 @@
 require("dotenv").config();
 const path = require("path");
 const fastify = require("fastify");
+const { LogController } = require("fastify");
 const zlib = require("zlib");
 const forkCluster = require("./services/cluster");
 const getLogger = require("./services/logger");
@@ -22,12 +23,14 @@ if (isProduction && forkCluster()) return;
 (async function main() {
   // create fastify app
   const app = fastify({
-    ignoreTrailingSlash: true,
+    routerOptions: {
+      ignoreTrailingSlash: true,
+      caseSensitive: false,
+    },
     bodyLimit: 10 * 1024 * 1024, // 10mb
-    caseSensitive: false,
     trustProxy: true,
-    logger: getLogger("plcogwas"),
-    disableRequestLogging: true,
+    loggerInstance: getLogger("plcogwas"),
+    logController: new LogController({ disableRequestLogging: true }),
   });
 
   app.log.info("Waiting for mysql connection...");
@@ -35,7 +38,7 @@ if (isProduction && forkCluster()) return;
   app.log.info("Connection established");
 
   // compress all responses (note: keep quality low to decrease ttfb)
-  app.register(require("fastify-compress"), {
+  app.register(require("@fastify/compress"), {
     brotliOptions: {
       params: {
         [zlib.constants.BROTLI_PARAM_MODE]: zlib.constants.BROTLI_MODE_TEXT,
@@ -48,17 +51,15 @@ if (isProduction && forkCluster()) return;
   });
 
   // set 20 minute response timeout
-  app.register(require("fastify-server-timeout"), {
-    serverTimeout: 1000 * 60 * 20,
-  });
+  app.server.setTimeout(1000 * 60 * 20);
 
   // serve static files
-  app.register(require("fastify-static"), {
+  app.register(require("@fastify/static"), {
     root: path.resolve(config.static || "www"),
   });
 
   // register mysql connection pool
-  app.register(require("fastify-mysql"), {
+  app.register(require("@fastify/mysql"), {
     ...databaseConfig,
     promise: true,
     waitForConnections: true,
@@ -70,7 +71,7 @@ if (isProduction && forkCluster()) return;
 
   // register redis cache if available
   if (config.redis?.host) {
-    app.register(require("fastify-redis"), config.redis);
+    app.register(require("@fastify/redis"), config.redis);
   }
 
   // serve website api
@@ -80,7 +81,7 @@ if (isProduction && forkCluster()) return;
   app.register(api.publicApiRoutes);
 
   // listen on specified port
-  app.listen(config.port, "0.0.0.0").catch((error) => {
+  app.listen({ port: config.port, host: "0.0.0.0" }).catch((error) => {
     app.log.error(error);
     process.exit(1);
   });

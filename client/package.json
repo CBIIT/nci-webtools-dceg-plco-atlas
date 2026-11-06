@@ -64,12 +64,19 @@
   "overrides": {
     "swagger-ui": {
       "swagger-client": "3.18.5",
-      "dompurify": "3.4.14",
+      "dompurify": "3.4.17",
+      "immutable": "4.3.9",
       "react": "$react",
       "react-dom": "$react-dom",
       "@braintree/sanitize-url": "^6.0.4",
       "js-yaml": "^4.3.2"
     },
+    "d3-color": "3.1.0",
+    "fast-uri": "3.1.9",
+    "maplibre-gl": "6.4.1",
+    "prismjs": "1.30.0",
+    "qs": "6.16.1",
+    "source-map-js": "1.2.2",
     "cookie": "0.7.2",
     "underscore": "^1.13.8"
   }
