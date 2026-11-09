@@ -2,28 +2,31 @@ import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 
-function parseVersionAndDate(versionString) {
-  if (!versionString)
-    return { version: "dev", date: new Date().toISOString().split("T")[0] };
+export function parseVersion(versionString) {
+  if (!versionString) return "dev";
+
   const versionMatch = versionString.match(/(\d+\.\d+\.\d+)(_dev)?/);
-  const version = versionMatch
-    ? versionMatch[1] + (versionMatch[2] || "")
-    : "dev";
+  return versionMatch ? versionMatch[1] + (versionMatch[2] || "") : "dev";
+}
 
-  // Extract 8-digit date if present
-  const dateMatch = versionString.match(/(\d{8})/)?.[1];
-  const date = dateMatch
-    ? `${dateMatch.slice(0, 4)}-${dateMatch.slice(4, 6)}-${dateMatch.slice(
-        6,
-        8
-      )}`
-    : new Date().toISOString().split("T")[0];
+export function parseDeploymentDate(deploymentDate) {
+  return /^\d{4}-\d{2}-\d{2}$/.test(deploymentDate || "")
+    ? deploymentDate
+    : "Unknown";
+}
 
-  return { version, date };
+export function getFooterMetadata(versionString, deploymentDate) {
+  return {
+    version: parseVersion(versionString),
+    date: parseDeploymentDate(deploymentDate)
+  };
 }
 
 export default function Footer() {
-  const { version, date } = parseVersionAndDate(process.env.REACT_APP_VERSION);
+  const { version, date } = getFooterMetadata(
+    process.env.REACT_APP_VERSION,
+    process.env.REACT_APP_DEPLOYMENT_DATE
+  );
 
   return (
     <footer className="bg-primary">

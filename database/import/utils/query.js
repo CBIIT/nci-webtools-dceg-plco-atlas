@@ -78,7 +78,7 @@ async function getDataDirectory(connection) {
 async function deleteInnoDBTableFiles(connection, database, tableName) {
     const dataDirectory = path.resolve(await getDataDirectory(connection), database);
     const filenames = (await fs.promises.readdir(dataDirectory))
-        .filter(name => new RegExp(`${tableName}(#p#.*)?(\.ibd|\.cfg)$`, "i").test(name));
+        .filter(name => new RegExp(`${tableName}(#p#.*)?(\\.ibd|\\.cfg)$`, "i").test(name));
 
     for (let filename of filenames) {
         await fs.promises.unlink(
@@ -90,7 +90,7 @@ async function deleteInnoDBTableFiles(connection, database, tableName) {
 async function copyInnoDBTable(tableName, sourceDirectory, targetDirectory) {
     // select table files (including partitioned tables) which can be copied
     const filenames = (await fs.promises.readdir(sourceDirectory))
-        .filter(name => new RegExp(`${tableName}(#p#.*)?(\.ibd|\.cfg)$`, "i").test(name));
+        .filter(name => new RegExp(`${tableName}(#p#.*)?(\\.ibd|\\.cfg)$`, "i").test(name));
 
     for (let filename of filenames) {
         const sourcePath = path.resolve(sourceDirectory, filename);

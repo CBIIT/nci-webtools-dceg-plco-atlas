@@ -13,6 +13,9 @@ services:
     build:
       context: "."
       dockerfile: "./docker/frontend.dockerfile"
+      args:
+        REACT_APP_VERSION: ${REACT_APP_VERSION:-docker}
+        REACT_APP_DEPLOYMENT_DATE: ${REACT_APP_DEPLOYMENT_DATE:-Unknown}
     environment:
       API_BASE_URL: http://backend:9000
     links:

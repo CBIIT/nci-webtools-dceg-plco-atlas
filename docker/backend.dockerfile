@@ -1,4 +1,4 @@
-FROM public.ecr.aws/amazonlinux/amazonlinux:2023
+FROM public.ecr.aws/amazonlinux/amazonlinux:2023 AS builder
 
 # Use bash with pipefail so a failed curl/download in a piped command fails
 # the RUN step instead of silently falling back to AL2023's default (Node 18).
@@ -17,14 +17,34 @@ RUN dnf -y update \
 # earlier command in the install chain fails).
 RUN node -v | grep -q '^v24\.' || (echo "Expected Node 24, got: $(node -v)" && exit 1)
 
-RUN mkdir -p /server /logs
+WORKDIR /server
 
-# copy the rest of the application
-#COPY server/config*.json /deploy/server/
-COPY server /server/
+COPY server/package.json /server/package.json
+
+RUN npm install --omit=dev --no-audit --no-fund
+
+# Runtime image: only Node and the installed production dependencies
+FROM public.ecr.aws/amazonlinux/amazonlinux:2023
+
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+
+# python3 is only present as a dependency of dnf and has no patched AL2023
+# release, so remove dnf and python3 once Node is installed. npm (and its
+# bundled dependencies) is not needed at runtime either.
+RUN dnf -y update \
+    && curl -fsSL https://rpm.nodesource.com/setup_24.x | bash - \
+    && dnf -y install nodejs \
+    && dnf clean all \
+    && node -v | grep -q '^v24\.' \
+    && rm -rf /usr/lib/node_modules/npm /usr/lib/node_modules/corepack \
+       /usr/bin/npm /usr/bin/npx /usr/bin/corepack \
+    && rpm -e --nodeps $(rpm -qa 'python3*') yum dnf dnf-data \
+    && rm -rf /var/cache/dnf /var/lib/dnf \
+    && mkdir -p /server /logs
 
 WORKDIR /server/
 
-RUN npm install 
+COPY server /server/
+COPY --from=builder /server/node_modules /server/node_modules
 
-CMD npm start
+CMD ["node", "server.js"]

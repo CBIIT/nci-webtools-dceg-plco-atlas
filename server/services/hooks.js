@@ -5,8 +5,8 @@ function useResponseLogger(request, reply, done) {
   request.log.info(
     [
       `[${reply.statusCode}]`,
-      `[${Math.round(reply.getResponseTime())} ms]`,
-      request.routerPath,
+      `[${Math.round(reply.elapsedTime)} ms]`,
+      request.routeOptions.url,
       JSON.stringify(request.query),
     ].join(" ")
   );
