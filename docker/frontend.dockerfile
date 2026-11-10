@@ -61,5 +61,4 @@ COPY docker/frontend.conf /etc/httpd/conf.d/frontend.conf
 EXPOSE 80
 EXPOSE 443
 
-CMD rm -rf /run/httpd/* /tmp/httpd* \
-   && exec /usr/sbin/httpd -DFOREGROUND
+CMD ["/bin/bash", "-c", "rm -rf /run/httpd/* /tmp/httpd* && exec /usr/sbin/httpd -DFOREGROUND"]
