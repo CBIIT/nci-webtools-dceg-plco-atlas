@@ -19,10 +19,29 @@ import {
 } from '../../../controls/table/table';
 import paginationFactory from 'react-bootstrap-table2-paginator';
 import filterFactory from 'react-bootstrap-table2-filter';
-import ToolkitProvider, { CSVExport } from 'react-bootstrap-table2-toolkit';
+import { saveAs } from 'file-saver';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
 import { VariantLookupSearchCriteria } from './lookup-search-criteria';
 import { RootContext } from '../../../../index';
+
+const getValue = (row, path) =>
+	path.split('.').reduce((value, key) => value?.[key], row);
+
+function exportCsv(columns, rows, fileName) {
+	const header = columns.map((c) => `"${c.csvText || c.text}"`).join(',');
+	const body = rows.map((row) =>
+		columns
+			.map(
+				(c) => `"${String(getValue(row, c.dataField)).replace(/"/g, '""')}"`
+			)
+			.join(',')
+	);
+	saveAs(
+		new Blob([[header, ...body].join('\n')], { type: 'text/csv;charset=utf-8' }),
+		fileName
+	);
+}
+
 export function VariantLookup() {
 	const dispatch = useDispatch();
 	const { getInitialState } = useContext(RootContext);
@@ -35,7 +54,6 @@ export function VariantLookup() {
 		sharedState,
 	} = useSelector((state) => state.variantLookup);
 	const results = useSelector((state) => state.variantLookupTable.results);
-	const { ExportCSVButton } = CSVExport;
 	const defaultFormatter = (cell) => (cell === null ? '-' : cell);
 	const columns = [
 		{
@@ -186,6 +204,7 @@ export function VariantLookup() {
 		},
 		{
 			dataField: 'p_value',
+			csvText: 'Assoc. P-Value',
 			text: (
 				<span>
 					Assoc. <span className='text-nowrap'>P-Value</span>
@@ -202,6 +221,7 @@ export function VariantLookup() {
 		},
 		{
 			dataField: 'p_value_heterogenous',
+			csvText: 'Het. P-Value',
 			text: (
 				<span>
 					Het. <span className='text-nowrap'>P-Value</span>
@@ -293,46 +313,37 @@ export function VariantLookup() {
 						{results && submitted && (
 							<div className='mw-100 my-2 px-4'>
 								<LoadingOverlay active={submitted && results.length === 0} />
-								<ToolkitProvider
-									keyField='variant_id'
-									data={results}
-									columns={columns}
-									exportCSV={{
-										fileName: 'variant_lookup.csv',
-									}}
-								>
-									{(props) => (
-										<div>
-											<ExportCSVButton
-												className='float-right btn-link'
-												{...props.csvProps}
-											>
-												Export CSV
-											</ExportCSVButton>
-											<br />
-											<Table
-												wrapperClasses='table-responsive'
-												{...props.baseProps}
-												bootstrap4
-												// keyField="variant_id"
-												// data={results}
-												// columns={columns}
-												filter={filterFactory()}
-												pagination={paginationFactory({
-													showTotal: results ? results.length > 0 : false,
-													sizePerPageList: [25, 50, 100],
-													paginationTotalRenderer: paginationText(
-														'variant',
-														'variants'
-													),
-													sizePerPageRenderer: paginationSizeSelector,
-													pageButtonRenderer: paginationButton,
-												})}
-												defaultSorted={[{ dataField: 'p', order: 'asc' }]}
-											/>
-										</div>
-									)}
-								</ToolkitProvider>
+								<div>
+									<button
+										type='button'
+										className='float-right btn btn-link'
+										onClick={() =>
+											exportCsv(columns, results, 'variant_lookup.csv')
+										}
+									>
+										Export CSV
+									</button>
+									<br />
+									<Table
+										wrapperClasses='table-responsive'
+										keyField='variant_id'
+										data={results}
+										columns={columns}
+										bootstrap4
+										filter={filterFactory()}
+										pagination={paginationFactory({
+											showTotal: results ? results.length > 0 : false,
+											sizePerPageList: [25, 50, 100],
+											paginationTotalRenderer: paginationText(
+												'variant',
+												'variants'
+											),
+											sizePerPageRenderer: paginationSizeSelector,
+											pageButtonRenderer: paginationButton,
+										})}
+										defaultSorted={[{ dataField: 'p', order: 'asc' }]}
+									/>
+								</div>
 							</div>
 						)}
 						{placeholder}
