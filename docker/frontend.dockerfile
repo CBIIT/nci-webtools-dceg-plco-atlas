@@ -20,6 +20,9 @@ RUN test "$(node -v)" = 'v24.22.1' || (echo "Expected Node v24.22.1, got: $(node
 # The lockfile is generated with npm 10
 RUN npm install --global npm@10.8.2 --no-audit --no-fund
 
+# The lockfile is generated with npm 10
+RUN npm install --global npm@10.8.2 --no-audit --no-fund
+
 RUN mkdir /client
 
 WORKDIR /client
