@@ -5,17 +5,17 @@ FROM public.ecr.aws/amazonlinux/amazonlinux:2023 AS builder
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
 # AL2023's dnf repo only ships Node.js 18.x; use NodeSource to install a
-# supported current LTS release (Node 24) instead.
+# supported LTS release (Node 24.22.1) instead.
 RUN dnf -y update \
     && dnf -y install gcc-c++ make \
     && curl -fsSL https://rpm.nodesource.com/setup_24.x | bash - \
-    && dnf -y install nodejs \
+    && dnf -y install nodejs-24.22.1 \
     && dnf clean all
 
 # Run the version assertion as its own step so it only ever runs after the
 # install above has already succeeded (avoids ambiguous failures/output if an
 # earlier command in the install chain fails).
-RUN node -v | grep -q '^v24\.' || (echo "Expected Node 24, got: $(node -v)" && exit 1)
+RUN test "$(node -v)" = 'v24.22.1' || (echo "Expected Node v24.22.1, got: $(node -v)" && exit 1)
 
 WORKDIR /server
 
@@ -33,9 +33,9 @@ SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 # bundled dependencies) is not needed at runtime either.
 RUN dnf -y update \
     && curl -fsSL https://rpm.nodesource.com/setup_24.x | bash - \
-    && dnf -y install nodejs \
+    && dnf -y install nodejs-24.22.1 \
     && dnf clean all \
-    && node -v | grep -q '^v24\.' \
+    && test "$(node -v)" = 'v24.22.1' \
     && rm -rf /usr/lib/node_modules/npm /usr/lib/node_modules/corepack \
        /usr/bin/npm /usr/bin/npx /usr/bin/corepack \
     && rpm -e --nodeps $(rpm -qa 'python3*') yum dnf dnf-data \
