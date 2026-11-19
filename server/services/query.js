@@ -143,7 +143,13 @@ function deferUntilConnected(config, logger) {
   let interval = 1;
   async function tryConnection() {
     try {
-      return await mysql.createConnection(config).promise().query("select 1");
+      // close the probe connection; an idle one is dropped by mysql after wait_timeout (8h) and crashes the process
+      const connection = mysql.createConnection(config).promise();
+      try {
+        return await connection.query("select 1");
+      } finally {
+        connection.end().catch(() => {});
+      }
     } catch (e) {
       logger.error(e.message);
       interval *= 1.5;
