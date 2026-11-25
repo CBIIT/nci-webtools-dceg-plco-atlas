@@ -19,10 +19,13 @@ import {
 } from '../../../controls/table/table';
 import paginationFactory from 'react-bootstrap-table2-paginator';
 import filterFactory from 'react-bootstrap-table2-filter';
-import ToolkitProvider, { CSVExport } from 'react-bootstrap-table2-toolkit';
+import ToolkitProvider, {
+	CSVExport,
+} from 'react-bootstrap-table2-toolkit/dist/react-bootstrap-table2-toolkit.min';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
 import { VariantLookupSearchCriteria } from './lookup-search-criteria';
 import { RootContext } from '../../../../index';
+
 export function VariantLookup() {
 	const dispatch = useDispatch();
 	const { getInitialState } = useContext(RootContext);
@@ -186,6 +189,7 @@ export function VariantLookup() {
 		},
 		{
 			dataField: 'p_value',
+			csvText: 'Assoc. P-Value',
 			text: (
 				<span>
 					Assoc. <span className='text-nowrap'>P-Value</span>
@@ -202,6 +206,7 @@ export function VariantLookup() {
 		},
 		{
 			dataField: 'p_value_heterogenous',
+			csvText: 'Het. P-Value',
 			text: (
 				<span>
 					Het. <span className='text-nowrap'>P-Value</span>
@@ -314,9 +319,6 @@ export function VariantLookup() {
 												wrapperClasses='table-responsive'
 												{...props.baseProps}
 												bootstrap4
-												// keyField="variant_id"
-												// data={results}
-												// columns={columns}
 												filter={filterFactory()}
 												pagination={paginationFactory({
 													showTotal: results ? results.length > 0 : false,

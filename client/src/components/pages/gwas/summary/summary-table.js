@@ -18,7 +18,7 @@ import {
 } from '../../../controls/table/table';
 import paginationFactory from 'react-bootstrap-table2-paginator';
 import { asTitleCase } from './utils';
-import { asQueryString, query } from '../../../../services/query';
+import { asQueryString, query, root } from '../../../../services/query';
 import { RootContext } from '../../../..';
 
 export function SummaryResultsTable() {
@@ -298,7 +298,7 @@ export function SummaryResultsTable() {
         position_max: bpMax
       };
 
-    return `${process.env.REACT_APP_API_ROOT}/export-variants${asQueryString(
+    return `${root}/export-variants${asQueryString(
       exportParams
     )}`;
   };
